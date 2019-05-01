@@ -326,6 +326,156 @@ var _ = Describe("set-label command", func() {
 			})
 		})
 	})
+
+	When("setting labels on spaces", func() {
+		BeforeEach(func() {
+			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+			fakeActor = new(v7fakes.FakeSetLabelActor)
+			fakeConfig = new(commandfakes.FakeConfig)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
+
+			fakeSharedActor = new(commandfakes.FakeSharedActor)
+			resourceName = "some-space"
+			cmd = SetLabelCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			}
+			cmd.RequiredArgs = flag.SetLabelArgs{
+				ResourceType: "space",
+				ResourceName: resourceName,
+			}
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("doesn't error", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+
+		It("checks that the user is logged in and targeted to an org", func() {
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(checkOrg).To(BeTrue())
+			Expect(checkSpace).To(BeFalse())
+		})
+
+		When("checking target succeeds", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(nil)
+			})
+
+			When("fetching current user's name succeeds", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
+				})
+
+				When("all the provided labels are valid", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "space",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateSpaceLabelsBySpaceNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					When("updating the space labels succeeds", func() {
+						It("sets the provided labels on the space", func() {
+							Expect(fakeActor.UpdateSpaceLabelsBySpaceNameCallCount()).To(Equal(1))
+							spaceName, orgGUID, labels := fakeActor.UpdateSpaceLabelsBySpaceNameArgsForCall(0)
+							Expect(spaceName).To(Equal(resourceName), "failed to pass space name")
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+								"FOO": types.NewNullString("BAR"),
+								"ENV": types.NewNullString("FAKE"),
+							}))
+						})
+
+						It("displays a message", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for space %s in org fake-org as some-user...`), resourceName))
+							Expect(testUI.Out).To(Say("OK"))
+						})
+
+						It("prints all warnings", func() {
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
+					})
+				})
+
+				When("updating the application labels fail", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "org",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateOrganizationLabelsByOrganizationNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							errors.New("some-updating-error"),
+						)
+					})
+
+					It("displays warnings and an error message", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+						Expect(executeErr).To(MatchError("some-updating-error"))
+					})
+				})
+
+				When("some provided labels do not have a value part", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "org",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "MISSING_EQUALS", "ENV=FAKE"},
+						}
+					})
+
+					It("complains about the missing equal sign", func() {
+						Expect(executeErr).To(MatchError("Metadata error: no value provided for label 'MISSING_EQUALS'"))
+						Expect(executeErr).To(HaveOccurred())
+					})
+				})
+			})
+
+			When("fetching the current user's name fails", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.SetLabelArgs{
+						ResourceType: "org",
+						ResourceName: resourceName,
+					}
+					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+		})
+
+		When("checking targeted org and space fails", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(errors.New("nope"))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("nope"))
+			})
+		})
+	})
+
 	When("an unrecognized resource is specified", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())

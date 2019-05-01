@@ -55,6 +55,7 @@ const (
 	PatchOrganizationRequest                                    = "PatchOrganization"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
 	PatchProcessRequest                                         = "PatchProcess"
+	PatchSpaceRequest                                           = "PatchSpace"
 	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
 	PostApplicationActionApplyManifest                          = "PostApplicationActionApplyM"
 	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
@@ -144,6 +145,7 @@ var APIRoutes = []Route{
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipsSharedSpacesRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteServiceInstanceRelationshipsSharedSpaceRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
+	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodPatch, Name: PatchSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostSpaceActionApplyManifestRequest},

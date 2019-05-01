@@ -129,6 +129,72 @@ var _ = Describe("set-label command", func() {
 			})
 		})
 
+		When("assigning label to space", func() {
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+
+				helpers.SetupCF(orgName, spaceName)
+			})
+
+			It("sets the specified labels on the space", func() {
+				session := helpers.CF("set-label", "space", spaceName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+				spaceGUID := helpers.GetSpaceGUID(spaceName)
+				session = helpers.CF("curl", fmt.Sprintf("/v3/spaces/%s", spaceGUID))
+				Eventually(session).Should(Exit(0))
+				spaceJSON := session.Out.Contents()
+				var space commonResource
+				Expect(json.Unmarshal(spaceJSON, &space)).To(Succeed())
+				Expect(len(space.Metadata.Labels)).To(Equal(2))
+				Expect(space.Metadata.Labels["some-key"]).To(Equal("some-value"))
+				Expect(space.Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
+			})
+
+			When("the space is unknown", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "space", "non-existent-space", "some-key=some-value")
+					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label has an empty key and an invalid value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "space", spaceName, "=test", "sha2=108&eb90d734")
+					Eventually(session.Err).Should(Say("Metadata key error: label key cannot be empty string, Metadata value error: label '108&eb90d734' contains invalid characters"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label does not include a '=' to separate the key and value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "space", spaceName, "test-label")
+					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "space", spaceName, "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+					spaceGUID := helpers.GetSpaceGUID(spaceName)
+					session = helpers.CF("curl", fmt.Sprintf("/v3/spaces/%s", spaceGUID))
+					Eventually(session).Should(Exit(0))
+					spaceJSON := session.Out.Contents()
+					var space commonResource
+					Expect(json.Unmarshal(spaceJSON, &space)).To(Succeed())
+					Expect(len(space.Metadata.Labels)).To(Equal(1))
+					Expect(space.Metadata.Labels["owner"]).To(Equal("beth"))
+				})
+			})
+		})
+
 		When("assigning label to org", func() {
 			It("sets the specified labels on the org", func() {
 				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")

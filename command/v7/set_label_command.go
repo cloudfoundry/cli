@@ -17,6 +17,7 @@ import (
 type SetLabelActor interface {
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type SetLabelCommand struct {
@@ -62,6 +63,9 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 
 	case "org":
 		err = cmd.executeOrg(username, labels)
+
+	case "space":
+		err = cmd.executeSpace(username, labels)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
@@ -118,6 +122,36 @@ func (cmd SetLabelCommand) executeApp(username string, labels map[string]types.N
 
 	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(appName,
 		cmd.Config.TargetedSpace().GUID,
+		labels)
+
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(true, false)
+	if err != nil {
+		return err
+	}
+
+	spaceName := cmd.RequiredArgs.ResourceName
+
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": spaceName,
+			"OrgName":      cmd.Config.TargetedOrganization().Name,
+			"User":         username,
+		},
+	)
+
+	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(spaceName,
+		cmd.Config.TargetedOrganization().GUID,
 		labels)
 
 	cmd.UI.DisplayWarnings(warnings)

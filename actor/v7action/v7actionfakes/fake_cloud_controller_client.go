@@ -957,6 +957,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
+	updateSpaceMutex       sync.RWMutex
+	updateSpaceArgsForCall []struct {
+		arg1 ccv3.Space
+	}
+	updateSpaceReturns struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateSpaceApplyManifestStub        func(string, []byte, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	updateSpaceApplyManifestMutex       sync.RWMutex
 	updateSpaceApplyManifestArgsForCall []struct {
@@ -5251,6 +5266,72 @@ func (fake *FakeCloudControllerClient) UpdateProcessReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
+	fake.updateSpaceMutex.Lock()
+	ret, specificReturn := fake.updateSpaceReturnsOnCall[len(fake.updateSpaceArgsForCall)]
+	fake.updateSpaceArgsForCall = append(fake.updateSpaceArgsForCall, struct {
+		arg1 ccv3.Space
+	}{arg1})
+	fake.recordInvocation("UpdateSpace", []interface{}{arg1})
+	fake.updateSpaceMutex.Unlock()
+	if fake.UpdateSpaceStub != nil {
+		return fake.UpdateSpaceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceCallCount() int {
+	fake.updateSpaceMutex.RLock()
+	defer fake.updateSpaceMutex.RUnlock()
+	return len(fake.updateSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceCalls(stub func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)) {
+	fake.updateSpaceMutex.Lock()
+	defer fake.updateSpaceMutex.Unlock()
+	fake.UpdateSpaceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceArgsForCall(i int) ccv3.Space {
+	fake.updateSpaceMutex.RLock()
+	defer fake.updateSpaceMutex.RUnlock()
+	argsForCall := fake.updateSpaceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceReturns(result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+	fake.updateSpaceMutex.Lock()
+	defer fake.updateSpaceMutex.Unlock()
+	fake.UpdateSpaceStub = nil
+	fake.updateSpaceReturns = struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceReturnsOnCall(i int, result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+	fake.updateSpaceMutex.Lock()
+	defer fake.updateSpaceMutex.Unlock()
+	fake.UpdateSpaceStub = nil
+	if fake.updateSpaceReturnsOnCall == nil {
+		fake.updateSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Space
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg2 []byte, arg3 ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error) {
 	var arg2Copy []byte
 	if arg2 != nil {
@@ -5798,6 +5879,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateProcessMutex.RLock()
 	defer fake.updateProcessMutex.RUnlock()
+	fake.updateSpaceMutex.RLock()
+	defer fake.updateSpaceMutex.RUnlock()
 	fake.updateSpaceApplyManifestMutex.RLock()
 	defer fake.updateSpaceApplyManifestMutex.RUnlock()
 	fake.updateSpaceIsolationSegmentRelationshipMutex.RLock()
