@@ -18,7 +18,7 @@ var _ = Describe("delete-private-domain command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say(`\s+delete-private-domain - Delete a private domain`))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`\s+cf delete-shared-domain DOMAIN \[-f\]`))
+			Eventually(session).Should(Say(`\s+cf delete-private-domain DOMAIN \[-f\]`))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Say("SEE ALSO:"))
@@ -45,7 +45,7 @@ var _ = Describe("delete-private-domain command", func() {
 			username, _ = helpers.GetCredentials()
 			helpers.SetupCF(orgName, spaceName)
 
-			session := helpers.CF("create-private-domain", domainName)
+			session := helpers.CF("create-private-domain", orgName, domainName)
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -55,14 +55,14 @@ var _ = Describe("delete-private-domain command", func() {
 				BeforeEach(func() {
 					_, err := buffer.Write([]byte("y\n"))
 					Expect(err).ToNot(HaveOccurred())
-					sharedDomainName := helpers.NewDomainName()
+					sharedDomainName = helpers.NewDomainName()
 					session := helpers.CF("create-shared-domain", sharedDomainName)
 					Eventually(session).Should(Exit(0))
 				})
 				When("the user attempts to delete-private-domain a private domain", func() {
 					It("it asks for confirmation and deletes the domain", func() {
 						session := helpers.CFWithStdin(buffer, "delete-private-domain", domainName)
-						Eventually(session).Should(Say("Deleting the private domain will remove associated routes rendering apps with this domain unreachable."))
+						Eventually(session).Should(Say("Deleting the private domain will remove associated routes which will make apps with this domain unreachable."))
 						Eventually(session).Should(Say(`Really delete the private domain %s\?`, domainName))
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting private domain %s as %s...`), domainName, username))
 						Eventually(session).Should(Say("OK"))
@@ -71,11 +71,11 @@ var _ = Describe("delete-private-domain command", func() {
 					})
 				})
 				When("the user attempts to delete-private-domain a shared domain", func() {
-					It("it asks for confirmation and deletes the domain", func() {
+					It("it fails and provides the appropriate error message", func() {
 						session := helpers.CFWithStdin(buffer, "delete-private-domain", sharedDomainName)
+						Eventually(session).Should(Say(`Domain '%s' is a shared domain, not a private domain.`, sharedDomainName))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say(`Domain %s is a shared domain, not a private domain.\?`, sharedDomainName))
-						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 			})
@@ -88,7 +88,7 @@ var _ = Describe("delete-private-domain command", func() {
 
 				It("it asks for confirmation and does not delete the domain", func() {
 					session := helpers.CFWithStdin(buffer, "delete-private-domain", domainName)
-					Eventually(session).Should(Say("Deleting the private domain will remove associated routes rendering apps with this domain unreachable."))
+					Eventually(session).Should(Say("Deleting the private domain will remove associated routes which will make apps with this domain unreachable."))
 					Eventually(session).Should(Say(`Really delete the private domain %s\?`, domainName))
 					Eventually(session).Should(Say(`'%s' has not been deleted`, domainName))
 					Consistently(session).ShouldNot(Say("OK"))

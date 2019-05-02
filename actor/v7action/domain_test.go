@@ -76,6 +76,26 @@ var _ = Describe("Domain Actions", func() {
 		})
 	})
 
+	Describe("check if shared domain", func() {
+		When("deleting attempting to delete a shared domain", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{
+						{Name: "the-domain.com", GUID: "shared-domain-guid"},
+					},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+			})
+
+			It("delegates to the cloud controller client", func() {
+				warnings, executeErr := actor.CheckSharedDomain("the-domain.com")
+				Expect(executeErr).To(MatchError("Domain the-domain.com is a shared domain, not a private domain."))
+				Expect(warnings).To(ConsistOf("get-domains-warning"))
+			})
+		})
+	})
+
 	Describe("delete shared domain", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetDomainsReturns(
@@ -99,6 +119,34 @@ var _ = Describe("Domain Actions", func() {
 
 			Expect(passedDomainGuid).To(Equal("domain-guid"))
 		})
+	})
+
+	Describe("delete private domain", func() {
+		When("deleting a private domain", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{
+						{Name: "the-domain.com", OrganizationGUID: "org-guid", GUID: "private-domain-guid"},
+					},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+			})
+
+			It("delegates to the cloud controller client", func() {
+				fakeCloudControllerClient.DeleteDomainReturns(ccv3.JobURL("https://job.com"), ccv3.Warnings{"delete-warning"}, errors.New("delete-error"))
+
+				warnings, executeErr := actor.DeletePrivateDomain("the-domain.com")
+				Expect(executeErr).To(MatchError("delete-error"))
+				Expect(warnings).To(ConsistOf("get-domains-warning", "delete-warning"))
+
+				Expect(fakeCloudControllerClient.DeleteDomainCallCount()).To(Equal(1))
+				passedDomainGuid := fakeCloudControllerClient.DeleteDomainArgsForCall(0)
+
+				Expect(passedDomainGuid).To(Equal("private-domain-guid"))
+			})
+		})
+
 	})
 
 	Describe("list domains for org", func() {

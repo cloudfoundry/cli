@@ -69,11 +69,11 @@ type commandList struct {
 	CreateUser                         v6.CreateUserCommand                         `command:"create-user" description:"Create a new user"`
 	Curl                               v6.CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
 	DeleteBuildpack                    v7.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
-	DeleteDomain                       v6.DeleteDomainCommand                       `command:"delete-domain" description:"Delete a domain"`
 	DeleteIsolationSegment             v6.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
 	DeleteLabel                        v7.DeleteLabelCommand                        `command:"delete-label" description:"Delete a label (key-value pairs) for an API resource"`
 	DeleteOrg                          v6.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
 	DeleteOrphanedRoutes               v6.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app)"`
+	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" description:"Delete a private domain"`
 	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
 	DeleteRoute                        v6.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
 	DeleteSecurityGroup                v6.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
