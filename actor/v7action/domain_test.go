@@ -77,7 +77,7 @@ var _ = Describe("Domain Actions", func() {
 	})
 
 	Describe("check if shared domain", func() {
-		When("deleting attempting to delete a shared domain", func() {
+		When("attempting to delete a shared domain", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
 					[]ccv3.Domain{
@@ -90,7 +90,7 @@ var _ = Describe("Domain Actions", func() {
 
 			It("delegates to the cloud controller client", func() {
 				warnings, executeErr := actor.CheckSharedDomain("the-domain.com")
-				Expect(executeErr).To(MatchError("Domain the-domain.com is a shared domain, not a private domain."))
+				Expect(executeErr).To(MatchError("Domain 'the-domain.com' is a shared domain, not a private domain."))
 				Expect(warnings).To(ConsistOf("get-domains-warning"))
 			})
 		})

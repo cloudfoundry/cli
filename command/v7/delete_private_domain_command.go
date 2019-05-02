@@ -57,9 +57,6 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 	shareCheckWarnings, shareCheckErr := cmd.Actor.CheckSharedDomain(domain)
 
 	if shareCheckErr != nil {
-		cmd.UI.DisplayText("Domain '{{.DomainName}}' is a shared domain, not a private domain.", map[string]interface{}{
-			"DomainName": domain,
-		})
 		cmd.UI.DisplayWarnings(shareCheckWarnings)
 		return shareCheckErr
 	}

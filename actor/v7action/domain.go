@@ -87,7 +87,7 @@ func (actor Actor) CheckSharedDomain(domainName string) (Warnings, error) {
 		return allWarnings, err
 	}
 	if domain.Shared() {
-		err = fmt.Errorf("Domain %s is a shared domain, not a private domain.", domainName)
+		err = fmt.Errorf("Domain '%s' is a shared domain, not a private domain.", domainName)
 	}
 
 	return allWarnings, err

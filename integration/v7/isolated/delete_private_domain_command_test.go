@@ -73,8 +73,9 @@ var _ = Describe("delete-private-domain command", func() {
 				When("the user attempts to delete-private-domain a shared domain", func() {
 					It("it fails and provides the appropriate error message", func() {
 						session := helpers.CFWithStdin(buffer, "delete-private-domain", sharedDomainName)
-						Eventually(session).Should(Say(`Domain '%s' is a shared domain, not a private domain.`, sharedDomainName))
 						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say(`Domain '%s' is a shared domain, not a private domain.`, sharedDomainName))
+
 						Eventually(session).Should(Exit(1))
 					})
 				})
