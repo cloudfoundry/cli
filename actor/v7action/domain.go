@@ -1,10 +1,11 @@
 package v7action
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
-	"fmt"
 )
 
 type Domain ccv3.Domain
@@ -86,7 +87,7 @@ func (actor Actor) CheckSharedDomain(domainName string) (Warnings, error) {
 		return allWarnings, err
 	}
 	if domain.Shared() {
-		err = fmt.Errorf(``)
+		err = fmt.Errorf("Domain %s is a shared domain, not a private domain.", domainName)
 	}
 
 	return allWarnings, err
