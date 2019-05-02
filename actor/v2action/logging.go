@@ -78,8 +78,7 @@ func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *
 
 	ready := actor.setOnConnectBlocker(client)
 
-	// Do not pass in token because client should have a TokenRefresher set
-	incomingLogStream, incomingErrStream := client.TailingLogs(appGUID, "")
+	incomingLogStream, incomingErrStream := client.TailingLogs(appGUID, actor.Config.AccessToken())
 
 	outgoingLogStream, outgoingErrStream := actor.blockOnConnect(ready)
 
@@ -94,7 +93,7 @@ func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spa
 		return nil, allWarnings, err
 	}
 
-	noaaMessages, err := client.RecentLogs(app.GUID, "")
+	noaaMessages, err := client.RecentLogs(app.GUID, actor.Config.AccessToken())
 	if err != nil {
 		return nil, allWarnings, err
 	}

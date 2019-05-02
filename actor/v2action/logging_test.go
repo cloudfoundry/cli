@@ -25,6 +25,7 @@ var _ = Describe("Logging Actions", func() {
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, _, fakeConfig = NewTestActor()
 		fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
+		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
 
 	Describe("LogMessage", func() {
@@ -74,7 +75,7 @@ var _ = Describe("Logging Actions", func() {
 
 				fakeNOAAClient.TailingLogsStub = func(appGUID string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					Expect(appGUID).To(Equal(expectedAppGUID))
-					Expect(authToken).To(BeEmpty())
+					Expect(authToken).To(Equal("AccessTokenForTest"))
 
 					Expect(fakeNOAAClient.SetOnConnectCallbackCallCount()).To(Equal(1))
 					onConnectOrOnRetry := fakeNOAAClient.SetOnConnectCallbackArgsForCall(0)
@@ -358,6 +359,12 @@ var _ = Describe("Logging Actions", func() {
 					fakeNOAAClient.RecentLogsReturns(messages, nil)
 				})
 
+				It("passes a nonempty access token to the NOAA client", func() {
+					actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
+					_, accessToken := fakeNOAAClient.RecentLogsArgsForCall(0)
+					Expect(accessToken).To(Equal("AccessTokenForTest"))
+				})
+
 				It("returns all the recent logs and warnings", func() {
 					messages, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
 					Expect(err).ToNot(HaveOccurred())
@@ -446,7 +453,7 @@ var _ = Describe("Logging Actions", func() {
 
 				fakeNOAAClient.TailingLogsStub = func(appGUID string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					Expect(appGUID).To(Equal(expectedAppGUID))
-					Expect(authToken).To(BeEmpty())
+					Expect(authToken).To(Equal("AccessTokenForTest"))
 
 					Expect(fakeNOAAClient.SetOnConnectCallbackCallCount()).To(Equal(1))
 					onConnectOrOnRetry := fakeNOAAClient.SetOnConnectCallbackArgsForCall(0)
