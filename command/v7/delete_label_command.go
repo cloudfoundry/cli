@@ -7,12 +7,14 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
+	"fmt"
 )
 
 //go:generate counterfeiter . DeleteLabelActor
 
 type DeleteLabelActor interface {
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type DeleteLabelCommand struct {
@@ -37,32 +39,23 @@ func (cmd *DeleteLabelCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd DeleteLabelCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(true, true)
-	if err != nil {
-		return err
-	}
-
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
-
-	cmd.UI.DisplayTextWithFlavor("Deleting label(s) for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.RequiredArgs.ResourceName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-	})
 
 	labels := make(map[string]types.NullString)
 	for _, value := range cmd.RequiredArgs.LabelKeys {
 		labels[value] = types.NewNullString()
 	}
 
-	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
-
-	for _, warning := range warnings {
-		cmd.UI.DisplayWarning(warning)
+	switch cmd.RequiredArgs.ResourceType {
+	case "app":
+		err = cmd.executeApp(user.Name, labels)
+	case "org":
+		err = cmd.executeOrg(user.Name, labels)
+	default:
+		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
 
 	if err != nil {
@@ -71,4 +64,46 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	return nil
+}
+
+func (cmd DeleteLabelCommand) executeApp(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(true, true)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Deleting label(s) for app {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"OrgName":      cmd.Config.TargetedOrganization().Name,
+		"SpaceName":    cmd.Config.TargetedSpace().Name,
+		"User":         username,
+	})
+
+	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
+
+	for _, warning := range warnings {
+		cmd.UI.DisplayWarning(warning)
+	}
+
+	return err
+}
+
+func (cmd DeleteLabelCommand) executeOrg(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Deleting label(s) for org {{.ResourceName}} as {{.User}}...", map[string]interface{}{
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"User":         username,
+	})
+
+	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, labels)
+
+	for _, warning := range warnings {
+		cmd.UI.DisplayWarning(warning)
+	}
+
+	return err
 }
