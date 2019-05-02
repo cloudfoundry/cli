@@ -30,6 +30,7 @@ var _ = Describe("Service", func() {
 							"label": "some-service",
 							"description": "some-description",
 							"service_broker_name": "service-broker",
+							"service_broker_guid": "service-broker-guid",
 							"extra": "{\"provider\":{\"name\":\"The name\"},\"listing\":{\"imageUrl\":\"http://catgifpage.com/cat.gif\",\"blurb\":\"fake broker that is fake\",\"longDescription\":\"A long time ago, in a galaxy far far away...\"},\"displayName\":\"The Fake Broker\",\"shareable\":true}"
 						}
 					}`
@@ -50,6 +51,7 @@ var _ = Describe("Service", func() {
 						Label:             "some-service",
 						Description:       "some-description",
 						ServiceBrokerName: "service-broker",
+						ServiceBrokerGUID: "service-broker-guid",
 						Extra: ServiceExtra{
 							Shareable: true,
 						},

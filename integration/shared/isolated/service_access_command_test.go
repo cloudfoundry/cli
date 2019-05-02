@@ -52,7 +52,7 @@ var _ = Describe("service-access command", func() {
 			It("shows an error message", func() {
 				session := helpers.CF("service-access", "-b", "non-existent-broker")
 				Eventually(session).Should(Say(`Getting service access for broker non-existent-broker as %s\.\.\.`, userName))
-				Eventually(session.Err).Should(Say(`Service broker 'non-existent-broker' not found\.`))
+				Eventually(session.Err).Should(Say(`Service broker with name 'non-existent-broker' not found\.`))
 				Eventually(session.Err).Should(Say(`TIP: Use 'cf service-brokers' to see a list of available brokers\.`))
 				Eventually(session).Should(Exit(1))
 			})
