@@ -20,7 +20,7 @@ var _ = Describe("marketplace command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("marketplace - List available offerings in the marketplace"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf marketplace \\[-s SERVICE\\]"))
+				Eventually(session).Should(Say("cf marketplace \\[-s SERVICE\\] \\[--no-plans\\]"))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("m"))
 				Eventually(session).Should(Say("OPTIONS:"))
