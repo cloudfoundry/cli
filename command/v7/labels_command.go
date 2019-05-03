@@ -17,12 +17,12 @@ import (
 
 type LabelActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
-	GetOrganizationLabels(appName string) (map[string]types.NullString, v7action.Warnings, error)
+	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
 }
 
 type LabelsCommand struct {
 	RequiredArgs flag.LabelsArgs `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n\nSEE ALSO:\n   set-label, delete-label"`
+	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   org\n\nSEE ALSO:\n   set-label, delete-label"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
@@ -43,8 +43,8 @@ func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
 
 func (cmd LabelsCommand) Execute(args []string) error {
 	var (
-		labels    map[string]types.NullString
-		warnings  v7action.Warnings
+		labels   map[string]types.NullString
+		warnings v7action.Warnings
 	)
 	username, err := cmd.Config.CurrentUserName()
 	if err != nil {
@@ -72,7 +72,7 @@ func (cmd LabelsCommand) Execute(args []string) error {
 func (cmd LabelsCommand) fetchAppLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return nil , nil, err
+		return nil, nil, err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting labels for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
@@ -93,7 +93,7 @@ func (cmd LabelsCommand) fetchOrgLabels(username string) (map[string]types.NullS
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting labels for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
-		"OrgName":  cmd.Config.TargetedOrganization().Name,
+		"OrgName":  cmd.RequiredArgs.ResourceName,
 		"Username": username,
 	})
 
