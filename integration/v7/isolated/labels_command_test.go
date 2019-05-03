@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("labels command", func() {
+var _ = Describe("labels command", func() {
 	When("--help flag is given", func() {
 		It("Displays command usage", func() {
 			session := helpers.CF("labels", "--help")
@@ -23,6 +23,7 @@ var _ = FDescribe("labels command", func() {
 			Eventually(session).Should(Say(`\s+cf labels app dora`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
+			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, delete-label`))
 			Eventually(session).Should(Exit(0))
@@ -123,8 +124,8 @@ var _ = FDescribe("labels command", func() {
 			When("the org does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "org", "non-existent-org")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for org %s as %s...\n\n"), orgName, username))
-					Eventually(session.Err).Should(Say("Org 'non-existent-org' not found"))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for org %s as %s...\n\n"), "non-existent-org", username))
+					Eventually(session.Err).Should(Say("Organization 'non-existent-org' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})

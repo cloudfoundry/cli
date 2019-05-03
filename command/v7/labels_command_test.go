@@ -158,7 +158,6 @@ var _ = Describe("labels command", func() {
 		Describe("for orgs", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserNameReturns("some-user", nil)
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "org",
 					ResourceName: "fake-org",
