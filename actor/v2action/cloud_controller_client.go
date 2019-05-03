@@ -92,6 +92,7 @@ type CloudControllerClient interface {
 	UpdateRouteApplication(routeGUID string, appGUID string) (ccv2.Route, ccv2.Warnings, error)
 	UpdateSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
+	UpdateServiceInstanceMaintenanceInfo(serviceInstanceGUID string, maintenanceInfo ccv2.MaintenanceInfo) (ccv2.Warnings, error)
 	UpdateServicePlan(guid string, public bool) (ccv2.Warnings, error)
 	UpdateSpaceDeveloper(spaceGUID string, uaaID string) (ccv2.Warnings, error)
 	UpdateSpaceDeveloperByUsername(spaceGUID string, username string) (ccv2.Warnings, error)
