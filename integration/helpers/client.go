@@ -9,6 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
+// CreateCCV2Client constructs a client object able to communicate with the
+// cloudcontroller V2 API.
 func CreateCCV2Client() (*ccv2.Client, error) {
 	config, err := configv3.LoadConfig(configv3.FlagOverride{})
 	if err != nil {

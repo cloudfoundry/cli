@@ -3,13 +3,14 @@ package helpers
 import (
 	"archive/zip"
 	"fmt"
-	"github.com/onsi/gomega/gbytes"
 	"io"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/onsi/gomega/gbytes"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -37,7 +38,7 @@ func WithHelloWorldApp(f func(dir string)) {
 
 // WithMultiEndpointApp creates a simple application to use with your CLI command
 // (typically CF Push). It has multiple endpoints which are helpful when testing
-// http healthchecks
+// http healthchecks.
 func WithMultiEndpointApp(f func(dir string)) {
 	dir, err := ioutil.TempDir("", "simple-app")
 	Expect(err).ToNot(HaveOccurred())
@@ -174,6 +175,7 @@ func AppGUID(appName string) string {
 	return strings.TrimSpace(string(session.Out.Contents()))
 }
 
+// AppJSON returns the JSON representation of an app by name.
 func AppJSON(appName string) string {
 	appGUID := AppGUID(appName)
 	session := CF("curl", fmt.Sprintf("/v3/apps/%s", appGUID))
@@ -189,7 +191,7 @@ func WriteManifest(path string, manifest map[string]interface{}) {
 	Expect(err).ToNot(HaveOccurred())
 }
 
-// Zipit zips the source into a .zip file in the target dir
+// Zipit zips the source into a .zip file in the target dir.
 func Zipit(source, target, prefix string) error {
 	// Thanks to Svett Ralchev
 	// http://blog.ralch.com/tutorial/golang-working-with-zip/
@@ -260,6 +262,8 @@ func Zipit(source, target, prefix string) error {
 	return err
 }
 
+// ConfirmStagingLogs checks session for output from NOAA client
+// indicating that staging is working.
 func ConfirmStagingLogs(session *Session) {
 	Eventually(session).Should(gbytes.Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
 }

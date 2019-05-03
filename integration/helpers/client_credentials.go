@@ -6,6 +6,8 @@ import (
 	. "github.com/onsi/ginkgo"
 )
 
+// SkipIfClientCredentialsNotSet will skip the test when either
+// CF_INT_CLIENT_ID or CF_INT_CLIENT_SECRET are not set.
 func SkipIfClientCredentialsNotSet() (string, string) {
 	privateClientID := os.Getenv("CF_INT_CLIENT_ID")
 	privateClientSecret := os.Getenv("CF_INT_CLIENT_SECRET")
@@ -17,6 +19,8 @@ func SkipIfClientCredentialsNotSet() (string, string) {
 	return privateClientID, privateClientSecret
 }
 
+// SkipIfCustomClientCredentialsNotSet will skip the test when either
+// CF_INT_CUSTOM_CLIENT_ID or CF_INT_CUSTOM_CLIENT_SECRET are not set.
 func SkipIfCustomClientCredentialsNotSet() (string, string) {
 	customClientID := os.Getenv("CF_INT_CUSTOM_CLIENT_ID")
 	customClientSecret := os.Getenv("CF_INT_CUSTOM_CLIENT_SECRET")

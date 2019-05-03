@@ -22,6 +22,7 @@ const (
 
 var isPass = regexp.MustCompile("(?i)password|token")
 
+// CF runs a 'cf' command with given arguments.
 func CF(args ...string) *Session {
 	WriteCommand("", nil, args)
 	session, err := Start(
@@ -32,12 +33,16 @@ func CF(args ...string) *Session {
 	return session
 }
 
+// CFEnv represents configuration for running a 'cf' command. It allows us to
+// run a 'cf' command with a custom working directory, specific environment
+// variables, and stdin.
 type CFEnv struct {
 	WorkingDirectory string
 	EnvVars          map[string]string
 	stdin            io.Reader
 }
 
+// CustomCF runs a 'cf' command with a custom environment and given arguments.
 func CustomCF(cfEnv CFEnv, args ...string) *Session {
 	command := exec.Command("cf", args...)
 	if cfEnv.stdin != nil {
@@ -64,6 +69,8 @@ func CustomCF(cfEnv CFEnv, args ...string) *Session {
 	return session
 }
 
+// DebugCustomCF runs a 'cf' command with a custom environment and given
+// arguments, with CF_LOG_LEVEL set to 'debug'.
 func DebugCustomCF(cfEnv CFEnv, args ...string) *Session {
 	if cfEnv.EnvVars == nil {
 		cfEnv.EnvVars = map[string]string{}
@@ -73,6 +80,7 @@ func DebugCustomCF(cfEnv CFEnv, args ...string) *Session {
 	return CustomCF(cfEnv, args...)
 }
 
+// CFWithStdin runs a 'cf' command with a custom stdin and given arguments.
 func CFWithStdin(stdin io.Reader, args ...string) *Session {
 	WriteCommand("", nil, args)
 	command := exec.Command("cf", args...)
@@ -85,10 +93,14 @@ func CFWithStdin(stdin io.Reader, args ...string) *Session {
 	return session
 }
 
+// CFWithEnv runs a 'cf' command with specified environment variables and given arguments.
 func CFWithEnv(envVars map[string]string, args ...string) *Session {
 	return CustomCF(CFEnv{EnvVars: envVars}, args...)
 }
 
+// WriteCommand prints the working directory, the environment variables, and
+// 'cf' with the given arguments. Environment variables that are passwords will
+// be redacted.
 func WriteCommand(workingDir string, env map[string]string, args []string) {
 	start := DebugCommandPrefix
 	if workingDir != "" {

@@ -213,7 +213,6 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				sharedDomainName = helpers.NewDomainName()
 				sharedDomain := helpers.NewDomain(orgName, sharedDomainName)
 				sharedDomain.Create()
-				sharedDomain.Share()
 
 				orphanedRoute1 = helpers.NewRoute(spaceName, domainName, "orphan-1", "path-1")
 				orphanedRoute2 = helpers.NewRoute(spaceName, sharedDomainName, "orphan-2", "path-2")

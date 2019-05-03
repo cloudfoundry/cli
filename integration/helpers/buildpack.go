@@ -2,14 +2,16 @@ package helpers
 
 import (
 	"fmt"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gbytes"
-	. "github.com/onsi/gomega/gexec"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
 )
 
+// MakeBuildpackArchive makes a simple buildpack zip for a given stack.
 func MakeBuildpackArchive(stackName string) string {
 	archiveFile, err := ioutil.TempFile("", "buildpack-archive-file-")
 	Expect(err).ToNot(HaveOccurred())
@@ -34,6 +36,9 @@ func MakeBuildpackArchive(stackName string) string {
 	return archiveName
 }
 
+// BuildpackWithStack makes a simple buildpack for the given stack (using
+// MakeBuildpackArchive) and yields it to the given function, removing the zip
+// at the end.
 func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 	buildpackZip := MakeBuildpackArchive(stackName)
 	defer os.Remove(buildpackZip)
@@ -41,19 +46,14 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 	f(buildpackZip)
 }
 
-type BuildpackFields struct {
-	Position string
-	Name     string
-	Enabled  string
-	Locked   string
-	Filename string
-	Stack    string
-}
-
+// BuildpackWithoutStack makes a simple buildpack without a stack (using
+// MakeBuildpackArchive) and yields it to the given function, removing the zip
+// at the end.
 func BuildpackWithoutStack(f func(buildpackArchive string)) {
 	BuildpackWithStack(f, "")
 }
 
+// SetupBuildpackWithStack makes and uploads a buildpack for the given stack.
 func SetupBuildpackWithStack(buildpackName, stack string) {
 	BuildpackWithStack(func(buildpackPath string) {
 		session := CF("create-buildpack", buildpackName, buildpackPath, "99")
@@ -63,8 +63,20 @@ func SetupBuildpackWithStack(buildpackName, stack string) {
 	}, stack)
 }
 
+// SetupBuildpackWithoutStack makes and uploads a buildpack without a stack.
 func SetupBuildpackWithoutStack(buildpackName string) {
 	SetupBuildpackWithStack(buildpackName, "")
+}
+
+// BuildpackFields represents a buildpack, displayed in the 'cf buildpacks'
+// command.
+type BuildpackFields struct {
+	Position string
+	Name     string
+	Enabled  string
+	Locked   string
+	Filename string
+	Stack    string
 }
 
 // DeleteBuildpackIfOnOldCCAPI deletes the buildpack if the CC API targeted

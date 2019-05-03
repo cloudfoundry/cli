@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+// AppInstanceRow represents an instance of a V3 app's process,
+// as displayed in the 'cf app' output.
 type AppInstanceRow struct {
 	Index   string
 	State   string
@@ -15,6 +17,8 @@ type AppInstanceRow struct {
 	Details string
 }
 
+// AppProcessTable represents a process of a V3 app, as displayed in the 'cf
+// app' output.
 type AppProcessTable struct {
 	Type          string
 	InstanceCount string
@@ -22,10 +26,13 @@ type AppProcessTable struct {
 	Instances     []AppInstanceRow
 }
 
+// AppTable represents a V3 app as a collection of processes,
+// as displayed in the 'cf app' output.
 type AppTable struct {
 	Processes []AppProcessTable
 }
 
+// ParseV3AppProcessTable parses bytes from 'cf app' stdout into an AppTable.
 func ParseV3AppProcessTable(input []byte) AppTable {
 	appTable := AppTable{}
 
