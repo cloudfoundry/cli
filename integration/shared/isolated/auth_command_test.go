@@ -53,7 +53,11 @@ var _ = Describe("auth command", func() {
 	When("no positional arguments are provided", func() {
 		Context("and no env variables are provided", func() {
 			It("errors-out with the help information", func() {
-				session := helpers.CF("auth")
+				envWithoutLoginInfo := map[string]string{
+					"CF_USERNAME": "",
+					"CF_PASSWORD": "",
+				}
+				session := helpers.CFWithEnv(envWithoutLoginInfo, "auth")
 				Eventually(session.Err).Should(Say("Username and password not provided."))
 				Eventually(session).Should(Say("NAME:"))
 
@@ -82,7 +86,11 @@ var _ = Describe("auth command", func() {
 
 	When("only a username is provided", func() {
 		It("errors-out with a password required error and the help information", func() {
-			session := helpers.CF("auth", "some-user")
+			envWithoutLoginInfo := map[string]string{
+				"CF_USERNAME": "",
+				"CF_PASSWORD": "",
+			}
+			session := helpers.CFWithEnv(envWithoutLoginInfo, "auth", "some-user")
 			Eventually(session.Err).Should(Say("Password not provided."))
 			Eventually(session).Should(Say("NAME:"))
 
@@ -93,6 +101,7 @@ var _ = Describe("auth command", func() {
 	When("only a password is provided", func() {
 		It("errors-out with a username required error and the help information", func() {
 			env := map[string]string{
+				"CF_USERNAME": "",
 				"CF_PASSWORD": "some-pass",
 			}
 			session := helpers.CFWithEnv(env, "auth")
