@@ -23,3 +23,9 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 
 	return Organization(orgs[0]), Warnings(warnings), nil
 }
+
+func (actor Actor) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
+	domain, warnings, err := actor.CloudControllerClient.GetDefaultDomain(orgGUID)
+
+	return Domain(domain), Warnings(warnings), err
+}

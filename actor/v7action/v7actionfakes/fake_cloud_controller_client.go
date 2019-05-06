@@ -416,6 +416,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetDefaultDomainStub        func(string) (ccv3.Domain, ccv3.Warnings, error)
+	getDefaultDomainMutex       sync.RWMutex
+	getDefaultDomainArgsForCall []struct {
+		arg1 string
+	}
+	getDefaultDomainReturns struct {
+		result1 ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getDefaultDomainReturnsOnCall map[int]struct {
+		result1 ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetDomainsStub        func(...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error)
 	getDomainsMutex       sync.RWMutex
 	getDomainsArgsForCall []struct {
@@ -2849,6 +2864,72 @@ func (fake *FakeCloudControllerClient) GetBuildpacksReturnsOnCall(i int, result1
 	}
 	fake.getBuildpacksReturnsOnCall[i] = struct {
 		result1 []ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetDefaultDomain(arg1 string) (ccv3.Domain, ccv3.Warnings, error) {
+	fake.getDefaultDomainMutex.Lock()
+	ret, specificReturn := fake.getDefaultDomainReturnsOnCall[len(fake.getDefaultDomainArgsForCall)]
+	fake.getDefaultDomainArgsForCall = append(fake.getDefaultDomainArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetDefaultDomain", []interface{}{arg1})
+	fake.getDefaultDomainMutex.Unlock()
+	if fake.GetDefaultDomainStub != nil {
+		return fake.GetDefaultDomainStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getDefaultDomainReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetDefaultDomainCallCount() int {
+	fake.getDefaultDomainMutex.RLock()
+	defer fake.getDefaultDomainMutex.RUnlock()
+	return len(fake.getDefaultDomainArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetDefaultDomainCalls(stub func(string) (ccv3.Domain, ccv3.Warnings, error)) {
+	fake.getDefaultDomainMutex.Lock()
+	defer fake.getDefaultDomainMutex.Unlock()
+	fake.GetDefaultDomainStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetDefaultDomainArgsForCall(i int) string {
+	fake.getDefaultDomainMutex.RLock()
+	defer fake.getDefaultDomainMutex.RUnlock()
+	argsForCall := fake.getDefaultDomainArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetDefaultDomainReturns(result1 ccv3.Domain, result2 ccv3.Warnings, result3 error) {
+	fake.getDefaultDomainMutex.Lock()
+	defer fake.getDefaultDomainMutex.Unlock()
+	fake.GetDefaultDomainStub = nil
+	fake.getDefaultDomainReturns = struct {
+		result1 ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetDefaultDomainReturnsOnCall(i int, result1 ccv3.Domain, result2 ccv3.Warnings, result3 error) {
+	fake.getDefaultDomainMutex.Lock()
+	defer fake.getDefaultDomainMutex.Unlock()
+	fake.GetDefaultDomainStub = nil
+	if fake.getDefaultDomainReturnsOnCall == nil {
+		fake.getDefaultDomainReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Domain
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getDefaultDomainReturnsOnCall[i] = struct {
+		result1 ccv3.Domain
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -5645,6 +5726,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getBuildMutex.RUnlock()
 	fake.getBuildpacksMutex.RLock()
 	defer fake.getBuildpacksMutex.RUnlock()
+	fake.getDefaultDomainMutex.RLock()
+	defer fake.getDefaultDomainMutex.RUnlock()
 	fake.getDomainsMutex.RLock()
 	defer fake.getDomainsMutex.RUnlock()
 	fake.getDropletMutex.RLock()

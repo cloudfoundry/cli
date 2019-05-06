@@ -73,6 +73,62 @@ var _ = Describe("Organization Actions", func() {
 		})
 	})
 
+	Describe("GetDefaultDomain", func() {
+		var (
+			domain     Domain
+			warnings   Warnings
+			executeErr error
+
+			orgGUID = "org-guid"
+		)
+
+		JustBeforeEach(func() {
+			domain, warnings, executeErr = actor.GetDefaultDomain(orgGUID)
+		})
+
+		When("the api call is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDefaultDomainReturns(
+					ccv3.Domain{
+						Name: "some-domain-name",
+						GUID: "some-domain-guid",
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns the domain and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(domain).To(Equal(Domain{
+					Name: "some-domain-name",
+					GUID: "some-domain-guid",
+				}))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+				Expect(fakeCloudControllerClient.GetDefaultDomainCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetDefaultDomainArgsForCall(0)).To(Equal(orgGUID))
+			})
+		})
+
+		When("the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetDefaultDomainReturns(
+					ccv3.Domain{},
+					ccv3.Warnings{"some-warning"},
+					expectedError)
+			})
+
+			It("returns the warnings and the error", func() {
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(executeErr).To(MatchError(expectedError))
+			})
+		})
+	})
+
 	When("the org does not exist", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(

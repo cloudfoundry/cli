@@ -20,6 +20,26 @@ type Organization struct {
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
+func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetDefaultDomainRequest,
+		URIParams:   map[string]string{"organization_guid": orgGUID},
+	})
+	if err != nil {
+		return Domain{}, nil, err
+	}
+
+	var defaultDomain Domain
+
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &defaultDomain,
+	}
+
+	err = client.connection.Make(request, &response)
+
+	return defaultDomain, response.Warnings, err
+}
+
 // GetIsolationSegmentOrganizations lists organizations
 // entitled to an isolation segment.
 func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]Organization, Warnings, error) {

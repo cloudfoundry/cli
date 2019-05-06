@@ -26,6 +26,7 @@ const (
 	GetApplicationTasksRequest                                  = "GetApplicationTasks"
 	GetBuildpacksRequest                                        = "GetBuildpacks"
 	GetBuildRequest                                             = "GetBuild"
+	GetDefaultDomainRequest                                     = "GetDefaultDomain"
 	GetDeploymentRequest                                        = "GetDeployment"
 	GetDeploymentsRequest                                       = "GetDeployments"
 	GetDomainsRequest                                           = "GetDomains"
@@ -128,6 +129,7 @@ var APIRoutes = []Route{
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest},
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid/relationships/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRelationshipOrganizationRequest},
 	{Resource: OrgsResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationsRequest},
+	{Resource: OrgsResource, Path: "/:organization_guid/domains/default", Method: http.MethodGet, Name: GetDefaultDomainRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/domains", Method: http.MethodGet, Name: GetOrganizationDomainsRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationRelationshipDefaultIsolationSegmentRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodPatch, Name: PatchOrganizationRelationshipDefaultIsolationSegmentRequest},

@@ -19,6 +19,97 @@ var _ = Describe("Organizations", func() {
 		client, _ = NewTestClient()
 	})
 
+	Describe("GetDefaultDomain", func() {
+		var (
+			defaultDomain Domain
+			warnings      Warnings
+			executeErr    error
+			orgGUID       = "some-org-guid"
+		)
+
+		JustBeforeEach(func() {
+			defaultDomain, warnings, executeErr = client.GetDefaultDomain(orgGUID)
+		})
+
+		When("organizations exist", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`
+    {
+      	"name": "domain-name-1",
+      	"guid": "domain-guid-1",
+      	"relationships": {
+            "organization": {
+                "data": {
+                    "guid": "some-org-guid"
+                }
+            }
+         },
+"internal": false
+    }`)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/organizations/%s/domains/default", orgGUID)),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the queried organizations and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(defaultDomain).To(Equal(
+					Domain{Name: "domain-name-1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: false},
+						OrganizationGUID: "some-org-guid"},
+				))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Org not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/organizations/%s/domains/default", orgGUID)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Org not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 	Describe("GetIsolationSegmentOrganizations", func() {
 		var (
 			organizations []Organization
