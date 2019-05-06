@@ -384,9 +384,6 @@ var _ = Describe("Verbose", func() {
 
 				session := helpers.CFWithEnv(envMap, command...)
 
-				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say("POST /oauth/token"))
-				Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`))
 				Eventually(session).Should(Say("WEBSOCKET REQUEST:"))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Eventually(session.Kill()).Should(Exit())
@@ -445,9 +442,6 @@ var _ = Describe("Verbose", func() {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp("POST /oauth/token"))
-					Expect(string(contents)).To(MatchRegexp(`\[PRIVATE DATA HIDDEN\]`))
 					Expect(string(contents)).To(MatchRegexp("WEBSOCKET REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 
