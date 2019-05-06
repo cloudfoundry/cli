@@ -175,7 +175,7 @@ var _ = Describe("labels command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
-			It("checks that the user is logged in and targeted to an org and space", func() {
+			It("checks that the user is logged in", func() {
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 				Expect(checkOrg).To(BeFalse())
