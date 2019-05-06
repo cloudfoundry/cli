@@ -57,6 +57,12 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 	shareCheckWarnings, shareCheckErr := cmd.Actor.CheckSharedDomain(domain)
 
 	if shareCheckErr != nil {
+
+		if _, ok := shareCheckErr.(actionerror.DomainNotFoundError); ok {
+			cmd.UI.DisplayOK()
+			return nil
+		}
+
 		cmd.UI.DisplayWarnings(shareCheckWarnings)
 		return shareCheckErr
 	}

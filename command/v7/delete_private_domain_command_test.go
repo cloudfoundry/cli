@@ -95,6 +95,18 @@ var _ = Describe("delete-private-domain Command", func() {
 			fakeActor.CheckSharedDomainReturns(v7action.Warnings{"some-warning"}, fmt.Errorf(`Domain %s is a shared domain, not a private domain.`, domain))
 		})
 	})
+
+	When("the domain does not exist", func() {
+		BeforeEach(func() {
+			fakeActor.CheckSharedDomainReturns(nil, actionerror.DomainNotFoundError{Name: "domain.com"})
+		})
+
+		It("displays OK and returns with success", func() {
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+
+	})
 	When("the -f flag is NOT provided", func() {
 		BeforeEach(func() {
 			cmd.Force = false

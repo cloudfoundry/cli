@@ -108,5 +108,14 @@ var _ = Describe("delete-private-domain command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		When("the domain doesn't exist", func() {
+			It("displays OK and returns successfully", func() {
+				session := helpers.CFWithStdin(buffer, "delete-private-domain", "non-existent.com", "-f")
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+			})
+
+		})
 	})
 })
