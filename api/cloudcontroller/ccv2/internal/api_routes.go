@@ -106,7 +106,6 @@ const (
 	PutOrganizationUserByUsernameRequest                 = "PutOrganizationUserByUsername"
 	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
-	PutServiceInstanceRequest                            = "PutServiceInstance"
 	PutServicePlanRequest                                = "PutServicePlan"
 	PutSpaceQuotaRequest                                 = "PutSpaceQuotaRequest"
 	PutSpaceDeveloperRequest                             = "PutSpaceDeveloper"
@@ -180,7 +179,6 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
 	{Path: "/v2/service_instances", Method: http.MethodPost, Name: PostServiceInstancesRequest},
 	{Path: "/v2/service_instances/:service_instance_guid", Method: http.MethodGet, Name: GetServiceInstanceRequest},
-	{Path: "/v2/service_instances/:service_instance_guid", Method: http.MethodPut, Name: PutServiceInstanceRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/service_bindings", Method: http.MethodGet, Name: GetServiceInstanceServiceBindingsRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/shared_from", Method: http.MethodGet, Name: GetServiceInstanceSharedFromRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/shared_to", Method: http.MethodGet, Name: GetServiceInstanceSharedToRequest},

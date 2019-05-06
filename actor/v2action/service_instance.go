@@ -9,7 +9,6 @@ import (
 
 // ServiceInstance represents an instance of a service.
 type ServiceInstance ccv2.ServiceInstance
-type MaintenanceInfo ccv2.MaintenanceInfo
 
 // CreateServiceInstance creates a new service instance with the provided attributes.
 func (actor Actor) CreateServiceInstance(spaceGUID, serviceName, servicePlanName, serviceInstanceName, brokerName string, params map[string]interface{}, tags []string) (ServiceInstance, Warnings, error) {
@@ -102,18 +101,12 @@ func (actor Actor) GetServiceInstancesBySpace(spaceGUID string) ([]ServiceInstan
 	return serviceInstances, Warnings(warnings), nil
 }
 
-// UpdateServiceInstanceMaintenanceInfo requests that the service instance be updated to the specified `maintenance_info`
-func (actor Actor) UpdateServiceInstanceMaintenanceInfo(guid string, maintenanceInfo MaintenanceInfo) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.UpdateServiceInstanceMaintenanceInfo(guid, ccv2.MaintenanceInfo(maintenanceInfo))
-	return Warnings(warnings), err
-}
-
-// IsManaged returns true if the service instance is managed, otherwise false.
+// IsManaged returns true if the service instance is managed, othersise false.
 func (instance ServiceInstance) IsManaged() bool {
 	return ccv2.ServiceInstance(instance).Managed()
 }
 
-// IsUserProvided returns true if the service instance is user provided, otherwise false.
+// IsUserProvided returns true if the service instance is user provided, othersise false.
 func (instance ServiceInstance) IsUserProvided() bool {
 	return ccv2.ServiceInstance(instance).UserProvided()
 }

@@ -30,9 +30,6 @@ type ServicePlan struct {
 
 	// Free is true if plan is free
 	Free bool
-
-	// Information about maintenance available
-	MaintenanceInfo MaintenanceInfo
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Plan response.
@@ -40,12 +37,11 @@ func (servicePlan *ServicePlan) UnmarshalJSON(data []byte) error {
 	var ccServicePlan struct {
 		Metadata internal.Metadata
 		Entity   struct {
-			Name            string          `json:"name"`
-			ServiceGUID     string          `json:"service_guid"`
-			Public          bool            `json:"public"`
-			Description     string          `json:"description"`
-			Free            bool            `json:"free"`
-			MaintenanceInfo MaintenanceInfo `json:"maintenance_info"`
+			Name        string `json:"name"`
+			ServiceGUID string `json:"service_guid"`
+			Public      bool   `json:"public"`
+			Description string `json:"description"`
+			Free        bool   `json:"free"`
 		}
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccServicePlan)
@@ -59,7 +55,6 @@ func (servicePlan *ServicePlan) UnmarshalJSON(data []byte) error {
 	servicePlan.Public = ccServicePlan.Entity.Public
 	servicePlan.Description = ccServicePlan.Entity.Description
 	servicePlan.Free = ccServicePlan.Entity.Free
-	servicePlan.MaintenanceInfo = ccServicePlan.Entity.MaintenanceInfo
 	return nil
 }
 
