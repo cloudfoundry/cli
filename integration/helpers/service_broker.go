@@ -135,6 +135,7 @@ func (b ServiceBroker) Configure(shareable bool) {
 
 	resp, err := http.DefaultClient.Do(req)
 	Expect(err).ToNot(HaveOccurred())
+	Expect(resp.StatusCode).To(Equal(http.StatusOK))
 	defer resp.Body.Close()
 }
 
