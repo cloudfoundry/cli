@@ -1,5 +1,4 @@
-// Package v2action contains the business logic for the commands/v6 package
-// Actors in this package should only call CC v2 API endpoints
+// Package v2action contains the business logic for the commands/v2 package
 package v2action
 
 // Warnings is a list of warnings returned back from the cloud controller

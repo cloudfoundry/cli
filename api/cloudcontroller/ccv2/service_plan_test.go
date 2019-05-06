@@ -30,10 +30,7 @@ var _ = Describe("Service Plan", func() {
 						"public": true,
 						"service_guid": "some-service-guid",
 						"description": "some-description",
-						"free": true,
-						"maintenance_info": {
-						  "version": "1.2.3"
-						}
+						"free": true
 					}
 				}`
 
@@ -56,9 +53,6 @@ var _ = Describe("Service Plan", func() {
 					ServiceGUID: "some-service-guid",
 					Description: "some-description",
 					Free:        true,
-					MaintenanceInfo: MaintenanceInfo{
-						Version: "1.2.3",
-					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

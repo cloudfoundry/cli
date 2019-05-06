@@ -57,10 +57,7 @@
                     }
                   ]
                 },
-                "schemas": "<fake-plan-schema>",
-                "maintenance_info" : {
-                  "version": "1.2.3"
-                }
+                "schemas": "<fake-plan-schema>"
               },
               {
                 "name": "<fake-plan-2>",

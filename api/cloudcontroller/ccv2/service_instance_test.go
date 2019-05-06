@@ -1,11 +1,9 @@
 package ccv2_test
 
 import (
-	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
@@ -699,62 +697,6 @@ var _ = Describe("Service Instance", func() {
 				}))
 
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
-			})
-		})
-	})
-
-	Describe("UpdateServiceInstanceMaintenanceInfo", func() {
-		const instanceGUID = "fake-guid"
-
-		When("updating succeeds", func() {
-			BeforeEach(func() {
-				requestBody := map[string]interface{}{
-					"maintenance_info": map[string]interface{}{
-						"version": "2.0.0",
-					},
-				}
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPut, fmt.Sprintf("/v2/service_instances/%s", instanceGUID), "accepts_incomplete=true"),
-						VerifyJSONRepresenting(requestBody),
-						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"warning-1,warning-2"}}),
-					),
-				)
-			})
-
-			It("sends a request and returns all warnings from the response", func() {
-				priorRequests := len(server.ReceivedRequests())
-				warnings, err := client.UpdateServiceInstanceMaintenanceInfo(instanceGUID, ccv2.MaintenanceInfo{Version: "2.0.0"})
-				Expect(server.ReceivedRequests()).To(HaveLen(priorRequests + 1))
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
-			})
-		})
-
-		When("the endpoint returns an error", func() {
-			BeforeEach(func() {
-				response := `{
-												"code": 10003,
-												"description": "You are not authorized to perform the requested action"
-			  							}`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPut, fmt.Sprintf("/v2/service_instances/%s", instanceGUID), "accepts_incomplete=true"),
-						RespondWith(http.StatusForbidden, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
-					))
-			})
-
-			It("returns all warnings and propagates the error", func() {
-				priorRequests := len(server.ReceivedRequests())
-				warnings, err := client.UpdateServiceInstanceMaintenanceInfo(instanceGUID, ccv2.MaintenanceInfo{Version: "2.0.0"})
-				Expect(server.ReceivedRequests()).To(HaveLen(priorRequests + 1))
-
-				Expect(err).To(MatchError(ccerror.ForbiddenError{
-					Message: "You are not authorized to perform the requested action",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
 	})
