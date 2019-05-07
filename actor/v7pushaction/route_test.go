@@ -17,10 +17,11 @@ var _ = Describe("Routes", func() {
 	var (
 		actor       *Actor
 		fakeV2Actor *v7pushactionfakes.FakeV2Actor
+		fakeV7Actor *v7pushactionfakes.FakeV7Actor
 	)
 
 	BeforeEach(func() {
-		actor, fakeV2Actor, _, _ = getTestPushActor()
+		actor, fakeV2Actor, fakeV7Actor, _ = getTestPushActor()
 	})
 
 	Describe("CreateAndMapDefaultApplicationRoute", func() {
@@ -43,11 +44,11 @@ var _ = Describe("Routes", func() {
 			warnings, executeErr = actor.CreateAndMapDefaultApplicationRoute(orgGUID, spaceGUID, application)
 		})
 
-		When("getting organization domains errors", func() {
+		When("getting default domain errors", func() {
 			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{},
-					v2action.Warnings{"domain-warning"},
+				fakeV7Actor.GetDefaultDomainReturns(
+					v7action.Domain{},
+					v7action.Warnings{"domain-warning"},
 					errors.New("some-error"))
 			})
 
@@ -59,14 +60,12 @@ var _ = Describe("Routes", func() {
 
 		When("getting organization domains succeeds", func() {
 			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{
-						{
-							GUID: "some-domain-guid",
-							Name: "some-domain",
-						},
+				fakeV7Actor.GetDefaultDomainReturns(
+					v7action.Domain{
+						GUID: "some-domain-guid",
+						Name: "some-domain",
 					},
-					v2action.Warnings{"domain-warning"},
+					v7action.Warnings{"domain-warning"},
 					nil,
 				)
 			})
@@ -110,8 +109,8 @@ var _ = Describe("Routes", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("domain-warning", "route-warning"))
 
-						Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1), "Expected GetOrganizationDomains to be called once, but it was not")
-						orgGUID := fakeV2Actor.GetOrganizationDomainsArgsForCall(0)
+						Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1), "Expected GetOrganizationDomains to be called once, but it was not")
+						orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
 						Expect(orgGUID).To(Equal("some-org-guid"))
 
 						Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1), "Expected GetApplicationRoutes to be called once, but it was not")

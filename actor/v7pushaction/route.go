@@ -62,11 +62,17 @@ func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID
 }
 
 func (actor Actor) getDefaultRoute(orgGUID string, spaceGUID string, appName string) (v2action.Route, Warnings, error) {
-	defaultDomain, domainWarnings, err := actor.DefaultDomain(orgGUID)
+	v7defaultDomain, v7domainWarnings, err := actor.V7Actor.GetDefaultDomain(orgGUID)
+
+	domainWarnings := append(Warnings{}, v7domainWarnings...)
 	if err != nil {
 		return v2action.Route{}, domainWarnings, err
 	}
 
+	defaultDomain := v2action.Domain{
+		Name: v7defaultDomain.Name,
+		GUID: v7defaultDomain.GUID,
+	}
 	return v2action.Route{
 		Host:      appName,
 		Domain:    defaultDomain,

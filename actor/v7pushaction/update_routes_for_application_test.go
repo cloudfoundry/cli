@@ -15,6 +15,7 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 	var (
 		actor       *Actor
 		fakeV2Actor *v7pushactionfakes.FakeV2Actor
+		fakeV7Actor *v7pushactionfakes.FakeV7Actor
 
 		paramPlan PushPlan
 
@@ -25,7 +26,7 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeV2Actor, _, _ = getTestPushActor()
+		actor, fakeV2Actor, fakeV7Actor, _ = getTestPushActor()
 
 		paramPlan = PushPlan{
 			Application: v7action.Application{
@@ -33,14 +34,12 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 			},
 		}
 
-		fakeV2Actor.GetOrganizationDomainsReturns(
-			[]v2action.Domain{
-				{
-					GUID: "some-domain-guid",
-					Name: "some-domain",
-				},
+		fakeV7Actor.GetDefaultDomainReturns(
+			v7action.Domain{
+				GUID: "some-domain-guid",
+				Name: "some-domain",
 			},
-			v2action.Warnings{"domain-warning"},
+			v7action.Warnings{"domain-warning"},
 			nil,
 		)
 	})
@@ -96,14 +95,12 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some route error")
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{
-						{
-							GUID: "some-domain-guid",
-							Name: "some-domain",
-						},
+				fakeV7Actor.GetDefaultDomainReturns(
+					v7action.Domain{
+						GUID: "some-domain-guid",
+						Name: "some-domain",
 					},
-					v2action.Warnings{"domain-warning"},
+					v7action.Warnings{"domain-warning"},
 					expectedErr,
 				)
 			})
