@@ -26,21 +26,3 @@ func SayPath(format string, path string) types.GomegaMatcher {
 	}
 	return gbytes.Say(format, theRealPath)
 }
-
-func EqualPath(format string, path string) types.GomegaMatcher {
-	theRealDir, err := filepath.EvalSymlinks(filepath.Dir(path))
-	Expect(err).ToNot(HaveOccurred())
-	theRealPath := filepath.Join(theRealDir, filepath.Base(path))
-
-	if runtime.GOOS == "windows" {
-		expected := "(?i)" + format
-		expected = fmt.Sprintf(expected, regexp.QuoteMeta(path))
-		return &matchers.MatchRegexpMatcher{
-			Regexp: expected,
-		}
-	}
-
-	return &matchers.MatchRegexpMatcher{
-		Regexp: theRealPath,
-	}
-}
