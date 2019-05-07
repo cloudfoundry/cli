@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,28 +11,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
-
-type Package struct {
-	Checksum string
-}
-
-func (p *Package) UnmarshalJSON(data []byte) error {
-	var ccPackage struct {
-		Data struct {
-			Checksum struct {
-				Value string `json:"value"`
-			} `json:"checksum"`
-		} `json:"data"`
-	}
-
-	if err := json.Unmarshal(data, &ccPackage); err != nil {
-		return err
-	}
-
-	p.Checksum = ccPackage.Data.Checksum.Value
-
-	return nil
-}
 
 func VerifyAppPackageContentsV3(appName string, files ...string) {
 	tmpZipFilepath, err := ioutil.TempFile("", "")
