@@ -8,6 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// GetIsolationSegmentGUID gets the Isolation Segment GUID by passing along the given isolation
+// segment name as a query parameter in the /v3/isolation_segments?names=name endpoint.
 func GetIsolationSegmentGUID(name string) string {
 	session := CF("curl", fmt.Sprintf("/v3/isolation_segments?names=%s", name))
 	bytes := session.Wait("15s").Out.Contents()

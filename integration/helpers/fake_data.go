@@ -11,6 +11,9 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
+// AddFiftyOneOrgs adds a mock handler to the given server which returns
+// 51 orgs on GET requests to /v3/organizations?order_by=name. It also
+// paginates, so page 2 can be requested with /v3/organizations?page=2&per_page=50.
 func AddFiftyOneOrgs(server *ghttp.Server) {
 	AddHandler(server,
 		http.MethodGet,

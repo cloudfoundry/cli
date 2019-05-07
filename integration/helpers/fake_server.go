@@ -15,6 +15,8 @@ const (
 	DefaultV3Version string = "3.66.0"
 )
 
+// StartAndTargetServerWithAPIVersions starts and targets a server with the given V2 and V3
+// API versions.
 func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Server {
 	server := StartServerWithAPIVersions(v2Version, v3Version)
 	Eventually(CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
@@ -22,10 +24,14 @@ func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Se
 	return server
 }
 
+// StartServerWithMinimumCLIVersion starts a server with the default V2 and V3
+// API versions and the given minimum CLI version.
 func StartServerWithMinimumCLIVersion(minCLIVersion string) *Server {
 	return startServerWithVersions(DefaultV2Version, DefaultV3Version, &minCLIVersion)
 }
 
+// StartServerWithAPIVersions starts a server with the given V2 and V3
+// API versions
 func StartServerWithAPIVersions(v2Version string, v3Version string) *Server {
 	return startServerWithVersions(v2Version, v3Version, nil)
 }
@@ -105,6 +111,9 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
 	return server
 }
 
+// AddMfa adds a mock handler to the given server which returns a login response and a 200 status code
+// on GET requests to the /login endpoint. It adds another mock handler to validate the given password and MFA token
+// upon POST requests to /oauth/token.
 func AddMfa(server *Server, password string, mfaToken string) {
 	getLoginResponse := fmt.Sprintf(`{
     "app": {
@@ -173,6 +182,8 @@ func makeMFAValidator(password string, mfaToken string) http.HandlerFunc {
 	}
 }
 
+// AddLoginRoutes adds a mock handler to the given server which returns an access token and a 200 status code
+// on POST requests to /oauth/token.
 func AddLoginRoutes(s *Server) {
 	s.RouteToHandler("POST", "/oauth/token", RespondWith(http.StatusOK,
 		fmt.Sprintf(`{

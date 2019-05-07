@@ -9,7 +9,8 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
-
+// AddOrReplaceEnvironment will update environment if it already exists or will add
+// a new environment with the given environment name and details.
 func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) []string {
 	var found bool
 	for i, envPair := range env {
@@ -64,6 +65,9 @@ func CheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, target
 	Eventually(session).Should(Exit(1))
 }
 
+// UnrefactoredCheckEnvironmentTargetedCorrectly will confirm if the command requires an
+// API to be targeted and logged in to run. It can optionally check if the
+// command requires org and space to be targeted.
 func UnrefactoredCheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, targetedSpaceRequired bool, testOrg string, command ...string) {
 	LoginCF()
 

@@ -19,6 +19,9 @@ type resp struct {
 var responses map[string]resp
 var seenRoutes map[string]bool
 
+// AddHandler adds a mock handler to the server making a request specified by "method" to the
+// endpoint specified by "pathAndQuery", returning a response with status code "status" and
+// response body "body".
 func AddHandler(ser *ghttp.Server, method string, pathAndQuery string, status int, body []byte) {
 	u, err := url.Parse(pathAndQuery)
 	if err != nil {
