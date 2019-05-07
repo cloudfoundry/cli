@@ -6,16 +6,14 @@ import (
 	"regexp"
 	"runtime"
 
-	"github.com/onsi/gomega/matchers"
-
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/types"
 )
 
-// SayPath is used to assert that a path is printed. On Windows, it uses a
-// case-insensitive match and escapes the path. On non-Windows, it evaluates
-// the base directory of the path for symlniks.
+// SayPath is used to assert that a path is printed within streaming output.
+// On Windows, it uses a case-insensitive match and escapes the path.
+// On non-Windows, it evaluates the base directory of the path for symlinks.
 func SayPath(format string, path string) types.GomegaMatcher {
 	theRealDir, err := filepath.EvalSymlinks(filepath.Dir(path))
 	Expect(err).ToNot(HaveOccurred())

@@ -12,6 +12,10 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+// SetAPI sets the API endpoint to the value of the CF_INT_API environment variable,
+// or "https://api.bosh-lite.com" if not set. If the SKIP_SSL_VALIDATION environment
+// variable is set, it will use the '--skip-ssl-validation' flag. It returns the API
+// URL and a boolean indicating if SSL validation was skipped.
 func SetAPI() (string, bool) {
 	apiURL := GetAPI()
 	skipSSLValidation := skipSSLValidation()
@@ -23,6 +27,7 @@ func SetAPI() (string, bool) {
 	return apiURL, skipSSLValidation
 }
 
+// UnsetAPI unsets the currently set API endpoint for the CLI.
 func UnsetAPI() {
 	Eventually(CF("api", "--unset")).Should(Exit(0))
 }
@@ -34,6 +39,9 @@ func skipSSLValidation() bool {
 	return true
 }
 
+// GetAPI gets the value of the CF_INT_API environment variable, if set, and prefixes
+// it with "https://" if the value doesn't already start with "http". If the variable
+// is not set, returns "https://api.bosh-lite.com".
 func GetAPI() string {
 	apiURL := os.Getenv("CF_INT_API")
 	if apiURL == "" {
@@ -46,6 +54,8 @@ func GetAPI() string {
 	return apiURL
 }
 
+// LoginAs logs in to the CLI with 'cf auth' and the given username and password,
+// retrying up to 3 times on failures.
 func LoginAs(username, password string) {
 	env := map[string]string{
 		"CF_USERNAME": username,
@@ -62,12 +72,18 @@ func LoginAs(username, password string) {
 	}
 }
 
+// LoginCF logs in to the CLI using the username and password from the CF_INT_USERNAME
+// and CF_INT_PASSWORD environment variables, respectively, defaulting to "admin" for
+// each if either is not set.
 func LoginCF() string {
 	username, password := GetCredentials()
 	LoginAs(username, password)
 	return username
 }
 
+// LoginCFWithClientCredentials logs in to the CLI using client credentials from the CF_INT_CLIENT_ID and
+// CF_INT_CLIENT_SECRET environment variables and returns the client ID. If these environment variables
+// are not set, it skips the current test.
 func LoginCFWithClientCredentials() string {
 	username, password := SkipIfClientCredentialsNotSet()
 	env := map[string]string{
@@ -79,7 +95,9 @@ func LoginCFWithClientCredentials() string {
 	return username
 }
 
-// GetCredentials returns back the username and the password.
+// GetCredentials returns back the username and the password from the CF_INT_USERNAME and CF_INT_PASSWORD
+// environment variables, defaulting to "admin" for
+// each if either is not set.
 func GetCredentials() (string, string) {
 	username := os.Getenv("CF_INT_USERNAME")
 	if username == "" {
@@ -105,29 +123,36 @@ func SkipIfOIDCCredentialsNotSet() (string, string) {
 	return oidcUsername, oidcPassword
 }
 
+// LogoutCF logs out of the CLI.
 func LogoutCF() {
 	Eventually(CF("logout")).Should(Exit(0))
 }
 
+// TargetOrgAndSpace targets the given org and space with 'cf target'.
 func TargetOrgAndSpace(org string, space string) {
 	Eventually(CF("target", "-o", org, "-s", space)).Should(Exit(0))
 }
 
+// TargetOrg targets the given org with 'cf target'.
 func TargetOrg(org string) {
 	Eventually(CF("target", "-o", org)).Should(Exit(0))
 }
 
+// ClearTarget logs out and logs back in to the CLI using LogoutCF and LoginCF.
 func ClearTarget() {
 	LogoutCF()
 	LoginCF()
 }
 
+// SetupCF logs in to the CLI with LoginCF, creates the given org and space, and targets that
+// org and space.
 func SetupCF(org string, space string) {
 	LoginCF()
 	CreateOrgAndSpace(org, space)
 	TargetOrgAndSpace(org, space)
 }
 
+// SwitchToNoRole logs out of the CLI and logs back in as a newly-created user without a role.
 func SwitchToNoRole() string {
 	username, password := CreateUser()
 	LogoutCF()
@@ -135,6 +160,8 @@ func SwitchToNoRole() string {
 	return username
 }
 
+// SwitchToOrgRole logs out of the CLI and logs back in as a newly-created user with the given
+// org role in the given org.
 func SwitchToOrgRole(org, role string) string {
 	username, password := CreateUserInOrgRole(org, role)
 	LogoutCF()
@@ -142,6 +169,8 @@ func SwitchToOrgRole(org, role string) string {
 	return username
 }
 
+// SwitchToSpaceRole logs out of the CLI and logs back in as a newly-created user with the given
+// space role in the given space and org.
 func SwitchToSpaceRole(org, space, role string) string {
 	username, password := CreateUserInSpaceRole(org, space, role)
 	LogoutCF()
