@@ -189,7 +189,7 @@ jobs:
                 - task: delete-bosh-lite
                   file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
                 - put: slack-alert
-                  params:
+                  params: &bosh-lite-failure-alert
                      channel: '#cli-eng'
                      text: |
                        Creating a bosh-lite failed :(
@@ -218,6 +218,8 @@ jobs:
                   region: ((bosh-lite-region))
               get_params:
                 action: destroy
+            - put: slack-alert
+              params: *bosh-lite-failure-alert
 
   - name: delete-bosh-lite
     plan:
