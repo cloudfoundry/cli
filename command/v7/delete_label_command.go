@@ -17,7 +17,7 @@ type DeleteLabelActor interface {
 
 type DeleteLabelCommand struct {
 	RequiredArgs flag.DeleteLabelArgs `positional-args:"yes"`
-	usage        interface{}          `usage:"CF_NAME delete-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf delete-label app dora ci_signature_sha2\n\nRESOURCES:\n   app\n\nSEE ALSO:\n   set-label, labels"`
+	usage        interface{}          `usage:"CF_NAME delete-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf delete-label app dora ci_signature_sha2\n   cf delete-label org business pci\n   cf delete-label space private pci\n\nRESOURCES:\n   app\n   org\n   space\n\nSEE ALSO:\n   set-label, labels"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
