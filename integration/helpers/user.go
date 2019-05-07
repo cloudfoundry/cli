@@ -14,7 +14,7 @@ type User struct {
 	CreatedAt time.Time
 }
 
-// GetUsers returns all the users in the targeted environment
+// GetUsers returns all the users in the targeted environment.
 func GetUsers() []User {
 	var userPagesResponse struct {
 		NextURL   *string `json:"next_url"`
@@ -55,6 +55,7 @@ func GetUsers() []User {
 	return allUsers
 }
 
+// CreateUser creates a user with a random username and password and returns both.
 func CreateUser() (string, string) {
 	username := NewUsername()
 	password := RandomName()
@@ -70,11 +71,14 @@ func CreateUser() (string, string) {
 	return username, password
 }
 
+// DeleteUser deletes the user specified by username.
 func DeleteUser(username string) {
 	session := CF("delete-user", username, "-f")
 	Eventually(session).Should(Exit(0))
 }
 
+// CreateUserInOrgRole creates a user with a random username and password and gives them the specified role within
+// a specific org. The new user's username and password are returned.
 func CreateUserInOrgRole(org, role string) (string, string) {
 	username, password := CreateUser()
 
@@ -84,6 +88,8 @@ func CreateUserInOrgRole(org, role string) (string, string) {
 	return username, password
 }
 
+// CreateUserInSpaceRole creates a user with a random username and password and gives them the specified role within
+// a specific space. The new user's username and password are returned.
 func CreateUserInSpaceRole(org, space, role string) (string, string) {
 	username, password := CreateUser()
 

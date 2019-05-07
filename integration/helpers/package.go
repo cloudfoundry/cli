@@ -12,6 +12,8 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+// VerifyAppPackageContentsV3 verifies the contents of a V3 app package by downloading the package zip and
+// verifying the zipped files match the passed files.
 func VerifyAppPackageContentsV3(appName string, files ...string) {
 	tmpZipFilepath, err := ioutil.TempFile("", "")
 	defer os.Remove(tmpZipFilepath.Name())
@@ -51,6 +53,8 @@ func downloadFirstAppPackage(appName string, tmpZipFilepath string) {
 	Eventually(session).Should(Exit(0))
 }
 
+// VerifyAppPackageContentsV2 verifies the contents of a V2 app package by downloading the package zip and
+// verifying the zipped files match the passed files.
 func VerifyAppPackageContentsV2(appName string, files ...string) {
 	tmpZipFilepath, err := ioutil.TempFile("", "")
 	defer os.Remove(tmpZipFilepath.Name())

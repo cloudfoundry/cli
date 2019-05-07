@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+// SecurityGroup represents a security group API resource
 type SecurityGroup struct {
 	Name        string `json:"-"`
 	Protocol    string `json:"protocol"`
@@ -18,6 +19,7 @@ type SecurityGroup struct {
 	Description string `json:"description"`
 }
 
+// NewSecurityGroup returns a new security group with the given attributes
 func NewSecurityGroup(name string, protocol string, destination string, ports string, description string) SecurityGroup {
 	return SecurityGroup{
 		Name:        name,
@@ -28,6 +30,7 @@ func NewSecurityGroup(name string, protocol string, destination string, ports st
 	}
 }
 
+// Create Creates a new security group on the API using the 'cf create-security-group'
 func (s SecurityGroup) Create() {
 	dir, err := ioutil.TempDir("", "simple-security-group")
 	Expect(err).ToNot(HaveOccurred())

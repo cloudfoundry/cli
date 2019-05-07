@@ -18,6 +18,8 @@ const (
 	DefaultDiskLimit   = "1G"
 )
 
+// PlanSchemas represent the broker-provided list of actions that can be taken on
+// instances of a given service plan.
 type PlanSchemas struct {
 	ServiceInstance struct {
 		Create struct {
@@ -34,12 +36,14 @@ type PlanSchemas struct {
 	} `json:"service_binding"`
 }
 
+// Plan represents the broker-provided specification for instances of a service plan.
 type Plan struct {
 	Name    string      `json:"name"`
 	ID      string      `json:"id"`
 	Schemas PlanSchemas `json:"schemas"`
 }
 
+// ServiceBroker represents a service broker conforming to the OSB API.
 type ServiceBroker struct {
 	Name       string
 	Path       string
@@ -59,6 +63,8 @@ type ServiceBroker struct {
 	AsyncPlans []Plan
 }
 
+// NewServiceBroker constructs a new ServiceBroker with given attributes. planName will be used
+// to create a synchronous service plan on the broker.
 func NewServiceBroker(name string, path string, appsDomain string, serviceName string, planName string) ServiceBroker {
 	b := ServiceBroker{}
 	b.Path = path
@@ -83,6 +89,8 @@ func NewServiceBroker(name string, path string, appsDomain string, serviceName s
 	return b
 }
 
+// NewAsynchServiceBroker constructs a new ServiceBroker with given attributes. planName will be used
+// to create an asynchronous service plan on the broker.
 func NewAsynchServiceBroker(name string, path string, appsDomain string, serviceName string, planName string) ServiceBroker {
 	b := ServiceBroker{}
 	b.Path = path
@@ -107,6 +115,7 @@ func NewAsynchServiceBroker(name string, path string, appsDomain string, service
 	return b
 }
 
+// Push pushes the service broker as an app and maps a route to it.
 func (b ServiceBroker) Push() {
 	Eventually(CF(
 		"push", b.Name,
@@ -126,6 +135,7 @@ func (b ServiceBroker) Push() {
 	Eventually(CF("start", b.Name)).Should(Exit(0))
 }
 
+// Configure makes a service broker shareable (or not).
 func (b ServiceBroker) Configure(shareable bool) {
 	uri := fmt.Sprintf("http://%s.%s%s", b.Name, b.AppsDomain, "/config")
 	body := strings.NewReader(b.ToJSON(shareable))
@@ -138,29 +148,34 @@ func (b ServiceBroker) Configure(shareable bool) {
 	defer resp.Body.Close()
 }
 
+// Create creates a service broker with 'cf create-service-broker' and asserts that it exists.
 func (b ServiceBroker) Create() {
 	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
 	Eventually(CF("create-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
+// Update updates a service broker with 'cf update-service-broker' and asserts that it has been updated.
 func (b ServiceBroker) Update() {
 	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
 	Eventually(CF("update-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
+// Delete deletes a service broker with 'cf delete-service-broker' and asserts that it has been deleted.
 func (b ServiceBroker) Delete() {
 	Eventually(CF("delete-service-broker", b.Name, "-f")).Should(Exit(0))
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Not(Say(b.Name))))
 }
 
+// Destroy purges a service broker with 'cf purge-service-offering'.
 func (b ServiceBroker) Destroy() {
 	Eventually(CF("purge-service-offering", b.Service.Name, "-b", b.Name, "-f")).Should(Exit(0))
 	b.Delete()
 	Eventually(CF("delete", b.Name, "-f", "-r")).Should(Exit(0))
 }
 
+// ToJSON creates a JSON representation of a service broker.
 func (b ServiceBroker) ToJSON(shareable bool) string {
 	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/broker_config.json")
 	Expect(err).To(BeNil())
@@ -193,6 +208,7 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 	return replacer.Replace(string(bytes))
 }
 
+// CreateBroker creates a new shareable broker which provides the user specified service plan to a foundation.
 func CreateBroker(domain, serviceName, planName string) ServiceBroker {
 	service := serviceName
 	servicePlan := planName
@@ -204,10 +220,12 @@ func CreateBroker(domain, serviceName, planName string) ServiceBroker {
 	return broker
 }
 
+// Assets wraps a path to a service broker asset
 type Assets struct {
 	ServiceBroker string
 }
 
+// NewAssets creates a new Assets struct which wraps a relative path to the included service broker asset
 func NewAssets() Assets {
 	return Assets{
 		ServiceBroker: "../../assets/service_broker",

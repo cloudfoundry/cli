@@ -9,6 +9,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// PollLastOperationUntilSuccess polls the last operation performed on a service instance bound to a given app until
+// success. An expectation will fail if the last operation does not succeed or polling takes over 5 minutes.
 func PollLastOperationUntilSuccess(client *ccv2.Client, appName string, serviceInstanceName string) {
 	apps, _, err := client.GetApplications(ccv2.Filter{
 		Type:     constant.NameFilter,

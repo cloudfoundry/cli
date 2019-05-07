@@ -19,6 +19,7 @@ type ccStacks struct {
 	} `json:"resources"`
 }
 
+// FetchStacks returns all the stack names present in the foundation.
 func FetchStacks() []string {
 	session := CF("curl", "/v2/stacks")
 
@@ -36,6 +37,7 @@ func FetchStacks() []string {
 	return stacks
 }
 
+// PreferredStack returns the cflinuxfs3 stack name if it present, otherwise cflinuxfs2 is returned.
 func PreferredStack() string {
 	stacks := FetchStacks()
 
@@ -48,6 +50,7 @@ func PreferredStack() string {
 	return "cflinuxfs2"
 }
 
+// CreateStack creates a new stack with the user provided name. If a name is not provided, a random name is used
 func CreateStack(names ...string) string {
 	name := NewStackName()
 	if len(names) > 0 {
@@ -66,6 +69,7 @@ func CreateStack(names ...string) string {
 	return name
 }
 
+// DeleteStack deletes a specific stack
 func DeleteStack(name string) {
 	session := CF("stack", "--guid", name)
 	Eventually(session).Should(Exit(0))
@@ -77,6 +81,8 @@ func DeleteStack(name string) {
 	Eventually(session).Should(Exit(0))
 }
 
+// EnsureMinimumNumberOfStacks ensures there are at least 2 stacks in the foundation by creating new ones if there
+// are fewer than 2
 func EnsureMinimumNumberOfStacks(num int) []string {
 	var stacks []string
 	for stacks = FetchStacks(); len(stacks) < 2; {

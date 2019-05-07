@@ -9,12 +9,15 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+// PluginCommand represents metadata for a CLI plugin command.
 type PluginCommand struct {
 	Name  string
 	Alias string
 	Help  string
 }
 
+// InstallConfigurablePlugin builds and installs a plugin called 'configurable_plugin'
+// with the given name, version, and commands.
 func InstallConfigurablePlugin(name string, version string, pluginCommands []PluginCommand) {
 	path := BuildConfigurablePlugin("configurable_plugin", name, version, pluginCommands)
 	Eventually(CF("install-plugin", "-f", path)).Should(Exit(0))
@@ -23,11 +26,17 @@ func InstallConfigurablePlugin(name string, version string, pluginCommands []Plu
 		"install-plugin", "-f", path)).Should(Exit(0))
 }
 
+// InstallConfigurablePluginFailsUninstall builds and installs a plugin called 'configurable_plugin_fails_uninstall'
+// with the given name, version, and commands.
 func InstallConfigurablePluginFailsUninstall(name string, version string, pluginCommands []PluginCommand) {
 	path := BuildConfigurablePlugin("configurable_plugin_fails_uninstall", name, version, pluginCommands)
 	Eventually(CF("install-plugin", "-f", path)).Should(Exit(0))
 }
 
+// BuildConfigurablePlugin builds a plugin of type pluginType from the integration/assets/<pluginType>
+// directory with the given name, version, and commands.
+// Available pluginTypes: configurable_plugin, configurable_plugin_fails_uninstall, test_plugin,
+// test_plugin_fails_metadata, test_plugin_with_command_overrides, test_plugin_with_panic.
 func BuildConfigurablePlugin(pluginType string, name string, version string, pluginCommands []PluginCommand) string {
 	commands := []string{}
 	commandHelps := []string{}

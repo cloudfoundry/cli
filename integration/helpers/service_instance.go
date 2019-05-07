@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+// ServiceInstanceGUID represents a service instance relationship
 type ServiceInstanceGUID struct {
 	Resources []struct {
 		Metadata struct {

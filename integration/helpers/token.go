@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// BuildTokenString returns a string typed JSON web token with the specified expiration time
 func BuildTokenString(expiration time.Time) string {
 	c := jws.Claims{}
 	c.SetExpiration(expiration)
@@ -20,6 +21,7 @@ func BuildTokenString(expiration time.Time) string {
 	return string(tokenBytes)
 }
 
+// ParseTokenString takes a string typed token and returns a jwt.JWT struct representation of that token
 func ParseTokenString(token string) jwt.JWT {
 	strippedToken := strings.TrimPrefix(token, "bearer ")
 	jwt, err := jws.ParseJWT([]byte(strippedToken))
