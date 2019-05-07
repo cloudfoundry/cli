@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	uuid "github.com/nu7hatch/gouuid"
 )
@@ -12,21 +13,17 @@ import (
 // GenerateHigherName will use the passed randomNameGenerator to generate a name with a higher
 // sort value than all the passed names
 func GenerateHigherName(randomNameGenerator func() string, names ...string) string {
-	name := randomNameGenerator()
+	sort.Strings(names)
 
-	var safe bool
-	for !safe {
-		safe = true
-		for _, nameToBeLowerThan := range names {
-			// regenerate name if name is NOT higher
-			if !sort.StringsAreSorted([]string{nameToBeLowerThan, name}) {
-				name = randomNameGenerator()
-				safe = false
-				break
-			}
+	maxName := names[len(names)-1]
+
+	for {
+		name := randomNameGenerator()
+		// regenerate name if name is NOT higher
+		if strings.Compare(name, maxName) > 0 {
+			return name
 		}
 	}
-	return name
 }
 
 // TODO: Is this working???
@@ -34,21 +31,21 @@ func GenerateHigherName(randomNameGenerator func() string, names ...string) stri
 // GenerateLowerName will use the passed randomNameGenerator to generate a name with a lower
 // sort value than all the passed names
 func GenerateLowerName(randomNameGenerator func() string, names ...string) string {
-	name := randomNameGenerator()
+	if len(names) == 0 {
+		return randomNameGenerator()
+	}
 
-	var safe bool
-	for !safe {
-		safe = true
-		for _, nameToBeHigherThan := range names {
-			// regenerate name if name is NOT lower
-			if !sort.StringsAreSorted([]string{name, nameToBeHigherThan}) {
-				name = randomNameGenerator()
-				safe = false
-				break
-			}
+	sort.Strings(names)
+
+	minName := names[0]
+
+	for {
+		name := randomNameGenerator()
+		// regenerate name if name is NOT higher
+		if strings.Compare(name, minName) < 0 {
+			return name
 		}
 	}
-	return name
 }
 
 // NewAppName provides a random name prefixed with INTEGRATION-APP
