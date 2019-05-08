@@ -13,6 +13,9 @@ import (
 // GenerateHigherName will use the passed randomNameGenerator to generate a name with a higher
 // sort value than all the passed names
 func GenerateHigherName(randomNameGenerator func() string, names ...string) string {
+	if len(names) == 0 {
+		return randomNameGenerator()
+	}
 	sort.Strings(names)
 
 	maxName := names[len(names)-1]
