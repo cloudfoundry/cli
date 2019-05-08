@@ -72,19 +72,19 @@ func (d Domain) CreatePrivate() {
 	Eventually(CF("create-private-domain", d.Org, d.Name)).Should(Exit(0))
 }
 
-// CreateShared uses 'cf create-shared-domain' to create an unscoped domain
+// CreateShared uses 'cf create-shared-domain' to create an shared domain
 // with name d.Name.
 func (d Domain) CreateShared() {
 	Eventually(CF("create-shared-domain", d.Name)).Should(Exit(0))
 }
 
-// CreateWithRouterGroup uses 'cf create-shared-domain' to create an unscoped
+// CreateWithRouterGroup uses 'cf create-shared-domain' to create a shared
 // domain with name d.Name and given router group.
 func (d Domain) CreateWithRouterGroup(routerGroup string) {
 	Eventually(CF("create-shared-domain", d.Name, "--router-group", routerGroup)).Should(Exit(0))
 }
 
-// CreateInternal uses 'cf create-shared-domain' to create an unscoped,
+// CreateInternal uses 'cf create-shared-domain' to create an shared,
 // internal domain with name d.Name.
 func (d Domain) CreateInternal() {
 	Eventually(CF("create-shared-domain", d.Name, "--internal")).Should(Exit(0))

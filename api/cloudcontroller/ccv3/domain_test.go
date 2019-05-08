@@ -20,7 +20,7 @@ var _ = Describe("Domain", func() {
 		client, _ = NewTestClient()
 	})
 
-	Describe("CreateDomain for Unscoped Domains", func() {
+	Describe("CreateDomain for Shared Domains", func() {
 		var (
 			domain     Domain
 			warnings   Warnings
@@ -110,7 +110,7 @@ var _ = Describe("Domain", func() {
 		})
 	})
 
-	Describe("CreateDomain for Scoped Domains", func() {
+	Describe("CreateDomain for Private Domains", func() {
 		var (
 			domain     Domain
 			warnings   Warnings
