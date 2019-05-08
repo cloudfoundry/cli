@@ -10,11 +10,22 @@ import (
 
 var _ = Describe("stack", func() {
 	var (
-		appName string
+		appName   string
+		stackName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.PrefixedRandomName("app")
+		stackName = helpers.CreateStack()
+	})
+
+	AfterEach(func() {
+		buffer := NewBuffer()
+		_, err := buffer.Write([]byte("y\n"))
+		Expect(err).ToNot(HaveOccurred())
+		session := helpers.CFWithStdin(buffer, "delete", appName)
+		Eventually(session).Should(Exit(0))
+		helpers.DeleteStack(stackName)
 	})
 
 	When("the --stack flag is provided", func() {
@@ -22,11 +33,11 @@ var _ = Describe("stack", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
 					PushCommandName, appName,
-					"--stack", WindowsStack,
+					"--stack", stackName,
 					"--no-start",
 				)
 				Eventually(session).Should(Exit(0))
-				Expect(helpers.AppJSON(appName)).To(MatchRegexp(`"stack":\s*"%s"`, WindowsStack))
+				Expect(helpers.AppJSON(appName)).To(MatchRegexp(`"stack":\s*"%s"`, stackName))
 			})
 		})
 
