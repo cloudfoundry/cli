@@ -5,5 +5,5 @@ set -e
 version=$(cat BUILD_VERSION)
 
 echo "Creating v$version tag at current version"
-git tag v$version
-git push --tags
+git tag "v$version"
+git push origin "v$version"
