@@ -151,7 +151,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:815a621dbf3d3201e3969cc8a1f0b9ae88861e328643378bf1e18956bde50ea0"
+  digest = "1:8d9680d9ae7aaf0ff4b923b7ce723d6664949642d07303071012b0e9ff2e0aed"
   name = "github.com/cloudfoundry/noaa"
   packages = [
     ".",
@@ -160,7 +160,7 @@
     "errors",
   ]
   pruneopts = "NUT"
-  revision = "5beab4261046115d89e363902e75155f7370849c"
+  revision = "5ce49363dfa666c00fc716cb5f8c2f99462b41ef"
 
 [[projects]]
   branch = "master"

@@ -158,15 +158,23 @@ func (c *Consumer) SetOnConnectCallback(cb func()) {
 func (c *Consumer) Close() error {
 	c.connsLock.Lock()
 	defer c.connsLock.Unlock()
+
+	var errStrings []string
+
 	if len(c.conns) == 0 {
 		return errors.New("connection does not exist")
 	}
 	for len(c.conns) > 0 {
 		if err := c.conns[0].close(); err != nil {
-			return err
+			errStrings = append(errStrings, err.Error())
 		}
 		c.conns = c.conns[1:]
 	}
+
+	if len(errStrings) > 0 {
+		return fmt.Errorf(strings.Join(errStrings, ", "))
+	}
+
 	return nil
 }
 
