@@ -13,9 +13,9 @@ import (
 	"fmt"
 )
 
-//go:generate counterfeiter . LabelActor
+//go:generate counterfeiter . GetLabelActor
 
-type LabelActor interface {
+type GetLabelActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
 }
@@ -26,7 +26,7 @@ type LabelsCommand struct {
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
-	Actor        LabelActor
+	Actor        GetLabelActor
 }
 
 func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
@@ -57,7 +57,6 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchOrgLabels(username)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
-
 	}
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
