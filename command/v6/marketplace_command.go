@@ -26,7 +26,7 @@ type ServicesSummariesActor interface {
 type MarketplaceCommand struct {
 	ServiceName     string      `short:"s" description:"Show plan details for a particular service offering"`
 	NoPlans         bool        `long:"no-plans" description:"Hide plan information for service offerings"`
-	usage           interface{} `usage:"CF_NAME marketplace [-s SERVICE]"`
+	usage           interface{} `usage:"CF_NAME marketplace [-s SERVICE] [--no-plans]"`
 	relatedCommands interface{} `related_commands:"create-service, services"`
 
 	UI          command.UI
