@@ -17,10 +17,10 @@ import (
 
 type ServicesSummariesActor interface {
 	GetServicesSummaries() ([]v2action.ServiceSummary, v2action.Warnings, error)
-	GetServicesSummariesForSpace(spaceGUID string) ([]v2action.ServiceSummary, v2action.Warnings, error)
+	GetServicesSummariesForSpace(spaceGUID string, organizationGUID string) ([]v2action.ServiceSummary, v2action.Warnings, error)
 
 	GetServiceSummaryByName(serviceName string) (v2action.ServiceSummary, v2action.Warnings, error)
-	GetServiceSummaryForSpaceByName(spaceGUID, serviceName string) (v2action.ServiceSummary, v2action.Warnings, error)
+	GetServiceSummaryForSpaceByName(spaceGUID, serviceName string, organizationGUID string) (v2action.ServiceSummary, v2action.Warnings, error)
 }
 
 type MarketplaceCommand struct {
@@ -80,7 +80,10 @@ func (cmd *MarketplaceCommand) marketplace() error {
 			"SpaceName": cmd.Config.TargetedSpace().Name,
 			"Username":  user.Name,
 		})
-		serviceSummaries, warnings, err := cmd.Actor.GetServicesSummariesForSpace(cmd.Config.TargetedSpace().GUID)
+		serviceSummaries, warnings, err := cmd.Actor.GetServicesSummariesForSpace(
+			cmd.Config.TargetedSpace().GUID,
+			cmd.Config.TargetedOrganization().GUID,
+		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -99,7 +102,7 @@ func (cmd *MarketplaceCommand) marketplace() error {
 				"Username":    user.Name,
 			})
 
-		serviceSummary, warnings, err := cmd.Actor.GetServiceSummaryForSpaceByName(cmd.Config.TargetedSpace().GUID, cmd.ServiceName)
+		serviceSummary, warnings, err := cmd.Actor.GetServiceSummaryForSpaceByName(cmd.Config.TargetedSpace().GUID, cmd.ServiceName, cmd.Config.TargetedOrganization().GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err

@@ -24,11 +24,12 @@ type FakeServicesSummariesActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetServiceSummaryForSpaceByNameStub        func(string, string) (v2action.ServiceSummary, v2action.Warnings, error)
+	GetServiceSummaryForSpaceByNameStub        func(string, string, string) (v2action.ServiceSummary, v2action.Warnings, error)
 	getServiceSummaryForSpaceByNameMutex       sync.RWMutex
 	getServiceSummaryForSpaceByNameArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	getServiceSummaryForSpaceByNameReturns struct {
 		result1 v2action.ServiceSummary
@@ -54,10 +55,11 @@ type FakeServicesSummariesActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetServicesSummariesForSpaceStub        func(string) ([]v2action.ServiceSummary, v2action.Warnings, error)
+	GetServicesSummariesForSpaceStub        func(string, string) ([]v2action.ServiceSummary, v2action.Warnings, error)
 	getServicesSummariesForSpaceMutex       sync.RWMutex
 	getServicesSummariesForSpaceArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	getServicesSummariesForSpaceReturns struct {
 		result1 []v2action.ServiceSummary
@@ -139,17 +141,18 @@ func (fake *FakeServicesSummariesActor) GetServiceSummaryByNameReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByName(arg1 string, arg2 string) (v2action.ServiceSummary, v2action.Warnings, error) {
+func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByName(arg1 string, arg2 string, arg3 string) (v2action.ServiceSummary, v2action.Warnings, error) {
 	fake.getServiceSummaryForSpaceByNameMutex.Lock()
 	ret, specificReturn := fake.getServiceSummaryForSpaceByNameReturnsOnCall[len(fake.getServiceSummaryForSpaceByNameArgsForCall)]
 	fake.getServiceSummaryForSpaceByNameArgsForCall = append(fake.getServiceSummaryForSpaceByNameArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("GetServiceSummaryForSpaceByName", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetServiceSummaryForSpaceByName", []interface{}{arg1, arg2, arg3})
 	fake.getServiceSummaryForSpaceByNameMutex.Unlock()
 	if fake.GetServiceSummaryForSpaceByNameStub != nil {
-		return fake.GetServiceSummaryForSpaceByNameStub(arg1, arg2)
+		return fake.GetServiceSummaryForSpaceByNameStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -164,17 +167,17 @@ func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByNameCallCount
 	return len(fake.getServiceSummaryForSpaceByNameArgsForCall)
 }
 
-func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByNameCalls(stub func(string, string) (v2action.ServiceSummary, v2action.Warnings, error)) {
+func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByNameCalls(stub func(string, string, string) (v2action.ServiceSummary, v2action.Warnings, error)) {
 	fake.getServiceSummaryForSpaceByNameMutex.Lock()
 	defer fake.getServiceSummaryForSpaceByNameMutex.Unlock()
 	fake.GetServiceSummaryForSpaceByNameStub = stub
 }
 
-func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByNameArgsForCall(i int) (string, string) {
+func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByNameArgsForCall(i int) (string, string, string) {
 	fake.getServiceSummaryForSpaceByNameMutex.RLock()
 	defer fake.getServiceSummaryForSpaceByNameMutex.RUnlock()
 	argsForCall := fake.getServiceSummaryForSpaceByNameArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeServicesSummariesActor) GetServiceSummaryForSpaceByNameReturns(result1 v2action.ServiceSummary, result2 v2action.Warnings, result3 error) {
@@ -264,16 +267,17 @@ func (fake *FakeServicesSummariesActor) GetServicesSummariesReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpace(arg1 string) ([]v2action.ServiceSummary, v2action.Warnings, error) {
+func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpace(arg1 string, arg2 string) ([]v2action.ServiceSummary, v2action.Warnings, error) {
 	fake.getServicesSummariesForSpaceMutex.Lock()
 	ret, specificReturn := fake.getServicesSummariesForSpaceReturnsOnCall[len(fake.getServicesSummariesForSpaceArgsForCall)]
 	fake.getServicesSummariesForSpaceArgsForCall = append(fake.getServicesSummariesForSpaceArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetServicesSummariesForSpace", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetServicesSummariesForSpace", []interface{}{arg1, arg2})
 	fake.getServicesSummariesForSpaceMutex.Unlock()
 	if fake.GetServicesSummariesForSpaceStub != nil {
-		return fake.GetServicesSummariesForSpaceStub(arg1)
+		return fake.GetServicesSummariesForSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -288,17 +292,17 @@ func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpaceCallCount() 
 	return len(fake.getServicesSummariesForSpaceArgsForCall)
 }
 
-func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpaceCalls(stub func(string) ([]v2action.ServiceSummary, v2action.Warnings, error)) {
+func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpaceCalls(stub func(string, string) ([]v2action.ServiceSummary, v2action.Warnings, error)) {
 	fake.getServicesSummariesForSpaceMutex.Lock()
 	defer fake.getServicesSummariesForSpaceMutex.Unlock()
 	fake.GetServicesSummariesForSpaceStub = stub
 }
 
-func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpaceArgsForCall(i int) string {
+func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpaceArgsForCall(i int) (string, string) {
 	fake.getServicesSummariesForSpaceMutex.RLock()
 	defer fake.getServicesSummariesForSpaceMutex.RUnlock()
 	argsForCall := fake.getServicesSummariesForSpaceArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeServicesSummariesActor) GetServicesSummariesForSpaceReturns(result1 []v2action.ServiceSummary, result2 v2action.Warnings, result3 error) {

@@ -2,6 +2,7 @@ package v2action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
@@ -29,6 +30,17 @@ func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	return brokersToReturn, Warnings(warnings), nil
 }
 
+// GetServiceBroker returns a ServiceBroker and any warnings or errors.
+func (actor Actor) GetServiceBroker(guid string) (ServiceBroker, Warnings, error) {
+	instance, warnings, err := actor.CloudControllerClient.GetServiceBroker(guid)
+
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+		return ServiceBroker{}, Warnings(warnings), actionerror.ServiceBrokerNotFoundError{Key: actionerror.KeyGUID, Value: guid}
+	}
+
+	return ServiceBroker(instance), Warnings(warnings), err
+}
+
 // GetServiceBrokerByName returns a ServiceBroker and any warnings or errors.
 func (actor Actor) GetServiceBrokerByName(brokerName string) (ServiceBroker, Warnings, error) {
 	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers(ccv2.Filter{
@@ -42,7 +54,7 @@ func (actor Actor) GetServiceBrokerByName(brokerName string) (ServiceBroker, War
 	}
 
 	if len(serviceBrokers) == 0 {
-		return ServiceBroker{}, Warnings(warnings), actionerror.ServiceBrokerNotFoundError{Name: brokerName}
+		return ServiceBroker{}, Warnings(warnings), actionerror.ServiceBrokerNotFoundError{Key: actionerror.KeyName, Value: brokerName}
 	}
 
 	return ServiceBroker(serviceBrokers[0]), Warnings(warnings), err
