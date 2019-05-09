@@ -1152,6 +1152,7 @@ var _ = Describe("login command", func() {
 		)
 
 		BeforeEach(func() {
+			helpers.TurnOnExperimentalLogin()
 			customClientID, customClientSecret = helpers.SkipIfCustomClientCredentialsNotSet()
 
 			helpers.LoginCF()
@@ -1165,6 +1166,10 @@ var _ = Describe("login command", func() {
 
 			session := helpers.CF("login", "-u", username, "-p", password)
 			Eventually(session).Should(Exit(0))
+		})
+
+		AfterEach(func() {
+			helpers.TurnOffExperimentalLogin()
 		})
 
 		It("gets a token whose settings match those of the custom client", func() {
@@ -1183,7 +1188,6 @@ var _ = Describe("login command", func() {
 		})
 
 		It("warns the user that this configuration is deprecated", func() {
-			helpers.TurnOnExperimentalLogin()
 			deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
 
 			session := helpers.CF("login", "-u", username, "-p", password)
