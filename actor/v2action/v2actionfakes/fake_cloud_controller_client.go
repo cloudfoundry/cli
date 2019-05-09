@@ -721,21 +721,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetServiceBrokerStub        func(string) (ccv2.ServiceBroker, ccv2.Warnings, error)
-	getServiceBrokerMutex       sync.RWMutex
-	getServiceBrokerArgsForCall []struct {
-		arg1 string
-	}
-	getServiceBrokerReturns struct {
-		result1 ccv2.ServiceBroker
-		result2 ccv2.Warnings
-		result3 error
-	}
-	getServiceBrokerReturnsOnCall map[int]struct {
-		result1 ccv2.ServiceBroker
-		result2 ccv2.Warnings
-		result3 error
-	}
 	GetServiceBrokersStub        func(...ccv2.Filter) ([]ccv2.ServiceBroker, ccv2.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []struct {
@@ -4570,72 +4555,6 @@ func (fake *FakeCloudControllerClient) GetServiceBindingsReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetServiceBroker(arg1 string) (ccv2.ServiceBroker, ccv2.Warnings, error) {
-	fake.getServiceBrokerMutex.Lock()
-	ret, specificReturn := fake.getServiceBrokerReturnsOnCall[len(fake.getServiceBrokerArgsForCall)]
-	fake.getServiceBrokerArgsForCall = append(fake.getServiceBrokerArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetServiceBroker", []interface{}{arg1})
-	fake.getServiceBrokerMutex.Unlock()
-	if fake.GetServiceBrokerStub != nil {
-		return fake.GetServiceBrokerStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.getServiceBrokerReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) GetServiceBrokerCallCount() int {
-	fake.getServiceBrokerMutex.RLock()
-	defer fake.getServiceBrokerMutex.RUnlock()
-	return len(fake.getServiceBrokerArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) GetServiceBrokerCalls(stub func(string) (ccv2.ServiceBroker, ccv2.Warnings, error)) {
-	fake.getServiceBrokerMutex.Lock()
-	defer fake.getServiceBrokerMutex.Unlock()
-	fake.GetServiceBrokerStub = stub
-}
-
-func (fake *FakeCloudControllerClient) GetServiceBrokerArgsForCall(i int) string {
-	fake.getServiceBrokerMutex.RLock()
-	defer fake.getServiceBrokerMutex.RUnlock()
-	argsForCall := fake.getServiceBrokerArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeCloudControllerClient) GetServiceBrokerReturns(result1 ccv2.ServiceBroker, result2 ccv2.Warnings, result3 error) {
-	fake.getServiceBrokerMutex.Lock()
-	defer fake.getServiceBrokerMutex.Unlock()
-	fake.GetServiceBrokerStub = nil
-	fake.getServiceBrokerReturns = struct {
-		result1 ccv2.ServiceBroker
-		result2 ccv2.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) GetServiceBrokerReturnsOnCall(i int, result1 ccv2.ServiceBroker, result2 ccv2.Warnings, result3 error) {
-	fake.getServiceBrokerMutex.Lock()
-	defer fake.getServiceBrokerMutex.Unlock()
-	fake.GetServiceBrokerStub = nil
-	if fake.getServiceBrokerReturnsOnCall == nil {
-		fake.getServiceBrokerReturnsOnCall = make(map[int]struct {
-			result1 ccv2.ServiceBroker
-			result2 ccv2.Warnings
-			result3 error
-		})
-	}
-	fake.getServiceBrokerReturnsOnCall[i] = struct {
-		result1 ccv2.ServiceBroker
-		result2 ccv2.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeCloudControllerClient) GetServiceBrokers(arg1 ...ccv2.Filter) ([]ccv2.ServiceBroker, ccv2.Warnings, error) {
 	fake.getServiceBrokersMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
@@ -7919,8 +7838,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceMutex.RUnlock()
 	fake.getServiceBindingsMutex.RLock()
 	defer fake.getServiceBindingsMutex.RUnlock()
-	fake.getServiceBrokerMutex.RLock()
-	defer fake.getServiceBrokerMutex.RUnlock()
 	fake.getServiceBrokersMutex.RLock()
 	defer fake.getServiceBrokersMutex.RUnlock()
 	fake.getServiceInstanceMutex.RLock()

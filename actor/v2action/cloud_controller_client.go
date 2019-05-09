@@ -54,7 +54,6 @@ type CloudControllerClient interface {
 	GetSecurityGroups(filters ...ccv2.Filter) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetService(serviceGUID string) (ccv2.Service, ccv2.Warnings, error)
 	GetServiceBindings(filters ...ccv2.Filter) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
-	GetServiceBroker(serviceBrokerGUID string) (ccv2.ServiceBroker, ccv2.Warnings, error)
 	GetServiceBrokers(filters ...ccv2.Filter) ([]ccv2.ServiceBroker, ccv2.Warnings, error)
 	GetServiceInstance(serviceInstanceGUID string) (ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetServiceInstanceServiceBindings(serviceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error)

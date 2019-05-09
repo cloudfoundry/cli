@@ -144,12 +144,6 @@ func (b ServiceBroker) Create() {
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
-func (b ServiceBroker) CreateSpaceScoped() {
-	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
-	Eventually(CF("create-service-broker", b.Name, "username", "password", appURI, "--space-scoped")).Should(Exit(0))
-	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
-}
-
 func (b ServiceBroker) Update() {
 	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
 	Eventually(CF("update-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
@@ -206,17 +200,6 @@ func CreateBroker(domain, serviceName, planName string) ServiceBroker {
 	broker.Push()
 	broker.Configure(true)
 	broker.Create()
-
-	return broker
-}
-
-func CreateSpaceScopedBroker(domain, serviceName, planName string) ServiceBroker {
-	service := serviceName
-	servicePlan := planName
-	broker := NewServiceBroker(NewServiceBrokerName(), NewAssets().ServiceBroker, domain, service, servicePlan)
-	broker.Push()
-	broker.Configure(true)
-	broker.CreateSpaceScoped()
 
 	return broker
 }
