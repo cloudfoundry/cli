@@ -32,7 +32,7 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 	return actor.convertCCToActorOrganization(orgs[0]), Warnings(warnings), nil
 }
 
-// UpdateOrganization updates the labels of an organization
+// UpdateOrganization updates the name and/or labels of an organization
 func (actor Actor) UpdateOrganization(org Organization) (Organization, Warnings, error) {
 	ccOrg := ccv3.Organization{
 		GUID:     org.GUID,
