@@ -55,7 +55,6 @@ const (
 	GetSecurityGroupStagingSpacesRequest                 = "GetSecurityGroupStagingSpaces"
 	GetServiceBindingRequest                             = "GetServiceBinding"
 	GetServiceBindingsRequest                            = "GetServiceBindings"
-	GetServiceBrokerRequest                              = "GetServiceBroker"
 	GetServiceBrokersRequest                             = "GetServiceBrokers"
 	GetServiceInstanceRequest                            = "GetServiceInstance"
 	GetServiceInstanceServiceBindingsRequest             = "GetServiceInstanceServiceBindings"
@@ -175,7 +174,6 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodGet, Name: GetServiceBindingRequest},
-	{Path: "/v2/service_brokers/:service_broker_guid", Method: http.MethodGet, Name: GetServiceBrokerRequest},
 	{Path: "/v2/service_brokers", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Path: "/v2/service_brokers", Method: http.MethodPost, Name: PostServiceBrokerRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},

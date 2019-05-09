@@ -239,7 +239,7 @@ var _ = Describe("purge-service-offering command", func() {
 				It("prints a warning that this flag is no longer supported", func() {
 					session := helpers.CF("purge-service-offering", service, "-b", "non-existent-broker")
 
-					Eventually(session.Err).Should(Say("Service broker with name 'non-existent-broker' not found"))
+					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 					Eventually(session.Err).Should(Say("TIP: Use 'cf service-brokers' to see a list of available brokers."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))

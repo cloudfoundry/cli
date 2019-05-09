@@ -90,25 +90,6 @@ func (client *Client) CreateServiceBroker(brokerName, username, password, url, s
 	return serviceBroker, response.Warnings, err
 }
 
-// GetServiceBroker returns the service broker with the given GUID.
-func (client *Client) GetServiceBroker(serviceBrokerGUID string) (ServiceBroker, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetServiceBrokerRequest,
-		URIParams:   Params{"service_broker_guid": serviceBrokerGUID},
-	})
-	if err != nil {
-		return ServiceBroker{}, nil, err
-	}
-
-	var serviceBroker ServiceBroker
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &serviceBroker,
-	}
-
-	err = client.connection.Make(request, &response)
-	return serviceBroker, response.Warnings, err
-}
-
 // GetServiceBrokers returns back a list of Service Brokers given the provided
 // filters.
 func (client *Client) GetServiceBrokers(filters ...Filter) ([]ServiceBroker, Warnings, error) {

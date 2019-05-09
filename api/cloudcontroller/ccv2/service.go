@@ -23,8 +23,6 @@ type Service struct {
 	DocumentationURL string
 	// ServiceBrokerName is name of the service broker associated with the service
 	ServiceBrokerName string
-	// ServiceBrokerGUID is guid of the service broker associated with the service
-	ServiceBrokerGUID string
 	// Extra is a field with extra data pertaining to the service.
 	Extra ServiceExtra
 }
@@ -59,7 +57,6 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 			Description       string `json:"description"`
 			DocumentationURL  string `json:"documentation_url"`
 			ServiceBrokerName string `json:"service_broker_name"`
-			ServiceBrokerGUID string `json:"service_broker_guid"`
 			Extra             string `json:"extra"`
 		}
 	}
@@ -74,7 +71,6 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 	service.Description = ccService.Entity.Description
 	service.DocumentationURL = ccService.Entity.DocumentationURL
 	service.ServiceBrokerName = ccService.Entity.ServiceBrokerName
-	service.ServiceBrokerGUID = ccService.Entity.ServiceBrokerGUID
 
 	// We explicitly unmarshal the Extra field to type string because CC returns
 	// a stringified JSON object ONLY for the 'extra' key (see test stub JSON
