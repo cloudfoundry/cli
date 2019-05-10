@@ -105,6 +105,9 @@ func SetupV3Response() {
 			"organizations": {
 				"href": "SERVER_URL/v3/organizations"
 			},
+			"service_brokers": {
+				"href": "SERVER_URL/v3/service_brokers"
+			},
 			"service_instances": {
 				"href": "SERVER_URL/v3/service_instances"
 			},

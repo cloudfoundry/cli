@@ -51,6 +51,7 @@ type CloudControllerClient interface {
 	GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error)
 	GetPackages(query ...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error)
 	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
+	GetServiceBrokers() ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
