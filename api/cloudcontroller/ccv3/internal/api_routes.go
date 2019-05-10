@@ -78,7 +78,6 @@ const (
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
-
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.

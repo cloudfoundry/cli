@@ -219,7 +219,8 @@ var _ = Describe("Spaces", func() {
 			It("should include the labels in the JSON", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(server.ReceivedRequests()).To(HaveLen(3))
-				Expect(len(warnings)).To(Equal(0))
+				Expect(len(warnings)).To(Equal(1))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(updatedSpace.Metadata.Labels).To(BeEquivalentTo(
 					map[string]types.NullString{
 						"k1": types.NewNullString("v1"),
