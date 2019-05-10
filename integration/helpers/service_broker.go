@@ -137,9 +137,8 @@ func (b ServiceBroker) Push() {
 
 // Configure makes a service broker shareable (or not).
 func (b ServiceBroker) Configure(shareable bool) {
-	uri := fmt.Sprintf("http://%s.%s%s", b.Name, b.AppsDomain, "/config")
 	body := strings.NewReader(b.ToJSON(shareable))
-	req, err := http.NewRequest("POST", uri, body)
+	req, err := http.NewRequest("POST", b.URL("/config"), body)
 	Expect(err).ToNot(HaveOccurred())
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -151,15 +150,13 @@ func (b ServiceBroker) Configure(shareable bool) {
 
 // Create creates a service broker with 'cf create-service-broker' and asserts that it exists.
 func (b ServiceBroker) Create() {
-	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
-	Eventually(CF("create-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
+	Eventually(CF("create-service-broker", b.Name, "username", "password", b.URL())).Should(Exit(0))
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
 // Update updates a service broker with 'cf update-service-broker' and asserts that it has been updated.
 func (b ServiceBroker) Update() {
-	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
-	Eventually(CF("update-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
+	Eventually(CF("update-service-broker", b.Name, "username", "password", b.URL())).Should(Exit(0))
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
@@ -176,7 +173,10 @@ func (b ServiceBroker) Destroy() {
 	Eventually(CF("delete", b.Name, "-f", "-r")).Should(Exit(0))
 }
 
-// ToJSON creates a JSON representation of a service broker.
+func (b ServiceBroker) URL(paths ...string) string {
+	return fmt.Sprintf("http://%s.%s%s", b.Name, b.AppsDomain, strings.Join(paths, ""))
+}
+
 func (b ServiceBroker) ToJSON(shareable bool) string {
 	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/broker_config.json")
 	Expect(err).To(BeNil())
