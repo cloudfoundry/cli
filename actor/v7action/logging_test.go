@@ -25,6 +25,7 @@ var _ = Describe("Logging Actions", func() {
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, fakeConfig, _, _ = NewTestActor()
 		fakeNOAAClient = new(v7actionfakes.FakeNOAAClient)
+		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
 
 	Describe("LogMessage", func() {
@@ -74,7 +75,7 @@ var _ = Describe("Logging Actions", func() {
 
 				fakeNOAAClient.TailingLogsStub = func(appGUID string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					Expect(appGUID).To(Equal(expectedAppGUID))
-					Expect(authToken).To(BeEmpty())
+					Expect(authToken).To(Equal("AccessTokenForTest"))
 
 					Expect(fakeNOAAClient.SetOnConnectCallbackCallCount()).To(Equal(1))
 					onConnectOrOnRetry := fakeNOAAClient.SetOnConnectCallbackArgsForCall(0)
@@ -347,7 +348,7 @@ var _ = Describe("Logging Actions", func() {
 
 				fakeNOAAClient.TailingLogsStub = func(appGUID string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					Expect(appGUID).To(Equal(expectedAppGUID))
-					Expect(authToken).To(BeEmpty())
+					Expect(authToken).To(Equal("AccessTokenForTest"))
 
 					Expect(fakeNOAAClient.SetOnConnectCallbackCallCount()).To(Equal(1))
 					onConnectOrOnRetry := fakeNOAAClient.SetOnConnectCallbackArgsForCall(0)
