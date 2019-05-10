@@ -1317,6 +1317,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	UpdateServiceInstanceMaintenanceInfoStub        func(string, ccv2.MaintenanceInfo) (ccv2.Warnings, error)
+	updateServiceInstanceMaintenanceInfoMutex       sync.RWMutex
+	updateServiceInstanceMaintenanceInfoArgsForCall []struct {
+		arg1 string
+		arg2 ccv2.MaintenanceInfo
+	}
+	updateServiceInstanceMaintenanceInfoReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	updateServiceInstanceMaintenanceInfoReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	UpdateServicePlanStub        func(string, bool) (ccv2.Warnings, error)
 	updateServicePlanMutex       sync.RWMutex
 	updateServicePlanArgsForCall []struct {
@@ -7211,6 +7225,70 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceReturnsOnC
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateServiceInstanceMaintenanceInfo(arg1 string, arg2 ccv2.MaintenanceInfo) (ccv2.Warnings, error) {
+	fake.updateServiceInstanceMaintenanceInfoMutex.Lock()
+	ret, specificReturn := fake.updateServiceInstanceMaintenanceInfoReturnsOnCall[len(fake.updateServiceInstanceMaintenanceInfoArgsForCall)]
+	fake.updateServiceInstanceMaintenanceInfoArgsForCall = append(fake.updateServiceInstanceMaintenanceInfoArgsForCall, struct {
+		arg1 string
+		arg2 ccv2.MaintenanceInfo
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateServiceInstanceMaintenanceInfo", []interface{}{arg1, arg2})
+	fake.updateServiceInstanceMaintenanceInfoMutex.Unlock()
+	if fake.UpdateServiceInstanceMaintenanceInfoStub != nil {
+		return fake.UpdateServiceInstanceMaintenanceInfoStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateServiceInstanceMaintenanceInfoReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceInstanceMaintenanceInfoCallCount() int {
+	fake.updateServiceInstanceMaintenanceInfoMutex.RLock()
+	defer fake.updateServiceInstanceMaintenanceInfoMutex.RUnlock()
+	return len(fake.updateServiceInstanceMaintenanceInfoArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceInstanceMaintenanceInfoCalls(stub func(string, ccv2.MaintenanceInfo) (ccv2.Warnings, error)) {
+	fake.updateServiceInstanceMaintenanceInfoMutex.Lock()
+	defer fake.updateServiceInstanceMaintenanceInfoMutex.Unlock()
+	fake.UpdateServiceInstanceMaintenanceInfoStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceInstanceMaintenanceInfoArgsForCall(i int) (string, ccv2.MaintenanceInfo) {
+	fake.updateServiceInstanceMaintenanceInfoMutex.RLock()
+	defer fake.updateServiceInstanceMaintenanceInfoMutex.RUnlock()
+	argsForCall := fake.updateServiceInstanceMaintenanceInfoArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceInstanceMaintenanceInfoReturns(result1 ccv2.Warnings, result2 error) {
+	fake.updateServiceInstanceMaintenanceInfoMutex.Lock()
+	defer fake.updateServiceInstanceMaintenanceInfoMutex.Unlock()
+	fake.UpdateServiceInstanceMaintenanceInfoStub = nil
+	fake.updateServiceInstanceMaintenanceInfoReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceInstanceMaintenanceInfoReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.updateServiceInstanceMaintenanceInfoMutex.Lock()
+	defer fake.updateServiceInstanceMaintenanceInfoMutex.Unlock()
+	fake.UpdateServiceInstanceMaintenanceInfoStub = nil
+	if fake.updateServiceInstanceMaintenanceInfoReturnsOnCall == nil {
+		fake.updateServiceInstanceMaintenanceInfoReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.updateServiceInstanceMaintenanceInfoReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateServicePlan(arg1 string, arg2 bool) (ccv2.Warnings, error) {
 	fake.updateServicePlanMutex.Lock()
 	ret, specificReturn := fake.updateServicePlanReturnsOnCall[len(fake.updateServicePlanArgsForCall)]
@@ -7920,6 +7998,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSecurityGroupSpaceMutex.RUnlock()
 	fake.updateSecurityGroupStagingSpaceMutex.RLock()
 	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
+	fake.updateServiceInstanceMaintenanceInfoMutex.RLock()
+	defer fake.updateServiceInstanceMaintenanceInfoMutex.RUnlock()
 	fake.updateServicePlanMutex.RLock()
 	defer fake.updateServicePlanMutex.RUnlock()
 	fake.updateSpaceDeveloperMutex.RLock()
