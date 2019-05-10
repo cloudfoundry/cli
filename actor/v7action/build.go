@@ -19,7 +19,6 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 	dropletStream := make(chan Droplet)
 	warningsStream := make(chan Warnings)
 	errorStream := make(chan error)
-
 	go func() {
 		defer close(dropletStream)
 		defer close(warningsStream)

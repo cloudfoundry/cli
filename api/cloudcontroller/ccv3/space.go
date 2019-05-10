@@ -74,5 +74,5 @@ func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
 	if err != nil {
 		return Space{}, nil, err
 	}
-	return responseSpace, nil, err
+	return responseSpace, response.Warnings, err
 }

@@ -352,10 +352,6 @@ var _ = Describe("set-label command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		It("doesn't error", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
-		})
-
 		It("checks that the user is logged in and targeted to an org", func() {
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -400,9 +396,7 @@ var _ = Describe("set-label command", func() {
 
 						It("displays a message", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-
 							Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-
 							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for space %s in org fake-org as some-user...`), resourceName))
 							Expect(testUI.Out).To(Say("OK"))
 						})
