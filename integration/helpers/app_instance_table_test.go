@@ -10,7 +10,7 @@ import (
 var _ = Describe("AppInstanceTable", func() {
 	It("can parse app instance table from app", func() {
 		input := `
-Showing health and status for app dora in org wut / space wut as admin...
+Showing health and status for app dora in org wut / space wut as foo...
 
 name:              dora
 requested state:   started
@@ -61,7 +61,7 @@ memory usage: 32M
 
 	It("can parse app instance table from scale", func() {
 		input := `
-Showing health and status for app dora in org wut / space wut as admin...
+Showing health and status for app dora in org wut / space wut as foo...
 
 type:         web
 instances:    4/4

@@ -461,7 +461,7 @@ var _ = Describe("service command", func() {
 		})
 
 		AfterEach(func() {
-			// need to login as admin
+			// need to login as foo
 			helpers.LoginCF()
 			helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
 			broker.Destroy()

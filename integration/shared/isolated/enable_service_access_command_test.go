@@ -88,7 +88,7 @@ var _ = Describe("enable service access command", func() {
 			When("only the service is specified", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", "some-service")
-					Eventually(session).Should(Say("Enabling access to all plans of service some-service for all orgs as admin\\.\\.\\."))
+					Eventually(session).Should(Say("Enabling access to all plans of service some-service for all orgs as foo\\.\\.\\."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Service offering 'some-service' not found"))
 					Eventually(session).Should(Exit(1))
@@ -98,7 +98,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service and an org are specified", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", "some-service", "-o", "some-org")
-					Eventually(session).Should(Say("Enabling access to all plans of service some-service for the org some-org as admin\\.\\.\\."))
+					Eventually(session).Should(Say("Enabling access to all plans of service some-service for the org some-org as foo\\.\\.\\."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Service offering 'some-service' not found"))
 					Eventually(session).Should(Exit(1))
@@ -108,7 +108,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service and a plan are specified", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", "some-service", "-p", "some-plan")
-					Eventually(session).Should(Say("Enabling access of plan some-plan for service some-service as admin\\.\\.\\."))
+					Eventually(session).Should(Say("Enabling access of plan some-plan for service some-service as foo\\.\\.\\."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Service offering 'some-service' not found"))
 					Eventually(session).Should(Exit(1))
@@ -118,7 +118,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service, a plan and an org are specified", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", "some-service", "-p", "some-plan", "-o", "some-org")
-					Eventually(session).Should(Say("Enabling access to plan some-plan of service some-service for org some-org as admin\\.\\.\\."))
+					Eventually(session).Should(Say("Enabling access to plan some-plan of service some-service for org some-org as foo\\.\\.\\."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Service offering 'some-service' not found"))
 					Eventually(session).Should(Exit(1))
@@ -157,7 +157,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service name is provided", func() {
 				It("displays an informative message, exits 0, and enables the service for all orgs", func() {
 					session := helpers.CF("enable-service-access", service)
-					Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as admin...", service))
+					Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as foo...", service))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
@@ -179,7 +179,7 @@ var _ = Describe("enable service access command", func() {
 
 					It("disables the limited access for that org", func() {
 						session := helpers.CF("enable-service-access", service, "-p", servicePlan)
-						Eventually(session).Should(Say("Enabling access of plan %s for service %s as admin...", servicePlan, service))
+						Eventually(session).Should(Say("Enabling access of plan %s for service %s as foo...", servicePlan, service))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
@@ -225,7 +225,7 @@ var _ = Describe("enable service access command", func() {
 				When("a service name and broker name are provided", func() {
 					It("displays an informative message, exits 0, and enables access to the service", func() {
 						session := helpers.CF("enable-service-access", service, "-b", secondBroker.Name)
-						Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as admin...", service, secondBroker.Name))
+						Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as foo...", service, secondBroker.Name))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
@@ -241,7 +241,7 @@ var _ = Describe("enable service access command", func() {
 					When("a broker name is not provided", func() {
 						It("fails to create the service", func() {
 							session := helpers.CF("enable-service-access", service)
-							Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as admin...", service))
+							Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as foo...", service))
 							Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
@@ -259,7 +259,7 @@ var _ = Describe("enable service access command", func() {
 					When("no broker by that name exists", func() {
 						It("displays an informative message, exits 1", func() {
 							session := helpers.CF("enable-service-access", service, "-b", "non-existent-broker")
-							Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as admin...", service, "non-existent-broker"))
+							Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as foo...", service, "non-existent-broker"))
 							Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 							Eventually(session.Err).Should(Say("TIP: Use 'cf service-brokers' to see a list of available brokers."))
 							Eventually(session).Should(Say("FAILED"))
@@ -272,7 +272,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service name and plan name are provided", func() {
 				It("displays an informative message, exits 0, and enables the plan for all orgs", func() {
 					session := helpers.CF("enable-service-access", service, "-p", servicePlan)
-					Eventually(session).Should(Say("Enabling access of plan %s for service %s as admin...", servicePlan, service))
+					Eventually(session).Should(Say("Enabling access of plan %s for service %s as foo...", servicePlan, service))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
@@ -289,7 +289,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service name and org is provided", func() {
 				It("displays an informative message, and exits 0", func() {
 					session := helpers.CF("enable-service-access", service, "-o", orgName)
-					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org %s as admin...", service, orgName))
+					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org %s as foo...", service, orgName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -298,7 +298,7 @@ var _ = Describe("enable service access command", func() {
 			When("a service name, plan name and org is provided", func() {
 				It("displays an informative message, and exits 0", func() {
 					session := helpers.CF("enable-service-access", service, "-p", servicePlan, "-o", orgName)
-					Eventually(session).Should(Say("Enabling access to plan %s of service %s for org %s as admin...", servicePlan, service, orgName))
+					Eventually(session).Should(Say("Enabling access to plan %s of service %s for org %s as foo...", servicePlan, service, orgName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
@@ -317,7 +317,7 @@ var _ = Describe("enable service access command", func() {
 			When("the org does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", service, "-o", "not-a-real-org")
-					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org not-a-real-org as admin...", service))
+					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org not-a-real-org as foo...", service))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Organization 'not-a-real-org' not found"))
 					Eventually(session).Should(Exit(1))
@@ -327,7 +327,7 @@ var _ = Describe("enable service access command", func() {
 			When("the plan does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", service, "-p", "plan-does-not-exist")
-					Eventually(session).Should(Say("Enabling access of plan plan-does-not-exist for service %s as admin...", service))
+					Eventually(session).Should(Say("Enabling access of plan plan-does-not-exist for service %s as foo...", service))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("The plan plan-does-not-exist could not be found for service %s", service))
 					Eventually(session).Should(Exit(1))
@@ -337,7 +337,7 @@ var _ = Describe("enable service access command", func() {
 			When("the plan does exist and the org does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", service, "-p", servicePlan, "-o", "not-a-real-org")
-					Eventually(session).Should(Say("Enabling access to plan %s of service %s for org not-a-real-org as admin...", servicePlan, service))
+					Eventually(session).Should(Say("Enabling access to plan %s of service %s for org not-a-real-org as foo...", servicePlan, service))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Organization 'not-a-real-org' not found"))
 					Eventually(session).Should(Exit(1))
@@ -347,7 +347,7 @@ var _ = Describe("enable service access command", func() {
 			When("the plan does not exist and the org does exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("enable-service-access", service, "-p", "not-a-real-plan", "-o", orgName)
-					Eventually(session).Should(Say("Enabling access to plan not-a-real-plan of service %s for org %s as admin...", service, orgName))
+					Eventually(session).Should(Say("Enabling access to plan not-a-real-plan of service %s for org %s as foo...", service, orgName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Service plan 'not-a-real-plan' not found"))
 					Eventually(session).Should(Exit(1))
@@ -362,7 +362,7 @@ var _ = Describe("enable service access command", func() {
 
 				It("displays OK, and exits 0", func() {
 					session := helpers.CF("enable-service-access", service, "-o", orgName)
-					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org %s as admin...", service, orgName))
+					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org %s as foo...", service, orgName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -411,7 +411,7 @@ var _ = Describe("enable service access command", func() {
 				When("the service already has access globally enabled", func() {
 					It("displays an informative message, and exits 0", func() {
 						session := helpers.CF("enable-service-access", service)
-						Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as admin...", service))
+						Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as foo...", service))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -420,7 +420,7 @@ var _ = Describe("enable service access command", func() {
 				When("the plan already has access globally enabled", func() {
 					It("displays an informative message, and exits 0", func() {
 						session := helpers.CF("enable-service-access", service, "-p", servicePlan)
-						Eventually(session).Should(Say("Enabling access of plan %s for service %s as admin...", servicePlan, service))
+						Eventually(session).Should(Say("Enabling access of plan %s for service %s as foo...", servicePlan, service))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
