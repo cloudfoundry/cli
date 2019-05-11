@@ -89,7 +89,7 @@ var _ = Describe("disable service access command", func() {
 			When("only the service is specified", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("disable-service-access", "some-service")
-					Eventually(session).Should(Say("Disabling access to all plans of service some-service for all orgs as admin\\.\\.\\."))
+					Eventually(session).Should(Say("Disabling access to all plans of service some-service for all orgs as foo\\.\\.\\."))
 					Eventually(session.Err).Should(Say("Service offering 'some-service' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -127,7 +127,7 @@ var _ = Describe("disable service access command", func() {
 				When("a service name is provided", func() {
 					It("displays an informative message, exits 0, and disables the service for all orgs", func() {
 						session := helpers.CF("disable-service-access", broker.ServiceName())
-						Eventually(session).Should(Say("Disabling access to all plans of service %s for all orgs as admin...", broker.ServiceName()))
+						Eventually(session).Should(Say("Disabling access to all plans of service %s for all orgs as foo...", broker.ServiceName()))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
@@ -144,7 +144,7 @@ var _ = Describe("disable service access command", func() {
 				When("a service name and plan name are provided", func() {
 					It("displays an informative message, exits 0, and disables the plan for all orgs", func() {
 						session := helpers.CF("disable-service-access", broker.ServiceName(), "-p", broker.ServicePlanName())
-						Eventually(session).Should(Say("Disabling access of plan %s for service %s as admin...", broker.ServicePlanName(), broker.ServiceName()))
+						Eventually(session).Should(Say("Disabling access of plan %s for service %s as foo...", broker.ServicePlanName(), broker.ServiceName()))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
@@ -180,7 +180,7 @@ var _ = Describe("disable service access command", func() {
 				When("a service name and org is provided", func() {
 					It("displays an informative message, and exits 0, and disables the service for the given org", func() {
 						session := helpers.CF("disable-service-access", broker.ServiceName(), "-o", orgName)
-						Eventually(session).Should(Say("Disabling access to all plans of service %s for the org %s as admin...", broker.ServiceName(), orgName))
+						Eventually(session).Should(Say("Disabling access to all plans of service %s for the org %s as foo...", broker.ServiceName(), orgName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
@@ -198,7 +198,7 @@ var _ = Describe("disable service access command", func() {
 				When("a service name, plan name and org is provided", func() {
 					It("displays an informative message, and exits 0, disables the service for the given org and plan", func() {
 						session := helpers.CF("disable-service-access", broker.ServiceName(), "-p", broker.ServicePlanName(), "-o", orgName)
-						Eventually(session).Should(Say("Disabling access to plan %s of service %s for org %s as admin...", broker.ServicePlanName(), broker.ServiceName(), orgName))
+						Eventually(session).Should(Say("Disabling access to plan %s of service %s for org %s as foo...", broker.ServicePlanName(), broker.ServiceName(), orgName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
@@ -217,7 +217,7 @@ var _ = Describe("disable service access command", func() {
 			When("the org does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("disable-service-access", broker.ServiceName(), "-o", "not-a-real-org")
-					Eventually(session).Should(Say("Disabling access to all plans of service %s for the org not-a-real-org as admin...", broker.ServiceName()))
+					Eventually(session).Should(Say("Disabling access to all plans of service %s for the org not-a-real-org as foo...", broker.ServiceName()))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Organization 'not-a-real-org' not found"))
 					Eventually(session).Should(Exit(1))
@@ -227,7 +227,7 @@ var _ = Describe("disable service access command", func() {
 			When("the plan does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("disable-service-access", broker.ServiceName(), "-p", "plan-does-not-exist")
-					Eventually(session).Should(Say("Disabling access of plan plan-does-not-exist for service %s as admin...", broker.ServiceName()))
+					Eventually(session).Should(Say("Disabling access of plan plan-does-not-exist for service %s as foo...", broker.ServiceName()))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("The plan plan-does-not-exist could not be found for service %s", broker.ServiceName()))
 					Eventually(session).Should(Exit(1))
@@ -253,7 +253,7 @@ var _ = Describe("disable service access command", func() {
 				When("a service name and broker name are provided", func() {
 					It("displays an informative message, exits 0, and disables access to the service", func() {
 						session := helpers.CF("disable-service-access", broker.ServiceName(), "-b", secondBroker.Name())
-						Eventually(session).Should(Say("Disabling access to all plans of service %s from broker %s for all orgs as admin...", broker.ServiceName(), secondBroker.Name()))
+						Eventually(session).Should(Say("Disabling access to all plans of service %s from broker %s for all orgs as foo...", broker.ServiceName(), secondBroker.Name()))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 

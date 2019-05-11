@@ -82,7 +82,7 @@ var _ = Describe("create-service-broker command", func() {
 
 				It("registers the broker", func() {
 					session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL())
-					Eventually(session).Should(Say("Creating service broker %s as admin...", brokerName))
+					Eventually(session).Should(Say("Creating service broker %s as foo...", brokerName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
@@ -133,7 +133,7 @@ var _ = Describe("create-service-broker command", func() {
 
 					It("registers the broker and exposes its services only to the targeted space", func() {
 						session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL(), "--space-scoped")
-						Eventually(session).Should(Say("Creating service broker " + brokerName + " in org " + orgName + " / space " + spaceName + " as admin..."))
+						Eventually(session).Should(Say("Creating service broker " + brokerName + " in org " + orgName + " / space " + spaceName + " as foo..."))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 

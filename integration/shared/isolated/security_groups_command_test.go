@@ -143,7 +143,7 @@ var _ = Describe("security-groups command", func() {
 			})
 
 			It("lists the security groups", func() {
-				Eventually(session).Should(Say("Getting security groups as admin"))
+				Eventually(session).Should(Say("Getting security groups as foo"))
 				Eventually(session).Should(Say(`OK\n\n`))
 				Eventually(session).Should(Say(`\s+name\s+organization\s+space\s+lifecycle`))
 				// How to test alphabetization with auto-generated names?  Here's how.
