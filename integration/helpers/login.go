@@ -76,9 +76,10 @@ func LoginAs(username, password string) {
 // and CF_INT_PASSWORD environment variables, respectively, defaulting to "admin" for
 // each if either is not set.
 func LoginCF() string {
-	username, password := GetCredentials()
-	LoginAs(username, password)
-	return username
+	// username, password := GetCredentials()
+	// LoginAs(username, password)
+	// return username
+	return LoginCFWithClientCredentials()
 }
 
 // LoginCFWithClientCredentials logs in to the CLI using client credentials from the CF_INT_CLIENT_ID and
@@ -99,15 +100,16 @@ func LoginCFWithClientCredentials() string {
 // environment variables, defaulting to "admin" for
 // each if either is not set.
 func GetCredentials() (string, string) {
-	username := os.Getenv("CF_INT_USERNAME")
-	if username == "" {
-		username = "admin"
-	}
-	password := os.Getenv("CF_INT_PASSWORD")
-	if password == "" {
-		password = "admin"
-	}
-	return username, password
+	return SkipIfClientCredentialsNotSet()
+	// username := os.Getenv("CF_INT_USERNAME")
+	// if username == "" {
+	// 	username = "admin"
+	// }
+	// password := os.Getenv("CF_INT_PASSWORD")
+	// if password == "" {
+	// 	password = "admin"
+	// }
+	// return username, password
 }
 
 // SkipIfOIDCCredentialsNotSet returns back the username and the password for
