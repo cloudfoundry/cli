@@ -43,6 +43,11 @@ func (cmd OauthTokenCommand) Execute(_ []string) error {
 		return err
 	}
 
+	if cmd.Config.UAAGrantType() == "client_credentials" && cmd.Config.UAAOAuthClientSecret() == "" {
+		cmd.UI.DisplayText(cmd.Config.AccessToken())
+		return nil
+	}
+
 	accessToken, err := cmd.Actor.RefreshAccessToken(cmd.Config.RefreshToken())
 	if err != nil {
 		return err

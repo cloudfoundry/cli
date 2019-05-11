@@ -70,10 +70,16 @@ var _ = Describe("oauth-token command", func() {
 
 		When("the refresh token and oauth creds are valid", func() {
 			It("refreshes the access token and displays it", func() {
-				session := helpers.CF("oauth-token")
+				existingAccessToken := helpers.GetConfig().ConfigFile.AccessToken
 
-				Eventually(session).Should(Say("bearer .+"))
-				Eventually(session).Should(Exit(0))
+				session := helpers.CF("oauth-token").Wait()
+
+				output := string(session.Out.Contents())
+				Expect(output).ToNot(ContainSubstring(existingAccessToken))
+				Expect(output).To(MatchRegexp("bearer .+"))
+
+				Expect(session.Err.Contents()).To(BeEmpty())
+				Expect(session.ExitCode()).To(Equal(0))
 			})
 		})
 	})
@@ -81,6 +87,13 @@ var _ = Describe("oauth-token command", func() {
 	When("the environment is setup correctly and user is logged in with client credentials grant", func() {
 		BeforeEach(func() {
 			helpers.LoginCFWithClientCredentials()
+		})
+
+		It("displays the current access token without trying to re-authenticate", func() {
+			session := helpers.CF("oauth-token")
+
+			Eventually(session).Should(Say("bearer .+"))
+			Eventually(session).Should(Exit(0))
 		})
 
 		When("the oauth client ID and secret combination is invalid", func() {
@@ -125,16 +138,6 @@ var _ = Describe("oauth-token command", func() {
 				})
 			})
 
-			When("the client credentials are not present in the config", func() {
-				It("displays an error and exits 1", func() {
-					session := helpers.CF("oauth-token")
-
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
 		})
 
 		When("the oauth creds are valid", func() {
@@ -147,11 +150,18 @@ var _ = Describe("oauth-token command", func() {
 						conf.ConfigFile.UAAOAuthClientSecret = clientSecret
 					})
 				})
-				It("re-authenticates and displays the new access token", func() {
-					session := helpers.CF("oauth-token")
 
-					Eventually(session).Should(Say("bearer .+"))
-					Eventually(session).Should(Exit(0))
+				It("re-authenticates and displays the new access token", func() {
+					existingAccessToken := helpers.GetConfig().ConfigFile.AccessToken
+
+					session := helpers.CF("oauth-token").Wait()
+
+					output := string(session.Out.Contents())
+					Expect(output).ToNot(ContainSubstring(existingAccessToken))
+					Expect(output).To(MatchRegexp("bearer .+"))
+
+					Expect(session.Err.Contents()).To(BeEmpty())
+					Expect(session.ExitCode()).To(Equal(0))
 				})
 			})
 		})
