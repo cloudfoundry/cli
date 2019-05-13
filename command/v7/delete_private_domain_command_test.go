@@ -1,8 +1,11 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"errors"
+
+	"code.cloudfoundry.org/cli/actor/v7action"
+
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -11,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -102,6 +104,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		})
 
 		It("displays OK and returns with success", func() {
+			Expect(testUI.Out).To(Say("Domain some-domain.com does not exist"))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).ToNot(HaveOccurred())
 		})
