@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-type FakeGetLabelActor struct {
+type FakeLabelsActor struct {
 	GetApplicationLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
 	getApplicationLabelsMutex       sync.RWMutex
 	getApplicationLabelsArgsForCall []struct {
@@ -45,7 +45,7 @@ type FakeGetLabelActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeGetLabelActor) GetApplicationLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
+func (fake *FakeLabelsActor) GetApplicationLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
 	fake.getApplicationLabelsMutex.Lock()
 	ret, specificReturn := fake.getApplicationLabelsReturnsOnCall[len(fake.getApplicationLabelsArgsForCall)]
 	fake.getApplicationLabelsArgsForCall = append(fake.getApplicationLabelsArgsForCall, struct {
@@ -64,26 +64,26 @@ func (fake *FakeGetLabelActor) GetApplicationLabels(arg1 string, arg2 string) (m
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeGetLabelActor) GetApplicationLabelsCallCount() int {
+func (fake *FakeLabelsActor) GetApplicationLabelsCallCount() int {
 	fake.getApplicationLabelsMutex.RLock()
 	defer fake.getApplicationLabelsMutex.RUnlock()
 	return len(fake.getApplicationLabelsArgsForCall)
 }
 
-func (fake *FakeGetLabelActor) GetApplicationLabelsCalls(stub func(string, string) (map[string]types.NullString, v7action.Warnings, error)) {
+func (fake *FakeLabelsActor) GetApplicationLabelsCalls(stub func(string, string) (map[string]types.NullString, v7action.Warnings, error)) {
 	fake.getApplicationLabelsMutex.Lock()
 	defer fake.getApplicationLabelsMutex.Unlock()
 	fake.GetApplicationLabelsStub = stub
 }
 
-func (fake *FakeGetLabelActor) GetApplicationLabelsArgsForCall(i int) (string, string) {
+func (fake *FakeLabelsActor) GetApplicationLabelsArgsForCall(i int) (string, string) {
 	fake.getApplicationLabelsMutex.RLock()
 	defer fake.getApplicationLabelsMutex.RUnlock()
 	argsForCall := fake.getApplicationLabelsArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeGetLabelActor) GetApplicationLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+func (fake *FakeLabelsActor) GetApplicationLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationLabelsMutex.Lock()
 	defer fake.getApplicationLabelsMutex.Unlock()
 	fake.GetApplicationLabelsStub = nil
@@ -94,7 +94,7 @@ func (fake *FakeGetLabelActor) GetApplicationLabelsReturns(result1 map[string]ty
 	}{result1, result2, result3}
 }
 
-func (fake *FakeGetLabelActor) GetApplicationLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+func (fake *FakeLabelsActor) GetApplicationLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationLabelsMutex.Lock()
 	defer fake.getApplicationLabelsMutex.Unlock()
 	fake.GetApplicationLabelsStub = nil
@@ -112,7 +112,7 @@ func (fake *FakeGetLabelActor) GetApplicationLabelsReturnsOnCall(i int, result1 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeGetLabelActor) GetOrganizationLabels(arg1 string) (map[string]types.NullString, v7action.Warnings, error) {
+func (fake *FakeLabelsActor) GetOrganizationLabels(arg1 string) (map[string]types.NullString, v7action.Warnings, error) {
 	fake.getOrganizationLabelsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationLabelsReturnsOnCall[len(fake.getOrganizationLabelsArgsForCall)]
 	fake.getOrganizationLabelsArgsForCall = append(fake.getOrganizationLabelsArgsForCall, struct {
@@ -130,26 +130,26 @@ func (fake *FakeGetLabelActor) GetOrganizationLabels(arg1 string) (map[string]ty
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeGetLabelActor) GetOrganizationLabelsCallCount() int {
+func (fake *FakeLabelsActor) GetOrganizationLabelsCallCount() int {
 	fake.getOrganizationLabelsMutex.RLock()
 	defer fake.getOrganizationLabelsMutex.RUnlock()
 	return len(fake.getOrganizationLabelsArgsForCall)
 }
 
-func (fake *FakeGetLabelActor) GetOrganizationLabelsCalls(stub func(string) (map[string]types.NullString, v7action.Warnings, error)) {
+func (fake *FakeLabelsActor) GetOrganizationLabelsCalls(stub func(string) (map[string]types.NullString, v7action.Warnings, error)) {
 	fake.getOrganizationLabelsMutex.Lock()
 	defer fake.getOrganizationLabelsMutex.Unlock()
 	fake.GetOrganizationLabelsStub = stub
 }
 
-func (fake *FakeGetLabelActor) GetOrganizationLabelsArgsForCall(i int) string {
+func (fake *FakeLabelsActor) GetOrganizationLabelsArgsForCall(i int) string {
 	fake.getOrganizationLabelsMutex.RLock()
 	defer fake.getOrganizationLabelsMutex.RUnlock()
 	argsForCall := fake.getOrganizationLabelsArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeGetLabelActor) GetOrganizationLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+func (fake *FakeLabelsActor) GetOrganizationLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationLabelsMutex.Lock()
 	defer fake.getOrganizationLabelsMutex.Unlock()
 	fake.GetOrganizationLabelsStub = nil
@@ -160,7 +160,7 @@ func (fake *FakeGetLabelActor) GetOrganizationLabelsReturns(result1 map[string]t
 	}{result1, result2, result3}
 }
 
-func (fake *FakeGetLabelActor) GetOrganizationLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+func (fake *FakeLabelsActor) GetOrganizationLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationLabelsMutex.Lock()
 	defer fake.getOrganizationLabelsMutex.Unlock()
 	fake.GetOrganizationLabelsStub = nil
@@ -178,7 +178,7 @@ func (fake *FakeGetLabelActor) GetOrganizationLabelsReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeGetLabelActor) Invocations() map[string][][]interface{} {
+func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationLabelsMutex.RLock()
@@ -192,7 +192,7 @@ func (fake *FakeGetLabelActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeGetLabelActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeLabelsActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -204,4 +204,4 @@ func (fake *FakeGetLabelActor) recordInvocation(key string, args []interface{}) 
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v7.GetLabelActor = new(FakeGetLabelActor)
+var _ v7.LabelsActor = new(FakeLabelsActor)

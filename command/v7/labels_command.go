@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"fmt"
 	"sort"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -10,12 +11,11 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
-	"fmt"
 )
 
-//go:generate counterfeiter . GetLabelActor
+//go:generate counterfeiter . LabelsActor
 
-type GetLabelActor interface {
+type LabelsActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
 }
@@ -26,7 +26,7 @@ type LabelsCommand struct {
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
-	Actor        GetLabelActor
+	Actor        LabelsActor
 }
 
 func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
