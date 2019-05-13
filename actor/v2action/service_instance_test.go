@@ -772,4 +772,50 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 	})
+
+	Describe("UpdateServiceInstanceMaintenanceInfo", func() {
+		const serviceInstanceGUID = "service-instance-guid"
+		var maintenanceInfo MaintenanceInfo
+
+		BeforeEach(func() {
+			maintenanceInfo = MaintenanceInfo{
+				Version: "1.2.3",
+			}
+		})
+
+		When("the update is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceInstanceMaintenanceInfoReturns(
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns all the warnings", func() {
+				warnings, err := actor.UpdateServiceInstanceMaintenanceInfo(serviceInstanceGUID, maintenanceInfo)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(fakeCloudControllerClient.UpdateServiceInstanceMaintenanceInfoCallCount()).To(Equal(1))
+				guid, minfo := fakeCloudControllerClient.UpdateServiceInstanceMaintenanceInfoArgsForCall(0)
+				Expect(guid).To(Equal(serviceInstanceGUID))
+				Expect(minfo).To(Equal(ccv2.MaintenanceInfo(maintenanceInfo)))
+			})
+		})
+
+		When("the update fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceInstanceMaintenanceInfoReturns(
+					ccv2.Warnings{"warning-1", "warning-2"},
+					errors.New("update failed horribly!!!"),
+				)
+			})
+
+			It("returns the error and all the warnings", func() {
+				warnings, err := actor.UpdateServiceInstanceMaintenanceInfo(serviceInstanceGUID, maintenanceInfo)
+				Expect(err).To(MatchError("update failed horribly!!!"))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
 })

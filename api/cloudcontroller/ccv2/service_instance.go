@@ -199,6 +199,7 @@ func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProv
 		URIParams:   map[string]string{"guid": spaceGUID},
 		Query:       query,
 	})
+
 	if err != nil {
 		return nil, nil, err
 	}
@@ -244,4 +245,38 @@ func (client *Client) GetUserProvidedServiceInstances(filters ...Filter) ([]Serv
 	})
 
 	return fullInstancesList, warnings, err
+}
+
+type MaintenanceInfo struct {
+	Version string `json:"version"`
+}
+
+type updateServiceInstanceRequestBody struct {
+	MaintenanceInfo MaintenanceInfo `json:"maintenance_info"`
+}
+
+func (client *Client) UpdateServiceInstanceMaintenanceInfo(serviceInstanceGUID string, maintenanceInfo MaintenanceInfo) (Warnings, error) {
+	requestBody := updateServiceInstanceRequestBody{
+		MaintenanceInfo: maintenanceInfo,
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutServiceInstanceRequest,
+		URIParams:   Params{"service_instance_guid": serviceInstanceGUID},
+		Body:        bytes.NewReader(bodyBytes),
+		Query:       url.Values{"accepts_incomplete": {"true"}},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
 }
