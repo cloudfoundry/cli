@@ -108,6 +108,16 @@ func (actor Actor) GetOrganizationDomains(orgGuid string) ([]Domain, Warnings, e
 	return domains, Warnings(warnings), nil
 }
 
+func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
+	domain, warnings, err := actor.CloudControllerClient.GetDomain(domainGUID)
+
+	if err != nil {
+		return Domain{}, Warnings(warnings), err
+	}
+
+	return Domain(domain), Warnings(warnings), nil
+}
+
 func (actor Actor) GetDomainByName(domainName string) (Domain, Warnings, error) {
 	domains, warnings, err := actor.CloudControllerClient.GetDomains(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},

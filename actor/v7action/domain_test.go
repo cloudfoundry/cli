@@ -230,6 +230,69 @@ var _ = Describe("Domain Actions", func() {
 		})
 	})
 
+	Describe("get domain by guid", func() {
+		var (
+			domain      Domain
+			ccv3Domain  ccv3.Domain
+			domain1Guid string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			domain1Guid = "domain-1-guid"
+			ccv3Domain = ccv3.Domain{Name: "domain-1-name", GUID: domain1Guid}
+		})
+
+		JustBeforeEach(func() {
+
+			domain, warnings, executeErr = actor.GetDomain(domain1Guid)
+		})
+
+		When("the API layer call is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainReturns(
+					ccv3Domain,
+					ccv3.Warnings{"some-domain-warning"},
+					nil,
+				)
+			})
+
+			It("returns back the domains and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetDomainCallCount()).To(Equal(1))
+				actualGUID := fakeCloudControllerClient.GetDomainArgsForCall(0)
+				Expect(actualGUID).To(Equal(domain1Guid))
+
+				Expect(domain).To(Equal(
+					Domain{Name: "domain-1-name", GUID: domain1Guid},
+				))
+				Expect(warnings).To(ConsistOf("some-domain-warning"))
+
+			})
+		})
+
+		When("when the API layer call returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainReturns(
+					ccv3.Domain{},
+					ccv3.Warnings{"some-domain-warning"},
+					errors.New("get-domain-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("get-domain-error"))
+				Expect(warnings).To(ConsistOf("some-domain-warning"))
+				Expect(domain).To(Equal(Domain{}))
+
+				Expect(fakeCloudControllerClient.GetDomainCallCount()).To(Equal(1))
+			})
+		})
+	})
+
 	Describe("get domain by name", func() {
 		var (
 			ccv3Domains []ccv3.Domain

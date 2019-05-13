@@ -432,6 +432,89 @@ var _ = Describe("Domain", func() {
 		})
 	})
 
+	Describe("GetDomain", func() {
+
+		var (
+			domainGUID string
+			domain     Domain
+			warnings   Warnings
+			executeErr error
+		)
+		JustBeforeEach(func() {
+			domainGUID = "domain-guid-1"
+			domain, warnings, executeErr = client.GetDomain(domainGUID)
+		})
+
+		When("domain is found", func() {
+			BeforeEach(func() {
+				response := `{
+	      	"name": "domain-name-1",
+	      	"guid": "domain-guid-1"
+	    }`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/domains/domain-guid-1"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns a domain and prints all warnings", func() {
+				Expect(executeErr).To(Not(HaveOccurred()))
+
+				Expect(domain).To(Equal(Domain{
+					Name: "domain-name-1",
+					GUID: "domain-guid-1",
+				}))
+
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Domain not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/domains/domain-guid-1"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Domain not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 	Describe("GetOrganizationDomains", func() {
 		var (
 			orgGUID    string

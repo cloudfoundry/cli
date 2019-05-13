@@ -39,6 +39,7 @@ type CloudControllerClient interface {
 	GetBuild(guid string) (ccv3.Build, ccv3.Warnings, error)
 	GetBuildpacks(query ...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)
 	GetDefaultDomain(orgGuid string) (ccv3.Domain, ccv3.Warnings, error)
+	GetDomain(GUID string) (ccv3.Domain, ccv3.Warnings, error)
 	GetDomains(query ...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error)
 	GetDroplet(guid string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetDroplets(query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)

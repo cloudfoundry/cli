@@ -170,6 +170,25 @@ func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
+// GetDomain returns a domain with the given GUID.
+func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetDomainRequest,
+		URIParams:   map[string]string{"domain_guid": domainGUID},
+	})
+	if err != nil {
+		return Domain{}, nil, err
+	}
+
+	var responseDomain Domain
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseDomain,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseDomain, response.Warnings, err
+}
+
 func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainsRequest,
