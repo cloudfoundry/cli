@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -89,11 +91,29 @@ var _ = Describe("oauth-token command", func() {
 			helpers.LoginCFWithClientCredentials()
 		})
 
-		It("displays the current access token without trying to re-authenticate", func() {
-			session := helpers.CF("oauth-token")
+		When("the access token has not expired", func() {
+			It("displays the current access token without trying to re-authenticate", func() {
+				existingAccessToken := helpers.GetConfig().ConfigFile.AccessToken
+				session := helpers.CF("oauth-token")
 
-			Eventually(session).Should(Say("bearer .+"))
-			Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Say(regexp.QuoteMeta(existingAccessToken)))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the access token has expired", func() {
+			BeforeEach(func() {
+				helpers.SetConfig(func(conf *configv3.Config) {
+					conf.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
+				})
+			})
+			It("displays an error and exits 1", func() {
+				session := helpers.CF("oauth-token")
+
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say(`Access token has expired\.`))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 
 		When("the oauth client ID and secret combination is invalid", func() {
@@ -135,6 +155,16 @@ var _ = Describe("oauth-token command", func() {
 
 					Eventually(session).Should(Say("bearer .+"))
 					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the client credentials are not present in the config", func() {
+				It("displays an error and exits 1", func() {
+					session := helpers.CF("oauth-token")
+
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`Access token is invalid\.`))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 

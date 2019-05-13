@@ -1,10 +1,15 @@
 package v6
 
 import (
+	"errors"
+	"strings"
+	"time"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
+	"github.com/SermoDigital/jose/jws"
 )
 
 //go:generate counterfeiter . OauthTokenActor
@@ -44,6 +49,18 @@ func (cmd OauthTokenCommand) Execute(_ []string) error {
 	}
 
 	if cmd.Config.UAAGrantType() == "client_credentials" && cmd.Config.UAAOAuthClientSecret() == "" {
+		tokenStr := strings.TrimPrefix(cmd.Config.AccessToken(), "bearer ")
+		token, err := jws.ParseJWT([]byte(tokenStr))
+		if err != nil {
+			return errors.New(cmd.UI.TranslateText("Access token is invalid."))
+		}
+
+		expiration, _ := token.Claims().Expiration()
+
+		if expiration.Before(time.Now()) {
+			return errors.New(cmd.UI.TranslateText("Access token has expired."))
+		}
+
 		cmd.UI.DisplayText(cmd.Config.AccessToken())
 		return nil
 	}
