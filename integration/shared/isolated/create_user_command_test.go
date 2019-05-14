@@ -51,6 +51,7 @@ var _ = Describe("create-user command", func() {
 				noobPassword := helpers.NewPassword()
 				session := helpers.CF("create-user", noobUser, noobPassword)
 				Eventually(session).Should(Exit(0))
+				helpers.LogoutCF()
 
 				env := map[string]string{
 					"CF_USERNAME": noobUser,

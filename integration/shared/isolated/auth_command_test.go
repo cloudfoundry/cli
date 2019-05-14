@@ -138,13 +138,14 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	When("no flags are set (logging in with password grant type)", func() {
+	FWhen("no flags are set (logging in with password grant type)", func() {
 		When("the user provides an invalid username/password combo", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 			})
 
+			// This test probably needs to be skipped for client credentials
 			It("clears the cached tokens and target info, then displays an error message", func() {
 				session := helpers.CF("auth", "some-username", "some-password")
 
@@ -169,6 +170,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		When("the username and password are valid", func() {
+			//This test will be an interesting one to mess with
 			It("authenticates the user", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password)
