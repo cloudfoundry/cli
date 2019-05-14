@@ -85,15 +85,15 @@ func (t *UAAAuthentication) refreshToken() error {
 
 	tokenStr := strings.TrimPrefix(t.cache.AccessToken(), "bearer ")
 	token, err := jws.ParseJWT([]byte(tokenStr))
-	if err != nil {
-		// if the JWT could not be parsed, force a refresh
-		expiresIn = 0
-	} else {
-		expiration, _ := token.Claims().Expiration()
-		expiresIn = time.Until(expiration)
+
+	if err == nil {
+		expiration, ok := token.Claims().Expiration()
+		if ok {
+			expiresIn = time.Until(expiration)
+		}
 	}
 
-	if expiresIn < accessTokenExpirationMargin {
+	if err != nil || expiresIn < accessTokenExpirationMargin {
 		tokens, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {
 			return err
