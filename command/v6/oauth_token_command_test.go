@@ -8,6 +8,8 @@ import (
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/ui"
+	"github.com/SermoDigital/jose/crypto"
+	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -60,7 +62,50 @@ var _ = Describe("oauth-token command", func() {
 		})
 	})
 
-	When("the user is logged in", func() {
+	When("logged in as a client", func() {
+		BeforeEach(func() {
+			fakeConfig.UAAGrantTypeReturns("client_credentials")
+		})
+
+		When("the existing access token is invalid", func() {
+			BeforeEach(func() {
+				token := jws.NewJWT(jws.Claims{}, crypto.SigningMethodHS256)
+				fakeConfig.AccessTokenReturns("invalid-existing-access-token")
+				fakeActor.ParseAccessTokenReturns(token, errors.New("Access token is invalid"))
+			})
+
+			It("errors", func() {
+				Expect(executeErr).To(MatchError(errors.New("Access token is invalid.")))
+
+				Expect(testUI.Out).ToNot(Say("new-access-token"))
+
+				Expect(fakeActor.RefreshAccessTokenCallCount()).To(Equal(0))
+				Expect(fakeActor.ParseAccessTokenCallCount()).To(Equal(1))
+				Expect(fakeActor.ParseAccessTokenArgsForCall(0)).To(Equal("invalid-existing-access-token"))
+			})
+		})
+
+		When("the existing access token does not have an expiry time", func() {
+			BeforeEach(func() {
+				token := jws.NewJWT(jws.Claims{}, crypto.SigningMethodHS256)
+				fakeConfig.AccessTokenReturns("existing-access-token")
+				fakeActor.ParseAccessTokenReturns(token, nil)
+			})
+
+			It("errors", func() {
+				Expect(executeErr).To(MatchError(errors.New("Access token is missing expiration claim.")))
+
+				Expect(testUI.Out).ToNot(Say("new-access-token"))
+
+				Expect(fakeActor.RefreshAccessTokenCallCount()).To(Equal(0))
+				Expect(fakeActor.ParseAccessTokenCallCount()).To(Equal(1))
+				Expect(fakeActor.ParseAccessTokenArgsForCall(0)).To(Equal("existing-access-token"))
+			})
+		})
+
+	})
+
+	When("logged in as a user", func() {
 		BeforeEach(func() {
 			fakeConfig.RefreshTokenReturns("existing-refresh-token")
 		})

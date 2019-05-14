@@ -2,20 +2,20 @@ package v6
 
 import (
 	"errors"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
-	"github.com/SermoDigital/jose/jws"
+	"github.com/SermoDigital/jose/jwt"
 )
 
 //go:generate counterfeiter . OauthTokenActor
 
 type OauthTokenActor interface {
 	RefreshAccessToken(refreshToken string) (string, error)
+	ParseAccessToken(accessToken string) (jwt.JWT, error)
 }
 
 type OauthTokenCommand struct {
@@ -49,13 +49,15 @@ func (cmd OauthTokenCommand) Execute(_ []string) error {
 	}
 
 	if cmd.Config.UAAGrantType() == "client_credentials" && cmd.Config.UAAOAuthClientSecret() == "" {
-		tokenStr := strings.TrimPrefix(cmd.Config.AccessToken(), "bearer ")
-		token, err := jws.ParseJWT([]byte(tokenStr))
+		token, err := cmd.Actor.ParseAccessToken(cmd.Config.AccessToken())
 		if err != nil {
 			return errors.New(cmd.UI.TranslateText("Access token is invalid."))
 		}
 
-		expiration, _ := token.Claims().Expiration()
+		expiration, success := token.Claims().Expiration()
+		if !success {
+			return errors.New(cmd.UI.TranslateText("Access token is missing expiration claim."))
+		}
 
 		if expiration.Before(time.Now()) {
 			return errors.New(cmd.UI.TranslateText("Access token has expired."))

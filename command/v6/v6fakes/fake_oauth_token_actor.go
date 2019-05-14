@@ -5,9 +5,23 @@ import (
 	"sync"
 
 	v6 "code.cloudfoundry.org/cli/command/v6"
+	"github.com/SermoDigital/jose/jwt"
 )
 
 type FakeOauthTokenActor struct {
+	ParseAccessTokenStub        func(string) (jwt.JWT, error)
+	parseAccessTokenMutex       sync.RWMutex
+	parseAccessTokenArgsForCall []struct {
+		arg1 string
+	}
+	parseAccessTokenReturns struct {
+		result1 jwt.JWT
+		result2 error
+	}
+	parseAccessTokenReturnsOnCall map[int]struct {
+		result1 jwt.JWT
+		result2 error
+	}
 	RefreshAccessTokenStub        func(string) (string, error)
 	refreshAccessTokenMutex       sync.RWMutex
 	refreshAccessTokenArgsForCall []struct {
@@ -23,6 +37,69 @@ type FakeOauthTokenActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeOauthTokenActor) ParseAccessToken(arg1 string) (jwt.JWT, error) {
+	fake.parseAccessTokenMutex.Lock()
+	ret, specificReturn := fake.parseAccessTokenReturnsOnCall[len(fake.parseAccessTokenArgsForCall)]
+	fake.parseAccessTokenArgsForCall = append(fake.parseAccessTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ParseAccessToken", []interface{}{arg1})
+	fake.parseAccessTokenMutex.Unlock()
+	if fake.ParseAccessTokenStub != nil {
+		return fake.ParseAccessTokenStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.parseAccessTokenReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeOauthTokenActor) ParseAccessTokenCallCount() int {
+	fake.parseAccessTokenMutex.RLock()
+	defer fake.parseAccessTokenMutex.RUnlock()
+	return len(fake.parseAccessTokenArgsForCall)
+}
+
+func (fake *FakeOauthTokenActor) ParseAccessTokenCalls(stub func(string) (jwt.JWT, error)) {
+	fake.parseAccessTokenMutex.Lock()
+	defer fake.parseAccessTokenMutex.Unlock()
+	fake.ParseAccessTokenStub = stub
+}
+
+func (fake *FakeOauthTokenActor) ParseAccessTokenArgsForCall(i int) string {
+	fake.parseAccessTokenMutex.RLock()
+	defer fake.parseAccessTokenMutex.RUnlock()
+	argsForCall := fake.parseAccessTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeOauthTokenActor) ParseAccessTokenReturns(result1 jwt.JWT, result2 error) {
+	fake.parseAccessTokenMutex.Lock()
+	defer fake.parseAccessTokenMutex.Unlock()
+	fake.ParseAccessTokenStub = nil
+	fake.parseAccessTokenReturns = struct {
+		result1 jwt.JWT
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeOauthTokenActor) ParseAccessTokenReturnsOnCall(i int, result1 jwt.JWT, result2 error) {
+	fake.parseAccessTokenMutex.Lock()
+	defer fake.parseAccessTokenMutex.Unlock()
+	fake.ParseAccessTokenStub = nil
+	if fake.parseAccessTokenReturnsOnCall == nil {
+		fake.parseAccessTokenReturnsOnCall = make(map[int]struct {
+			result1 jwt.JWT
+			result2 error
+		})
+	}
+	fake.parseAccessTokenReturnsOnCall[i] = struct {
+		result1 jwt.JWT
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeOauthTokenActor) RefreshAccessToken(arg1 string) (string, error) {
@@ -91,6 +168,8 @@ func (fake *FakeOauthTokenActor) RefreshAccessTokenReturnsOnCall(i int, result1 
 func (fake *FakeOauthTokenActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.parseAccessTokenMutex.RLock()
+	defer fake.parseAccessTokenMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
