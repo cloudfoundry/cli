@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"github.com/SermoDigital/jose/jwt"
@@ -48,7 +49,7 @@ func (cmd OauthTokenCommand) Execute(_ []string) error {
 		return err
 	}
 
-	if cmd.Config.UAAGrantType() == "client_credentials" && cmd.Config.UAAOAuthClientSecret() == "" {
+	if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) && cmd.Config.UAAOAuthClientSecret() == "" {
 		token, err := cmd.Actor.ParseAccessToken(cmd.Config.AccessToken())
 		if err != nil {
 			return errors.New(cmd.UI.TranslateText("Access token is invalid."))

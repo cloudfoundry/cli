@@ -141,7 +141,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 	defer cmd.showStatus()
 
-	if cmd.Config.UAAGrantType() == "client_credentials" {
+	if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
 		return errors.New("Service account currently logged in. Use 'cf logout' to log out service account and try again.")
 	}
 
