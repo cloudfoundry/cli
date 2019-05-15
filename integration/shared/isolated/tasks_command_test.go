@@ -109,6 +109,7 @@ id   name   state   start time   command
 						password := helpers.NewPassword()
 						Eventually(helpers.CF("create-user", user, password)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-role", user, orgName, spaceName, "SpaceAuditor")).Should(Exit(0))
+						helpers.LogoutCF()
 						env := map[string]string{
 							"CF_USERNAME": user,
 							"CF_PASSWORD": password,

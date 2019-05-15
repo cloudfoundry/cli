@@ -34,6 +34,7 @@ var _ = Describe("oauth-token command", func() {
 
 	When("the environment is setup correctly and user is logged in with password grant", func() {
 		BeforeEach(func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			helpers.LoginCF()
 		})
 

@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("run-task command", func() {
+var _ = Describe("run-task command", func() {
 	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("run-task", "--help")

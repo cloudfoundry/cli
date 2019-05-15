@@ -31,3 +31,11 @@ func SkipIfCustomClientCredentialsNotSet() (string, string) {
 
 	return customClientID, customClientSecret
 }
+
+func SkipIfClientCredentialsTestMode() {
+	clientCredentialsTestMode := os.Getenv("CF_INT_CLIENT_CREDENTIALS_TEST_MODE")
+
+	if clientCredentialsTestMode != "" {
+		Skip("CF_INT_CLIENT_CREDENTIALS_TEST_MODE is set")
+	}
+}
