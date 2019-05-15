@@ -217,9 +217,26 @@ var _ = Describe("AuthenticationRepository", func() {
 					setupTestServer(successfulClientCredentialsLoginRequest)
 				})
 
-				It("uses client credentials to refresh the access token", func() {
+				It("uses client credentials to re-authenticate and obtain a new access token", func() {
 					Expect(apiErr).ToNot(HaveOccurred())
 					Expect(accessToken).To(Equal(fmt.Sprintf("BEARER %s", testAccessToken)))
+				})
+
+				When("the access token is still valid", func() {
+					var existingToken string
+
+					BeforeEach(func() {
+						expiringAnHourFromNow := time.Now().Add(time.Hour)
+						t := testconfig.BuildTokenString(expiringAnHourFromNow)
+						existingToken = fmt.Sprintf("bearer %s", t)
+						config.SetAccessToken(existingToken)
+					})
+
+					It("returns the existing access token without re-authenticating", func() {
+						Expect(apiErr).ToNot(HaveOccurred())
+						Expect(handler.CallCount).To(Equal(0))
+						Expect(accessToken).To(Equal(existingToken))
+					})
 				})
 			})
 
@@ -232,6 +249,23 @@ var _ = Describe("AuthenticationRepository", func() {
 
 				It("uses the refresh token to refresh the access token", func() {
 					Expect(accessToken).To(Equal(fmt.Sprintf("BEARER %s", testAccessToken)))
+				})
+
+				When("the access token is still valid", func() {
+					var existingToken string
+
+					BeforeEach(func() {
+						expiringAnHourFromNow := time.Now().Add(time.Hour)
+						t := testconfig.BuildTokenString(expiringAnHourFromNow)
+						existingToken = fmt.Sprintf("bearer %s", t)
+						config.SetAccessToken(existingToken)
+					})
+
+					It("returns the existing access token without refreshing", func() {
+						Expect(apiErr).ToNot(HaveOccurred())
+						Expect(handler.CallCount).To(Equal(0))
+						Expect(accessToken).To(Equal(existingToken))
+					})
 				})
 			})
 
