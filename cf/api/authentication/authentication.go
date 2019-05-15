@@ -195,8 +195,8 @@ func (uaa UAARepository) RefreshToken(t string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	expiration, _ := token.Claims().Expiration()
-	if expiration.Sub(time.Now()) > accessTokenExpirationMargin {
+	expiration, ok := token.Claims().Expiration()
+	if ok && expiration.Sub(time.Now()) > accessTokenExpirationMargin {
 		return t, nil
 	}
 
