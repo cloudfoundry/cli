@@ -17,6 +17,11 @@ import (
 )
 
 var _ = Describe("login command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("Help Text", func() {
 		When("--help flag is set", func() {
 			It("displays the command usage", func() {

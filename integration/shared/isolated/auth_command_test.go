@@ -67,6 +67,7 @@ var _ = Describe("auth command", func() {
 
 		When("env variables are provided", func() {
 			It("authenticates the user", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				username, password := helpers.GetCredentials()
 				env := map[string]string{
 					"CF_USERNAME": username,
@@ -138,7 +139,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	FWhen("no flags are set (logging in with password grant type)", func() {
+	When("no flags are set (logging in with password grant type)", func() {
 		When("the user provides an invalid username/password combo", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
@@ -147,6 +148,7 @@ var _ = Describe("auth command", func() {
 
 			// This test probably needs to be skipped for client credentials
 			It("clears the cached tokens and target info, then displays an error message", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				session := helpers.CF("auth", "some-username", "some-password")
 
 				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
@@ -172,6 +174,7 @@ var _ = Describe("auth command", func() {
 		When("the username and password are valid", func() {
 			//This test will be an interesting one to mess with
 			It("authenticates the user", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password)
 
@@ -318,6 +321,7 @@ var _ = Describe("auth command", func() {
 
 			When("the user provides the default origin and valid credentials", func() {
 				It("authenticates the user", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("auth", username, password, "--origin", "uaa")
 

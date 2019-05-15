@@ -58,6 +58,7 @@ var _ = Describe("custom oauth client id", func() {
 
 			Context("auth", func() {
 				It("uses the custom client id and secret", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					username, password := helpers.GetCredentials()
 					env := map[string]string{
 						"CF_USERNAME": username,
@@ -72,6 +73,7 @@ var _ = Describe("custom oauth client id", func() {
 
 			Context("login", func() {
 				It("uses the custom client id and secret", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-u", username, "-p", password)
 					Eventually(session).Should(Exit(1))
@@ -89,6 +91,8 @@ var _ = Describe("custom oauth client id", func() {
 
 			Context("v6 command", func() {
 				It("replaces the empty client id with the default values for client id and secret", func() {
+					// when authenticated as a client, client credentials must be present
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(0))
 
@@ -120,6 +124,7 @@ var _ = Describe("custom oauth client id", func() {
 
 			Context("v6 command", func() {
 				It("writes default values for client id and secret", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(0))
 
