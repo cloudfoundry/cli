@@ -3,11 +3,11 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
-	"fmt"
 )
 
 //go:generate counterfeiter . DeleteLabelActor
@@ -55,7 +55,7 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 	case "org":
 		err = cmd.executeOrg(user.Name, labels)
 	default:
-		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
+		err = errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.RequiredArgs.ResourceType}))
 	}
 
 	if err != nil {
@@ -81,9 +81,7 @@ func (cmd DeleteLabelCommand) executeApp(username string, labels map[string]type
 
 	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
 
-	for _, warning := range warnings {
-		cmd.UI.DisplayWarning(warning)
-	}
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -101,9 +99,7 @@ func (cmd DeleteLabelCommand) executeOrg(username string, labels map[string]type
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, labels)
 
-	for _, warning := range warnings {
-		cmd.UI.DisplayWarning(warning)
-	}
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
