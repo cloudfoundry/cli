@@ -8,5 +8,5 @@ type RouteAlreadyExistsError struct {
 }
 
 func (e RouteAlreadyExistsError) Error() string {
-	return fmt.Sprintf("Route %s already exists", e.Route)
+	return fmt.Sprintf("Route %s already exists.", e.Route)
 }

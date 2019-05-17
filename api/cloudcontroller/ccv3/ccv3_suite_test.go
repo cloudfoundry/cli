@@ -140,7 +140,10 @@ func SetupV3Response() {
 			},
 			"resource_matches": {
 				"href": "SERVER_URL/v3/resource_matches"
-			}
+			},
+            "routes": {
+                "href": "SERVER_URL/v3/routes"
+            }
 		}
 	}`, "SERVER_URL", serverURL, -1)
 

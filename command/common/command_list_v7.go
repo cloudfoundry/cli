@@ -57,7 +57,7 @@ type commandList struct {
 	CreateOrg                          v6.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
 	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" description:"Create a private domain for a specific org"`
 	CreateQuota                        v6.CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
-	CreateRoute                        v6.CreateRouteCommand                        `command:"create-route" description:"Create a url route in a space for later use"`
+	CreateRoute                        v7.CreateRouteCommand                        `command:"create-route" description:"Create a route for later use"`
 	CreateSecurityGroup                v6.CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
 	CreateServiceBroker                v6.CreateServiceBrokerCommand                `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
 	CreateServiceKey                   v6.CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`

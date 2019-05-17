@@ -21,6 +21,7 @@ type CloudControllerClient interface {
 	CreateDomain(domain ccv3.Domain) (ccv3.Domain, ccv3.Warnings, error)
 	CreateIsolationSegment(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
+	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
 	DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
 	DeleteBuildpack(buildpackGUID string) (ccv3.JobURL, ccv3.Warnings, error)

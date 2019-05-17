@@ -76,6 +76,7 @@ const (
 	PostIsolationSegmentsRequest                                = "PostIsolationSegments"
 	PostPackageRequest                                          = "PostPackage"
 	PostResourceMatchesRequest                                  = "PostResourceMatches"
+	PostRouteRequest                                            = "PostRoute"
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
@@ -144,6 +145,7 @@ var APIRoutes = []Route{
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodPatch, Name: PatchProcessRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ResourceMatches, Path: "/", Method: http.MethodPost, Name: PostResourceMatchesRequest},
+	{Resource: RoutesResource, Path: "/", Method: http.MethodPost, Name: PostRouteRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceInstancesResource, Path: "/", Method: http.MethodGet, Name: GetServiceInstancesRequest},
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipsSharedSpacesRequest},
