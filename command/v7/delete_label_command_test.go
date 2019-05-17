@@ -105,7 +105,7 @@ var _ = Describe("delete-label command", func() {
 					})
 
 					It("passes the correct parameters into the actor", func() {
-						expectedMaps := map[string]types.NullString{
+						expectedMap := map[string]types.NullString{
 							"some-label":     types.NewNullString(),
 							"some-other-key": types.NewNullString()}
 
@@ -113,7 +113,7 @@ var _ = Describe("delete-label command", func() {
 						actualAppName, spaceGUID, labelsMap := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
 						Expect(actualAppName).To(Equal(appName))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
-						Expect(labelsMap).To(Equal(expectedMaps))
+						Expect(labelsMap).To(Equal(expectedMap))
 					})
 				})
 
@@ -165,10 +165,6 @@ var _ = Describe("delete-label command", func() {
 
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
-		})
-
-		It("doesn't error", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
 		})
 
 		When("checking target succeeds", func() {
