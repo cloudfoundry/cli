@@ -20,7 +20,6 @@ var _ = Describe("ServiceBroker", func() {
 
 	Describe("GetServiceBrokers", func() {
 		var (
-			// query      Query
 			serviceBrokers []ServiceBroker
 			warnings       Warnings
 			executeErr     error
@@ -121,6 +120,113 @@ var _ = Describe("ServiceBroker", func() {
 			})
 
 			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("CreateServiceBroker", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+
+			credentials = ServiceBrokerCredentials{
+				Name:     "name",
+				URL:      "url",
+				Username: "username",
+				Password: "password",
+			}
+
+			expectedBody = map[string]interface{}{
+				"name":     "name",
+				"url":      "url",
+				"username": "username",
+				"password": "password",
+			}
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.CreateServiceBroker(credentials)
+		})
+
+		When("the Cloud Controller successfully creates the broker", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/service_brokers"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the broker is space scoped", func() {
+			BeforeEach(func() {
+				credentials.SpaceGUID = "space-guid"
+				expectedBody["space_guid"] = "space-guid"
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/service_brokers"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the Cloud Controller fails to create the broker", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Isolation segment not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/service_brokers"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns parsed errors and warnings", func() {
 				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{
