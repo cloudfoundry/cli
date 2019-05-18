@@ -106,13 +106,22 @@ func (cmd *CopySource) Execute(c flags.FlagContext) error {
 
 	var targetOrgName, targetSpaceName, spaceGUID, copyStr string
 	if targetOrg != "" && targetSpace != "" {
-		spaceGUID, err = cmd.findSpaceGUID(targetOrg, targetSpace)
+		var org models.Organization
+		var space models.Space
+
+		org, err := cmd.orgRepo.FindByName(targetOrg)
 		if err != nil {
 			return err
 		}
 
-		targetOrgName = targetOrg
-		targetSpaceName = targetSpace
+		space, err = cmd.spaceRepo.FindByNameInOrg(targetSpace,org.GUID)
+		spaceGUID = space.GUID
+		if err != nil {
+			return err
+		}
+
+		targetOrgName = org.Name
+		targetSpaceName = space.Name
 	} else if targetSpace != "" {
 		var space models.Space
 		space, err = cmd.spaceRepo.FindByName(targetSpace)
