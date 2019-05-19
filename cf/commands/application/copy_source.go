@@ -3,6 +3,7 @@ package application
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/cf/api/applications"
 	"code.cloudfoundry.org/cli/cf/api/authentication"
@@ -107,19 +108,29 @@ func (cmd *CopySource) Execute(c flags.FlagContext) error {
 	var targetOrgName, targetSpaceName, spaceGUID, copyStr string
 	if targetOrg != "" && targetSpace != "" {
 		var org models.Organization
-		var space models.Space
-
 		org, err := cmd.orgRepo.FindByName(targetOrg)
 		if err != nil {
 			return err
 		}
-
-		space, err = cmd.spaceRepo.FindByNameInOrg(targetSpace,org.GUID)
-		spaceGUID = space.GUID
-		if err != nil {
-			return err
+		//Get the matching space in the org by name
+		var space models.SpaceFields
+		var foundSpace bool
+		for _, s := range org.Spaces {
+			if strings.EqualFold(s.Name, targetSpace) {
+				space = s
+				foundSpace = true
+			}
 		}
-
+		//If no matching space is found
+		if !foundSpace {
+			return errors.New(T("Could not find space {{.Space}} in organization {{.Org}}",
+				map[string]interface{}{
+					"Space": terminal.EntityNameColor(targetSpace),
+					"Org":   terminal.EntityNameColor(targetOrg),
+				},
+			))
+		}
+		spaceGUID = space.GUID
 		targetOrgName = org.Name
 		targetSpaceName = space.Name
 	} else if targetSpace != "" {
@@ -130,7 +141,7 @@ func (cmd *CopySource) Execute(c flags.FlagContext) error {
 		}
 		spaceGUID = space.GUID
 		targetOrgName = cmd.config.OrganizationFields().Name
-		targetSpaceName = targetSpace
+		targetSpaceName = space.Name
 	} else {
 		spaceGUID = cmd.config.SpaceFields().GUID
 		targetOrgName = cmd.config.OrganizationFields().Name
@@ -159,33 +170,6 @@ func (cmd *CopySource) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Ok()
 	return nil
-}
-
-func (cmd *CopySource) findSpaceGUID(targetOrg, targetSpace string) (string, error) {
-	org, err := cmd.orgRepo.FindByName(targetOrg)
-	if err != nil {
-		return "", err
-	}
-
-	var space models.SpaceFields
-	var foundSpace bool
-	for _, s := range org.Spaces {
-		if s.Name == targetSpace {
-			space = s
-			foundSpace = true
-		}
-	}
-
-	if !foundSpace {
-		return "", fmt.Errorf(T("Could not find space {{.Space}} in organization {{.Org}}",
-			map[string]interface{}{
-				"Space": terminal.EntityNameColor(targetSpace),
-				"Org":   terminal.EntityNameColor(targetOrg),
-			},
-		))
-	}
-
-	return space.GUID, nil
 }
 
 func buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, username string) string {
