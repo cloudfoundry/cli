@@ -188,19 +188,6 @@ jobs:
               aggregate:
                 - task: delete-bosh-lite
                   file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
-                - put: slack-alert
-                  params: &bosh-lite-failure-alert
-                     channel: '#cli-eng'
-                     text: |
-                       Creating a bosh-lite failed :(
-                       ```
-                       Do the following tasks:
-                       1.Make sure the bosh-lite is deleted and resources are cleaned up.
-                       2.Remove the corresponding sha file from building-bosh-lites pool.
-                       3.Retrigger the create-bosh-lite task in the pipeline.
-                       Link: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-                       https://bit.ly/2S5aIov
-                       ```
         on_failure:
           aggregate:
             - put: terraform
@@ -219,7 +206,18 @@ jobs:
               get_params:
                 action: destroy
             - put: slack-alert
-              params: *bosh-lite-failure-alert
+              params:
+                channel: '#cli-eng'
+                text: |
+                  Creating a bosh-lite failed :(
+                  ```
+                  Do the following tasks:
+                  1.Make sure the bosh-lite is deleted and resources are cleaned up.
+                  2.Remove the corresponding sha file from building-bosh-lites pool.
+                  3.Retrigger the create-bosh-lite task in the pipeline.
+                  Link: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+                  https://bit.ly/2S5aIov
+                  ```
 
   - name: delete-bosh-lite
     plan:
