@@ -1121,6 +1121,23 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateResourceMetadataStub        func(string, string, ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)
+	updateResourceMetadataMutex       sync.RWMutex
+	updateResourceMetadataArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 ccv3.Metadata
+	}
+	updateResourceMetadataReturns struct {
+		result1 ccv3.ResourceMetadata
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateResourceMetadataReturnsOnCall map[int]struct {
+		result1 ccv3.ResourceMetadata
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	updateSpaceMutex       sync.RWMutex
 	updateSpaceArgsForCall []struct {
@@ -6165,6 +6182,74 @@ func (fake *FakeCloudControllerClient) UpdateProcessReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateResourceMetadata(arg1 string, arg2 string, arg3 ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error) {
+	fake.updateResourceMetadataMutex.Lock()
+	ret, specificReturn := fake.updateResourceMetadataReturnsOnCall[len(fake.updateResourceMetadataArgsForCall)]
+	fake.updateResourceMetadataArgsForCall = append(fake.updateResourceMetadataArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 ccv3.Metadata
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateResourceMetadata", []interface{}{arg1, arg2, arg3})
+	fake.updateResourceMetadataMutex.Unlock()
+	if fake.UpdateResourceMetadataStub != nil {
+		return fake.UpdateResourceMetadataStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateResourceMetadataReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataCallCount() int {
+	fake.updateResourceMetadataMutex.RLock()
+	defer fake.updateResourceMetadataMutex.RUnlock()
+	return len(fake.updateResourceMetadataArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataCalls(stub func(string, string, ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)) {
+	fake.updateResourceMetadataMutex.Lock()
+	defer fake.updateResourceMetadataMutex.Unlock()
+	fake.UpdateResourceMetadataStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataArgsForCall(i int) (string, string, ccv3.Metadata) {
+	fake.updateResourceMetadataMutex.RLock()
+	defer fake.updateResourceMetadataMutex.RUnlock()
+	argsForCall := fake.updateResourceMetadataArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturns(result1 ccv3.ResourceMetadata, result2 ccv3.Warnings, result3 error) {
+	fake.updateResourceMetadataMutex.Lock()
+	defer fake.updateResourceMetadataMutex.Unlock()
+	fake.UpdateResourceMetadataStub = nil
+	fake.updateResourceMetadataReturns = struct {
+		result1 ccv3.ResourceMetadata
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int, result1 ccv3.ResourceMetadata, result2 ccv3.Warnings, result3 error) {
+	fake.updateResourceMetadataMutex.Lock()
+	defer fake.updateResourceMetadataMutex.Unlock()
+	fake.UpdateResourceMetadataStub = nil
+	if fake.updateResourceMetadataReturnsOnCall == nil {
+		fake.updateResourceMetadataReturnsOnCall = make(map[int]struct {
+			result1 ccv3.ResourceMetadata
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateResourceMetadataReturnsOnCall[i] = struct {
+		result1 ccv3.ResourceMetadata
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
 	fake.updateSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSpaceReturnsOnCall[len(fake.updateSpaceArgsForCall)]
@@ -6869,6 +6954,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateProcessMutex.RLock()
 	defer fake.updateProcessMutex.RUnlock()
+	fake.updateResourceMetadataMutex.RLock()
+	defer fake.updateResourceMetadataMutex.RUnlock()
 	fake.updateSpaceMutex.RLock()
 	defer fake.updateSpaceMutex.RUnlock()
 	fake.updateSpaceApplyManifestMutex.RLock()
