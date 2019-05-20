@@ -16,6 +16,7 @@ var _ = Describe("Token Refreshing", func() {
 	Describe("password grant type", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
+			helpers.SkipIfClientCredentialsTestMode()
 		})
 
 		Describe("config file backwards compatibility", func() {

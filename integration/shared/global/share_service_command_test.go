@@ -221,6 +221,8 @@ var _ = Describe("share-service command", func() {
 						"CF_USERNAME": user,
 						"CF_PASSWORD": password,
 					}
+
+					helpers.LogoutCF()
 					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					helpers.TargetOrgAndSpace(sharedToOrgName, sharedToSpaceName)
 					sharedToSpaceGUID = helpers.GetSpaceGUID(sharedToSpaceName)

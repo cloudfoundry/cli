@@ -57,6 +57,10 @@ func GetAPI() string {
 // LoginAs logs in to the CLI with 'cf auth' and the given username and password,
 // retrying up to 3 times on failures.
 func LoginAs(username, password string) {
+	if ClientCredentialsTestMode() {
+		LogoutCF()
+	}
+
 	env := map[string]string{
 		"CF_USERNAME": username,
 		"CF_PASSWORD": password,
