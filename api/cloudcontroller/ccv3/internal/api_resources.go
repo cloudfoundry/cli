@@ -14,6 +14,7 @@ const (
 	PackagesResource          = "packages"
 	ProcessesResource         = "processes"
 	ResourceMatches           = "resource_matches"
+	ServiceBrokersResource    = "service_brokers"
 	ServiceInstancesResource  = "service_instances"
 	SpacesResource            = "spaces"
 	StacksResource            = "stacks"
