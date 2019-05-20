@@ -76,6 +76,7 @@ type CloudControllerClient interface {
 	UpdateOrganization(org ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)
 	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateProcess(process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
+	UpdateResourceMetadata(resource string, resourceGUID string, metadata ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)
 	UpdateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
