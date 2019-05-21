@@ -198,9 +198,11 @@ var _ = Describe("Verbose", func() {
 
 				// Invalidate the access token to cause a token refresh in order to
 				// test the call to the UAA.
-				helpers.SetConfig(func(config *configv3.Config) {
-					config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
-				})
+				if !helpers.ClientCredentialsTestMode() {
+					helpers.SetConfig(func(config *configv3.Config) {
+						config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
+					})
+				}
 
 				var envMap map[string]string
 				if env != "" {
@@ -226,11 +228,13 @@ var _ = Describe("Verbose", func() {
 
 				session := helpers.CFWithEnv(envMap, command...)
 				// implicit access token refresh
-				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say("POST /oauth/token"))
-				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
-				Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`)) //This is required to test the previous line. If it fails, the previous matcher went too far.
-				Eventually(session).Should(Say("RESPONSE:"))
+				if !helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say("REQUEST:"))
+					Eventually(session).Should(Say("POST /oauth/token"))
+					Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
+					Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`)) //This is required to test the previous line. If it fails, the previous matcher went too far.
+					Eventually(session).Should(Say("RESPONSE:"))
+				}
 				// actual request
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("GET /v3/apps"))
@@ -266,9 +270,11 @@ var _ = Describe("Verbose", func() {
 
 				// Invalidate the access token to cause a token refresh in order to
 				// test the call to the UAA.
-				helpers.SetConfig(func(config *configv3.Config) {
-					config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
-				})
+				if !helpers.ClientCredentialsTestMode() {
+					helpers.SetConfig(func(config *configv3.Config) {
+						config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
+					})
+				}
 
 				var envMap map[string]string
 				if env != "" {
@@ -302,9 +308,12 @@ var _ = Describe("Verbose", func() {
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("GET /v3/apps"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
-					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp("POST /oauth/token"))
-					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+
+					if !helpers.ClientCredentialsTestMode() {
+						Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+						Expect(string(contents)).To(MatchRegexp("POST /oauth/token"))
+						Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+					}
 
 					stat, err := os.Stat(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())

@@ -43,7 +43,7 @@ var _ = Describe("running plugins", func() {
 				})
 
 				It("is able to run an installed plugin command", func() {
-					confirmTestPluginOutput("Username", "admin")
+					confirmTestPluginOutput("ApiEndpoint", helpers.GetAPI())
 				})
 			})
 		})
