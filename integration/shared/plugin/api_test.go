@@ -248,6 +248,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("UserEmail", func() {
 		It("gets the current user's Email", func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			username, _ := helpers.GetCredentials()
 			confirmTestPluginOutput("UserEmail", username)
 		})
@@ -255,12 +256,14 @@ var _ = Describe("plugin API", func() {
 
 	Describe("UserGuid", func() {
 		It("gets the current user's GUID", func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			confirmTestPluginOutput("UserGuid", `[\w\d]+-[\w\d]+-[\w\d]+-[\w\d]+-[\w\d]+`)
 		})
 	})
 
 	Describe("Username", func() {
 		It("gets the current username", func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			username, _ := helpers.GetCredentials()
 			confirmTestPluginOutput("Username", username)
 		})
