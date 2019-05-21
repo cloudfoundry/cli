@@ -163,6 +163,7 @@ jobs:
                   - cf-deployment/operations/use-compiled-releases.yml
                   - cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml
                   - cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell-bosh-lite.yml
+                  - cf-deployment/operations/use-internal-lookup-for-route-services.yml
                   - capi-ci/cf-deployment-operations/seed-credhub-asg.yml
                   - cli/ci/infrastructure/operations/default-app-memory.yml
                   - cli/ci/infrastructure/operations/add-oidc-provider.yml
