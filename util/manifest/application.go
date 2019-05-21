@@ -36,6 +36,7 @@ type Application struct {
 	Routes          []string
 	RoutePath       string
 	Services        []string
+	Sidecars        []interface{}
 	StackName       string
 
 	DeprecatedDomain     interface{}
@@ -59,6 +60,7 @@ func (app Application) MarshalYAML() (interface{}, error) {
 		NoRoute:                 app.NoRoute,
 		Path:                    app.Path,
 		Services:                app.Services,
+		Sidecars:                app.Sidecars,
 		StackName:               app.StackName,
 		Timeout:                 app.HealthCheckTimeout,
 	}
@@ -129,6 +131,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.Path = m.Path
 	app.RandomRoute = m.RandomRoute
 	app.Services = m.Services
+	app.Sidecars = m.Sidecars
 	app.StackName = m.StackName
 	app.HealthCheckTimeout = m.Timeout
 	app.EnvironmentVariables = m.EnvironmentVariables

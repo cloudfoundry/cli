@@ -23,6 +23,7 @@ type rawManifestApplication struct {
 	RandomRoute             bool               `yaml:"random-route,omitempty"`
 	Routes                  []rawManifestRoute `yaml:"routes,omitempty"`
 	Services                []string           `yaml:"services,omitempty"`
+	Sidecars                []interface{}      `yaml:"sidecars,omitempty"`
 	StackName               string             `yaml:"stack,omitempty"`
 	Timeout                 uint64             `yaml:"timeout,omitempty"`
 }
