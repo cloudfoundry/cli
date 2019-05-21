@@ -120,6 +120,7 @@ func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, orgGUID, orgName strin
 			"TargetUser":  terminal.EntityNameColor(username),
 			"TargetOrg":   terminal.EntityNameColor(orgName),
 			"TargetSpace": terminal.EntityNameColor(space.Name),
+			//FIXME: not client credential mode compatible
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 

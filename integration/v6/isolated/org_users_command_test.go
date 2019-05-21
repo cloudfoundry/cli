@@ -39,7 +39,9 @@ var _ = Describe("org-users command", func() {
 
 			It("prints the users in the target org under their roles", func() {
 				session := helpers.CF("org-users", orgName)
-				Eventually(session).Should(Say("Getting users in org %s as %s", orgName, adminUsername))
+				if !helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say("Getting users in org %s as %s", orgName, adminUsername))
+				}
 				Eventually(session).Should(Say("ORG MANAGER"))
 				Eventually(session).Should(Say(`\s+%s`, orgManagerUser1))
 				Eventually(session).Should(Say(`\s+%s`, orgManagerUser2))
@@ -61,7 +63,9 @@ var _ = Describe("org-users command", func() {
 
 			It("prints the client-credentials user", func() {
 				session := helpers.CF("org-users", orgName)
-				Eventually(session).Should(Say("Getting users in org %s as %s", orgName, adminUsername))
+				if !helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say("Getting users in org %s as %s", orgName, adminUsername))
+				}
 				Eventually(session).Should(Say("ORG MANAGER"))
 				Eventually(session).Should(Say(`\s+%s \(client\)`, clientID))
 				Eventually(session).Should(Say("BILLING MANAGER"))

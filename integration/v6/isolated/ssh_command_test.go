@@ -105,6 +105,7 @@ applications:
 
 			When("it is a valid index", func() {
 				It("does not throw any error", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					buffer := NewBuffer()
 					buffer.Write([]byte("exit\n"))
 

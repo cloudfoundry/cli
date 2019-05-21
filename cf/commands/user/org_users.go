@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 )
 
 type OrgUsers struct {
@@ -72,7 +72,8 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"TargetOrg": terminal.EntityNameColor(org.Name),
+			//FIXME: not client credential mode compatible
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 

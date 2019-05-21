@@ -88,6 +88,7 @@ var _ = Describe("set-org-role command", func() {
 				})
 
 				It("sets the org role for the client", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("set-org-role", clientID, orgName, "OrgManager", "--client")
 					Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as foo...", clientID, orgName))
 					Eventually(session).Should(Say("OK"))
@@ -127,6 +128,7 @@ var _ = Describe("set-org-role command", func() {
 		When("the org and user both exist", func() {
 			When("the passed role is all lowercase", func() {
 				It("sets the org role for the user", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("set-org-role", username, orgName, "orgauditor")
 					Eventually(session).Should(Say("Assigning role OrgAuditor to user %s in org %s as foo...", username, orgName))
 					Eventually(session).Should(Say("OK"))
@@ -135,6 +137,7 @@ var _ = Describe("set-org-role command", func() {
 			})
 
 			It("sets the org role for the user", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				session := helpers.CF("set-org-role", username, orgName, "OrgAuditor")
 				Eventually(session).Should(Say("Assigning role OrgAuditor to user %s in org %s as foo...", username, orgName))
 				Eventually(session).Should(Say("OK"))
@@ -156,6 +159,7 @@ var _ = Describe("set-org-role command", func() {
 
 			When("the user already has the desired role", func() {
 				BeforeEach(func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("set-org-role", username, orgName, "OrgManager")
 					Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as foo...", username, orgName))
 					Eventually(session).Should(Exit(0))
@@ -198,6 +202,7 @@ var _ = Describe("set-org-role command", func() {
 
 		When("the user does not exist", func() {
 			It("prints an appropriate error and exits 1", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				session := helpers.CF("set-org-role", "not-exists", orgName, "OrgAuditor")
 				Eventually(session).Should(Say("Assigning role OrgAuditor to user not-exists in org %s as foo...", orgName))
 				Eventually(session).Should(Say("FAILED"))

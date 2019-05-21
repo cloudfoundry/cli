@@ -178,11 +178,12 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			When("running a v6 unrefactored command", func() {
+			FWhen("running a v6 unrefactored command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
-					It("displays an error and exits 1", func() {
+					FIt("displays an error and exits 1", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CF("quotas")
+						//FIXME
 						Eventually(session).Should(Say("Getting quotas as %s", username))
 						Eventually(session).Should(Say("Bad credentials"))
 						Eventually(session).Should(Exit(1))

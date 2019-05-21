@@ -51,6 +51,7 @@ var _ = Describe("target command", func() {
 		})
 
 		It("tells the user to login and exits with 1", func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			session := helpers.CF("target", "-o", "some-org", "-s", "some-space")
 			Eventually(session.Err).Should(Say("The token expired, was revoked, or the token ID is incorrect. Please log back in to re-authenticate."))
 			Eventually(session).Should(Say("FAILED"))
