@@ -31,6 +31,7 @@ var _ = Describe("create-route Command", func() {
 		domainName string
 		spaceName  string
 		orgName    string
+		hostname   string
 	)
 
 	BeforeEach(func() {
@@ -42,21 +43,23 @@ var _ = Describe("create-route Command", func() {
 		domainName = "example.com"
 		spaceName = "space"
 		orgName = "org"
-		cmd = CreateRouteCommand{
-			RequiredArgs: flag.Domain{
-				Domain: domainName,
-			},
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-		}
+		hostname = ""
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 	})
 
 	JustBeforeEach(func() {
+		cmd = CreateRouteCommand{
+			RequiredArgs: flag.Domain{
+				Domain: domainName,
+			},
+			Hostname:    hostname,
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
+		}
 		executeErr = cmd.Execute(nil)
 	})
 
@@ -93,6 +96,17 @@ var _ = Describe("create-route Command", func() {
 			Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
 		})
 
+		When("passing in a hostname", func() {
+			BeforeEach(func() {
+				hostname = "flan"
+			})
+
+			It("should print text indicating it is creating a route", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`Creating route %s\.%s for org %s / space %s as the-user\.\.\.`, hostname, domainName, orgName, spaceName))
+			})
+		})
+
 		When("creating the route errors", func() {
 			BeforeEach(func() {
 				fakeActor.CreateRouteReturns(v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("err-create-route"))
@@ -120,15 +134,38 @@ var _ = Describe("create-route Command", func() {
 
 			It("creates the route", func() {
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedSpaceName, expectedDomainName := fakeActor.CreateRouteArgsForCall(0)
+				expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedSpaceName).To(Equal(spaceName))
+				Expect(expectedHostname).To(Equal(hostname))
+			})
+
+			When("passing in a hostname", func() {
+				BeforeEach(func() {
+					hostname = "flan"
+				})
+
+				It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Err).To(Say("warnings-1"))
+					Expect(testUI.Err).To(Say("warnings-2"))
+					Expect(testUI.Out).To(Say(`Route %s\.%s has been created.`, hostname, domainName))
+					Expect(testUI.Out).To(Say("OK"))
+				})
+
+				It("creates the route", func() {
+					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
+					expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+					Expect(expectedDomainName).To(Equal(domainName))
+					Expect(expectedSpaceName).To(Equal(spaceName))
+					Expect(expectedHostname).To(Equal(hostname))
+				})
 			})
 		})
 
 		When("the route already exists", func() {
 			BeforeEach(func() {
-				fakeActor.CreateRouteReturns(v7action.Warnings{"some-warning"}, actionerror.RouteAlreadyExistsError{Route: "some-route.com"})
+				fakeActor.CreateRouteReturns(v7action.Warnings{"some-warning"}, actionerror.RouteAlreadyExistsError{Err: errors.New("api error for a route that already exists")})
 			})
 
 			It("displays all warnings, that the route already exists, and does not error", func() {
@@ -136,7 +173,7 @@ var _ = Describe("create-route Command", func() {
 
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
-				Expect(testUI.Out).To(Say("Route example.com already exists"))
+				Expect(testUI.Out).To(Say("api error for a route that already exists"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})

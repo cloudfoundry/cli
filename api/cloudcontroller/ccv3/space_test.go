@@ -1,9 +1,10 @@
 package ccv3_test
 
 import (
-	"code.cloudfoundry.org/cli/types"
 	"fmt"
 	"net/http"
+
+	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"

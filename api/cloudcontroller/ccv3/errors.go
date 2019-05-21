@@ -1,11 +1,12 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
 const taskWorkersUnavailable = "CF-TaskWorkersUnavailable"
@@ -124,19 +125,20 @@ func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Requ
 func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	//idea to make route already exist error flexible for all relevant error cases
 	errorString := errorResponse.Detail
+	err := ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
 	// boolean switch case with partial/regex string matchers
 	switch {
 	case strings.Contains(errorString,
 		"name must be unique in space"):
 		return ccerror.NameNotUniqueInSpaceError{}
 	case strings.Contains(errorString,
-		"Route already exists for domain"):
-		return ccerror.RouteNotUniqueError{}
+		"Route already exists"):
+		return ccerror.RouteNotUniqueError{UnprocessableEntityError: err}
 	case strings.Contains(errorString,
 		"Buildpack must be an existing admin buildpack or a valid git URI"):
 		return ccerror.InvalidBuildpackError{}
 	default:
-		return ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
+		return err
 	}
 }
 

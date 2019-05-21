@@ -1,9 +1,10 @@
 package v7action_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"errors"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -29,7 +30,7 @@ var _ = Describe("Route Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateRoute("space-name", "domain-name")
+			warnings, executeErr = actor.CreateRoute("space-name", "domain-name", "hostname")
 		})
 
 		When("the API layer calls are successful", func() {
@@ -51,7 +52,7 @@ var _ = Describe("Route Actions", func() {
 				)
 
 				fakeCloudControllerClient.CreateRouteReturns(
-					ccv3.Route{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid"},
+					ccv3.Route{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname"},
 					ccv3.Warnings{"create-warning-1", "create-warning-2"},
 					nil)
 			})
@@ -67,6 +68,7 @@ var _ = Describe("Route Actions", func() {
 					ccv3.Route{
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
+						Host:       "hostname",
 					},
 				))
 			})
@@ -95,12 +97,18 @@ var _ = Describe("Route Actions", func() {
 					fakeCloudControllerClient.CreateRouteReturns(
 						ccv3.Route{},
 						ccv3.Warnings{"create-route-warning"},
-						ccerror.RouteNotUniqueError{},
+						ccerror.RouteNotUniqueError{
+							UnprocessableEntityError: ccerror.UnprocessableEntityError{Message: "some cool error"},
+						},
 					)
 				})
 
 				It("returns the RouteAlreadyExistsError and warnings", func() {
-					Expect(executeErr).To(MatchError(actionerror.RouteAlreadyExistsError{Route: "domain-name"}))
+					Expect(executeErr).To(MatchError(actionerror.RouteAlreadyExistsError{
+						Err: ccerror.RouteNotUniqueError{
+							UnprocessableEntityError: ccerror.UnprocessableEntityError{Message: "some cool error"},
+						},
+					}))
 					Expect(warnings).To(ConsistOf("get-domains-warning",
 						"get-spaces-warning",
 						"create-route-warning"))

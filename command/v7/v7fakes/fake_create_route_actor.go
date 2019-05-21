@@ -9,11 +9,12 @@ import (
 )
 
 type FakeCreateRouteActor struct {
-	CreateRouteStub        func(string, string) (v7action.Warnings, error)
+	CreateRouteStub        func(string, string, string) (v7action.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	createRouteReturns struct {
 		result1 v7action.Warnings
@@ -27,17 +28,18 @@ type FakeCreateRouteActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateRouteActor) CreateRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeCreateRouteActor) CreateRoute(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2)
+		return fake.CreateRouteStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -52,17 +54,17 @@ func (fake *FakeCreateRouteActor) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeCreateRouteActor) CreateRouteCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeCreateRouteActor) CreateRouteCalls(stub func(string, string, string) (v7action.Warnings, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
 }
 
-func (fake *FakeCreateRouteActor) CreateRouteArgsForCall(i int) (string, string) {
+func (fake *FakeCreateRouteActor) CreateRouteArgsForCall(i int) (string, string, string) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	argsForCall := fake.createRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeCreateRouteActor) CreateRouteReturns(result1 v7action.Warnings, result2 error) {

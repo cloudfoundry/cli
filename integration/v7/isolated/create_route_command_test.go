@@ -61,25 +61,6 @@ var _ = Describe("create-route command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("the domain does not exist", func() {
-			It("displays error and exits 1", func() {
-				session := helpers.CF("create-route", "some-domain")
-				Eventually(session).Should(Say(`FAILED`))
-				Eventually(session.Err).Should(Say(`Domain some-domain not found`))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("the domain is not specified", func() {
-			It("displays error and exits 1", func() {
-				session := helpers.CF("create-route")
-				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `DOMAIN` was not provided\n"))
-				Eventually(session.Err).Should(Say("\n"))
-				Eventually(session).Should(Say("NAME:\n"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		When("the space and domain exist", func() {
 			var (
 				userName   string
@@ -92,12 +73,16 @@ var _ = Describe("create-route command", func() {
 			})
 
 			When("the route already exists", func() {
-				var domain helpers.Domain
+				var (
+					domain   helpers.Domain
+					hostname string
+				)
 
 				BeforeEach(func() {
 					domain = helpers.NewDomain(orgName, domainName)
+					hostname = "key-lime-pie"
 					domain.CreatePrivate()
-					Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
+					Eventually(helpers.CF("create-route", domainName, "--hostname", hostname)).Should(Exit(0))
 				})
 
 				AfterEach(func() {
@@ -105,9 +90,9 @@ var _ = Describe("create-route command", func() {
 				})
 
 				It("warns the user that it has already been created and runs to completion without failing", func() {
-					session := helpers.CF("create-route", domainName)
-					Eventually(session).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`Route %s already exists\.`, domainName))
+					session := helpers.CF("create-route", domainName, "--hostname", hostname)
+					Eventually(session).Should(Say(`Creating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Route already exists with host '%s' for domain '%s'\.`, hostname, domainName))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
 				})
@@ -134,7 +119,36 @@ var _ = Describe("create-route command", func() {
 							Eventually(session).Should(Exit(0))
 						})
 					})
+
+					When("passing in a hostname", func() {
+						It("creates the route with the hostname", func() {
+							hostname := "tiramisu"
+							session := helpers.CF("create-route", domainName, "-n", hostname)
+							Eventually(session).Should(Say(`Creating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s\.%s has been created\.`, hostname, domainName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 				})
+			})
+		})
+
+		When("the domain does not exist", func() {
+			It("displays error and exits 1", func() {
+				session := helpers.CF("create-route", "some-domain")
+				Eventually(session).Should(Say(`FAILED`))
+				Eventually(session.Err).Should(Say(`Domain some-domain not found`))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("the domain is not specified", func() {
+			It("displays error and exits 1", func() {
+				session := helpers.CF("create-route")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `DOMAIN` was not provided\n"))
+				Eventually(session.Err).Should(Say("\n"))
+				Eventually(session).Should(Say("NAME:\n"))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

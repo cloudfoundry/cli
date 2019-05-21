@@ -17,24 +17,28 @@ var _ = Describe("Route", func() {
 		client, _ = NewTestClient()
 	})
 
-	Describe("Create route with shared domains", func() {
+	Describe("CreateRoute", func() {
 		var (
 			route      Route
 			warnings   Warnings
 			executeErr error
 			spaceGUID  string
 			domainGUID string
+			host       string
 		)
 
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-			route, warnings, executeErr = client.CreateRoute(Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID})
+			route, warnings, executeErr = client.CreateRoute(Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host})
 		})
 
-		When("the request succeeds", func() {
-			BeforeEach(func() {
-				response := `{ 
+		Describe("with private domains", func() {
+			When("no additional flags", func() {
+				When("the request succeeds", func() {
+					BeforeEach(func() {
+						host = ""
+						response := `{
   "guid": "some-route-guid",
   "relationships": {
     "space": {
@@ -43,10 +47,11 @@ var _ = Describe("Route", func() {
     "domain": {
 	  "data": { "guid": "domain-guid" }
     }
-  }
+  },
+	"host": ""
 }`
 
-				expectedBody := `{
+						expectedBody := `{
   "relationships": {
   	"space": {
       "data": { "guid": "space-guid" }
@@ -57,24 +62,78 @@ var _ = Describe("Route", func() {
   }
 }`
 
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/routes"),
-						VerifyJSON(expectedBody),
-						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodPost, "/v3/routes"),
+								VerifyJSON(expectedBody),
+								RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+							),
+						)
+					})
+
+					It("returns the given route and all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("warning-1"))
+
+						Expect(route).To(Equal(Route{
+							GUID:       "some-route-guid",
+							SpaceGUID:  "space-guid",
+							DomainGUID: "domain-guid",
+						}))
+					})
+				})
 			})
 
-			It("returns the given route and all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("warning-1"))
+			When("hostname is passed in", func() {
+				When("the request succeeds", func() {
+					BeforeEach(func() {
+						host = "cheesecake"
+						response := `{
+  "guid": "some-route-guid",
+  "relationships": {
+    "space": {
+			"data": { "guid": "space-guid" }
+    },
+    "domain": {
+			"data": { "guid": "domain-guid" }
+    }
+  },
+	"host": "cheesecake"
+}`
 
-				Expect(route).To(Equal(Route{
-					GUID:       "some-route-guid",
-					SpaceGUID:  "space-guid",
-					DomainGUID: "domain-guid",
-				}))
+						expectedBody := `{
+  "relationships": {
+  	"space": {
+      "data": { "guid": "space-guid" }
+    },
+    "domain": {
+			"data": { "guid": "domain-guid" }
+    }
+  },
+	"host": "cheesecake"
+}`
+
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodPost, "/v3/routes"),
+								VerifyJSON(expectedBody),
+								RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+							),
+						)
+					})
+
+					It("returns the given route and all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("warning-1"))
+
+						Expect(route).To(Equal(Route{
+							GUID:       "some-route-guid",
+							SpaceGUID:  "space-guid",
+							DomainGUID: "domain-guid",
+							Host:       "cheesecake",
+						}))
+					})
+				})
 			})
 		})
 
@@ -122,5 +181,4 @@ var _ = Describe("Route", func() {
 			})
 		})
 	})
-
 })

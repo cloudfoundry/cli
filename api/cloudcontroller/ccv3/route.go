@@ -9,9 +9,10 @@ import (
 )
 
 type Route struct {
-	GUID       string `json:"guid,omitempty"`
-	SpaceGUID  string `json:"spaceguid,omitempty"`
-	DomainGUID string `json:"domainguid,omitempty"`
+	GUID       string
+	SpaceGUID  string
+	DomainGUID string
+	Host       string
 }
 
 func (r Route) MarshalJSON() ([]byte, error) {
@@ -31,15 +32,13 @@ func (r Route) MarshalJSON() ([]byte, error) {
 	// Building up the request body in ccRoute
 	type ccRoute struct {
 		GUID          string         `json:"guid,omitempty"`
+		Host          string         `json:"host,omitempty"`
 		Relationships *Relationships `json:"relationships,omitempty"`
 	}
 
 	ccR := ccRoute{
 		GUID: r.GUID,
-	}
-
-	if r.GUID != "" {
-		ccR.GUID = r.GUID
+		Host: r.Host,
 	}
 
 	if r.SpaceGUID != "" {
@@ -52,6 +51,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 func (r *Route) UnmarshalJSON(data []byte) error {
 	var alias struct {
 		GUID          string `json:"guid,omitempty"`
+		Host          string `json:"host,omitempty"`
 		Relationships struct {
 			Space struct {
 				Data struct {
@@ -72,6 +72,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	}
 
 	r.GUID = alias.GUID
+	r.Host = alias.Host
 	r.SpaceGUID = alias.Relationships.Space.Data.GUID
 	r.DomainGUID = alias.Relationships.Domain.Data.GUID
 

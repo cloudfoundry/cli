@@ -8,7 +8,7 @@ import (
 
 type Route ccv3.Route
 
-func (actor Actor) CreateRoute(spaceName string, domainName string) (Warnings, error) {
+func (actor Actor) CreateRoute(spaceName, domainName, hostname string) (Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -24,14 +24,16 @@ func (actor Actor) CreateRoute(spaceName string, domainName string) (Warnings, e
 		return allWarnings, err
 	}
 	_, apiWarnings, err := actor.CloudControllerClient.CreateRoute(ccv3.Route{
-		SpaceGUID: space.GUID, DomainGUID: domain.GUID,
+		SpaceGUID:  space.GUID,
+		DomainGUID: domain.GUID,
+		Host:       hostname,
 	})
 
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
 
 	if _, ok := err.(ccerror.RouteNotUniqueError); ok {
-		return allWarnings, actionerror.RouteAlreadyExistsError{Route: domainName}
+		return allWarnings, actionerror.RouteAlreadyExistsError{Err: err}
 	}
 
 	return allWarnings, err

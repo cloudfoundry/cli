@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . CreateRouteActor
 
 type CreateRouteActor interface {
-	CreateRoute(spaceName string, domainName string) (v7action.Warnings, error)
+	CreateRoute(spaceName, domainName, hostname string) (v7action.Warnings, error)
 }
 
 type CreateRouteCommand struct {
@@ -54,34 +54,38 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	}
 
 	domain := cmd.RequiredArgs.Domain
+	hostname := cmd.Hostname
 	spaceName := cmd.Config.TargetedSpace().Name
 	orgName := cmd.Config.TargetedOrganization().Name
+	fqdn := ""
+	if hostname != "" {
+		fqdn += hostname + "."
+	}
+	fqdn += domain
 
-	cmd.UI.DisplayTextWithFlavor("Creating route {{.Domain}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
+	cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
 		map[string]interface{}{
-			"Domain":       domain,
+			"FQDN":         fqdn,
 			"User":         user.Name,
 			"Space":        spaceName,
 			"Organization": orgName,
 		})
 
-	warnings, err := cmd.Actor.CreateRoute(spaceName, domain)
+	warnings, err := cmd.Actor.CreateRoute(spaceName, domain, hostname)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteAlreadyExistsError); ok {
-			cmd.UI.DisplayTextWithFlavor("Route {{.DomainName}} already exists.", map[string]interface{}{
-				"DomainName": domain,
-			})
+			cmd.UI.DisplayText(err.Error())
 			cmd.UI.DisplayOK()
 			return nil
 		}
 		return err
 	}
 
-	cmd.UI.DisplayText("Route {{.Domain}} has been created.",
+	cmd.UI.DisplayText("Route {{.FQDN}} has been created.",
 		map[string]interface{}{
-			"Domain": domain,
+			"FQDN": fqdn,
 		})
 
 	cmd.UI.DisplayOK()
