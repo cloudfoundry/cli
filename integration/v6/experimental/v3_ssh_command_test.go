@@ -23,6 +23,7 @@ var _ = Describe("v3-ssh command", func() {
 		appName = helpers.PrefixedRandomName("app")
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
+		helpers.SkipIfClientCredentialsTestMode() // client credentials cannot presently ssh
 	})
 
 	When("--help flag is set", func() {
