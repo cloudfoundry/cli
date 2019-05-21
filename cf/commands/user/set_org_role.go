@@ -95,9 +95,10 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"Role":        terminal.EntityNameColor(role.Display()),
-			"TargetUser":  terminal.EntityNameColor(user.Username),
-			"TargetOrg":   terminal.EntityNameColor(org.Name),
+			"Role":       terminal.EntityNameColor(role.Display()),
+			"TargetUser": terminal.EntityNameColor(user.Username),
+			"TargetOrg":  terminal.EntityNameColor(org.Name),
+			//FIXME: not client credential mode compatible
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 

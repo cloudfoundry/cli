@@ -109,6 +109,7 @@ var _ = Describe("set-space-role command", func() {
 
 			When("the client exists", func() {
 				It("sets the org role for the client", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
 					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as foo...", clientID, orgName, spaceName))
 					Eventually(session).Should(Say("OK"))
@@ -154,6 +155,7 @@ var _ = Describe("set-space-role command", func() {
 
 			When("the passed role is lowercase", func() {
 				It("sets the space role for the user", func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "spaceauditor")
 					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as foo...", username, orgName, spaceName))
 					Eventually(session).Should(Say("OK"))
@@ -162,6 +164,7 @@ var _ = Describe("set-space-role command", func() {
 			})
 
 			It("sets the space role for the user", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
 				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as foo...", username, orgName, spaceName))
 				Eventually(session).Should(Say("OK"))
@@ -183,6 +186,7 @@ var _ = Describe("set-space-role command", func() {
 
 			When("the user already has the desired role", func() {
 				BeforeEach(func() {
+					helpers.SkipIfClientCredentialsTestMode()
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
 					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as foo...", username, orgName, spaceName))
 					Eventually(session).Should(Exit(0))
@@ -216,6 +220,7 @@ var _ = Describe("set-space-role command", func() {
 
 		When("the user does not exist", func() {
 			It("prints an appropriate error and exits 1", func() {
+				helpers.SkipIfClientCredentialsTestMode()
 				session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
 				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user not-exists in org %s / space %s as foo...", orgName, spaceName))
 				Eventually(session).Should(Say("FAILED"))

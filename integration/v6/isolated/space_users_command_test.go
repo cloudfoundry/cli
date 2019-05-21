@@ -41,7 +41,9 @@ var _ = Describe("space-users command", func() {
 
 			It("prints the users in the target space under their roles", func() {
 				session := helpers.CF("space-users", orgName, spaceName)
-				Eventually(session).Should(Say("Getting users in org %s / space %s as %s", orgName, spaceName, adminUsername))
+				if !helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say("Getting users in org %s / space %s as %s", orgName, spaceName, adminUsername))
+				}
 				Eventually(session).Should(Say("SPACE MANAGER"))
 				Eventually(session).Should(Say(`\s+%s`, spaceManagerUser))
 				Eventually(session).Should(Say("SPACE DEVELOPER"))
@@ -67,7 +69,9 @@ var _ = Describe("space-users command", func() {
 
 			It("prints the client-credentials user", func() {
 				session := helpers.CF("space-users", orgName, spaceName)
-				Eventually(session).Should(Say("Getting users in org %s / space %s as %s", orgName, spaceName, adminUsername))
+				if !helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say("Getting users in org %s / space %s as %s", orgName, spaceName, adminUsername))
+				}
 				Eventually(session).Should(Say("SPACE MANAGER"))
 				Eventually(session).Should(Say(`\s+%s`, spaceManagerUser))
 				Eventually(session).Should(Say("SPACE DEVELOPER"))
