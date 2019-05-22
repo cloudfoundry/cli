@@ -2,6 +2,8 @@ package v7action_test
 
 import (
 	"errors"
+	"io"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -23,6 +25,62 @@ var _ = Describe("Droplet Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
+	})
+
+	Describe("CreateApplicationDroplet", func() {
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateDropletReturns(
+					ccv3.Droplet{
+						GUID:      "some-droplet-guid",
+						State:     constant.DropletAwaitingUpload,
+						CreatedAt: "2017-08-14T21:16:42Z",
+						Image:     "docker/some-image",
+						Stack:     "penguin",
+					},
+					ccv3.Warnings{"create-application-droplet-warning"},
+					nil,
+				)
+			})
+
+			It("creates a droplet for the app", func() {
+				droplet, warnings, err := actor.CreateApplicationDroplet("some-app-guid")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("create-application-droplet-warning"))
+				Expect(droplet).To(Equal(Droplet{
+					GUID:      "some-droplet-guid",
+					State:     constant.DropletAwaitingUpload,
+					CreatedAt: "2017-08-14T21:16:42Z",
+					Image:     "docker/some-image",
+					Stack:     "penguin",
+				}))
+
+				Expect(fakeCloudControllerClient.CreateDropletCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreateDropletArgsForCall(0)).To(Equal("some-app-guid"))
+			})
+		})
+
+		When("creating the application droplet fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some upload droplet error")
+
+				fakeCloudControllerClient.CreateDropletReturns(
+					ccv3.Droplet{},
+					ccv3.Warnings{"create-application-droplet-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.CreateApplicationDroplet("some-app-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("create-application-droplet-warning"))
+			})
+		})
 	})
 
 	Describe("SetApplicationDropletByApplicationNameAndSpace", func() {
@@ -389,6 +447,89 @@ var _ = Describe("Droplet Actions", func() {
 					Expect(executionErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-warning"))
 				})
+			})
+		})
+	})
+
+	Describe("UploadDroplet", func() {
+		var (
+			dropletGUID     string
+			dropletFilePath string
+			reader          io.Reader
+			readerLength    int64
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			dropletGUID = "some-droplet-guid"
+			dropletContents := "i am a droplet"
+			reader = strings.NewReader(dropletContents)
+			readerLength = int64(len([]byte(dropletContents)))
+		})
+
+		JustBeforeEach(func() {
+			dropletFilePath = "tmp/droplet.tgz"
+			warnings, executeErr = actor.UploadDroplet(dropletGUID, dropletFilePath, reader, readerLength)
+		})
+
+		When("the upload is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadDropletBitsReturns(
+					ccv3.JobURL("some-job-url"),
+					ccv3.Warnings{"some-upload-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"some-job-warning"},
+					nil,
+				)
+			})
+
+			It("returns any CC warnings", func() {
+				Expect(warnings).To(Equal(Warnings{"some-upload-warning", "some-job-warning"}))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		When("the upload returns an error", func() {
+			var uploadErr = errors.New("upload failed")
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadDropletBitsReturns(
+					"",
+					ccv3.Warnings{"some-upload-warning"},
+					uploadErr,
+				)
+			})
+
+			It("returns any warnings and the error", func() {
+				Expect(warnings).To(Equal(Warnings{"some-upload-warning"}))
+				Expect(executeErr).To(Equal(uploadErr))
+			})
+		})
+
+		When("the upload job fails eventually", func() {
+			var jobErr = errors.New("job failed")
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadDropletBitsReturns(
+					ccv3.JobURL("some-job-url"),
+					ccv3.Warnings{"some-upload-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"some-job-warning"},
+					jobErr,
+				)
+			})
+
+			It("returns any warning and the error", func() {
+				Expect(warnings).To(Equal(Warnings{"some-upload-warning", "some-job-warning"}))
+				Expect(executeErr).To(Equal(jobErr))
 			})
 		})
 	})

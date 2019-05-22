@@ -797,6 +797,10 @@ var _ = Describe("push Command", func() {
 					func() {
 						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
 					}),
+				Entry("droplet is specified",
+					func() {
+						cmd.DropletPath = "some-droplet.tgz"
+					}),
 			)
 		})
 
@@ -814,6 +818,10 @@ var _ = Describe("push Command", func() {
 				Entry("disk is specified",
 					func() {
 						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
+					}),
+				Entry("droplet is specified",
+					func() {
+						cmd.DropletPath = "some-droplet.tgz"
 					}),
 				Entry("docker image is specified",
 					func() {
@@ -903,6 +911,7 @@ var _ = Describe("push Command", func() {
 			cmd.HealthCheckTimeout = flag.PositiveInteger{Value: 7}
 			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 			cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
+			cmd.DropletPath = flag.PathWithExistenceCheck("some-droplet.tgz")
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
 			cmd.NoStart = true
@@ -917,6 +926,7 @@ var _ = Describe("push Command", func() {
 		It("sets them on the flag overrides", func() {
 			Expect(overridesErr).ToNot(HaveOccurred())
 			Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
+			Expect(overrides.DropletPath).To(Equal("some-droplet.tgz"))
 			Expect(overrides.Stack).To(Equal("validStack"))
 			Expect(overrides.HealthCheckType).To(Equal(constant.Port))
 			Expect(overrides.HealthCheckEndpoint).To(Equal("/health-check-http-endpoint"))
@@ -1131,6 +1141,39 @@ var _ = Describe("push Command", func() {
 				cmd.HealthCheckHTTPEndpoint = "/health"
 			},
 			nil),
-	)
 
+		Entry("when droplet and path flags are passed",
+			func() {
+				cmd.DropletPath = "some-droplet.tgz"
+				cmd.AppPath = "/my/app"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--droplet", "--docker-image, -o", "--docker-username", "-p",
+				},
+			}),
+
+		Entry("when droplet and docker image flags are passed",
+			func() {
+				cmd.DropletPath = "some-droplet.tgz"
+				cmd.DockerImage.Path = "docker-image"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--droplet", "--docker-image, -o", "--docker-username", "-p",
+				},
+			}),
+
+		Entry("when droplet, docker image, and docker username flags are passed",
+			func() {
+				cmd.DropletPath = "some-droplet.tgz"
+				cmd.DockerImage.Path = "docker-image"
+				cmd.DockerUsername = "docker-username"
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--droplet", "--docker-image, -o", "--docker-username", "-p",
+				},
+			}),
+	)
 })

@@ -12,20 +12,24 @@ import (
 const PushRetries = 3
 
 func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	if !pushPlan.DockerImageCredentialsNeedsUpdate {
-		pkg, warnings, err := actor.CreateAndUploadApplicationBits(pushPlan, progressBar, eventStream)
-		if err != nil {
-			return pushPlan, warnings, err
-		}
-
-		polledPackage, pollWarnings, err := actor.V7Actor.PollPackage(pkg)
-
-		pushPlan.PackageGUID = polledPackage.GUID
-
-		return pushPlan, append(warnings, pollWarnings...), err
+	if pushPlan.DropletPath != "" {
+		return pushPlan, nil, nil
 	}
 
-	return pushPlan, nil, nil
+	if pushPlan.DockerImageCredentialsNeedsUpdate {
+		return pushPlan, nil, nil
+	}
+
+	pkg, warnings, err := actor.CreateAndUploadApplicationBits(pushPlan, progressBar, eventStream)
+	if err != nil {
+		return pushPlan, warnings, err
+	}
+
+	polledPackage, pollWarnings, err := actor.V7Actor.PollPackage(pkg)
+
+	pushPlan.PackageGUID = polledPackage.GUID
+
+	return pushPlan, append(warnings, pollWarnings...), err
 }
 
 func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar ProgressBar, eventStream chan<- Event) (v7action.Package, Warnings, error) {

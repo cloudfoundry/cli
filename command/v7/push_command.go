@@ -76,6 +76,7 @@ type PushCommand struct {
 	Disk                    flag.Megabytes                `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	DockerImage             flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername          string                        `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
+	DropletPath             flag.PathWithExistenceCheck   `long:"droplet" description:"Path to a tgz file with a pre-staged app"`
 	HealthCheckHTTPEndpoint string                        `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	HealthCheckType         flag.HealthCheckType          `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
 	Instances               flag.Instances                `long:"instances" short:"i" description:"Number of instances"`
@@ -456,6 +457,15 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (b
 		cmd.ProgressBar.Complete()
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case v7pushaction.CreatingDroplet:
+		cmd.UI.DisplayText("Creating droplet...")
+	case v7pushaction.UploadingDroplet:
+		cmd.UI.DisplayText("Uploading droplet bits...")
+		cmd.ProgressBar.Ready()
+	case v7pushaction.UploadDropletComplete:
+		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
 	case v7pushaction.StoppingApplication:
 		cmd.UI.DisplayText("Stopping Application...")
 	case v7pushaction.StoppingApplicationComplete:
@@ -543,6 +553,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		Buildpacks:          cmd.Buildpacks,
 		Stack:               cmd.Stack,
 		Disk:                cmd.Disk.NullUint64,
+		DropletPath:         string(cmd.DropletPath),
 		DockerImage:         cmd.DockerImage.Path,
 		DockerUsername:      cmd.DockerUsername,
 		HealthCheckEndpoint: cmd.HealthCheckHTTPEndpoint,
@@ -565,6 +576,7 @@ func (cmd PushCommand) ValidateAllowedFlagsForMultipleApps(containsMultipleApps 
 		cmd.Disk.IsSet ||
 		cmd.DockerImage.Path != "" ||
 		cmd.DockerUsername != "" ||
+		cmd.DropletPath != "" ||
 		cmd.HealthCheckType.Type != "" ||
 		cmd.HealthCheckHTTPEndpoint != "" ||
 		cmd.HealthCheckTimeout.Value > 0 ||
@@ -644,6 +656,16 @@ func (cmd PushCommand) ValidateFlags() error {
 			Arg2: "--endpoint",
 		}
 
+	case cmd.DropletPath != "" && (cmd.DockerImage.Path != "" || cmd.DockerUsername != "" || cmd.AppPath != ""):
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--droplet",
+				"--docker-image, -o",
+				"--docker-username",
+				"-p",
+			},
+		}
 	}
+
 	return nil
 }

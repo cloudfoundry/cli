@@ -1,10 +1,14 @@
 package ccv3
 
 import (
+	"bytes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
+	"encoding/json"
+	"io"
 )
 
 // Droplet represents a Cloud Controller droplet's metadata. A droplet is a set of
@@ -31,6 +35,41 @@ type DropletBuildpack struct {
 	Name string `json:"name"`
 	//DetectOutput is the output during buildpack detect process.
 	DetectOutput string `json:"detect_output"`
+}
+
+type DropletCreateRequest struct {
+	Relationships Relationships `json:"relationships"`
+}
+
+// CreateDroplet creates a new droplet without a package for the app with
+// the given guid.
+func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
+	requestBody := DropletCreateRequest{
+		Relationships: Relationships{
+			constant.RelationshipTypeApplication: Relationship{GUID: appGUID},
+		},
+	}
+
+	body, marshalErr := json.Marshal(requestBody)
+	if marshalErr != nil {
+		return Droplet{}, nil, marshalErr
+	}
+
+	request, createRequestErr := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostDropletRequest,
+		Body:        bytes.NewReader(body),
+	})
+	if createRequestErr != nil {
+		return Droplet{}, nil, createRequestErr
+	}
+
+	var responseDroplet Droplet
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseDroplet,
+	}
+	err := client.connection.Make(request, &response)
+
+	return responseDroplet, response.Warnings, err
 }
 
 // GetApplicationDropletCurrent returns the current droplet for a given
@@ -95,4 +134,87 @@ func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 	})
 
 	return responseDroplets, warnings, err
+}
+
+// UploadDropletBits asynchronously uploads bits from a .tgz file located at dropletPath to the
+// droplet with guid dropletGUID. It returns a job URL pointing to the asynchronous upload job.
+func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, droplet io.Reader, dropletLength int64) (JobURL, Warnings, error) {
+	contentLength, err := uploads.CalculateRequestSize(dropletLength, dropletPath, "bits")
+	if err != nil {
+		return "", nil, err
+	}
+
+	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(droplet, dropletPath, "bits")
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostDropletBitsRequest,
+		URIParams:   internal.Params{"droplet_guid": dropletGUID},
+		Body:        body,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	request.ContentLength = contentLength
+	request.Header.Set("Content-Type", contentType)
+
+	jobURL, warnings, err := client.uploadDropletAsynchronously(request, writeErrors)
+	if err != nil {
+		return "", warnings, err
+	}
+
+	return jobURL, warnings, nil
+}
+
+func (client *Client) uploadDropletAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (JobURL, Warnings, error) {
+	var droplet Droplet
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &droplet,
+	}
+
+	httpErrors := make(chan error)
+
+	go func() {
+		defer close(httpErrors)
+
+		err := client.connection.Make(request, &response)
+		if err != nil {
+			httpErrors <- err
+		}
+	}()
+
+	// The following section makes the following assumptions:
+	// 1) If an error occurs during file reading, an EOF is sent to the request
+	// object. Thus ending the request transfer.
+	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
+	// Thus ending the writing routine.
+	var firstError error
+	var writeClosed, httpClosed bool
+
+	for {
+		select {
+		case writeErr, ok := <-writeErrors:
+			if !ok {
+				writeClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = writeErr
+			}
+		case httpErr, ok := <-httpErrors:
+			if !ok {
+				httpClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = httpErr
+			}
+		}
+
+		if writeClosed && httpClosed {
+			break // for for
+		}
+	}
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, firstError
 }

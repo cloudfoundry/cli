@@ -826,6 +826,24 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UploadDropletBitsStub        func(string, string, io.Reader, int64) (ccv3.JobURL, ccv3.Warnings, error)
+	uploadDropletBitsMutex       sync.RWMutex
+	uploadDropletBitsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 io.Reader
+		arg4 int64
+	}
+	uploadDropletBitsReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	uploadDropletBitsReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UploadPackageStub        func(ccv3.Package, string) (ccv3.Package, ccv3.Warnings, error)
 	uploadPackageMutex       sync.RWMutex
 	uploadPackageArgsForCall []struct {
@@ -4447,6 +4465,75 @@ func (fake *FakeCloudControllerClient) UploadBitsPackageReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UploadDropletBits(arg1 string, arg2 string, arg3 io.Reader, arg4 int64) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.uploadDropletBitsMutex.Lock()
+	ret, specificReturn := fake.uploadDropletBitsReturnsOnCall[len(fake.uploadDropletBitsArgsForCall)]
+	fake.uploadDropletBitsArgsForCall = append(fake.uploadDropletBitsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 io.Reader
+		arg4 int64
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UploadDropletBits", []interface{}{arg1, arg2, arg3, arg4})
+	fake.uploadDropletBitsMutex.Unlock()
+	if fake.UploadDropletBitsStub != nil {
+		return fake.UploadDropletBitsStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.uploadDropletBitsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletBitsCallCount() int {
+	fake.uploadDropletBitsMutex.RLock()
+	defer fake.uploadDropletBitsMutex.RUnlock()
+	return len(fake.uploadDropletBitsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletBitsCalls(stub func(string, string, io.Reader, int64) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.uploadDropletBitsMutex.Lock()
+	defer fake.uploadDropletBitsMutex.Unlock()
+	fake.UploadDropletBitsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletBitsArgsForCall(i int) (string, string, io.Reader, int64) {
+	fake.uploadDropletBitsMutex.RLock()
+	defer fake.uploadDropletBitsMutex.RUnlock()
+	argsForCall := fake.uploadDropletBitsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletBitsReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.uploadDropletBitsMutex.Lock()
+	defer fake.uploadDropletBitsMutex.Unlock()
+	fake.UploadDropletBitsStub = nil
+	fake.uploadDropletBitsReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletBitsReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.uploadDropletBitsMutex.Lock()
+	defer fake.uploadDropletBitsMutex.Unlock()
+	fake.UploadDropletBitsStub = nil
+	if fake.uploadDropletBitsReturnsOnCall == nil {
+		fake.uploadDropletBitsReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.uploadDropletBitsReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UploadPackage(arg1 ccv3.Package, arg2 string) (ccv3.Package, ccv3.Warnings, error) {
 	fake.uploadPackageMutex.Lock()
 	ret, specificReturn := fake.uploadPackageReturnsOnCall[len(fake.uploadPackageArgsForCall)]
@@ -4627,6 +4714,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateTaskCancelMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
+	fake.uploadDropletBitsMutex.RLock()
+	defer fake.uploadDropletBitsMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
 	defer fake.uploadPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

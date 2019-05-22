@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"io"
 )
 
 // Droplet represents a Cloud Controller droplet.
@@ -18,6 +19,14 @@ type Droplet struct {
 }
 
 type DropletBuildpack ccv3.DropletBuildpack
+
+// CreateApplicationDroplet creates a new droplet without a package for the app with
+// guid appGUID.
+func (actor Actor) CreateApplicationDroplet(appGUID string) (Droplet, Warnings, error) {
+	ccDroplet, warnings, err := actor.CloudControllerClient.CreateDroplet(appGUID)
+
+	return actor.convertCCToActorDroplet(ccDroplet), Warnings(warnings), err
+}
 
 // SetApplicationDropletByApplicationNameAndSpace sets the droplet for an application.
 func (actor Actor) SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (Warnings, error) {
@@ -83,6 +92,24 @@ func (actor Actor) GetCurrentDropletByApplication(appGUID string) (Droplet, Warn
 		return Droplet{}, Warnings(warnings), actionerror.DropletNotFoundError{AppGUID: appGUID}
 	}
 	return actor.convertCCToActorDroplet(droplet), Warnings(warnings), err
+}
+
+func (actor Actor) UploadDroplet(dropletGUID string, dropletPath string, progressReader io.Reader, size int64) (Warnings, error) {
+	var allWarnings Warnings
+
+	jobURL, uploadWarnings, err := actor.CloudControllerClient.UploadDropletBits(dropletGUID, dropletPath, progressReader, size)
+	allWarnings = append(allWarnings, uploadWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobWarnings, jobErr := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, jobWarnings...)
+	if jobErr != nil {
+		return allWarnings, jobErr
+	}
+
+	return allWarnings, nil
 }
 
 func (actor Actor) convertCCToActorDroplet(ccDroplet ccv3.Droplet) Droplet {

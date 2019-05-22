@@ -33,6 +33,7 @@ type PushPlan struct {
 
 	Archive      bool
 	BitsPath     string
+	DropletPath  string
 	AllResources []sharedaction.V3Resource
 
 	PackageGUID string
@@ -43,6 +44,7 @@ type FlagOverrides struct {
 	Buildpacks          []string
 	Stack               string
 	Disk                types.NullUint64
+	DropletPath         string
 	DockerImage         string
 	DockerPassword      string
 	DockerUsername      string

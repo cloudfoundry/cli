@@ -40,6 +40,17 @@ var _ = Describe("StagePackageForApplication", func() {
 		})
 	})
 
+	When("the plan has a droplet path", func() {
+		BeforeEach(func() {
+			paramPlan.DropletPath = "some-droplet.tgz"
+		})
+
+		It("returns the unmodified plan without staging", func() {
+			Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
+			Expect(returnedPushPlan).To(Equal(paramPlan))
+		})
+	})
+
 	Describe("staging package", func() {
 		It("stages the application using the package guid", func() {
 			Expect(executeErr).ToNot(HaveOccurred())

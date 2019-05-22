@@ -14,6 +14,7 @@ const (
 	CreatingAndMappingRoutes        Event = "creating and mapping routes"
 	CreatingApplication             Event = "creating application"
 	CreatingArchive                 Event = "creating archive"
+	CreatingDroplet                 Event = "creating droplet"
 	CreatingPackage                 Event = "creating package"
 	PollingBuild                    Event = "polling build"
 	ReadingArchive                  Event = "reading archive"

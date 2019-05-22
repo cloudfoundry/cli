@@ -11,6 +11,21 @@ import (
 )
 
 type FakeV7Actor struct {
+	CreateApplicationDropletStub        func(string) (v7action.Droplet, v7action.Warnings, error)
+	createApplicationDropletMutex       sync.RWMutex
+	createApplicationDropletArgsForCall []struct {
+		arg1 string
+	}
+	createApplicationDropletReturns struct {
+		result1 v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}
+	createApplicationDropletReturnsOnCall map[int]struct {
+		result1 v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}
 	CreateApplicationInSpaceStub        func(v7action.Application, string) (v7action.Application, v7action.Warnings, error)
 	createApplicationInSpaceMutex       sync.RWMutex
 	createApplicationInSpaceArgsForCall []struct {
@@ -299,8 +314,90 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	UploadDropletStub        func(string, string, io.Reader, int64) (v7action.Warnings, error)
+	uploadDropletMutex       sync.RWMutex
+	uploadDropletArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 io.Reader
+		arg4 int64
+	}
+	uploadDropletReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	uploadDropletReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeV7Actor) CreateApplicationDroplet(arg1 string) (v7action.Droplet, v7action.Warnings, error) {
+	fake.createApplicationDropletMutex.Lock()
+	ret, specificReturn := fake.createApplicationDropletReturnsOnCall[len(fake.createApplicationDropletArgsForCall)]
+	fake.createApplicationDropletArgsForCall = append(fake.createApplicationDropletArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("CreateApplicationDroplet", []interface{}{arg1})
+	fake.createApplicationDropletMutex.Unlock()
+	if fake.CreateApplicationDropletStub != nil {
+		return fake.CreateApplicationDropletStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createApplicationDropletReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) CreateApplicationDropletCallCount() int {
+	fake.createApplicationDropletMutex.RLock()
+	defer fake.createApplicationDropletMutex.RUnlock()
+	return len(fake.createApplicationDropletArgsForCall)
+}
+
+func (fake *FakeV7Actor) CreateApplicationDropletCalls(stub func(string) (v7action.Droplet, v7action.Warnings, error)) {
+	fake.createApplicationDropletMutex.Lock()
+	defer fake.createApplicationDropletMutex.Unlock()
+	fake.CreateApplicationDropletStub = stub
+}
+
+func (fake *FakeV7Actor) CreateApplicationDropletArgsForCall(i int) string {
+	fake.createApplicationDropletMutex.RLock()
+	defer fake.createApplicationDropletMutex.RUnlock()
+	argsForCall := fake.createApplicationDropletArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeV7Actor) CreateApplicationDropletReturns(result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+	fake.createApplicationDropletMutex.Lock()
+	defer fake.createApplicationDropletMutex.Unlock()
+	fake.CreateApplicationDropletStub = nil
+	fake.createApplicationDropletReturns = struct {
+		result1 v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) CreateApplicationDropletReturnsOnCall(i int, result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+	fake.createApplicationDropletMutex.Lock()
+	defer fake.createApplicationDropletMutex.Unlock()
+	fake.CreateApplicationDropletStub = nil
+	if fake.createApplicationDropletReturnsOnCall == nil {
+		fake.createApplicationDropletReturnsOnCall = make(map[int]struct {
+			result1 v7action.Droplet
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createApplicationDropletReturnsOnCall[i] = struct {
+		result1 v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeV7Actor) CreateApplicationInSpace(arg1 v7action.Application, arg2 string) (v7action.Application, v7action.Warnings, error) {
@@ -1579,9 +1676,77 @@ func (fake *FakeV7Actor) UploadBitsPackageReturnsOnCall(i int, result1 v7action.
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) UploadDroplet(arg1 string, arg2 string, arg3 io.Reader, arg4 int64) (v7action.Warnings, error) {
+	fake.uploadDropletMutex.Lock()
+	ret, specificReturn := fake.uploadDropletReturnsOnCall[len(fake.uploadDropletArgsForCall)]
+	fake.uploadDropletArgsForCall = append(fake.uploadDropletArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 io.Reader
+		arg4 int64
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UploadDroplet", []interface{}{arg1, arg2, arg3, arg4})
+	fake.uploadDropletMutex.Unlock()
+	if fake.UploadDropletStub != nil {
+		return fake.UploadDropletStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.uploadDropletReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) UploadDropletCallCount() int {
+	fake.uploadDropletMutex.RLock()
+	defer fake.uploadDropletMutex.RUnlock()
+	return len(fake.uploadDropletArgsForCall)
+}
+
+func (fake *FakeV7Actor) UploadDropletCalls(stub func(string, string, io.Reader, int64) (v7action.Warnings, error)) {
+	fake.uploadDropletMutex.Lock()
+	defer fake.uploadDropletMutex.Unlock()
+	fake.UploadDropletStub = stub
+}
+
+func (fake *FakeV7Actor) UploadDropletArgsForCall(i int) (string, string, io.Reader, int64) {
+	fake.uploadDropletMutex.RLock()
+	defer fake.uploadDropletMutex.RUnlock()
+	argsForCall := fake.uploadDropletArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeV7Actor) UploadDropletReturns(result1 v7action.Warnings, result2 error) {
+	fake.uploadDropletMutex.Lock()
+	defer fake.uploadDropletMutex.Unlock()
+	fake.UploadDropletStub = nil
+	fake.uploadDropletReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) UploadDropletReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.uploadDropletMutex.Lock()
+	defer fake.uploadDropletMutex.Unlock()
+	fake.UploadDropletStub = nil
+	if fake.uploadDropletReturnsOnCall == nil {
+		fake.uploadDropletReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.uploadDropletReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.createApplicationDropletMutex.RLock()
+	defer fake.createApplicationDropletMutex.RUnlock()
 	fake.createApplicationInSpaceMutex.RLock()
 	defer fake.createApplicationInSpaceMutex.RUnlock()
 	fake.createBitsPackageByApplicationMutex.RLock()
@@ -1620,6 +1785,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
+	fake.uploadDropletMutex.RLock()
+	defer fake.uploadDropletMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -49,6 +49,17 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 		})
 	})
 
+	When("the plan has a droplet path", func() {
+		BeforeEach(func() {
+			paramPlan.DropletPath = "some-droplet.tgz"
+		})
+
+		It("returns the unmodified plan without creating a package", func() {
+			Expect(fakeV7Actor.CreateBitsPackageByApplicationCallCount()).To(BeZero())
+			Expect(returnedPushPlan).To(Equal(paramPlan))
+		})
+	})
+
 	Describe("package upload", func() {
 		When("resource match errors ", func() {
 			BeforeEach(func() {

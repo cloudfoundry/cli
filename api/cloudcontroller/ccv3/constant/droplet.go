@@ -4,6 +4,8 @@ package constant
 type DropletState string
 
 const (
+	// DropletAwaitingUpload is a droplet that has been created without a package.
+	DropletAwaitingUpload DropletState = "AWAITING_UPLOAD"
 	// DropletStaged is a droplet that has been properly processed.
 	DropletStaged DropletState = "STAGED"
 	// DropletFailed is a droplet that had failed the staging process.

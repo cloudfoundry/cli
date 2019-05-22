@@ -1,6 +1,10 @@
 package v7pushaction
 
 func (actor Actor) StagePackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
+	if pushPlan.DropletPath != "" {
+		return pushPlan, nil, nil
+	}
+
 	eventStream <- StartingStaging
 
 	var allWarnings Warnings

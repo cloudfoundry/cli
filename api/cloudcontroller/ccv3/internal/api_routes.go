@@ -72,6 +72,8 @@ const (
 	PostBuildpackBitsRequest                                    = "PostBuildpackBits"
 	PostBuildpackRequest                                        = "PostBuildpack"
 	PostDomainRequest                                           = "PostDomain"
+	PostDropletRequest                                          = "PostDroplet"
+	PostDropletBitsRequest                                      = "PostDropletBits"
 	PostIsolationSegmentRelationshipOrganizationsRequest        = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                                = "PostIsolationSegments"
 	PostPackageRequest                                          = "PostPackage"
@@ -123,6 +125,8 @@ var APIRoutes = []Route{
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations/:org_guid", Method: http.MethodDelete, Name: DeleteSharedOrgFromDomainRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
+	{Resource: DropletsResource, Path: "/", Method: http.MethodPost, Name: PostDropletRequest},
+	{Resource: DropletsResource, Path: "/:droplet_guid/upload", Method: http.MethodPost, Name: PostDropletBitsRequest},
 	{Resource: FeatureFlagsResource, Path: "/:name", Method: http.MethodGet, Name: GetFeatureFlagRequest},
 	{Resource: FeatureFlagsResource, Path: "/:name", Method: http.MethodPatch, Name: PatchFeatureFlagRequest},
 	{Resource: FeatureFlagsResource, Path: "/", Method: http.MethodGet, Name: GetFeatureFlagsRequest},

@@ -19,6 +19,7 @@ type CloudControllerClient interface {
 	CreateBuild(build ccv3.Build) (ccv3.Build, ccv3.Warnings, error)
 	CreateBuildpack(bp ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
 	CreateDomain(domain ccv3.Domain) (ccv3.Domain, ccv3.Warnings, error)
+	CreateDroplet(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
 	CreateIsolationSegment(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
 	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
@@ -83,5 +84,6 @@ type CloudControllerClient interface {
 	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadBitsPackage(pkg ccv3.Package, matchedResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)
 	UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv3.JobURL, ccv3.Warnings, error)
+	UploadDropletBits(dropletGUID string, dropletPath string, droplet io.Reader, dropletLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }

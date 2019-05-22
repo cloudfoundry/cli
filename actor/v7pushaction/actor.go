@@ -43,6 +43,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		SetupApplicationForPushPlan,
 		SetupDockerImageCredentialsForPushPlan,
 		SetupBitsPathForPushPlan,
+		SetupDropletPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
 		SetupNoStartForPushPlan,
 		SetupSkipRouteCreationForPushPlan,
@@ -57,6 +58,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		actor.UpdateWebProcessForApplication,
 		actor.CreateBitsPackageForApplication,
 		actor.CreateDockerPackageForApplication,
+		actor.CreateDropletForApplication,
 	}
 
 	actor.StartFuncs = []ChangeApplicationFunc{
@@ -66,6 +68,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 
 	actor.NoStartFuncs = []ChangeApplicationFunc{
 		actor.StopApplication,
+		actor.ConditionallyRunFunc(actor.IsDropletPathSet, actor.SetDropletForApplication),
 	}
 
 	return actor

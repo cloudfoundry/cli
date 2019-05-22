@@ -9,6 +9,10 @@ import (
 )
 
 func (actor Actor) SetupAllResourcesForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+	if pushPlan.DropletPath != "" {
+		return pushPlan, nil
+	}
+
 	if pushPlan.Application.LifecycleType == constant.AppLifecycleTypeDocker {
 		return pushPlan, nil
 	}

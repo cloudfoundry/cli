@@ -3,9 +3,9 @@ package ccv2
 import (
 	"bytes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/buildpacks"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
 	"code.cloudfoundry.org/cli/types"
 	"encoding/json"
 	"io"
@@ -157,12 +157,12 @@ func (client *Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 // UploadBuildpack uploads the contents of a buildpack zip to the server.
 func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
 
-	contentLength, err := buildpacks.CalculateRequestSize(buildpackLength, buildpackPath, "buildpack")
+	contentLength, err := uploads.CalculateRequestSize(buildpackLength, buildpackPath, "buildpack")
 	if err != nil {
 		return nil, err
 	}
 
-	contentType, body, writeErrors := buildpacks.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "buildpack")
+	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "buildpack")
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutBuildpackBitsRequest,

@@ -1,8 +1,16 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -17,6 +25,92 @@ var _ = Describe("Droplet", func() {
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
+	})
+
+	Describe("CreateDroplet", func() {
+		var (
+			droplet    Droplet
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			droplet, warnings, executeErr = client.CreateDroplet("app-guid")
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-guid",
+					"state": "AWAITING_UPLOAD",
+					"error": null,
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {}
+					},
+					"buildpacks": [
+						{
+							"name": "some-buildpack",
+							"detect_output": "detected-buildpack"
+						}
+					],
+					"image": "docker/some-image",
+					"stack": "some-stack",
+					"created_at": "2016-03-28T23:39:34Z",
+					"updated_at": "2016-03-28T23:39:47Z"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/droplets"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the given droplet and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(droplet).To(Equal(Droplet{
+					GUID:  "some-guid",
+					Stack: "some-stack",
+					State: constant.DropletAwaitingUpload,
+					Buildpacks: []DropletBuildpack{
+						{
+							Name:         "some-buildpack",
+							DetectOutput: "detected-buildpack",
+						},
+					},
+					Image:     "docker/some-image",
+					CreatedAt: "2016-03-28T23:39:34Z",
+				}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Droplet not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/droplets"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.DropletNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
 	})
 
 	Describe("GetApplicationDropletCurrent", func() {
@@ -336,6 +430,208 @@ var _ = Describe("Droplet", func() {
 			It("returns the error", func() {
 				Expect(executeErr).To(MatchError(ccerror.ApplicationNotFoundError{}))
 				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
+
+	Describe("UploadDropletBits", func() {
+		var (
+			dropletGUID     string
+			dropletFile     io.Reader
+			dropletFilePath string
+			dropletContent  string
+			jobURL          JobURL
+			warnings        Warnings
+			executeErr      error
+		)
+
+		BeforeEach(func() {
+			dropletGUID = "some-droplet-guid"
+			dropletContent = "some-content"
+			dropletFile = strings.NewReader(dropletContent)
+			dropletFilePath = "some/fake-droplet.tgz"
+		})
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.UploadDropletBits(dropletGUID, dropletFilePath, dropletFile, int64(len(dropletContent)))
+		})
+
+		When("the upload is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-droplet-guid",
+					"state": "PROCESSING_UPLOAD"
+				}`
+
+				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
+					contentType := req.Header.Get("Content-Type")
+					Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+					defer req.Body.Close()
+					requestReader := multipart.NewReader(req.Body, contentType[30:])
+
+					dropletPart, err := requestReader.NextPart()
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(dropletPart.FormName()).To(Equal("bits"))
+					Expect(dropletPart.FileName()).To(Equal("fake-droplet.tgz"))
+
+					defer dropletPart.Close()
+					partContents, err := ioutil.ReadAll(dropletPart)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(partContents)).To(Equal(dropletContent))
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
+						verifyHeaderAndBody,
+						RespondWith(
+							http.StatusAccepted,
+							response,
+							http.Header{
+								"X-Cf-Warnings": {"this is a warning"},
+								"Location":      {"http://example.com/job-guid"},
+							},
+						),
+					),
+				)
+			})
+
+			It("returns the processing job URL and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				Expect(jobURL).To(Equal(JobURL("http://example.com/job-guid")))
+			})
+		})
+
+		When("there is an error reading the buildpack", func() {
+			var (
+				fakeReader  *ccv3fakes.FakeReader
+				expectedErr error
+			)
+
+			BeforeEach(func() {
+				expectedErr = errors.New("droplet read error")
+				fakeReader = new(ccv3fakes.FakeReader)
+				fakeReader.ReadReturns(0, expectedErr)
+				dropletFile = fakeReader
+
+				server.AppendHandlers(
+					VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+			})
+		})
+
+		When("the upload returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [{
+                        "detail": "The droplet could not be found: some-droplet-guid",
+                        "title": "CF-ResourceNotFound",
+                        "code": 10010
+                    }]
+                }`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(
+					ccerror.ResourceNotFoundError{
+						Message: "The droplet could not be found: some-droplet-guid",
+					},
+				))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				dropletGUID = "some-guid"
+
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Droplet not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/droplets/some-guid/upload"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.DropletNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("a retryable error occurs", func() {
+			BeforeEach(func() {
+				wrapper := &wrapper.CustomWrapper{
+					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
+						defer GinkgoRecover() // Since this will be running in a thread
+
+						if strings.HasSuffix(request.URL.String(), "/v3/droplets/some-droplet-guid/upload") {
+							_, err := ioutil.ReadAll(request.Body)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(request.Body.Close()).ToNot(HaveOccurred())
+							return request.ResetBody()
+						}
+						return connection.Make(request, response)
+					},
+				}
+
+				client, _ = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+			})
+
+			It("returns the PipeSeekError", func() {
+				Expect(executeErr).To(MatchError(ccerror.PipeSeekError{}))
+			})
+		})
+
+		When("an http error occurs mid-transfer", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some read error")
+
+				wrapper := &wrapper.CustomWrapper{
+					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
+						defer GinkgoRecover() // Since this will be running in a thread
+
+						if strings.HasSuffix(request.URL.String(), "/v3/droplets/some-droplet-guid/upload") {
+							defer request.Body.Close()
+							readBytes, err := ioutil.ReadAll(request.Body)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(len(readBytes)).To(BeNumerically(">", len(dropletContent)))
+							return expectedErr
+						}
+						return connection.Make(request, response)
+					},
+				}
+
+				client, _ = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+			})
+
+			It("returns the http error", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
 			})
 		})
 	})

@@ -40,6 +40,20 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 		expectedPushPlan, executeErr = actor.SetupAllResourcesForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
+	When("the plan has a droplet path", func() {
+		BeforeEach(func() {
+			pushPlan.DropletPath = "some-droplet.tgz"
+		})
+
+		It("skips settings the resources", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(pushPlan.AllResources).To(BeEmpty())
+
+			Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(0))
+			Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(0))
+		})
+	})
+
 	When("the application is a docker app", func() {
 		BeforeEach(func() {
 			pushPlan.Application.LifecycleType = constant.AppLifecycleTypeDocker

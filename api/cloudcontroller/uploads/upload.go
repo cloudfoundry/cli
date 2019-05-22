@@ -1,4 +1,4 @@
-package buildpacks
+package uploads
 
 import (
 	"bytes"
@@ -9,13 +9,11 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
-// tested via the ccv2.buildpack_test.go file at this point
-
-func CalculateRequestSize(buildpackSize int64, bpPath string, fieldName string) (int64, error) {
+func CalculateRequestSize(fileSize int64, path string, fieldName string) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
-	bpFileName := filepath.Base(bpPath)
+	bpFileName := filepath.Base(path)
 
 	_, err := form.CreateFormFile(fieldName, bpFileName)
 	if err != nil {
@@ -27,10 +25,10 @@ func CalculateRequestSize(buildpackSize int64, bpPath string, fieldName string) 
 		return 0, err
 	}
 
-	return int64(body.Len()) + buildpackSize, nil
+	return int64(body.Len()) + fileSize, nil
 }
 
-func CreateMultipartBodyAndHeader(buildpack io.Reader, bpPath string, fieldName string) (string, io.ReadSeeker, <-chan error) {
+func CreateMultipartBodyAndHeader(file io.Reader, path string, fieldName string) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 
 	form := multipart.NewWriter(writerInput)
@@ -41,14 +39,14 @@ func CreateMultipartBodyAndHeader(buildpack io.Reader, bpPath string, fieldName 
 		defer close(writeErrors)
 		defer writerInput.Close()
 
-		bpFileName := filepath.Base(bpPath)
+		bpFileName := filepath.Base(path)
 		writer, err := form.CreateFormFile(fieldName, bpFileName)
 		if err != nil {
 			writeErrors <- err
 			return
 		}
 
-		_, err = io.Copy(writer, buildpack)
+		_, err = io.Copy(writer, file)
 		if err != nil {
 			writeErrors <- err
 			return
