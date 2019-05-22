@@ -92,7 +92,9 @@ var _ = Describe("update-service command", func() {
 			When("updating to the same service plan (no-op)", func() {
 				It("displays an informative success message, exits 0", func() {
 					session := helpers.CF("update-service", serviceInstanceName, "-p", servicePlan)
-					Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
+					if !helpers.ClientCredentialsTestMode() {
+						Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
+					}
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
