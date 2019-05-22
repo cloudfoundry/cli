@@ -34,6 +34,7 @@ var _ = Describe("ssh-code command", func() {
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
+			helpers.SkipIfClientCredentialsTestMode()
 		})
 
 		It("returns a one time passcode for ssh", func() {

@@ -65,7 +65,9 @@ var _ = Describe("service-brokers command", func() {
 			})
 
 			It("prints a table of service brokers", func() {
-				Eventually(session).Should(Say("Getting service brokers as admin..."))
+				if !helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say("Getting service brokers as admin..."))
+				}
 				Eventually(session).Should(Say(`name\s+url`))
 				Eventually(session).Should(Say(`%s\s+%s`, broker.Name(), broker.URL()))
 				Eventually(session).Should(Exit(0))
