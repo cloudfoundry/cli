@@ -11,8 +11,9 @@ import (
 type FakeBuildpackRequirement struct {
 	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
-	executeArgsForCall []struct{}
-	executeReturns     struct {
+	executeArgsForCall []struct {
+	}
+	executeReturns struct {
 		result1 error
 	}
 	executeReturnsOnCall map[int]struct {
@@ -20,8 +21,9 @@ type FakeBuildpackRequirement struct {
 	}
 	GetBuildpackStub        func() models.Buildpack
 	getBuildpackMutex       sync.RWMutex
-	getBuildpackArgsForCall []struct{}
-	getBuildpackReturns     struct {
+	getBuildpackArgsForCall []struct {
+	}
+	getBuildpackReturns struct {
 		result1 models.Buildpack
 	}
 	getBuildpackReturnsOnCall map[int]struct {
@@ -34,7 +36,8 @@ type FakeBuildpackRequirement struct {
 func (fake *FakeBuildpackRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
-	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
@@ -43,7 +46,8 @@ func (fake *FakeBuildpackRequirement) Execute() error {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.executeReturns.result1
+	fakeReturns := fake.executeReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeBuildpackRequirement) ExecuteCallCount() int {
@@ -52,7 +56,15 @@ func (fake *FakeBuildpackRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
+func (fake *FakeBuildpackRequirement) ExecuteCalls(stub func() error) {
+	fake.executeMutex.Lock()
+	defer fake.executeMutex.Unlock()
+	fake.ExecuteStub = stub
+}
+
 func (fake *FakeBuildpackRequirement) ExecuteReturns(result1 error) {
+	fake.executeMutex.Lock()
+	defer fake.executeMutex.Unlock()
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
 		result1 error
@@ -60,6 +72,8 @@ func (fake *FakeBuildpackRequirement) ExecuteReturns(result1 error) {
 }
 
 func (fake *FakeBuildpackRequirement) ExecuteReturnsOnCall(i int, result1 error) {
+	fake.executeMutex.Lock()
+	defer fake.executeMutex.Unlock()
 	fake.ExecuteStub = nil
 	if fake.executeReturnsOnCall == nil {
 		fake.executeReturnsOnCall = make(map[int]struct {
@@ -74,7 +88,8 @@ func (fake *FakeBuildpackRequirement) ExecuteReturnsOnCall(i int, result1 error)
 func (fake *FakeBuildpackRequirement) GetBuildpack() models.Buildpack {
 	fake.getBuildpackMutex.Lock()
 	ret, specificReturn := fake.getBuildpackReturnsOnCall[len(fake.getBuildpackArgsForCall)]
-	fake.getBuildpackArgsForCall = append(fake.getBuildpackArgsForCall, struct{}{})
+	fake.getBuildpackArgsForCall = append(fake.getBuildpackArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetBuildpack", []interface{}{})
 	fake.getBuildpackMutex.Unlock()
 	if fake.GetBuildpackStub != nil {
@@ -83,7 +98,8 @@ func (fake *FakeBuildpackRequirement) GetBuildpack() models.Buildpack {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getBuildpackReturns.result1
+	fakeReturns := fake.getBuildpackReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeBuildpackRequirement) GetBuildpackCallCount() int {
@@ -92,7 +108,15 @@ func (fake *FakeBuildpackRequirement) GetBuildpackCallCount() int {
 	return len(fake.getBuildpackArgsForCall)
 }
 
+func (fake *FakeBuildpackRequirement) GetBuildpackCalls(stub func() models.Buildpack) {
+	fake.getBuildpackMutex.Lock()
+	defer fake.getBuildpackMutex.Unlock()
+	fake.GetBuildpackStub = stub
+}
+
 func (fake *FakeBuildpackRequirement) GetBuildpackReturns(result1 models.Buildpack) {
+	fake.getBuildpackMutex.Lock()
+	defer fake.getBuildpackMutex.Unlock()
 	fake.GetBuildpackStub = nil
 	fake.getBuildpackReturns = struct {
 		result1 models.Buildpack
@@ -100,6 +124,8 @@ func (fake *FakeBuildpackRequirement) GetBuildpackReturns(result1 models.Buildpa
 }
 
 func (fake *FakeBuildpackRequirement) GetBuildpackReturnsOnCall(i int, result1 models.Buildpack) {
+	fake.getBuildpackMutex.Lock()
+	defer fake.getBuildpackMutex.Unlock()
 	fake.GetBuildpackStub = nil
 	if fake.getBuildpackReturnsOnCall == nil {
 		fake.getBuildpackReturnsOnCall = make(map[int]struct {

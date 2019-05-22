@@ -134,7 +134,8 @@ var _ = Describe("create-route Command", func() {
 
 			It("creates the route", func() {
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+				expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+				Expect(expectedOrgName).To(Equal(orgName))
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedSpaceName).To(Equal(spaceName))
 				Expect(expectedHostname).To(Equal(hostname))
@@ -155,7 +156,8 @@ var _ = Describe("create-route Command", func() {
 
 				It("creates the route", func() {
 					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-					expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+					expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+					Expect(expectedOrgName).To(Equal(orgName))
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedSpaceName).To(Equal(spaceName))
 					Expect(expectedHostname).To(Equal(hostname))

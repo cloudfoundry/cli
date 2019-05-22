@@ -8,7 +8,7 @@ import (
 
 type Route ccv3.Route
 
-func (actor Actor) CreateRoute(spaceName, domainName, hostname string) (Warnings, error) {
+func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname string) (Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -17,9 +17,14 @@ func (actor Actor) CreateRoute(spaceName, domainName, hostname string) (Warnings
 		return allWarnings, err
 	}
 
-	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, domain.OrganizationGUID)
+	org, warnings, err := actor.GetOrganizationByName(orgName)
 	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
 
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}

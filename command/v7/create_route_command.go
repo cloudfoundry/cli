@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . CreateRouteActor
 
 type CreateRouteActor interface {
-	CreateRoute(spaceName, domainName, hostname string) (v7action.Warnings, error)
+	CreateRoute(orgName, spaceName, domainName, hostname string) (v7action.Warnings, error)
 }
 
 type CreateRouteCommand struct {
@@ -71,7 +71,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	warnings, err := cmd.Actor.CreateRoute(spaceName, domain, hostname)
+	warnings, err := cmd.Actor.CreateRoute(orgName, spaceName, domain, hostname)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

@@ -2,9 +2,9 @@
 package apifakes
 
 import (
-	sync "sync"
+	"sync"
 
-	api "code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/cf/api"
 )
 
 type FakeCurlRepository struct {

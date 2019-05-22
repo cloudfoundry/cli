@@ -130,6 +130,39 @@ var _ = Describe("create-route command", func() {
 						})
 					})
 				})
+
+				When("the domain is shared", func() {
+					var domain helpers.Domain
+
+					BeforeEach(func() {
+						domain = helpers.NewDomain("", domainName)
+						domain.CreateShared()
+					})
+
+					AfterEach(func() {
+						domain.DeleteShared()
+					})
+
+					When("no flags are used", func() {
+						It("errors indicating that hostname is missing", func() {
+							session := helpers.CF("create-route", domainName)
+							Eventually(session).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say(`FAILED`))
+							Eventually(session.Err).Should(Say(`Missing host. Routes in shared domains must have a host defined.`))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("passing in a hostname", func() {
+						It("creates the route with the hostname", func() {
+							hostname := "tiramisu"
+							session := helpers.CF("create-route", domainName, "-n", hostname)
+							Eventually(session).Should(Say(`Creating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s\.%s has been created\.`, hostname, domainName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
 			})
 		})
 

@@ -10,23 +10,10 @@ import (
 )
 
 type FakeBuildpackBitsRepository struct {
-	UploadBuildpackStub        func(buildpack models.Buildpack, buildpackFile *os.File, zipFileName string) error
-	uploadBuildpackMutex       sync.RWMutex
-	uploadBuildpackArgsForCall []struct {
-		buildpack     models.Buildpack
-		buildpackFile *os.File
-		zipFileName   string
-	}
-	uploadBuildpackReturns struct {
-		result1 error
-	}
-	uploadBuildpackReturnsOnCall map[int]struct {
-		result1 error
-	}
-	CreateBuildpackZipFileStub        func(buildpackPath string) (*os.File, string, error)
+	CreateBuildpackZipFileStub        func(string) (*os.File, string, error)
 	createBuildpackZipFileMutex       sync.RWMutex
 	createBuildpackZipFileArgsForCall []struct {
-		buildpackPath string
+		arg1 string
 	}
 	createBuildpackZipFileReturns struct {
 		result1 *os.File
@@ -38,75 +25,39 @@ type FakeBuildpackBitsRepository struct {
 		result2 string
 		result3 error
 	}
+	UploadBuildpackStub        func(models.Buildpack, *os.File, string) error
+	uploadBuildpackMutex       sync.RWMutex
+	uploadBuildpackArgsForCall []struct {
+		arg1 models.Buildpack
+		arg2 *os.File
+		arg3 string
+	}
+	uploadBuildpackReturns struct {
+		result1 error
+	}
+	uploadBuildpackReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackFile *os.File, zipFileName string) error {
-	fake.uploadBuildpackMutex.Lock()
-	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
-	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
-		buildpack     models.Buildpack
-		buildpackFile *os.File
-		zipFileName   string
-	}{buildpack, buildpackFile, zipFileName})
-	fake.recordInvocation("UploadBuildpack", []interface{}{buildpack, buildpackFile, zipFileName})
-	fake.uploadBuildpackMutex.Unlock()
-	if fake.UploadBuildpackStub != nil {
-		return fake.UploadBuildpackStub(buildpack, buildpackFile, zipFileName)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.uploadBuildpackReturns.result1
-}
-
-func (fake *FakeBuildpackBitsRepository) UploadBuildpackCallCount() int {
-	fake.uploadBuildpackMutex.RLock()
-	defer fake.uploadBuildpackMutex.RUnlock()
-	return len(fake.uploadBuildpackArgsForCall)
-}
-
-func (fake *FakeBuildpackBitsRepository) UploadBuildpackArgsForCall(i int) (models.Buildpack, *os.File, string) {
-	fake.uploadBuildpackMutex.RLock()
-	defer fake.uploadBuildpackMutex.RUnlock()
-	return fake.uploadBuildpackArgsForCall[i].buildpack, fake.uploadBuildpackArgsForCall[i].buildpackFile, fake.uploadBuildpackArgsForCall[i].zipFileName
-}
-
-func (fake *FakeBuildpackBitsRepository) UploadBuildpackReturns(result1 error) {
-	fake.UploadBuildpackStub = nil
-	fake.uploadBuildpackReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeBuildpackBitsRepository) UploadBuildpackReturnsOnCall(i int, result1 error) {
-	fake.UploadBuildpackStub = nil
-	if fake.uploadBuildpackReturnsOnCall == nil {
-		fake.uploadBuildpackReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.uploadBuildpackReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFile(buildpackPath string) (*os.File, string, error) {
+func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFile(arg1 string) (*os.File, string, error) {
 	fake.createBuildpackZipFileMutex.Lock()
 	ret, specificReturn := fake.createBuildpackZipFileReturnsOnCall[len(fake.createBuildpackZipFileArgsForCall)]
 	fake.createBuildpackZipFileArgsForCall = append(fake.createBuildpackZipFileArgsForCall, struct {
-		buildpackPath string
-	}{buildpackPath})
-	fake.recordInvocation("CreateBuildpackZipFile", []interface{}{buildpackPath})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("CreateBuildpackZipFile", []interface{}{arg1})
 	fake.createBuildpackZipFileMutex.Unlock()
 	if fake.CreateBuildpackZipFileStub != nil {
-		return fake.CreateBuildpackZipFileStub(buildpackPath)
+		return fake.CreateBuildpackZipFileStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createBuildpackZipFileReturns.result1, fake.createBuildpackZipFileReturns.result2, fake.createBuildpackZipFileReturns.result3
+	fakeReturns := fake.createBuildpackZipFileReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileCallCount() int {
@@ -115,13 +66,22 @@ func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileCallCount() int {
 	return len(fake.createBuildpackZipFileArgsForCall)
 }
 
+func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileCalls(stub func(string) (*os.File, string, error)) {
+	fake.createBuildpackZipFileMutex.Lock()
+	defer fake.createBuildpackZipFileMutex.Unlock()
+	fake.CreateBuildpackZipFileStub = stub
+}
+
 func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileArgsForCall(i int) string {
 	fake.createBuildpackZipFileMutex.RLock()
 	defer fake.createBuildpackZipFileMutex.RUnlock()
-	return fake.createBuildpackZipFileArgsForCall[i].buildpackPath
+	argsForCall := fake.createBuildpackZipFileArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileReturns(result1 *os.File, result2 string, result3 error) {
+	fake.createBuildpackZipFileMutex.Lock()
+	defer fake.createBuildpackZipFileMutex.Unlock()
 	fake.CreateBuildpackZipFileStub = nil
 	fake.createBuildpackZipFileReturns = struct {
 		result1 *os.File
@@ -131,6 +91,8 @@ func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileReturns(result1 *
 }
 
 func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileReturnsOnCall(i int, result1 *os.File, result2 string, result3 error) {
+	fake.createBuildpackZipFileMutex.Lock()
+	defer fake.createBuildpackZipFileMutex.Unlock()
 	fake.CreateBuildpackZipFileStub = nil
 	if fake.createBuildpackZipFileReturnsOnCall == nil {
 		fake.createBuildpackZipFileReturnsOnCall = make(map[int]struct {
@@ -146,13 +108,75 @@ func (fake *FakeBuildpackBitsRepository) CreateBuildpackZipFileReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeBuildpackBitsRepository) UploadBuildpack(arg1 models.Buildpack, arg2 *os.File, arg3 string) error {
+	fake.uploadBuildpackMutex.Lock()
+	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
+	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
+		arg1 models.Buildpack
+		arg2 *os.File
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UploadBuildpack", []interface{}{arg1, arg2, arg3})
+	fake.uploadBuildpackMutex.Unlock()
+	if fake.UploadBuildpackStub != nil {
+		return fake.UploadBuildpackStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.uploadBuildpackReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeBuildpackBitsRepository) UploadBuildpackCallCount() int {
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
+	return len(fake.uploadBuildpackArgsForCall)
+}
+
+func (fake *FakeBuildpackBitsRepository) UploadBuildpackCalls(stub func(models.Buildpack, *os.File, string) error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = stub
+}
+
+func (fake *FakeBuildpackBitsRepository) UploadBuildpackArgsForCall(i int) (models.Buildpack, *os.File, string) {
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
+	argsForCall := fake.uploadBuildpackArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeBuildpackBitsRepository) UploadBuildpackReturns(result1 error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = nil
+	fake.uploadBuildpackReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeBuildpackBitsRepository) UploadBuildpackReturnsOnCall(i int, result1 error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = nil
+	if fake.uploadBuildpackReturnsOnCall == nil {
+		fake.uploadBuildpackReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.uploadBuildpackReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeBuildpackBitsRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.uploadBuildpackMutex.RLock()
-	defer fake.uploadBuildpackMutex.RUnlock()
 	fake.createBuildpackZipFileMutex.RLock()
 	defer fake.createBuildpackZipFileMutex.RUnlock()
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

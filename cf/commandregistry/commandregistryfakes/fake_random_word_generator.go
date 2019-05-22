@@ -10,8 +10,9 @@ import (
 type FakeRandomWordGenerator struct {
 	BabbleStub        func() string
 	babbleMutex       sync.RWMutex
-	babbleArgsForCall []struct{}
-	babbleReturns     struct {
+	babbleArgsForCall []struct {
+	}
+	babbleReturns struct {
 		result1 string
 	}
 	babbleReturnsOnCall map[int]struct {
@@ -24,7 +25,8 @@ type FakeRandomWordGenerator struct {
 func (fake *FakeRandomWordGenerator) Babble() string {
 	fake.babbleMutex.Lock()
 	ret, specificReturn := fake.babbleReturnsOnCall[len(fake.babbleArgsForCall)]
-	fake.babbleArgsForCall = append(fake.babbleArgsForCall, struct{}{})
+	fake.babbleArgsForCall = append(fake.babbleArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Babble", []interface{}{})
 	fake.babbleMutex.Unlock()
 	if fake.BabbleStub != nil {
@@ -33,7 +35,8 @@ func (fake *FakeRandomWordGenerator) Babble() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.babbleReturns.result1
+	fakeReturns := fake.babbleReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeRandomWordGenerator) BabbleCallCount() int {
@@ -42,7 +45,15 @@ func (fake *FakeRandomWordGenerator) BabbleCallCount() int {
 	return len(fake.babbleArgsForCall)
 }
 
+func (fake *FakeRandomWordGenerator) BabbleCalls(stub func() string) {
+	fake.babbleMutex.Lock()
+	defer fake.babbleMutex.Unlock()
+	fake.BabbleStub = stub
+}
+
 func (fake *FakeRandomWordGenerator) BabbleReturns(result1 string) {
+	fake.babbleMutex.Lock()
+	defer fake.babbleMutex.Unlock()
 	fake.BabbleStub = nil
 	fake.babbleReturns = struct {
 		result1 string
@@ -50,6 +61,8 @@ func (fake *FakeRandomWordGenerator) BabbleReturns(result1 string) {
 }
 
 func (fake *FakeRandomWordGenerator) BabbleReturnsOnCall(i int, result1 string) {
+	fake.babbleMutex.Lock()
+	defer fake.babbleMutex.Unlock()
 	fake.BabbleStub = nil
 	if fake.babbleReturnsOnCall == nil {
 		fake.babbleReturnsOnCall = make(map[int]struct {

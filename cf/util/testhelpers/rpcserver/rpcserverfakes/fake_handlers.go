@@ -6,243 +6,15 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver"
 	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 )
 
 type FakeHandlers struct {
-	IsMinCliVersionStub        func(args string, retVal *bool) error
-	isMinCliVersionMutex       sync.RWMutex
-	isMinCliVersionArgsForCall []struct {
-		args   string
-		retVal *bool
-	}
-	isMinCliVersionReturns struct {
-		result1 error
-	}
-	isMinCliVersionReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SetPluginMetadataStub        func(pluginMetadata plugin.PluginMetadata, retVal *bool) error
-	setPluginMetadataMutex       sync.RWMutex
-	setPluginMetadataArgsForCall []struct {
-		pluginMetadata plugin.PluginMetadata
-		retVal         *bool
-	}
-	setPluginMetadataReturns struct {
-		result1 error
-	}
-	setPluginMetadataReturnsOnCall map[int]struct {
-		result1 error
-	}
-	DisableTerminalOutputStub        func(disable bool, retVal *bool) error
-	disableTerminalOutputMutex       sync.RWMutex
-	disableTerminalOutputArgsForCall []struct {
-		disable bool
-		retVal  *bool
-	}
-	disableTerminalOutputReturns struct {
-		result1 error
-	}
-	disableTerminalOutputReturnsOnCall map[int]struct {
-		result1 error
-	}
-	CallCoreCommandStub        func(args []string, retVal *bool) error
-	callCoreCommandMutex       sync.RWMutex
-	callCoreCommandArgsForCall []struct {
-		args   []string
-		retVal *bool
-	}
-	callCoreCommandReturns struct {
-		result1 error
-	}
-	callCoreCommandReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetOutputAndResetStub        func(args bool, retVal *[]string) error
-	getOutputAndResetMutex       sync.RWMutex
-	getOutputAndResetArgsForCall []struct {
-		args   bool
-		retVal *[]string
-	}
-	getOutputAndResetReturns struct {
-		result1 error
-	}
-	getOutputAndResetReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetCurrentOrgStub        func(args string, retVal *plugin_models.Organization) error
-	getCurrentOrgMutex       sync.RWMutex
-	getCurrentOrgArgsForCall []struct {
-		args   string
-		retVal *plugin_models.Organization
-	}
-	getCurrentOrgReturns struct {
-		result1 error
-	}
-	getCurrentOrgReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetCurrentSpaceStub        func(args string, retVal *plugin_models.Space) error
-	getCurrentSpaceMutex       sync.RWMutex
-	getCurrentSpaceArgsForCall []struct {
-		args   string
-		retVal *plugin_models.Space
-	}
-	getCurrentSpaceReturns struct {
-		result1 error
-	}
-	getCurrentSpaceReturnsOnCall map[int]struct {
-		result1 error
-	}
-	UsernameStub        func(args string, retVal *string) error
-	usernameMutex       sync.RWMutex
-	usernameArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	usernameReturns struct {
-		result1 error
-	}
-	usernameReturnsOnCall map[int]struct {
-		result1 error
-	}
-	UserGuidStub        func(args string, retVal *string) error
-	userGuidMutex       sync.RWMutex
-	userGuidArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	userGuidReturns struct {
-		result1 error
-	}
-	userGuidReturnsOnCall map[int]struct {
-		result1 error
-	}
-	UserEmailStub        func(args string, retVal *string) error
-	userEmailMutex       sync.RWMutex
-	userEmailArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	userEmailReturns struct {
-		result1 error
-	}
-	userEmailReturnsOnCall map[int]struct {
-		result1 error
-	}
-	IsLoggedInStub        func(args string, retVal *bool) error
-	isLoggedInMutex       sync.RWMutex
-	isLoggedInArgsForCall []struct {
-		args   string
-		retVal *bool
-	}
-	isLoggedInReturns struct {
-		result1 error
-	}
-	isLoggedInReturnsOnCall map[int]struct {
-		result1 error
-	}
-	IsSSLDisabledStub        func(args string, retVal *bool) error
-	isSSLDisabledMutex       sync.RWMutex
-	isSSLDisabledArgsForCall []struct {
-		args   string
-		retVal *bool
-	}
-	isSSLDisabledReturns struct {
-		result1 error
-	}
-	isSSLDisabledReturnsOnCall map[int]struct {
-		result1 error
-	}
-	HasOrganizationStub        func(args string, retVal *bool) error
-	hasOrganizationMutex       sync.RWMutex
-	hasOrganizationArgsForCall []struct {
-		args   string
-		retVal *bool
-	}
-	hasOrganizationReturns struct {
-		result1 error
-	}
-	hasOrganizationReturnsOnCall map[int]struct {
-		result1 error
-	}
-	HasSpaceStub        func(args string, retVal *bool) error
-	hasSpaceMutex       sync.RWMutex
-	hasSpaceArgsForCall []struct {
-		args   string
-		retVal *bool
-	}
-	hasSpaceReturns struct {
-		result1 error
-	}
-	hasSpaceReturnsOnCall map[int]struct {
-		result1 error
-	}
-	ApiEndpointStub        func(args string, retVal *string) error
-	apiEndpointMutex       sync.RWMutex
-	apiEndpointArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	apiEndpointReturns struct {
-		result1 error
-	}
-	apiEndpointReturnsOnCall map[int]struct {
-		result1 error
-	}
-	HasAPIEndpointStub        func(args string, retVal *bool) error
-	hasAPIEndpointMutex       sync.RWMutex
-	hasAPIEndpointArgsForCall []struct {
-		args   string
-		retVal *bool
-	}
-	hasAPIEndpointReturns struct {
-		result1 error
-	}
-	hasAPIEndpointReturnsOnCall map[int]struct {
-		result1 error
-	}
-	ApiVersionStub        func(args string, retVal *string) error
-	apiVersionMutex       sync.RWMutex
-	apiVersionArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	apiVersionReturns struct {
-		result1 error
-	}
-	apiVersionReturnsOnCall map[int]struct {
-		result1 error
-	}
-	LoggregatorEndpointStub        func(args string, retVal *string) error
-	loggregatorEndpointMutex       sync.RWMutex
-	loggregatorEndpointArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	loggregatorEndpointReturns struct {
-		result1 error
-	}
-	loggregatorEndpointReturnsOnCall map[int]struct {
-		result1 error
-	}
-	DopplerEndpointStub        func(args string, retVal *string) error
-	dopplerEndpointMutex       sync.RWMutex
-	dopplerEndpointArgsForCall []struct {
-		args   string
-		retVal *string
-	}
-	dopplerEndpointReturns struct {
-		result1 error
-	}
-	dopplerEndpointReturnsOnCall map[int]struct {
-		result1 error
-	}
-	AccessTokenStub        func(args string, retVal *string) error
+	AccessTokenStub        func(string, *string) error
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct {
-		args   string
-		retVal *string
+		arg1 string
+		arg2 *string
 	}
 	accessTokenReturns struct {
 		result1 error
@@ -250,11 +22,71 @@ type FakeHandlers struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetAppStub        func(appName string, retVal *plugin_models.GetAppModel) error
+	ApiEndpointStub        func(string, *string) error
+	apiEndpointMutex       sync.RWMutex
+	apiEndpointArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	apiEndpointReturns struct {
+		result1 error
+	}
+	apiEndpointReturnsOnCall map[int]struct {
+		result1 error
+	}
+	ApiVersionStub        func(string, *string) error
+	apiVersionMutex       sync.RWMutex
+	apiVersionArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	apiVersionReturns struct {
+		result1 error
+	}
+	apiVersionReturnsOnCall map[int]struct {
+		result1 error
+	}
+	CallCoreCommandStub        func([]string, *bool) error
+	callCoreCommandMutex       sync.RWMutex
+	callCoreCommandArgsForCall []struct {
+		arg1 []string
+		arg2 *bool
+	}
+	callCoreCommandReturns struct {
+		result1 error
+	}
+	callCoreCommandReturnsOnCall map[int]struct {
+		result1 error
+	}
+	DisableTerminalOutputStub        func(bool, *bool) error
+	disableTerminalOutputMutex       sync.RWMutex
+	disableTerminalOutputArgsForCall []struct {
+		arg1 bool
+		arg2 *bool
+	}
+	disableTerminalOutputReturns struct {
+		result1 error
+	}
+	disableTerminalOutputReturnsOnCall map[int]struct {
+		result1 error
+	}
+	DopplerEndpointStub        func(string, *string) error
+	dopplerEndpointMutex       sync.RWMutex
+	dopplerEndpointArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	dopplerEndpointReturns struct {
+		result1 error
+	}
+	dopplerEndpointReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetAppStub        func(string, *plugin_models.GetAppModel) error
 	getAppMutex       sync.RWMutex
 	getAppArgsForCall []struct {
-		appName string
-		retVal  *plugin_models.GetAppModel
+		arg1 string
+		arg2 *plugin_models.GetAppModel
 	}
 	getAppReturns struct {
 		result1 error
@@ -262,11 +94,11 @@ type FakeHandlers struct {
 	getAppReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetAppsStub        func(args string, retVal *[]plugin_models.GetAppsModel) error
+	GetAppsStub        func(string, *[]plugin_models.GetAppsModel) error
 	getAppsMutex       sync.RWMutex
 	getAppsArgsForCall []struct {
-		args   string
-		retVal *[]plugin_models.GetAppsModel
+		arg1 string
+		arg2 *[]plugin_models.GetAppsModel
 	}
 	getAppsReturns struct {
 		result1 error
@@ -274,71 +106,35 @@ type FakeHandlers struct {
 	getAppsReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetOrgsStub        func(args string, retVal *[]plugin_models.GetOrgs_Model) error
-	getOrgsMutex       sync.RWMutex
-	getOrgsArgsForCall []struct {
-		args   string
-		retVal *[]plugin_models.GetOrgs_Model
+	GetCurrentOrgStub        func(string, *plugin_models.Organization) error
+	getCurrentOrgMutex       sync.RWMutex
+	getCurrentOrgArgsForCall []struct {
+		arg1 string
+		arg2 *plugin_models.Organization
 	}
-	getOrgsReturns struct {
+	getCurrentOrgReturns struct {
 		result1 error
 	}
-	getOrgsReturnsOnCall map[int]struct {
+	getCurrentOrgReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetSpacesStub        func(args string, retVal *[]plugin_models.GetSpaces_Model) error
-	getSpacesMutex       sync.RWMutex
-	getSpacesArgsForCall []struct {
-		args   string
-		retVal *[]plugin_models.GetSpaces_Model
+	GetCurrentSpaceStub        func(string, *plugin_models.Space) error
+	getCurrentSpaceMutex       sync.RWMutex
+	getCurrentSpaceArgsForCall []struct {
+		arg1 string
+		arg2 *plugin_models.Space
 	}
-	getSpacesReturns struct {
+	getCurrentSpaceReturns struct {
 		result1 error
 	}
-	getSpacesReturnsOnCall map[int]struct {
+	getCurrentSpaceReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetServicesStub        func(args string, retVal *[]plugin_models.GetServices_Model) error
-	getServicesMutex       sync.RWMutex
-	getServicesArgsForCall []struct {
-		args   string
-		retVal *[]plugin_models.GetServices_Model
-	}
-	getServicesReturns struct {
-		result1 error
-	}
-	getServicesReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetOrgUsersStub        func(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error
-	getOrgUsersMutex       sync.RWMutex
-	getOrgUsersArgsForCall []struct {
-		args   []string
-		retVal *[]plugin_models.GetOrgUsers_Model
-	}
-	getOrgUsersReturns struct {
-		result1 error
-	}
-	getOrgUsersReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetSpaceUsersStub        func(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error
-	getSpaceUsersMutex       sync.RWMutex
-	getSpaceUsersArgsForCall []struct {
-		args   []string
-		retVal *[]plugin_models.GetSpaceUsers_Model
-	}
-	getSpaceUsersReturns struct {
-		result1 error
-	}
-	getSpaceUsersReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetOrgStub        func(orgName string, retVal *plugin_models.GetOrg_Model) error
+	GetOrgStub        func(string, *plugin_models.GetOrg_Model) error
 	getOrgMutex       sync.RWMutex
 	getOrgArgsForCall []struct {
-		orgName string
-		retVal  *plugin_models.GetOrg_Model
+		arg1 string
+		arg2 *plugin_models.GetOrg_Model
 	}
 	getOrgReturns struct {
 		result1 error
@@ -346,23 +142,47 @@ type FakeHandlers struct {
 	getOrgReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetSpaceStub        func(spaceName string, retVal *plugin_models.GetSpace_Model) error
-	getSpaceMutex       sync.RWMutex
-	getSpaceArgsForCall []struct {
-		spaceName string
-		retVal    *plugin_models.GetSpace_Model
+	GetOrgUsersStub        func([]string, *[]plugin_models.GetOrgUsers_Model) error
+	getOrgUsersMutex       sync.RWMutex
+	getOrgUsersArgsForCall []struct {
+		arg1 []string
+		arg2 *[]plugin_models.GetOrgUsers_Model
 	}
-	getSpaceReturns struct {
+	getOrgUsersReturns struct {
 		result1 error
 	}
-	getSpaceReturnsOnCall map[int]struct {
+	getOrgUsersReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetServiceStub        func(serviceInstance string, retVal *plugin_models.GetService_Model) error
+	GetOrgsStub        func(string, *[]plugin_models.GetOrgs_Model) error
+	getOrgsMutex       sync.RWMutex
+	getOrgsArgsForCall []struct {
+		arg1 string
+		arg2 *[]plugin_models.GetOrgs_Model
+	}
+	getOrgsReturns struct {
+		result1 error
+	}
+	getOrgsReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetOutputAndResetStub        func(bool, *[]string) error
+	getOutputAndResetMutex       sync.RWMutex
+	getOutputAndResetArgsForCall []struct {
+		arg1 bool
+		arg2 *[]string
+	}
+	getOutputAndResetReturns struct {
+		result1 error
+	}
+	getOutputAndResetReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetServiceStub        func(string, *plugin_models.GetService_Model) error
 	getServiceMutex       sync.RWMutex
 	getServiceArgsForCall []struct {
-		serviceInstance string
-		retVal          *plugin_models.GetService_Model
+		arg1 string
+		arg2 *plugin_models.GetService_Model
 	}
 	getServiceReturns struct {
 		result1 error
@@ -370,962 +190,207 @@ type FakeHandlers struct {
 	getServiceReturnsOnCall map[int]struct {
 		result1 error
 	}
+	GetServicesStub        func(string, *[]plugin_models.GetServices_Model) error
+	getServicesMutex       sync.RWMutex
+	getServicesArgsForCall []struct {
+		arg1 string
+		arg2 *[]plugin_models.GetServices_Model
+	}
+	getServicesReturns struct {
+		result1 error
+	}
+	getServicesReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetSpaceStub        func(string, *plugin_models.GetSpace_Model) error
+	getSpaceMutex       sync.RWMutex
+	getSpaceArgsForCall []struct {
+		arg1 string
+		arg2 *plugin_models.GetSpace_Model
+	}
+	getSpaceReturns struct {
+		result1 error
+	}
+	getSpaceReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetSpaceUsersStub        func([]string, *[]plugin_models.GetSpaceUsers_Model) error
+	getSpaceUsersMutex       sync.RWMutex
+	getSpaceUsersArgsForCall []struct {
+		arg1 []string
+		arg2 *[]plugin_models.GetSpaceUsers_Model
+	}
+	getSpaceUsersReturns struct {
+		result1 error
+	}
+	getSpaceUsersReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetSpacesStub        func(string, *[]plugin_models.GetSpaces_Model) error
+	getSpacesMutex       sync.RWMutex
+	getSpacesArgsForCall []struct {
+		arg1 string
+		arg2 *[]plugin_models.GetSpaces_Model
+	}
+	getSpacesReturns struct {
+		result1 error
+	}
+	getSpacesReturnsOnCall map[int]struct {
+		result1 error
+	}
+	HasAPIEndpointStub        func(string, *bool) error
+	hasAPIEndpointMutex       sync.RWMutex
+	hasAPIEndpointArgsForCall []struct {
+		arg1 string
+		arg2 *bool
+	}
+	hasAPIEndpointReturns struct {
+		result1 error
+	}
+	hasAPIEndpointReturnsOnCall map[int]struct {
+		result1 error
+	}
+	HasOrganizationStub        func(string, *bool) error
+	hasOrganizationMutex       sync.RWMutex
+	hasOrganizationArgsForCall []struct {
+		arg1 string
+		arg2 *bool
+	}
+	hasOrganizationReturns struct {
+		result1 error
+	}
+	hasOrganizationReturnsOnCall map[int]struct {
+		result1 error
+	}
+	HasSpaceStub        func(string, *bool) error
+	hasSpaceMutex       sync.RWMutex
+	hasSpaceArgsForCall []struct {
+		arg1 string
+		arg2 *bool
+	}
+	hasSpaceReturns struct {
+		result1 error
+	}
+	hasSpaceReturnsOnCall map[int]struct {
+		result1 error
+	}
+	IsLoggedInStub        func(string, *bool) error
+	isLoggedInMutex       sync.RWMutex
+	isLoggedInArgsForCall []struct {
+		arg1 string
+		arg2 *bool
+	}
+	isLoggedInReturns struct {
+		result1 error
+	}
+	isLoggedInReturnsOnCall map[int]struct {
+		result1 error
+	}
+	IsMinCliVersionStub        func(string, *bool) error
+	isMinCliVersionMutex       sync.RWMutex
+	isMinCliVersionArgsForCall []struct {
+		arg1 string
+		arg2 *bool
+	}
+	isMinCliVersionReturns struct {
+		result1 error
+	}
+	isMinCliVersionReturnsOnCall map[int]struct {
+		result1 error
+	}
+	IsSSLDisabledStub        func(string, *bool) error
+	isSSLDisabledMutex       sync.RWMutex
+	isSSLDisabledArgsForCall []struct {
+		arg1 string
+		arg2 *bool
+	}
+	isSSLDisabledReturns struct {
+		result1 error
+	}
+	isSSLDisabledReturnsOnCall map[int]struct {
+		result1 error
+	}
+	LoggregatorEndpointStub        func(string, *string) error
+	loggregatorEndpointMutex       sync.RWMutex
+	loggregatorEndpointArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	loggregatorEndpointReturns struct {
+		result1 error
+	}
+	loggregatorEndpointReturnsOnCall map[int]struct {
+		result1 error
+	}
+	SetPluginMetadataStub        func(plugin.PluginMetadata, *bool) error
+	setPluginMetadataMutex       sync.RWMutex
+	setPluginMetadataArgsForCall []struct {
+		arg1 plugin.PluginMetadata
+		arg2 *bool
+	}
+	setPluginMetadataReturns struct {
+		result1 error
+	}
+	setPluginMetadataReturnsOnCall map[int]struct {
+		result1 error
+	}
+	UserEmailStub        func(string, *string) error
+	userEmailMutex       sync.RWMutex
+	userEmailArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	userEmailReturns struct {
+		result1 error
+	}
+	userEmailReturnsOnCall map[int]struct {
+		result1 error
+	}
+	UserGuidStub        func(string, *string) error
+	userGuidMutex       sync.RWMutex
+	userGuidArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	userGuidReturns struct {
+		result1 error
+	}
+	userGuidReturnsOnCall map[int]struct {
+		result1 error
+	}
+	UsernameStub        func(string, *string) error
+	usernameMutex       sync.RWMutex
+	usernameArgsForCall []struct {
+		arg1 string
+		arg2 *string
+	}
+	usernameReturns struct {
+		result1 error
+	}
+	usernameReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHandlers) IsMinCliVersion(args string, retVal *bool) error {
-	fake.isMinCliVersionMutex.Lock()
-	ret, specificReturn := fake.isMinCliVersionReturnsOnCall[len(fake.isMinCliVersionArgsForCall)]
-	fake.isMinCliVersionArgsForCall = append(fake.isMinCliVersionArgsForCall, struct {
-		args   string
-		retVal *bool
-	}{args, retVal})
-	fake.recordInvocation("IsMinCliVersion", []interface{}{args, retVal})
-	fake.isMinCliVersionMutex.Unlock()
-	if fake.IsMinCliVersionStub != nil {
-		return fake.IsMinCliVersionStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.isMinCliVersionReturns.result1
-}
-
-func (fake *FakeHandlers) IsMinCliVersionCallCount() int {
-	fake.isMinCliVersionMutex.RLock()
-	defer fake.isMinCliVersionMutex.RUnlock()
-	return len(fake.isMinCliVersionArgsForCall)
-}
-
-func (fake *FakeHandlers) IsMinCliVersionArgsForCall(i int) (string, *bool) {
-	fake.isMinCliVersionMutex.RLock()
-	defer fake.isMinCliVersionMutex.RUnlock()
-	return fake.isMinCliVersionArgsForCall[i].args, fake.isMinCliVersionArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) IsMinCliVersionReturns(result1 error) {
-	fake.IsMinCliVersionStub = nil
-	fake.isMinCliVersionReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) IsMinCliVersionReturnsOnCall(i int, result1 error) {
-	fake.IsMinCliVersionStub = nil
-	if fake.isMinCliVersionReturnsOnCall == nil {
-		fake.isMinCliVersionReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.isMinCliVersionReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
-	fake.setPluginMetadataMutex.Lock()
-	ret, specificReturn := fake.setPluginMetadataReturnsOnCall[len(fake.setPluginMetadataArgsForCall)]
-	fake.setPluginMetadataArgsForCall = append(fake.setPluginMetadataArgsForCall, struct {
-		pluginMetadata plugin.PluginMetadata
-		retVal         *bool
-	}{pluginMetadata, retVal})
-	fake.recordInvocation("SetPluginMetadata", []interface{}{pluginMetadata, retVal})
-	fake.setPluginMetadataMutex.Unlock()
-	if fake.SetPluginMetadataStub != nil {
-		return fake.SetPluginMetadataStub(pluginMetadata, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.setPluginMetadataReturns.result1
-}
-
-func (fake *FakeHandlers) SetPluginMetadataCallCount() int {
-	fake.setPluginMetadataMutex.RLock()
-	defer fake.setPluginMetadataMutex.RUnlock()
-	return len(fake.setPluginMetadataArgsForCall)
-}
-
-func (fake *FakeHandlers) SetPluginMetadataArgsForCall(i int) (plugin.PluginMetadata, *bool) {
-	fake.setPluginMetadataMutex.RLock()
-	defer fake.setPluginMetadataMutex.RUnlock()
-	return fake.setPluginMetadataArgsForCall[i].pluginMetadata, fake.setPluginMetadataArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) SetPluginMetadataReturns(result1 error) {
-	fake.SetPluginMetadataStub = nil
-	fake.setPluginMetadataReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) SetPluginMetadataReturnsOnCall(i int, result1 error) {
-	fake.SetPluginMetadataStub = nil
-	if fake.setPluginMetadataReturnsOnCall == nil {
-		fake.setPluginMetadataReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.setPluginMetadataReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) DisableTerminalOutput(disable bool, retVal *bool) error {
-	fake.disableTerminalOutputMutex.Lock()
-	ret, specificReturn := fake.disableTerminalOutputReturnsOnCall[len(fake.disableTerminalOutputArgsForCall)]
-	fake.disableTerminalOutputArgsForCall = append(fake.disableTerminalOutputArgsForCall, struct {
-		disable bool
-		retVal  *bool
-	}{disable, retVal})
-	fake.recordInvocation("DisableTerminalOutput", []interface{}{disable, retVal})
-	fake.disableTerminalOutputMutex.Unlock()
-	if fake.DisableTerminalOutputStub != nil {
-		return fake.DisableTerminalOutputStub(disable, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.disableTerminalOutputReturns.result1
-}
-
-func (fake *FakeHandlers) DisableTerminalOutputCallCount() int {
-	fake.disableTerminalOutputMutex.RLock()
-	defer fake.disableTerminalOutputMutex.RUnlock()
-	return len(fake.disableTerminalOutputArgsForCall)
-}
-
-func (fake *FakeHandlers) DisableTerminalOutputArgsForCall(i int) (bool, *bool) {
-	fake.disableTerminalOutputMutex.RLock()
-	defer fake.disableTerminalOutputMutex.RUnlock()
-	return fake.disableTerminalOutputArgsForCall[i].disable, fake.disableTerminalOutputArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) DisableTerminalOutputReturns(result1 error) {
-	fake.DisableTerminalOutputStub = nil
-	fake.disableTerminalOutputReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) DisableTerminalOutputReturnsOnCall(i int, result1 error) {
-	fake.DisableTerminalOutputStub = nil
-	if fake.disableTerminalOutputReturnsOnCall == nil {
-		fake.disableTerminalOutputReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.disableTerminalOutputReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) CallCoreCommand(args []string, retVal *bool) error {
-	var argsCopy []string
-	if args != nil {
-		argsCopy = make([]string, len(args))
-		copy(argsCopy, args)
-	}
-	fake.callCoreCommandMutex.Lock()
-	ret, specificReturn := fake.callCoreCommandReturnsOnCall[len(fake.callCoreCommandArgsForCall)]
-	fake.callCoreCommandArgsForCall = append(fake.callCoreCommandArgsForCall, struct {
-		args   []string
-		retVal *bool
-	}{argsCopy, retVal})
-	fake.recordInvocation("CallCoreCommand", []interface{}{argsCopy, retVal})
-	fake.callCoreCommandMutex.Unlock()
-	if fake.CallCoreCommandStub != nil {
-		return fake.CallCoreCommandStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.callCoreCommandReturns.result1
-}
-
-func (fake *FakeHandlers) CallCoreCommandCallCount() int {
-	fake.callCoreCommandMutex.RLock()
-	defer fake.callCoreCommandMutex.RUnlock()
-	return len(fake.callCoreCommandArgsForCall)
-}
-
-func (fake *FakeHandlers) CallCoreCommandArgsForCall(i int) ([]string, *bool) {
-	fake.callCoreCommandMutex.RLock()
-	defer fake.callCoreCommandMutex.RUnlock()
-	return fake.callCoreCommandArgsForCall[i].args, fake.callCoreCommandArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) CallCoreCommandReturns(result1 error) {
-	fake.CallCoreCommandStub = nil
-	fake.callCoreCommandReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) CallCoreCommandReturnsOnCall(i int, result1 error) {
-	fake.CallCoreCommandStub = nil
-	if fake.callCoreCommandReturnsOnCall == nil {
-		fake.callCoreCommandReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.callCoreCommandReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetOutputAndReset(args bool, retVal *[]string) error {
-	fake.getOutputAndResetMutex.Lock()
-	ret, specificReturn := fake.getOutputAndResetReturnsOnCall[len(fake.getOutputAndResetArgsForCall)]
-	fake.getOutputAndResetArgsForCall = append(fake.getOutputAndResetArgsForCall, struct {
-		args   bool
-		retVal *[]string
-	}{args, retVal})
-	fake.recordInvocation("GetOutputAndReset", []interface{}{args, retVal})
-	fake.getOutputAndResetMutex.Unlock()
-	if fake.GetOutputAndResetStub != nil {
-		return fake.GetOutputAndResetStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getOutputAndResetReturns.result1
-}
-
-func (fake *FakeHandlers) GetOutputAndResetCallCount() int {
-	fake.getOutputAndResetMutex.RLock()
-	defer fake.getOutputAndResetMutex.RUnlock()
-	return len(fake.getOutputAndResetArgsForCall)
-}
-
-func (fake *FakeHandlers) GetOutputAndResetArgsForCall(i int) (bool, *[]string) {
-	fake.getOutputAndResetMutex.RLock()
-	defer fake.getOutputAndResetMutex.RUnlock()
-	return fake.getOutputAndResetArgsForCall[i].args, fake.getOutputAndResetArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) GetOutputAndResetReturns(result1 error) {
-	fake.GetOutputAndResetStub = nil
-	fake.getOutputAndResetReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetOutputAndResetReturnsOnCall(i int, result1 error) {
-	fake.GetOutputAndResetStub = nil
-	if fake.getOutputAndResetReturnsOnCall == nil {
-		fake.getOutputAndResetReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.getOutputAndResetReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
-	fake.getCurrentOrgMutex.Lock()
-	ret, specificReturn := fake.getCurrentOrgReturnsOnCall[len(fake.getCurrentOrgArgsForCall)]
-	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct {
-		args   string
-		retVal *plugin_models.Organization
-	}{args, retVal})
-	fake.recordInvocation("GetCurrentOrg", []interface{}{args, retVal})
-	fake.getCurrentOrgMutex.Unlock()
-	if fake.GetCurrentOrgStub != nil {
-		return fake.GetCurrentOrgStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getCurrentOrgReturns.result1
-}
-
-func (fake *FakeHandlers) GetCurrentOrgCallCount() int {
-	fake.getCurrentOrgMutex.RLock()
-	defer fake.getCurrentOrgMutex.RUnlock()
-	return len(fake.getCurrentOrgArgsForCall)
-}
-
-func (fake *FakeHandlers) GetCurrentOrgArgsForCall(i int) (string, *plugin_models.Organization) {
-	fake.getCurrentOrgMutex.RLock()
-	defer fake.getCurrentOrgMutex.RUnlock()
-	return fake.getCurrentOrgArgsForCall[i].args, fake.getCurrentOrgArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) GetCurrentOrgReturns(result1 error) {
-	fake.GetCurrentOrgStub = nil
-	fake.getCurrentOrgReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetCurrentOrgReturnsOnCall(i int, result1 error) {
-	fake.GetCurrentOrgStub = nil
-	if fake.getCurrentOrgReturnsOnCall == nil {
-		fake.getCurrentOrgReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.getCurrentOrgReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
-	fake.getCurrentSpaceMutex.Lock()
-	ret, specificReturn := fake.getCurrentSpaceReturnsOnCall[len(fake.getCurrentSpaceArgsForCall)]
-	fake.getCurrentSpaceArgsForCall = append(fake.getCurrentSpaceArgsForCall, struct {
-		args   string
-		retVal *plugin_models.Space
-	}{args, retVal})
-	fake.recordInvocation("GetCurrentSpace", []interface{}{args, retVal})
-	fake.getCurrentSpaceMutex.Unlock()
-	if fake.GetCurrentSpaceStub != nil {
-		return fake.GetCurrentSpaceStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getCurrentSpaceReturns.result1
-}
-
-func (fake *FakeHandlers) GetCurrentSpaceCallCount() int {
-	fake.getCurrentSpaceMutex.RLock()
-	defer fake.getCurrentSpaceMutex.RUnlock()
-	return len(fake.getCurrentSpaceArgsForCall)
-}
-
-func (fake *FakeHandlers) GetCurrentSpaceArgsForCall(i int) (string, *plugin_models.Space) {
-	fake.getCurrentSpaceMutex.RLock()
-	defer fake.getCurrentSpaceMutex.RUnlock()
-	return fake.getCurrentSpaceArgsForCall[i].args, fake.getCurrentSpaceArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) GetCurrentSpaceReturns(result1 error) {
-	fake.GetCurrentSpaceStub = nil
-	fake.getCurrentSpaceReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetCurrentSpaceReturnsOnCall(i int, result1 error) {
-	fake.GetCurrentSpaceStub = nil
-	if fake.getCurrentSpaceReturnsOnCall == nil {
-		fake.getCurrentSpaceReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.getCurrentSpaceReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) Username(args string, retVal *string) error {
-	fake.usernameMutex.Lock()
-	ret, specificReturn := fake.usernameReturnsOnCall[len(fake.usernameArgsForCall)]
-	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("Username", []interface{}{args, retVal})
-	fake.usernameMutex.Unlock()
-	if fake.UsernameStub != nil {
-		return fake.UsernameStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.usernameReturns.result1
-}
-
-func (fake *FakeHandlers) UsernameCallCount() int {
-	fake.usernameMutex.RLock()
-	defer fake.usernameMutex.RUnlock()
-	return len(fake.usernameArgsForCall)
-}
-
-func (fake *FakeHandlers) UsernameArgsForCall(i int) (string, *string) {
-	fake.usernameMutex.RLock()
-	defer fake.usernameMutex.RUnlock()
-	return fake.usernameArgsForCall[i].args, fake.usernameArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) UsernameReturns(result1 error) {
-	fake.UsernameStub = nil
-	fake.usernameReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) UsernameReturnsOnCall(i int, result1 error) {
-	fake.UsernameStub = nil
-	if fake.usernameReturnsOnCall == nil {
-		fake.usernameReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.usernameReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) UserGuid(args string, retVal *string) error {
-	fake.userGuidMutex.Lock()
-	ret, specificReturn := fake.userGuidReturnsOnCall[len(fake.userGuidArgsForCall)]
-	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("UserGuid", []interface{}{args, retVal})
-	fake.userGuidMutex.Unlock()
-	if fake.UserGuidStub != nil {
-		return fake.UserGuidStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.userGuidReturns.result1
-}
-
-func (fake *FakeHandlers) UserGuidCallCount() int {
-	fake.userGuidMutex.RLock()
-	defer fake.userGuidMutex.RUnlock()
-	return len(fake.userGuidArgsForCall)
-}
-
-func (fake *FakeHandlers) UserGuidArgsForCall(i int) (string, *string) {
-	fake.userGuidMutex.RLock()
-	defer fake.userGuidMutex.RUnlock()
-	return fake.userGuidArgsForCall[i].args, fake.userGuidArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) UserGuidReturns(result1 error) {
-	fake.UserGuidStub = nil
-	fake.userGuidReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) UserGuidReturnsOnCall(i int, result1 error) {
-	fake.UserGuidStub = nil
-	if fake.userGuidReturnsOnCall == nil {
-		fake.userGuidReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.userGuidReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) UserEmail(args string, retVal *string) error {
-	fake.userEmailMutex.Lock()
-	ret, specificReturn := fake.userEmailReturnsOnCall[len(fake.userEmailArgsForCall)]
-	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("UserEmail", []interface{}{args, retVal})
-	fake.userEmailMutex.Unlock()
-	if fake.UserEmailStub != nil {
-		return fake.UserEmailStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.userEmailReturns.result1
-}
-
-func (fake *FakeHandlers) UserEmailCallCount() int {
-	fake.userEmailMutex.RLock()
-	defer fake.userEmailMutex.RUnlock()
-	return len(fake.userEmailArgsForCall)
-}
-
-func (fake *FakeHandlers) UserEmailArgsForCall(i int) (string, *string) {
-	fake.userEmailMutex.RLock()
-	defer fake.userEmailMutex.RUnlock()
-	return fake.userEmailArgsForCall[i].args, fake.userEmailArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) UserEmailReturns(result1 error) {
-	fake.UserEmailStub = nil
-	fake.userEmailReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) UserEmailReturnsOnCall(i int, result1 error) {
-	fake.UserEmailStub = nil
-	if fake.userEmailReturnsOnCall == nil {
-		fake.userEmailReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.userEmailReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) IsLoggedIn(args string, retVal *bool) error {
-	fake.isLoggedInMutex.Lock()
-	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
-	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct {
-		args   string
-		retVal *bool
-	}{args, retVal})
-	fake.recordInvocation("IsLoggedIn", []interface{}{args, retVal})
-	fake.isLoggedInMutex.Unlock()
-	if fake.IsLoggedInStub != nil {
-		return fake.IsLoggedInStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.isLoggedInReturns.result1
-}
-
-func (fake *FakeHandlers) IsLoggedInCallCount() int {
-	fake.isLoggedInMutex.RLock()
-	defer fake.isLoggedInMutex.RUnlock()
-	return len(fake.isLoggedInArgsForCall)
-}
-
-func (fake *FakeHandlers) IsLoggedInArgsForCall(i int) (string, *bool) {
-	fake.isLoggedInMutex.RLock()
-	defer fake.isLoggedInMutex.RUnlock()
-	return fake.isLoggedInArgsForCall[i].args, fake.isLoggedInArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) IsLoggedInReturns(result1 error) {
-	fake.IsLoggedInStub = nil
-	fake.isLoggedInReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) IsLoggedInReturnsOnCall(i int, result1 error) {
-	fake.IsLoggedInStub = nil
-	if fake.isLoggedInReturnsOnCall == nil {
-		fake.isLoggedInReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.isLoggedInReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) IsSSLDisabled(args string, retVal *bool) error {
-	fake.isSSLDisabledMutex.Lock()
-	ret, specificReturn := fake.isSSLDisabledReturnsOnCall[len(fake.isSSLDisabledArgsForCall)]
-	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct {
-		args   string
-		retVal *bool
-	}{args, retVal})
-	fake.recordInvocation("IsSSLDisabled", []interface{}{args, retVal})
-	fake.isSSLDisabledMutex.Unlock()
-	if fake.IsSSLDisabledStub != nil {
-		return fake.IsSSLDisabledStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.isSSLDisabledReturns.result1
-}
-
-func (fake *FakeHandlers) IsSSLDisabledCallCount() int {
-	fake.isSSLDisabledMutex.RLock()
-	defer fake.isSSLDisabledMutex.RUnlock()
-	return len(fake.isSSLDisabledArgsForCall)
-}
-
-func (fake *FakeHandlers) IsSSLDisabledArgsForCall(i int) (string, *bool) {
-	fake.isSSLDisabledMutex.RLock()
-	defer fake.isSSLDisabledMutex.RUnlock()
-	return fake.isSSLDisabledArgsForCall[i].args, fake.isSSLDisabledArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) IsSSLDisabledReturns(result1 error) {
-	fake.IsSSLDisabledStub = nil
-	fake.isSSLDisabledReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) IsSSLDisabledReturnsOnCall(i int, result1 error) {
-	fake.IsSSLDisabledStub = nil
-	if fake.isSSLDisabledReturnsOnCall == nil {
-		fake.isSSLDisabledReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.isSSLDisabledReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) HasOrganization(args string, retVal *bool) error {
-	fake.hasOrganizationMutex.Lock()
-	ret, specificReturn := fake.hasOrganizationReturnsOnCall[len(fake.hasOrganizationArgsForCall)]
-	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct {
-		args   string
-		retVal *bool
-	}{args, retVal})
-	fake.recordInvocation("HasOrganization", []interface{}{args, retVal})
-	fake.hasOrganizationMutex.Unlock()
-	if fake.HasOrganizationStub != nil {
-		return fake.HasOrganizationStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.hasOrganizationReturns.result1
-}
-
-func (fake *FakeHandlers) HasOrganizationCallCount() int {
-	fake.hasOrganizationMutex.RLock()
-	defer fake.hasOrganizationMutex.RUnlock()
-	return len(fake.hasOrganizationArgsForCall)
-}
-
-func (fake *FakeHandlers) HasOrganizationArgsForCall(i int) (string, *bool) {
-	fake.hasOrganizationMutex.RLock()
-	defer fake.hasOrganizationMutex.RUnlock()
-	return fake.hasOrganizationArgsForCall[i].args, fake.hasOrganizationArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) HasOrganizationReturns(result1 error) {
-	fake.HasOrganizationStub = nil
-	fake.hasOrganizationReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) HasOrganizationReturnsOnCall(i int, result1 error) {
-	fake.HasOrganizationStub = nil
-	if fake.hasOrganizationReturnsOnCall == nil {
-		fake.hasOrganizationReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.hasOrganizationReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) HasSpace(args string, retVal *bool) error {
-	fake.hasSpaceMutex.Lock()
-	ret, specificReturn := fake.hasSpaceReturnsOnCall[len(fake.hasSpaceArgsForCall)]
-	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct {
-		args   string
-		retVal *bool
-	}{args, retVal})
-	fake.recordInvocation("HasSpace", []interface{}{args, retVal})
-	fake.hasSpaceMutex.Unlock()
-	if fake.HasSpaceStub != nil {
-		return fake.HasSpaceStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.hasSpaceReturns.result1
-}
-
-func (fake *FakeHandlers) HasSpaceCallCount() int {
-	fake.hasSpaceMutex.RLock()
-	defer fake.hasSpaceMutex.RUnlock()
-	return len(fake.hasSpaceArgsForCall)
-}
-
-func (fake *FakeHandlers) HasSpaceArgsForCall(i int) (string, *bool) {
-	fake.hasSpaceMutex.RLock()
-	defer fake.hasSpaceMutex.RUnlock()
-	return fake.hasSpaceArgsForCall[i].args, fake.hasSpaceArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) HasSpaceReturns(result1 error) {
-	fake.HasSpaceStub = nil
-	fake.hasSpaceReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) HasSpaceReturnsOnCall(i int, result1 error) {
-	fake.HasSpaceStub = nil
-	if fake.hasSpaceReturnsOnCall == nil {
-		fake.hasSpaceReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.hasSpaceReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) ApiEndpoint(args string, retVal *string) error {
-	fake.apiEndpointMutex.Lock()
-	ret, specificReturn := fake.apiEndpointReturnsOnCall[len(fake.apiEndpointArgsForCall)]
-	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("ApiEndpoint", []interface{}{args, retVal})
-	fake.apiEndpointMutex.Unlock()
-	if fake.ApiEndpointStub != nil {
-		return fake.ApiEndpointStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.apiEndpointReturns.result1
-}
-
-func (fake *FakeHandlers) ApiEndpointCallCount() int {
-	fake.apiEndpointMutex.RLock()
-	defer fake.apiEndpointMutex.RUnlock()
-	return len(fake.apiEndpointArgsForCall)
-}
-
-func (fake *FakeHandlers) ApiEndpointArgsForCall(i int) (string, *string) {
-	fake.apiEndpointMutex.RLock()
-	defer fake.apiEndpointMutex.RUnlock()
-	return fake.apiEndpointArgsForCall[i].args, fake.apiEndpointArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) ApiEndpointReturns(result1 error) {
-	fake.ApiEndpointStub = nil
-	fake.apiEndpointReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) ApiEndpointReturnsOnCall(i int, result1 error) {
-	fake.ApiEndpointStub = nil
-	if fake.apiEndpointReturnsOnCall == nil {
-		fake.apiEndpointReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.apiEndpointReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) HasAPIEndpoint(args string, retVal *bool) error {
-	fake.hasAPIEndpointMutex.Lock()
-	ret, specificReturn := fake.hasAPIEndpointReturnsOnCall[len(fake.hasAPIEndpointArgsForCall)]
-	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct {
-		args   string
-		retVal *bool
-	}{args, retVal})
-	fake.recordInvocation("HasAPIEndpoint", []interface{}{args, retVal})
-	fake.hasAPIEndpointMutex.Unlock()
-	if fake.HasAPIEndpointStub != nil {
-		return fake.HasAPIEndpointStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.hasAPIEndpointReturns.result1
-}
-
-func (fake *FakeHandlers) HasAPIEndpointCallCount() int {
-	fake.hasAPIEndpointMutex.RLock()
-	defer fake.hasAPIEndpointMutex.RUnlock()
-	return len(fake.hasAPIEndpointArgsForCall)
-}
-
-func (fake *FakeHandlers) HasAPIEndpointArgsForCall(i int) (string, *bool) {
-	fake.hasAPIEndpointMutex.RLock()
-	defer fake.hasAPIEndpointMutex.RUnlock()
-	return fake.hasAPIEndpointArgsForCall[i].args, fake.hasAPIEndpointArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) HasAPIEndpointReturns(result1 error) {
-	fake.HasAPIEndpointStub = nil
-	fake.hasAPIEndpointReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) HasAPIEndpointReturnsOnCall(i int, result1 error) {
-	fake.HasAPIEndpointStub = nil
-	if fake.hasAPIEndpointReturnsOnCall == nil {
-		fake.hasAPIEndpointReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.hasAPIEndpointReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) ApiVersion(args string, retVal *string) error {
-	fake.apiVersionMutex.Lock()
-	ret, specificReturn := fake.apiVersionReturnsOnCall[len(fake.apiVersionArgsForCall)]
-	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("ApiVersion", []interface{}{args, retVal})
-	fake.apiVersionMutex.Unlock()
-	if fake.ApiVersionStub != nil {
-		return fake.ApiVersionStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.apiVersionReturns.result1
-}
-
-func (fake *FakeHandlers) ApiVersionCallCount() int {
-	fake.apiVersionMutex.RLock()
-	defer fake.apiVersionMutex.RUnlock()
-	return len(fake.apiVersionArgsForCall)
-}
-
-func (fake *FakeHandlers) ApiVersionArgsForCall(i int) (string, *string) {
-	fake.apiVersionMutex.RLock()
-	defer fake.apiVersionMutex.RUnlock()
-	return fake.apiVersionArgsForCall[i].args, fake.apiVersionArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) ApiVersionReturns(result1 error) {
-	fake.ApiVersionStub = nil
-	fake.apiVersionReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) ApiVersionReturnsOnCall(i int, result1 error) {
-	fake.ApiVersionStub = nil
-	if fake.apiVersionReturnsOnCall == nil {
-		fake.apiVersionReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.apiVersionReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) LoggregatorEndpoint(args string, retVal *string) error {
-	fake.loggregatorEndpointMutex.Lock()
-	ret, specificReturn := fake.loggregatorEndpointReturnsOnCall[len(fake.loggregatorEndpointArgsForCall)]
-	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("LoggregatorEndpoint", []interface{}{args, retVal})
-	fake.loggregatorEndpointMutex.Unlock()
-	if fake.LoggregatorEndpointStub != nil {
-		return fake.LoggregatorEndpointStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.loggregatorEndpointReturns.result1
-}
-
-func (fake *FakeHandlers) LoggregatorEndpointCallCount() int {
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
-	return len(fake.loggregatorEndpointArgsForCall)
-}
-
-func (fake *FakeHandlers) LoggregatorEndpointArgsForCall(i int) (string, *string) {
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
-	return fake.loggregatorEndpointArgsForCall[i].args, fake.loggregatorEndpointArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) LoggregatorEndpointReturns(result1 error) {
-	fake.LoggregatorEndpointStub = nil
-	fake.loggregatorEndpointReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) LoggregatorEndpointReturnsOnCall(i int, result1 error) {
-	fake.LoggregatorEndpointStub = nil
-	if fake.loggregatorEndpointReturnsOnCall == nil {
-		fake.loggregatorEndpointReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.loggregatorEndpointReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) DopplerEndpoint(args string, retVal *string) error {
-	fake.dopplerEndpointMutex.Lock()
-	ret, specificReturn := fake.dopplerEndpointReturnsOnCall[len(fake.dopplerEndpointArgsForCall)]
-	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("DopplerEndpoint", []interface{}{args, retVal})
-	fake.dopplerEndpointMutex.Unlock()
-	if fake.DopplerEndpointStub != nil {
-		return fake.DopplerEndpointStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.dopplerEndpointReturns.result1
-}
-
-func (fake *FakeHandlers) DopplerEndpointCallCount() int {
-	fake.dopplerEndpointMutex.RLock()
-	defer fake.dopplerEndpointMutex.RUnlock()
-	return len(fake.dopplerEndpointArgsForCall)
-}
-
-func (fake *FakeHandlers) DopplerEndpointArgsForCall(i int) (string, *string) {
-	fake.dopplerEndpointMutex.RLock()
-	defer fake.dopplerEndpointMutex.RUnlock()
-	return fake.dopplerEndpointArgsForCall[i].args, fake.dopplerEndpointArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) DopplerEndpointReturns(result1 error) {
-	fake.DopplerEndpointStub = nil
-	fake.dopplerEndpointReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) DopplerEndpointReturnsOnCall(i int, result1 error) {
-	fake.DopplerEndpointStub = nil
-	if fake.dopplerEndpointReturnsOnCall == nil {
-		fake.dopplerEndpointReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.dopplerEndpointReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) AccessToken(args string, retVal *string) error {
+func (fake *FakeHandlers) AccessToken(arg1 string, arg2 *string) error {
 	fake.accessTokenMutex.Lock()
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
-		args   string
-		retVal *string
-	}{args, retVal})
-	fake.recordInvocation("AccessToken", []interface{}{args, retVal})
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("AccessToken", []interface{}{arg1, arg2})
 	fake.accessTokenMutex.Unlock()
 	if fake.AccessTokenStub != nil {
-		return fake.AccessTokenStub(args, retVal)
+		return fake.AccessTokenStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.accessTokenReturns.result1
+	fakeReturns := fake.accessTokenReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHandlers) AccessTokenCallCount() int {
@@ -1334,13 +399,22 @@ func (fake *FakeHandlers) AccessTokenCallCount() int {
 	return len(fake.accessTokenArgsForCall)
 }
 
+func (fake *FakeHandlers) AccessTokenCalls(stub func(string, *string) error) {
+	fake.accessTokenMutex.Lock()
+	defer fake.accessTokenMutex.Unlock()
+	fake.AccessTokenStub = stub
+}
+
 func (fake *FakeHandlers) AccessTokenArgsForCall(i int) (string, *string) {
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
-	return fake.accessTokenArgsForCall[i].args, fake.accessTokenArgsForCall[i].retVal
+	argsForCall := fake.accessTokenArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeHandlers) AccessTokenReturns(result1 error) {
+	fake.accessTokenMutex.Lock()
+	defer fake.accessTokenMutex.Unlock()
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
 		result1 error
@@ -1348,6 +422,8 @@ func (fake *FakeHandlers) AccessTokenReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) AccessTokenReturnsOnCall(i int, result1 error) {
+	fake.accessTokenMutex.Lock()
+	defer fake.accessTokenMutex.Unlock()
 	fake.AccessTokenStub = nil
 	if fake.accessTokenReturnsOnCall == nil {
 		fake.accessTokenReturnsOnCall = make(map[int]struct {
@@ -1359,22 +435,333 @@ func (fake *FakeHandlers) AccessTokenReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	fake.getAppMutex.Lock()
-	ret, specificReturn := fake.getAppReturnsOnCall[len(fake.getAppArgsForCall)]
-	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
-		appName string
-		retVal  *plugin_models.GetAppModel
-	}{appName, retVal})
-	fake.recordInvocation("GetApp", []interface{}{appName, retVal})
-	fake.getAppMutex.Unlock()
-	if fake.GetAppStub != nil {
-		return fake.GetAppStub(appName, retVal)
+func (fake *FakeHandlers) ApiEndpoint(arg1 string, arg2 *string) error {
+	fake.apiEndpointMutex.Lock()
+	ret, specificReturn := fake.apiEndpointReturnsOnCall[len(fake.apiEndpointArgsForCall)]
+	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("ApiEndpoint", []interface{}{arg1, arg2})
+	fake.apiEndpointMutex.Unlock()
+	if fake.ApiEndpointStub != nil {
+		return fake.ApiEndpointStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getAppReturns.result1
+	fakeReturns := fake.apiEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) ApiEndpointCallCount() int {
+	fake.apiEndpointMutex.RLock()
+	defer fake.apiEndpointMutex.RUnlock()
+	return len(fake.apiEndpointArgsForCall)
+}
+
+func (fake *FakeHandlers) ApiEndpointCalls(stub func(string, *string) error) {
+	fake.apiEndpointMutex.Lock()
+	defer fake.apiEndpointMutex.Unlock()
+	fake.ApiEndpointStub = stub
+}
+
+func (fake *FakeHandlers) ApiEndpointArgsForCall(i int) (string, *string) {
+	fake.apiEndpointMutex.RLock()
+	defer fake.apiEndpointMutex.RUnlock()
+	argsForCall := fake.apiEndpointArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) ApiEndpointReturns(result1 error) {
+	fake.apiEndpointMutex.Lock()
+	defer fake.apiEndpointMutex.Unlock()
+	fake.ApiEndpointStub = nil
+	fake.apiEndpointReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) ApiEndpointReturnsOnCall(i int, result1 error) {
+	fake.apiEndpointMutex.Lock()
+	defer fake.apiEndpointMutex.Unlock()
+	fake.ApiEndpointStub = nil
+	if fake.apiEndpointReturnsOnCall == nil {
+		fake.apiEndpointReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.apiEndpointReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) ApiVersion(arg1 string, arg2 *string) error {
+	fake.apiVersionMutex.Lock()
+	ret, specificReturn := fake.apiVersionReturnsOnCall[len(fake.apiVersionArgsForCall)]
+	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("ApiVersion", []interface{}{arg1, arg2})
+	fake.apiVersionMutex.Unlock()
+	if fake.ApiVersionStub != nil {
+		return fake.ApiVersionStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.apiVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) ApiVersionCallCount() int {
+	fake.apiVersionMutex.RLock()
+	defer fake.apiVersionMutex.RUnlock()
+	return len(fake.apiVersionArgsForCall)
+}
+
+func (fake *FakeHandlers) ApiVersionCalls(stub func(string, *string) error) {
+	fake.apiVersionMutex.Lock()
+	defer fake.apiVersionMutex.Unlock()
+	fake.ApiVersionStub = stub
+}
+
+func (fake *FakeHandlers) ApiVersionArgsForCall(i int) (string, *string) {
+	fake.apiVersionMutex.RLock()
+	defer fake.apiVersionMutex.RUnlock()
+	argsForCall := fake.apiVersionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) ApiVersionReturns(result1 error) {
+	fake.apiVersionMutex.Lock()
+	defer fake.apiVersionMutex.Unlock()
+	fake.ApiVersionStub = nil
+	fake.apiVersionReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) ApiVersionReturnsOnCall(i int, result1 error) {
+	fake.apiVersionMutex.Lock()
+	defer fake.apiVersionMutex.Unlock()
+	fake.ApiVersionStub = nil
+	if fake.apiVersionReturnsOnCall == nil {
+		fake.apiVersionReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.apiVersionReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) CallCoreCommand(arg1 []string, arg2 *bool) error {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.callCoreCommandMutex.Lock()
+	ret, specificReturn := fake.callCoreCommandReturnsOnCall[len(fake.callCoreCommandArgsForCall)]
+	fake.callCoreCommandArgsForCall = append(fake.callCoreCommandArgsForCall, struct {
+		arg1 []string
+		arg2 *bool
+	}{arg1Copy, arg2})
+	fake.recordInvocation("CallCoreCommand", []interface{}{arg1Copy, arg2})
+	fake.callCoreCommandMutex.Unlock()
+	if fake.CallCoreCommandStub != nil {
+		return fake.CallCoreCommandStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.callCoreCommandReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) CallCoreCommandCallCount() int {
+	fake.callCoreCommandMutex.RLock()
+	defer fake.callCoreCommandMutex.RUnlock()
+	return len(fake.callCoreCommandArgsForCall)
+}
+
+func (fake *FakeHandlers) CallCoreCommandCalls(stub func([]string, *bool) error) {
+	fake.callCoreCommandMutex.Lock()
+	defer fake.callCoreCommandMutex.Unlock()
+	fake.CallCoreCommandStub = stub
+}
+
+func (fake *FakeHandlers) CallCoreCommandArgsForCall(i int) ([]string, *bool) {
+	fake.callCoreCommandMutex.RLock()
+	defer fake.callCoreCommandMutex.RUnlock()
+	argsForCall := fake.callCoreCommandArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) CallCoreCommandReturns(result1 error) {
+	fake.callCoreCommandMutex.Lock()
+	defer fake.callCoreCommandMutex.Unlock()
+	fake.CallCoreCommandStub = nil
+	fake.callCoreCommandReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) CallCoreCommandReturnsOnCall(i int, result1 error) {
+	fake.callCoreCommandMutex.Lock()
+	defer fake.callCoreCommandMutex.Unlock()
+	fake.CallCoreCommandStub = nil
+	if fake.callCoreCommandReturnsOnCall == nil {
+		fake.callCoreCommandReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.callCoreCommandReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) DisableTerminalOutput(arg1 bool, arg2 *bool) error {
+	fake.disableTerminalOutputMutex.Lock()
+	ret, specificReturn := fake.disableTerminalOutputReturnsOnCall[len(fake.disableTerminalOutputArgsForCall)]
+	fake.disableTerminalOutputArgsForCall = append(fake.disableTerminalOutputArgsForCall, struct {
+		arg1 bool
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("DisableTerminalOutput", []interface{}{arg1, arg2})
+	fake.disableTerminalOutputMutex.Unlock()
+	if fake.DisableTerminalOutputStub != nil {
+		return fake.DisableTerminalOutputStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.disableTerminalOutputReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) DisableTerminalOutputCallCount() int {
+	fake.disableTerminalOutputMutex.RLock()
+	defer fake.disableTerminalOutputMutex.RUnlock()
+	return len(fake.disableTerminalOutputArgsForCall)
+}
+
+func (fake *FakeHandlers) DisableTerminalOutputCalls(stub func(bool, *bool) error) {
+	fake.disableTerminalOutputMutex.Lock()
+	defer fake.disableTerminalOutputMutex.Unlock()
+	fake.DisableTerminalOutputStub = stub
+}
+
+func (fake *FakeHandlers) DisableTerminalOutputArgsForCall(i int) (bool, *bool) {
+	fake.disableTerminalOutputMutex.RLock()
+	defer fake.disableTerminalOutputMutex.RUnlock()
+	argsForCall := fake.disableTerminalOutputArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) DisableTerminalOutputReturns(result1 error) {
+	fake.disableTerminalOutputMutex.Lock()
+	defer fake.disableTerminalOutputMutex.Unlock()
+	fake.DisableTerminalOutputStub = nil
+	fake.disableTerminalOutputReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) DisableTerminalOutputReturnsOnCall(i int, result1 error) {
+	fake.disableTerminalOutputMutex.Lock()
+	defer fake.disableTerminalOutputMutex.Unlock()
+	fake.DisableTerminalOutputStub = nil
+	if fake.disableTerminalOutputReturnsOnCall == nil {
+		fake.disableTerminalOutputReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.disableTerminalOutputReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) DopplerEndpoint(arg1 string, arg2 *string) error {
+	fake.dopplerEndpointMutex.Lock()
+	ret, specificReturn := fake.dopplerEndpointReturnsOnCall[len(fake.dopplerEndpointArgsForCall)]
+	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("DopplerEndpoint", []interface{}{arg1, arg2})
+	fake.dopplerEndpointMutex.Unlock()
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.dopplerEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) DopplerEndpointCallCount() int {
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	return len(fake.dopplerEndpointArgsForCall)
+}
+
+func (fake *FakeHandlers) DopplerEndpointCalls(stub func(string, *string) error) {
+	fake.dopplerEndpointMutex.Lock()
+	defer fake.dopplerEndpointMutex.Unlock()
+	fake.DopplerEndpointStub = stub
+}
+
+func (fake *FakeHandlers) DopplerEndpointArgsForCall(i int) (string, *string) {
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	argsForCall := fake.dopplerEndpointArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) DopplerEndpointReturns(result1 error) {
+	fake.dopplerEndpointMutex.Lock()
+	defer fake.dopplerEndpointMutex.Unlock()
+	fake.DopplerEndpointStub = nil
+	fake.dopplerEndpointReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) DopplerEndpointReturnsOnCall(i int, result1 error) {
+	fake.dopplerEndpointMutex.Lock()
+	defer fake.dopplerEndpointMutex.Unlock()
+	fake.DopplerEndpointStub = nil
+	if fake.dopplerEndpointReturnsOnCall == nil {
+		fake.dopplerEndpointReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.dopplerEndpointReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetApp(arg1 string, arg2 *plugin_models.GetAppModel) error {
+	fake.getAppMutex.Lock()
+	ret, specificReturn := fake.getAppReturnsOnCall[len(fake.getAppArgsForCall)]
+	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
+		arg1 string
+		arg2 *plugin_models.GetAppModel
+	}{arg1, arg2})
+	fake.recordInvocation("GetApp", []interface{}{arg1, arg2})
+	fake.getAppMutex.Unlock()
+	if fake.GetAppStub != nil {
+		return fake.GetAppStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getAppReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHandlers) GetAppCallCount() int {
@@ -1383,13 +770,22 @@ func (fake *FakeHandlers) GetAppCallCount() int {
 	return len(fake.getAppArgsForCall)
 }
 
+func (fake *FakeHandlers) GetAppCalls(stub func(string, *plugin_models.GetAppModel) error) {
+	fake.getAppMutex.Lock()
+	defer fake.getAppMutex.Unlock()
+	fake.GetAppStub = stub
+}
+
 func (fake *FakeHandlers) GetAppArgsForCall(i int) (string, *plugin_models.GetAppModel) {
 	fake.getAppMutex.RLock()
 	defer fake.getAppMutex.RUnlock()
-	return fake.getAppArgsForCall[i].appName, fake.getAppArgsForCall[i].retVal
+	argsForCall := fake.getAppArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeHandlers) GetAppReturns(result1 error) {
+	fake.getAppMutex.Lock()
+	defer fake.getAppMutex.Unlock()
 	fake.GetAppStub = nil
 	fake.getAppReturns = struct {
 		result1 error
@@ -1397,6 +793,8 @@ func (fake *FakeHandlers) GetAppReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) GetAppReturnsOnCall(i int, result1 error) {
+	fake.getAppMutex.Lock()
+	defer fake.getAppMutex.Unlock()
 	fake.GetAppStub = nil
 	if fake.getAppReturnsOnCall == nil {
 		fake.getAppReturnsOnCall = make(map[int]struct {
@@ -1408,22 +806,23 @@ func (fake *FakeHandlers) GetAppReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetApps(args string, retVal *[]plugin_models.GetAppsModel) error {
+func (fake *FakeHandlers) GetApps(arg1 string, arg2 *[]plugin_models.GetAppsModel) error {
 	fake.getAppsMutex.Lock()
 	ret, specificReturn := fake.getAppsReturnsOnCall[len(fake.getAppsArgsForCall)]
 	fake.getAppsArgsForCall = append(fake.getAppsArgsForCall, struct {
-		args   string
-		retVal *[]plugin_models.GetAppsModel
-	}{args, retVal})
-	fake.recordInvocation("GetApps", []interface{}{args, retVal})
+		arg1 string
+		arg2 *[]plugin_models.GetAppsModel
+	}{arg1, arg2})
+	fake.recordInvocation("GetApps", []interface{}{arg1, arg2})
 	fake.getAppsMutex.Unlock()
 	if fake.GetAppsStub != nil {
-		return fake.GetAppsStub(args, retVal)
+		return fake.GetAppsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getAppsReturns.result1
+	fakeReturns := fake.getAppsReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHandlers) GetAppsCallCount() int {
@@ -1432,13 +831,22 @@ func (fake *FakeHandlers) GetAppsCallCount() int {
 	return len(fake.getAppsArgsForCall)
 }
 
+func (fake *FakeHandlers) GetAppsCalls(stub func(string, *[]plugin_models.GetAppsModel) error) {
+	fake.getAppsMutex.Lock()
+	defer fake.getAppsMutex.Unlock()
+	fake.GetAppsStub = stub
+}
+
 func (fake *FakeHandlers) GetAppsArgsForCall(i int) (string, *[]plugin_models.GetAppsModel) {
 	fake.getAppsMutex.RLock()
 	defer fake.getAppsMutex.RUnlock()
-	return fake.getAppsArgsForCall[i].args, fake.getAppsArgsForCall[i].retVal
+	argsForCall := fake.getAppsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeHandlers) GetAppsReturns(result1 error) {
+	fake.getAppsMutex.Lock()
+	defer fake.getAppsMutex.Unlock()
 	fake.GetAppsStub = nil
 	fake.getAppsReturns = struct {
 		result1 error
@@ -1446,6 +854,8 @@ func (fake *FakeHandlers) GetAppsReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) GetAppsReturnsOnCall(i int, result1 error) {
+	fake.getAppsMutex.Lock()
+	defer fake.getAppsMutex.Unlock()
 	fake.GetAppsStub = nil
 	if fake.getAppsReturnsOnCall == nil {
 		fake.getAppsReturnsOnCall = make(map[int]struct {
@@ -1457,277 +867,145 @@ func (fake *FakeHandlers) GetAppsReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetOrgs(args string, retVal *[]plugin_models.GetOrgs_Model) error {
-	fake.getOrgsMutex.Lock()
-	ret, specificReturn := fake.getOrgsReturnsOnCall[len(fake.getOrgsArgsForCall)]
-	fake.getOrgsArgsForCall = append(fake.getOrgsArgsForCall, struct {
-		args   string
-		retVal *[]plugin_models.GetOrgs_Model
-	}{args, retVal})
-	fake.recordInvocation("GetOrgs", []interface{}{args, retVal})
-	fake.getOrgsMutex.Unlock()
-	if fake.GetOrgsStub != nil {
-		return fake.GetOrgsStub(args, retVal)
+func (fake *FakeHandlers) GetCurrentOrg(arg1 string, arg2 *plugin_models.Organization) error {
+	fake.getCurrentOrgMutex.Lock()
+	ret, specificReturn := fake.getCurrentOrgReturnsOnCall[len(fake.getCurrentOrgArgsForCall)]
+	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct {
+		arg1 string
+		arg2 *plugin_models.Organization
+	}{arg1, arg2})
+	fake.recordInvocation("GetCurrentOrg", []interface{}{arg1, arg2})
+	fake.getCurrentOrgMutex.Unlock()
+	if fake.GetCurrentOrgStub != nil {
+		return fake.GetCurrentOrgStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getOrgsReturns.result1
+	fakeReturns := fake.getCurrentOrgReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeHandlers) GetOrgsCallCount() int {
-	fake.getOrgsMutex.RLock()
-	defer fake.getOrgsMutex.RUnlock()
-	return len(fake.getOrgsArgsForCall)
+func (fake *FakeHandlers) GetCurrentOrgCallCount() int {
+	fake.getCurrentOrgMutex.RLock()
+	defer fake.getCurrentOrgMutex.RUnlock()
+	return len(fake.getCurrentOrgArgsForCall)
 }
 
-func (fake *FakeHandlers) GetOrgsArgsForCall(i int) (string, *[]plugin_models.GetOrgs_Model) {
-	fake.getOrgsMutex.RLock()
-	defer fake.getOrgsMutex.RUnlock()
-	return fake.getOrgsArgsForCall[i].args, fake.getOrgsArgsForCall[i].retVal
+func (fake *FakeHandlers) GetCurrentOrgCalls(stub func(string, *plugin_models.Organization) error) {
+	fake.getCurrentOrgMutex.Lock()
+	defer fake.getCurrentOrgMutex.Unlock()
+	fake.GetCurrentOrgStub = stub
 }
 
-func (fake *FakeHandlers) GetOrgsReturns(result1 error) {
-	fake.GetOrgsStub = nil
-	fake.getOrgsReturns = struct {
+func (fake *FakeHandlers) GetCurrentOrgArgsForCall(i int) (string, *plugin_models.Organization) {
+	fake.getCurrentOrgMutex.RLock()
+	defer fake.getCurrentOrgMutex.RUnlock()
+	argsForCall := fake.getCurrentOrgArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetCurrentOrgReturns(result1 error) {
+	fake.getCurrentOrgMutex.Lock()
+	defer fake.getCurrentOrgMutex.Unlock()
+	fake.GetCurrentOrgStub = nil
+	fake.getCurrentOrgReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetOrgsReturnsOnCall(i int, result1 error) {
-	fake.GetOrgsStub = nil
-	if fake.getOrgsReturnsOnCall == nil {
-		fake.getOrgsReturnsOnCall = make(map[int]struct {
+func (fake *FakeHandlers) GetCurrentOrgReturnsOnCall(i int, result1 error) {
+	fake.getCurrentOrgMutex.Lock()
+	defer fake.getCurrentOrgMutex.Unlock()
+	fake.GetCurrentOrgStub = nil
+	if fake.getCurrentOrgReturnsOnCall == nil {
+		fake.getCurrentOrgReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.getOrgsReturnsOnCall[i] = struct {
+	fake.getCurrentOrgReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetSpaces(args string, retVal *[]plugin_models.GetSpaces_Model) error {
-	fake.getSpacesMutex.Lock()
-	ret, specificReturn := fake.getSpacesReturnsOnCall[len(fake.getSpacesArgsForCall)]
-	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
-		args   string
-		retVal *[]plugin_models.GetSpaces_Model
-	}{args, retVal})
-	fake.recordInvocation("GetSpaces", []interface{}{args, retVal})
-	fake.getSpacesMutex.Unlock()
-	if fake.GetSpacesStub != nil {
-		return fake.GetSpacesStub(args, retVal)
+func (fake *FakeHandlers) GetCurrentSpace(arg1 string, arg2 *plugin_models.Space) error {
+	fake.getCurrentSpaceMutex.Lock()
+	ret, specificReturn := fake.getCurrentSpaceReturnsOnCall[len(fake.getCurrentSpaceArgsForCall)]
+	fake.getCurrentSpaceArgsForCall = append(fake.getCurrentSpaceArgsForCall, struct {
+		arg1 string
+		arg2 *plugin_models.Space
+	}{arg1, arg2})
+	fake.recordInvocation("GetCurrentSpace", []interface{}{arg1, arg2})
+	fake.getCurrentSpaceMutex.Unlock()
+	if fake.GetCurrentSpaceStub != nil {
+		return fake.GetCurrentSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getSpacesReturns.result1
+	fakeReturns := fake.getCurrentSpaceReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeHandlers) GetSpacesCallCount() int {
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
-	return len(fake.getSpacesArgsForCall)
+func (fake *FakeHandlers) GetCurrentSpaceCallCount() int {
+	fake.getCurrentSpaceMutex.RLock()
+	defer fake.getCurrentSpaceMutex.RUnlock()
+	return len(fake.getCurrentSpaceArgsForCall)
 }
 
-func (fake *FakeHandlers) GetSpacesArgsForCall(i int) (string, *[]plugin_models.GetSpaces_Model) {
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
-	return fake.getSpacesArgsForCall[i].args, fake.getSpacesArgsForCall[i].retVal
+func (fake *FakeHandlers) GetCurrentSpaceCalls(stub func(string, *plugin_models.Space) error) {
+	fake.getCurrentSpaceMutex.Lock()
+	defer fake.getCurrentSpaceMutex.Unlock()
+	fake.GetCurrentSpaceStub = stub
 }
 
-func (fake *FakeHandlers) GetSpacesReturns(result1 error) {
-	fake.GetSpacesStub = nil
-	fake.getSpacesReturns = struct {
+func (fake *FakeHandlers) GetCurrentSpaceArgsForCall(i int) (string, *plugin_models.Space) {
+	fake.getCurrentSpaceMutex.RLock()
+	defer fake.getCurrentSpaceMutex.RUnlock()
+	argsForCall := fake.getCurrentSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetCurrentSpaceReturns(result1 error) {
+	fake.getCurrentSpaceMutex.Lock()
+	defer fake.getCurrentSpaceMutex.Unlock()
+	fake.GetCurrentSpaceStub = nil
+	fake.getCurrentSpaceReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetSpacesReturnsOnCall(i int, result1 error) {
-	fake.GetSpacesStub = nil
-	if fake.getSpacesReturnsOnCall == nil {
-		fake.getSpacesReturnsOnCall = make(map[int]struct {
+func (fake *FakeHandlers) GetCurrentSpaceReturnsOnCall(i int, result1 error) {
+	fake.getCurrentSpaceMutex.Lock()
+	defer fake.getCurrentSpaceMutex.Unlock()
+	fake.GetCurrentSpaceStub = nil
+	if fake.getCurrentSpaceReturnsOnCall == nil {
+		fake.getCurrentSpaceReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.getSpacesReturnsOnCall[i] = struct {
+	fake.getCurrentSpaceReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetServices(args string, retVal *[]plugin_models.GetServices_Model) error {
-	fake.getServicesMutex.Lock()
-	ret, specificReturn := fake.getServicesReturnsOnCall[len(fake.getServicesArgsForCall)]
-	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct {
-		args   string
-		retVal *[]plugin_models.GetServices_Model
-	}{args, retVal})
-	fake.recordInvocation("GetServices", []interface{}{args, retVal})
-	fake.getServicesMutex.Unlock()
-	if fake.GetServicesStub != nil {
-		return fake.GetServicesStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getServicesReturns.result1
-}
-
-func (fake *FakeHandlers) GetServicesCallCount() int {
-	fake.getServicesMutex.RLock()
-	defer fake.getServicesMutex.RUnlock()
-	return len(fake.getServicesArgsForCall)
-}
-
-func (fake *FakeHandlers) GetServicesArgsForCall(i int) (string, *[]plugin_models.GetServices_Model) {
-	fake.getServicesMutex.RLock()
-	defer fake.getServicesMutex.RUnlock()
-	return fake.getServicesArgsForCall[i].args, fake.getServicesArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) GetServicesReturns(result1 error) {
-	fake.GetServicesStub = nil
-	fake.getServicesReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetServicesReturnsOnCall(i int, result1 error) {
-	fake.GetServicesStub = nil
-	if fake.getServicesReturnsOnCall == nil {
-		fake.getServicesReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.getServicesReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
-	var argsCopy []string
-	if args != nil {
-		argsCopy = make([]string, len(args))
-		copy(argsCopy, args)
-	}
-	fake.getOrgUsersMutex.Lock()
-	ret, specificReturn := fake.getOrgUsersReturnsOnCall[len(fake.getOrgUsersArgsForCall)]
-	fake.getOrgUsersArgsForCall = append(fake.getOrgUsersArgsForCall, struct {
-		args   []string
-		retVal *[]plugin_models.GetOrgUsers_Model
-	}{argsCopy, retVal})
-	fake.recordInvocation("GetOrgUsers", []interface{}{argsCopy, retVal})
-	fake.getOrgUsersMutex.Unlock()
-	if fake.GetOrgUsersStub != nil {
-		return fake.GetOrgUsersStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getOrgUsersReturns.result1
-}
-
-func (fake *FakeHandlers) GetOrgUsersCallCount() int {
-	fake.getOrgUsersMutex.RLock()
-	defer fake.getOrgUsersMutex.RUnlock()
-	return len(fake.getOrgUsersArgsForCall)
-}
-
-func (fake *FakeHandlers) GetOrgUsersArgsForCall(i int) ([]string, *[]plugin_models.GetOrgUsers_Model) {
-	fake.getOrgUsersMutex.RLock()
-	defer fake.getOrgUsersMutex.RUnlock()
-	return fake.getOrgUsersArgsForCall[i].args, fake.getOrgUsersArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) GetOrgUsersReturns(result1 error) {
-	fake.GetOrgUsersStub = nil
-	fake.getOrgUsersReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetOrgUsersReturnsOnCall(i int, result1 error) {
-	fake.GetOrgUsersStub = nil
-	if fake.getOrgUsersReturnsOnCall == nil {
-		fake.getOrgUsersReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.getOrgUsersReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
-	var argsCopy []string
-	if args != nil {
-		argsCopy = make([]string, len(args))
-		copy(argsCopy, args)
-	}
-	fake.getSpaceUsersMutex.Lock()
-	ret, specificReturn := fake.getSpaceUsersReturnsOnCall[len(fake.getSpaceUsersArgsForCall)]
-	fake.getSpaceUsersArgsForCall = append(fake.getSpaceUsersArgsForCall, struct {
-		args   []string
-		retVal *[]plugin_models.GetSpaceUsers_Model
-	}{argsCopy, retVal})
-	fake.recordInvocation("GetSpaceUsers", []interface{}{argsCopy, retVal})
-	fake.getSpaceUsersMutex.Unlock()
-	if fake.GetSpaceUsersStub != nil {
-		return fake.GetSpaceUsersStub(args, retVal)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getSpaceUsersReturns.result1
-}
-
-func (fake *FakeHandlers) GetSpaceUsersCallCount() int {
-	fake.getSpaceUsersMutex.RLock()
-	defer fake.getSpaceUsersMutex.RUnlock()
-	return len(fake.getSpaceUsersArgsForCall)
-}
-
-func (fake *FakeHandlers) GetSpaceUsersArgsForCall(i int) ([]string, *[]plugin_models.GetSpaceUsers_Model) {
-	fake.getSpaceUsersMutex.RLock()
-	defer fake.getSpaceUsersMutex.RUnlock()
-	return fake.getSpaceUsersArgsForCall[i].args, fake.getSpaceUsersArgsForCall[i].retVal
-}
-
-func (fake *FakeHandlers) GetSpaceUsersReturns(result1 error) {
-	fake.GetSpaceUsersStub = nil
-	fake.getSpaceUsersReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetSpaceUsersReturnsOnCall(i int, result1 error) {
-	fake.GetSpaceUsersStub = nil
-	if fake.getSpaceUsersReturnsOnCall == nil {
-		fake.getSpaceUsersReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.getSpaceUsersReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeHandlers) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
+func (fake *FakeHandlers) GetOrg(arg1 string, arg2 *plugin_models.GetOrg_Model) error {
 	fake.getOrgMutex.Lock()
 	ret, specificReturn := fake.getOrgReturnsOnCall[len(fake.getOrgArgsForCall)]
 	fake.getOrgArgsForCall = append(fake.getOrgArgsForCall, struct {
-		orgName string
-		retVal  *plugin_models.GetOrg_Model
-	}{orgName, retVal})
-	fake.recordInvocation("GetOrg", []interface{}{orgName, retVal})
+		arg1 string
+		arg2 *plugin_models.GetOrg_Model
+	}{arg1, arg2})
+	fake.recordInvocation("GetOrg", []interface{}{arg1, arg2})
 	fake.getOrgMutex.Unlock()
 	if fake.GetOrgStub != nil {
-		return fake.GetOrgStub(orgName, retVal)
+		return fake.GetOrgStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getOrgReturns.result1
+	fakeReturns := fake.getOrgReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHandlers) GetOrgCallCount() int {
@@ -1736,13 +1014,22 @@ func (fake *FakeHandlers) GetOrgCallCount() int {
 	return len(fake.getOrgArgsForCall)
 }
 
+func (fake *FakeHandlers) GetOrgCalls(stub func(string, *plugin_models.GetOrg_Model) error) {
+	fake.getOrgMutex.Lock()
+	defer fake.getOrgMutex.Unlock()
+	fake.GetOrgStub = stub
+}
+
 func (fake *FakeHandlers) GetOrgArgsForCall(i int) (string, *plugin_models.GetOrg_Model) {
 	fake.getOrgMutex.RLock()
 	defer fake.getOrgMutex.RUnlock()
-	return fake.getOrgArgsForCall[i].orgName, fake.getOrgArgsForCall[i].retVal
+	argsForCall := fake.getOrgArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeHandlers) GetOrgReturns(result1 error) {
+	fake.getOrgMutex.Lock()
+	defer fake.getOrgMutex.Unlock()
 	fake.GetOrgStub = nil
 	fake.getOrgReturns = struct {
 		result1 error
@@ -1750,6 +1037,8 @@ func (fake *FakeHandlers) GetOrgReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) GetOrgReturnsOnCall(i int, result1 error) {
+	fake.getOrgMutex.Lock()
+	defer fake.getOrgMutex.Unlock()
 	fake.GetOrgStub = nil
 	if fake.getOrgReturnsOnCall == nil {
 		fake.getOrgReturnsOnCall = make(map[int]struct {
@@ -1761,71 +1050,211 @@ func (fake *FakeHandlers) GetOrgReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
-	fake.getSpaceMutex.Lock()
-	ret, specificReturn := fake.getSpaceReturnsOnCall[len(fake.getSpaceArgsForCall)]
-	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct {
-		spaceName string
-		retVal    *plugin_models.GetSpace_Model
-	}{spaceName, retVal})
-	fake.recordInvocation("GetSpace", []interface{}{spaceName, retVal})
-	fake.getSpaceMutex.Unlock()
-	if fake.GetSpaceStub != nil {
-		return fake.GetSpaceStub(spaceName, retVal)
+func (fake *FakeHandlers) GetOrgUsers(arg1 []string, arg2 *[]plugin_models.GetOrgUsers_Model) error {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.getOrgUsersMutex.Lock()
+	ret, specificReturn := fake.getOrgUsersReturnsOnCall[len(fake.getOrgUsersArgsForCall)]
+	fake.getOrgUsersArgsForCall = append(fake.getOrgUsersArgsForCall, struct {
+		arg1 []string
+		arg2 *[]plugin_models.GetOrgUsers_Model
+	}{arg1Copy, arg2})
+	fake.recordInvocation("GetOrgUsers", []interface{}{arg1Copy, arg2})
+	fake.getOrgUsersMutex.Unlock()
+	if fake.GetOrgUsersStub != nil {
+		return fake.GetOrgUsersStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getSpaceReturns.result1
+	fakeReturns := fake.getOrgUsersReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeHandlers) GetSpaceCallCount() int {
-	fake.getSpaceMutex.RLock()
-	defer fake.getSpaceMutex.RUnlock()
-	return len(fake.getSpaceArgsForCall)
+func (fake *FakeHandlers) GetOrgUsersCallCount() int {
+	fake.getOrgUsersMutex.RLock()
+	defer fake.getOrgUsersMutex.RUnlock()
+	return len(fake.getOrgUsersArgsForCall)
 }
 
-func (fake *FakeHandlers) GetSpaceArgsForCall(i int) (string, *plugin_models.GetSpace_Model) {
-	fake.getSpaceMutex.RLock()
-	defer fake.getSpaceMutex.RUnlock()
-	return fake.getSpaceArgsForCall[i].spaceName, fake.getSpaceArgsForCall[i].retVal
+func (fake *FakeHandlers) GetOrgUsersCalls(stub func([]string, *[]plugin_models.GetOrgUsers_Model) error) {
+	fake.getOrgUsersMutex.Lock()
+	defer fake.getOrgUsersMutex.Unlock()
+	fake.GetOrgUsersStub = stub
 }
 
-func (fake *FakeHandlers) GetSpaceReturns(result1 error) {
-	fake.GetSpaceStub = nil
-	fake.getSpaceReturns = struct {
+func (fake *FakeHandlers) GetOrgUsersArgsForCall(i int) ([]string, *[]plugin_models.GetOrgUsers_Model) {
+	fake.getOrgUsersMutex.RLock()
+	defer fake.getOrgUsersMutex.RUnlock()
+	argsForCall := fake.getOrgUsersArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetOrgUsersReturns(result1 error) {
+	fake.getOrgUsersMutex.Lock()
+	defer fake.getOrgUsersMutex.Unlock()
+	fake.GetOrgUsersStub = nil
+	fake.getOrgUsersReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetSpaceReturnsOnCall(i int, result1 error) {
-	fake.GetSpaceStub = nil
-	if fake.getSpaceReturnsOnCall == nil {
-		fake.getSpaceReturnsOnCall = make(map[int]struct {
+func (fake *FakeHandlers) GetOrgUsersReturnsOnCall(i int, result1 error) {
+	fake.getOrgUsersMutex.Lock()
+	defer fake.getOrgUsersMutex.Unlock()
+	fake.GetOrgUsersStub = nil
+	if fake.getOrgUsersReturnsOnCall == nil {
+		fake.getOrgUsersReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.getSpaceReturnsOnCall[i] = struct {
+	fake.getOrgUsersReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeHandlers) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
-	fake.getServiceMutex.Lock()
-	ret, specificReturn := fake.getServiceReturnsOnCall[len(fake.getServiceArgsForCall)]
-	fake.getServiceArgsForCall = append(fake.getServiceArgsForCall, struct {
-		serviceInstance string
-		retVal          *plugin_models.GetService_Model
-	}{serviceInstance, retVal})
-	fake.recordInvocation("GetService", []interface{}{serviceInstance, retVal})
-	fake.getServiceMutex.Unlock()
-	if fake.GetServiceStub != nil {
-		return fake.GetServiceStub(serviceInstance, retVal)
+func (fake *FakeHandlers) GetOrgs(arg1 string, arg2 *[]plugin_models.GetOrgs_Model) error {
+	fake.getOrgsMutex.Lock()
+	ret, specificReturn := fake.getOrgsReturnsOnCall[len(fake.getOrgsArgsForCall)]
+	fake.getOrgsArgsForCall = append(fake.getOrgsArgsForCall, struct {
+		arg1 string
+		arg2 *[]plugin_models.GetOrgs_Model
+	}{arg1, arg2})
+	fake.recordInvocation("GetOrgs", []interface{}{arg1, arg2})
+	fake.getOrgsMutex.Unlock()
+	if fake.GetOrgsStub != nil {
+		return fake.GetOrgsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getServiceReturns.result1
+	fakeReturns := fake.getOrgsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) GetOrgsCallCount() int {
+	fake.getOrgsMutex.RLock()
+	defer fake.getOrgsMutex.RUnlock()
+	return len(fake.getOrgsArgsForCall)
+}
+
+func (fake *FakeHandlers) GetOrgsCalls(stub func(string, *[]plugin_models.GetOrgs_Model) error) {
+	fake.getOrgsMutex.Lock()
+	defer fake.getOrgsMutex.Unlock()
+	fake.GetOrgsStub = stub
+}
+
+func (fake *FakeHandlers) GetOrgsArgsForCall(i int) (string, *[]plugin_models.GetOrgs_Model) {
+	fake.getOrgsMutex.RLock()
+	defer fake.getOrgsMutex.RUnlock()
+	argsForCall := fake.getOrgsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetOrgsReturns(result1 error) {
+	fake.getOrgsMutex.Lock()
+	defer fake.getOrgsMutex.Unlock()
+	fake.GetOrgsStub = nil
+	fake.getOrgsReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetOrgsReturnsOnCall(i int, result1 error) {
+	fake.getOrgsMutex.Lock()
+	defer fake.getOrgsMutex.Unlock()
+	fake.GetOrgsStub = nil
+	if fake.getOrgsReturnsOnCall == nil {
+		fake.getOrgsReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.getOrgsReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetOutputAndReset(arg1 bool, arg2 *[]string) error {
+	fake.getOutputAndResetMutex.Lock()
+	ret, specificReturn := fake.getOutputAndResetReturnsOnCall[len(fake.getOutputAndResetArgsForCall)]
+	fake.getOutputAndResetArgsForCall = append(fake.getOutputAndResetArgsForCall, struct {
+		arg1 bool
+		arg2 *[]string
+	}{arg1, arg2})
+	fake.recordInvocation("GetOutputAndReset", []interface{}{arg1, arg2})
+	fake.getOutputAndResetMutex.Unlock()
+	if fake.GetOutputAndResetStub != nil {
+		return fake.GetOutputAndResetStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getOutputAndResetReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) GetOutputAndResetCallCount() int {
+	fake.getOutputAndResetMutex.RLock()
+	defer fake.getOutputAndResetMutex.RUnlock()
+	return len(fake.getOutputAndResetArgsForCall)
+}
+
+func (fake *FakeHandlers) GetOutputAndResetCalls(stub func(bool, *[]string) error) {
+	fake.getOutputAndResetMutex.Lock()
+	defer fake.getOutputAndResetMutex.Unlock()
+	fake.GetOutputAndResetStub = stub
+}
+
+func (fake *FakeHandlers) GetOutputAndResetArgsForCall(i int) (bool, *[]string) {
+	fake.getOutputAndResetMutex.RLock()
+	defer fake.getOutputAndResetMutex.RUnlock()
+	argsForCall := fake.getOutputAndResetArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetOutputAndResetReturns(result1 error) {
+	fake.getOutputAndResetMutex.Lock()
+	defer fake.getOutputAndResetMutex.Unlock()
+	fake.GetOutputAndResetStub = nil
+	fake.getOutputAndResetReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetOutputAndResetReturnsOnCall(i int, result1 error) {
+	fake.getOutputAndResetMutex.Lock()
+	defer fake.getOutputAndResetMutex.Unlock()
+	fake.GetOutputAndResetStub = nil
+	if fake.getOutputAndResetReturnsOnCall == nil {
+		fake.getOutputAndResetReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.getOutputAndResetReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetService(arg1 string, arg2 *plugin_models.GetService_Model) error {
+	fake.getServiceMutex.Lock()
+	ret, specificReturn := fake.getServiceReturnsOnCall[len(fake.getServiceArgsForCall)]
+	fake.getServiceArgsForCall = append(fake.getServiceArgsForCall, struct {
+		arg1 string
+		arg2 *plugin_models.GetService_Model
+	}{arg1, arg2})
+	fake.recordInvocation("GetService", []interface{}{arg1, arg2})
+	fake.getServiceMutex.Unlock()
+	if fake.GetServiceStub != nil {
+		return fake.GetServiceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getServiceReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHandlers) GetServiceCallCount() int {
@@ -1834,13 +1263,22 @@ func (fake *FakeHandlers) GetServiceCallCount() int {
 	return len(fake.getServiceArgsForCall)
 }
 
+func (fake *FakeHandlers) GetServiceCalls(stub func(string, *plugin_models.GetService_Model) error) {
+	fake.getServiceMutex.Lock()
+	defer fake.getServiceMutex.Unlock()
+	fake.GetServiceStub = stub
+}
+
 func (fake *FakeHandlers) GetServiceArgsForCall(i int) (string, *plugin_models.GetService_Model) {
 	fake.getServiceMutex.RLock()
 	defer fake.getServiceMutex.RUnlock()
-	return fake.getServiceArgsForCall[i].serviceInstance, fake.getServiceArgsForCall[i].retVal
+	argsForCall := fake.getServiceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeHandlers) GetServiceReturns(result1 error) {
+	fake.getServiceMutex.Lock()
+	defer fake.getServiceMutex.Unlock()
 	fake.GetServiceStub = nil
 	fake.getServiceReturns = struct {
 		result1 error
@@ -1848,6 +1286,8 @@ func (fake *FakeHandlers) GetServiceReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) GetServiceReturnsOnCall(i int, result1 error) {
+	fake.getServiceMutex.Lock()
+	defer fake.getServiceMutex.Unlock()
 	fake.GetServiceStub = nil
 	if fake.getServiceReturnsOnCall == nil {
 		fake.getServiceReturnsOnCall = make(map[int]struct {
@@ -1859,69 +1299,989 @@ func (fake *FakeHandlers) GetServiceReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeHandlers) GetServices(arg1 string, arg2 *[]plugin_models.GetServices_Model) error {
+	fake.getServicesMutex.Lock()
+	ret, specificReturn := fake.getServicesReturnsOnCall[len(fake.getServicesArgsForCall)]
+	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct {
+		arg1 string
+		arg2 *[]plugin_models.GetServices_Model
+	}{arg1, arg2})
+	fake.recordInvocation("GetServices", []interface{}{arg1, arg2})
+	fake.getServicesMutex.Unlock()
+	if fake.GetServicesStub != nil {
+		return fake.GetServicesStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getServicesReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) GetServicesCallCount() int {
+	fake.getServicesMutex.RLock()
+	defer fake.getServicesMutex.RUnlock()
+	return len(fake.getServicesArgsForCall)
+}
+
+func (fake *FakeHandlers) GetServicesCalls(stub func(string, *[]plugin_models.GetServices_Model) error) {
+	fake.getServicesMutex.Lock()
+	defer fake.getServicesMutex.Unlock()
+	fake.GetServicesStub = stub
+}
+
+func (fake *FakeHandlers) GetServicesArgsForCall(i int) (string, *[]plugin_models.GetServices_Model) {
+	fake.getServicesMutex.RLock()
+	defer fake.getServicesMutex.RUnlock()
+	argsForCall := fake.getServicesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetServicesReturns(result1 error) {
+	fake.getServicesMutex.Lock()
+	defer fake.getServicesMutex.Unlock()
+	fake.GetServicesStub = nil
+	fake.getServicesReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetServicesReturnsOnCall(i int, result1 error) {
+	fake.getServicesMutex.Lock()
+	defer fake.getServicesMutex.Unlock()
+	fake.GetServicesStub = nil
+	if fake.getServicesReturnsOnCall == nil {
+		fake.getServicesReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.getServicesReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetSpace(arg1 string, arg2 *plugin_models.GetSpace_Model) error {
+	fake.getSpaceMutex.Lock()
+	ret, specificReturn := fake.getSpaceReturnsOnCall[len(fake.getSpaceArgsForCall)]
+	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct {
+		arg1 string
+		arg2 *plugin_models.GetSpace_Model
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpace", []interface{}{arg1, arg2})
+	fake.getSpaceMutex.Unlock()
+	if fake.GetSpaceStub != nil {
+		return fake.GetSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getSpaceReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) GetSpaceCallCount() int {
+	fake.getSpaceMutex.RLock()
+	defer fake.getSpaceMutex.RUnlock()
+	return len(fake.getSpaceArgsForCall)
+}
+
+func (fake *FakeHandlers) GetSpaceCalls(stub func(string, *plugin_models.GetSpace_Model) error) {
+	fake.getSpaceMutex.Lock()
+	defer fake.getSpaceMutex.Unlock()
+	fake.GetSpaceStub = stub
+}
+
+func (fake *FakeHandlers) GetSpaceArgsForCall(i int) (string, *plugin_models.GetSpace_Model) {
+	fake.getSpaceMutex.RLock()
+	defer fake.getSpaceMutex.RUnlock()
+	argsForCall := fake.getSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetSpaceReturns(result1 error) {
+	fake.getSpaceMutex.Lock()
+	defer fake.getSpaceMutex.Unlock()
+	fake.GetSpaceStub = nil
+	fake.getSpaceReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetSpaceReturnsOnCall(i int, result1 error) {
+	fake.getSpaceMutex.Lock()
+	defer fake.getSpaceMutex.Unlock()
+	fake.GetSpaceStub = nil
+	if fake.getSpaceReturnsOnCall == nil {
+		fake.getSpaceReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.getSpaceReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetSpaceUsers(arg1 []string, arg2 *[]plugin_models.GetSpaceUsers_Model) error {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.getSpaceUsersMutex.Lock()
+	ret, specificReturn := fake.getSpaceUsersReturnsOnCall[len(fake.getSpaceUsersArgsForCall)]
+	fake.getSpaceUsersArgsForCall = append(fake.getSpaceUsersArgsForCall, struct {
+		arg1 []string
+		arg2 *[]plugin_models.GetSpaceUsers_Model
+	}{arg1Copy, arg2})
+	fake.recordInvocation("GetSpaceUsers", []interface{}{arg1Copy, arg2})
+	fake.getSpaceUsersMutex.Unlock()
+	if fake.GetSpaceUsersStub != nil {
+		return fake.GetSpaceUsersStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getSpaceUsersReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) GetSpaceUsersCallCount() int {
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	return len(fake.getSpaceUsersArgsForCall)
+}
+
+func (fake *FakeHandlers) GetSpaceUsersCalls(stub func([]string, *[]plugin_models.GetSpaceUsers_Model) error) {
+	fake.getSpaceUsersMutex.Lock()
+	defer fake.getSpaceUsersMutex.Unlock()
+	fake.GetSpaceUsersStub = stub
+}
+
+func (fake *FakeHandlers) GetSpaceUsersArgsForCall(i int) ([]string, *[]plugin_models.GetSpaceUsers_Model) {
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	argsForCall := fake.getSpaceUsersArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetSpaceUsersReturns(result1 error) {
+	fake.getSpaceUsersMutex.Lock()
+	defer fake.getSpaceUsersMutex.Unlock()
+	fake.GetSpaceUsersStub = nil
+	fake.getSpaceUsersReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetSpaceUsersReturnsOnCall(i int, result1 error) {
+	fake.getSpaceUsersMutex.Lock()
+	defer fake.getSpaceUsersMutex.Unlock()
+	fake.GetSpaceUsersStub = nil
+	if fake.getSpaceUsersReturnsOnCall == nil {
+		fake.getSpaceUsersReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.getSpaceUsersReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetSpaces(arg1 string, arg2 *[]plugin_models.GetSpaces_Model) error {
+	fake.getSpacesMutex.Lock()
+	ret, specificReturn := fake.getSpacesReturnsOnCall[len(fake.getSpacesArgsForCall)]
+	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
+		arg1 string
+		arg2 *[]plugin_models.GetSpaces_Model
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaces", []interface{}{arg1, arg2})
+	fake.getSpacesMutex.Unlock()
+	if fake.GetSpacesStub != nil {
+		return fake.GetSpacesStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getSpacesReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) GetSpacesCallCount() int {
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	return len(fake.getSpacesArgsForCall)
+}
+
+func (fake *FakeHandlers) GetSpacesCalls(stub func(string, *[]plugin_models.GetSpaces_Model) error) {
+	fake.getSpacesMutex.Lock()
+	defer fake.getSpacesMutex.Unlock()
+	fake.GetSpacesStub = stub
+}
+
+func (fake *FakeHandlers) GetSpacesArgsForCall(i int) (string, *[]plugin_models.GetSpaces_Model) {
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	argsForCall := fake.getSpacesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) GetSpacesReturns(result1 error) {
+	fake.getSpacesMutex.Lock()
+	defer fake.getSpacesMutex.Unlock()
+	fake.GetSpacesStub = nil
+	fake.getSpacesReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) GetSpacesReturnsOnCall(i int, result1 error) {
+	fake.getSpacesMutex.Lock()
+	defer fake.getSpacesMutex.Unlock()
+	fake.GetSpacesStub = nil
+	if fake.getSpacesReturnsOnCall == nil {
+		fake.getSpacesReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.getSpacesReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) HasAPIEndpoint(arg1 string, arg2 *bool) error {
+	fake.hasAPIEndpointMutex.Lock()
+	ret, specificReturn := fake.hasAPIEndpointReturnsOnCall[len(fake.hasAPIEndpointArgsForCall)]
+	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct {
+		arg1 string
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("HasAPIEndpoint", []interface{}{arg1, arg2})
+	fake.hasAPIEndpointMutex.Unlock()
+	if fake.HasAPIEndpointStub != nil {
+		return fake.HasAPIEndpointStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.hasAPIEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) HasAPIEndpointCallCount() int {
+	fake.hasAPIEndpointMutex.RLock()
+	defer fake.hasAPIEndpointMutex.RUnlock()
+	return len(fake.hasAPIEndpointArgsForCall)
+}
+
+func (fake *FakeHandlers) HasAPIEndpointCalls(stub func(string, *bool) error) {
+	fake.hasAPIEndpointMutex.Lock()
+	defer fake.hasAPIEndpointMutex.Unlock()
+	fake.HasAPIEndpointStub = stub
+}
+
+func (fake *FakeHandlers) HasAPIEndpointArgsForCall(i int) (string, *bool) {
+	fake.hasAPIEndpointMutex.RLock()
+	defer fake.hasAPIEndpointMutex.RUnlock()
+	argsForCall := fake.hasAPIEndpointArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) HasAPIEndpointReturns(result1 error) {
+	fake.hasAPIEndpointMutex.Lock()
+	defer fake.hasAPIEndpointMutex.Unlock()
+	fake.HasAPIEndpointStub = nil
+	fake.hasAPIEndpointReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) HasAPIEndpointReturnsOnCall(i int, result1 error) {
+	fake.hasAPIEndpointMutex.Lock()
+	defer fake.hasAPIEndpointMutex.Unlock()
+	fake.HasAPIEndpointStub = nil
+	if fake.hasAPIEndpointReturnsOnCall == nil {
+		fake.hasAPIEndpointReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.hasAPIEndpointReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) HasOrganization(arg1 string, arg2 *bool) error {
+	fake.hasOrganizationMutex.Lock()
+	ret, specificReturn := fake.hasOrganizationReturnsOnCall[len(fake.hasOrganizationArgsForCall)]
+	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct {
+		arg1 string
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("HasOrganization", []interface{}{arg1, arg2})
+	fake.hasOrganizationMutex.Unlock()
+	if fake.HasOrganizationStub != nil {
+		return fake.HasOrganizationStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.hasOrganizationReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) HasOrganizationCallCount() int {
+	fake.hasOrganizationMutex.RLock()
+	defer fake.hasOrganizationMutex.RUnlock()
+	return len(fake.hasOrganizationArgsForCall)
+}
+
+func (fake *FakeHandlers) HasOrganizationCalls(stub func(string, *bool) error) {
+	fake.hasOrganizationMutex.Lock()
+	defer fake.hasOrganizationMutex.Unlock()
+	fake.HasOrganizationStub = stub
+}
+
+func (fake *FakeHandlers) HasOrganizationArgsForCall(i int) (string, *bool) {
+	fake.hasOrganizationMutex.RLock()
+	defer fake.hasOrganizationMutex.RUnlock()
+	argsForCall := fake.hasOrganizationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) HasOrganizationReturns(result1 error) {
+	fake.hasOrganizationMutex.Lock()
+	defer fake.hasOrganizationMutex.Unlock()
+	fake.HasOrganizationStub = nil
+	fake.hasOrganizationReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) HasOrganizationReturnsOnCall(i int, result1 error) {
+	fake.hasOrganizationMutex.Lock()
+	defer fake.hasOrganizationMutex.Unlock()
+	fake.HasOrganizationStub = nil
+	if fake.hasOrganizationReturnsOnCall == nil {
+		fake.hasOrganizationReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.hasOrganizationReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) HasSpace(arg1 string, arg2 *bool) error {
+	fake.hasSpaceMutex.Lock()
+	ret, specificReturn := fake.hasSpaceReturnsOnCall[len(fake.hasSpaceArgsForCall)]
+	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct {
+		arg1 string
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("HasSpace", []interface{}{arg1, arg2})
+	fake.hasSpaceMutex.Unlock()
+	if fake.HasSpaceStub != nil {
+		return fake.HasSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.hasSpaceReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) HasSpaceCallCount() int {
+	fake.hasSpaceMutex.RLock()
+	defer fake.hasSpaceMutex.RUnlock()
+	return len(fake.hasSpaceArgsForCall)
+}
+
+func (fake *FakeHandlers) HasSpaceCalls(stub func(string, *bool) error) {
+	fake.hasSpaceMutex.Lock()
+	defer fake.hasSpaceMutex.Unlock()
+	fake.HasSpaceStub = stub
+}
+
+func (fake *FakeHandlers) HasSpaceArgsForCall(i int) (string, *bool) {
+	fake.hasSpaceMutex.RLock()
+	defer fake.hasSpaceMutex.RUnlock()
+	argsForCall := fake.hasSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) HasSpaceReturns(result1 error) {
+	fake.hasSpaceMutex.Lock()
+	defer fake.hasSpaceMutex.Unlock()
+	fake.HasSpaceStub = nil
+	fake.hasSpaceReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) HasSpaceReturnsOnCall(i int, result1 error) {
+	fake.hasSpaceMutex.Lock()
+	defer fake.hasSpaceMutex.Unlock()
+	fake.HasSpaceStub = nil
+	if fake.hasSpaceReturnsOnCall == nil {
+		fake.hasSpaceReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.hasSpaceReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) IsLoggedIn(arg1 string, arg2 *bool) error {
+	fake.isLoggedInMutex.Lock()
+	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
+	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct {
+		arg1 string
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("IsLoggedIn", []interface{}{arg1, arg2})
+	fake.isLoggedInMutex.Unlock()
+	if fake.IsLoggedInStub != nil {
+		return fake.IsLoggedInStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isLoggedInReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) IsLoggedInCallCount() int {
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	return len(fake.isLoggedInArgsForCall)
+}
+
+func (fake *FakeHandlers) IsLoggedInCalls(stub func(string, *bool) error) {
+	fake.isLoggedInMutex.Lock()
+	defer fake.isLoggedInMutex.Unlock()
+	fake.IsLoggedInStub = stub
+}
+
+func (fake *FakeHandlers) IsLoggedInArgsForCall(i int) (string, *bool) {
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	argsForCall := fake.isLoggedInArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) IsLoggedInReturns(result1 error) {
+	fake.isLoggedInMutex.Lock()
+	defer fake.isLoggedInMutex.Unlock()
+	fake.IsLoggedInStub = nil
+	fake.isLoggedInReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) IsLoggedInReturnsOnCall(i int, result1 error) {
+	fake.isLoggedInMutex.Lock()
+	defer fake.isLoggedInMutex.Unlock()
+	fake.IsLoggedInStub = nil
+	if fake.isLoggedInReturnsOnCall == nil {
+		fake.isLoggedInReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.isLoggedInReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) IsMinCliVersion(arg1 string, arg2 *bool) error {
+	fake.isMinCliVersionMutex.Lock()
+	ret, specificReturn := fake.isMinCliVersionReturnsOnCall[len(fake.isMinCliVersionArgsForCall)]
+	fake.isMinCliVersionArgsForCall = append(fake.isMinCliVersionArgsForCall, struct {
+		arg1 string
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("IsMinCliVersion", []interface{}{arg1, arg2})
+	fake.isMinCliVersionMutex.Unlock()
+	if fake.IsMinCliVersionStub != nil {
+		return fake.IsMinCliVersionStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isMinCliVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) IsMinCliVersionCallCount() int {
+	fake.isMinCliVersionMutex.RLock()
+	defer fake.isMinCliVersionMutex.RUnlock()
+	return len(fake.isMinCliVersionArgsForCall)
+}
+
+func (fake *FakeHandlers) IsMinCliVersionCalls(stub func(string, *bool) error) {
+	fake.isMinCliVersionMutex.Lock()
+	defer fake.isMinCliVersionMutex.Unlock()
+	fake.IsMinCliVersionStub = stub
+}
+
+func (fake *FakeHandlers) IsMinCliVersionArgsForCall(i int) (string, *bool) {
+	fake.isMinCliVersionMutex.RLock()
+	defer fake.isMinCliVersionMutex.RUnlock()
+	argsForCall := fake.isMinCliVersionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) IsMinCliVersionReturns(result1 error) {
+	fake.isMinCliVersionMutex.Lock()
+	defer fake.isMinCliVersionMutex.Unlock()
+	fake.IsMinCliVersionStub = nil
+	fake.isMinCliVersionReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) IsMinCliVersionReturnsOnCall(i int, result1 error) {
+	fake.isMinCliVersionMutex.Lock()
+	defer fake.isMinCliVersionMutex.Unlock()
+	fake.IsMinCliVersionStub = nil
+	if fake.isMinCliVersionReturnsOnCall == nil {
+		fake.isMinCliVersionReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.isMinCliVersionReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) IsSSLDisabled(arg1 string, arg2 *bool) error {
+	fake.isSSLDisabledMutex.Lock()
+	ret, specificReturn := fake.isSSLDisabledReturnsOnCall[len(fake.isSSLDisabledArgsForCall)]
+	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct {
+		arg1 string
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("IsSSLDisabled", []interface{}{arg1, arg2})
+	fake.isSSLDisabledMutex.Unlock()
+	if fake.IsSSLDisabledStub != nil {
+		return fake.IsSSLDisabledStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isSSLDisabledReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) IsSSLDisabledCallCount() int {
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	return len(fake.isSSLDisabledArgsForCall)
+}
+
+func (fake *FakeHandlers) IsSSLDisabledCalls(stub func(string, *bool) error) {
+	fake.isSSLDisabledMutex.Lock()
+	defer fake.isSSLDisabledMutex.Unlock()
+	fake.IsSSLDisabledStub = stub
+}
+
+func (fake *FakeHandlers) IsSSLDisabledArgsForCall(i int) (string, *bool) {
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	argsForCall := fake.isSSLDisabledArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) IsSSLDisabledReturns(result1 error) {
+	fake.isSSLDisabledMutex.Lock()
+	defer fake.isSSLDisabledMutex.Unlock()
+	fake.IsSSLDisabledStub = nil
+	fake.isSSLDisabledReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) IsSSLDisabledReturnsOnCall(i int, result1 error) {
+	fake.isSSLDisabledMutex.Lock()
+	defer fake.isSSLDisabledMutex.Unlock()
+	fake.IsSSLDisabledStub = nil
+	if fake.isSSLDisabledReturnsOnCall == nil {
+		fake.isSSLDisabledReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.isSSLDisabledReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) LoggregatorEndpoint(arg1 string, arg2 *string) error {
+	fake.loggregatorEndpointMutex.Lock()
+	ret, specificReturn := fake.loggregatorEndpointReturnsOnCall[len(fake.loggregatorEndpointArgsForCall)]
+	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("LoggregatorEndpoint", []interface{}{arg1, arg2})
+	fake.loggregatorEndpointMutex.Unlock()
+	if fake.LoggregatorEndpointStub != nil {
+		return fake.LoggregatorEndpointStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.loggregatorEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) LoggregatorEndpointCallCount() int {
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	return len(fake.loggregatorEndpointArgsForCall)
+}
+
+func (fake *FakeHandlers) LoggregatorEndpointCalls(stub func(string, *string) error) {
+	fake.loggregatorEndpointMutex.Lock()
+	defer fake.loggregatorEndpointMutex.Unlock()
+	fake.LoggregatorEndpointStub = stub
+}
+
+func (fake *FakeHandlers) LoggregatorEndpointArgsForCall(i int) (string, *string) {
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	argsForCall := fake.loggregatorEndpointArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) LoggregatorEndpointReturns(result1 error) {
+	fake.loggregatorEndpointMutex.Lock()
+	defer fake.loggregatorEndpointMutex.Unlock()
+	fake.LoggregatorEndpointStub = nil
+	fake.loggregatorEndpointReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) LoggregatorEndpointReturnsOnCall(i int, result1 error) {
+	fake.loggregatorEndpointMutex.Lock()
+	defer fake.loggregatorEndpointMutex.Unlock()
+	fake.LoggregatorEndpointStub = nil
+	if fake.loggregatorEndpointReturnsOnCall == nil {
+		fake.loggregatorEndpointReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.loggregatorEndpointReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) SetPluginMetadata(arg1 plugin.PluginMetadata, arg2 *bool) error {
+	fake.setPluginMetadataMutex.Lock()
+	ret, specificReturn := fake.setPluginMetadataReturnsOnCall[len(fake.setPluginMetadataArgsForCall)]
+	fake.setPluginMetadataArgsForCall = append(fake.setPluginMetadataArgsForCall, struct {
+		arg1 plugin.PluginMetadata
+		arg2 *bool
+	}{arg1, arg2})
+	fake.recordInvocation("SetPluginMetadata", []interface{}{arg1, arg2})
+	fake.setPluginMetadataMutex.Unlock()
+	if fake.SetPluginMetadataStub != nil {
+		return fake.SetPluginMetadataStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.setPluginMetadataReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) SetPluginMetadataCallCount() int {
+	fake.setPluginMetadataMutex.RLock()
+	defer fake.setPluginMetadataMutex.RUnlock()
+	return len(fake.setPluginMetadataArgsForCall)
+}
+
+func (fake *FakeHandlers) SetPluginMetadataCalls(stub func(plugin.PluginMetadata, *bool) error) {
+	fake.setPluginMetadataMutex.Lock()
+	defer fake.setPluginMetadataMutex.Unlock()
+	fake.SetPluginMetadataStub = stub
+}
+
+func (fake *FakeHandlers) SetPluginMetadataArgsForCall(i int) (plugin.PluginMetadata, *bool) {
+	fake.setPluginMetadataMutex.RLock()
+	defer fake.setPluginMetadataMutex.RUnlock()
+	argsForCall := fake.setPluginMetadataArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) SetPluginMetadataReturns(result1 error) {
+	fake.setPluginMetadataMutex.Lock()
+	defer fake.setPluginMetadataMutex.Unlock()
+	fake.SetPluginMetadataStub = nil
+	fake.setPluginMetadataReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) SetPluginMetadataReturnsOnCall(i int, result1 error) {
+	fake.setPluginMetadataMutex.Lock()
+	defer fake.setPluginMetadataMutex.Unlock()
+	fake.SetPluginMetadataStub = nil
+	if fake.setPluginMetadataReturnsOnCall == nil {
+		fake.setPluginMetadataReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.setPluginMetadataReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) UserEmail(arg1 string, arg2 *string) error {
+	fake.userEmailMutex.Lock()
+	ret, specificReturn := fake.userEmailReturnsOnCall[len(fake.userEmailArgsForCall)]
+	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("UserEmail", []interface{}{arg1, arg2})
+	fake.userEmailMutex.Unlock()
+	if fake.UserEmailStub != nil {
+		return fake.UserEmailStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.userEmailReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) UserEmailCallCount() int {
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	return len(fake.userEmailArgsForCall)
+}
+
+func (fake *FakeHandlers) UserEmailCalls(stub func(string, *string) error) {
+	fake.userEmailMutex.Lock()
+	defer fake.userEmailMutex.Unlock()
+	fake.UserEmailStub = stub
+}
+
+func (fake *FakeHandlers) UserEmailArgsForCall(i int) (string, *string) {
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	argsForCall := fake.userEmailArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) UserEmailReturns(result1 error) {
+	fake.userEmailMutex.Lock()
+	defer fake.userEmailMutex.Unlock()
+	fake.UserEmailStub = nil
+	fake.userEmailReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) UserEmailReturnsOnCall(i int, result1 error) {
+	fake.userEmailMutex.Lock()
+	defer fake.userEmailMutex.Unlock()
+	fake.UserEmailStub = nil
+	if fake.userEmailReturnsOnCall == nil {
+		fake.userEmailReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.userEmailReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) UserGuid(arg1 string, arg2 *string) error {
+	fake.userGuidMutex.Lock()
+	ret, specificReturn := fake.userGuidReturnsOnCall[len(fake.userGuidArgsForCall)]
+	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("UserGuid", []interface{}{arg1, arg2})
+	fake.userGuidMutex.Unlock()
+	if fake.UserGuidStub != nil {
+		return fake.UserGuidStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.userGuidReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) UserGuidCallCount() int {
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	return len(fake.userGuidArgsForCall)
+}
+
+func (fake *FakeHandlers) UserGuidCalls(stub func(string, *string) error) {
+	fake.userGuidMutex.Lock()
+	defer fake.userGuidMutex.Unlock()
+	fake.UserGuidStub = stub
+}
+
+func (fake *FakeHandlers) UserGuidArgsForCall(i int) (string, *string) {
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	argsForCall := fake.userGuidArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) UserGuidReturns(result1 error) {
+	fake.userGuidMutex.Lock()
+	defer fake.userGuidMutex.Unlock()
+	fake.UserGuidStub = nil
+	fake.userGuidReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) UserGuidReturnsOnCall(i int, result1 error) {
+	fake.userGuidMutex.Lock()
+	defer fake.userGuidMutex.Unlock()
+	fake.UserGuidStub = nil
+	if fake.userGuidReturnsOnCall == nil {
+		fake.userGuidReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.userGuidReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) Username(arg1 string, arg2 *string) error {
+	fake.usernameMutex.Lock()
+	ret, specificReturn := fake.usernameReturnsOnCall[len(fake.usernameArgsForCall)]
+	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct {
+		arg1 string
+		arg2 *string
+	}{arg1, arg2})
+	fake.recordInvocation("Username", []interface{}{arg1, arg2})
+	fake.usernameMutex.Unlock()
+	if fake.UsernameStub != nil {
+		return fake.UsernameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.usernameReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeHandlers) UsernameCallCount() int {
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
+	return len(fake.usernameArgsForCall)
+}
+
+func (fake *FakeHandlers) UsernameCalls(stub func(string, *string) error) {
+	fake.usernameMutex.Lock()
+	defer fake.usernameMutex.Unlock()
+	fake.UsernameStub = stub
+}
+
+func (fake *FakeHandlers) UsernameArgsForCall(i int) (string, *string) {
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
+	argsForCall := fake.usernameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeHandlers) UsernameReturns(result1 error) {
+	fake.usernameMutex.Lock()
+	defer fake.usernameMutex.Unlock()
+	fake.UsernameStub = nil
+	fake.usernameReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandlers) UsernameReturnsOnCall(i int, result1 error) {
+	fake.usernameMutex.Lock()
+	defer fake.usernameMutex.Unlock()
+	fake.UsernameStub = nil
+	if fake.usernameReturnsOnCall == nil {
+		fake.usernameReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.usernameReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeHandlers) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.isMinCliVersionMutex.RLock()
-	defer fake.isMinCliVersionMutex.RUnlock()
-	fake.setPluginMetadataMutex.RLock()
-	defer fake.setPluginMetadataMutex.RUnlock()
-	fake.disableTerminalOutputMutex.RLock()
-	defer fake.disableTerminalOutputMutex.RUnlock()
-	fake.callCoreCommandMutex.RLock()
-	defer fake.callCoreCommandMutex.RUnlock()
-	fake.getOutputAndResetMutex.RLock()
-	defer fake.getOutputAndResetMutex.RUnlock()
-	fake.getCurrentOrgMutex.RLock()
-	defer fake.getCurrentOrgMutex.RUnlock()
-	fake.getCurrentSpaceMutex.RLock()
-	defer fake.getCurrentSpaceMutex.RUnlock()
-	fake.usernameMutex.RLock()
-	defer fake.usernameMutex.RUnlock()
-	fake.userGuidMutex.RLock()
-	defer fake.userGuidMutex.RUnlock()
-	fake.userEmailMutex.RLock()
-	defer fake.userEmailMutex.RUnlock()
-	fake.isLoggedInMutex.RLock()
-	defer fake.isLoggedInMutex.RUnlock()
-	fake.isSSLDisabledMutex.RLock()
-	defer fake.isSSLDisabledMutex.RUnlock()
-	fake.hasOrganizationMutex.RLock()
-	defer fake.hasOrganizationMutex.RUnlock()
-	fake.hasSpaceMutex.RLock()
-	defer fake.hasSpaceMutex.RUnlock()
-	fake.apiEndpointMutex.RLock()
-	defer fake.apiEndpointMutex.RUnlock()
-	fake.hasAPIEndpointMutex.RLock()
-	defer fake.hasAPIEndpointMutex.RUnlock()
-	fake.apiVersionMutex.RLock()
-	defer fake.apiVersionMutex.RUnlock()
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
-	fake.dopplerEndpointMutex.RLock()
-	defer fake.dopplerEndpointMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.apiEndpointMutex.RLock()
+	defer fake.apiEndpointMutex.RUnlock()
+	fake.apiVersionMutex.RLock()
+	defer fake.apiVersionMutex.RUnlock()
+	fake.callCoreCommandMutex.RLock()
+	defer fake.callCoreCommandMutex.RUnlock()
+	fake.disableTerminalOutputMutex.RLock()
+	defer fake.disableTerminalOutputMutex.RUnlock()
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
 	fake.getAppMutex.RLock()
 	defer fake.getAppMutex.RUnlock()
 	fake.getAppsMutex.RLock()
 	defer fake.getAppsMutex.RUnlock()
-	fake.getOrgsMutex.RLock()
-	defer fake.getOrgsMutex.RUnlock()
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
-	fake.getServicesMutex.RLock()
-	defer fake.getServicesMutex.RUnlock()
-	fake.getOrgUsersMutex.RLock()
-	defer fake.getOrgUsersMutex.RUnlock()
-	fake.getSpaceUsersMutex.RLock()
-	defer fake.getSpaceUsersMutex.RUnlock()
+	fake.getCurrentOrgMutex.RLock()
+	defer fake.getCurrentOrgMutex.RUnlock()
+	fake.getCurrentSpaceMutex.RLock()
+	defer fake.getCurrentSpaceMutex.RUnlock()
 	fake.getOrgMutex.RLock()
 	defer fake.getOrgMutex.RUnlock()
-	fake.getSpaceMutex.RLock()
-	defer fake.getSpaceMutex.RUnlock()
+	fake.getOrgUsersMutex.RLock()
+	defer fake.getOrgUsersMutex.RUnlock()
+	fake.getOrgsMutex.RLock()
+	defer fake.getOrgsMutex.RUnlock()
+	fake.getOutputAndResetMutex.RLock()
+	defer fake.getOutputAndResetMutex.RUnlock()
 	fake.getServiceMutex.RLock()
 	defer fake.getServiceMutex.RUnlock()
+	fake.getServicesMutex.RLock()
+	defer fake.getServicesMutex.RUnlock()
+	fake.getSpaceMutex.RLock()
+	defer fake.getSpaceMutex.RUnlock()
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	fake.hasAPIEndpointMutex.RLock()
+	defer fake.hasAPIEndpointMutex.RUnlock()
+	fake.hasOrganizationMutex.RLock()
+	defer fake.hasOrganizationMutex.RUnlock()
+	fake.hasSpaceMutex.RLock()
+	defer fake.hasSpaceMutex.RUnlock()
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	fake.isMinCliVersionMutex.RLock()
+	defer fake.isMinCliVersionMutex.RUnlock()
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	fake.setPluginMetadataMutex.RLock()
+	defer fake.setPluginMetadataMutex.RUnlock()
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

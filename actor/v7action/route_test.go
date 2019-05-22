@@ -30,7 +30,7 @@ var _ = Describe("Route Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateRoute("space-name", "domain-name", "hostname")
+			warnings, executeErr = actor.CreateRoute("org-name", "space-name", "domain-name", "hostname")
 		})
 
 		When("the API layer calls are successful", func() {
@@ -40,6 +40,14 @@ var _ = Describe("Route Actions", func() {
 						{Name: "domain-name", GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{
+						{Name: "org-name", GUID: "org-guid"},
+					},
+					ccv3.Warnings{"get-orgs-warning"},
 					nil,
 				)
 
@@ -58,7 +66,7 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns the route and prints warnings", func() {
-				Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-domains-warning", "get-spaces-warning"))
+				Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-orgs-warning", "get-domains-warning", "get-spaces-warning"))
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
@@ -75,7 +83,6 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		When("the API call to get the domain returns an error", func() {
-
 			When("the cc client returns an RouteNotUniqueError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
@@ -83,6 +90,14 @@ var _ = Describe("Route Actions", func() {
 							{Name: "domain-name", GUID: "domain-guid"},
 						},
 						ccv3.Warnings{"get-domains-warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetOrganizationsReturns(
+						[]ccv3.Organization{
+							{Name: "org-name", GUID: "org-guid"},
+						},
+						ccv3.Warnings{"get-orgs-warning"},
 						nil,
 					)
 
@@ -110,6 +125,7 @@ var _ = Describe("Route Actions", func() {
 						},
 					}))
 					Expect(warnings).To(ConsistOf("get-domains-warning",
+						"get-orgs-warning",
 						"get-spaces-warning",
 						"create-route-warning"))
 				})
