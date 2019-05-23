@@ -21,8 +21,8 @@ func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID 
 			SpaceGUID: spaceGUID,
 		}
 
-		// List of PushPlanFuncs is defined in NewActor
-		for _, updatePlan := range actor.PushPlanFuncs {
+		// List of PreparePushPlanSequence is defined in NewActor
+		for _, updatePlan := range actor.PreparePushPlanSequence {
 			var err error
 			plan, err = updatePlan(plan, overrides, manifestApplication)
 			if err != nil {

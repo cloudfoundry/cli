@@ -1,14 +1,6 @@
 package v7pushaction
 
 func (actor Actor) CreateDockerPackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	if pushPlan.DropletPath != "" {
-		return pushPlan, nil, nil
-	}
-
-	if !pushPlan.DockerImageCredentialsNeedsUpdate {
-		return pushPlan, nil, nil
-	}
-
 	eventStream <- SetDockerImage
 
 	pkg, warnings, err := actor.V7Actor.CreateDockerPackageByApplication(pushPlan.Application.GUID, pushPlan.DockerImageCredentials)

@@ -6,18 +6,14 @@ import (
 )
 
 func (actor Actor) UpdateWebProcessForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	if pushPlan.UpdateWebProcessNeedsUpdate {
-		log.Info("Setting Web Process's Configuration")
-		eventStream <- SetProcessConfiguration
+	log.Info("Setting Web Process's Configuration")
+	eventStream <- SetProcessConfiguration
 
-		log.WithField("Process", pushPlan.UpdateWebProcess).Debug("Update process")
-		warnings, err := actor.V7Actor.UpdateProcessByTypeAndApplication(constant.ProcessTypeWeb, pushPlan.Application.GUID, pushPlan.UpdateWebProcess)
-		if err != nil {
-			return pushPlan, Warnings(warnings), err
-		}
-		eventStream <- SetProcessConfigurationComplete
-		return pushPlan, Warnings(warnings), nil
+	log.WithField("Process", pushPlan.UpdateWebProcess).Debug("Update process")
+	warnings, err := actor.V7Actor.UpdateProcessByTypeAndApplication(constant.ProcessTypeWeb, pushPlan.Application.GUID, pushPlan.UpdateWebProcess)
+	if err != nil {
+		return pushPlan, Warnings(warnings), err
 	}
-
-	return pushPlan, nil, nil
+	eventStream <- SetProcessConfigurationComplete
+	return pushPlan, Warnings(warnings), nil
 }

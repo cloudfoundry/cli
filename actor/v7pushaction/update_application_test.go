@@ -1,10 +1,11 @@
 package v7pushaction_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
-	"errors"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -84,17 +85,6 @@ var _ = Describe("UpdateApplication", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("some-app-update-warnings"))
 			})
-		})
-	})
-
-	When("the plan does not need an app update", func() {
-		BeforeEach(func() {
-			paramPlan.ApplicationNeedsUpdate = false
-		})
-
-		It("does not update the application", func() {
-			Expect(executeErr).NotTo(HaveOccurred())
-			Consistently(fakeV7Actor.UpdateApplicationCallCount).Should(Equal(0))
 		})
 	})
 })

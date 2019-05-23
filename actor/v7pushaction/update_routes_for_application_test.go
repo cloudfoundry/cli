@@ -1,12 +1,13 @@
 package v7pushaction_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -110,33 +111,6 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 				Expect(warnings).To(ConsistOf("domain-warning"))
 				Expect(events).To(ConsistOf(CreatingAndMappingRoutes))
 			})
-		})
-	})
-
-	When("skipping default route creation from manifest", func() {
-		BeforeEach(func() {
-			paramPlan.SkipRouteCreation = true
-		})
-
-		It("never attempts to create a route", func() {
-			Expect(events).To(BeEmpty())
-			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(BeZero())
-			Expect(fakeV2Actor.CreateRouteCallCount()).To(BeZero())
-		})
-	})
-
-	When("skipping default route creation from overrides", func() {
-		BeforeEach(func() {
-			paramPlan.SkipRouteCreation = false
-			paramPlan.NoRouteFlag = true
-		})
-
-		It("never attempts to create a route", func() {
-			Expect(events).To(BeEmpty())
-			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(BeZero())
-			Expect(fakeV2Actor.CreateRouteCallCount()).To(BeZero())
 		})
 	})
 })

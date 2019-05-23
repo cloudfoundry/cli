@@ -1,13 +1,14 @@
 package v7pushaction_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -46,17 +47,6 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 	JustBeforeEach(func() {
 		events = EventFollower(func(eventStream chan<- Event) {
 			returnedPushPlan, warnings, executeErr = actor.CreateBitsPackageForApplication(paramPlan, eventStream, fakeProgressBar)
-		})
-	})
-
-	When("the plan has a droplet path", func() {
-		BeforeEach(func() {
-			paramPlan.DropletPath = "some-droplet.tgz"
-		})
-
-		It("returns the unmodified plan without creating a package", func() {
-			Expect(fakeV7Actor.CreateBitsPackageByApplicationCallCount()).To(BeZero())
-			Expect(returnedPushPlan).To(Equal(paramPlan))
 		})
 	})
 

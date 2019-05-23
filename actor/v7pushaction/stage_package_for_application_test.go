@@ -1,10 +1,11 @@
 package v7pushaction_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -37,17 +38,6 @@ var _ = Describe("StagePackageForApplication", func() {
 	JustBeforeEach(func() {
 		events = EventFollower(func(eventStream chan<- Event) {
 			returnedPushPlan, warnings, executeErr = actor.StagePackageForApplication(paramPlan, eventStream, nil)
-		})
-	})
-
-	When("the plan has a droplet path", func() {
-		BeforeEach(func() {
-			paramPlan.DropletPath = "some-droplet.tgz"
-		})
-
-		It("returns the unmodified plan without staging", func() {
-			Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
-			Expect(returnedPushPlan).To(Equal(paramPlan))
 		})
 	})
 

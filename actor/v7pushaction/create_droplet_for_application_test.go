@@ -1,15 +1,16 @@
 package v7pushaction_test
 
 import (
+	"errors"
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"strings"
 )
 
 var _ = Describe("CreateDropletForApplication", func() {
@@ -45,25 +46,6 @@ var _ = Describe("CreateDropletForApplication", func() {
 	JustBeforeEach(func() {
 		events = EventFollower(func(eventStream chan<- Event) {
 			returnedPushPlan, warnings, executeErr = actor.CreateDropletForApplication(paramPlan, eventStream, fakeProgressBar)
-		})
-	})
-
-	When("the plan does not have a droplet path specified", func() {
-		It("does not create a droplet for app", func() {
-			Expect(fakeV7Actor.CreateApplicationDropletCallCount()).To(BeZero())
-		})
-
-		It("does not return warnings or error", func() {
-			Expect(warnings).To(BeNil())
-			Expect(executeErr).To(BeNil())
-		})
-
-		It("does not report any events", func() {
-			Expect(events).To(BeEmpty())
-		})
-
-		It("returns the plan, unmodified", func() {
-			Expect(returnedPushPlan).To(Equal(paramPlan))
 		})
 	})
 

@@ -1,12 +1,13 @@
 package v7pushaction_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -97,14 +98,6 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 				Expect(warnings).To(ConsistOf("health-check-warnings"))
 				Expect(events).To(ConsistOf(SetProcessConfiguration))
 			})
-		})
-	})
-
-	When("process configuration is not provided", func() {
-		It("should not set the configuration", func() {
-			Expect(events).To(BeEmpty())
-			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(0))
 		})
 	})
 })

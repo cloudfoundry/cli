@@ -15,11 +15,8 @@ type Actor struct {
 	V2Actor     V2Actor
 	V7Actor     V7Actor
 
-	PushPlanFuncs []UpdatePushPlanFunc
-
-	ChangeApplicationFuncs []ChangeApplicationFunc
-	StartFuncs             []ChangeApplicationFunc
-	NoStartFuncs           []ChangeApplicationFunc
+	PreparePushPlanSequence   []UpdatePushPlanFunc
+	ChangeApplicationSequence func(plan PushPlan) []ChangeApplicationFunc
 
 	startWithProtocol *regexp.Regexp
 	urlValidator      *regexp.Regexp
@@ -39,7 +36,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		urlValidator:      regexp.MustCompile(URLRegexp),
 	}
 
-	actor.PushPlanFuncs = []UpdatePushPlanFunc{
+	actor.PreparePushPlanSequence = []UpdatePushPlanFunc{
 		SetupApplicationForPushPlan,
 		SetupDockerImageCredentialsForPushPlan,
 		SetupBitsPathForPushPlan,
@@ -51,24 +48,12 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		SetupUpdateWebProcessForPushPlan,
 	}
 
-	actor.ChangeApplicationFuncs = []ChangeApplicationFunc{
-		actor.UpdateApplication,
-		actor.UpdateRoutesForApplication,
-		actor.ScaleWebProcessForApplication,
-		actor.UpdateWebProcessForApplication,
-		actor.CreateBitsPackageForApplication,
-		actor.CreateDockerPackageForApplication,
-		actor.CreateDropletForApplication,
-	}
-
-	actor.StartFuncs = []ChangeApplicationFunc{
-		actor.StagePackageForApplication,
-		actor.SetDropletForApplication,
-	}
-
-	actor.NoStartFuncs = []ChangeApplicationFunc{
-		actor.StopApplication,
-		actor.ConditionallyRunFunc(actor.IsDropletPathSet, actor.SetDropletForApplication),
+	actor.ChangeApplicationSequence = func(plan PushPlan) []ChangeApplicationFunc {
+		var sequence []ChangeApplicationFunc
+		sequence = append(sequence, actor.GetUpdateSequence(plan)...)
+		sequence = append(sequence, actor.GetPrepareApplicationSourceSequence(plan)...)
+		sequence = append(sequence, actor.GetRuntimeSequence(plan)...)
+		return sequence
 	}
 
 	return actor

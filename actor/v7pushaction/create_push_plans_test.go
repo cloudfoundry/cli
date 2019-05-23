@@ -34,7 +34,7 @@ var _ = Describe("CreatePushPlans", func() {
 
 	BeforeEach(func() {
 		pushActor, _, _, _ = getTestPushActor()
-		pushActor.PushPlanFuncs = []UpdatePushPlanFunc{testUpdatePlan, testUpdatePlan}
+		pushActor.PreparePushPlanSequence = []UpdatePushPlanFunc{testUpdatePlan, testUpdatePlan}
 
 		appNameArg = "my-app"
 		orgGUID = "org"

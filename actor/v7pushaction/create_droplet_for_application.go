@@ -9,10 +9,6 @@ import (
 const UploadRetries = 3
 
 func (actor Actor) CreateDropletForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	if pushPlan.DropletPath == "" {
-		return pushPlan, nil, nil
-	}
-
 	var allWarnings Warnings
 
 	eventStream <- CreatingDroplet

@@ -1,11 +1,12 @@
 package v7pushaction_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -36,18 +37,6 @@ var _ = Describe("StopApplication", func() {
 	JustBeforeEach(func() {
 		events = EventFollower(func(eventStream chan<- Event) {
 			_, warnings, executeErr = actor.StopApplication(paramPlan, eventStream, nil)
-		})
-	})
-
-	When("The app is stopped", func() {
-		BeforeEach(func() {
-			paramPlan.Application.State = constant.ApplicationStopped
-		})
-
-		It("Uploads a package and exits", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(events).To(BeEmpty())
-			Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
 		})
 	})
 

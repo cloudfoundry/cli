@@ -20,17 +20,9 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 		defer close(warningsStream)
 		defer close(errorStream)
 
-		changeFuncs := actor.ChangeApplicationFuncs
-
-		if plan.NoStart {
-			changeFuncs = append(changeFuncs, actor.NoStartFuncs...)
-		} else {
-			changeFuncs = append(changeFuncs, actor.StartFuncs...)
-		}
-
 		var err error
 		var warnings Warnings
-		for _, changeAppFunc := range changeFuncs {
+		for _, changeAppFunc := range actor.ChangeApplicationSequence(plan) {
 			plan, warnings, err = changeAppFunc(plan, eventStream, progressBar)
 			warningsStream <- warnings
 			if err != nil {
@@ -43,5 +35,6 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 		log.Debug("completed apply")
 		eventStream <- Complete
 	}()
+
 	return planStream, eventStream, warningsStream, errorStream
 }

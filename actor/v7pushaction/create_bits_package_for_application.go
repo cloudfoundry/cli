@@ -12,14 +12,6 @@ import (
 const PushRetries = 3
 
 func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	if pushPlan.DropletPath != "" {
-		return pushPlan, nil, nil
-	}
-
-	if pushPlan.DockerImageCredentialsNeedsUpdate {
-		return pushPlan, nil, nil
-	}
-
 	pkg, warnings, err := actor.CreateAndUploadApplicationBits(pushPlan, progressBar, eventStream)
 	if err != nil {
 		return pushPlan, warnings, err

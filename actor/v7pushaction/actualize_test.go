@@ -1,9 +1,10 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"errors"
 	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -133,18 +134,18 @@ var _ = Describe("Actualize", func() {
 		planStream, eventStream, warningsStream, errorStream = actor.Actualize(plan, fakeProgressBar)
 	})
 
-	Describe("ChangeApplicationFuncs", func() {
-		When("none of the ChangeApplicationFuncs return errors", func() {
+	Describe("ChangeApplicationSequence", func() {
+		When("none of the ChangeApplicationSequence return errors", func() {
 			BeforeEach(func() {
-				actor.ChangeApplicationFuncs = []ChangeApplicationFunc{
-					successfulChangeAppFunc,
-					warningChangeAppFunc,
+				actor.ChangeApplicationSequence = func(plan PushPlan) []ChangeApplicationFunc {
+					return []ChangeApplicationFunc{
+						successfulChangeAppFunc,
+						warningChangeAppFunc,
+					}
 				}
-				actor.NoStartFuncs = nil
-				actor.StartFuncs = nil
 			})
 
-			It("iterates over the actor's ChangeApplicationFuncs", func() {
+			It("iterates over the actor's ChangeApplicationSequence", func() {
 				Eventually(warningsStream).Should(Receive(BeNil()))
 				expectedPlan.Application.GUID = "successful-app-guid"
 				Eventually(planStream).Should(Receive(Equal(expectedPlan)))
@@ -161,17 +162,17 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		When("the ChangeApplicationFuncs return errors", func() {
+		When("the ChangeApplicationSequence return errors", func() {
 			BeforeEach(func() {
-				actor.ChangeApplicationFuncs = []ChangeApplicationFunc{
-					errorChangeAppFunc,
-					successfulChangeAppFunc,
+				actor.ChangeApplicationSequence = func(plan PushPlan) []ChangeApplicationFunc {
+					return []ChangeApplicationFunc{
+						errorChangeAppFunc,
+						successfulChangeAppFunc,
+					}
 				}
-				actor.NoStartFuncs = nil
-				actor.StartFuncs = nil
 			})
 
-			It("iterates over the actor's ChangeApplicationFuncs", func() {
+			It("iterates over the actor's ChangeApplicationSequence", func() {
 				Eventually(warningsStream).Should(Receive(BeNil()))
 				Eventually(errorStream).Should(Receive(MatchError("some error")))
 
@@ -180,61 +181,6 @@ var _ = Describe("Actualize", func() {
 				Expect(errorChangeAppFuncCallCount).To(Equal(1))
 
 				Consistently(eventStream).ShouldNot(Receive(Equal(Complete)))
-			})
-		})
-	})
-
-	Describe("no-start", func() {
-		When("it is true", func() {
-			BeforeEach(func() {
-				plan.NoStart = true
-				expectedPlan.NoStart = true
-
-				actor.ChangeApplicationFuncs = nil
-				actor.NoStartFuncs = []ChangeApplicationFunc{
-					successfulChangeAppFunc,
-				}
-				actor.StartFuncs = []ChangeApplicationFunc{
-					errorChangeAppFunc,
-				}
-			})
-
-			It("runs the actor's NoStartFuncs", func() {
-				Eventually(warningsStream).Should(Receive(BeNil()))
-				expectedPlan.Application.GUID = "successful-app-guid"
-				Eventually(planStream).Should(Receive(Equal(expectedPlan)))
-				Consistently(errorStream).ShouldNot(Receive())
-
-				Expect(successfulChangeAppFuncCallCount).To(Equal(1))
-				Expect(warningChangeAppFuncCallCount).To(Equal(0))
-				Expect(errorChangeAppFuncCallCount).To(Equal(0))
-
-				Eventually(eventStream).Should(Receive(Equal(Complete)))
-			})
-		})
-
-		When("it is false", func() {
-			BeforeEach(func() {
-				actor.ChangeApplicationFuncs = nil
-				actor.NoStartFuncs = []ChangeApplicationFunc{
-					errorChangeAppFunc,
-				}
-				actor.StartFuncs = []ChangeApplicationFunc{
-					successfulChangeAppFunc,
-				}
-			})
-
-			It("runs the actor's StartFuncs", func() {
-				Eventually(warningsStream).Should(Receive(BeNil()))
-				expectedPlan.Application.GUID = "successful-app-guid"
-				Eventually(planStream).Should(Receive(Equal(expectedPlan)))
-				Consistently(errorStream).ShouldNot(Receive())
-
-				Expect(successfulChangeAppFuncCallCount).To(Equal(1))
-				Expect(warningChangeAppFuncCallCount).To(Equal(0))
-				Expect(errorChangeAppFuncCallCount).To(Equal(0))
-
-				Eventually(eventStream).Should(Receive(Equal(Complete)))
 			})
 		})
 	})
