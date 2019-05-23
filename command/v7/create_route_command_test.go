@@ -32,6 +32,7 @@ var _ = Describe("create-route Command", func() {
 		spaceName  string
 		orgName    string
 		hostname   string
+		path       string
 	)
 
 	BeforeEach(func() {
@@ -44,6 +45,7 @@ var _ = Describe("create-route Command", func() {
 		spaceName = "space"
 		orgName = "org"
 		hostname = ""
+		path = ""
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -55,6 +57,7 @@ var _ = Describe("create-route Command", func() {
 				Domain: domainName,
 			},
 			Hostname:    hostname,
+			Path:        path,
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
@@ -91,7 +94,7 @@ var _ = Describe("create-route Command", func() {
 			})
 		})
 
-		It("should print text indicating it is creating a route", func() {
+		It("prints text indicating it is creating a route", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
 		})
@@ -101,9 +104,37 @@ var _ = Describe("create-route Command", func() {
 				hostname = "flan"
 			})
 
-			It("should print text indicating it is creating a route", func() {
+			It("prints text indicating it is creating a route", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(testUI.Out).To(Say(`Creating route %s\.%s for org %s / space %s as the-user\.\.\.`, hostname, domainName, orgName, spaceName))
+			})
+		})
+
+		When("passing in a path without a '/'", func() {
+
+			BeforeEach(func() {
+				path = "lion"
+			})
+
+			It("prints information about the created route ", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`Creating route %s/%s for org %s / space %s as the-user\.\.\.`, domainName, path, orgName, spaceName))
+				Expect(testUI.Out).To(Say("Route %s/%s has been created.", domainName, path))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("passing in a path with a '/'", func() {
+
+			BeforeEach(func() {
+				path = "/lion"
+			})
+
+			It("prints information about the created route ", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say(`Creating route %s%s for org %s / space %s as the-user\.\.\.`, domainName, path, orgName, spaceName))
+				Expect(testUI.Out).To(Say("Route %s%s has been created.", domainName, path))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 
@@ -134,7 +165,7 @@ var _ = Describe("create-route Command", func() {
 
 			It("creates the route", func() {
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+				expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
 				Expect(expectedOrgName).To(Equal(orgName))
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedSpaceName).To(Equal(spaceName))
@@ -156,7 +187,7 @@ var _ = Describe("create-route Command", func() {
 
 				It("creates the route", func() {
 					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-					expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname := fakeActor.CreateRouteArgsForCall(0)
+					expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
 					Expect(expectedOrgName).To(Equal(orgName))
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedSpaceName).To(Equal(spaceName))

@@ -27,10 +27,11 @@ var _ = Describe("Route Actions", func() {
 		var (
 			warnings   Warnings
 			executeErr error
+			path       string
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateRoute("org-name", "space-name", "domain-name", "hostname")
+			warnings, executeErr = actor.CreateRoute("org-name", "space-name", "domain-name", "hostname", path)
 		})
 
 		When("the API layer calls are successful", func() {
@@ -60,26 +61,56 @@ var _ = Describe("Route Actions", func() {
 				)
 
 				fakeCloudControllerClient.CreateRouteReturns(
-					ccv3.Route{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname"},
+					ccv3.Route{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname", Path: "path-name"},
 					ccv3.Warnings{"create-warning-1", "create-warning-2"},
 					nil)
 			})
 
-			It("returns the route and prints warnings", func() {
-				Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-orgs-warning", "get-domains-warning", "get-spaces-warning"))
-				Expect(executeErr).ToNot(HaveOccurred())
+			When("the input path starts with '/'", func() {
+				BeforeEach(func() {
+					path = "/path-name"
+				})
+				It("returns the route with '/<path>' and prints warnings", func() {
+					Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-orgs-warning", "get-domains-warning", "get-spaces-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
-				passedRoute := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+					Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+					passedRoute := fakeCloudControllerClient.CreateRouteArgsForCall(0)
 
-				Expect(passedRoute).To(Equal(
-					ccv3.Route{
-						SpaceGUID:  "space-guid",
-						DomainGUID: "domain-guid",
-						Host:       "hostname",
-					},
-				))
+					Expect(passedRoute).To(Equal(
+						ccv3.Route{
+							SpaceGUID:  "space-guid",
+							DomainGUID: "domain-guid",
+							Host:       "hostname",
+							Path:       "/path-name",
+						},
+					))
+				})
 			})
+
+			When("the input path does not start with '/'", func() {
+				BeforeEach(func() {
+					path = "path-name"
+				})
+
+				It("returns the route with '/<path>' and prints warnings", func() {
+					Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-orgs-warning", "get-domains-warning", "get-spaces-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+					passedRoute := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+
+					Expect(passedRoute).To(Equal(
+						ccv3.Route{
+							SpaceGUID:  "space-guid",
+							DomainGUID: "domain-guid",
+							Host:       "hostname",
+							Path:       "/path-name",
+						},
+					))
+				})
+			})
+
 		})
 
 		When("the API call to get the domain returns an error", func() {

@@ -8,7 +8,7 @@ import (
 
 type Route ccv3.Route
 
-func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname string) (Warnings, error) {
+func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -28,10 +28,15 @@ func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname string) 
 	if err != nil {
 		return allWarnings, err
 	}
+
+	if path != "" && string(path[0]) != "/" {
+		path = "/" + path
+	}
 	_, apiWarnings, err := actor.CloudControllerClient.CreateRoute(ccv3.Route{
 		SpaceGUID:  space.GUID,
 		DomainGUID: domain.GUID,
 		Host:       hostname,
+		Path:       path,
 	})
 
 	actorWarnings := Warnings(apiWarnings)

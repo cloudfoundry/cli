@@ -129,6 +129,28 @@ var _ = Describe("create-route command", func() {
 							Eventually(session).Should(Exit(0))
 						})
 					})
+
+					When("passing in hostname and path with a leading '/'", func() {
+						It("creates the route with hostname and path", func() {
+							hostname := "tiramisu"
+							pathString := "/recipes"
+							session := helpers.CF("create-route", domainName, "-n", hostname, "--path", pathString)
+							Eventually(session).Should(Say(`Creating route %s\.%s%s for org %s / space %s as %s\.\.\.`, hostname, domainName, pathString, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s\.%s%s has been created\.`, hostname, domainName, pathString))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("passing in hostname and path without a leading '/'", func() {
+						It("creates the route with hostname and path", func() {
+							hostname := "tiramisu"
+							pathString := "more-recipes"
+							session := helpers.CF("create-route", domainName, "-n", hostname, "--path", pathString)
+							Eventually(session).Should(Say(`Creating route %s\.%s\/%s for org %s / space %s as %s\.\.\.`, hostname, domainName, pathString, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s\.%s\/%s has been created\.`, hostname, domainName, pathString))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 				})
 
 				When("the domain is shared", func() {
@@ -159,6 +181,16 @@ var _ = Describe("create-route command", func() {
 							session := helpers.CF("create-route", domainName, "-n", hostname)
 							Eventually(session).Should(Say(`Creating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
 							Eventually(session).Should(Say(`Route %s\.%s has been created\.`, hostname, domainName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+					When("passing in a hostname and path", func() {
+						It("creates the route with the hostname", func() {
+							hostname := "tiramisu"
+							path := "lion"
+							session := helpers.CF("create-route", domainName, "-n", hostname, "--path", path)
+							Eventually(session).Should(Say(`Creating route %s\.%s\/%s for org %s / space %s as %s\.\.\.`, hostname, domainName, path, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s\.%s\/%s has been created\.`, hostname, domainName, path))
 							Eventually(session).Should(Exit(0))
 						})
 					})

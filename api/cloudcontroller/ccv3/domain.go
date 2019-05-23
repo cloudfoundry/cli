@@ -56,7 +56,7 @@ func (d Domain) MarshalJSON() ([]byte, error) {
 }
 
 func (d *Domain) UnmarshalJSON(data []byte) error {
-	var alias struct {
+	var ccRouteStruct struct {
 		GUID          string         `json:"guid,omitempty"`
 		Name          string         `json:"name"`
 		Internal      types.NullBool `json:"internal,omitempty"`
@@ -69,14 +69,16 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 		} `json:"relationships,omitempty"`
 	}
 
-	err := cloudcontroller.DecodeJSON(data, &alias)
+	err := cloudcontroller.DecodeJSON(data, &ccRouteStruct)
 	if err != nil {
 		return err
 	}
-	d.GUID = alias.GUID
-	d.Name = alias.Name
-	d.Internal = alias.Internal
-	d.OrganizationGUID = alias.Relationships.Organization.Data.GUID
+
+	d.GUID = ccRouteStruct.GUID
+	d.Name = ccRouteStruct.Name
+	d.Internal = ccRouteStruct.Internal
+	d.OrganizationGUID = ccRouteStruct.Relationships.Organization.Data.GUID
+
 	return nil
 }
 

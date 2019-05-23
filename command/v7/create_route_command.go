@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . CreateRouteActor
 
 type CreateRouteActor interface {
-	CreateRoute(orgName, spaceName, domainName, hostname string) (v7action.Warnings, error)
+	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Warnings, error)
 }
 
 type CreateRouteCommand struct {
@@ -55,13 +55,10 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 	domain := cmd.RequiredArgs.Domain
 	hostname := cmd.Hostname
+	pathName := cmd.Path
 	spaceName := cmd.Config.TargetedSpace().Name
 	orgName := cmd.Config.TargetedOrganization().Name
-	fqdn := ""
-	if hostname != "" {
-		fqdn += hostname + "."
-	}
-	fqdn += domain
+	fqdn := desiredFQDN(domain, hostname, pathName)
 
 	cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
 		map[string]interface{}{
@@ -71,7 +68,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	warnings, err := cmd.Actor.CreateRoute(orgName, spaceName, domain, hostname)
+	warnings, err := cmd.Actor.CreateRoute(orgName, spaceName, domain, hostname, pathName)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -90,4 +87,23 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	return nil
+}
+
+func desiredFQDN(domain, hostname, path string) string {
+	fqdn := ""
+
+	if hostname != "" {
+		fqdn += hostname + "."
+	}
+	fqdn += domain
+
+	if path != "" {
+		if string(path[0]) == "/" {
+			fqdn += path
+		} else {
+			fqdn += "/" + path
+		}
+	}
+
+	return fqdn
 }
