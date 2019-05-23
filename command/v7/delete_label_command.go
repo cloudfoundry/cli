@@ -49,10 +49,10 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 		labels[value] = types.NewNullString()
 	}
 
-	switch cmd.RequiredArgs.ResourceType {
-	case "app":
+	switch ResourceType(cmd.RequiredArgs.ResourceType) {
+	case App:
 		err = cmd.executeApp(user.Name, labels)
-	case "org":
+	case Org:
 		err = cmd.executeOrg(user.Name, labels)
 	default:
 		err = errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.RequiredArgs.ResourceType}))

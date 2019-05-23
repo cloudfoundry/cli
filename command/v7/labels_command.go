@@ -13,6 +13,14 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
+type ResourceType string
+
+const (
+	App   ResourceType = "app"
+	Org   ResourceType = "org"
+	Space ResourceType = "space"
+)
+
 //go:generate counterfeiter . LabelsActor
 
 type LabelsActor interface {
@@ -50,10 +58,10 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	switch cmd.RequiredArgs.ResourceType {
-	case "app":
+	switch ResourceType(cmd.RequiredArgs.ResourceType) {
+	case App:
 		labels, warnings, err = cmd.fetchAppLabels(username)
-	case "org":
+	case Org:
 		labels, warnings, err = cmd.fetchOrgLabels(username)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)

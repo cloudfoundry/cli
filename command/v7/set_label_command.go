@@ -57,14 +57,12 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		return err
 	}
 
-	switch cmd.RequiredArgs.ResourceType {
-	case "app":
+	switch ResourceType(cmd.RequiredArgs.ResourceType) {
+	case App:
 		err = cmd.executeApp(username, labels)
-
-	case "org":
+	case Org:
 		err = cmd.executeOrg(username, labels)
-
-	case "space":
+	case Space:
 		err = cmd.executeSpace(username, labels)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
