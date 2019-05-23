@@ -32,7 +32,7 @@ var _ = Describe("create-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`check-route, domains, map-route, routes, unmap route`))
+			Eventually(session).Should(Say(`check-route, domains, map-route, routes, unmap-route`))
 
 			Eventually(session).Should(Exit(0))
 		})

@@ -20,7 +20,7 @@ type CreateRouteCommand struct {
 	usage           interface{} `usage:"CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo"`
 	Hostname        string      `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path            string      `long:"path" description:"Path for the HTTP route"`
-	relatedCommands interface{} `related_commands:"check-route, domains, map-route, routes, unmap route"`
+	relatedCommands interface{} `related_commands:"check-route, domains, map-route, routes, unmap-route"`
 
 	UI          command.UI
 	Config      command.Config
