@@ -20,7 +20,7 @@ import (
 var _ = Describe("labels command", func() {
 	var (
 		cmd             LabelsCommand
-		fakeLabelActor  *v7fakes.FakeLabelsActor
+		fakeLabelsActor *v7fakes.FakeLabelsActor
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
@@ -30,11 +30,11 @@ var _ = Describe("labels command", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeLabelActor = new(v7fakes.FakeLabelsActor)
+		fakeLabelsActor = new(v7fakes.FakeLabelsActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		cmd = LabelsCommand{
-			Actor:       fakeLabelActor,
+			Actor:       fakeLabelsActor,
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
@@ -56,7 +56,7 @@ var _ = Describe("labels command", func() {
 					ResourceType: "app",
 					ResourceName: "dora",
 				}
-				fakeLabelActor.GetApplicationLabelsReturns(
+				fakeLabelsActor.GetApplicationLabelsReturns(
 					map[string]types.NullString{
 						"some-other-label": types.NewNullString("some-other-value"),
 						"some-label":       types.NewNullString("some-value"),
@@ -83,8 +83,8 @@ var _ = Describe("labels command", func() {
 			})
 
 			It("retrieves the labels associated with the application", func() {
-				Expect(fakeLabelActor.GetApplicationLabelsCallCount()).To(Equal(1))
-				appName, spaceGUID := fakeLabelActor.GetApplicationLabelsArgsForCall(0)
+				Expect(fakeLabelsActor.GetApplicationLabelsCallCount()).To(Equal(1))
+				appName, spaceGUID := fakeLabelsActor.GetApplicationLabelsArgsForCall(0)
 				Expect(appName).To(Equal("dora"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 			})
@@ -97,7 +97,7 @@ var _ = Describe("labels command", func() {
 
 			When("CAPI returns warnings", func() {
 				BeforeEach(func() {
-					fakeLabelActor.GetApplicationLabelsReturns(
+					fakeLabelsActor.GetApplicationLabelsReturns(
 						map[string]types.NullString{
 							"some-other-label": types.NewNullString("some-other-value"),
 							"some-label":       types.NewNullString("some-value"),
@@ -114,7 +114,7 @@ var _ = Describe("labels command", func() {
 
 			When("there is an error retrieving the application", func() {
 				BeforeEach(func() {
-					fakeLabelActor.GetApplicationLabelsReturns(
+					fakeLabelsActor.GetApplicationLabelsReturns(
 						map[string]types.NullString{},
 						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
 						errors.New("boom"))
@@ -162,7 +162,7 @@ var _ = Describe("labels command", func() {
 					ResourceType: "org",
 					ResourceName: "fake-org",
 				}
-				fakeLabelActor.GetOrganizationLabelsReturns(
+				fakeLabelsActor.GetOrganizationLabelsReturns(
 					map[string]types.NullString{
 						"some-other-label": types.NewNullString("some-other-value"),
 						"some-label":       types.NewNullString("some-value"),
@@ -189,7 +189,7 @@ var _ = Describe("labels command", func() {
 			})
 
 			It("retrieves the labels associated with the organization", func() {
-				Expect(fakeLabelActor.GetOrganizationLabelsCallCount()).To(Equal(1))
+				Expect(fakeLabelsActor.GetOrganizationLabelsCallCount()).To(Equal(1))
 			})
 
 			It("displays the labels that are associated with the organization, alphabetically", func() {
@@ -200,7 +200,7 @@ var _ = Describe("labels command", func() {
 
 			When("CAPI returns warnings", func() {
 				BeforeEach(func() {
-					fakeLabelActor.GetOrganizationLabelsReturns(
+					fakeLabelsActor.GetOrganizationLabelsReturns(
 						map[string]types.NullString{
 							"some-other-label": types.NewNullString("some-other-value"),
 							"some-label":       types.NewNullString("some-value"),
@@ -217,7 +217,7 @@ var _ = Describe("labels command", func() {
 
 			When("there is an error retrieving the organization", func() {
 				BeforeEach(func() {
-					fakeLabelActor.GetOrganizationLabelsReturns(
+					fakeLabelsActor.GetOrganizationLabelsReturns(
 						map[string]types.NullString{},
 						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
 						errors.New("boom"))
@@ -266,7 +266,7 @@ var _ = Describe("labels command", func() {
 					ResourceType: "space",
 					ResourceName: "fake-space",
 				}
-				fakeLabelActor.GetSpaceLabelsReturns(
+				fakeLabelsActor.GetSpaceLabelsReturns(
 					map[string]types.NullString{
 						"some-other-label": types.NewNullString("some-other-value"),
 						"some-label":       types.NewNullString("some-value"),
@@ -293,7 +293,7 @@ var _ = Describe("labels command", func() {
 			})
 
 			It("retrieves the labels associated with the space", func() {
-				Expect(fakeLabelActor.GetSpaceLabelsCallCount()).To(Equal(1))
+				Expect(fakeLabelsActor.GetSpaceLabelsCallCount()).To(Equal(1))
 			})
 
 			It("displays the labels that are associated with the space, alphabetically", func() {
@@ -304,7 +304,7 @@ var _ = Describe("labels command", func() {
 
 			When("CAPI returns warnings", func() {
 				BeforeEach(func() {
-					fakeLabelActor.GetSpaceLabelsReturns(
+					fakeLabelsActor.GetSpaceLabelsReturns(
 						map[string]types.NullString{
 							"some-other-label": types.NewNullString("some-other-value"),
 							"some-label":       types.NewNullString("some-value"),
@@ -321,7 +321,7 @@ var _ = Describe("labels command", func() {
 
 			When("there is an error retrieving the space", func() {
 				BeforeEach(func() {
-					fakeLabelActor.GetSpaceLabelsReturns(
+					fakeLabelsActor.GetSpaceLabelsReturns(
 						map[string]types.NullString{},
 						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
 						errors.New("boom"))
