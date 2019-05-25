@@ -64,7 +64,7 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchAppLabels(username)
 	case Org:
 		labels, warnings, err = cmd.fetchOrgLabels(username)
-	case "space":
+	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
