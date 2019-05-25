@@ -41,6 +41,22 @@ type FakeLabelsActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetSpaceLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
+	getSpaceLabelsMutex       sync.RWMutex
+	getSpaceLabelsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getSpaceLabelsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getSpaceLabelsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -178,6 +194,73 @@ func (fake *FakeLabelsActor) GetOrganizationLabelsReturnsOnCall(i int, result1 m
 	}{result1, result2, result3}
 }
 
+func (fake *FakeLabelsActor) GetSpaceLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getSpaceLabelsMutex.Lock()
+	ret, specificReturn := fake.getSpaceLabelsReturnsOnCall[len(fake.getSpaceLabelsArgsForCall)]
+	fake.getSpaceLabelsArgsForCall = append(fake.getSpaceLabelsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceLabels", []interface{}{arg1, arg2})
+	fake.getSpaceLabelsMutex.Unlock()
+	if fake.GetSpaceLabelsStub != nil {
+		return fake.GetSpaceLabelsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSpaceLabelsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeLabelsActor) GetSpaceLabelsCallCount() int {
+	fake.getSpaceLabelsMutex.RLock()
+	defer fake.getSpaceLabelsMutex.RUnlock()
+	return len(fake.getSpaceLabelsArgsForCall)
+}
+
+func (fake *FakeLabelsActor) GetSpaceLabelsCalls(stub func(string, string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getSpaceLabelsMutex.Lock()
+	defer fake.getSpaceLabelsMutex.Unlock()
+	fake.GetSpaceLabelsStub = stub
+}
+
+func (fake *FakeLabelsActor) GetSpaceLabelsArgsForCall(i int) (string, string) {
+	fake.getSpaceLabelsMutex.RLock()
+	defer fake.getSpaceLabelsMutex.RUnlock()
+	argsForCall := fake.getSpaceLabelsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeLabelsActor) GetSpaceLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getSpaceLabelsMutex.Lock()
+	defer fake.getSpaceLabelsMutex.Unlock()
+	fake.GetSpaceLabelsStub = nil
+	fake.getSpaceLabelsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetSpaceLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getSpaceLabelsMutex.Lock()
+	defer fake.getSpaceLabelsMutex.Unlock()
+	fake.GetSpaceLabelsStub = nil
+	if fake.getSpaceLabelsReturnsOnCall == nil {
+		fake.getSpaceLabelsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceLabelsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -185,6 +268,8 @@ func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationLabelsMutex.RUnlock()
 	fake.getOrganizationLabelsMutex.RLock()
 	defer fake.getOrganizationLabelsMutex.RUnlock()
+	fake.getSpaceLabelsMutex.RLock()
+	defer fake.getSpaceLabelsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

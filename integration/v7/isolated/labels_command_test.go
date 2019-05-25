@@ -23,6 +23,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+cf labels app dora`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
+			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, delete-label`))
@@ -126,6 +127,51 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("labels", "org", "non-existent-org")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for org %s as %s...\n\n"), "non-existent-org", username))
 					Eventually(session.Err).Should(Say("Organization 'non-existent-org' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		Describe("space labels", func() {
+			BeforeEach(func() {
+				helpers.TargetOrg(orgName)
+				spaceName = helpers.NewSpaceName()
+				helpers.CreateSpace(spaceName)
+				helpers.TargetOrgAndSpace(orgName, spaceName)
+				helpers.SetupCF(orgName, spaceName)
+			})
+
+			When("there are labels set on the space", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "space", spaceName, "some-other-key=some-other-value", "some-key=some-value")
+					Eventually(session).Should(Exit(0))
+				})
+				It("lists the labels", func() {
+					session := helpers.CF("labels", "space", spaceName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), spaceName, orgName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Eventually(session).Should(Say(`some-key\s+some-value`))
+					Eventually(session).Should(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("there are no labels set on the space", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "space", spaceName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), spaceName, orgName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Eventually(session).Should(Say("No labels found."))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the space does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "space", "non-existent-space")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), "non-existent-space", orgName, username))
+					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
