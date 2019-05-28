@@ -77,4 +77,53 @@ var _ = Describe("Service Broker Actions", func() {
 			})
 		})
 	})
+
+	Describe("CreateServiceBroker", func() {
+		var (
+			warnings       Warnings
+			executionError error
+
+			credentials = ServiceBrokerCredentials{
+				Name:      "name",
+				URL:       "url",
+				Username:  "username",
+				Password:  "password",
+				SpaceGUID: "space-guid",
+			}
+		)
+
+		JustBeforeEach(func() {
+			warnings, executionError = actor.CreateServiceBroker(credentials)
+		})
+
+		When("the client request is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateServiceBrokerReturns(ccv3.Warnings{"some-creation-warning"}, nil)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executionError).NotTo(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("some-creation-warning"))
+			})
+
+			It("passes the service broker credentials to the client", func() {
+				Expect(fakeCloudControllerClient.CreateServiceBrokerCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)).
+					To(Equal(ccv3.ServiceBrokerCredentials(credentials)))
+			})
+		})
+
+		When("the client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateServiceBrokerReturns(ccv3.Warnings{"some-other-warning"}, errors.New("invalid broker"))
+			})
+
+			It("fails and returns warnings", func() {
+				Expect(executionError).To(MatchError("invalid broker"))
+
+				Expect(warnings).To(ConsistOf("some-other-warning"))
+			})
+		})
+	})
 })

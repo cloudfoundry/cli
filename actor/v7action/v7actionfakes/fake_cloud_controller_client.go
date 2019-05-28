@@ -2,11 +2,11 @@
 package v7actionfakes
 
 import (
-	"io"
-	"sync"
+	io "io"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 type FakeCloudControllerClient struct {
@@ -191,6 +191,19 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Route
 		result2 ccv3.Warnings
 		result3 error
+	}
+	CreateServiceBrokerStub        func(ccv3.ServiceBrokerCredentials) (ccv3.Warnings, error)
+	createServiceBrokerMutex       sync.RWMutex
+	createServiceBrokerArgsForCall []struct {
+		arg1 ccv3.ServiceBrokerCredentials
+	}
+	createServiceBrokerReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	createServiceBrokerReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
 	}
 	DeleteApplicationStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteApplicationMutex       sync.RWMutex
@@ -1969,6 +1982,69 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 c
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 ccv3.ServiceBrokerCredentials) (ccv3.Warnings, error) {
+	fake.createServiceBrokerMutex.Lock()
+	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
+	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
+		arg1 ccv3.ServiceBrokerCredentials
+	}{arg1})
+	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1})
+	fake.createServiceBrokerMutex.Unlock()
+	if fake.CreateServiceBrokerStub != nil {
+		return fake.CreateServiceBrokerStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createServiceBrokerReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCallCount() int {
+	fake.createServiceBrokerMutex.RLock()
+	defer fake.createServiceBrokerMutex.RUnlock()
+	return len(fake.createServiceBrokerArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(ccv3.ServiceBrokerCredentials) (ccv3.Warnings, error)) {
+	fake.createServiceBrokerMutex.Lock()
+	defer fake.createServiceBrokerMutex.Unlock()
+	fake.CreateServiceBrokerStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) ccv3.ServiceBrokerCredentials {
+	fake.createServiceBrokerMutex.RLock()
+	defer fake.createServiceBrokerMutex.RUnlock()
+	argsForCall := fake.createServiceBrokerArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerReturns(result1 ccv3.Warnings, result2 error) {
+	fake.createServiceBrokerMutex.Lock()
+	defer fake.createServiceBrokerMutex.Unlock()
+	fake.CreateServiceBrokerStub = nil
+	fake.createServiceBrokerReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.createServiceBrokerMutex.Lock()
+	defer fake.createServiceBrokerMutex.Unlock()
+	fake.CreateServiceBrokerStub = nil
+	if fake.createServiceBrokerReturnsOnCall == nil {
+		fake.createServiceBrokerReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.createServiceBrokerReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) DeleteApplication(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
@@ -6179,6 +6255,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createPackageMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.createServiceBrokerMutex.RLock()
+	defer fake.createServiceBrokerMutex.RUnlock()
 	fake.deleteApplicationMutex.RLock()
 	defer fake.deleteApplicationMutex.RUnlock()
 	fake.deleteApplicationProcessInstanceMutex.RLock()
