@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -108,4 +109,29 @@ func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return ccRoute, response.Warnings, err
+}
+
+func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRoutesRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullRoutesList []Route
+	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
+		if route, ok := item.(Route); ok {
+			fullRoutesList = append(fullRoutesList, route)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Route{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullRoutesList, warnings, err
 }

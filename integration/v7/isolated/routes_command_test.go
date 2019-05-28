@@ -33,8 +33,7 @@ var _ = Describe("routes command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			Skip("this will work when we implement the v7 command")
-			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "routes")
+			helpers.CheckSpaceAndOrgTargetedCorrectly("routes")
 		})
 	})
 

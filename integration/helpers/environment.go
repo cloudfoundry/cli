@@ -28,6 +28,16 @@ func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) 
 	return env
 }
 
+func CheckSpaceAndOrgTargetedCorrectly(command ...string) {
+	LoginCF()
+
+	By("errors if org and space are not targeted")
+	session := CF(command...)
+	Eventually(session).Should(Say("FAILED"))
+	Eventually(session).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
+	Eventually(session).Should(Exit(1))
+}
+
 // CheckEnvironmentTargetedCorrectly will confirm if the command requires an
 // API to be targeted and logged in to run. It can optionally check if the
 // command requires org and space to be targeted.

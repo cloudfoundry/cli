@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -243,6 +244,129 @@ var _ = Describe("Route", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetRoutes", func() {
+		var (
+			query      Query
+			routes     []Route
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			routes, warnings, executeErr = client.GetRoutes(query)
+		})
+
+		When("the request succeeds", func() {
+			var (
+				response1 string
+				response2 string
+			)
+
+			BeforeEach(func() {
+				response1 = fmt.Sprintf(`
+				{
+					"pagination": {
+						"next": {
+							"href": "%s/v3/routes?page=2"
+						}
+					},
+					"resources": [
+						{
+							"guid": "route-1-guid"
+						},
+						{
+							"guid": "route-2-guid"
+						}
+					]
+				}`, server.URL())
+
+				response2 = `
+				{
+					"pagination": {
+						"next": null
+					},
+					"resources": [
+						{
+							"guid": "route-3-guid"
+						}
+					]
+				}`
+			})
+
+			When("not passing any filters", func() {
+				BeforeEach(func() {
+					query = Query{}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/routes"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/routes", "page=2"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("returns the given route and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(routes).To(Equal([]Route{
+						Route{
+							GUID: "route-1-guid",
+						},
+						Route{
+							GUID: "route-2-guid",
+						},
+						Route{
+							GUID: "route-3-guid",
+						},
+					}))
+				})
+			})
+
+			When("passing in a query", func() {
+				BeforeEach(func() {
+					query = Query{Key: "space_guids", Values: []string{"guid1", "guid2"}}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/routes", "space_guids=guid1,guid2"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/routes", "page=2", "space_guids=guid1,guid2"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("passes query params", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(routes).To(Equal([]Route{
+						Route{
+							GUID: "route-1-guid",
+						},
+						Route{
+							GUID: "route-2-guid",
+						},
+						Route{
+							GUID: "route-3-guid",
+						},
+					}))
+				})
 			})
 		})
 	})

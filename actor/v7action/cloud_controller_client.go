@@ -56,6 +56,7 @@ type CloudControllerClient interface {
 	GetOrganizations(query ...ccv3.Query) ([]ccv3.Organization, ccv3.Warnings, error)
 	GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error)
 	GetPackages(query ...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error)
+	GetRoutes(query ...ccv3.Query) ([]ccv3.Route, ccv3.Warnings, error)
 	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
 	GetServiceBrokers() ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)

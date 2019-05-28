@@ -3,8 +3,6 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/types"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -18,19 +16,19 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("domains Command", func() {
+var _ = Describe("routes Command", func() {
 	var (
-		cmd             DomainsCommand
+		cmd             RoutesCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDomainsActor
+		fakeActor       *v7fakes.FakeRoutesActor
 		executeErr      error
 		args            []string
 		binaryName      string
 	)
 
-	const tableHeaders = `name\s+availability\s+internal`
+	const tableHeaders = `space\s+host\s+domain\s+path`
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(args)
@@ -40,10 +38,10 @@ var _ = Describe("domains Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeDomainsActor)
+		fakeActor = new(v7fakes.FakeRoutesActor)
 		args = nil
 
-		cmd = DomainsCommand{
+		cmd = RoutesCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
@@ -66,7 +64,7 @@ var _ = Describe("domains Command", func() {
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 				Expect(checkTargetedOrg).To(BeTrue())
-				Expect(checkTargetedSpace).To(BeFalse())
+				Expect(checkTargetedSpace).To(BeTrue())
 			})
 		})
 
@@ -79,7 +77,7 @@ var _ = Describe("domains Command", func() {
 				Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 				Expect(checkTargetedOrg).To(BeTrue())
-				Expect(checkTargetedSpace).To(BeFalse())
+				Expect(checkTargetedSpace).To(BeTrue())
 			})
 		})
 	})
@@ -89,13 +87,13 @@ var _ = Describe("domains Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
-		When("DomainsActor returns an error", func() {
+		When("RoutesActor returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
 				warnings := v7action.Warnings{"warning-1", "warning-2"}
 				expectedErr = errors.New("some-error")
-				fakeActor.GetOrganizationDomainsReturns(nil, warnings, expectedErr)
+				fakeActor.GetRoutesBySpaceReturns(nil, warnings, expectedErr)
 			})
 
 			It("prints that error with warnings", func() {
@@ -107,18 +105,18 @@ var _ = Describe("domains Command", func() {
 			})
 		})
 
-		When("GetDomains returns some domains", func() {
-			var domains []v7action.Domain
+		When("GetRoutesBySpace returns some routes", func() {
+			var routes []v7action.Route
 
 			BeforeEach(func() {
-				domains = []v7action.Domain{
-					{Name: "domain1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: true}},
-					{Name: "domain3", GUID: "domain-guid-3", Internal: types.NullBool{IsSet: false, Value: false}, OrganizationGUID: "owning-org-guid"},
-					{Name: "domain2", GUID: "domain-guid-2", Internal: types.NullBool{IsSet: true, Value: false}},
+				routes = []v7action.Route{
+					{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
+					{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-2", Path: "/path/2"},
+					{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-3"},
 				}
 
-				fakeActor.GetOrganizationDomainsReturns(
-					domains,
+				fakeActor.GetRoutesBySpaceReturns(
+					routes,
 					v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
 					nil,
 				)
@@ -127,10 +125,15 @@ var _ = Describe("domains Command", func() {
 					GUID: "some-org-guid",
 					Name: "some-org",
 				})
+
+				fakeConfig.TargetedSpaceReturns(configv3.Space{
+					GUID: "some-space-guid",
+					Name: "some-space",
+				})
 			})
 
-			It("asks the DomainsActor for a list of domains", func() {
-				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
+			It("asks the RoutesActor for a list of routes", func() {
+				Expect(fakeActor.GetRoutesBySpaceCallCount()).To(Equal(1))
 			})
 
 			It("prints warnings", func() {
@@ -139,27 +142,27 @@ var _ = Describe("domains Command", func() {
 				Expect(testUI.Err).To(Say("actor-warning-3"))
 			})
 
-			It("prints the list of domains in alphabetical order", func() {
+			It("prints the list of routes", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(testUI.Out).To(Say(tableHeaders))
-				Expect(testUI.Out).To(Say(`domain1\s+shared\s+true`))
-				Expect(testUI.Out).To(Say(`domain2\s+shared`))
-				Expect(testUI.Out).To(Say(`domain3\s+private`))
+				Expect(testUI.Out).To(Say(`space-1\s+domain1`))
+				Expect(testUI.Out).To(Say(`space-2\s+host-2\s+domain2\s+\/path\/2`))
+				Expect(testUI.Out).To(Say(`space-3\s+host-3\s+domain3`))
 			})
 
 			It("prints the flavor text", func() {
-				Expect(testUI.Out).To(Say("Getting domains in org some-org as banana...\n\n"))
+				Expect(testUI.Out).To(Say("Getting routes for org some-org / space some-space as banana...\n\n"))
 			})
 		})
 
-		When("GetDomains returns no domains", func() {
-			var domains []v7action.Domain
+		When("GetRoutesBySpace returns no routes", func() {
+			var routes []v7action.Route
 
 			BeforeEach(func() {
-				domains = []v7action.Domain{}
+				routes = []v7action.Route{}
 
-				fakeActor.GetOrganizationDomainsReturns(
-					domains,
+				fakeActor.GetRoutesBySpaceReturns(
+					routes,
 					v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
 					nil,
 				)
@@ -168,10 +171,14 @@ var _ = Describe("domains Command", func() {
 					GUID: "some-org-guid",
 					Name: "some-org",
 				})
+				fakeConfig.TargetedSpaceReturns(configv3.Space{
+					GUID: "some-space-guid",
+					Name: "some-space",
+				})
 			})
 
-			It("asks the DomainsActor for a list of domains", func() {
-				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
+			It("asks the RoutesActor for a list of routes", func() {
+				Expect(fakeActor.GetRoutesBySpaceCallCount()).To(Equal(1))
 			})
 
 			It("prints warnings", func() {
@@ -184,13 +191,13 @@ var _ = Describe("domains Command", func() {
 				Expect(testUI.Out).NotTo(Say(tableHeaders))
 			})
 
-			It("prints a message indicating that no domains were found", func() {
+			It("prints a message indicating that no routes were found", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Out).To(Say("No domains found."))
+				Expect(testUI.Out).To(Say("No routes found."))
 			})
 
 			It("prints the flavor text", func() {
-				Expect(testUI.Out).To(Say("Getting domains in org some-org as banana...\n\n"))
+				Expect(testUI.Out).To(Say("Getting routes for org some-org / space some-space as banana...\n\n"))
 			})
 		})
 	})
