@@ -457,8 +457,6 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (b
 		cmd.ProgressBar.Complete()
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
-	case v7pushaction.CreatingDroplet:
-		cmd.UI.DisplayText("Creating droplet...")
 	case v7pushaction.UploadingDroplet:
 		cmd.UI.DisplayText("Uploading droplet bits...")
 		cmd.ProgressBar.Ready()

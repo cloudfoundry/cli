@@ -44,6 +44,7 @@ func (actor Actor) CreateDropletForApplication(pushPlan PushPlan, eventStream ch
 		if e, ok := err.(ccerror.PipeSeekError); ok {
 			return pushPlan, allWarnings, actionerror.UploadFailedError{Err: e.Err}
 		}
+		eventStream <- UploadDropletComplete
 
 		return pushPlan, allWarnings, err
 	}

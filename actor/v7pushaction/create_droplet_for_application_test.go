@@ -149,6 +149,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 					CreatingDroplet,
 					ReadingArchive,
 					UploadingDroplet,
+					UploadDropletComplete,
 				}))
 			})
 

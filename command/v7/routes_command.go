@@ -15,8 +15,9 @@ type RoutesActor interface {
 }
 
 type RoutesCommand struct {
-	usage           interface{} `usage:"CF_NAME routes"`
+	usage           interface{} `usage:"CF_NAME routes [--orglevel]"`
 	relatedCommands interface{} `related_commands:"check-route, domains, map-route, unmap-route"`
+	Orglevel        bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
 
 	UI          command.UI
 	Config      command.Config

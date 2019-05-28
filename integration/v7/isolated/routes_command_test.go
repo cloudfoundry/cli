@@ -33,7 +33,7 @@ var _ = Describe("routes command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckSpaceAndOrgTargetedCorrectly("routes")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "routes")
 		})
 	})
 
@@ -92,26 +92,26 @@ var _ = Describe("routes command", func() {
 
 			It("lists all the routes", func() {
 				session := helpers.CF("routes")
-				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s \.\.\.`, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
 				Eventually(session).Should(Exit(0))
 			})
 
-			When("fetching routes by org", func() {
-				It("lists all the routes in the org", func() {
-					session := helpers.CF("routes", "--orglevel")
-					Eventually(session).Should(Say(`Getting routes for org %s as %s \.\.\.`, orgName, userName))
-					Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
-					Eventually(session).Should(Say(`%s\s+route2\s+%s`, otherSpaceName, domainName))
-					Eventually(session).Should(Exit(0))
-				})
-			})
+			//When("fetching routes by org", func() {
+			//	It("lists all the routes in the org", func() {
+			//		session := helpers.CF("routes", "--orglevel")
+			//		Eventually(session).Should(Say(`Getting routes for org %s as %s \.\.\.`, orgName, userName))
+			//		Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
+			//		Eventually(session).Should(Say(`%s\s+route2\s+%s`, otherSpaceName, domainName))
+			//		Eventually(session).Should(Exit(0))
+			//	})
+			//})
 		})
 
 		When("no routes exist", func() {
 			It("outputs a message about no routes existing", func() {
 				session := helpers.CF("routes")
-				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s \.\.\.`, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Eventually(session).Should(Say("No routes found"))
 				Eventually(session).Should(Exit(0))
 			})
