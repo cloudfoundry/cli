@@ -50,9 +50,15 @@ var _ = Describe("SpaceSummary", func() {
 									"updated_at": "some time",
 									"created_at": "some time"
 							 },
+							 "maintenance_info": {
+							   "version": "2.0.0"
+						   },
 							 "service_plan": {
 									"guid": "plan-guid",
 									"name": "simple-plan",
+									"maintenance_info": {
+									  "version": "3.0.0"
+									},
 									"service": {
 										 "guid": "service-guid",
 										 "label": "service-label"
@@ -82,9 +88,15 @@ var _ = Describe("SpaceSummary", func() {
 					ServiceInstances: []SpaceSummaryServiceInstance{
 						{
 							Name: "service-instance-name",
+							MaintenanceInfo: MaintenanceInfo{
+								Version: "2.0.0",
+							},
 							ServicePlan: SpaceSummaryServicePlan{
 								GUID: "plan-guid",
 								Name: "simple-plan",
+								MaintenanceInfo: MaintenanceInfo{
+									Version: "3.0.0",
+								},
 								Service: SpaceSummaryService{
 									GUID:  "service-guid",
 									Label: "service-label",

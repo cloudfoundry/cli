@@ -138,8 +138,16 @@ var _ = Describe("services Command", func() {
 										State: "some-state",
 									},
 									Type: constant.ManagedService,
+									MaintenanceInfo: ccv2.MaintenanceInfo{
+										Version: "2.0.0",
+									},
 								},
-								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
+								ServicePlan: v2action.ServicePlan{
+									Name: "some-plan",
+									MaintenanceInfo: ccv2.MaintenanceInfo{
+										Version: "3.0.0",
+									},
+								},
 								Service: v2action.Service{
 									Label:             "some-service-1",
 									ServiceBrokerName: "broker-1",
@@ -159,6 +167,15 @@ var _ = Describe("services Command", func() {
 								ServiceInstance: v2action.ServiceInstance{
 									Name: "instance-2",
 									Type: constant.ManagedService,
+									MaintenanceInfo: ccv2.MaintenanceInfo{
+										Version: "2.0.0",
+									},
+								},
+								ServicePlan: v2action.ServicePlan{
+									Name: "some-plan",
+									MaintenanceInfo: ccv2.MaintenanceInfo{
+										Version: "2.0.0",
+									},
 								},
 								Service: v2action.Service{
 									Label:             "some-service-2",
@@ -171,14 +188,13 @@ var _ = Describe("services Command", func() {
 					)
 				})
 
-				It("displays all the services and apps in alphanumeric sorted order together with the org & space & warnings", func() {
+				It("displays all the services and apps in alphanumeric sorted order together with the org & space & warnings & upgrades", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Getting services in org %s / space %s as %s...", "some-org",
-						"some-space", fakeUser.Name))
-					Expect(testUI.Out).To(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker`))
-					Expect(testUI.Out).To(Say(`instance-1\s+some-service-1\s+some-plan\s+app-1, app-2\s+some-type some-state\s+broker-1`))
-					Expect(testUI.Out).To(Say(`instance-2\s+some-service-2\s+broker-2`))
-					Expect(testUI.Out).To(Say(`instance-3\s+user-provided\s+`))
+					Expect(testUI.Out).To(Say("Getting services in org %s / space %s as %s...", "some-org", "some-space", fakeUser.Name))
+					Expect(testUI.Out).To(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available`))
+					Expect(testUI.Out).To(Say(`instance-1\s+some-service-1\s+some-plan\s+app-1, app-2\s+some-type some-state\s+broker-1\s+yes`))
+					Expect(testUI.Out).To(Say(`instance-2\s+some-service-2\s+some-plan\s+broker-2\s+no`))
+					Expect(testUI.Out).To(Say(`instance-3\s+user-provided\s+$`))
 					Expect(testUI.Err).To(Say("get-summary-warnings"))
 				})
 			})

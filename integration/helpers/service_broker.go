@@ -59,8 +59,9 @@ type ServiceBroker struct {
 			RedirectUri string `json:"redirect_uri"`
 		}
 	}
-	SyncPlans  []Plan
-	AsyncPlans []Plan
+	SyncPlans              []Plan
+	AsyncPlans             []Plan
+	MaintenanceInfoVersion string
 }
 
 // NewServiceBroker constructs a new ServiceBroker with given attributes. planName will be used
@@ -86,6 +87,7 @@ func NewServiceBroker(name string, path string, appsDomain string, serviceName s
 	b.Service.DashboardClient.ID = RandomName()
 	b.Service.DashboardClient.Secret = RandomName()
 	b.Service.DashboardClient.RedirectUri = RandomName()
+	b.MaintenanceInfoVersion = "1.2.3"
 	return b
 }
 
@@ -112,6 +114,7 @@ func NewAsynchServiceBroker(name string, path string, appsDomain string, service
 	b.Service.DashboardClient.ID = RandomName()
 	b.Service.DashboardClient.Secret = RandomName()
 	b.Service.DashboardClient.RedirectUri = RandomName()
+	b.MaintenanceInfoVersion = "1.2.3"
 	return b
 }
 
@@ -146,6 +149,12 @@ func (b ServiceBroker) Configure(shareable bool) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
 	defer resp.Body.Close()
+}
+
+func (b ServiceBroker) UpdateMaintenanceInfo(version string) {
+	b.MaintenanceInfoVersion = version
+	b.Configure(true)
+	b.Update()
 }
 
 // Create creates a service broker with 'cf create-service-broker' and asserts that it exists.
@@ -204,6 +213,7 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 		"\"<shareable-service>\"", fmt.Sprintf("%t", shareable),
 		"\"<bindable>\"", fmt.Sprintf("%t", b.Service.Bindable),
 		"\"<requires>\"", b.Service.Requires,
+		"<fake-maintenance-info-version>", b.MaintenanceInfoVersion,
 	)
 
 	return replacer.Replace(string(bytes))

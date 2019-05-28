@@ -49,6 +49,16 @@ func (s ServiceInstanceSummary) IsSharedTo() bool {
 	return s.ServiceInstanceShareType == ServiceInstanceIsSharedTo
 }
 
+func (s ServiceInstanceSummary) UpgradeAvailable() string {
+	if s.ServicePlan.MaintenanceInfo.Version == "" {
+		return ""
+	}
+	if s.ServicePlan.MaintenanceInfo.Version == s.ServiceInstance.MaintenanceInfo.Version {
+		return "no"
+	}
+	return "yes"
+}
+
 type BoundApplication struct {
 	AppName            string
 	LastOperation      LastOperation
@@ -90,10 +100,12 @@ func (actor Actor) GetServiceInstancesSummaryBySpace(spaceGUID string) ([]Servic
 
 		instanceSummary.Name = serviceInstance.Name
 		instanceSummary.ServicePlan.Name = serviceInstance.ServicePlan.Name
+		instanceSummary.ServicePlan.MaintenanceInfo = serviceInstance.ServicePlan.MaintenanceInfo
 		instanceSummary.Service.Label = serviceInstance.ServicePlan.Service.Label
 		instanceSummary.LastOperation = serviceInstance.LastOperation
 		instanceSummary.Service.ServiceBrokerName = serviceGUIDToBrokerName[serviceInstance.ServicePlan.Service.GUID]
 		instanceSummary.ServiceInstance.Type = discoverServiceInstanceType(serviceInstance)
+		instanceSummary.ServiceInstance.MaintenanceInfo = serviceInstance.MaintenanceInfo
 		instanceSummary.BoundApplications = findServiceInstanceBoundApplications(serviceInstance.Name, spaceSummary.Applications)
 
 		serviceInstanceSummaries = append(serviceInstanceSummaries, instanceSummary)

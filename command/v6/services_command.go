@@ -81,6 +81,7 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		cmd.UI.TranslateText("bound apps"),
 		cmd.UI.TranslateText("last operation"),
 		cmd.UI.TranslateText("broker"),
+		cmd.UI.TranslateText("upgrade available"),
 	}}
 
 	var boundAppNames []string
@@ -96,13 +97,17 @@ func (cmd ServicesCommand) Execute(args []string) error {
 			boundAppNames = append(boundAppNames, boundApplication.AppName)
 		}
 
-		table = append(table, []string{
-			summary.Name,
-			serviceLabel,
-			summary.ServicePlan.Name,
-			strings.Join(boundAppNames, ", "),
-			fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State),
-			summary.Service.ServiceBrokerName},
+		table = append(
+			table,
+			[]string{
+				summary.Name,
+				serviceLabel,
+				summary.ServicePlan.Name,
+				strings.Join(boundAppNames, ", "),
+				fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State),
+				summary.Service.ServiceBrokerName,
+				summary.UpgradeAvailable(),
+			},
 		)
 	}
 	cmd.UI.DisplayTableWithHeader("", table, 3)

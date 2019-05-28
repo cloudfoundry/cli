@@ -48,6 +48,9 @@ type ServiceInstance struct {
 	// LastOperation is the status of the last operation requested on the service
 	// instance.
 	LastOperation LastOperation
+
+	// MaintenanceInfo is the maintenance version of this service instance
+	MaintenanceInfo MaintenanceInfo
 }
 
 // Managed returns true if the Service Instance is a managed service.
@@ -60,15 +63,16 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	var ccServiceInstance struct {
 		Metadata internal.Metadata
 		Entity   struct {
-			Name            string        `json:"name"`
-			SpaceGUID       string        `json:"space_guid"`
-			ServiceGUID     string        `json:"service_guid"`
-			ServicePlanGUID string        `json:"service_plan_guid"`
-			Type            string        `json:"type"`
-			Tags            []string      `json:"tags"`
-			DashboardURL    string        `json:"dashboard_url"`
-			RouteServiceURL string        `json:"route_service_url"`
-			LastOperation   LastOperation `json:"last_operation"`
+			Name            string          `json:"name"`
+			SpaceGUID       string          `json:"space_guid"`
+			ServiceGUID     string          `json:"service_guid"`
+			ServicePlanGUID string          `json:"service_plan_guid"`
+			Type            string          `json:"type"`
+			Tags            []string        `json:"tags"`
+			DashboardURL    string          `json:"dashboard_url"`
+			RouteServiceURL string          `json:"route_service_url"`
+			LastOperation   LastOperation   `json:"last_operation"`
+			MaintenanceInfo MaintenanceInfo `json:"maintenance_info"`
 		}
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccServiceInstance)
@@ -86,6 +90,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.DashboardURL = ccServiceInstance.Entity.DashboardURL
 	serviceInstance.RouteServiceURL = ccServiceInstance.Entity.RouteServiceURL
 	serviceInstance.LastOperation = ccServiceInstance.Entity.LastOperation
+	serviceInstance.MaintenanceInfo = ccServiceInstance.Entity.MaintenanceInfo
 	return nil
 }
 

@@ -12,6 +12,7 @@ const (
 	MinVersionMultiServiceRegistrationV2             = "2.125.0"
 	MinVersionUpdateServiceNameWhenPlanNotVisibleV2  = "2.131.0"
 	MinVersionUpdateServiceInstanceMaintenanceInfoV2 = "2.135.0"
+	MinVersionMaintenanceInfoInSummaryV2             = "2.137.0"
 
 	MinVersionShareServiceV3     = "3.36.0"
 	MinVersionZeroDowntimePushV3 = "3.57.0"
