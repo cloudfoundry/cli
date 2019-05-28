@@ -181,6 +181,19 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	RestartApplicationStub        func(string) (v7action.Warnings, error)
+	restartApplicationMutex       sync.RWMutex
+	restartApplicationArgsForCall []struct {
+		arg1 string
+	}
+	restartApplicationReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	restartApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	ScaleProcessByApplicationStub        func(string, v7action.Process) (v7action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
@@ -1075,6 +1088,69 @@ func (fake *FakeV7Actor) ResourceMatchReturnsOnCall(i int, result1 []sharedactio
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) RestartApplication(arg1 string) (v7action.Warnings, error) {
+	fake.restartApplicationMutex.Lock()
+	ret, specificReturn := fake.restartApplicationReturnsOnCall[len(fake.restartApplicationArgsForCall)]
+	fake.restartApplicationArgsForCall = append(fake.restartApplicationArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("RestartApplication", []interface{}{arg1})
+	fake.restartApplicationMutex.Unlock()
+	if fake.RestartApplicationStub != nil {
+		return fake.RestartApplicationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.restartApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) RestartApplicationCallCount() int {
+	fake.restartApplicationMutex.RLock()
+	defer fake.restartApplicationMutex.RUnlock()
+	return len(fake.restartApplicationArgsForCall)
+}
+
+func (fake *FakeV7Actor) RestartApplicationCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.restartApplicationMutex.Lock()
+	defer fake.restartApplicationMutex.Unlock()
+	fake.RestartApplicationStub = stub
+}
+
+func (fake *FakeV7Actor) RestartApplicationArgsForCall(i int) string {
+	fake.restartApplicationMutex.RLock()
+	defer fake.restartApplicationMutex.RUnlock()
+	argsForCall := fake.restartApplicationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeV7Actor) RestartApplicationReturns(result1 v7action.Warnings, result2 error) {
+	fake.restartApplicationMutex.Lock()
+	defer fake.restartApplicationMutex.Unlock()
+	fake.RestartApplicationStub = nil
+	fake.restartApplicationReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) RestartApplicationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.restartApplicationMutex.Lock()
+	defer fake.restartApplicationMutex.Unlock()
+	fake.RestartApplicationStub = nil
+	if fake.restartApplicationReturnsOnCall == nil {
+		fake.restartApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.restartApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 v7action.Process) (v7action.Warnings, error) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
@@ -1767,6 +1843,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.pollPackageMutex.RUnlock()
 	fake.resourceMatchMutex.RLock()
 	defer fake.resourceMatchMutex.RUnlock()
+	fake.restartApplicationMutex.RLock()
+	defer fake.restartApplicationMutex.RUnlock()
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()

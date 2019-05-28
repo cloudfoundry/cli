@@ -219,28 +219,44 @@ func (cmd PushCommand) Execute(args []string) error {
 	for _, plan := range pushPlans {
 		log.WithField("app_name", plan.Application.Name).Info("actualizing")
 		planStream, eventStream, warningsStream, errorStream := cmd.Actor.Actualize(plan, cmd.ProgressBar)
-		updatedPlan, err := cmd.processApplyStreams(plan.Application.Name, planStream, eventStream, warningsStream, errorStream)
-		if err != nil {
-			return err
-		}
+		err := cmd.processApplyStreams(plan.Application.Name, planStream, eventStream, warningsStream, errorStream)
 
-		anyProcessCrashed, err := cmd.appRestarter(plan.Application.Name, updatedPlan.Application.GUID)
-		if err != nil {
-			return err
-		}
-		err = cmd.displayAppSummary(plan)
-		if err != nil {
-			return err
-		}
-		if anyProcessCrashed {
-			return translatableerror.ApplicationUnableToStartError{
-				AppName:    plan.Application.Name,
-				BinaryName: cmd.Config.BinaryName(),
+		if cmd.shouldDisplaySummary(err) {
+			summaryErr := cmd.displayAppSummary(plan)
+			if summaryErr != nil {
+				return summaryErr
 			}
+		}
+		if err != nil {
+			return cmd.mapErr(plan.Application.Name, err)
 		}
 	}
 
 	return nil
+}
+
+func (cmd PushCommand) shouldDisplaySummary(err error) bool {
+	if err == nil {
+		return true
+	}
+	_, ok := err.(actionerror.AllInstancesCrashedError)
+	return ok
+}
+
+func (cmd PushCommand) mapErr(appName string, err error) error {
+	switch err.(type) {
+	case actionerror.AllInstancesCrashedError:
+		return translatableerror.ApplicationUnableToStartError{
+			AppName:    appName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	case actionerror.StartupTimeoutError:
+		return translatableerror.StartupTimeoutError{
+			AppName:    appName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	}
+	return err
 }
 
 func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
@@ -258,33 +274,6 @@ func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
 	} else {
 		cmd.UI.DisplayTextWithFlavor(plural, tokens)
 	}
-}
-
-func (cmd PushCommand) appRestarter(appName, appGUID string) (bool, error) {
-	anyProcessCrashed := false
-	if !cmd.NoStart {
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayTextWithFlavor(
-			"Waiting for app {{.AppName}} to start...",
-			map[string]interface{}{
-				"AppName": appName,
-			},
-		)
-		warnings, restartErr := cmd.VersionActor.RestartApplication(appGUID)
-		cmd.UI.DisplayWarnings(warnings)
-
-		if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
-			return anyProcessCrashed, translatableerror.StartupTimeoutError{
-				AppName:    appName,
-				BinaryName: cmd.Config.BinaryName(),
-			}
-		} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
-			anyProcessCrashed = true
-		} else if restartErr != nil {
-			return anyProcessCrashed, restartErr
-		}
-	}
-	return anyProcessCrashed, nil
 }
 
 func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
@@ -374,13 +363,12 @@ func (cmd PushCommand) processApplyStreams(
 	eventStream <-chan v7pushaction.Event,
 	warningsStream <-chan v7pushaction.Warnings,
 	errorStream <-chan error,
-) (v7pushaction.PushPlan, error) {
+) error {
 	var planClosed, eventClosed, warningsClosed, errClosed, complete bool
-	var updatePlan v7pushaction.PushPlan
 
 	for {
 		select {
-		case plan, ok := <-planStream:
+		case _, ok := <-planStream:
 			if !ok {
 				if !planClosed {
 					log.Debug("processing config stream closed")
@@ -388,7 +376,6 @@ func (cmd PushCommand) processApplyStreams(
 				planClosed = true
 				break
 			}
-			updatePlan = plan
 		case event, ok := <-eventStream:
 			if !ok {
 				if !eventClosed {
@@ -400,7 +387,7 @@ func (cmd PushCommand) processApplyStreams(
 			var err error
 			complete, err = cmd.processEvent(event, appName)
 			if err != nil {
-				return v7pushaction.PushPlan{}, err
+				return err
 			}
 		case warnings, ok := <-warningsStream:
 			if !ok {
@@ -419,7 +406,7 @@ func (cmd PushCommand) processApplyStreams(
 				errClosed = true
 				break
 			}
-			return v7pushaction.PushPlan{}, err
+			return err
 		}
 
 		if planClosed && eventClosed && warningsClosed && complete {
@@ -427,7 +414,7 @@ func (cmd PushCommand) processApplyStreams(
 		}
 	}
 
-	return updatePlan, nil
+	return nil
 }
 
 func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (bool, error) {
@@ -483,6 +470,14 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (b
 		go cmd.getLogs(logStream, errStream)
 	case v7pushaction.StagingComplete:
 		cmd.NOAAClient.Close()
+	case v7pushaction.RestartingApplication:
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayTextWithFlavor(
+			"Waiting for app {{.AppName}} to start...",
+			map[string]interface{}{
+				"AppName": appName,
+			},
+		)
 	case v7pushaction.Complete:
 		return true, nil
 	default:

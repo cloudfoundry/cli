@@ -43,7 +43,7 @@ var _ = Describe("Actor", func() {
 				plan = PushPlan{}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including updating the routes for the app", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.UpdateRoutesForApplication))
 			})
 		})
@@ -56,7 +56,7 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including scaling web process", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.ScaleWebProcessForApplication))
 			})
 		})
@@ -69,7 +69,7 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including updating a web process", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.UpdateWebProcessForApplication))
 			})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including creating a bits package", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.CreateBitsPackageForApplication))
 			})
 		})
@@ -99,7 +99,7 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including creating a docker package", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.CreateDockerPackageForApplication))
 			})
 		})
@@ -111,7 +111,7 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including creating a droplet", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.CreateDropletForApplication))
 			})
 		})
@@ -127,8 +127,8 @@ var _ = Describe("Actor", func() {
 				plan = PushPlan{}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
-				Expect(sequence).To(matchers.MatchFuncsByName(actor.StagePackageForApplication, actor.SetDropletForApplication))
+			It("returns a sequence including staging, setting the droplet, and restarting", func() {
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.StagePackageForApplication, actor.SetDropletForApplication, actor.RestartApplication))
 			})
 		})
 
@@ -140,7 +140,7 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
+			It("returns a sequence including stopping the application", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.StopApplication))
 			})
 		})
@@ -152,8 +152,8 @@ var _ = Describe("Actor", func() {
 				}
 			})
 
-			It("returns a sequence including UpdateApplication", func() {
-				Expect(sequence).To(matchers.MatchFuncsByName(actor.SetDropletForApplication))
+			It("returns a sequence including setting the droplet and restarting", func() {
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.SetDropletForApplication, actor.RestartApplication))
 			})
 		})
 	})

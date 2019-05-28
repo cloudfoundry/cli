@@ -21,6 +21,7 @@ type V7Actor interface {
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)
 	ResourceMatch(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)
+	RestartApplication(appGUID string) (v7action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	SetApplicationManifest(appGUID string, rawManifest []byte) (v7action.Warnings, error)

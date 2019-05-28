@@ -19,6 +19,8 @@ const (
 	PollingBuild                    Event = "polling build"
 	ReadingArchive                  Event = "reading archive"
 	ResourceMatching                Event = "resource matching"
+	RestartingApplication           Event = "restarting application"
+	RestartingApplicationComplete   Event = "restarting application complete"
 	RetryUpload                     Event = "retry upload"
 	ScaleWebProcess                 Event = "scaling the web process"
 	ScaleWebProcessComplete         Event = "scaling the web process complete"

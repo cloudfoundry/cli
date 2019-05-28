@@ -26,12 +26,13 @@ var _ = Describe("Actor", func() {
 			}
 		})
 
-		It("returns a sequence including UpdateApplication", func() {
+		It("returns a sequence including the required functions from all three sequences", func() {
 			Expect(actor.ChangeApplicationSequence(plan)).To(matchers.MatchFuncsByName(
 				actor.UpdateApplication,
 				actor.CreateBitsPackageForApplication,
 				actor.StagePackageForApplication,
 				actor.SetDropletForApplication,
+				actor.RestartApplication,
 			))
 		})
 	})

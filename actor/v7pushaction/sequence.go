@@ -42,6 +42,10 @@ func ShouldSetDroplet(plan PushPlan) bool {
 	return !plan.NoStart || plan.DropletPath != ""
 }
 
+func ShouldRestart(plan PushPlan) bool {
+	return !plan.NoStart
+}
+
 func (actor Actor) GetUpdateSequence(plan PushPlan) []ChangeApplicationFunc {
 	var updateSequence []ChangeApplicationFunc
 
@@ -90,6 +94,10 @@ func (actor Actor) GetRuntimeSequence(plan PushPlan) []ChangeApplicationFunc {
 
 	if ShouldSetDroplet(plan) {
 		runtimeSequence = append(runtimeSequence, actor.SetDropletForApplication)
+	}
+
+	if ShouldRestart(plan) {
+		runtimeSequence = append(runtimeSequence, actor.RestartApplication)
 	}
 
 	return runtimeSequence

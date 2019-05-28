@@ -430,6 +430,9 @@ var _ = Describe("push Command", func() {
 														{
 															Event: v7pushaction.UploadWithArchiveComplete,
 														},
+														{
+															Event: v7pushaction.RestartingApplication,
+														},
 													}, v7pushaction.PushPlan{})
 												})
 
@@ -552,135 +555,101 @@ var _ = Describe("push Command", func() {
 												})
 											})
 
-											When("user does not request --no-start", func() {
+											When("when getting the application summary succeeds", func() {
 												BeforeEach(func() {
-													cmd.NoStart = false
+													summary := v7action.ApplicationSummary{
+														Application:      v7action.Application{},
+														CurrentDroplet:   v7action.Droplet{},
+														ProcessSummaries: v7action.ProcessSummaries{},
+													}
+													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
+													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
 												})
 
-												When("restarting the app succeeds", func() {
-													BeforeEach(func() {
-														fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, nil)
-													})
-
-													It("restarts the app and displays warnings", func() {
-														Expect(executeErr).ToNot(HaveOccurred())
-
-														Expect(testUI.Err).To(Say("some-restart-warning"))
-
-														Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(2))
-														Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
-														Expect(fakeVersionActor.RestartApplicationArgsForCall(1)).To(Equal("potato"))
-													})
-
-													When("when getting the application summary succeeds", func() {
-														BeforeEach(func() {
-															summary := v7action.ApplicationSummary{
-																Application:      v7action.Application{},
-																CurrentDroplet:   v7action.Droplet{},
-																ProcessSummaries: v7action.ProcessSummaries{},
-															}
-															fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
-															fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
-														})
-
-														// TODO: Don't test the shared.AppSummaryDisplayer.AppDisplay method.
-														// Use DI to pass in a new AppSummaryDisplayer to the Command instead.
-														It("displays the app summary", func() {
-															Expect(executeErr).ToNot(HaveOccurred())
-															Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(2))
-														})
-
-													})
-
-													When("getting the application summary fails", func() {
-														BeforeEach(func() {
-															fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(
-																v7action.ApplicationSummary{},
-																v7action.Warnings{"get-application-summary-warnings"},
-																errors.New("get-application-summary-error"),
-															)
-														})
-
-														It("does not display the app summary", func() {
-															Expect(testUI.Out).ToNot(Say(`requested state:`))
-														})
-
-														It("returns the error from GetApplicationSummaryByNameAndSpace", func() {
-															Expect(executeErr).To(MatchError("get-application-summary-error"))
-														})
-
-														It("prints the warnings", func() {
-															Expect(testUI.Err).To(Say("get-application-summary-warnings"))
-														})
-													})
-
-												})
-
-												When("restarting the app fails", func() {
-													When("restarting fails in a generic way", func() {
-														BeforeEach(func() {
-															fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
-														})
-
-														It("returns an error and any warnings", func() {
-															Expect(executeErr).To(MatchError("restart failure"))
-															Expect(testUI.Err).To(Say("some-restart-warning"))
-														})
-													})
-
-													When("the error is an AllInstancesCrashedError", func() {
-														BeforeEach(func() {
-															fakeVersionActor.RestartApplicationReturns(nil, actionerror.AllInstancesCrashedError{})
-														})
-
-														It("returns the ApplicationUnableToStartError", func() {
-															Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
-																AppName:    "first-app",
-																BinaryName: binaryName,
-															}))
-														})
-
-													})
-
-													When("restart times out", func() {
-														BeforeEach(func() {
-															fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, actionerror.StartupTimeoutError{})
-														})
-
-														It("returns the StartupTimeoutError and prints warnings", func() {
-															Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
-																AppName:    "first-app",
-																BinaryName: binaryName,
-															}))
-
-															Expect(testUI.Err).To(Say("some-restart-warning"))
-														})
-													})
+												// TODO: Don't test the shared.AppSummaryDisplayer.AppDisplay method.
+												// Use DI to pass in a new AppSummaryDisplayer to the Command instead.
+												It("displays the app summary", func() {
+													Expect(executeErr).ToNot(HaveOccurred())
+													Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(2))
 												})
 											})
 
-											When("user requests --no-start", func() {
+											When("getting the application summary fails", func() {
 												BeforeEach(func() {
-													cmd.NoStart = true
+													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(
+														v7action.ApplicationSummary{},
+														v7action.Warnings{"get-application-summary-warnings"},
+														errors.New("get-application-summary-error"),
+													)
 												})
 
-												It("does not attempt to restart the app", func() {
-													Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(0))
+												It("does not display the app summary", func() {
+													Expect(testUI.Out).ToNot(Say(`requested state:`))
+												})
+
+												It("returns the error from GetApplicationSummaryByNameAndSpace", func() {
+													Expect(executeErr).To(MatchError("get-application-summary-error"))
+												})
+
+												It("prints the warnings", func() {
+													Expect(testUI.Err).To(Say("get-application-summary-warnings"))
 												})
 											})
+
 										})
 
-										When("Actualize returns an error", func() {
-											BeforeEach(func() {
-												fakeActor.ActualizeStub = FillInValues([]Step{
-													{
-														Error: errors.New("anti avant garde naming"),
-													},
-												}, v7pushaction.PushPlan{})
+										When("actualize returns an error", func() {
+											When("the error is generic", func() {
+												BeforeEach(func() {
+													fakeActor.ActualizeStub = FillInValues([]Step{
+														{
+															Error: errors.New("anti avant garde naming"),
+														},
+													}, v7pushaction.PushPlan{})
+												})
+
+												It("returns the error", func() {
+													Expect(executeErr).To(MatchError("anti avant garde naming"))
+												})
 											})
 
-											It("returns the error", func() {
-												Expect(executeErr).To(MatchError("anti avant garde naming"))
+											When("the error is a startup timeout error", func() {
+												BeforeEach(func() {
+													fakeActor.ActualizeStub = FillInValues([]Step{
+														{
+															Error: actionerror.StartupTimeoutError{},
+														},
+													}, v7pushaction.PushPlan{})
+												})
+
+												It("returns the StartupTimeoutError and prints warnings", func() {
+													Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
+														AppName:    "first-app",
+														BinaryName: binaryName,
+													}))
+												})
+											})
+
+											When("the error is a process crashed error", func() {
+												BeforeEach(func() {
+													fakeActor.ActualizeStub = FillInValues([]Step{
+														{
+															Error: actionerror.AllInstancesCrashedError{},
+														},
+													}, v7pushaction.PushPlan{})
+												})
+
+												It("returns the ApplicationUnableToStartError", func() {
+													Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
+														AppName:    "first-app",
+														BinaryName: binaryName,
+													}))
+												})
+
+												It("displays the app summary", func() {
+													Expect(executeErr).To(HaveOccurred())
+													Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+												})
 											})
 										})
 									})
