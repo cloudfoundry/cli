@@ -17,7 +17,6 @@ var _ = Describe("delete-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`Delete an HTTP route:\n`))
 			Eventually(session).Should(Say(`cf delete-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[-f\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
@@ -29,7 +28,7 @@ var _ = Describe("delete-route command", func() {
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`-f\s+Force deletion without confirmation`))
-			Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route`))
+			Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path used to identify the HTTP route`))
 			Eventually(session).Should(Say(`\n`))
 
@@ -54,6 +53,7 @@ var _ = Describe("delete-route command", func() {
 		)
 
 		BeforeEach(func() {
+			Skip("not implemented")
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 

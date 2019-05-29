@@ -75,7 +75,7 @@ type commandList struct {
 	DeleteOrphanedRoutes               v6.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app)"`
 	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" description:"Delete a private domain"`
 	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
-	DeleteRoute                        v6.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
+	DeleteRoute                        v7.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
 	DeleteSecurityGroup                v6.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
 	DeleteServiceBroker                v6.DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
 	DeleteServiceKey                   v6.DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
