@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7"
@@ -100,12 +101,16 @@ var _ = Describe("create-service-broker Command", func() {
 		It("calls the CreateServiceBrokerActor", func() {
 			Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
 			credentials := fakeActor.CreateServiceBrokerArgsForCall(0)
-			Expect(credentials).To(Equal(v7action.ServiceBrokerCredentials{
-				Name:      args.ServiceBroker,
-				URL:       args.URL,
-				Username:  args.Username,
-				Password:  args.Password,
-				SpaceGUID: "",
+			Expect(credentials).To(Equal(v7action.ServiceBroker{
+				Name: "service-broker-name",
+				URL:  "https://example.org/super-broker",
+				Credentials: v7action.ServiceBrokerCredentials{
+					Type: constant.BasicCredentials,
+					Data: v7action.ServiceBrokerCredentialsData{
+						Username: "username",
+						Password: "password",
+					},
+				},
 			}))
 		})
 

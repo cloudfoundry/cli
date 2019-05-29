@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -83,17 +84,21 @@ var _ = Describe("Service Broker Actions", func() {
 			warnings       Warnings
 			executionError error
 
-			credentials = ServiceBrokerCredentials{
-				Name:      "name",
-				URL:       "url",
-				Username:  "username",
-				Password:  "password",
-				SpaceGUID: "space-guid",
+			serviceBroker = ServiceBroker{
+				Name: "name",
+				URL:  "url",
+				Credentials: ServiceBrokerCredentials{
+					Type: constant.BasicCredentials,
+					Data: ServiceBrokerCredentialsData{
+						Username: "username",
+						Password: "password",
+					},
+				},
 			}
 		)
 
 		JustBeforeEach(func() {
-			warnings, executionError = actor.CreateServiceBroker(credentials)
+			warnings, executionError = actor.CreateServiceBroker(serviceBroker)
 		})
 
 		When("the client request is successful", func() {
@@ -110,7 +115,7 @@ var _ = Describe("Service Broker Actions", func() {
 			It("passes the service broker credentials to the client", func() {
 				Expect(fakeCloudControllerClient.CreateServiceBrokerCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)).
-					To(Equal(ccv3.ServiceBrokerCredentials(credentials)))
+					To(Equal(serviceBroker))
 			})
 		})
 
