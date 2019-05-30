@@ -29,6 +29,7 @@ var _ = Describe("Unshare Private Domain", func() {
 			Eventually(session).Should(Say("cf unshare-private-domain ORG DOMAIN"))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("delete-private-domain, domains"))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
