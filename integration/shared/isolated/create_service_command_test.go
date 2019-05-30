@@ -186,10 +186,8 @@ var _ = Describe("create-service command", func() {
 					service = helpers.PrefixedRandomName("SERVICE")
 					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-					broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-					broker.Push()
-					broker.Configure(true)
-					broker.Create()
+					broker = helpers.CreateBroker(domain, service, servicePlan)
+
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				})
 
@@ -303,10 +301,8 @@ var _ = Describe("create-service command", func() {
 					service = helpers.PrefixedRandomName("SERVICE")
 					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-					broker = helpers.NewAsynchServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-					broker.Push()
-					broker.Configure(true)
-					broker.Create()
+					broker = helpers.CreateAsyncBroker(domain, service, servicePlan)
+
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				})
 

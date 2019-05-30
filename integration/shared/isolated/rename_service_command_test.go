@@ -16,6 +16,7 @@ var _ = Describe("rename-service command", func() {
 			serviceName  string
 			orgName      string
 			spaceName    string
+			broker       helpers.ServiceBroker
 		)
 
 		BeforeEach(func() {
@@ -26,16 +27,8 @@ var _ = Describe("rename-service command", func() {
 			helpers.SetupCF(orgName, spaceName)
 
 			servicePlanName := helpers.NewPlanName()
-			broker := helpers.NewServiceBroker(
-				helpers.NewServiceBrokerName(),
-				helpers.NewAssets().ServiceBroker,
-				helpers.DefaultSharedDomain(),
-				serviceName,
-				servicePlanName,
-			)
-			broker.Push()
-			broker.Configure(true)
-			broker.Create()
+
+			broker = helpers.CreateBroker(helpers.DefaultSharedDomain(), serviceName, servicePlanName)
 
 			Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", serviceName, servicePlanName, instanceName)).Should(Exit(0))
@@ -43,6 +36,7 @@ var _ = Describe("rename-service command", func() {
 
 		AfterEach(func() {
 			Eventually(helpers.CF("delete-service", "my-new-instance-name", "-f")).Should(Exit(0))
+			broker.Destroy()
 			helpers.QuickDeleteOrg(orgName)
 		})
 
