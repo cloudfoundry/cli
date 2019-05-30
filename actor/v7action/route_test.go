@@ -234,39 +234,21 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
-
-				Expect(query).To(Equal(
-					[]ccv3.Query{
-						{
-							Key:    "guids",
-							Values: []string{"space-guid"},
-						},
-					},
-				))
+				Expect(query).To(HaveLen(1))
+				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
+				Expect(query[0].Values).To(ConsistOf("space-guid"))
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
-
-				Expect(query).To(Equal(
-					[]ccv3.Query{
-						{
-							Key:    "space_guids",
-							Values: []string{"space-guid"},
-						},
-					},
-				))
+				Expect(query).To(HaveLen(1))
+				Expect(query[0].Key).To(Equal(ccv3.SpaceGUIDFilter))
+				Expect(query[0].Values).To(ConsistOf("space-guid"))
 
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetDomainsArgsForCall(0)
-
-				Expect(query).To(Equal(
-					[]ccv3.Query{
-						{
-							Key:    "guids",
-							Values: []string{"domain1-guid", "domain2-guid"},
-						},
-					},
-				))
+				Expect(query).To(HaveLen(1))
+				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
+				Expect(query[0].Values).To(ConsistOf("domain1-guid", "domain2-guid"))
 			})
 		})
 
@@ -394,36 +376,21 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(query).To(Equal(
-					[]ccv3.Query{
-						{
-							Key:    "organization_guids",
-							Values: []string{"org-guid"},
-						},
-					},
-				))
+				Expect(query).To(HaveLen(1))
+				Expect(query[0].Key).To(Equal(ccv3.OrganizationGUIDFilter))
+				Expect(query[0].Values).To(ConsistOf("org-guid"))
 
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetSpacesArgsForCall(0)
-				Expect(query).To(Equal(
-					[]ccv3.Query{
-						{
-							Key:    "guids",
-							Values: []string{"space1-guid", "space2-guid"},
-						},
-					},
-				))
+				Expect(query).To(HaveLen(1))
+				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
+				Expect(query[0].Values).To(ConsistOf("space1-guid", "space2-guid"))
 
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetDomainsArgsForCall(0)
-				Expect(query).To(Equal(
-					[]ccv3.Query{
-						{
-							Key:    "guids",
-							Values: []string{"domain1-guid", "domain2-guid"},
-						},
-					},
-				))
+				Expect(query).To(HaveLen(1))
+				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
+				Expect(query[0].Values).To(ConsistOf("domain1-guid", "domain2-guid"))
 			})
 		})
 

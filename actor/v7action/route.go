@@ -136,32 +136,28 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 
 	spaceGUIDsSet := map[string]struct{}{}
 	domainGUIDsSet := map[string]struct{}{}
+	spacesQuery := ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{}}
+	domainsQuery := ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{}}
+
 	for _, route := range routes {
-		spaceGUIDsSet[route.SpaceGUID] = struct{}{}
-		domainGUIDsSet[route.DomainGUID] = struct{}{}
-	}
-	spaceGUIDs := []string{}
-	for elem := range spaceGUIDsSet {
-		spaceGUIDs = append(spaceGUIDs, elem)
-	}
-	domainGUIDs := []string{}
-	for elem := range domainGUIDsSet {
-		domainGUIDs = append(domainGUIDs, elem)
+		if _, ok := spaceGUIDsSet[route.SpaceGUID]; !ok {
+			spacesQuery.Values = append(spacesQuery.Values, route.SpaceGUID)
+			spaceGUIDsSet[route.SpaceGUID] = struct{}{}
+		}
+
+		if _, ok := domainGUIDsSet[route.DomainGUID]; !ok {
+			domainsQuery.Values = append(domainsQuery.Values, route.DomainGUID)
+			domainGUIDsSet[route.DomainGUID] = struct{}{}
+		}
 	}
 
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: spaceGUIDs,
-	})
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(spacesQuery)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
-	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: domainGUIDs,
-	})
+	domains, warnings, err := actor.CloudControllerClient.GetDomains(domainsQuery)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
