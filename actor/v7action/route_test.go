@@ -211,6 +211,7 @@ var _ = Describe("Route Actions", func() {
 				[]ccv3.Route{
 					{GUID: "route1-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", Host: "hostname"},
 					{GUID: "route2-guid", SpaceGUID: "space-guid", DomainGUID: "domain2-guid", Path: "/my-path"},
+					{GUID: "route3-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid"},
 				},
 				ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
 				nil,
@@ -226,6 +227,7 @@ var _ = Describe("Route Actions", func() {
 				Expect(routes).To(Equal([]Route{
 					{GUID: "route1-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", Host: "hostname", DomainName: "domain1-name", SpaceName: "space-name"},
 					{GUID: "route2-guid", SpaceGUID: "space-guid", DomainGUID: "domain2-guid", Path: "/my-path", DomainName: "domain2-name", SpaceName: "space-name"},
+					{GUID: "route3-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", DomainName: "domain1-name", SpaceName: "space-name"},
 				}))
 				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-domains-warning", "get-spaces-warning"))
 				Expect(executeErr).ToNot(HaveOccurred())
@@ -349,6 +351,7 @@ var _ = Describe("Route Actions", func() {
 				[]ccv3.Route{
 					{GUID: "route1-guid", SpaceGUID: "space1-guid", DomainGUID: "domain1-guid", Host: "hostname"},
 					{GUID: "route2-guid", SpaceGUID: "space2-guid", DomainGUID: "domain2-guid", Path: "/my-path"},
+					{GUID: "route3-guid", SpaceGUID: "space1-guid", DomainGUID: "domain1-guid"},
 				},
 				ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
 				nil,
@@ -377,6 +380,13 @@ var _ = Describe("Route Actions", func() {
 						Path:       "/my-path",
 						DomainName: "domain2-name",
 						SpaceName:  "space2-name",
+					},
+					{
+						GUID:       "route3-guid",
+						SpaceGUID:  "space1-guid",
+						DomainGUID: "domain1-guid",
+						DomainName: "domain1-name",
+						SpaceName:  "space1-name",
 					},
 				}))
 				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-domains-warning", "get-spaces-warning"))

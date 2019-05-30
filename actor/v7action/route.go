@@ -78,9 +78,13 @@ func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error)
 		return nil, allWarnings, err
 	}
 
-	domainGUIDs := []string{}
+	domainGUIDsSet := map[string]struct{}{}
 	for _, route := range routes {
-		domainGUIDs = append(domainGUIDs, route.DomainGUID)
+		domainGUIDsSet[route.DomainGUID] = struct{}{}
+	}
+	domainGUIDs := []string{}
+	for elem := range domainGUIDsSet {
+		domainGUIDs = append(domainGUIDs, elem)
 	}
 
 	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
@@ -130,9 +134,19 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 		return nil, allWarnings, err
 	}
 
-	spaceGUIDs := []string{}
+	spaceGUIDsSet := map[string]struct{}{}
+	domainGUIDsSet := map[string]struct{}{}
 	for _, route := range routes {
-		spaceGUIDs = append(spaceGUIDs, route.SpaceGUID)
+		spaceGUIDsSet[route.SpaceGUID] = struct{}{}
+		domainGUIDsSet[route.DomainGUID] = struct{}{}
+	}
+	spaceGUIDs := []string{}
+	for elem := range spaceGUIDsSet {
+		spaceGUIDs = append(spaceGUIDs, elem)
+	}
+	domainGUIDs := []string{}
+	for elem := range domainGUIDsSet {
+		domainGUIDs = append(domainGUIDs, elem)
 	}
 
 	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
@@ -144,10 +158,6 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 		return nil, allWarnings, err
 	}
 
-	domainGUIDs := []string{}
-	for _, route := range routes {
-		domainGUIDs = append(domainGUIDs, route.DomainGUID)
-	}
 	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
 		Key:    ccv3.GUIDFilter,
 		Values: domainGUIDs,
