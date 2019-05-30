@@ -13,10 +13,10 @@ type DomainNotFoundError struct {
 func (e DomainNotFoundError) Error() string {
 	switch {
 	case e.Name != "":
-		return fmt.Sprintf("Domain %s not found", e.Name)
+		return fmt.Sprintf("Domain '%s' not found.", e.Name)
 	case e.GUID != "":
-		return fmt.Sprintf("Domain with GUID %s not found", e.GUID)
+		return fmt.Sprintf("Domain with GUID '%s' not found.", e.GUID)
 	default:
-		return "Domain not found"
+		return "Domain not found."
 	}
 }

@@ -135,7 +135,7 @@ var _ = Describe("Domain Actions", func() {
 			})
 
 			It("returns the correct message", func() {
-				Expect(err.Error()).To(Equal("Domain some-domain-name not found"))
+				Expect(err.Error()).To(Equal("Domain 'some-domain-name' not found."))
 			})
 		})
 
@@ -145,7 +145,7 @@ var _ = Describe("Domain Actions", func() {
 			})
 
 			It("returns the correct message", func() {
-				Expect(err.Error()).To(Equal("Domain with GUID some-domain-guid not found"))
+				Expect(err.Error()).To(Equal("Domain with GUID 'some-domain-guid' not found."))
 			})
 		})
 
@@ -155,7 +155,7 @@ var _ = Describe("Domain Actions", func() {
 			})
 
 			It("returns the correct message", func() {
-				Expect(err.Error()).To(Equal("Domain not found"))
+				Expect(err.Error()).To(Equal("Domain not found."))
 			})
 		})
 	})
