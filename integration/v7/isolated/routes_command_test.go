@@ -97,15 +97,15 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			//When("fetching routes by org", func() {
-			//	It("lists all the routes in the org", func() {
-			//		session := helpers.CF("routes", "--orglevel")
-			//		Eventually(session).Should(Say(`Getting routes for org %s as %s \.\.\.`, orgName, userName))
-			//		Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
-			//		Eventually(session).Should(Say(`%s\s+route2\s+%s`, otherSpaceName, domainName))
-			//		Eventually(session).Should(Exit(0))
-			//	})
-			//})
+			When("fetching routes by org", func() {
+				It("lists all the routes in the org", func() {
+					session := helpers.CF("routes", "--orglevel")
+					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
+					Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
+					Eventually(session).Should(Say(`%s\s+route2\s+%s`, otherSpaceName, domainName))
+					Eventually(session).Should(Exit(0))
+				})
+			})
 		})
 
 		When("no routes exist", func() {

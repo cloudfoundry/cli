@@ -12,6 +12,7 @@ import (
 
 type RoutesActor interface {
 	GetRoutesBySpace(string) ([]v7action.Route, v7action.Warnings, error)
+	GetRoutesByOrg(string) ([]v7action.Route, v7action.Warnings, error)
 }
 
 type RoutesCommand struct {
@@ -40,7 +41,13 @@ func (cmd *RoutesCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd RoutesCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(true, true)
+	var (
+		routes   []v7action.Route
+		warnings v7action.Warnings
+		err      error
+	)
+
+	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
@@ -52,13 +59,22 @@ func (cmd RoutesCommand) Execute(args []string) error {
 
 	targetedOrg := cmd.Config.TargetedOrganization()
 	targetedSpace := cmd.Config.TargetedSpace()
-	cmd.UI.DisplayTextWithFlavor("Getting routes for org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...\n", map[string]interface{}{
-		"CurrentOrg":   targetedOrg.Name,
-		"CurrentSpace": targetedSpace.Name,
-		"CurrentUser":  currentUser.Name,
-	})
 
-	routes, warnings, err := cmd.Actor.GetRoutesBySpace(targetedSpace.GUID)
+	if cmd.Orglevel {
+		cmd.UI.DisplayTextWithFlavor("Getting routes for org {{.CurrentOrg}} as {{.CurrentUser}}...\n", map[string]interface{}{
+			"CurrentOrg":  targetedOrg.Name,
+			"CurrentUser": currentUser.Name,
+		})
+		routes, warnings, err = cmd.Actor.GetRoutesByOrg(targetedOrg.GUID)
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Getting routes for org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...\n", map[string]interface{}{
+			"CurrentOrg":   targetedOrg.Name,
+			"CurrentSpace": targetedSpace.Name,
+			"CurrentUser":  currentUser.Name,
+		})
+		routes, warnings, err = cmd.Actor.GetRoutesBySpace(targetedSpace.GUID)
+	}
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
