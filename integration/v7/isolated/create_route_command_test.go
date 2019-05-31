@@ -184,6 +184,7 @@ var _ = Describe("create-route command", func() {
 							Eventually(session).Should(Exit(0))
 						})
 					})
+
 					When("passing in a hostname and path", func() {
 						It("creates the route with the hostname", func() {
 							hostname := "tiramisu"
@@ -202,7 +203,7 @@ var _ = Describe("create-route command", func() {
 			It("displays error and exits 1", func() {
 				session := helpers.CF("create-route", "some-domain")
 				Eventually(session).Should(Say(`FAILED`))
-				Eventually(session.Err).Should(Say(`Domain some-domain not found`))
+				Eventually(session.Err).Should(Say(`Domain 'some-domain' not found.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

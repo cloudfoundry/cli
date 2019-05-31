@@ -8,11 +8,11 @@ type DomainNotFoundError struct {
 func (e DomainNotFoundError) Error() string {
 	switch {
 	case e.Name != "":
-		return "Domain {{.DomainName}} not found"
+		return "Domain '{{.DomainName}}' not found."
 	case e.GUID != "":
-		return "Domain with GUID {{.DomainGUID}} not found"
+		return "Domain with GUID '{{.DomainGUID}}' not found."
 	default:
-		return "Domain not found"
+		return "Domain not found."
 	}
 }
 

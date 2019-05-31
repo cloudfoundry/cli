@@ -97,10 +97,7 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 	if err != nil {
 		switch err.(type) {
 		case actionerror.DomainNotFoundError:
-			cmd.UI.DisplayTextWithFlavor("Domain {{.DomainName}} not found", map[string]interface{}{
-				"DomainName": domain,
-			})
-
+			cmd.UI.DisplayText(err.Error())
 		default:
 			return err
 		}

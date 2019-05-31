@@ -214,7 +214,7 @@ var _ = Describe("delete-private-domain Command", func() {
 
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting private domain some-domain.com as steve\.\.\.`))
-				Expect(testUI.Out).To(Say("Domain some-domain.com not found"))
+				Expect(testUI.Out).To(Say("Domain 'some-domain.com' not found."))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})

@@ -42,7 +42,7 @@ var _ = Describe("push with different domain values", func() {
 						PushCommandName, appName, "--no-start",
 						"-d", domainName,
 					)
-					Eventually(session.Err).Should(Say("Domain %s not found", domainName))
+					Eventually(session.Err).Should(Say("Domain '%s' not found.", domainName))
 					Eventually(session).Should(Exit(1))
 				})
 			})
