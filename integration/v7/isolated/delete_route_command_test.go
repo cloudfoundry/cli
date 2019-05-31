@@ -155,6 +155,67 @@ var _ = Describe("delete-route command", func() {
 						})
 					})
 				})
+
+				When("the domain is shared", func() {
+					var domain helpers.Domain
+
+					BeforeEach(func() {
+						domain = helpers.NewDomain("", domainName)
+						domain.CreateShared()
+					})
+
+					AfterEach(func() {
+						domain.DeleteShared()
+					})
+
+					When("no flags are used", func() {
+						It("fails with a helpful message", func() {
+							session := helpers.CF("delete-route", domainName, "-f")
+							Eventually(session).Should(Say(`Deleting route %s\.\.\.`, domainName))
+							Eventually(session).Should(Say(`Unable to delete\. Route with domain '%s' not found\.`, domainName))
+							Eventually(session).Should(Say(`OK`))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("passing in a hostname", func() {
+						It("deletes the route with the hostname", func() {
+							hostname := "tiramisu"
+							Eventually(helpers.CF("create-route", domainName, "-n", hostname)).Should(Exit(0))
+
+							session := helpers.CF("delete-route", domainName, "-n", hostname, "-f")
+							Eventually(session).Should(Say(`Deleting route %s\.%s\.\.\.`, hostname, domainName))
+							Eventually(session).Should(Say(`OK`))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("passing in hostname and path with a leading '/'", func() {
+						It("deletes the route with hostname and path", func() {
+							hostname := "tiramisu"
+							pathString := "/recipes"
+							Eventually(helpers.CF("create-route", domainName, "-n", hostname, "--path", pathString)).Should(Exit(0))
+
+							session := helpers.CF("delete-route", domainName, "-n", hostname, "--path", pathString, "-f")
+							Eventually(session).Should(Say(`Deleting route %s\.%s%s\.\.\.`, hostname, domainName, pathString))
+							Eventually(session).Should(Say(`OK`))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("passing in hostname and path without a leading '/'", func() {
+						It("deletes the route with hostname and path", func() {
+							hostname := "tiramisu"
+							pathString := "more-recipes"
+							Eventually(helpers.CF("create-route", domainName, "-n", hostname, "--path", pathString)).Should(Exit(0))
+
+							session := helpers.CF("delete-route", domainName, "-n", hostname, "--path", pathString, "-f")
+							Eventually(session).Should(Say(`Deleting route %s\.%s\/%s\.\.\.`, hostname, domainName, pathString))
+							Eventually(session).Should(Say(`OK`))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
 			})
 		})
 
