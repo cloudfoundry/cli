@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -30,22 +31,14 @@ var _ = Describe("unbind-service command", func() {
 
 	When("the environment is setup correctly", func() {
 		var (
-			org         string
-			space       string
-			service     string
-			servicePlan string
-			broker      helpers.ServiceBroker
-			domain      string
+			org   string
+			space string
 		)
 
 		BeforeEach(func() {
 			org = helpers.NewOrgName()
 			space = helpers.NewSpaceName()
-			service = helpers.PrefixedRandomName("SERVICE")
-			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-
 			helpers.SetupCF(org, space)
-			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
@@ -123,11 +116,19 @@ var _ = Describe("unbind-service command", func() {
 		})
 
 		When("the service is provided by a broker", func() {
+			var (
+				service     string
+				servicePlan string
+				broker      *fakeservicebroker.FakeServiceBroker
+			)
+
 			When("the unbinding is asynchronous", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 
-					broker = helpers.CreateAsyncBroker(domain, service, servicePlan)
+					broker = fakeservicebroker.New().Async().Register()
+					service = broker.ServiceName()
+					servicePlan = broker.ServicePlanName()
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 
@@ -161,7 +162,10 @@ var _ = Describe("unbind-service command", func() {
 
 			When("the unbinding is blocking", func() {
 				BeforeEach(func() {
-					broker = helpers.CreateBroker(domain, service, servicePlan)
+					broker = fakeservicebroker.New().Register()
+					service = broker.ServiceName()
+					servicePlan = broker.ServicePlanName()
+
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				})
 
