@@ -3,6 +3,7 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -107,13 +108,10 @@ var _ = Describe("purge-service-offering command", func() {
 
 			When("the service exists", func() {
 				var (
-					orgName     string
-					spaceName   string
-					domain      string
-					service     string
-					servicePlan string
-					broker      helpers.ServiceBroker
-					buffer      *Buffer
+					orgName   string
+					spaceName string
+					broker    *fakeservicebroker.FakeServiceBroker
+					buffer    *Buffer
 				)
 
 				BeforeEach(func() {
@@ -123,11 +121,7 @@ var _ = Describe("purge-service-offering command", func() {
 					spaceName = helpers.NewSpaceName()
 					helpers.SetupCF(orgName, spaceName)
 
-					domain = helpers.DefaultSharedDomain()
-					service = helpers.PrefixedRandomName("SERVICE")
-					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-
-					broker = helpers.CreateBroker(domain, service, servicePlan)
+					broker = fakeservicebroker.New().Register()
 				})
 
 				AfterEach(func() {
@@ -142,17 +136,17 @@ var _ = Describe("purge-service-offering command", func() {
 					})
 
 					It("purges the service offering, asking for confirmation", func() {
-						session := helpers.CFWithStdin(buffer, "purge-service-offering", service)
+						session := helpers.CFWithStdin(buffer, "purge-service-offering", broker.ServiceName())
 
 						Eventually(session).Should(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", service))
-						Eventually(session).Should(Say("Purging service %s...", service))
+						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", broker.ServiceName()))
+						Eventually(session).Should(Say("Purging service %s...", broker.ServiceName()))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("marketplace")
 						Eventually(session).Should(Say("OK"))
-						Consistently(session).ShouldNot(Say(service))
+						Consistently(session).ShouldNot(Say(broker.ServiceName()))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -164,12 +158,12 @@ var _ = Describe("purge-service-offering command", func() {
 					})
 
 					It("asks again", func() {
-						session := helpers.CFWithStdin(buffer, "purge-service-offering", service)
+						session := helpers.CFWithStdin(buffer, "purge-service-offering", broker.ServiceName())
 
 						Eventually(session).Should(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", service))
+						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", broker.ServiceName()))
 						Eventually(session).Should(Say(`invalid input \(not y, n, yes, or no\)`))
-						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", service))
+						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", broker.ServiceName()))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -181,11 +175,11 @@ var _ = Describe("purge-service-offering command", func() {
 					})
 
 					It("does not purge the service offering", func() {
-						session := helpers.CFWithStdin(buffer, "purge-service-offering", service)
+						session := helpers.CFWithStdin(buffer, "purge-service-offering", broker.ServiceName())
 
 						Eventually(session).Should(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", service))
-						Eventually(session).ShouldNot(Say("Purging service %s...", service))
+						Eventually(session).Should(Say("Really purge service offering %s from Cloud Foundry?", broker.ServiceName()))
+						Eventually(session).ShouldNot(Say("Purging service %s...", broker.ServiceName()))
 						Eventually(session).ShouldNot(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -193,10 +187,10 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the -f flag is provided", func() {
 					It("purges the service offering without asking for confirmation", func() {
-						session := helpers.CF("purge-service-offering", service, "-f")
+						session := helpers.CF("purge-service-offering", broker.ServiceName(), "-f")
 
 						Eventually(session).Should(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-						Eventually(session).Should(Say("Purging service %s...", service))
+						Eventually(session).Should(Say("Purging service %s...", broker.ServiceName()))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -226,18 +220,15 @@ var _ = Describe("purge-service-offering command", func() {
 
 			When("the -b flag is provided", func() {
 				var (
-					orgName     string
-					spaceName   string
-					domain      string
-					service     string
-					servicePlan string
-					broker1     helpers.ServiceBroker
-					broker2     helpers.ServiceBroker
-					buffer      *Buffer
+					orgName   string
+					spaceName string
+					broker1   *fakeservicebroker.FakeServiceBroker
+					broker2   *fakeservicebroker.FakeServiceBroker
+					buffer    *Buffer
 				)
 
-				It("prints a warning that this flag is no longer supported", func() {
-					session := helpers.CF("purge-service-offering", service, "-b", "non-existent-broker")
+				It("fails when service broker is not registered yet", func() {
+					session := helpers.CF("purge-service-offering", "some-service", "-b", "non-existent-broker")
 
 					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 					Eventually(session.Err).Should(Say("TIP: Use 'cf service-brokers' to see a list of available brokers."))
@@ -256,16 +247,14 @@ var _ = Describe("purge-service-offering command", func() {
 						spaceName = helpers.NewSpaceName()
 						helpers.SetupCF(orgName, spaceName)
 
-						domain = helpers.DefaultSharedDomain()
-						service = helpers.PrefixedRandomName("SERVICE")
-						servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+						broker1 = fakeservicebroker.New().Register()
+						broker2 = fakeservicebroker.New()
+						broker2.Services[0].Name = broker1.ServiceName()
+						broker2.Register()
 
-						broker1 = helpers.CreateBroker(domain, service, servicePlan)
-						broker2 = helpers.CreateBroker(domain, service, servicePlan)
-
-						session := helpers.CF("enable-service-access", service, "-b", broker1.Name)
+						session := helpers.CF("enable-service-access", broker1.ServiceName(), "-b", broker1.Name())
 						Eventually(session).Should(Exit(0))
-						session = helpers.CF("enable-service-access", service, "-b", broker2.Name)
+						session = helpers.CF("enable-service-access", broker1.ServiceName(), "-b", broker2.Name())
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -278,31 +267,31 @@ var _ = Describe("purge-service-offering command", func() {
 					When("the user specifies the desired broker", func() {
 
 						It("purges the service offering, asking for confirmation", func() {
-							session := helpers.CFWithStdin(buffer, "purge-service-offering", service, "-b", broker1.Name)
+							session := helpers.CFWithStdin(buffer, "purge-service-offering", broker1.ServiceName(), "-b", broker1.Name())
 
 							Eventually(session).Should(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-							Eventually(session).Should(Say("Really purge service offering %s from broker %s from Cloud Foundry?", service, broker1.Name))
-							Eventually(session).Should(Say("Purging service %s...", service))
+							Eventually(session).Should(Say("Really purge service offering %s from broker %s from Cloud Foundry?", broker1.ServiceName(), broker1.Name()))
+							Eventually(session).Should(Say("Purging service %s...", broker1.ServiceName()))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
 							session = helpers.CF("marketplace")
 							Eventually(session).Should(Say("OK"))
-							Consistently(session).ShouldNot(Say(`%s.+%s`, service, broker1.Name))
-							Eventually(session).Should(Say(`%s.+%s`, service, broker2.Name))
+							Consistently(session).ShouldNot(Say(`%s.+%s`, broker1.ServiceName(), broker1.Name()))
+							Eventually(session).Should(Say(`%s.+%s`, broker1.ServiceName(), broker2.Name()))
 							Eventually(session).Should(Exit(0))
 						})
 					})
 
 					When("the user does not specify the desired broker", func() {
 						It("does not purge the service offering", func() {
-							session := helpers.CFWithStdin(buffer, "purge-service-offering", service)
+							session := helpers.CFWithStdin(buffer, "purge-service-offering", broker1.ServiceName())
 
-							Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
+							Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", broker1.ServiceName()))
 							Eventually(session).Should(Say("FAILED"))
 
 							Eventually(session).ShouldNot(Say("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database\\. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings\\. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances\\. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup\\."))
-							Eventually(session).ShouldNot(Say("Purging service %s...", service))
+							Eventually(session).ShouldNot(Say("Purging service %s...", broker1.ServiceName()))
 							Eventually(session).ShouldNot(Say("OK"))
 							Eventually(session).Should(Exit(1))
 						})

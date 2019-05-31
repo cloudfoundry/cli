@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -143,21 +144,18 @@ var _ = Describe("plugin API", func() {
 		var (
 			serviceInstance1 string
 			serviceInstance2 string
-			broker           helpers.ServiceBroker
+			broker           *fakeservicebroker.FakeServiceBroker
 		)
 		BeforeEach(func() {
 			createTargetedOrgAndSpace()
-			domain := helpers.DefaultSharedDomain()
-			service := helpers.PrefixedRandomName("SERVICE")
-			servicePlan := helpers.PrefixedRandomName("SERVICE-PLAN")
 			serviceInstance1 = helpers.PrefixedRandomName("SI1")
 			serviceInstance2 = helpers.PrefixedRandomName("SI2")
 
-			broker = helpers.CreateBroker(domain, service, servicePlan)
+			broker = fakeservicebroker.New().Register()
 
-			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
-			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance1)).Should(Exit(0))
-			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance2)).Should(Exit(0))
+			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance1)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance2)).Should(Exit(0))
 		})
 
 		AfterEach(func() {

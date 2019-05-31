@@ -1,9 +1,8 @@
 package isolated
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -11,9 +10,7 @@ import (
 )
 
 var _ = Describe("create-service-broker command", func() {
-	var (
-		brokerName string
-	)
+	var brokerName string
 
 	BeforeEach(func() {
 		// TODO: remove that when capi-release is cut with v3 create-service-broker functionality
@@ -63,21 +60,18 @@ var _ = Describe("create-service-broker command", func() {
 
 	When("logged in", func() {
 		When("all arguments are provided", func() {
-			var (
-				brokerURI string
-				orgName   string
-				spaceName string
-			)
-
-			BeforeEach(func() {
-				orgName = helpers.NewOrgName()
-				spaceName = helpers.NewSpaceName()
-
-				brokerURI, _ = pushServiceBroker(orgName, spaceName)
-			})
-
 			When("no org or space is targeted", func() {
+				var (
+					orgName   string
+					spaceName string
+					broker    *fakeservicebroker.FakeServiceBroker
+				)
+
 				BeforeEach(func() {
+					orgName = helpers.NewOrgName()
+					spaceName = helpers.NewSpaceName()
+					helpers.SetupCF(orgName, spaceName)
+					broker = fakeservicebroker.New().Deploy()
 					helpers.ClearTarget()
 				})
 
@@ -87,7 +81,7 @@ var _ = Describe("create-service-broker command", func() {
 				})
 
 				It("registers the broker", func() {
-					session := helpers.CF("create-service-broker", brokerName, "username", "password", brokerURI)
+					session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL())
 					Eventually(session).Should(Say("Creating service broker %s as admin...", brokerName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -119,18 +113,17 @@ var _ = Describe("create-service-broker command", func() {
 
 				When("both org and space are targeted", func() {
 					var (
-						brokerURI       string
-						orgName         string
-						spaceName       string
-						servicePlanName string
+						orgName   string
+						spaceName string
+						broker    *fakeservicebroker.FakeServiceBroker
 					)
 
 					BeforeEach(func() {
 						orgName = helpers.NewOrgName()
 						spaceName = helpers.NewSpaceName()
-						brokerURI, servicePlanName = pushServiceBroker(orgName, spaceName)
+						helpers.SetupCF(orgName, spaceName)
 
-						helpers.TargetOrgAndSpace(orgName, spaceName)
+						broker = fakeservicebroker.New().Deploy()
 					})
 
 					AfterEach(func() {
@@ -139,7 +132,7 @@ var _ = Describe("create-service-broker command", func() {
 					})
 
 					It("registers the broker and exposes its services only to the targeted space", func() {
-						session := helpers.CF("create-service-broker", brokerName, "username", "password", brokerURI, "--space-scoped")
+						session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL(), "--space-scoped")
 						Eventually(session).Should(Say("Creating service broker " + brokerName + " in org " + orgName + " / space " + spaceName + " as admin..."))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
@@ -148,70 +141,53 @@ var _ = Describe("create-service-broker command", func() {
 						Eventually(session).Should(Say(brokerName))
 
 						session = helpers.CF("marketplace")
-						Eventually(session).Should(Say(servicePlanName))
+						Eventually(session).Should(Say(broker.ServicePlanName()))
 
 						helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 						session = helpers.CF("marketplace")
-						Eventually(session).ShouldNot(Say(servicePlanName))
+						Eventually(session).ShouldNot(Say(broker.ServicePlanName()))
 					})
-				})
-			})
-
-			When("no arguments are provided", func() {
-				It("displays an error, naming each of the missing args and the help text", func() {
-					session := helpers.CF("create-service-broker")
-					Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SERVICE_BROKER`, `USERNAME`, `PASSWORD` and `URL` were not provided"))
-
-					Eventually(session).Should(Say("NAME:"))
-					Eventually(session).Should(Say("\\s+create-service-broker - Create a service broker"))
-
-					Eventually(session).Should(Say("USAGE:"))
-					Eventually(session).Should(Say("\\s+cf create-service-broker SERVICE_BROKER USERNAME PASSWORD URL \\[--space-scoped\\]"))
-
-					Eventually(session).Should(Say("ALIAS:"))
-					Eventually(session).Should(Say("\\s+csb"))
-
-					Eventually(session).Should(Say("OPTIONS:"))
-					Eventually(session).Should(Say("\\s+--space-scoped      Make the broker's service plans only visible within the targeted space"))
-
-					Eventually(session).Should(Say("SEE ALSO:"))
-					Eventually(session).Should(Say("\\s+enable-service-access, service-brokers, target"))
-
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the broker URL is invalid", func() {
-				BeforeEach(func() {
-					// TODO: replace skip with versioned skip when
-					// https://www.pivotaltracker.com/story/show/166215494 is resolved.
-					helpers.SkipIfV7()
-				})
-
-				It("displays a relevant error", func() {
-					session := helpers.CF("create-service-broker", brokerName, "user", "pass", "not-a-valid-url")
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("not-a-valid-url is not a valid URL"))
-					Eventually(session).Should(Exit(1))
 				})
 			})
 		})
 	})
+
+	When("the broker URL is invalid", func() {
+		BeforeEach(func() {
+			// TODO: replace skip with versioned skip when
+			// https://www.pivotaltracker.com/story/show/166215494 is resolved.
+			helpers.SkipIfV7()
+		})
+
+		It("displays a relevant error", func() {
+			session := helpers.CF("create-service-broker", brokerName, "user", "pass", "not-a-valid-url")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say("not-a-valid-url is not a valid URL"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	When("no arguments are provided", func() {
+		It("displays an error, naming each of the missing args and the help text", func() {
+			session := helpers.CF("create-service-broker")
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SERVICE_BROKER`, `USERNAME`, `PASSWORD` and `URL` were not provided"))
+
+			Eventually(session).Should(Say("NAME:"))
+			Eventually(session).Should(Say("\\s+create-service-broker - Create a service broker"))
+
+			Eventually(session).Should(Say("USAGE:"))
+			Eventually(session).Should(Say("\\s+cf create-service-broker SERVICE_BROKER USERNAME PASSWORD URL \\[--space-scoped\\]"))
+
+			Eventually(session).Should(Say("ALIAS:"))
+			Eventually(session).Should(Say("\\s+csb"))
+
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say("\\s+--space-scoped      Make the broker's service plans only visible within the targeted space"))
+
+			Eventually(session).Should(Say("SEE ALSO:"))
+			Eventually(session).Should(Say("\\s+enable-service-access, service-brokers, target"))
+
+			Eventually(session).Should(Exit(1))
+		})
+	})
 })
-
-func pushServiceBroker(org, space string) (string, string) {
-	helpers.SetupCF(org, space)
-
-	servicePlanName := helpers.NewPlanName()
-	broker := helpers.NewServiceBroker(
-		helpers.NewServiceBrokerName(),
-		helpers.NewAssets().ServiceBroker,
-		helpers.DefaultSharedDomain(),
-		helpers.PrefixedRandomName("service"),
-		servicePlanName,
-	)
-	broker.Push()
-	broker.Configure(true)
-
-	return fmt.Sprintf("http://%s.%s", broker.Name, broker.AppsDomain), servicePlanName
-}
