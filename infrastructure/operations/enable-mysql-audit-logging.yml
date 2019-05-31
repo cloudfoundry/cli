@@ -1,4 +1,4 @@
 ---
-- type: set
-  path: /instance_groups/name=database/jobs/name=pxc-mysql/properties/engine_config/audit_logs/enabled?
+- type: replace
+  path: /instance_groups/name=database/jobs/name=pxc-mysql/properties/engine_config?/audit_logs/enabled
   value: true
