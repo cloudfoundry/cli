@@ -303,18 +303,19 @@ var _ = Describe("bind-service command", func() {
 			})
 
 			When("the service is provided by a broker", func() {
-				var broker helpers.ServiceBroker
-
-				AfterEach(func() {
-					broker.Destroy()
-				})
 
 				When("the service binding is blocking", func() {
+					var broker helpers.ServiceBroker
+
 					BeforeEach(func() {
 						broker = helpers.CreateBroker(domain, service, servicePlan)
 
 						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						broker.Destroy()
 					})
 
 					It("binds the service to the app, displays OK and TIP", func() {
@@ -332,13 +333,12 @@ var _ = Describe("bind-service command", func() {
 				})
 
 				When("the service binding is asynchronous", func() {
+					var broker helpers.ServiceBroker
+
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 
-						broker = helpers.NewAsynchServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-						broker.Push()
-						broker.Configure(true)
-						broker.Create()
+						broker = helpers.CreateAsyncBroker(domain, service, servicePlan)
 
 						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
@@ -347,6 +347,10 @@ var _ = Describe("bind-service command", func() {
 							session := helpers.CF("service", serviceInstance)
 							return session.Wait()
 						}, time.Minute*5, time.Second*5).Should(Say("create succeeded"))
+					})
+
+					AfterEach(func() {
+						broker.Destroy()
 					})
 
 					It("binds the service to the app, displays OK and TIP", func() {

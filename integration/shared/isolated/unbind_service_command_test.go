@@ -126,10 +126,8 @@ var _ = Describe("unbind-service command", func() {
 			When("the unbinding is asynchronous", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
-					broker = helpers.NewAsynchServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-					broker.Push()
-					broker.Configure(true)
-					broker.Create()
+
+					broker = helpers.CreateAsyncBroker(domain, service, servicePlan)
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 

@@ -65,7 +65,7 @@ type ServiceBroker struct {
 
 // NewServiceBroker constructs a new ServiceBroker with given attributes. planName will be used
 // to create a synchronous service plan on the broker.
-func NewServiceBroker(name string, path string, appsDomain string, serviceName string, planName string) ServiceBroker {
+func NewServiceBroker(name, path, appsDomain, serviceName, planName string) ServiceBroker {
 	b := ServiceBroker{}
 	b.Path = path
 	b.Name = name
@@ -91,7 +91,7 @@ func NewServiceBroker(name string, path string, appsDomain string, serviceName s
 
 // NewAsynchServiceBroker constructs a new ServiceBroker with given attributes. planName will be used
 // to create an asynchronous service plan on the broker.
-func NewAsynchServiceBroker(name string, path string, appsDomain string, serviceName string, planName string) ServiceBroker {
+func NewAsynchServiceBroker(name, path, appsDomain, serviceName, planName string) ServiceBroker {
 	b := ServiceBroker{}
 	b.Path = path
 	b.Name = name
@@ -211,9 +211,17 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 
 // CreateBroker creates a new shareable broker which provides the user specified service plan to a foundation.
 func CreateBroker(domain, serviceName, planName string) ServiceBroker {
-	service := serviceName
-	servicePlan := planName
-	broker := NewServiceBroker(NewServiceBrokerName(), NewAssets().ServiceBroker, domain, service, servicePlan)
+	broker := NewServiceBroker(NewServiceBrokerName(), NewAssets().ServiceBroker, domain, serviceName, planName)
+	broker.Push()
+	broker.Configure(true)
+	broker.Create()
+
+	return broker
+}
+
+// CreateAsyncBroker creates a new shareable broker which provides the user specified service plan to a foundation.
+func CreateAsyncBroker(domain, serviceName, planName string) ServiceBroker {
+	broker := NewAsynchServiceBroker(NewServiceBrokerName(), NewAssets().ServiceBroker, domain, serviceName, planName)
 	broker.Push()
 	broker.Configure(true)
 	broker.Create()
