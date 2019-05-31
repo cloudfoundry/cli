@@ -515,6 +515,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 	})
+
 	Describe("GetOrganizationDomains", func() {
 		var (
 			orgGUID    string

@@ -188,3 +188,44 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 
 	return actorRoutes, allWarnings, nil
 }
+
+func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, error) {
+	allWarnings := Warnings{}
+	domain, warnings, err := actor.GetDomainByName(domainName)
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if path != "" && string(path[0]) != "/" {
+		path = "/" + path
+	}
+
+	routes, apiWarnings, err := actor.CloudControllerClient.GetRoutes([]ccv3.Query{
+		{Key: "domain_guids", Values: []string{domain.GUID}},
+		{Key: "hosts", Values: []string{hostname}},
+		{Key: "paths", Values: []string{path}},
+	}...)
+
+	actorWarnings := Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if len(routes) == 0 {
+		return allWarnings, actionerror.RouteNotFoundError{
+			DomainName: domainName,
+			Host:       hostname,
+			Path:       path,
+		}
+	}
+	_, apiWarnings, err = actor.CloudControllerClient.DeleteRoute(routes[0].GUID)
+
+	actorWarnings = Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
+
+	return allWarnings, err
+}

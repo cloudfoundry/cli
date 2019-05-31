@@ -444,4 +444,120 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 	})
+
+	Describe("DeleteRoute", func() {
+		When("deleting a route", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{
+						{GUID: "domain-guid"},
+					},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]ccv3.Route{
+						{GUID: "route-guid"},
+					},
+					ccv3.Warnings{"get-routes-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.DeleteRouteReturns(ccv3.JobURL("https://job.com"), ccv3.Warnings{"delete-warning"}, nil)
+
+			})
+
+			It("delegates to the cloud controller client", func() {
+				warnings, executeErr := actor.DeleteRoute("domain.com", "hostname", "path")
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "delete-warning"))
+
+				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetDomainsArgsForCall(0)
+				Expect(query).To(ConsistOf([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{"domain.com"}},
+				}))
+
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
+				Expect(query).To(ConsistOf([]ccv3.Query{
+					{Key: "domain_guids", Values: []string{"domain-guid"}},
+					{Key: "hosts", Values: []string{"hostname"}},
+					{Key: "paths", Values: []string{"/path"}},
+				}))
+
+				Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(1))
+				passedRouteGuid := fakeCloudControllerClient.DeleteRouteArgsForCall(0)
+
+				Expect(passedRouteGuid).To(Equal("route-guid"))
+			})
+
+			When("getting domains fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDomainsReturns(
+						nil,
+						ccv3.Warnings{"get-domains-warning"},
+						errors.New("get-domains-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
+					Expect(err).To(MatchError("get-domains-error"))
+					Expect(warnings).To(ConsistOf("get-domains-warning"))
+				})
+			})
+
+			When("getting routes fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns(
+						nil,
+						ccv3.Warnings{"get-routes-warning"},
+						errors.New("get-routes-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
+					Expect(err).To(MatchError("get-routes-error"))
+					Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning"))
+				})
+			})
+
+			When("deleting route fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteRouteReturns(
+						"",
+						ccv3.Warnings{"delete-route-warning"},
+						errors.New("delete-route-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
+					Expect(err).To(MatchError("delete-route-error"))
+					Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "delete-route-warning"))
+				})
+			})
+
+			When("no routes are returned", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns(
+						[]ccv3.Route{},
+						ccv3.Warnings{"get-routes-warning"},
+						nil,
+					)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
+					Expect(err).To(Equal(actionerror.RouteNotFoundError{
+						DomainName: "domain.com",
+						Host:       "hostname",
+						Path:       "/path",
+					}))
+					Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning"))
+				})
+			})
+		})
+	})
 })

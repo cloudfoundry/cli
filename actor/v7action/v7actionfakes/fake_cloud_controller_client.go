@@ -2,11 +2,11 @@
 package v7actionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
-	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 type FakeCloudControllerClient struct {
@@ -291,6 +291,21 @@ type FakeCloudControllerClient struct {
 	deleteIsolationSegmentOrganizationReturnsOnCall map[int]struct {
 		result1 ccv3.Warnings
 		result2 error
+	}
+	DeleteRouteStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteRouteMutex       sync.RWMutex
+	deleteRouteArgsForCall []struct {
+		arg1 string
+	}
+	deleteRouteReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteRouteReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	DeleteServiceInstanceRelationshipsSharedSpaceStub        func(string, string) (ccv3.Warnings, error)
 	deleteServiceInstanceRelationshipsSharedSpaceMutex       sync.RWMutex
@@ -2450,6 +2465,72 @@ func (fake *FakeCloudControllerClient) DeleteIsolationSegmentOrganizationReturns
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteRoute(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteRouteMutex.Lock()
+	ret, specificReturn := fake.deleteRouteReturnsOnCall[len(fake.deleteRouteArgsForCall)]
+	fake.deleteRouteArgsForCall = append(fake.deleteRouteArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteRoute", []interface{}{arg1})
+	fake.deleteRouteMutex.Unlock()
+	if fake.DeleteRouteStub != nil {
+		return fake.DeleteRouteStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteRouteReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteCallCount() int {
+	fake.deleteRouteMutex.RLock()
+	defer fake.deleteRouteMutex.RUnlock()
+	return len(fake.deleteRouteArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteRouteMutex.Lock()
+	defer fake.deleteRouteMutex.Unlock()
+	fake.DeleteRouteStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteArgsForCall(i int) string {
+	fake.deleteRouteMutex.RLock()
+	defer fake.deleteRouteMutex.RUnlock()
+	argsForCall := fake.deleteRouteArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteRouteMutex.Lock()
+	defer fake.deleteRouteMutex.Unlock()
+	fake.DeleteRouteStub = nil
+	fake.deleteRouteReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteRouteMutex.Lock()
+	defer fake.deleteRouteMutex.Unlock()
+	fake.DeleteRouteStub = nil
+	if fake.deleteRouteReturnsOnCall == nil {
+		fake.deleteRouteReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteRouteReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
@@ -6350,6 +6431,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.deleteIsolationSegmentOrganizationMutex.RLock()
 	defer fake.deleteIsolationSegmentOrganizationMutex.RUnlock()
+	fake.deleteRouteMutex.RLock()
+	defer fake.deleteRouteMutex.RUnlock()
 	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
 	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()

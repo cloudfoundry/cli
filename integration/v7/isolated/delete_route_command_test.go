@@ -41,7 +41,6 @@ var _ = Describe("delete-route command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			Skip("unskip this when doing #165987972")
 			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "delete-route", "some-domain")
 		})
 	})
@@ -53,7 +52,6 @@ var _ = Describe("delete-route command", func() {
 		)
 
 		BeforeEach(func() {
-			Skip("not implemented")
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 
@@ -90,7 +88,7 @@ var _ = Describe("delete-route command", func() {
 				It("warns the user that it has already been deleted and runs to completion without failing", func() {
 					session := helpers.CF("delete-route", domainName, "-f")
 					Eventually(session).Should(Say(`Deleting route %s\.\.\.`, domainName))
-					Eventually(session).Should(Say(`Unable to delete, route '%s' does not exist\.`, domainName))
+					Eventually(session).Should(Say(`Unable to delete\. Route with domain '%s' not found\.`, domainName))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -162,9 +160,9 @@ var _ = Describe("delete-route command", func() {
 
 		When("the domain does not exist", func() {
 			It("displays error and exits 1", func() {
-				session := helpers.CF("delete-route", "some-domain")
+				session := helpers.CF("delete-route", "some-domain", "-f")
 				Eventually(session).Should(Say(`FAILED`))
-				Eventually(session).Should(Say(`Domain some-domain not found`))
+				Eventually(session.Err).Should(Say(`Domain some-domain not found`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
