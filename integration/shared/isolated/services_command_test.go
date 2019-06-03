@@ -201,23 +201,6 @@ var _ = Describe("services command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("CAPI version does NOT support maintenance_info in summary endpoint", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionAtLeast(ccversion.MinVersionMaintenanceInfoInSummaryV2)
-			})
-
-			It("displays all service information", func() {
-				session := helpers.CF("services")
-				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
-				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithNewMaintenanceInfo, service, planWithMaintenanceInfo, "", "create succeeded", broker.Name))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithOldMaintenanceInfo, service, planWithMaintenanceInfo, "", "create succeeded", broker.Name))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithNoMaintenanceInfo, service, planWithNoMaintenanceInfo, "", "create succeeded", broker.Name))
-				Eventually(session).Should(Say(`%s\s+%s\s+`, userProvidedService, "user-provided"))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
 		When("CAPI version supports maintenance_info in summary endpoint", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionMaintenanceInfoInSummaryV2)
