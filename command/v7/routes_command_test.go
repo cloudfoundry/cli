@@ -115,9 +115,9 @@ var _ = Describe("routes Command", func() {
 
 				BeforeEach(func() {
 					routes = []v7action.Route{
+						{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"},
 						{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
-						{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-2", Path: "/path/2"},
-						{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-3"},
+						{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"},
 					}
 
 					fakeActor.GetRoutesBySpaceReturns(
@@ -147,12 +147,12 @@ var _ = Describe("routes Command", func() {
 					Expect(testUI.Err).To(Say("actor-warning-3"))
 				})
 
-				It("prints the list of routes", func() {
+				It("prints the list of routes in alphabetical order", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say(tableHeaders))
 					Expect(testUI.Out).To(Say(`space-1\s+domain1`))
-					Expect(testUI.Out).To(Say(`space-2\s+host-2\s+domain2\s+\/path\/2`))
-					Expect(testUI.Out).To(Say(`space-3\s+host-3\s+domain3`))
+					Expect(testUI.Out).To(Say(`space-2\s+host-3\s+domain2\s+\/path\/2`))
+					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3`))
 				})
 
 				It("prints the flavor text", func() {

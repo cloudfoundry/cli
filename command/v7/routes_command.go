@@ -1,10 +1,13 @@
 package v7
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -79,6 +82,8 @@ func (cmd RoutesCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	sort.Slice(routes, func(i, j int) bool { return sorting.LessIgnoreCase(routes[i].SpaceName, routes[j].SpaceName) })
 
 	if len(routes) > 0 {
 		cmd.displayRoutesTable(routes)
