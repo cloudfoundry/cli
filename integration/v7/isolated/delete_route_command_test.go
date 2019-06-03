@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"regexp"
 )
 
 var _ = Describe("delete-route command", func() {
@@ -47,13 +48,17 @@ var _ = Describe("delete-route command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
-			orgName   string
-			spaceName string
+			buffer     *Buffer
+			orgName    string
+			spaceName  string
+			domainName string
 		)
 
 		BeforeEach(func() {
+			buffer = NewBuffer()
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
+			domainName = helpers.NewDomainName()
 
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -61,12 +66,59 @@ var _ = Describe("delete-route command", func() {
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
-
-		When("the space and domain exist", func() {
+		When("the -f flag is not given", func() {
 			var (
-				domainName string
+				domain helpers.Domain
 			)
 
+			BeforeEach(func() {
+				domain = helpers.NewDomain(orgName, domainName)
+				domain.CreatePrivate()
+			})
+
+			AfterEach(func() {
+				domain.Delete()
+			})
+
+			When("the user enters 'y'", func() {
+				BeforeEach(func() {
+					_, err := buffer.Write([]byte("y\n"))
+					Expect(err).ToNot(HaveOccurred())
+
+					Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
+				})
+				When("the user attempts to delete a route with a private domain", func() {
+					It("it asks for confirmation and deletes the domain", func() {
+						session := helpers.CFWithStdin(buffer, "delete-route", domainName)
+						Eventually(session).Should(Say("This action impacts all apps using this route."))
+						Eventually(session).Should(Say("Deleting the route will remove associated apps which will make apps with this route unreachable."))
+						Eventually(session).Should(Say(`Really delete the route %s\?`, domainName))
+						Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting route %s...`), domainName))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("the user enters 'n'", func() {
+				BeforeEach(func() {
+					_, err := buffer.Write([]byte("n\n"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("it asks for confirmation and does not delete the domain", func() {
+					session := helpers.CFWithStdin(buffer, "delete-route", domainName)
+					Eventually(session).Should(Say("This action impacts all apps using this route."))
+					Eventually(session).Should(Say("Deleting the route will remove associated apps which will make apps with this route unreachable."))
+					Eventually(session).Should(Say(`Really delete the route %s\?`, domainName))
+					Eventually(session).Should(Say(`'%s' has not been deleted`, domainName))
+					Consistently(session).ShouldNot(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		When("the -f flag is given", func() {
 			BeforeEach(func() {
 				domainName = helpers.NewDomainName()
 			})

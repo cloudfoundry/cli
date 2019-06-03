@@ -59,10 +59,8 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 	pathName := cmd.Path
 	fqdn := desiredFQDN(domain, hostname, pathName)
 
-	cmd.UI.DisplayTextWithFlavor("Deleting route {{.FQDN}}...",
-		map[string]interface{}{
-			"FQDN": fqdn,
-		})
+	cmd.UI.DisplayText("This action impacts all apps using this route.")
+	cmd.UI.DisplayText("Deleting the route will remove associated apps which will make apps with this route unreachable.")
 
 	if !cmd.Force {
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the route {{.FQDN}}?", map[string]interface{}{
@@ -80,6 +78,11 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 			return nil
 		}
 	}
+
+	cmd.UI.DisplayTextWithFlavor("Deleting route {{.FQDN}}...",
+		map[string]interface{}{
+			"FQDN": fqdn,
+		})
 
 	warnings, err := cmd.Actor.DeleteRoute(domain, hostname, pathName)
 
