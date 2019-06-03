@@ -17,7 +17,7 @@ type DeleteRouteActor interface {
 
 type DeleteRouteCommand struct {
 	RequiredArgs    flag.Domain `positional-args:"yes"`
-	usage           interface{} `usage:"Delete an HTTP route:\n      CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\n\n   Delete a TCP route:\n      CF_NAME delete-route DOMAIN [-f]\n\nEXAMPLES:\n   CF_NAME delete-route example.com                              # example.com\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	usage           interface{} `usage:"CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
 	Hostname        string      `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route (required for shared domains)"`
 	Path            string      `long:"path" description:"Path used to identify the HTTP route"`
