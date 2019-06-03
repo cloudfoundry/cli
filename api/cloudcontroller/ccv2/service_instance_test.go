@@ -250,7 +250,8 @@ var _ = Describe("Service Instance", func() {
 						"description": "service broker-provided description",
 						"updated_at": "updated-at-time",
 						"created_at": "created-at-time"
-					}
+					},
+					"maintenance_info": { "version": "2.0.0" }
 				}
 			}`
 
@@ -284,6 +285,7 @@ var _ = Describe("Service Instance", func() {
 						UpdatedAt:   "updated-at-time",
 						CreatedAt:   "created-at-time",
 					},
+					MaintenanceInfo: MaintenanceInfo{Version: "2.0.0"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

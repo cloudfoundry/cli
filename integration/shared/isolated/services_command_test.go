@@ -52,7 +52,7 @@ var _ = Describe("services command", func() {
 		})
 	})
 
-	Context("has services", func() {
+	Context("has services and applications", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -135,7 +135,7 @@ var _ = Describe("services command", func() {
 			})
 		})
 
-		When("CAPI version is => 2.125.0", func() {
+		When("CAPI version is >= 2.125.0 (broker name is available in summary endpoint)", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 			})
@@ -148,6 +148,89 @@ var _ = Describe("services command", func() {
 				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s`, managedService2, service, servicePlan, appName1, appName2, "create succeeded", broker.Name))
 				Eventually(session).Should(Say(`%s\s+%s\s+%s`, userProvidedService1, "user-provided", appName1))
 				Eventually(session).Should(Say(`%s\s+%s\s+%s, %s`, userProvidedService2, "user-provided", appName1, appName2))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("has only services", func() {
+		const (
+			serviceInstanceWithNoMaintenanceInfo  = "s3"
+			serviceInstanceWithOldMaintenanceInfo = "s2"
+			serviceInstanceWithNewMaintenanceInfo = "s1"
+		)
+
+		var (
+			broker                    helpers.ServiceBroker
+			orgName                   string
+			spaceName                 string
+			service                   string
+			planWithNoMaintenanceInfo string
+			planWithMaintenanceInfo   string
+			userProvidedService       string
+		)
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+
+			domain := helpers.DefaultSharedDomain()
+			service = helpers.PrefixedRandomName("SERVICE")
+			planWithMaintenanceInfo = helpers.PrefixedRandomName("SERVICE-PLAN")
+			broker = helpers.CreateBroker(domain, service, planWithMaintenanceInfo)
+			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+
+			planWithNoMaintenanceInfo = broker.SyncPlans[1].Name
+			Eventually(helpers.CF("create-service", service, planWithNoMaintenanceInfo, serviceInstanceWithNoMaintenanceInfo)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", service, planWithMaintenanceInfo, serviceInstanceWithOldMaintenanceInfo)).Should(Exit(0))
+
+			broker.UpdateMaintenanceInfo("2.0.0") // default is 1.2.3
+			Eventually(helpers.CF("create-service", service, planWithMaintenanceInfo, serviceInstanceWithNewMaintenanceInfo)).Should(Exit(0))
+
+			userProvidedService = helpers.PrefixedRandomName("UPS1")
+			Eventually(helpers.CF("cups", userProvidedService, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
+		})
+
+		AfterEach(func() {
+			Eventually(helpers.CF("delete-service", serviceInstanceWithNoMaintenanceInfo, "-f")).Should(Exit(0))
+			Eventually(helpers.CF("delete-service", serviceInstanceWithOldMaintenanceInfo, "-f")).Should(Exit(0))
+			Eventually(helpers.CF("delete-service", serviceInstanceWithNewMaintenanceInfo, "-f")).Should(Exit(0))
+
+			broker.Destroy()
+			helpers.QuickDeleteOrg(orgName)
+		})
+
+		When("CAPI version does NOT support maintenance_info in summary endpoint", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionAtLeast(ccversion.MinVersionMaintenanceInfoInSummaryV2)
+			})
+
+			It("displays all service information", func() {
+				session := helpers.CF("services")
+				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
+				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available`))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithNewMaintenanceInfo, service, planWithMaintenanceInfo, "", "create succeeded", broker.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithOldMaintenanceInfo, service, planWithMaintenanceInfo, "", "create succeeded", broker.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithNoMaintenanceInfo, service, planWithNoMaintenanceInfo, "", "create succeeded", broker.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+`, userProvidedService, "user-provided"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("CAPI version supports maintenance_info in summary endpoint", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionMaintenanceInfoInSummaryV2)
+			})
+
+			It("displays all service information", func() {
+				session := helpers.CF("services")
+				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
+				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker\s+upgrade available`))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithNewMaintenanceInfo, service, planWithMaintenanceInfo, "", "create succeeded", broker.Name, "no"))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithOldMaintenanceInfo, service, planWithMaintenanceInfo, "", "create succeeded", broker.Name, "yes"))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`, serviceInstanceWithNoMaintenanceInfo, service, planWithNoMaintenanceInfo, "", "create succeeded", broker.Name, ""))
+				Eventually(session).Should(Say(`%s\s+%s\s+`, userProvidedService, "user-provided"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -80,6 +81,19 @@ var _ = Describe("Service Instance Summary Actions", func() {
 				})
 			})
 		})
+
+		DescribeTable("UpgradeAvailable",
+			func(versionFromPlan, versionFromServiceInstance, expectedResult string) {
+				summary.MaintenanceInfo.Version = versionFromServiceInstance
+				summary.ServicePlan.MaintenanceInfo.Version = versionFromPlan
+				Expect(summary.UpgradeAvailable()).To(Equal(expectedResult))
+			},
+			Entry("values are the same", "2.0.0", "2.0.0", "no"),
+			Entry("values are different", "3.0.0", "2.0.0", "yes"),
+			Entry("values are both empty", "", "", ""),
+			Entry("plan has value but instance does not", "1.0.0", "", "yes"),
+			Entry("instance has value but plan does not", "", "1.0.0", ""),
+		)
 	})
 
 	Describe("GetServiceInstanceSummaryByNameAndSpace", func() {
@@ -895,9 +909,15 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						ServiceInstances: []ccv2.SpaceSummaryServiceInstance{
 							{
 								Name: "managed-service-instance",
+								MaintenanceInfo: ccv2.MaintenanceInfo{
+									Version: "2.0.0",
+								},
 								ServicePlan: ccv2.SpaceSummaryServicePlan{
 									GUID: "plan-guid",
 									Name: "simple-plan",
+									MaintenanceInfo: ccv2.MaintenanceInfo{
+										Version: "3.0.0",
+									},
 									Service: ccv2.SpaceSummaryService{
 										GUID:              "service-guid-1",
 										Label:             "service-label",
@@ -933,9 +953,15 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								State:       "succeeded",
 								Description: "a description",
 							},
+							MaintenanceInfo: ccv2.MaintenanceInfo{
+								Version: "2.0.0",
+							},
 						},
 						ServicePlan: ServicePlan{
 							Name: "simple-plan",
+							MaintenanceInfo: ccv2.MaintenanceInfo{
+								Version: "3.0.0",
+							},
 						},
 						Service: Service{
 							Label:             "service-label",

@@ -20,16 +20,18 @@ type SpaceSummaryService struct {
 
 // SpaceSummaryServicePlan represents a service plan inside a space
 type SpaceSummaryServicePlan struct {
-	GUID    string              `json:"guid"`
-	Name    string              `json:"name"`
-	Service SpaceSummaryService `json:"service"`
+	GUID            string              `json:"guid"`
+	Name            string              `json:"name"`
+	Service         SpaceSummaryService `json:"service"`
+	MaintenanceInfo MaintenanceInfo     `json:"maintenance_info"`
 }
 
 // SpaceSummaryServiceInstance represents a service instance inside a space
 type SpaceSummaryServiceInstance struct {
-	LastOperation LastOperation           `json:"last_operation"`
-	Name          string                  `json:"name"`
-	ServicePlan   SpaceSummaryServicePlan `json:"service_plan"`
+	LastOperation   LastOperation           `json:"last_operation"`
+	Name            string                  `json:"name"`
+	ServicePlan     SpaceSummaryServicePlan `json:"service_plan"`
+	MaintenanceInfo MaintenanceInfo         `json:"maintenance_info"`
 }
 
 // SpaceSummary represents a service instance inside a space
