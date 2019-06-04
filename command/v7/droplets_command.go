@@ -1,9 +1,10 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"strings"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/v7action"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command"
@@ -19,8 +20,9 @@ type DropletsActor interface {
 }
 
 type DropletsCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME droplets APP_NAME"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	usage           interface{}  `usage:"CF_NAME droplets APP_NAME"`
+	relatedCommands interface{}  `related_commands:"set-droplet, create-package, packages, app, push"`
 
 	UI          command.UI
 	Config      command.Config
@@ -54,7 +56,7 @@ func (cmd DropletsCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Listing droplets of app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting droplets of app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,

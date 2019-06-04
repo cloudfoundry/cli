@@ -30,6 +30,8 @@ var _ = Describe("droplets command", func() {
 				Eventually(session).Should(Say("droplets - List droplets of an app"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf droplets APP_NAME"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("app, create-package, packages, push, set-droplet"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -68,7 +70,7 @@ var _ = Describe("droplets command", func() {
 			It("displays app not found and exits 1", func() {
 				session := helpers.CF("droplets", appName)
 
-				Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 
@@ -84,7 +86,7 @@ var _ = Describe("droplets command", func() {
 
 				It("displays empty list", func() {
 					session := helpers.CF("droplets", appName)
-					Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Getting droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("No droplets found"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -99,7 +101,7 @@ var _ = Describe("droplets command", func() {
 
 				It("displays droplets in the list", func() {
 					session := helpers.CF("droplets", appName)
-					Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Getting droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`guid\s+state\s+created`))
 					Eventually(session).Should(Say(`\s+.*\s+staged\s+%s`, helpers.UserFriendlyDateRegex))
 
