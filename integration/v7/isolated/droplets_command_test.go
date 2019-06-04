@@ -1,4 +1,4 @@
-package experimental
+package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("v3-droplets command", func() {
+var _ = Describe("droplets command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -24,12 +24,12 @@ var _ = Describe("v3-droplets command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
-				session := helpers.CF("v3-droplets", "--help")
+				session := helpers.CF("droplets", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("v3-droplets - List droplets of an app"))
+				Eventually(session).Should(Say("droplets - List droplets of an app"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf v3-droplets APP_NAME"))
+				Eventually(session).Should(Say("cf droplets APP_NAME"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -38,7 +38,7 @@ var _ = Describe("v3-droplets command", func() {
 
 	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("v3-droplets")
+			session := helpers.CF("droplets")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session).Should(Say("NAME:"))
@@ -46,15 +46,9 @@ var _ = Describe("v3-droplets command", func() {
 		})
 	})
 
-	It("displays the experimental warning", func() {
-		session := helpers.CF("v3-droplets", appName)
-		Eventually(session.Err).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-		Eventually(session).Should(Exit())
-	})
-
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "v3-droplets", appName)
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "droplets", appName)
 		})
 	})
 
@@ -72,7 +66,7 @@ var _ = Describe("v3-droplets command", func() {
 
 		When("the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
-				session := helpers.CF("v3-droplets", appName)
+				session := helpers.CF("droplets", appName)
 
 				Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App '%s' not found", appName))
@@ -89,7 +83,7 @@ var _ = Describe("v3-droplets command", func() {
 				})
 
 				It("displays empty list", func() {
-					session := helpers.CF("v3-droplets", appName)
+					session := helpers.CF("droplets", appName)
 					Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("No droplets found"))
 					Eventually(session).Should(Exit(0))
@@ -104,7 +98,7 @@ var _ = Describe("v3-droplets command", func() {
 				})
 
 				It("displays droplets in the list", func() {
-					session := helpers.CF("v3-droplets", appName)
+					session := helpers.CF("droplets", appName)
 					Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`guid\s+state\s+created`))
 					Eventually(session).Should(Say(`\s+.*\s+staged\s+%s`, helpers.UserFriendlyDateRegex))

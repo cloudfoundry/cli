@@ -1,49 +1,48 @@
-package v6
+package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-//go:generate counterfeiter . V3DropletsActor
+//go:generate counterfeiter . DropletsActor
 
-type V3DropletsActor interface {
-	GetApplicationDroplets(appName string, spaceGUID string) ([]v3action.Droplet, v3action.Warnings, error)
+type DropletsActor interface {
+	GetApplicationDroplets(appName string, spaceGUID string) ([]v7action.Droplet, v7action.Warnings, error)
 }
 
-type V3DropletsCommand struct {
+type DropletsCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-droplets APP_NAME"`
+	usage        interface{}  `usage:"CF_NAME droplets APP_NAME"`
 
 	UI          command.UI
 	Config      command.Config
-	Actor       V3DropletsActor
+	Actor       DropletsActor
 	SharedActor command.SharedActor
 }
 
-func (cmd *V3DropletsCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *DropletsCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
 
 	return nil
 }
 
-func (cmd V3DropletsCommand) Execute(args []string) error {
-	cmd.UI.DisplayWarning(command.ExperimentalWarning)
+func (cmd DropletsCommand) Execute(args []string) error {
 
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {

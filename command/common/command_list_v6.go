@@ -18,14 +18,14 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	App                                v6.V3AppCommand                              `command:"app" description:"Display health and status for an app"`
-	V3Apps                             v6.V3AppsCommand                             `command:"v3-apps" description:"List all apps in the target space"`
-	V3ApplyManifest                    v6.V3ApplyManifestCommand                    `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
-	V3CancelZdtPush                    v6.V3CancelZdtPushCommand                    `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
-	V3CreateApp                        v6.V3CreateAppCommand                        `command:"v3-create-app" description:"Create a V3 App"`
-	V3CreatePackage                    v6.V3CreatePackageCommand                    `command:"v3-create-package" description:"Uploads a V3 Package"`
-	V3DeleteApp                        v6.V3DeleteCommand                           `command:"v3-delete" description:"Delete a V3 App"`
-	V3Droplets                         v6.V3DropletsCommand                         `command:"v3-droplets" description:"List droplets of an app"`
+	App             v6.V3AppCommand           `command:"app" description:"Display health and status for an app"`
+	V3Apps          v6.V3AppsCommand          `command:"v3-apps" description:"List all apps in the target space"`
+	V3ApplyManifest v6.V3ApplyManifestCommand `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
+	V3CancelZdtPush v6.V3CancelZdtPushCommand `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
+	V3CreateApp     v6.V3CreateAppCommand     `command:"v3-create-app" description:"Create a V3 App"`
+	V3CreatePackage v6.V3CreatePackageCommand `command:"v3-create-package" description:"Uploads a V3 Package"`
+	V3DeleteApp     v6.V3DeleteCommand        `command:"v3-delete" description:"Delete a V3 App"`
+	//V3Droplets                         v6.V3DropletsCommand                         `command:"v3-droplets" description:"List droplets of an app"`
 	V3Env                              v6.V3EnvCommand                              `command:"v3-env" description:"Show all env variables for an app"`
 	V3GetHealthCheck                   v6.V3GetHealthCheckCommand                   `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
 	V3Packages                         v6.V3PackagesCommand                         `command:"v3-packages" description:"List packages of an app"`

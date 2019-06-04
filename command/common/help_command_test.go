@@ -631,7 +631,6 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say(`   v3-stage\s+Create a new droplet for an app`))
 				Expect(testUI.Out).To(Say(`   v3-restart-app-instance\s+Terminate, then instantiate an app instance`))
 				Expect(testUI.Out).To(Say(`   v3-apply-manifest\s+Applies manifest properties to an application`))
-				Expect(testUI.Out).To(Say(`   v3-droplets\s+List droplets of an app`))
 				Expect(testUI.Out).To(Say(`   v3-set-droplet\s+Set the droplet used to run an app`))
 				Expect(testUI.Out).To(Say(`   v3-env\s+Show all env variables for an app`))
 				Expect(testUI.Out).To(Say(`   v3-set-env\s+Set an env variable for an app`))

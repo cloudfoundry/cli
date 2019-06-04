@@ -48,32 +48,6 @@ func (actor Actor) SetApplicationDroplet(appGUID string, dropletGUID string) (Wa
 	return Warnings(warnings), err
 }
 
-// GetApplicationDroplets returns the list of droplets that belong to applicaiton.
-func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]Droplet, Warnings, error) {
-	allWarnings := Warnings{}
-	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	ccv3Droplets, apiWarnings, err := actor.CloudControllerClient.GetDroplets(
-		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{application.GUID}},
-	)
-	actorWarnings := Warnings(apiWarnings)
-	allWarnings = append(allWarnings, actorWarnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	var droplets []Droplet
-	for _, ccv3Droplet := range ccv3Droplets {
-		droplets = append(droplets, actor.convertCCToActorDroplet(ccv3Droplet))
-	}
-
-	return droplets, allWarnings, err
-}
-
 func (actor Actor) GetCurrentDropletByApplication(appGUID string) (Droplet, Warnings, error) {
 	droplet, warnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(appGUID)
 	switch err.(type) {

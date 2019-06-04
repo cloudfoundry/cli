@@ -89,6 +89,22 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetApplicationDropletsStub        func(string, string) ([]v7action.Droplet, v7action.Warnings, error)
+	getApplicationDropletsMutex       sync.RWMutex
+	getApplicationDropletsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getApplicationDropletsReturns struct {
+		result1 []v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationDropletsReturnsOnCall map[int]struct {
+		result1 []v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationsByNamesAndSpaceStub        func([]string, string) ([]v7action.Application, v7action.Warnings, error)
 	getApplicationsByNamesAndSpaceMutex       sync.RWMutex
 	getApplicationsByNamesAndSpaceArgsForCall []struct {
@@ -675,6 +691,73 @@ func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result
 	}
 	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) GetApplicationDroplets(arg1 string, arg2 string) ([]v7action.Droplet, v7action.Warnings, error) {
+	fake.getApplicationDropletsMutex.Lock()
+	ret, specificReturn := fake.getApplicationDropletsReturnsOnCall[len(fake.getApplicationDropletsArgsForCall)]
+	fake.getApplicationDropletsArgsForCall = append(fake.getApplicationDropletsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationDroplets", []interface{}{arg1, arg2})
+	fake.getApplicationDropletsMutex.Unlock()
+	if fake.GetApplicationDropletsStub != nil {
+		return fake.GetApplicationDropletsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationDropletsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) GetApplicationDropletsCallCount() int {
+	fake.getApplicationDropletsMutex.RLock()
+	defer fake.getApplicationDropletsMutex.RUnlock()
+	return len(fake.getApplicationDropletsArgsForCall)
+}
+
+func (fake *FakeV7Actor) GetApplicationDropletsCalls(stub func(string, string) ([]v7action.Droplet, v7action.Warnings, error)) {
+	fake.getApplicationDropletsMutex.Lock()
+	defer fake.getApplicationDropletsMutex.Unlock()
+	fake.GetApplicationDropletsStub = stub
+}
+
+func (fake *FakeV7Actor) GetApplicationDropletsArgsForCall(i int) (string, string) {
+	fake.getApplicationDropletsMutex.RLock()
+	defer fake.getApplicationDropletsMutex.RUnlock()
+	argsForCall := fake.getApplicationDropletsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) GetApplicationDropletsReturns(result1 []v7action.Droplet, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationDropletsMutex.Lock()
+	defer fake.getApplicationDropletsMutex.Unlock()
+	fake.GetApplicationDropletsStub = nil
+	fake.getApplicationDropletsReturns = struct {
+		result1 []v7action.Droplet
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) GetApplicationDropletsReturnsOnCall(i int, result1 []v7action.Droplet, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationDropletsMutex.Lock()
+	defer fake.getApplicationDropletsMutex.Unlock()
+	fake.GetApplicationDropletsStub = nil
+	if fake.getApplicationDropletsReturnsOnCall == nil {
+		fake.getApplicationDropletsReturnsOnCall = make(map[int]struct {
+			result1 []v7action.Droplet
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationDropletsReturnsOnCall[i] = struct {
+		result1 []v7action.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1831,6 +1914,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getApplicationDropletsMutex.RLock()
+	defer fake.getApplicationDropletsMutex.RUnlock()
 	fake.getApplicationsByNamesAndSpaceMutex.RLock()
 	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
 	fake.getDefaultDomainMutex.RLock()

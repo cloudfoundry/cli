@@ -1,31 +1,32 @@
-package v6_test
+package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command/flag"
 	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
-	. "code.cloudfoundry.org/cli/command/v6"
-	"code.cloudfoundry.org/cli/command/v6/v6fakes"
+	. "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("v3-droplets Command", func() {
+var _ = Describe("droplets Command", func() {
 	var (
-		cmd             V3DropletsCommand
+		cmd             DropletsCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v6fakes.FakeV3DropletsActor
+		fakeActor       *v7fakes.FakeDropletsActor
 		binaryName      string
 		executeErr      error
 	)
@@ -34,12 +35,12 @@ var _ = Describe("v3-droplets Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v6fakes.FakeV3DropletsActor)
+		fakeActor = new(v7fakes.FakeDropletsActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		cmd = V3DropletsCommand{
+		cmd = DropletsCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
 			UI:           testUI,
 			Config:       fakeConfig,
@@ -61,10 +62,6 @@ var _ = Describe("v3-droplets Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	It("displays the experimental warning", func() {
-		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 	})
 
 	When("checking target fails", func() {
@@ -100,7 +97,7 @@ var _ = Describe("v3-droplets Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationDropletsReturns([]v3action.Droplet{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.GetApplicationDropletsReturns([]v7action.Droplet{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -118,7 +115,7 @@ var _ = Describe("v3-droplets Command", func() {
 		BeforeEach(func() {
 			createdAtOne = "2017-08-14T21:16:42Z"
 			createdAtTwo = "2017-08-16T00:18:24Z"
-			droplets := []v3action.Droplet{
+			droplets := []v7action.Droplet{
 				{
 					GUID:      "some-droplet-guid-1",
 					State:     constant.DropletStaged,
@@ -130,7 +127,7 @@ var _ = Describe("v3-droplets Command", func() {
 					CreatedAt: createdAtTwo,
 				},
 			}
-			fakeActor.GetApplicationDropletsReturns(droplets, v3action.Warnings{"warning-1", "warning-2"}, nil)
+			fakeActor.GetApplicationDropletsReturns(droplets, v7action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
 		It("prints the application droplets and outputs warnings", func() {
@@ -160,7 +157,7 @@ var _ = Describe("v3-droplets Command", func() {
 
 	When("getting the application droplets returns no droplets", func() {
 		BeforeEach(func() {
-			fakeActor.GetApplicationDropletsReturns([]v3action.Droplet{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
+			fakeActor.GetApplicationDropletsReturns([]v7action.Droplet{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
 		It("displays there are no droplets", func() {
