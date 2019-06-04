@@ -400,21 +400,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetDropletsStub        func(...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
-	getDropletsMutex       sync.RWMutex
-	getDropletsArgsForCall []struct {
-		arg1 []ccv3.Query
-	}
-	getDropletsReturns struct {
-		result1 []ccv3.Droplet
-		result2 ccv3.Warnings
-		result3 error
-	}
-	getDropletsReturnsOnCall map[int]struct {
-		result1 []ccv3.Droplet
-		result2 ccv3.Warnings
-		result3 error
-	}
 	GetInfoStub        func() (ccv3.Info, ccv3.ResourceLinks, ccv3.Warnings, error)
 	getInfoMutex       sync.RWMutex
 	getInfoArgsForCall []struct {
@@ -2604,72 +2589,6 @@ func (fake *FakeCloudControllerClient) GetDropletReturnsOnCall(i int, result1 cc
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetDroplets(arg1 ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error) {
-	fake.getDropletsMutex.Lock()
-	ret, specificReturn := fake.getDropletsReturnsOnCall[len(fake.getDropletsArgsForCall)]
-	fake.getDropletsArgsForCall = append(fake.getDropletsArgsForCall, struct {
-		arg1 []ccv3.Query
-	}{arg1})
-	fake.recordInvocation("GetDroplets", []interface{}{arg1})
-	fake.getDropletsMutex.Unlock()
-	if fake.GetDropletsStub != nil {
-		return fake.GetDropletsStub(arg1...)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.getDropletsReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) GetDropletsCallCount() int {
-	fake.getDropletsMutex.RLock()
-	defer fake.getDropletsMutex.RUnlock()
-	return len(fake.getDropletsArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) GetDropletsCalls(stub func(...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)) {
-	fake.getDropletsMutex.Lock()
-	defer fake.getDropletsMutex.Unlock()
-	fake.GetDropletsStub = stub
-}
-
-func (fake *FakeCloudControllerClient) GetDropletsArgsForCall(i int) []ccv3.Query {
-	fake.getDropletsMutex.RLock()
-	defer fake.getDropletsMutex.RUnlock()
-	argsForCall := fake.getDropletsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeCloudControllerClient) GetDropletsReturns(result1 []ccv3.Droplet, result2 ccv3.Warnings, result3 error) {
-	fake.getDropletsMutex.Lock()
-	defer fake.getDropletsMutex.Unlock()
-	fake.GetDropletsStub = nil
-	fake.getDropletsReturns = struct {
-		result1 []ccv3.Droplet
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) GetDropletsReturnsOnCall(i int, result1 []ccv3.Droplet, result2 ccv3.Warnings, result3 error) {
-	fake.getDropletsMutex.Lock()
-	defer fake.getDropletsMutex.Unlock()
-	fake.GetDropletsStub = nil
-	if fake.getDropletsReturnsOnCall == nil {
-		fake.getDropletsReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Droplet
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.getDropletsReturnsOnCall[i] = struct {
-		result1 []ccv3.Droplet
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeCloudControllerClient) GetInfo() (ccv3.Info, ccv3.ResourceLinks, ccv3.Warnings, error) {
 	fake.getInfoMutex.Lock()
 	ret, specificReturn := fake.getInfoReturnsOnCall[len(fake.getInfoArgsForCall)]
@@ -4658,8 +4577,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getDeploymentsMutex.RUnlock()
 	fake.getDropletMutex.RLock()
 	defer fake.getDropletMutex.RUnlock()
-	fake.getDropletsMutex.RLock()
-	defer fake.getDropletsMutex.RUnlock()
 	fake.getInfoMutex.RLock()
 	defer fake.getInfoMutex.RUnlock()
 	fake.getIsolationSegmentMutex.RLock()

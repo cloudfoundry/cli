@@ -2,6 +2,7 @@ package ccv2
 
 import (
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -82,6 +83,11 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 		return APIInformation{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}
 	return info, response.Warnings, err
+}
+
+func (client *Client) LogCacheEndpoint() string {
+	apiURL := client.AuthorizationEndpoint()
+	return strings.Replace(apiURL, "login", "log-cache", 1)
 }
 
 // MinCLIVersion returns the minimum CLI version required for the targeted

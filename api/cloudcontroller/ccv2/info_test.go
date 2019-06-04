@@ -1,8 +1,8 @@
 package ccv2_test
 
 import (
+	"fmt"
 	"net/http"
-	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -24,27 +24,26 @@ var _ = Describe("Info", func() {
 		client = NewTestClient()
 	})
 
-	Describe("Info", func() {
+	Describe("When the API returns a correct response", func() {
 		BeforeEach(func() {
-			response := `{
+			response := fmt.Sprintf(`{
 					"name":"faceman test server",
 					"build":"",
 					"support":"http://support.cloudfoundry.com",
 					"version":0,
 					"description":"",
-					"authorization_endpoint":"https://login.APISERVER",
-					"token_endpoint":"https://uaa.APISERVER",
+					"authorization_endpoint":"https://login.%[1]s",
+					"token_endpoint":"https://uaa.%[1]s",
 					"min_cli_version":"6.22.1",
 					"min_recommended_cli_version":null,
 					"api_version":"2.59.0",
-					"app_ssh_endpoint":"ssh.APISERVER",
+					"app_ssh_endpoint":"ssh.%[1]s",
 					"app_ssh_host_key_fingerprint":"a6:d1:08:0b:b0:cb:9b:5f:c4:ba:44:2a:97:26:19:8a",
-					"routing_endpoint": "https://APISERVER/routing",
+					"routing_endpoint": "https://%[1]s/routing",
 					"app_ssh_oauth_client":"ssh-proxy",
-					"logging_endpoint":"wss://loggregator.APISERVER",
-					"doppler_logging_endpoint":"wss://doppler.APISERVER"
-				}`
-			response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
+					"logging_endpoint":"wss://loggregator.%[1]s",
+					"doppler_logging_endpoint":"wss://doppler.%[1]s"
+				}`, serverAPIURL)
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/v2/info"),
@@ -65,6 +64,12 @@ var _ = Describe("Info", func() {
 			Expect(info.Name).To(Equal("faceman test server"))
 			Expect(info.RoutingEndpoint).To(MatchRegexp("https://%s/routing", serverAPIURL))
 			Expect(info.TokenEndpoint).To(MatchRegexp("https://uaa.%s", serverAPIURL))
+		})
+
+		It("returns back the log cache endpoint", func() {
+			logCacheEndpoint := client.LogCacheEndpoint()
+
+			Expect(logCacheEndpoint).To(MatchRegexp("https://log-cache.%s", serverAPIURL))
 		})
 
 		It("sets the http endpoint and warns user", func() {

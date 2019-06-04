@@ -84,6 +84,11 @@ func WithMultiBuildpackApp(f func(dir string)) {
 	f("../../assets/go_calls_ruby")
 }
 
+// WithMultiBuildpackApp creates a multi-buildpack application to use with the CF push command.
+func WithGoLoggerApp(f func(dir string)) {
+	f("../../assets/go_logger")
+}
+
 // WithProcfileApp creates an application to use with your CLI command
 // that contains Procfile defining web and worker processes.
 func WithProcfileApp(f func(dir string)) {

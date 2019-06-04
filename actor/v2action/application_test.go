@@ -1,6 +1,7 @@
 package v2action_test
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -11,12 +12,14 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
-	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
 
-var _ = Describe("Application Actions", func() {
+var _ = FDescribe("Application Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
@@ -655,17 +658,14 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("StartApplication/RestartApplication", func() {
 		var (
-			app            Application
-			fakeNOAAClient *v2actionfakes.FakeNOAAClient
+			app                Application
+			fakeLogCacheClient *v2actionfakes.FakeLogCacheClient
 
 			messages <-chan *LogMessage
 			logErrs  <-chan error
 			appState <-chan ApplicationStateChange
 			warnings <-chan string
 			errs     <-chan error
-
-			eventStream chan *events.LogMessage
-			errStream   chan error
 		)
 
 		BeforeEach(func() {
@@ -678,21 +678,30 @@ var _ = Describe("Application Actions", func() {
 				Instances: types.NullInt{Value: 2, IsSet: true},
 			}
 
-			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
-			fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
-				eventStream = make(chan *events.LogMessage)
-				errStream = make(chan error)
-				return eventStream, errStream
-			}
+			// TODO change this to log cache client!
+			fakeLogCacheClient = new(v2actionfakes.FakeLogCacheClient)
 
-			closed := false
-			fakeNOAAClient.CloseStub = func() error {
-				if !closed {
-					closed = true
-					close(errStream)
-					close(eventStream)
-				}
-				return nil
+			fakeLogCacheClient.ReadStub = func(
+				ctx context.Context,
+				sourceID string,
+				start time.Time,
+				opts ...logcache.ReadOption,
+			) ([]*loggregator_v2.Envelope, error) {
+				return []*loggregator_v2.Envelope{{
+					// 2 seconds in the past to get past Walk delay
+					Timestamp:  time.Now().Add(-2 * time.Second).UnixNano(),
+					SourceId:   "some-app-guid",
+					InstanceId: "some-source-instance",
+					Message: &loggregator_v2.Envelope_Log{
+						Log: &loggregator_v2.Log{
+							Payload: []byte("message"),
+							Type:    loggregator_v2.Log_OUT,
+						},
+					},
+					Tags: map[string]string{
+						"source_type": "some-source-type",
+					},
+				}}, nil
 			}
 
 			appCount := 0
@@ -953,7 +962,6 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
-					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 			})
 
@@ -1018,7 +1026,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient)
+				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeLogCacheClient)
 			})
 
 			When("the app is already staged", func() {
@@ -1056,7 +1064,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeNOAAClient)
+				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeLogCacheClient)
 			})
 
 			When("application is running", func() {
@@ -1092,7 +1100,6 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
-					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
 				When("updating the application to stop fails", func() {
@@ -1177,7 +1184,7 @@ var _ = Describe("Application Actions", func() {
 
 		Describe("RestageApplication", func() {
 			JustBeforeEach(func() {
-				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeNOAAClient)
+				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeLogCacheClient)
 			})
 
 			When("restaging succeeds", func() {
@@ -1207,7 +1214,6 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
-					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
 				ItHandlesStagingIssues()

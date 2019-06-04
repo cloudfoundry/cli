@@ -3,6 +3,7 @@ package isolated
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -81,8 +82,9 @@ var _ = Describe("Logs Command", func() {
 
 			BeforeEach(func() {
 				appName = helpers.PrefixedRandomName("app")
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+
+				helpers.WithGoLoggerApp(func(appDir string) {
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "-b", "go_buildpack")).Should(Exit(0))
 				})
 			})
 
@@ -93,21 +95,21 @@ var _ = Describe("Logs Command", func() {
 
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-
-					response, err := http.Get(fmt.Sprintf("http://%s.%s", appName, helpers.DefaultSharedDomain()))
-					Expect(err).NotTo(HaveOccurred())
-					Expect(response.StatusCode).To(Equal(http.StatusOK))
-					Eventually(session).Should(Say(`%s \[APP/PROC/WEB/0\]\s+OUT .*? \"GET / HTTP/1.1\" 200 \d+`, helpers.ISO8601Regex))
+					Eventually(session).Should(Say(`%s \[APP/PROC/WEB/0\]\s+OUT this is log \d+`, helpers.ISO8601Regex))
 				})
 			})
 
 			Context("with the --recent flag", func() {
 				It("displays the most recent logs and closes the stream", func() {
-					session := helpers.CF("logs", appName, "--recent")
-					userName, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`%s \[API/\d+\]\s+OUT Created app with guid %s`, helpers.ISO8601Regex, helpers.GUIDRegex))
-					Eventually(session).Should(Exit(0))
+					Eventually(func() []string {
+						session := helpers.CF("logs", appName, "--recent")
+						Eventually(session).Should(Exit(0))
+
+						userName, _ := helpers.GetCredentials()
+						Expect(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						logRegex := regexp.MustCompile(fmt.Sprintf("%s \\[APP/PROC/WEB/0\\]\\s+OUT this is log \\d+", helpers.ISO8601Regex))
+						return logRegex.FindAllString(string(session.Buffer().Contents()), -1)
+					}).Should(HaveLen(100))
 				})
 			})
 		})
