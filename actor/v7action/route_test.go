@@ -492,7 +492,8 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("only passes in queries that are not blank", func() {
-				actor.DeleteRoute("domain.com", "", "")
+				_, err := actor.DeleteRoute("domain.com", "", "")
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetDomainsArgsForCall(0)
