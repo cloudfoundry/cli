@@ -41,6 +41,7 @@ var _ = Describe("routes command", func() {
 		var (
 			orgName   string
 			spaceName string
+			userName  string
 		)
 
 		BeforeEach(func() {
@@ -48,23 +49,15 @@ var _ = Describe("routes command", func() {
 			spaceName = helpers.NewSpaceName()
 
 			helpers.SetupCF(orgName, spaceName)
+			userName, _ = helpers.GetCredentials()
 		})
 
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		var (
-			userName string
-		)
-
-		BeforeEach(func() {
-			userName, _ = helpers.GetCredentials()
-		})
-
 		When("routes exist", func() {
 			var (
-				userName   string
 				domainName string
 				domain     helpers.Domain
 
@@ -72,10 +65,9 @@ var _ = Describe("routes command", func() {
 			)
 
 			BeforeEach(func() {
-				otherSpaceName = helpers.NewSpaceName()
+				otherSpaceName = helpers.GenerateHigherName(helpers.NewSpaceName, spaceName)
 
 				domainName = helpers.NewDomainName()
-				userName, _ = helpers.GetCredentials()
 
 				domain = helpers.NewDomain(orgName, domainName)
 				domain.CreatePrivate()
