@@ -250,7 +250,7 @@ var _ = Describe("ssh command", func() {
 
 			When("the application hasn't started", func() {
 				BeforeEach(func() {
-					session := helpers.CF("v3-stop", appName)
+					session := helpers.CF("stop", appName)
 					Eventually(session).Should(Exit(0))
 				})
 
