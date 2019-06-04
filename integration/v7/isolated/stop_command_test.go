@@ -50,12 +50,6 @@ var _ = Describe("stop command", func() {
 		})
 	})
 
-	It("does not displays the experimental warning", func() {
-		session := helpers.CF("stop", appName)
-		Eventually(session.Err).ShouldNot(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-		Eventually(session).Should(Exit())
-	})
-
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "stop", appName)
