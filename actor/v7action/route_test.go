@@ -491,6 +491,27 @@ var _ = Describe("Route Actions", func() {
 				Expect(passedRouteGuid).To(Equal("route-guid"))
 			})
 
+			It("only passes in queries that are not blank", func() {
+				actor.DeleteRoute("domain.com", "", "")
+
+				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetDomainsArgsForCall(0)
+				Expect(query).To(ConsistOf([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{"domain.com"}},
+				}))
+
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
+				Expect(query).To(ConsistOf([]ccv3.Query{
+					{Key: "domain_guids", Values: []string{"domain-guid"}},
+				}))
+
+				Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(1))
+				passedRouteGuid := fakeCloudControllerClient.DeleteRouteArgsForCall(0)
+
+				Expect(passedRouteGuid).To(Equal("route-guid"))
+			})
+
 			When("getting domains fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(

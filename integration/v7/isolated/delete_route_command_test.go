@@ -1,12 +1,13 @@
 package isolated
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"regexp"
 )
 
 var _ = Describe("delete-route command", func() {
@@ -87,6 +88,7 @@ var _ = Describe("delete-route command", func() {
 
 					Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
 				})
+
 				When("the user attempts to delete a route with a private domain", func() {
 					It("it asks for confirmation and deletes the domain", func() {
 						session := helpers.CFWithStdin(buffer, "delete-route", domainName)
@@ -96,6 +98,8 @@ var _ = Describe("delete-route command", func() {
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting route %s...`), domainName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
+
+						Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 					})
 				})
 			})
@@ -166,6 +170,8 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.\.\.`, domainName))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 
@@ -178,6 +184,22 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.%s\.\.\.`, hostname, domainName))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+						})
+					})
+
+					When("passing in a path", func() {
+						It("deletes the route with the path", func() {
+							path := "/flan"
+							Eventually(helpers.CF("create-route", domainName, "--path", path)).Should(Exit(0))
+
+							session := helpers.CF("delete-route", domainName, "--path", path, "-f")
+							Eventually(session).Should(Say(`Deleting route %s%s\.\.\.`, domainName, path))
+							Eventually(session).Should(Say(`OK`))
+							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 
@@ -191,6 +213,8 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.%s%s\.\.\.`, hostname, domainName, pathString))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 
@@ -204,6 +228,8 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.%s\/%s\.\.\.`, hostname, domainName, pathString))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 				})
@@ -239,6 +265,8 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.%s\.\.\.`, hostname, domainName))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 
@@ -252,6 +280,8 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.%s%s\.\.\.`, hostname, domainName, pathString))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 
@@ -265,6 +295,8 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Say(`Deleting route %s\.%s\/%s\.\.\.`, hostname, domainName, pathString))
 							Eventually(session).Should(Say(`OK`))
 							Eventually(session).Should(Exit(0))
+
+							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
 						})
 					})
 				})
