@@ -82,7 +82,7 @@ var _ = Describe("packages command", func() {
 		When("the app exists", func() {
 			Context("with no packages", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
+					Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
 				})
 
 				It("displays empty list", func() {

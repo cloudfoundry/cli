@@ -13,7 +13,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS:",
 		CommandList: [][]string{
-			{"apps", "app"},
+			{"apps", "app", "create-app"},
 			{"push", "scale", "delete", "rename"},
 			{"start", "stop", "restart", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
@@ -166,7 +166,6 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS (experimental):",
 		CommandList: [][]string{
-			{"v3-create-app"},
 			{"v3-start", "v3-restart", "v3-stage", "v3-restart-app-instance", "v3-apply-manifest"},
 			{"v3-create-package"},
 		},

@@ -83,7 +83,7 @@ var _ = Describe("set-droplet command", func() {
 
 			BeforeEach(func() {
 				var packageGUID string
-				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
+				Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
 
 				helpers.WithHelloWorldApp(func(appDir string) {
 					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)

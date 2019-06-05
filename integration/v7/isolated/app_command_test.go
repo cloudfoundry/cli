@@ -60,7 +60,7 @@ var _ = Describe("app command", func() {
 		Describe("version dependent display", func() {
 			When("the app is created but not pushed", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
+					Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
 				})
 
 				It("displays blank fields for unpopulated fields", func() {
