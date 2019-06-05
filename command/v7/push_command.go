@@ -487,6 +487,8 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (b
 				"AppName": appName,
 			},
 		)
+	case v7pushaction.WaitingForDeployment:
+		cmd.UI.DisplayText("Waiting for app to deploy...")
 	case v7pushaction.Complete:
 		return true, nil
 	default:

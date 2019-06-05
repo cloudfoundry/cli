@@ -436,6 +436,9 @@ var _ = Describe("push Command", func() {
 														{
 															Event: v7pushaction.StartingDeployment,
 														},
+														{
+															Event: v7pushaction.WaitingForDeployment,
+														},
 													}, v7pushaction.PushPlan{})
 												})
 
@@ -488,6 +491,8 @@ var _ = Describe("push Command", func() {
 													Expect(testUI.Out).To(Say("Waiting for app second-app to start..."))
 
 													Expect(testUI.Out).To(Say("Starting deployment for app second-app..."))
+
+													Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
 												})
 											})
 

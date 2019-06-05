@@ -67,7 +67,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("records deployment events", func() {
-				Expect(events).To(ConsistOf(StartingDeployment, StartingApplication))
+				Expect(events).To(ConsistOf(StartingDeployment, WaitingForDeployment))
 			})
 		})
 
@@ -112,7 +112,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("records deployment events", func() {
-				Expect(events).To(ConsistOf(StartingDeployment, StartingApplication))
+				Expect(events).To(ConsistOf(StartingDeployment, WaitingForDeployment))
 			})
 		})
 
@@ -130,7 +130,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("records deployment events", func() {
-				Expect(events).To(ConsistOf(StartingDeployment, StartingApplication))
+				Expect(events).To(ConsistOf(StartingDeployment, WaitingForDeployment))
 			})
 		})
 	})

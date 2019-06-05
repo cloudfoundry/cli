@@ -9,7 +9,7 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 		return pushPlan, Warnings(warnings), err
 	}
 
-	eventStream <- StartingApplication
+	eventStream <- WaitingForDeployment
 
 	pollWarnings, err := actor.V7Actor.PollStartForRolling(pushPlan.Application.GUID, deploymentGUID)
 	warnings = append(warnings, pollWarnings...)

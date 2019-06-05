@@ -33,7 +33,6 @@ const (
 	SettingUpApplication            Event = "setting up application"
 	SkippingApplicationCreation     Event = "skipping creation"
 	StagingComplete                 Event = "staging complete"
-	StartingApplication             Event = "starting application"
 	StartingDeployment              Event = "starting deployment"
 	StartingStaging                 Event = "starting staging"
 	StoppingApplication             Event = "stopping application"
@@ -45,5 +44,6 @@ const (
 	UploadingApplicationWithArchive Event = "uploading application with archive"
 	UploadingDroplet                Event = "uploading droplet"
 	UploadWithArchiveComplete       Event = "upload complete"
+	WaitingForDeployment            Event = "waiting for deployment"
 	Complete                        Event = "complete"
 )
