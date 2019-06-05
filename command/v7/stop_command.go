@@ -58,7 +58,7 @@ func (cmd StopCommand) Execute(args []string) error {
 	}
 
 	if !app.Started() {
-		cmd.UI.DisplayWarning("App {{.AppName}} is already stopped",
+		cmd.UI.DisplayTextWithFlavor("App {{.AppName}} is already stopped.",
 			map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})

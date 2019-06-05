@@ -182,11 +182,11 @@ var _ = Describe("stop Command", func() {
 		It("says that the app failed to stop", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(testUI.Out).ToNot(Say("Stopping"))
+			Expect(testUI.Out).To(Say(`App some-app is already stopped\.`))
 			Expect(testUI.Out).To(Say("OK"))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
-			Expect(testUI.Err).To(Say("App some-app is already stopped"))
 
 			Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
 		})
