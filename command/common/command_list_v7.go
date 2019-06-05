@@ -22,12 +22,13 @@ type commandList struct {
 
 	V3ApplyManifest      v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
 	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
-	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
 	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	V3Stage              v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
 	V3Start              v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
 	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
+
+	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 
 	API                                v6.APICommand                                `command:"api" description:"Set or view target api url"`
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
@@ -48,6 +49,7 @@ type commandList struct {
 	CreateApp                          v7.CreateAppCommand                          `command:"create-app" description:"Create an Application in the target space"`
 	CreateAppManifest                  v7.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	CreateBuildpack                    v7.CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
+	CreatePackage                      v7.CreatePackageCommand                      `command:"create-package" description:"Uploads a Package"`
 	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
 	CreateOrg                          v6.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
 	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" description:"Create a private domain for a specific org"`
@@ -199,7 +201,6 @@ type commandList struct {
 	UpdateServiceBroker                v6.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
 	UpdateSpaceQuota                   v6.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
 	UpdateUserProvidedService          v6.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
-	V3Push                             v7.PushCommand                               `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 	Version                            VersionCommand                               `command:"version" description:"Print the version"`
 }
 

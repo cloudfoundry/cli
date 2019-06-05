@@ -21,7 +21,7 @@ func (display PackageDisplayer) DisplaySetupMessage(appName string, isDockerImag
 	if isDockerImage {
 		flavorTextTemplate = "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
 	} else {
-		flavorTextTemplate = "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
+		flavorTextTemplate = "Creating and uploading bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
 	}
 
 	currentUser, err := display.config.CurrentUser()

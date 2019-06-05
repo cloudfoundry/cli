@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"io"
+	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -45,6 +46,88 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 	}
 	pkg, warnings, err := actor.CreateDockerPackageByApplication(app.GUID, dockerImageCredentials)
 	return pkg, append(getWarnings, warnings...), err
+}
+
+func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (Package, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	if bitsPath == "" {
+		bitsPath, err = os.Getwd()
+		if err != nil {
+			return Package{}, allWarnings, err
+		}
+	}
+
+	info, err := os.Stat(bitsPath)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	var resources []sharedaction.Resource
+	if info.IsDir() {
+		resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
+	} else {
+		resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
+	}
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	// potentially match resources here in the future
+
+	var archivePath string
+	if info.IsDir() {
+		archivePath, err = actor.SharedActor.ZipDirectoryResources(bitsPath, resources)
+	} else {
+		archivePath, err = actor.SharedActor.ZipArchiveResources(bitsPath, resources)
+	}
+	if err != nil {
+		os.RemoveAll(archivePath)
+		return Package{}, allWarnings, err
+	}
+	defer os.RemoveAll(archivePath)
+
+	inputPackage := ccv3.Package{
+		Type: constant.PackageTypeBits,
+		Relationships: ccv3.Relationships{
+			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: app.GUID},
+		},
+	}
+
+	pkg, warnings, err := actor.CloudControllerClient.CreatePackage(inputPackage)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	_, warnings, err = actor.CloudControllerClient.UploadPackage(pkg, archivePath)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	for pkg.State != constant.PackageReady &&
+		pkg.State != constant.PackageFailed &&
+		pkg.State != constant.PackageExpired {
+		time.Sleep(actor.Config.PollingInterval())
+		pkg, warnings, err = actor.CloudControllerClient.GetPackage(pkg.GUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return Package{}, allWarnings, err
+		}
+	}
+
+	if pkg.State == constant.PackageFailed {
+		return Package{}, allWarnings, actionerror.PackageProcessingFailedError{}
+	} else if pkg.State == constant.PackageExpired {
+		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
+	}
+
+	updatedPackage, updatedWarnings, err := actor.PollPackage(Package(pkg))
+	return updatedPackage, append(allWarnings, updatedWarnings...), err
 }
 
 // GetApplicationPackages returns a list of package of an app.

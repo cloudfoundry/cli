@@ -86,7 +86,7 @@ var _ = Describe("set-droplet command", func() {
 				Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
 
 				helpers.WithHelloWorldApp(func(appDir string) {
-					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
+					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "create-package", appName)
 					Eventually(pkgSession).Should(Exit(0))
 					regex := regexp.MustCompile(`package guid: (.+)`)
 					matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))

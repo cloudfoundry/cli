@@ -15,7 +15,6 @@ import (
 const (
 	CFEventuallyTimeout   = 300 * time.Second
 	CFConsistentlyTimeout = 500 * time.Millisecond
-	PublicDockerImage     = "cloudfoundry/diego-docker-app-custom"
 )
 
 var (
