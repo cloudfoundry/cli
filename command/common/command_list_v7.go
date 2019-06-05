@@ -20,12 +20,10 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	App                  v7.AppCommand                   `command:"app" description:"Display health and status for an app"`
 	V3ApplyManifest      v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
 	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
 	V3CreateApp          v6.V3CreateAppCommand           `command:"v3-create-app" description:"Create a V3 App"`
 	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
-	V3Packages           v6.V3PackagesCommand            `command:"v3-packages" description:"List packages of an app"`
 	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	V3SetDroplet         v6.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
@@ -37,6 +35,7 @@ type commandList struct {
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
+	App                                v7.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
@@ -113,6 +112,7 @@ type commandList struct {
 	Org                                v6.OrgCommand                                `command:"org" description:"Show org info"`
 	OrgUsers                           v6.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Orgs                               v6.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
+	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`
 	Passwd                             v6.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
 	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
 	PurgeServiceInstance               v6.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
