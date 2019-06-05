@@ -50,6 +50,10 @@ var _ = Describe("update-service command", func() {
 	})
 
 	When("the environment is not setup correctly", func() {
+		BeforeEach(func() {
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2)
+		})
+
 		It("fails with the appropriate errors", func() {
 			// the upgrade flag is passed here to exercise a particular code path before refactoring
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "update-service", "foo", "--upgrade")
@@ -73,6 +77,10 @@ var _ = Describe("update-service command", func() {
 
 		When("there are no service instances", func() {
 			When("upgrading", func() {
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2)
+				})
+
 				It("displays an informative error before prompting and exits 1", func() {
 					session := helpers.CF("update-service", "non-existent-service", "--upgrade")
 					Eventually(session.Err).Should(Say("Service instance non-existent-service not found"))
@@ -144,41 +152,58 @@ var _ = Describe("update-service command", func() {
 					buffer = NewBuffer()
 				})
 
-				When("cancelling the update", func() {
+				When("the user provides --upgrade in an unsupported CAPI version", func() {
 					BeforeEach(func() {
-						_, err := buffer.Write([]byte("n\n"))
-						Expect(err).ToNot(HaveOccurred())
+						helpers.SkipIfVersionAtLeast(ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2)
 					})
 
-					It("does not proceed", func() {
-						session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
-						Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
-						Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
-						Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
-						Eventually(session).Should(Say("Update cancelled"))
-						Eventually(session).Should(Exit(0))
+					It("should report that the version of CAPI is too low", func() {
+						session := helpers.CF("update-service", serviceInstanceName, "--upgrade")
+						Eventually(session.Err).Should(Say(`Option '--upgrade' requires CF API version %s or higher. Your target is 2\.\d+\.\d+`, ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 
-				When("proceeding with the update", func() {
+				When("when CAPI supports service instance maintenance_info updates", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2)
-						_, err := buffer.Write([]byte("y\n"))
-						Expect(err).ToNot(HaveOccurred())
 					})
 
-					It("updates the service", func() {
-						session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
+					When("cancelling the update", func() {
+						BeforeEach(func() {
+							_, err := buffer.Write([]byte("n\n"))
+							Expect(err).ToNot(HaveOccurred())
+						})
 
-						By("displaying an informative message")
-						Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
-						Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
-						Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
-						Eventually(session).Should(Exit(0))
+						It("does not proceed", func() {
+							session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
+							Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
+							Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+							Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+							Eventually(session).Should(Say("Update cancelled"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 
-						By("requesting an upgrade from the platform")
-						session = helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("status:\\s+update succeeded"))
+					When("proceeding with the update", func() {
+						BeforeEach(func() {
+							_, err := buffer.Write([]byte("y\n"))
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						It("updates the service", func() {
+							session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
+
+							By("displaying an informative message")
+							Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
+							Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+							Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+							Eventually(session).Should(Exit(0))
+
+							By("requesting an upgrade from the platform")
+							session = helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say("status:\\s+update succeeded"))
+						})
 					})
 				})
 			})
