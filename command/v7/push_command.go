@@ -88,6 +88,7 @@ type PushCommand struct {
 	AppPath                 flag.PathWithExistenceCheck   `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	Stack                   string                        `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                  `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
+	Strategy                flag.DeploymentStrategy       `long:"strategy" description:"Deployment strategy, either rolling or null."`
 	Vars                    []template.VarKV              `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles        []flag.PathWithExistenceCheck `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	dockerPassword          interface{}                   `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
@@ -478,6 +479,14 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (b
 				"AppName": appName,
 			},
 		)
+	case v7pushaction.StartingDeployment:
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayTextWithFlavor(
+			"Starting deployment for app {{.AppName}}...",
+			map[string]interface{}{
+				"AppName": appName,
+			},
+		)
 	case v7pushaction.Complete:
 		return true, nil
 	default:
@@ -557,6 +566,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		ProvidedAppPath:   string(cmd.AppPath),
 		SkipRouteCreation: cmd.NoRoute,
 		StartCommand:      cmd.StartCommand.FilteredString,
+		Strategy:          cmd.Strategy.Name,
 	}, nil
 }
 
@@ -578,7 +588,8 @@ func (cmd PushCommand) ValidateAllowedFlagsForMultipleApps(containsMultipleApps 
 		cmd.Memory.IsSet ||
 		cmd.AppPath != "" ||
 		cmd.NoRoute ||
-		cmd.StartCommand.IsSet)
+		cmd.StartCommand.IsSet ||
+		cmd.Strategy.Name != "")
 
 	if containsMultipleApps && !allowedFlagsMultipleApps {
 		return translatableerror.CommandLineArgsWithMultipleAppsError{}

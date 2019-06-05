@@ -44,6 +44,7 @@ const (
 	GetOrganizationsRequest                                     = "GetOrganizations"
 	GetPackageRequest                                           = "GetPackage"
 	GetPackagesRequest                                          = "GetPackages"
+	GetProcessRequest                                           = "GetProcess"
 	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetRoutesRequest                                            = "GetRoutes"
 	GetServiceBrokersRequest                                    = "GetServiceBrokers"
@@ -150,6 +151,7 @@ var APIRoutes = []Route{
 	{Resource: PackagesResource, Path: "/", Method: http.MethodGet, Name: GetPackagesRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodPost, Name: PostPackageRequest},
 	{Resource: PackagesResource, Path: "/:package_guid", Method: http.MethodGet, Name: GetPackageRequest},
+	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodGet, Name: GetProcessRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodPatch, Name: PatchProcessRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ResourceMatches, Path: "/", Method: http.MethodPost, Name: PostResourceMatchesRequest},

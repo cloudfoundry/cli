@@ -10,6 +10,12 @@ import (
 // Process represents a V3 actor process.
 type Process ccv3.Process
 
+func (actor Actor) GetProcess(processGUID string) (Process, Warnings, error) {
+	process, warnings, err := actor.CloudControllerClient.GetProcess(processGUID)
+
+	return Process(process), Warnings(warnings), err
+}
+
 // GetProcessByTypeAndApplication returns a process for the given application
 // and type.
 func (actor Actor) GetProcessByTypeAndApplication(processType string, appGUID string) (Process, Warnings, error) {

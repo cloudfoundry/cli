@@ -19,6 +19,7 @@ type PushPlan struct {
 	NoStart           bool
 	NoRouteFlag       bool
 	SkipRouteCreation bool
+	Strategy          constant.DeploymentStrategy
 
 	DockerImageCredentials            v7action.DockerImageCredentials
 	DockerImageCredentialsNeedsUpdate bool
@@ -57,6 +58,7 @@ type FlagOverrides struct {
 	ProvidedAppPath     string
 	SkipRouteCreation   bool
 	StartCommand        types.FilteredString
+	Strategy            constant.DeploymentStrategy
 }
 
 func (state PushPlan) String() string {

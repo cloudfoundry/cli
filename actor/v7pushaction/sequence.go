@@ -34,6 +34,10 @@ func ShouldStagePackage(plan PushPlan) bool {
 	return !plan.NoStart && plan.DropletPath == ""
 }
 
+func ShouldCreateDeployment(plan PushPlan) bool {
+	return plan.Strategy == constant.DeploymentStrategyRolling
+}
+
 func ShouldStopApplication(plan PushPlan) bool {
 	return plan.NoStart && plan.Application.State == constant.ApplicationStarted
 }
@@ -88,16 +92,20 @@ func (actor Actor) GetRuntimeSequence(plan PushPlan) []ChangeApplicationFunc {
 		runtimeSequence = append(runtimeSequence, actor.StagePackageForApplication)
 	}
 
-	if ShouldStopApplication(plan) {
-		runtimeSequence = append(runtimeSequence, actor.StopApplication)
-	}
+	if ShouldCreateDeployment(plan) {
+		runtimeSequence = append(runtimeSequence, actor.CreateDeploymentForApplication)
+	} else {
+		if ShouldStopApplication(plan) {
+			runtimeSequence = append(runtimeSequence, actor.StopApplication)
+		}
 
-	if ShouldSetDroplet(plan) {
-		runtimeSequence = append(runtimeSequence, actor.SetDropletForApplication)
-	}
+		if ShouldSetDroplet(plan) {
+			runtimeSequence = append(runtimeSequence, actor.SetDropletForApplication)
+		}
 
-	if ShouldRestart(plan) {
-		runtimeSequence = append(runtimeSequence, actor.RestartApplication)
+		if ShouldRestart(plan) {
+			runtimeSequence = append(runtimeSequence, actor.RestartApplication)
+		}
 	}
 
 	return runtimeSequence

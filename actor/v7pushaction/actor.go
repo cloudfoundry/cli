@@ -42,6 +42,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		SetupBitsPathForPushPlan,
 		SetupDropletPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
+		SetupDeploymentStrategyForPushPlan,
 		SetupNoStartForPushPlan,
 		SetupSkipRouteCreationForPushPlan,
 		SetupScaleWebProcessForPushPlan,

@@ -433,6 +433,9 @@ var _ = Describe("push Command", func() {
 														{
 															Event: v7pushaction.RestartingApplication,
 														},
+														{
+															Event: v7pushaction.StartingDeployment,
+														},
 													}, v7pushaction.PushPlan{})
 												})
 
@@ -483,6 +486,8 @@ var _ = Describe("push Command", func() {
 													Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
 
 													Expect(testUI.Out).To(Say("Waiting for app second-app to start..."))
+
+													Expect(testUI.Out).To(Say("Starting deployment for app second-app..."))
 												})
 											})
 
@@ -837,6 +842,10 @@ var _ = Describe("push Command", func() {
 					func() {
 						cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true}}
 					}),
+				Entry("strategy is specified",
+					func() {
+						cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+					}),
 			)
 
 			DescribeTable("is nil when",
@@ -884,6 +893,7 @@ var _ = Describe("push Command", func() {
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
 			cmd.NoStart = true
+			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
 			cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 10, IsSet: true}}
 		})
 
@@ -905,6 +915,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 			Expect(overrides.SkipRouteCreation).To(BeTrue())
 			Expect(overrides.NoStart).To(BeTrue())
+			Expect(overrides.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 			Expect(overrides.Instances).To(Equal(types.NullInt{Value: 10, IsSet: true}))
 		})
 

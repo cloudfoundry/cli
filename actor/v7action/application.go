@@ -185,36 +185,13 @@ func (actor Actor) RestartApplication(appGUID string) (Warnings, error) {
 }
 
 func (actor Actor) PollStart(appGUID string) (Warnings, error) {
-	var allWarnings Warnings
 	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
+	return actor.pollForProcesses(processes, warnings, err)
+}
 
-	timeout := time.Now().Add(actor.Config.StartupTimeout())
-	for time.Now().Before(timeout) {
-		allProcessesDone := true
-		for _, process := range processes {
-			shouldContinuePolling, warnings, err := actor.shouldContinuePollingProcessStatus(process)
-			allWarnings = append(allWarnings, warnings...)
-			if err != nil {
-				return allWarnings, err
-			}
-
-			if shouldContinuePolling {
-				allProcessesDone = false
-				break
-			}
-		}
-
-		if allProcessesDone {
-			return allWarnings, nil
-		}
-		time.Sleep(actor.Config.PollingInterval())
-	}
-
-	return allWarnings, actionerror.StartupTimeoutError{}
+func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string) (Warnings, error) {
+	processes, warnings, err := actor.CloudControllerClient.GetNewApplicationProcesses(appGUID, deploymentGUID)
+	return actor.pollForProcesses(processes, warnings, err)
 }
 
 // UpdateApplication updates the buildpacks on an application
@@ -245,6 +222,38 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 		State:               app.State,
 		Metadata:            (*Metadata)(app.Metadata),
 	}
+}
+
+func (actor Actor) pollForProcesses(processes []ccv3.Process, warnings ccv3.Warnings, err error) (Warnings, error) {
+	var allWarnings Warnings
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	timeout := time.Now().Add(actor.Config.StartupTimeout())
+	for time.Now().Before(timeout) {
+		allProcessesDone := true
+		for _, process := range processes {
+			shouldContinuePolling, warnings, err := actor.shouldContinuePollingProcessStatus(process)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return allWarnings, err
+			}
+
+			if shouldContinuePolling {
+				allProcessesDone = false
+				break
+			}
+		}
+
+		if allProcessesDone {
+			return allWarnings, nil
+		}
+		time.Sleep(actor.Config.PollingInterval())
+	}
+
+	return allWarnings, actionerror.StartupTimeoutError{}
 }
 
 func (actor Actor) shouldContinuePollingProcessStatus(process ccv3.Process) (bool, Warnings, error) {

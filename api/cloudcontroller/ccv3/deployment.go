@@ -17,6 +17,7 @@ type Deployment struct {
 	CreatedAt     string
 	UpdatedAt     string
 	Relationships Relationships
+	NewProcesses  []Process
 }
 
 // MarshalJSON converts a Deployment into a Cloud Controller Deployment.
@@ -47,6 +48,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 		Relationships Relationships            `json:"relationships,omitempty"`
 		State         constant.DeploymentState `json:"state,omitempty"`
 		Droplet       Droplet                  `json:"droplet,omitempty"`
+		NewProcesses  []Process                `json:"new_processes,omitempty"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccDeployment)
 	if err != nil {
@@ -58,6 +60,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	d.Relationships = ccDeployment.Relationships
 	d.State = ccDeployment.State
 	d.DropletGUID = ccDeployment.Droplet.GUID
+	d.NewProcesses = ccDeployment.NewProcesses
 
 	return nil
 }

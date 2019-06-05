@@ -149,6 +149,67 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnin
 	return fullProcessesList, warnings, err
 }
 
+// GetNewApplicationProcesses gets processes for an application in the middle of a deployment.
+// The app's processes will include a web process that will be removed when the deployment completes,
+// so exclude that soon-to-be-removed process from the result.
+func (client *Client) GetNewApplicationProcesses(appGUID string, deploymentGUID string) ([]Process, Warnings, error) {
+	var allWarnings Warnings
+
+	deployment, warnings, err := client.GetDeployment(deploymentGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	allProcesses, warnings, err := client.GetApplicationProcesses(appGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	var newWebProcessGUID string
+	for _, process := range deployment.NewProcesses {
+		if process.Type == constant.ProcessTypeWeb {
+			newWebProcessGUID = process.GUID
+		}
+	}
+
+	var processesList []Process
+	for _, process := range allProcesses {
+		if process.Type == constant.ProcessTypeWeb {
+			if process.GUID == newWebProcessGUID {
+				processesList = append(processesList, process)
+			}
+		} else {
+			processesList = append(processesList, process)
+		}
+	}
+
+	return processesList, allWarnings, nil
+}
+
+// GetProcess returns a process with the given guid
+func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetProcessRequest,
+		URIParams: map[string]string{
+			"process_guid": processGUID,
+		},
+	})
+
+	if err != nil {
+		return Process{}, nil, err
+	}
+
+	var process Process
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &process,
+	}
+
+	err = client.connection.Make(request, &response)
+	return process, response.Warnings, err
+}
+
 // UpdateProcess updates the process's command or health check settings. GUID
 // is always required; HealthCheckType is only required when updating health
 // check settings.

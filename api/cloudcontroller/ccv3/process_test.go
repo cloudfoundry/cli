@@ -176,6 +176,106 @@ var _ = Describe("Process", func() {
 		})
 	})
 
+	Describe("GetProcess", func() {
+		var (
+			process  Process
+			warnings []string
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			process, warnings, err = client.GetProcess("some-process-guid")
+		})
+
+		When("the process exists", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "process-1-guid",
+					"type": "some-type",
+					"command": "start-command-1",
+					"instances": 22,
+					"memory_in_mb": 32,
+					"disk_in_mb": 1024,
+					"health_check": {
+						"type": "http",
+						"data": {
+							"timeout": 90,
+							"endpoint": "/health",
+							"invocation_timeout": 42
+						}
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/processes/some-process-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the process and all warnings", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(process).To(MatchAllFields(Fields{
+					"GUID":                         Equal("process-1-guid"),
+					"Type":                         Equal("some-type"),
+					"Command":                      Equal(types.FilteredString{IsSet: true, Value: "start-command-1"}),
+					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
+					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
+					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
+					"HealthCheckType":              Equal(constant.HTTP),
+					"HealthCheckEndpoint":          Equal("/health"),
+					"HealthCheckInvocationTimeout": BeEquivalentTo(42),
+					"HealthCheckTimeout":           BeEquivalentTo(90),
+				}))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10009,
+							"detail": "Some CC Error",
+							"title": "CF-SomeNewError"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/processes/some-process-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("CreateApplicationProcessScale", func() {
 		var passedProcess Process
 
@@ -579,6 +679,174 @@ var _ = Describe("Process", func() {
 			It("returns the error", func() {
 				_, _, err := client.GetApplicationProcesses("some-app-guid")
 				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
+			})
+		})
+	})
+
+	Describe("GetNewApplicationProcesses", func() {
+		When("the application exists", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`
+					{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/apps/some-app-guid/processes?page=2"
+							}
+						},
+						"resources": [
+							{
+								"guid": "old-web-process-guid",
+								"type": "web",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
+								"memory_in_mb": 32,
+								"health_check": {
+								   "type": "port",
+								   "data": {
+								 		"timeout": null,
+								 		"endpoint": null
+								   }
+								}
+							},
+							{
+								"guid": "new-web-process-guid",
+								"type": "web",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
+								"memory_in_mb": 32,
+								"health_check": {
+									"type": "port",
+									"data": {
+										"timeout": null,
+										"endpoint": null
+									}
+								}
+							},
+							{
+								"guid": "worker-process-guid",
+								"type": "worker",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
+								"memory_in_mb": 64,
+								"health_check": {
+									"type": "http",
+									"data": {
+										"timeout": 60,
+										"endpoint": "/health"
+									}
+								}
+							}
+						]
+					}`, server.URL())
+
+				response2 := `
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"guid": "console-process-guid",
+								"type": "console",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
+								"memory_in_mb": 128,
+								"health_check": {
+								    "type": "process",
+								    "data": {
+								  		"timeout": 90,
+								  		"endpoint": null
+								    }
+								}
+							}
+						]
+					}`
+
+				deploymentResponse := `
+					{
+						"state": "DEPLOYING",
+						"new_processes": [
+							{
+								"guid": "new-web-process-guid", 
+								"type": "web"
+							}
+						]
+					}
+				`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/deployments/some-deployment-guid"),
+						RespondWith(http.StatusOK, deploymentResponse, http.Header{"X-CF-Warnings": {"warning-1"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes", "page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-3"}}),
+					),
+				)
+			})
+
+			It("returns a list of processes associated with the application and all warnings", func() {
+				processes, warnings, err := client.GetNewApplicationProcesses("some-app-guid", "some-deployment-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(processes).To(ConsistOf(
+					Process{
+						GUID:               "new-web-process-guid",
+						Type:               constant.ProcessTypeWeb,
+						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
+						MemoryInMB:         types.NullUint64{Value: 32, IsSet: true},
+						HealthCheckType:    constant.Port,
+						HealthCheckTimeout: 0,
+					},
+					Process{
+						GUID:                "worker-process-guid",
+						Type:                "worker",
+						Command:             types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
+						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
+						HealthCheckType:     constant.HTTP,
+						HealthCheckEndpoint: "/health",
+						HealthCheckTimeout:  60,
+					},
+					Process{
+						GUID:               "console-process-guid",
+						Type:               "console",
+						Command:            types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
+						MemoryInMB:         types.NullUint64{Value: 128, IsSet: true},
+						HealthCheckType:    constant.Process,
+						HealthCheckTimeout: 90,
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3"))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Deployment not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/deployments/some-deployment-guid"),
+						RespondWith(http.StatusNotFound, response),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				_, _, err := client.GetNewApplicationProcesses("some-app-guid", "some-deployment-guid")
+				Expect(err).To(MatchError(ccerror.DeploymentNotFoundError{}))
 			})
 		})
 	})

@@ -17,6 +17,23 @@ var _ = Describe("Actor", func() {
 		actor, _, _, _ = getTestPushActor()
 	})
 
+	Describe("PreparePushPlanSequence", func() {
+		It("is a list of functions for preparing the push plan", func() {
+			Expect(actor.PreparePushPlanSequence).To(matchers.MatchFuncsByName(
+				SetupApplicationForPushPlan,
+				SetupDockerImageCredentialsForPushPlan,
+				SetupBitsPathForPushPlan,
+				SetupDropletPathForPushPlan,
+				actor.SetupAllResourcesForPushPlan,
+				SetupDeploymentStrategyForPushPlan,
+				SetupNoStartForPushPlan,
+				SetupSkipRouteCreationForPushPlan,
+				SetupScaleWebProcessForPushPlan,
+				SetupUpdateWebProcessForPushPlan,
+			))
+		})
+	})
+
 	Describe("ChangeApplicationSequence", func() {
 		BeforeEach(func() {
 			plan = PushPlan{

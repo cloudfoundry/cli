@@ -26,6 +26,66 @@ var _ = Describe("Process Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
 	})
 
+	Describe("GetProcess", func() {
+		var (
+			processGUID string
+
+			process  Process
+			warnings Warnings
+			err      error
+		)
+
+		BeforeEach(func() {
+			processGUID = "some-process-guid"
+		})
+
+		JustBeforeEach(func() {
+			process, warnings, err = actor.GetProcess(processGUID)
+		})
+
+		When("getting the process is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetProcessReturns(
+					ccv3.Process{
+						GUID: "some-process-guid",
+					},
+					ccv3.Warnings{"some-process-warning"},
+					nil,
+				)
+			})
+
+			It("returns the process and warnings", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-process-warning"))
+				Expect(process).To(Equal(Process{
+					GUID: "some-process-guid",
+				}))
+
+				Expect(fakeCloudControllerClient.GetProcessCallCount()).To(Equal(1))
+				passedProcessGUID := fakeCloudControllerClient.GetProcessArgsForCall(0)
+				Expect(passedProcessGUID).To(Equal("some-process-guid"))
+			})
+		})
+
+		When("getting application process by type returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some-error")
+				fakeCloudControllerClient.GetProcessReturns(
+					ccv3.Process{},
+					ccv3.Warnings{"some-process-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("some-process-warning"))
+			})
+		})
+	})
+
 	Describe("GetProcessByTypeAndApplication", func() {
 		var (
 			processType string

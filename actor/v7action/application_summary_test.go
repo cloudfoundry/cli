@@ -127,14 +127,14 @@ var _ = Describe("Application Summary Actions", func() {
 
 						explicitlyCalledProcess := listedProcesses[0]
 						explicitlyCalledProcess.Command = *types.NewFilteredString("some-start-command")
-						fakeCloudControllerClient.GetApplicationProcessByTypeReturnsOnCall(
+						fakeCloudControllerClient.GetProcessReturnsOnCall(
 							0,
 							explicitlyCalledProcess,
 							ccv3.Warnings{"get-process-by-type-warning"},
 							nil,
 						)
 
-						fakeCloudControllerClient.GetApplicationProcessByTypeReturnsOnCall(
+						fakeCloudControllerClient.GetProcessReturnsOnCall(
 							1,
 							listedProcesses[1],
 							ccv3.Warnings{"get-process-by-type-warning"},
@@ -247,10 +247,9 @@ var _ = Describe("Application Summary Actions", func() {
 							Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
 
-							Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(2))
-							appGUID, processType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)
-							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(processType).To(Equal("some-type"))
+							Expect(fakeCloudControllerClient.GetProcessCallCount()).To(Equal(2))
+							processGUID := fakeCloudControllerClient.GetProcessArgsForCall(0)
+							Expect(processGUID).To(Equal("some-process-guid"))
 
 							Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
 							Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
@@ -354,9 +353,9 @@ var _ = Describe("Application Summary Actions", func() {
 							nil,
 						)
 
-						fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+						fakeCloudControllerClient.GetProcessReturns(
 							ccv3.Process{},
-							ccv3.Warnings{"get-process-by-type-warning"},
+							ccv3.Warnings{"get-process-warning"},
 							nil,
 						)
 
@@ -370,7 +369,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 					It("returns the error", func() {
 						Expect(executeErr).To(Equal(expectedErr))
-						Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "get-process-by-type-warning", "some-process-stats-warning"))
+						Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "get-process-warning", "some-process-stats-warning"))
 					})
 				})
 			})

@@ -85,7 +85,7 @@ func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValue
 	for _, ccv3Process := range ccv3Processes {
 		process := Process(ccv3Process)
 		if withObfuscatedValues {
-			fullProcess, warnings, err := actor.GetProcessByTypeAndApplication(ccv3Process.Type, appGUID)
+			fullProcess, warnings, err := actor.GetProcess(ccv3Process.GUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return nil, allWarnings, err

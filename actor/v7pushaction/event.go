@@ -33,6 +33,8 @@ const (
 	SettingUpApplication            Event = "setting up application"
 	SkippingApplicationCreation     Event = "skipping creation"
 	StagingComplete                 Event = "staging complete"
+	StartingApplication             Event = "starting application"
+	StartingDeployment              Event = "starting deployment"
 	StartingStaging                 Event = "starting staging"
 	StoppingApplication             Event = "stopping application"
 	StoppingApplicationComplete     Event = "stopping application complete"

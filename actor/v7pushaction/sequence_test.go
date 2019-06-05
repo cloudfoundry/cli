@@ -156,5 +156,17 @@ var _ = Describe("Actor", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.SetDropletForApplication, actor.RestartApplication))
 			})
 		})
+
+		When("the plan has strategy 'rolling'", func() {
+			BeforeEach(func() {
+				plan = PushPlan{
+					Strategy: constant.DeploymentStrategyRolling,
+				}
+			})
+
+			It("returns a sequence that creates a deployment without stopping/restarting the app", func() {
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.StagePackageForApplication, actor.CreateDeploymentForApplication))
+			})
+		})
 	})
 })
