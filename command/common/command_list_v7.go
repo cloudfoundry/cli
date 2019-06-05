@@ -22,7 +22,6 @@ type commandList struct {
 
 	App                  v7.AppCommand                   `command:"app" description:"Display health and status for an app"`
 	V3ApplyManifest      v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
-	V3Apps               v6.V3AppsCommand                `command:"v3-apps" description:"List all apps in the target space"`
 	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
 	V3CreateApp          v6.V3CreateAppCommand           `command:"v3-create-app" description:"Create a V3 App"`
 	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
@@ -38,7 +37,7 @@ type commandList struct {
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
-	Apps                               v6.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
+	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
 	BindRunningSecurityGroup           v6.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
