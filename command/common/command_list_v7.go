@@ -26,7 +26,6 @@ type commandList struct {
 	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
 	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
-	V3SetDroplet         v6.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
 	V3Stage              v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
 	V3Start              v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
 	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
@@ -151,6 +150,7 @@ type commandList struct {
 	ServiceKey                         v6.ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
 	ServiceKeys                        v6.ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
 	Services                           v6.ServicesCommand                           `command:"services" alias:"s" description:"List all service instances in the target space"`
+	SetDroplet                         v7.SetDropletCommand                         `command:"set-droplet" description:"Set the droplet used to run an app"`
 	SetEnv                             v7.SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
 	SetHealthCheck                     v7.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app's process"`
 	SetLabel                           v7.SetLabelCommand                           `command:"set-label" description:"Set a label (key-value pairs) for an API resource"`

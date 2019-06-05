@@ -18,7 +18,7 @@ var HelpCategoryList = []HelpCategory{
 			{"start", "stop", "restart", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
 			{"packages"},
-			{"droplets"},
+			{"droplets", "set-droplet"},
 			{"events", "logs"},
 			{"env", "set-env", "unset-env"},
 			{"stacks", "stack"},
@@ -168,7 +168,6 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 		CommandList: [][]string{
 			{"v3-create-app"},
 			{"v3-start", "v3-restart", "v3-stage", "v3-restart-app-instance", "v3-apply-manifest"},
-			{"v3-set-droplet"},
 			{"v3-create-package"},
 		},
 	},
