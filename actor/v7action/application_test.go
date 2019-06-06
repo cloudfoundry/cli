@@ -887,6 +887,20 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("StartApplication", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			fakeConfig.StartupTimeoutReturns(time.Second)
+			fakeConfig.PollingIntervalReturns(0)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.StartApplication("some-app-guid")
+		})
+
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateApplicationStartReturns(
@@ -896,15 +910,43 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
-			It("starts the application", func() {
-				app, warnings, err := actor.StartApplication("some-app-guid")
+			When("polling the application start is successful", func() {
+				BeforeEach(func() {
+					processes := []ccv3.Process{{GUID: "some-process-guid"}}
+					fakeCloudControllerClient.GetApplicationProcessesReturns(processes, ccv3.Warnings{"get-process-warnings"}, nil)
+					fakeCloudControllerClient.GetProcessInstancesReturns(nil, ccv3.Warnings{"some-process-instance-warnings"}, nil)
+				})
 
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("start-application-warning"))
-				Expect(app).To(Equal(Application{GUID: "some-app-guid"}))
+				It("returns all the warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("start-application-warning", "get-process-warnings", "some-process-instance-warnings"))
+				})
 
-				Expect(fakeCloudControllerClient.UpdateApplicationStartCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.UpdateApplicationStartArgsForCall(0)).To(Equal("some-app-guid"))
+				It("calls start", func() {
+					Expect(fakeCloudControllerClient.UpdateApplicationStartCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.UpdateApplicationStartArgsForCall(0)).To(Equal("some-app-guid"))
+				})
+
+				It("polls for the application's process to start", func() {
+					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
+
+					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
+				})
+			})
+
+			When("polling the application start errors", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					expectedErr = errors.New("some polling error")
+					fakeCloudControllerClient.GetApplicationProcessesReturns(nil, ccv3.Warnings{"get-process-warnings"}, expectedErr)
+				})
+
+				It("returns the warnings and error", func() {
+					Expect(executeErr).To(Equal(expectedErr))
+					Expect(warnings).To(ConsistOf("start-application-warning", "get-process-warnings"))
+				})
 			})
 		})
 
@@ -920,7 +962,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.StartApplication("some-app-guid")
+				warnings, err := actor.StartApplication("some-app-guid")
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("start-application-warning"))

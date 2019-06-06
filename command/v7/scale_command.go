@@ -19,7 +19,7 @@ type ScaleActor interface {
 
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
-	StartApplication(appGUID string) (v7action.Application, v7action.Warnings, error)
+	StartApplication(appGUID string) (v7action.Warnings, error)
 	PollStart(appGUID string) (v7action.Warnings, error)
 }
 
@@ -188,7 +188,7 @@ func (cmd ScaleCommand) restartApplication(appGUID string, username string) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	_, warnings, err = cmd.Actor.StartApplication(appGUID)
+	warnings, err = cmd.Actor.StartApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

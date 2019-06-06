@@ -24,7 +24,6 @@ type commandList struct {
 	V3CancelZdtPush v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
 	V3Restart       v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3Stage         v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
-	V3Start         v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
 	V3ZdtRestart    v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
@@ -175,7 +174,7 @@ type commandList struct {
 	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StagingEnvironmentVariableGroup    v6.StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
 	StagingSecurityGroups              v6.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups in the staging set for applications"`
-	Start                              v6.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
+	Start                              v7.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
 	Stop                               v7.StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
 	Target                             v7.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
 	Tasks                              v6.TasksCommand                              `command:"tasks" description:"List tasks of an app"`

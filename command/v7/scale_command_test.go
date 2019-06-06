@@ -362,7 +362,7 @@ var _ = Describe("scale Command", func() {
 
 							When("Restarting the app fails to start the app", func() {
 								BeforeEach(func() {
-									fakeActor.StartApplicationReturns(v7action.Application{}, v7action.Warnings{"some-start-warning"}, errors.New("start-error"))
+									fakeActor.StartApplicationReturns(v7action.Warnings{"some-start-warning"}, errors.New("start-error"))
 								})
 
 								It("Delegates the correct appGUID", func() {

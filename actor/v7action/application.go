@@ -161,13 +161,18 @@ func (actor Actor) StopApplication(appGUID string) (Warnings, error) {
 }
 
 // StartApplication starts an application.
-func (actor Actor) StartApplication(appGUID string) (Application, Warnings, error) {
-	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplicationStart(appGUID)
+func (actor Actor) StartApplication(appGUID string) (Warnings, error) {
+	var allWarnings Warnings
+	_, warnings, err := actor.CloudControllerClient.UpdateApplicationStart(appGUID)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return Application{}, Warnings(warnings), err
+		return Warnings(warnings), err
 	}
 
-	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
+	// return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
+	pollingWarnings, err := actor.PollStart(appGUID)
+	allWarnings = append(allWarnings, pollingWarnings...)
+	return allWarnings, err
 }
 
 // RestartApplication restarts an application and waits for it to start.
