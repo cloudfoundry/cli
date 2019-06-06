@@ -90,7 +90,7 @@ var _ = Describe("stop command", func() {
 				It("displays that the app is already stopped", func() {
 					session := helpers.CF("stop", appName)
 
-					Eventually(session.Err).Should(Say("App %s is already stopped", appName))
+					Eventually(session).Should(Say(`App %s is already stopped\.`, appName))
 					Eventually(session).Should(Say("OK"))
 
 					Eventually(session).Should(Exit(0))
