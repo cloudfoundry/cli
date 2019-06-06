@@ -42,14 +42,31 @@ func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) e
 		// No test for sleeping for 500 ms for parity with pre-refactored behavior.
 		time.Sleep(500 * time.Millisecond)
 
-		err = os.Remove(plugin.Location)
-		if err != nil && !os.IsNotExist(err) {
-			if _, isPathError := err.(*os.PathError); isPathError {
-				binaryErr = actionerror.PluginBinaryRemoveFailedError{
-					Err: err,
+		removed := false
+		for i := 0; i < 50; i++ {
+			err = os.Remove(plugin.Location)
+			if err == nil {
+				removed = true
+				break
+			}
+
+			if os.IsNotExist(err) {
+				removed = true
+				break
+			}
+
+			if err != nil && !os.IsNotExist(err) {
+				if _, isPathError := err.(*os.PathError); isPathError {
+					time.Sleep(50 * time.Millisecond)
+				} else {
+					return err
 				}
-			} else {
-				return err
+			}
+		}
+
+		if !removed {
+			binaryErr = actionerror.PluginBinaryRemoveFailedError{
+				Err: err,
 			}
 		}
 	}

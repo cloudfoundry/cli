@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
@@ -74,12 +75,40 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 	return nil
 }
 
-func (cmd InstallPluginCommand) Execute([]string) error {
+func (cmd InstallPluginCommand) Execute([]string) (err error) {
 	log.WithField("PluginHome", cmd.Config.PluginHome()).Info("making plugin dir")
 
-	tempPluginDir, err := ioutil.TempDir(cmd.Config.PluginHome(), "temp")
+	var tempPluginDir string
+	tempPluginDir, err = ioutil.TempDir(cmd.Config.PluginHome(), "temp")
 	log.WithField("tempPluginDir", tempPluginDir).Debug("making tempPluginDir dir")
-	defer os.RemoveAll(tempPluginDir)
+	defer func() {
+		removed := false
+		var removeErr error
+		for i := 0; i < 50; i++ {
+			removeErr = os.RemoveAll(tempPluginDir)
+			if removeErr == nil {
+				removed = true
+				break
+			}
+
+			if os.IsNotExist(err) {
+				removed = true
+				break
+			}
+
+			if removeErr != nil && !os.IsNotExist(err) {
+				if _, isPathError := removeErr.(*os.PathError); isPathError {
+					time.Sleep(50 * time.Millisecond)
+				} else {
+					err = removeErr
+				}
+			}
+		}
+
+		if !removed {
+			err = removeErr
+		}
+	}()
 
 	if err != nil {
 		return err
