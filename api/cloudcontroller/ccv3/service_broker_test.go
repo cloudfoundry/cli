@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -145,18 +146,28 @@ var _ = Describe("ServiceBroker", func() {
 			warnings   Warnings
 			executeErr error
 
-			credentials = ServiceBrokerCredentials{
-				Name:     "name",
-				URL:      "url",
-				Username: "username",
-				Password: "password",
+			credentials = ServiceBroker{
+				Name: "name",
+				URL:  "url",
+				Credentials: ServiceBrokerCredentials{
+					Type: constant.BasicCredentials,
+					Data: ServiceBrokerCredentialsData{
+						Username: "username",
+						Password: "password",
+					},
+				},
 			}
 
 			expectedBody = map[string]interface{}{
-				"name":     "name",
-				"url":      "url",
-				"username": "username",
-				"password": "password",
+				"name": "name",
+				"url":  "url",
+				"credentials": map[string]interface{}{
+					"type": "basic",
+					"data": map[string]string{
+						"username": "username",
+						"password": "password",
+					},
+				},
 			}
 		)
 

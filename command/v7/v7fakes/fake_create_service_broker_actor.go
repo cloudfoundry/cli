@@ -5,14 +5,15 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
 type FakeCreateServiceBrokerActor struct {
-	CreateServiceBrokerStub        func(v7action.ServiceBrokerCredentials) (v7action.Warnings, error)
+	CreateServiceBrokerStub        func(ccv3.ServiceBroker) (v7action.Warnings, error)
 	createServiceBrokerMutex       sync.RWMutex
 	createServiceBrokerArgsForCall []struct {
-		arg1 v7action.ServiceBrokerCredentials
+		arg1 ccv3.ServiceBroker
 	}
 	createServiceBrokerReturns struct {
 		result1 v7action.Warnings
@@ -26,11 +27,11 @@ type FakeCreateServiceBrokerActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateServiceBrokerActor) CreateServiceBroker(arg1 v7action.ServiceBrokerCredentials) (v7action.Warnings, error) {
+func (fake *FakeCreateServiceBrokerActor) CreateServiceBroker(arg1 ccv3.ServiceBroker) (v7action.Warnings, error) {
 	fake.createServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
 	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
-		arg1 v7action.ServiceBrokerCredentials
+		arg1 ccv3.ServiceBroker
 	}{arg1})
 	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1})
 	fake.createServiceBrokerMutex.Unlock()
@@ -50,13 +51,13 @@ func (fake *FakeCreateServiceBrokerActor) CreateServiceBrokerCallCount() int {
 	return len(fake.createServiceBrokerArgsForCall)
 }
 
-func (fake *FakeCreateServiceBrokerActor) CreateServiceBrokerCalls(stub func(v7action.ServiceBrokerCredentials) (v7action.Warnings, error)) {
+func (fake *FakeCreateServiceBrokerActor) CreateServiceBrokerCalls(stub func(ccv3.ServiceBroker) (v7action.Warnings, error)) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = stub
 }
 
-func (fake *FakeCreateServiceBrokerActor) CreateServiceBrokerArgsForCall(i int) v7action.ServiceBrokerCredentials {
+func (fake *FakeCreateServiceBrokerActor) CreateServiceBrokerArgsForCall(i int) ccv3.ServiceBroker {
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
 	argsForCall := fake.createServiceBrokerArgsForCall[i]

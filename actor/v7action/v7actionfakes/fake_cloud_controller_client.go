@@ -2,11 +2,11 @@
 package v7actionfakes
 
 import (
-	"io"
-	"sync"
+	io "io"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 type FakeCloudControllerClient struct {
@@ -208,10 +208,10 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateServiceBrokerStub        func(ccv3.ServiceBrokerCredentials) (ccv3.Warnings, error)
+	CreateServiceBrokerStub        func(ccv3.ServiceBroker) (ccv3.Warnings, error)
 	createServiceBrokerMutex       sync.RWMutex
 	createServiceBrokerArgsForCall []struct {
-		arg1 ccv3.ServiceBrokerCredentials
+		arg1 ccv3.ServiceBroker
 	}
 	createServiceBrokerReturns struct {
 		result1 ccv3.Warnings
@@ -2143,11 +2143,11 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 ccv3.ServiceBrokerCredentials) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 ccv3.ServiceBroker) (ccv3.Warnings, error) {
 	fake.createServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
 	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
-		arg1 ccv3.ServiceBrokerCredentials
+		arg1 ccv3.ServiceBroker
 	}{arg1})
 	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1})
 	fake.createServiceBrokerMutex.Unlock()
@@ -2167,13 +2167,13 @@ func (fake *FakeCloudControllerClient) CreateServiceBrokerCallCount() int {
 	return len(fake.createServiceBrokerArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(ccv3.ServiceBrokerCredentials) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(ccv3.ServiceBroker) (ccv3.Warnings, error)) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) ccv3.ServiceBrokerCredentials {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) ccv3.ServiceBroker {
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
 	argsForCall := fake.createServiceBrokerArgsForCall[i]
