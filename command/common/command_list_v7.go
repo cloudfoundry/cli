@@ -23,7 +23,6 @@ type commandList struct {
 	V3ApplyManifest v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
 	V3CancelZdtPush v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
 	V3Restart       v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
-	V3Stage         v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
 	V3ZdtRestart    v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
@@ -131,6 +130,7 @@ type commandList struct {
 	ResetOrgDefaultIsolationSegment    v6.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v6.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v6.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.). This action will cause app downtime."`
+	Stage                              v7.StageCommand                              `command:"stage" description:"Create a new droplet for an app"`
 	Restart                            v6.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	RouterGroups                       v6.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`

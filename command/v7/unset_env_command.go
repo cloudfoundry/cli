@@ -18,7 +18,7 @@ type UnsetEnvActor interface {
 type UnsetEnvCommand struct {
 	RequiredArgs    flag.UnsetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}               `usage:"CF_NAME unset-env APP_NAME ENV_VAR_NAME"`
-	relatedCommands interface{}               `related_commands:"apps, env, v3-restart, set-env, v3-stage"`
+	relatedCommands interface{}               `related_commands:"apps, env, v3-restart, set-env, stage"`
 
 	UI          command.UI
 	Config      command.Config
@@ -78,7 +78,7 @@ func (cmd UnsetEnvCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	if err == nil {
-		cmd.UI.DisplayText("TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
+		cmd.UI.DisplayText("TIP: Use 'cf stage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
 			"AppName": appName,
 		})
 	}
