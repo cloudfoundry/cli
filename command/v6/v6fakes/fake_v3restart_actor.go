@@ -25,20 +25,18 @@ type FakeV3RestartActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StartApplicationStub        func(string) (v3action.Application, v3action.Warnings, error)
+	StartApplicationStub        func(string) (v3action.Warnings, error)
 	startApplicationMutex       sync.RWMutex
 	startApplicationArgsForCall []struct {
 		arg1 string
 	}
 	startApplicationReturns struct {
-		result1 v3action.Application
-		result2 v3action.Warnings
-		result3 error
+		result1 v3action.Warnings
+		result2 error
 	}
 	startApplicationReturnsOnCall map[int]struct {
-		result1 v3action.Application
-		result2 v3action.Warnings
-		result3 error
+		result1 v3action.Warnings
+		result2 error
 	}
 	StopApplicationStub        func(string) (v3action.Warnings, error)
 	stopApplicationMutex       sync.RWMutex
@@ -124,7 +122,7 @@ func (fake *FakeV3RestartActor) GetApplicationByNameAndSpaceReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3RestartActor) StartApplication(arg1 string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3RestartActor) StartApplication(arg1 string) (v3action.Warnings, error) {
 	fake.startApplicationMutex.Lock()
 	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
 	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
@@ -136,10 +134,10 @@ func (fake *FakeV3RestartActor) StartApplication(arg1 string) (v3action.Applicat
 		return fake.StartApplicationStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.startApplicationReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeV3RestartActor) StartApplicationCallCount() int {
@@ -148,7 +146,7 @@ func (fake *FakeV3RestartActor) StartApplicationCallCount() int {
 	return len(fake.startApplicationArgsForCall)
 }
 
-func (fake *FakeV3RestartActor) StartApplicationCalls(stub func(string) (v3action.Application, v3action.Warnings, error)) {
+func (fake *FakeV3RestartActor) StartApplicationCalls(stub func(string) (v3action.Warnings, error)) {
 	fake.startApplicationMutex.Lock()
 	defer fake.startApplicationMutex.Unlock()
 	fake.StartApplicationStub = stub
@@ -161,33 +159,30 @@ func (fake *FakeV3RestartActor) StartApplicationArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV3RestartActor) StartApplicationReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3RestartActor) StartApplicationReturns(result1 v3action.Warnings, result2 error) {
 	fake.startApplicationMutex.Lock()
 	defer fake.startApplicationMutex.Unlock()
 	fake.StartApplicationStub = nil
 	fake.startApplicationReturns = struct {
-		result1 v3action.Application
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v3action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeV3RestartActor) StartApplicationReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3RestartActor) StartApplicationReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
 	fake.startApplicationMutex.Lock()
 	defer fake.startApplicationMutex.Unlock()
 	fake.StartApplicationStub = nil
 	if fake.startApplicationReturnsOnCall == nil {
 		fake.startApplicationReturnsOnCall = make(map[int]struct {
-			result1 v3action.Application
-			result2 v3action.Warnings
-			result3 error
+			result1 v3action.Warnings
+			result2 error
 		})
 	}
 	fake.startApplicationReturnsOnCall[i] = struct {
-		result1 v3action.Application
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v3action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeV3RestartActor) StopApplication(arg1 string) (v3action.Warnings, error) {

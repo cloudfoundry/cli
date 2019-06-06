@@ -19,7 +19,7 @@ type V3ScaleActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
-	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplication(appGUID string) (v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
 }
 
@@ -200,7 +200,7 @@ func (cmd V3ScaleCommand) restartApplication(appGUID string, username string) er
 	})
 	cmd.UI.DisplayNewline()
 
-	_, warnings, err = cmd.Actor.StartApplication(appGUID)
+	warnings, err = cmd.Actor.StartApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

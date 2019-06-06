@@ -17,7 +17,7 @@ type V3ZeroDowntimeRestartActor interface {
 
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplication(appGUID string) (v3action.Warnings, error)
 }
 
 type V3ZeroDowntimeRestartCommand struct {
@@ -76,7 +76,7 @@ func (cmd V3ZeroDowntimeRestartCommand) Execute(args []string) error {
 			"Username":  user.Name,
 		})
 
-		_, warnings, err = cmd.Actor.StartApplication(app.GUID)
+		warnings, err = cmd.Actor.StartApplication(app.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err

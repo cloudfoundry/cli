@@ -805,11 +805,10 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("starts the application", func() {
-				app, warnings, err := actor.StartApplication("some-app-guid")
+				warnings, err := actor.StartApplication("some-app-guid")
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("start-application-warning"))
-				Expect(app).To(Equal(Application{GUID: "some-app-guid"}))
 
 				Expect(fakeCloudControllerClient.UpdateApplicationStartCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.UpdateApplicationStartArgsForCall(0)).To(Equal("some-app-guid"))
@@ -828,7 +827,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.StartApplication("some-app-guid")
+				warnings, err := actor.StartApplication("some-app-guid")
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("start-application-warning"))

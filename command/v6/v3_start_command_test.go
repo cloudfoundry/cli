@@ -96,7 +96,7 @@ var _ = Describe("v3-start Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStopped}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-			fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+			fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 		})
 
 		It("says that the app was started and outputs warnings", func() {
@@ -153,7 +153,7 @@ var _ = Describe("v3-start Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: constant.ApplicationStopped}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-			fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+			fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
 		})
 
 		It("says that the app failed to start", func() {
@@ -231,7 +231,7 @@ var _ = Describe("v3-start Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: constant.ApplicationStopped}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = errors.New("some-error")
-			fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+			fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
 		})
 
 		It("says that the app failed to start", func() {

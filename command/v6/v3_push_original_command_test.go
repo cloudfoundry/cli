@@ -577,7 +577,7 @@ var _ = Describe("v3-push Command", func() {
 
 									When("starting the application fails", func() {
 										BeforeEach(func() {
-											fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, errors.New("some-error"))
+											fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, errors.New("some-error"))
 										})
 
 										It("says that the app failed to start", func() {
@@ -593,7 +593,7 @@ var _ = Describe("v3-push Command", func() {
 
 									When("starting the application succeeds", func() {
 										BeforeEach(func() {
-											fakeActor.StartApplicationReturns(v3action.Application{GUID: "some-app-guid"}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+											fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 										})
 
 										It("says that the app was started and outputs warnings", func() {

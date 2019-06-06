@@ -12,7 +12,7 @@ import (
 
 type V3RestartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplication(appGUID string) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 }
 
@@ -84,7 +84,7 @@ func (cmd V3RestartCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	_, warnings, err = cmd.Actor.StartApplication(app.GUID)
+	warnings, err = cmd.Actor.StartApplication(app.GUID)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

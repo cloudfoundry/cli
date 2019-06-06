@@ -132,13 +132,13 @@ func (actor Actor) StopApplication(appGUID string) (Warnings, error) {
 }
 
 // StartApplication starts an application.
-func (actor Actor) StartApplication(appGUID string) (Application, Warnings, error) {
-	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplicationStart(appGUID)
+func (actor Actor) StartApplication(appGUID string) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.UpdateApplicationStart(appGUID)
 	if err != nil {
-		return Application{}, Warnings(warnings), err
+		return Warnings(warnings), err
 	}
 
-	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
+	return Warnings(warnings), nil
 }
 
 // RestartApplication restarts an application.

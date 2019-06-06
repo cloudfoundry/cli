@@ -146,7 +146,7 @@ var _ = Describe("v3-zdt-restart Command", func() {
 							State: constant.ApplicationStopped,
 						}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 
-					fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+					fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 				})
 
 				It("starts the app", func() {
@@ -167,7 +167,7 @@ var _ = Describe("v3-zdt-restart Command", func() {
 
 				When("it fails to start the app", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationReturns(v3action.Application{}, nil, errors.New("lol error"))
+						fakeActor.StartApplicationReturns(nil, errors.New("lol error"))
 					})
 
 					It("returns the error", func() {

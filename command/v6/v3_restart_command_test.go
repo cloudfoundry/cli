@@ -104,7 +104,7 @@ var _ = Describe("v3-restart Command", func() {
 
 			When("start app does not return an error", func() {
 				BeforeEach(func() {
-					fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+					fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 				})
 
 				When("get app does not return an error", func() {
@@ -229,7 +229,7 @@ var _ = Describe("v3-restart Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("some start error")
-						fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+						fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
 					})
 
 					It("says that the app failed to start", func() {
@@ -245,7 +245,7 @@ var _ = Describe("v3-restart Command", func() {
 
 				When("the start app call returns an ApplicationNotFoundError (someone else deleted app after we fetched app)", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
+						fakeActor.StartApplicationReturns(v3action.Warnings{"start-warning-1", "start-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 					})
 
 					It("says that the app failed to start", func() {
