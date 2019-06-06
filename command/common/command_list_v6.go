@@ -25,7 +25,7 @@ type commandList struct {
 	V3CreateApp     v6.V3CreateAppCommand     `command:"v3-create-app" description:"Create a V3 App"`
 	V3CreatePackage v6.V3CreatePackageCommand `command:"v3-create-package" description:"Uploads a V3 Package"`
 	V3DeleteApp     v6.V3DeleteCommand        `command:"v3-delete" description:"Delete a V3 App"`
-	//V3Droplets                         v6.V3DropletsCommand                         `command:"v3-droplets" description:"List droplets of an app"`
+	V3Droplets                         v6.V3DropletsCommand                         `command:"v3-droplets" description:"List droplets of an app"`
 	V3Env                              v6.V3EnvCommand                              `command:"v3-env" description:"Show all env variables for an app"`
 	V3GetHealthCheck                   v6.V3GetHealthCheckCommand                   `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
 	V3Packages                         v6.V3PackagesCommand                         `command:"v3-packages" description:"List packages of an app"`

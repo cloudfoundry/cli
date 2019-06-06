@@ -37,6 +37,7 @@ type CloudControllerClient interface {
 	GetDeployment(guid string) (ccv3.Deployment, ccv3.Warnings, error)
 	GetDeployments(query ...ccv3.Query) ([]ccv3.Deployment, ccv3.Warnings, error)
 	GetDroplet(guid string) (ccv3.Droplet, ccv3.Warnings, error)
+	GetDroplets(query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
 	GetInfo() (ccv3.Info, ccv3.ResourceLinks, ccv3.Warnings, error)
 	GetIsolationSegment(guid string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]ccv3.Organization, ccv3.Warnings, error)
