@@ -20,13 +20,12 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	V3ApplyManifest      v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
-	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
-	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
-	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
-	V3Stage              v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
-	V3Start              v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
-	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
+	V3ApplyManifest v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
+	V3CancelZdtPush v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
+	V3Restart       v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
+	V3Stage         v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
+	V3Start         v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
+	V3ZdtRestart    v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 
@@ -134,7 +133,7 @@ type commandList struct {
 	ResetSpaceIsolationSegment         v6.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v6.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.). This action will cause app downtime."`
 	Restart                            v6.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
-	RestartAppInstance                 v6.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then restart an app instance"`
+	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	RouterGroups                       v6.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
 	Routes                             v7.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
 	RunTask                            v6.RunTaskCommand                            `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`

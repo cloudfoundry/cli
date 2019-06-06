@@ -166,7 +166,7 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS (experimental):",
 		CommandList: [][]string{
-			{"v3-start", "v3-restart", "v3-stage", "v3-restart-app-instance", "v3-apply-manifest"},
+			{"v3-start", "v3-restart", "v3-stage", "v3-apply-manifest"},
 		},
 	},
 }
