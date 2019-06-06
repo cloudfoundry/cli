@@ -96,7 +96,7 @@ var _ = Describe("packages command", func() {
 			Context("with existing packages", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
-						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "v3-push", appName)).Should(Exit(0))
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "v3-push", appName, "--no-start")).Should(Exit(0))
 					})
 				})
 

@@ -73,6 +73,21 @@ func (cmd PackagesCommand) Execute(args []string) error {
 		return nil
 	}
 
+	contents := [][]string{}
+
+	for _, pkg := range packages {
+		t, err := time.Parse(time.RFC3339, pkg.CreatedAt)
+		if err != nil {
+			return err
+		}
+
+		contents = append(contents, []string{
+			pkg.GUID,
+			cmd.UI.TranslateText(strings.ToLower(string(pkg.State))),
+			cmd.UI.UserFriendlyDate(t),
+		})
+	}
+
 	table := [][]string{
 		{
 			cmd.UI.TranslateText("guid"),
@@ -81,17 +96,8 @@ func (cmd PackagesCommand) Execute(args []string) error {
 		},
 	}
 
-	for _, pkg := range packages {
-		t, err := time.Parse(time.RFC3339, pkg.CreatedAt)
-		if err != nil {
-			return err
-		}
-
-		table = append(table, []string{
-			pkg.GUID,
-			cmd.UI.TranslateText(strings.ToLower(string(pkg.State))),
-			cmd.UI.UserFriendlyDate(t),
-		})
+	for i := len(contents) - 1; i >= 0; i-- {
+		table = append(table, contents[i])
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
