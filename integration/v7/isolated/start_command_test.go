@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("start-application command", func() {
+var _ = Describe("start command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -64,6 +64,7 @@ var _ = Describe("start-application command", func() {
 	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
+			Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
@@ -71,65 +72,77 @@ var _ = Describe("start-application command", func() {
 		})
 
 		When("the app exists", func() {
-			BeforeEach(func() {
-				var packageGUID string
-				Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
+			When("the app is staged", func() {
+				BeforeEach(func() {
+					var packageGUID string
 
-				mapRouteSession := helpers.CF("map-route", appName, helpers.DefaultSharedDomain(), "-n", appName)
-				Eventually(mapRouteSession).Should(Exit(0))
+					mapRouteSession := helpers.CF("map-route", appName, helpers.DefaultSharedDomain(), "-n", appName)
+					Eventually(mapRouteSession).Should(Exit(0))
 
-				helpers.WithHelloWorldApp(func(dir string) {
-					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "create-package", appName)
-					Eventually(pkgSession).Should(Exit(0))
-					regex := regexp.MustCompile(`Package with guid '(.+)' has been created.`)
-					matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
+					helpers.WithHelloWorldApp(func(dir string) {
+						pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "create-package", appName)
+						Eventually(pkgSession).Should(Exit(0))
+						regex := regexp.MustCompile(`Package with guid '(.+)' has been created.`)
+						matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
+						Expect(matches).To(HaveLen(2))
+
+						packageGUID = matches[1]
+					})
+
+					stageSession := helpers.CF("stage", appName, "--package-guid", packageGUID)
+					Eventually(stageSession).Should(Exit(0))
+
+					regex := regexp.MustCompile(`droplet guid:\s+(.+)`)
+					matches := regex.FindStringSubmatch(string(stageSession.Out.Contents()))
 					Expect(matches).To(HaveLen(2))
 
-					packageGUID = matches[1]
+					dropletGUID := matches[1]
+					setDropletSession := helpers.CF("set-droplet", appName, "--droplet-guid", dropletGUID)
+					Eventually(setDropletSession).Should(Exit(0))
 				})
 
-				stageSession := helpers.CF("stage", appName, "--package-guid", packageGUID)
-				Eventually(stageSession).Should(Exit(0))
+				It("starts the app", func() {
+					userName, _ := helpers.GetCredentials()
 
-				regex := regexp.MustCompile(`droplet guid:\s+(.+)`)
-				matches := regex.FindStringSubmatch(string(stageSession.Out.Contents()))
-				Expect(matches).To(HaveLen(2))
-
-				dropletGUID := matches[1]
-				setDropletSession := helpers.CF("set-droplet", appName, "--droplet-guid", dropletGUID)
-				Eventually(setDropletSession).Should(Exit(0))
-			})
-
-			It("starts the app", func() {
-				userName, _ := helpers.GetCredentials()
-
-				session := helpers.CF("start", appName)
-				Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
-				Eventually(session).Should(Say(`name:\s+%s`, appName))
-				Eventually(session).Should(Say(`requested state:\s+started`))
-				Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
-				Eventually(session).Should(Say(`type:\s+web`))
-				Eventually(session).Should(Say(`instances:\s+1/1`))
-				Eventually(session).Should(Say(`memory usage:\s+32M`))
-				Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-				Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
-
-				Eventually(session).Should(Exit(0))
-			})
-
-			When("the app is already started", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("start", appName)).Should(Exit(0))
-				})
-
-				It("displays app already started and exits 0", func() {
 					session := helpers.CF("start", appName)
-
-					Eventually(session.Err).Should(Say("App %s is already started", appName))
-					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+32M`))
+					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("the app is already started", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("start", appName)).Should(Exit(0))
+					})
+
+					It("displays app already started and exits 0", func() {
+						session := helpers.CF("start", appName)
+
+						Eventually(session.Err).Should(Say("App %s is already started", appName))
+						Eventually(session).Should(Say("OK"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("the app is not staged", func() {
+				It("complains about not having a droplet", func() {
+					session := helpers.CF("start", appName)
+
+					Eventually(session.Err).Should(Say(`Assign a droplet before starting this app\.`))
+					Eventually(session).Should(Say("FAILED"))
+
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

@@ -69,13 +69,13 @@ var _ = Describe("restart command", func() {
 		})
 
 		When("the app exists", func() {
-			BeforeEach(func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
-				})
-			})
-
 			When("the app is running", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					})
+				})
+
 				It("stops then restarts the app", func() {
 					userName, _ := helpers.GetCredentials()
 
@@ -97,31 +97,53 @@ var _ = Describe("restart command", func() {
 			})
 
 			When("the app is stopped", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("stop", appName)).Should(Exit(0))
+				When("the app is already staged", func() {
+					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+						})
+						Eventually(helpers.CF("stop", appName)).Should(Exit(0))
+					})
+
+					It("starts the app", func() {
+						userName, _ := helpers.GetCredentials()
+
+						session := helpers.CF("restart", appName)
+						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+						Eventually(session).Should(Say(`type:\s+web`))
+						Eventually(session).Should(Say(`instances:\s+1/1`))
+						Eventually(session).Should(Say(`memory usage:\s+32M`))
+						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+
+						Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
+
+						Eventually(session).Should(Exit(0))
+					})
 				})
 
-				It("starts the app", func() {
-					userName, _ := helpers.GetCredentials()
+				When("the app is *not* staged", func() {
+					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start")).Should(Exit(0))
+						})
+					})
 
-					session := helpers.CF("restart", appName)
-					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
-					Eventually(session).Should(Say(`name:\s+%s`, appName))
-					Eventually(session).Should(Say(`requested state:\s+started`))
-					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
-					Eventually(session).Should(Say(`type:\s+web`))
-					Eventually(session).Should(Say(`instances:\s+1/1`))
-					Eventually(session).Should(Say(`memory usage:\s+32M`))
-					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
-					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					It("complains about not having a droplet", func() {
+						userName, _ := helpers.GetCredentials()
 
-					Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
-
-					Eventually(session).Should(Exit(0))
+						session := helpers.CF("restart", appName)
+						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session.Err).Should(Say(`Assign a droplet before starting this app\.`))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
 				})
 			})
-
 		})
 
 		When("the app does not exist", func() {
