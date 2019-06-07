@@ -910,43 +910,12 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
-			When("polling the application start is successful", func() {
-				BeforeEach(func() {
-					processes := []ccv3.Process{{GUID: "some-process-guid"}}
-					fakeCloudControllerClient.GetApplicationProcessesReturns(processes, ccv3.Warnings{"get-process-warnings"}, nil)
-					fakeCloudControllerClient.GetProcessInstancesReturns(nil, ccv3.Warnings{"some-process-instance-warnings"}, nil)
-				})
+			It("starts the application", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("start-application-warning"))
 
-				It("returns all the warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("start-application-warning", "get-process-warnings", "some-process-instance-warnings"))
-				})
-
-				It("calls start", func() {
-					Expect(fakeCloudControllerClient.UpdateApplicationStartCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.UpdateApplicationStartArgsForCall(0)).To(Equal("some-app-guid"))
-				})
-
-				It("polls for the application's process to start", func() {
-					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
-
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
-				})
-			})
-
-			When("polling the application start errors", func() {
-				var expectedErr error
-				BeforeEach(func() {
-					expectedErr = errors.New("some polling error")
-					fakeCloudControllerClient.GetApplicationProcessesReturns(nil, ccv3.Warnings{"get-process-warnings"}, expectedErr)
-				})
-
-				It("returns the warnings and error", func() {
-					Expect(executeErr).To(Equal(expectedErr))
-					Expect(warnings).To(ConsistOf("start-application-warning", "get-process-warnings"))
-				})
+				Expect(fakeCloudControllerClient.UpdateApplicationStartCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateApplicationStartArgsForCall(0)).To(Equal("some-app-guid"))
 			})
 		})
 
