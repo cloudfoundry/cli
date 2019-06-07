@@ -10,6 +10,45 @@ import (
 )
 
 var _ = Describe("update-service command", func() {
+	Describe("help", func() {
+		When("--help flag is set", func() {
+			It("displays command usage to output", func() {
+				session := helpers.CF("update-service", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say(`\s+update-service - Update a service instance`))
+				Eventually(session).Should(Say(`USAGE:`))
+				Eventually(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE \[-p NEW_PLAN\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\] \[--upgrade\]`))
+				Eventually(session).Should(Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:`))
+				Eventually(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'`))
+				Eventually(session).Should(Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.`))
+				Eventually(session).Should(Say(`\s+The path to the parameters file can be an absolute or relative path to a file:`))
+				Eventually(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE -c PATH_TO_FILE`))
+				Eventually(session).Should(Say(`\s+Example of valid JSON object:`))
+				Eventually(session).Should(Say(`\s+{`))
+				Eventually(session).Should(Say(`\s+\"cluster_nodes\": {`))
+				Eventually(session).Should(Say(`\s+\"count\": 5,`))
+				Eventually(session).Should(Say(`\s+\"memory_mb\": 1024`))
+				Eventually(session).Should(Say(`\s+}`))
+				Eventually(session).Should(Say(`\s+}`))
+				Eventually(session).Should(Say(`\s+ Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.`))
+				Eventually(session).Should(Say(`EXAMPLES:`))
+				Eventually(session).Should(Say(`\s+cf update-service mydb -p gold`))
+				Eventually(session).Should(Say(`\s+cf update-service mydb -c '{\"ram_gb\":4}'`))
+				Eventually(session).Should(Say(`\s+cf update-service mydb -c ~/workspace/tmp/instance_config.json`))
+				Eventually(session).Should(Say(`\s+cf update-service mydb -t "list, of, tags"`))
+				Eventually(session).Should(Say(`\s+cf update-service mydb --upgrade`))
+				Eventually(session).Should(Say(`OPTIONS:`))
+				Eventually(session).Should(Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`))
+				Eventually(session).Should(Say(`\s+-p\s+Change service plan for a service instance`))
+				Eventually(session).Should(Say(`\s+-t\s+User provided tags`))
+				Eventually(session).Should(Say(`\s+-u\s+Upgrade the service instance to the latest version of the service plan available. This flag is in EXPERIMENTAL stage and may change without notice. It cannot be combined with other flags.`))
+				Eventually(session).Should(Say(`SEE ALSO:`))
+				Eventually(session).Should(Say(`\s+rename-service, services, update-user-provided-service`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			// the upgrade flag is passed here to exercise a particular code path before refactoring
