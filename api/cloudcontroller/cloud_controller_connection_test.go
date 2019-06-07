@@ -135,7 +135,6 @@ var _ = Describe("Cloud Controller Connection", func() {
 					Expect(response.ResourceLocationURL).To(Equal("/v2/some-location"))
 				})
 			})
-
 			Describe("X-Cf-Warnings", func() {
 				When("there are warnings", func() {
 					BeforeEach(func() {
@@ -165,6 +164,42 @@ var _ = Describe("Cloud Controller Connection", func() {
 						Expect(warnings).To(ContainElement("Ed McMann"))
 						Expect(warnings).To(ContainElement("the 1942 doggers"))
 						Expect(warnings).To(ContainElement("a,b"))
+					})
+				})
+
+				When("there are warnings using multi-value header", func() {
+					BeforeEach(func() {
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/v2/foo"),
+								RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {
+									"42,+Ed+McMann,+the+1942+doggers,a%2Cb",
+									"something,simpler",
+								}}),
+							),
+						)
+					})
+
+					It("returns them in Response", func() {
+						req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+						Expect(err).ToNot(HaveOccurred())
+						request := &Request{Request: req}
+
+						var response Response
+						err = connection.Make(request, &response)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+						warnings := response.Warnings
+						Expect(warnings).ToNot(BeNil())
+						Expect(warnings).To(HaveLen(6))
+						Expect(warnings).To(ContainElement("42"))
+						Expect(warnings).To(ContainElement("Ed McMann"))
+						Expect(warnings).To(ContainElement("the 1942 doggers"))
+						Expect(warnings).To(ContainElement("a,b"))
+						Expect(warnings).To(ContainElement("something"))
+						Expect(warnings).To(ContainElement("simpler"))
 					})
 				})
 
