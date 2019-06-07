@@ -135,6 +135,13 @@ func (b ServiceBroker) Push() {
 		"--hostname", b.Name,
 	)).Should(Exit(0))
 
+	if V7 {
+		// cf start on V7 currently does not stage the app before starting after a push --no-start
+		Eventually(CF(
+			"push", b.Name,
+			"-p", b.Path,
+		)).Should(Exit(0))
+	}
 	Eventually(CF("start", b.Name)).Should(Exit(0))
 }
 
