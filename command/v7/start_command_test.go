@@ -256,7 +256,7 @@ var _ = Describe("start Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-			Expect(testUI.Out).To(Say(`Waiting for app some-app to start\.\.\.`))
+			Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -308,7 +308,7 @@ var _ = Describe("start Command", func() {
 		It("prints the application summary and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say(`Waiting for app some-app to start\.\.\.`))
+			Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 			Expect(testUI.Out).To(Say(`name:\s+some-app`))
 			Expect(testUI.Out).To(Say(`requested state:\s+started`))
 			Expect(testUI.Out).ToNot(Say("start command:"))

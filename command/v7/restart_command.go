@@ -10,27 +10,29 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-//go:generate counterfeiter . StartActor
+//go:generate counterfeiter . RestartActor
 
-type StartActor interface {
+type RestartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
+	StopApplication(appGUID string) (v7action.Warnings, error)
 }
 
-type StartCommand struct {
-	RequiredArgs    flag.AppName `positional-args:"yes"`
-	usage           interface{}  `usage:"CF_NAME start APP_NAME"`
-	relatedCommands interface{}  `related_commands:"apps, logs, scale, ssh, stop, restart, run-task"`
+type RestartCommand struct {
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	usage               interface{}  `usage:"CF_NAME restart APP_NAME"`
+	relatedCommands     interface{}  `related_commands:"restage, restart-app-instance"`
+	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       StartActor
+	Actor       RestartActor
 	RouteActor  v7action.RouteActor
 }
 
-func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
@@ -52,7 +54,7 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd StartCommand) Execute(args []string) error {
+func (cmd RestartCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -68,24 +70,25 @@ func (cmd StartCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-
-	if app.Started() {
-		cmd.UI.DisplayWarning("App {{.AppName}} is already started.",
-			map[string]interface{}{
-				"AppName": cmd.RequiredArgs.AppName,
-			})
-		cmd.UI.DisplayOK()
-		return nil
-	}
-
-	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
 
+	if app.Started() {
+		cmd.UI.DisplayText("\nStopping app...")
+
+		warnings, err = cmd.Actor.StopApplication(app.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+	}
+
 	cmd.UI.DisplayText("\nWaiting for app to start...")
+
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -105,5 +108,6 @@ func (cmd StartCommand) Execute(args []string) error {
 	}
 
 	appSummaryDisplayer.AppDisplay(summary, false)
+
 	return nil
 }

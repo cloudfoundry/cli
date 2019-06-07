@@ -102,7 +102,7 @@ var _ = Describe("start-application command", func() {
 
 				session := helpers.CF("start", appName)
 				Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`Waiting for app %s to start\.\.\.`, appName))
+				Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
 				Eventually(session).Should(Say(`name:\s+%s`, appName))
 				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
@@ -136,7 +136,7 @@ var _ = Describe("start-application command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("start", invalidAppName)
 
-				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
+				Eventually(session.Err).Should(Say(`App '%s' not found\.`, invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))

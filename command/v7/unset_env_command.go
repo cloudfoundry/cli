@@ -18,7 +18,7 @@ type UnsetEnvActor interface {
 type UnsetEnvCommand struct {
 	RequiredArgs    flag.UnsetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}               `usage:"CF_NAME unset-env APP_NAME ENV_VAR_NAME"`
-	relatedCommands interface{}               `related_commands:"apps, env, v3-restart, set-env, stage"`
+	relatedCommands interface{}               `related_commands:"apps, env, restart, set-env, stage"`
 
 	UI          command.UI
 	Config      command.Config

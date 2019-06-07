@@ -37,7 +37,7 @@ var _ = Describe("unset-env command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("ue"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("apps, env, set-env, v3-restart, stage"))
+				Eventually(session).Should(Say("apps, env, restart, set-env, stage"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

@@ -5,21 +5,22 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
 type FakeServiceBrokersActor struct {
-	GetServiceBrokersStub        func() ([]v7action.ServiceBroker, v7action.Warnings, error)
+	GetServiceBrokersStub        func() ([]ccv3.ServiceBroker, v7action.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []struct {
 	}
 	getServiceBrokersReturns struct {
-		result1 []v7action.ServiceBroker
+		result1 []ccv3.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}
 	getServiceBrokersReturnsOnCall map[int]struct {
-		result1 []v7action.ServiceBroker
+		result1 []ccv3.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -27,7 +28,7 @@ type FakeServiceBrokersActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeServiceBrokersActor) GetServiceBrokers() ([]v7action.ServiceBroker, v7action.Warnings, error) {
+func (fake *FakeServiceBrokersActor) GetServiceBrokers() ([]ccv3.ServiceBroker, v7action.Warnings, error) {
 	fake.getServiceBrokersMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
 	fake.getServiceBrokersArgsForCall = append(fake.getServiceBrokersArgsForCall, struct {
@@ -50,36 +51,36 @@ func (fake *FakeServiceBrokersActor) GetServiceBrokersCallCount() int {
 	return len(fake.getServiceBrokersArgsForCall)
 }
 
-func (fake *FakeServiceBrokersActor) GetServiceBrokersCalls(stub func() ([]v7action.ServiceBroker, v7action.Warnings, error)) {
+func (fake *FakeServiceBrokersActor) GetServiceBrokersCalls(stub func() ([]ccv3.ServiceBroker, v7action.Warnings, error)) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = stub
 }
 
-func (fake *FakeServiceBrokersActor) GetServiceBrokersReturns(result1 []v7action.ServiceBroker, result2 v7action.Warnings, result3 error) {
+func (fake *FakeServiceBrokersActor) GetServiceBrokersReturns(result1 []ccv3.ServiceBroker, result2 v7action.Warnings, result3 error) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = nil
 	fake.getServiceBrokersReturns = struct {
-		result1 []v7action.ServiceBroker
+		result1 []ccv3.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeServiceBrokersActor) GetServiceBrokersReturnsOnCall(i int, result1 []v7action.ServiceBroker, result2 v7action.Warnings, result3 error) {
+func (fake *FakeServiceBrokersActor) GetServiceBrokersReturnsOnCall(i int, result1 []ccv3.ServiceBroker, result2 v7action.Warnings, result3 error) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = nil
 	if fake.getServiceBrokersReturnsOnCall == nil {
 		fake.getServiceBrokersReturnsOnCall = make(map[int]struct {
-			result1 []v7action.ServiceBroker
+			result1 []ccv3.ServiceBroker
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getServiceBrokersReturnsOnCall[i] = struct {
-		result1 []v7action.ServiceBroker
+		result1 []ccv3.ServiceBroker
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
