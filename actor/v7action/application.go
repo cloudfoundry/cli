@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -186,8 +187,57 @@ func (actor Actor) PollStart(appGUID string) (Warnings, error) {
 }
 
 func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string) (Warnings, error) {
-	processes, warnings, err := actor.CloudControllerClient.GetNewApplicationProcesses(appGUID, deploymentGUID)
-	return actor.pollForProcesses(processes, warnings, err)
+	deploymentWarnings, err := actor.pollDeployment(deploymentGUID)
+	var allWarnings Warnings
+	allWarnings = append(allWarnings, deploymentWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	allProcesses, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	pollingWarnings, err := actor.pollForProcesses(allProcesses, warnings, err)
+	allWarnings = append(allWarnings, pollingWarnings...)
+	return allWarnings, err
+}
+
+func (actor Actor) getDeploymentState(deploymentGUID string) (constant.DeploymentState, Warnings, error) {
+	deployment, warnings, err := actor.CloudControllerClient.GetDeployment(deploymentGUID)
+	if err != nil {
+		return "", Warnings(warnings), err
+	}
+	return deployment.State, Warnings(warnings), nil
+}
+
+func (actor Actor) pollDeployment(deploymentGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	timeout := time.Now().Add(actor.Config.StartupTimeout())
+	for time.Now().Before(timeout) {
+		deploymentState, warnings, err := actor.getDeploymentState(deploymentGUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return allWarnings, err
+		}
+		switch deploymentState {
+		case constant.DeploymentDeployed:
+			return allWarnings, nil
+		case constant.DeploymentCanceled:
+			return allWarnings, errors.New("Deployment has been canceled")
+		case constant.DeploymentFailed:
+			return allWarnings, errors.New("Deployment has failed")
+		case constant.DeploymentDeploying:
+		case constant.DeploymentFailing:
+		case constant.DeploymentCanceling:
+			time.Sleep(actor.Config.PollingInterval())
+		}
+	}
+	return allWarnings, actionerror.StartupTimeoutError{}
 }
 
 // UpdateApplication updates the buildpacks on an application

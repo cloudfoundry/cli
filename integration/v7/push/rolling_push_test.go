@@ -64,9 +64,12 @@ var _ = Describe("push with --strategy rolling", func() {
 			})
 		})
 
-		It("pushes the app", func() {
+		It("times out", func() {
 			helpers.WithCrashingApp(func(appDir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--strategy", "rolling")
+				session := helpers.CustomCF(helpers.CFEnv{
+					WorkingDirectory: appDir,
+					EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
+				}, PushCommandName, appName, "--strategy", "rolling")
 				Eventually(session).Should(Say(`Updating app %s\.\.\.`, appName))
 				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
 				Eventually(session).Should(Say(`Getting app info\.\.\.`))
@@ -77,13 +80,10 @@ var _ = Describe("push with --strategy rolling", func() {
 				Eventually(session).Should(Say(`Staging app and tracing logs\.\.\.`))
 				Eventually(session).Should(Say(`Starting deployment for app %s\.\.\.`, appName))
 				Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
-				Eventually(session).Should(Say(`name:\s+%s`, appName))
-				Eventually(session).Should(Say(`requested state:\s+started`))
-				Eventually(session).Should(Say(`type:\s+web`))
-				Eventually(session).Should(Say(`start command:\s+bogus bogus`))
-				Eventually(session).Should(Say(`#0\s+crashed`))
-				Eventually(session.Err).Should(Say(`Start unsuccessful`))
-				Eventually(session.Err).Should(Say(`TIP: use 'cf logs %s --recent' for more information`, appName))
+				Eventually(session).Should(Say(`FAILED`))
+				Eventually(session.Err).Should(Say(`Start app timeout`))
+				Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\. Instead of hard coding the port, use the \$PORT environment variable\.`))
+				Eventually(session.Err).Should(Say(`Use 'cf logs %s --recent' for more information`, appName))
 				Eventually(session).Should(Exit(1))
 			})
 		})
