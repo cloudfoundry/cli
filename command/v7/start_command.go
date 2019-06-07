@@ -19,9 +19,11 @@ type StartActor interface {
 }
 
 type StartCommand struct {
-	RequiredArgs    flag.AppName `positional-args:"yes"`
-	usage           interface{}  `usage:"CF_NAME start APP_NAME"`
-	relatedCommands interface{}  `related_commands:"apps, logs, scale, ssh, stop, restart, run-task"`
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	usage               interface{}  `usage:"CF_NAME start APP_NAME"`
+	relatedCommands     interface{}  `related_commands:"apps, logs, scale, ssh, stop, restart, run-task"`
+	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI          command.UI
 	Config      command.Config

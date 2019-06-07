@@ -30,10 +30,11 @@ var _ = Describe("restart command", func() {
 				Eventually(session).Should(Say(`restart - Stop all instances of the app, then start them again\. This causes downtime\.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restart APP_NAME"))
-				Eventually(session).Should(Say("ENVIRONMENT:"))
-				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rs"))
+				Eventually(session).Should(Say("ENVIRONMENT:"))
+				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for buildpack staging, in minutes`))
+				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("restage, restart-app-instance"))
 
@@ -115,7 +116,7 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
-					Expect(session.Out.Contents()).NotTo(Say(`Stopping app\.\.\.`))
+					Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
 
 					Eventually(session).Should(Exit(0))
 				})
