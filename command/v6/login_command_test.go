@@ -78,12 +78,6 @@ var _ = Describe("login Command", func() {
 			Expect(testUI.Err).To(Say("Using experimental login command, some behavior may be different"))
 		})
 
-		// When("the entire flow succeeds", func() {
-		// 	It("displays all warnings", func() {
-		// 		Expect(false).To(BeTrue())
-		// 	})
-		// })
-
 		Describe("API Endpoint", func() {
 			BeforeEach(func() {
 				fakeConfig.APIVersionReturns("3.4.5")
