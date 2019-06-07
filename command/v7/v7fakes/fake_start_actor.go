@@ -43,6 +43,19 @@ type FakeStartActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	PollStartStub        func(string) (v7action.Warnings, error)
+	pollStartMutex       sync.RWMutex
+	pollStartArgsForCall []struct {
+		arg1 string
+	}
+	pollStartReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	pollStartReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	StartApplicationStub        func(string) (v7action.Warnings, error)
 	startApplicationMutex       sync.RWMutex
 	startApplicationArgsForCall []struct {
@@ -196,6 +209,69 @@ func (fake *FakeStartActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeStartActor) PollStart(arg1 string) (v7action.Warnings, error) {
+	fake.pollStartMutex.Lock()
+	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
+	fake.pollStartArgsForCall = append(fake.pollStartArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("PollStart", []interface{}{arg1})
+	fake.pollStartMutex.Unlock()
+	if fake.PollStartStub != nil {
+		return fake.PollStartStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.pollStartReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeStartActor) PollStartCallCount() int {
+	fake.pollStartMutex.RLock()
+	defer fake.pollStartMutex.RUnlock()
+	return len(fake.pollStartArgsForCall)
+}
+
+func (fake *FakeStartActor) PollStartCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.pollStartMutex.Lock()
+	defer fake.pollStartMutex.Unlock()
+	fake.PollStartStub = stub
+}
+
+func (fake *FakeStartActor) PollStartArgsForCall(i int) string {
+	fake.pollStartMutex.RLock()
+	defer fake.pollStartMutex.RUnlock()
+	argsForCall := fake.pollStartArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeStartActor) PollStartReturns(result1 v7action.Warnings, result2 error) {
+	fake.pollStartMutex.Lock()
+	defer fake.pollStartMutex.Unlock()
+	fake.PollStartStub = nil
+	fake.pollStartReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeStartActor) PollStartReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.pollStartMutex.Lock()
+	defer fake.pollStartMutex.Unlock()
+	fake.PollStartStub = nil
+	if fake.pollStartReturnsOnCall == nil {
+		fake.pollStartReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.pollStartReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeStartActor) StartApplication(arg1 string) (v7action.Warnings, error) {
 	fake.startApplicationMutex.Lock()
 	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
@@ -266,6 +342,8 @@ func (fake *FakeStartActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
+	fake.pollStartMutex.RLock()
+	defer fake.pollStartMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

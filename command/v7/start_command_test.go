@@ -98,21 +98,29 @@ var _ = Describe("start Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+			fakeActor.PollStartReturns(v7action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
 		})
 
 		It("says that the app was started and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
+			Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
 			Expect(testUI.Err).To(Say("start-warning-1"))
 			Expect(testUI.Err).To(Say("start-warning-2"))
+			Expect(testUI.Err).To(Say("poll-warning-1"))
+			Expect(testUI.Err).To(Say("poll-warning-2"))
 
 			Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-			appName := fakeActor.StartApplicationArgsForCall(0)
-			Expect(appName).To(Equal("some-app-guid"))
+			appGUID := fakeActor.StartApplicationArgsForCall(0)
+			Expect(appGUID).To(Equal("some-app-guid"))
+
+			Expect(fakeActor.PollStartCallCount()).To(Equal(1))
+			appGUID = fakeActor.PollStartArgsForCall(0)
+			Expect(appGUID).To(Equal("some-app-guid"))
 		})
 	})
 
@@ -159,11 +167,42 @@ var _ = Describe("start Command", func() {
 		It("says that the app failed to start", func() {
 			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 			Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
+			Expect(testUI.Out).NotTo(Say(`Waiting for app to start\.\.\.`))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
 			Expect(testUI.Err).To(Say("start-warning-1"))
 			Expect(testUI.Err).To(Say("start-warning-2"))
+		})
+	})
+
+	When("there is an error when polling the app", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+				Name: "some-org",
+			})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{
+				Name: "some-space",
+			})
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			expectedErr = actionerror.ApplicationNotStartedError{Name: app}
+			fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+			fakeActor.PollStartReturns(v7action.Warnings{"poll-warning"}, expectedErr)
+		})
+
+		It("says that the app failed to start", func() {
+			Expect(executeErr).To(Equal(actionerror.ApplicationNotStartedError{Name: app}))
+			Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
+			Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
+
+			Expect(testUI.Err).To(Say("get-warning-1"))
+			Expect(testUI.Err).To(Say("get-warning-2"))
+			Expect(testUI.Err).To(Say("start-warning-1"))
+			Expect(testUI.Err).To(Say("start-warning-2"))
+			Expect(testUI.Err).To(Say("poll-warning"))
 		})
 	})
 

@@ -15,6 +15,7 @@ import (
 type StartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
+	PollStart(appGUID string) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 }
 
@@ -87,8 +88,14 @@ func (cmd StartCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	cmd.UI.DisplayText("\nWaiting for app to start...")
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayText("\nWaiting for app to start...")
+
+	warnings, err = cmd.Actor.PollStart(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
