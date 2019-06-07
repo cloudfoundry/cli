@@ -66,7 +66,7 @@ var _ = Describe("set-label command", func() {
 
 				helpers.SetupCF(orgName, spaceName)
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 				})
 			})
 

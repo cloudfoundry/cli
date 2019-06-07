@@ -55,7 +55,7 @@ var _ = Describe("labels command", func() {
 				helpers.TargetOrgAndSpace(orgName, spaceName)
 				helpers.SetupCF(orgName, spaceName)
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 				})
 			})
 

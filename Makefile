@@ -27,7 +27,7 @@ TARGET = v6
 ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
 else
 TARGET = v7
-ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -tags "V7"
+ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120 -tags "V7"
 endif
 
 all: test build

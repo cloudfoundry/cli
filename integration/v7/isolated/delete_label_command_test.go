@@ -59,7 +59,7 @@ var _ = Describe("delete-label command", func() {
 
 				helpers.SetupCF(orgName, spaceName)
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 				})
 
 				session := helpers.CF("set-label", "app", appName, "some-key=some-value", "some-other-key=some-other-value", "some-third-key=other")
