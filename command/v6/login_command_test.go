@@ -180,6 +180,12 @@ var _ = Describe("login Command", func() {
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 				})
+
+				When("client secret in the configuration is present", func() {
+					It("should not display a warning", func() {
+						Expect(testUI.Err).NotTo(Say("Deprecation warning:"))
+					})
+				})
 			})
 
 			When("the current grant type is password", func() {
