@@ -172,4 +172,4 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/cloudfoundry/bosh-cli"
-  version = "3.0.1"
+  version = "5.5.1"

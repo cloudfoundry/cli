@@ -126,8 +126,8 @@
   name = "github.com/cloudfoundry/bosh-cli"
   packages = ["director/template"]
   pruneopts = "NUT"
-  revision = "712bfd7271b478ba03c3f604339e2eefbec4647c"
-  version = "v3.0.1"
+  revision = "7850ac985726c614f8ecba726ae8c0d17b08ad7f"
+  version = "v5.5.1"
 
 [[projects]]
   branch = "master"
