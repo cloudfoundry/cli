@@ -606,7 +606,6 @@
     "github.com/onsi/gomega/gexec",
     "github.com/onsi/gomega/ghttp",
     "github.com/onsi/gomega/gstruct",
-    "github.com/onsi/gomega/matchers",
     "github.com/onsi/gomega/types",
     "github.com/sabhiram/go-gitignore",
     "github.com/sajari/fuzzy",
