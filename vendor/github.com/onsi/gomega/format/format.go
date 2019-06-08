@@ -1,6 +1,9 @@
 /*
 Gomega's format package pretty-prints objects.  It explores input objects recursively and generates formatted, indented output with type information.
 */
+
+// untested sections: 4
+
 package format
 
 import (
@@ -97,7 +100,16 @@ func MessageWithDiff(actual, message, expected string) string {
 		padding := strings.Repeat(" ", spaceFromMessageToActual+spacesBeforeFormattedMismatch) + "|"
 		return Message(formattedActual, message+padding, formattedExpected)
 	}
+
+	actual = escapedWithGoSyntax(actual)
+	expected = escapedWithGoSyntax(expected)
+
 	return Message(actual, message, expected)
+}
+
+func escapedWithGoSyntax(str string) string {
+	withQuotes := fmt.Sprintf("%q", str)
+	return withQuotes[1 : len(withQuotes)-1]
 }
 
 func truncateAndFormat(str string, index int) string {
