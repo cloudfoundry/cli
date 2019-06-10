@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -50,21 +51,18 @@ var _ = Describe("delete-service command", func() {
 
 			When("there is a service instance and it is bound to an app", func() {
 				var (
-					domain      string
 					service     string
 					servicePlan string
-					broker      helpers.ServiceBroker
+					broker      *fakeservicebroker.FakeServiceBroker
 
 					serviceInstanceName string
 					appName             string
 				)
 
 				BeforeEach(func() {
-					domain = helpers.DefaultSharedDomain()
-					service = helpers.PrefixedRandomName("SERVICE")
-					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-
-					broker = helpers.CreateBroker(domain, service, servicePlan)
+					broker = fakeservicebroker.New().Register()
+					service = broker.ServiceName()
+					servicePlan = broker.ServicePlanName()
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 

@@ -3,6 +3,7 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -57,9 +58,7 @@ var _ = Describe("services command", func() {
 			orgName   string
 			spaceName string
 
-			service     string
-			servicePlan string
-			broker      helpers.ServiceBroker
+			broker *fakeservicebroker.FakeServiceBroker
 
 			managedService1      string
 			managedService2      string
@@ -80,16 +79,13 @@ var _ = Describe("services command", func() {
 			Eventually(helpers.CF("cups", userProvidedService1, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
 			Eventually(helpers.CF("cups", userProvidedService2, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
 
-			domain := helpers.DefaultSharedDomain()
-			service = helpers.PrefixedRandomName("SERVICE")
-			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-			broker = helpers.CreateBroker(domain, service, servicePlan)
-			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+			broker = fakeservicebroker.New().Register()
+			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 
 			managedService1 = helpers.PrefixedRandomName("MANAGED1")
 			managedService2 = helpers.PrefixedRandomName("MANAGED2")
-			Eventually(helpers.CF("create-service", service, servicePlan, managedService1)).Should(Exit(0))
-			Eventually(helpers.CF("create-service", service, servicePlan, managedService2)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), managedService1)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), managedService2)).Should(Exit(0))
 
 			appName1 = helpers.PrefixedRandomName("APP1")
 			appName2 = helpers.PrefixedRandomName("APP2")
@@ -127,8 +123,8 @@ var _ = Describe("services command", func() {
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
 				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s`, managedService1, service, servicePlan, appName1, "create succeeded"))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s`, managedService2, service, servicePlan, appName1, appName2, "create succeeded"))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s`, managedService1, broker.ServiceName(), broker.ServicePlanName(), appName1, "create succeeded"))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s`, managedService2, broker.ServiceName(), broker.ServicePlanName(), appName1, appName2, "create succeeded"))
 				Eventually(session).Should(Say(`%s\s+%s\s+%s`, userProvidedService1, "user-provided", appName1))
 				Eventually(session).Should(Say(`%s\s+%s\s+%s, %s`, userProvidedService2, "user-provided", appName1, appName2))
 				Eventually(session).Should(Exit(0))
@@ -144,8 +140,8 @@ var _ = Describe("services command", func() {
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
 				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, managedService1, service, servicePlan, appName1, "create succeeded", broker.Name))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s`, managedService2, service, servicePlan, appName1, appName2, "create succeeded", broker.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, managedService1, broker.ServiceName(), broker.ServicePlanName(), appName1, "create succeeded", broker.Name()))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s`, managedService2, broker.ServiceName(), broker.ServicePlanName(), appName1, appName2, "create succeeded", broker.Name()))
 				Eventually(session).Should(Say(`%s\s+%s\s+%s`, userProvidedService1, "user-provided", appName1))
 				Eventually(session).Should(Say(`%s\s+%s\s+%s, %s`, userProvidedService2, "user-provided", appName1, appName2))
 				Eventually(session).Should(Exit(0))
@@ -161,7 +157,7 @@ var _ = Describe("services command", func() {
 		)
 
 		var (
-			broker                    helpers.ServiceBroker
+			broker                    *fakeservicebroker.FakeServiceBroker
 			orgName                   string
 			spaceName                 string
 			service                   string
@@ -175,17 +171,23 @@ var _ = Describe("services command", func() {
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
 
-			domain := helpers.DefaultSharedDomain()
-			service = helpers.PrefixedRandomName("SERVICE")
-			planWithMaintenanceInfo = helpers.PrefixedRandomName("SERVICE-PLAN")
-			broker = helpers.CreateBroker(domain, service, planWithMaintenanceInfo)
+			broker = fakeservicebroker.New()
+
+			service = broker.ServiceName()
+			planWithMaintenanceInfo = broker.Services[0].Plans[0].Name
+			broker.Services[0].Plans[0].SetMaintenanceInfoVersion("1.2.3")
+			planWithNoMaintenanceInfo = broker.Services[0].Plans[1].Name
+			broker.Services[0].Plans[1].RemoveMaintenanceInfo()
+
+			broker.Register()
+
 			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 
-			planWithNoMaintenanceInfo = broker.SyncPlans[1].Name
 			Eventually(helpers.CF("create-service", service, planWithNoMaintenanceInfo, serviceInstanceWithNoMaintenanceInfo)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, planWithMaintenanceInfo, serviceInstanceWithOldMaintenanceInfo)).Should(Exit(0))
 
-			broker.UpdateMaintenanceInfo("2.0.0") // default is 1.2.3
+			broker.Services[0].Plans[0].SetMaintenanceInfoVersion("2.0.0")
+			broker.Update()
 			Eventually(helpers.CF("create-service", service, planWithMaintenanceInfo, serviceInstanceWithNewMaintenanceInfo)).Should(Exit(0))
 
 			userProvidedService = helpers.PrefixedRandomName("UPS1")
