@@ -16,6 +16,7 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 		composite                                     *UpdateServiceInstanceCompositeActor
 		fakeGetServiceInstanceActor                   *compositefakes.FakeGetServiceInstanceActor
 		fakeGetServicePlanActor                       *compositefakes.FakeGetServicePlanActor
+		fakeGetAPIVersionActor                        *compositefakes.FakeGetAPIVersionActor
 		fakeUpdateServiceInstanceMaintenanceInfoActor *compositefakes.FakeUpdateServiceInstanceMaintenanceInfoActor
 		err                                           error
 		warnings                                      v2action.Warnings
@@ -24,10 +25,12 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 	BeforeEach(func() {
 		fakeGetServiceInstanceActor = new(compositefakes.FakeGetServiceInstanceActor)
 		fakeGetServicePlanActor = new(compositefakes.FakeGetServicePlanActor)
+		fakeGetAPIVersionActor = new(compositefakes.FakeGetAPIVersionActor)
 		fakeUpdateServiceInstanceMaintenanceInfoActor = new(compositefakes.FakeUpdateServiceInstanceMaintenanceInfoActor)
 		composite = &UpdateServiceInstanceCompositeActor{
 			GetServiceInstanceActor:                   fakeGetServiceInstanceActor,
 			GetServicePlanActor:                       fakeGetServicePlanActor,
+			GetAPIVersionActor:                        fakeGetAPIVersionActor,
 			UpdateServiceInstanceMaintenanceInfoActor: fakeUpdateServiceInstanceMaintenanceInfoActor,
 		}
 	})
@@ -150,6 +153,19 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 			It("returns an error and warnings", func() {
 				Expect(err).To(MatchError("something really bad happened"))
 				Expect(warnings).To(ConsistOf("foo"))
+			})
+		})
+	})
+
+	Describe("CloudControllerAPIVersion", func() {
+		When("CloudControllerAPIVersion returns an API version", func() {
+			BeforeEach(func() {
+				fakeGetAPIVersionActor.CloudControllerAPIVersionReturns("2.42")
+			})
+
+			It("calls the get API version function and returns the result", func() {
+				Expect(composite.CloudControllerAPIVersion()).To(Equal("2.42"))
+				Expect(fakeGetAPIVersionActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
 			})
 		})
 	})

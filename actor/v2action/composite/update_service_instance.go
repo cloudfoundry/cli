@@ -22,10 +22,17 @@ type UpdateServiceInstanceMaintenanceInfoActor interface {
 	UpdateServiceInstanceMaintenanceInfo(serviceInsrtanceGUID string, maintenanceInfo v2action.MaintenanceInfo) (v2action.Warnings, error)
 }
 
+//go:generate counterfeiter . GetAPIVersionActor
+
+type GetAPIVersionActor interface {
+	CloudControllerAPIVersion() string
+}
+
 type UpdateServiceInstanceCompositeActor struct {
 	GetServiceInstanceActor                   GetServiceInstanceActor
 	GetServicePlanActor                       GetServicePlanActor
 	UpdateServiceInstanceMaintenanceInfoActor UpdateServiceInstanceMaintenanceInfoActor
+	GetAPIVersionActor                        GetAPIVersionActor
 }
 
 // UpgradeServiceInstance requests update on the service instance with the `maintenance_info` available on the plan
@@ -44,4 +51,9 @@ func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInsta
 // GetServiceInstanceByNameAndSpace gets the service instance by name and space guid provided
 func (c UpdateServiceInstanceCompositeActor) GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error) {
 	return c.GetServiceInstanceActor.GetServiceInstanceByNameAndSpace(name, spaceGUID)
+}
+
+// CloudControllerAPIVersion returns the CloudController API version
+func (c UpdateServiceInstanceCompositeActor) CloudControllerAPIVersion() string {
+	return c.GetAPIVersionActor.CloudControllerAPIVersion()
 }

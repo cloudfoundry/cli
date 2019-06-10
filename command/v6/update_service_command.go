@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/composite"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -13,6 +14,7 @@ import (
 //go:generate counterfeiter . UpdateServiceActor
 
 type UpdateServiceActor interface {
+	CloudControllerAPIVersion() string
 	GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
 	UpgradeServiceInstance(serviceInstanceGUID, servicePlanGUID string) (v2action.Warnings, error)
 }
@@ -47,8 +49,9 @@ func (cmd *UpdateServiceCommand) Setup(config command.Config, ui command.UI) err
 
 	baseActor := v2action.NewActor(ccClient, uaaClient, config)
 	cmd.Actor = &composite.UpdateServiceInstanceCompositeActor{
-		GetServiceInstanceActor:                   baseActor,
+		GetAPIVersionActor:                        baseActor,
 		GetServicePlanActor:                       baseActor,
+		GetServiceInstanceActor:                   baseActor,
 		UpdateServiceInstanceMaintenanceInfoActor: baseActor,
 	}
 
@@ -67,6 +70,10 @@ func (cmd *UpdateServiceCommand) Execute(args []string) error {
 	}
 
 	if err := cmd.validateArgumentCombination(); err != nil {
+		return err
+	}
+
+	if err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2, "Option '--upgrade'"); err != nil {
 		return err
 	}
 
