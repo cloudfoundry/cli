@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -19,15 +18,19 @@ var _ = Describe("service-key command", func() {
 		service         string
 		servicePlan     string
 		serviceInstance string
-		broker          *fakeservicebroker.FakeServiceBroker
+		broker          helpers.ServiceBroker
+		domain          string
 	)
 
 	BeforeEach(func() {
 		org = helpers.NewOrgName()
 		space = helpers.NewSpaceName()
+		service = helpers.PrefixedRandomName("SERVICE")
+		servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 		serviceInstance = helpers.PrefixedRandomName("si")
 
 		helpers.SetupCF(org, space)
+		domain = helpers.DefaultSharedDomain()
 	})
 
 	AfterEach(func() {
@@ -36,9 +39,7 @@ var _ = Describe("service-key command", func() {
 
 	When("the service key is not found", func() {
 		BeforeEach(func() {
-			broker = fakeservicebroker.New().Register()
-			service = broker.ServiceName()
-			servicePlan = broker.ServicePlanName()
+			broker = helpers.CreateBroker(domain, service, servicePlan)
 
 			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))

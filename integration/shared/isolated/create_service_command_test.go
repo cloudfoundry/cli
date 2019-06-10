@@ -7,7 +7,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -87,6 +86,7 @@ var _ = Describe("create-service command", func() {
 			var (
 				org      string
 				space    string
+				domain   string
 				username string
 			)
 
@@ -97,6 +97,7 @@ var _ = Describe("create-service command", func() {
 				helpers.SetupCF(org, space)
 
 				username, _ = helpers.GetCredentials()
+				domain = helpers.DefaultSharedDomain()
 			})
 
 			AfterEach(func() {
@@ -178,13 +179,14 @@ var _ = Describe("create-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      helpers.ServiceBroker
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Register()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
+					service = helpers.PrefixedRandomName("SERVICE")
+					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+					broker = helpers.CreateBroker(domain, service, servicePlan)
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				})
@@ -292,13 +294,15 @@ var _ = Describe("create-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      helpers.ServiceBroker
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Async().Register()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
+					service = helpers.PrefixedRandomName("SERVICE")
+					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+					broker = helpers.CreateAsyncBroker(domain, service, servicePlan)
+
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				})
 
@@ -307,7 +311,7 @@ var _ = Describe("create-service command", func() {
 				})
 
 				It("creates the service and displays a message that creation is in progress", func() {
-					session := helpers.CF("create-service", service, servicePlan, "my-service")
+					session := helpers.CF("create-service", service, servicePlan, "my-service", "-v")
 					Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
 						"my-service", org, space, username))
 					Eventually(session).Should(Say("OK"))
@@ -320,23 +324,20 @@ var _ = Describe("create-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker1     *fakeservicebroker.FakeServiceBroker
-					broker2     *fakeservicebroker.FakeServiceBroker
+					broker1     helpers.ServiceBroker
+					broker2     helpers.ServiceBroker
 				)
 
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+					service = helpers.PrefixedRandomName("SERVICE")
+					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-					broker1 = fakeservicebroker.New().Register()
-					service = broker1.ServiceName()
-					servicePlan = broker1.ServicePlanName()
-					broker2 = fakeservicebroker.New()
-					broker2.Services[0].Name = service
-					broker2.Services[0].Plans[0].Name = servicePlan
-					broker2.Register()
+					broker1 = helpers.CreateBroker(domain, service, servicePlan)
+					broker2 = helpers.CreateBroker(domain, service, servicePlan)
 
-					Eventually(helpers.CF("enable-service-access", service, "-b", broker1.Name())).Should(Exit(0))
-					Eventually(helpers.CF("enable-service-access", service, "-b", broker2.Name())).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", service, "-b", broker1.Name)).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", service, "-b", broker2.Name)).Should(Exit(0))
 				})
 
 				AfterEach(func() {
@@ -368,7 +369,7 @@ var _ = Describe("create-service command", func() {
 
 						It("displays an informative success message, exits 0", func() {
 							By("creating the service with -b flag")
-							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name())
+							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name)
 							Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
 								"my-service", org, space, username))
 							Eventually(session).Should(Say("OK"))

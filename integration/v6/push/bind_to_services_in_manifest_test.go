@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -14,12 +13,16 @@ import (
 var _ = Describe("bind app to provided services from manifest", func() {
 	var (
 		appName                         string
+		serviceName                     string
+		servicePlan                     string
 		managedServiceInstanceName      string
 		userProvidedServiceInstanceName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
+		serviceName = helpers.PrefixedRandomName("SERVICE")
+		servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 		managedServiceInstanceName = helpers.PrefixedRandomName("si")
 		userProvidedServiceInstanceName = helpers.PrefixedRandomName("usi")
 	})
@@ -46,13 +49,16 @@ var _ = Describe("bind app to provided services from manifest", func() {
 	})
 
 	When("the services do exist", func() {
-		var broker *fakeservicebroker.FakeServiceBroker
+		var broker helpers.ServiceBroker
 
 		BeforeEach(func() {
-			broker = fakeservicebroker.New().Register()
-			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+			domain := helpers.DefaultSharedDomain()
 
-			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), managedServiceInstanceName)).Should(Exit(0))
+			broker = helpers.CreateBroker(domain, serviceName, servicePlan)
+
+			Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
+
+			Eventually(helpers.CF("create-service", serviceName, servicePlan, managedServiceInstanceName)).Should(Exit(0))
 
 			Eventually(helpers.CF("create-user-provided-service", userProvidedServiceInstanceName)).Should(Exit(0))
 		})
@@ -87,7 +93,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 
 				session := helpers.CF("services")
 				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s`, managedServiceInstanceName, broker.ServiceName(), broker.ServicePlanName(), appName))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s`, managedServiceInstanceName, serviceName, servicePlan, appName))
 				Eventually(session).Should(Say(`%s\s+user-provided\s+%s`, userProvidedServiceInstanceName, appName))
 
 			})

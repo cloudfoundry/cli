@@ -3,7 +3,6 @@ package global
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -98,13 +97,19 @@ var _ = Describe("unshare-service command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
+			domain      string
 			service     string
 			servicePlan string
 		)
 
 		BeforeEach(func() {
+			service = helpers.PrefixedRandomName("SERVICE")
+			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
 			helpers.CreateOrgAndSpace(sharedToOrgName, sharedToSpaceName)
 			helpers.SetupCF(sourceOrgName, sourceSpaceName)
+
+			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
@@ -113,12 +118,10 @@ var _ = Describe("unshare-service command", func() {
 		})
 
 		When("there is a managed service instance in my current targeted space", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker helpers.ServiceBroker
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().Register()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker = helpers.CreateBroker(domain, service, servicePlan)
 
 				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
@@ -323,17 +326,12 @@ var _ = Describe("unshare-service command", func() {
 		})
 
 		When("there is a shared service instance in my currently targeted space", func() {
-			var (
-				broker   *fakeservicebroker.FakeServiceBroker
-				user     string
-				password string
-			)
+			var broker helpers.ServiceBroker
+			var user string
+			var password string
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().Register()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
-
+				broker = helpers.CreateBroker(domain, service, servicePlan)
 				user = helpers.NewUsername()
 				password = helpers.NewPassword()
 

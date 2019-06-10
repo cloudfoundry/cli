@@ -3,7 +3,6 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -218,15 +217,18 @@ var _ = Describe("service command", func() {
 
 			When("the service instance is a managed service instance", func() {
 				var (
+					domain      string
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      helpers.ServiceBroker
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Register()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
+					domain = helpers.DefaultSharedDomain()
+					service = helpers.PrefixedRandomName("SERVICE")
+					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+					broker = helpers.CreateBroker(domain, service, servicePlan)
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName, "-t", "database, email")).Should(Exit(0))
@@ -296,7 +298,7 @@ var _ = Describe("service command", func() {
 								Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
 								Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
 								Eventually(session).Should(Say(`service broker:`))
-								Consistently(session).ShouldNot(Say(broker.Name()))
+								Consistently(session).ShouldNot(Say(broker.Name))
 								Eventually(session).Should(Say("\n\n"))
 								Consistently(session).ShouldNot(Say("shared with spaces:"))
 								Eventually(session).Should(Say(`Showing status of last operation from service %s\.\.\.`, serviceInstanceName))
@@ -331,7 +333,7 @@ var _ = Describe("service command", func() {
 								Eventually(session).Should(Say(`description:\s+fake service`))
 								Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
 								Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
-								Eventually(session).Should(Say(`service broker:\s+%s`, broker.Name()))
+								Eventually(session).Should(Say(`service broker:\s+%s`, broker.Name))
 								Eventually(session).Should(Say("\n\n"))
 								Consistently(session).ShouldNot(Say("shared with spaces:"))
 								Eventually(session).Should(Say(`Showing status of last operation from service %s\.\.\.`, serviceInstanceName))
@@ -440,7 +442,7 @@ var _ = Describe("service command", func() {
 
 			service     string
 			servicePlan string
-			broker      *fakeservicebroker.FakeServiceBroker
+			broker      helpers.ServiceBroker
 		)
 
 		BeforeEach(func() {
@@ -449,9 +451,10 @@ var _ = Describe("service command", func() {
 			sourceSpaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, sourceSpaceName)
 
-			broker = fakeservicebroker.New().Register()
-			service = broker.ServiceName()
-			servicePlan = broker.ServicePlanName()
+			domain := helpers.DefaultSharedDomain()
+			service = helpers.PrefixedRandomName("SERVICE")
+			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+			broker = helpers.CreateBroker(domain, service, servicePlan)
 
 			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
@@ -524,7 +527,7 @@ var _ = Describe("service command", func() {
 				When("the service is no longer shareable", func() {
 					Context("due to service broker settings", func() {
 						BeforeEach(func() {
-							broker.Services[0].Metadata.Shareable = false
+							broker.Configure(false)
 							broker.Update()
 						})
 

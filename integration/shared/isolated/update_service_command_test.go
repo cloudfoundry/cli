@@ -3,7 +3,6 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -102,17 +101,24 @@ var _ = Describe("update-service command", func() {
 
 		When("there is a service instance", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				service             string
+				servicePlan         string
+				broker              helpers.ServiceBroker
 				serviceInstanceName string
 				username            string
 			)
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().Register()
-				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+				var domain = helpers.DefaultSharedDomain()
+				service = helpers.PrefixedRandomName("SERVICE")
+				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+				broker = helpers.CreateBroker(domain, service, servicePlan)
+
+				Eventually(helpers.CF("service-access")).Should(Say(service))
+				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 
 				serviceInstanceName = helpers.PrefixedRandomName("SI")
-				Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstanceName)).Should(Exit(0))
+				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
 
 				username, _ = helpers.GetCredentials()
 			})
@@ -125,14 +131,14 @@ var _ = Describe("update-service command", func() {
 			When("updating to a service plan that does not exist", func() {
 				It("displays an informative error message, exits 1", func() {
 					session := helpers.CF("update-service", serviceInstanceName, "-p", "non-existing-service-plan")
-					Eventually(session).Should(Say("Plan does not exist for the %s service", broker.ServiceName()))
+					Eventually(session).Should(Say("Plan does not exist for the %s service", service))
 					Eventually(session).Should(Exit(1))
 				})
 			})
 
 			When("updating to the same service plan (no-op)", func() {
 				It("displays an informative success message, exits 0", func() {
-					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.ServicePlanName())
+					session := helpers.CF("update-service", serviceInstanceName, "-p", servicePlan)
 					Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))

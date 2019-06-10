@@ -1,7 +1,6 @@
 package global
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -101,13 +100,19 @@ var _ = Describe("share-service command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
+			domain      string
 			service     string
 			servicePlan string
 		)
 
 		BeforeEach(func() {
+			service = helpers.PrefixedRandomName("SERVICE")
+			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
 			helpers.CreateOrgAndSpace(sharedToOrgName, sharedToSpaceName)
 			helpers.SetupCF(sourceOrgName, sourceSpaceName)
+
+			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
@@ -116,12 +121,10 @@ var _ = Describe("share-service command", func() {
 		})
 
 		When("there is a managed service instance in my current targeted space", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker helpers.ServiceBroker
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().Register()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker = helpers.CreateBroker(domain, service, servicePlan)
 
 				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
@@ -284,7 +287,7 @@ var _ = Describe("share-service command", func() {
 
 				Context("due to service broker settings", func() {
 					BeforeEach(func() {
-						broker.Services[0].Metadata.Shareable = false
+						broker.Configure(false)
 						broker.Update()
 					})
 
@@ -298,7 +301,7 @@ var _ = Describe("share-service command", func() {
 				Context("due to global settings AND service broker settings", func() {
 					BeforeEach(func() {
 						helpers.DisableFeatureFlag("service_instance_sharing")
-						broker.Services[0].Metadata.Shareable = false
+						broker.Configure(false)
 						broker.Update()
 					})
 
