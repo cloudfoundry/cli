@@ -1,6 +1,7 @@
 package shared_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"time"
 
@@ -22,7 +23,7 @@ var _ = Describe("Poll Start", func() {
 	var (
 		testUI      *ui.UI
 		fakeConfig  *commandfakes.FakeConfig
-		messages    chan *v2action.LogMessage
+		messages    chan loggingaction.LogMessage
 		logErrs     chan error
 		appState    chan v2action.ApplicationStateChange
 		apiWarnings chan string
@@ -36,7 +37,7 @@ var _ = Describe("Poll Start", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("FiveThirtyEight")
 
-		messages = make(chan *v2action.LogMessage)
+		messages = make(chan loggingaction.LogMessage)
 		logErrs = make(chan error)
 		appState = make(chan v2action.ApplicationStateChange)
 		apiWarnings = make(chan string)
@@ -58,21 +59,20 @@ var _ = Describe("Poll Start", func() {
 			appState <- v2action.ApplicationStateStopping
 			appState <- v2action.ApplicationStateStaging
 			appState <- v2action.ApplicationStateStarting
-			logErrs <- actionerror.NOAATimeoutError{}
 			apiWarnings <- "some warning"
 			logErrs <- errors.New("some logErrhea")
-			messages <- v2action.NewLogMessage(
-				"some log message",
-				1,
-				time.Unix(0, 0),
-				"STG",
-				"some source instance")
-			messages <- v2action.NewLogMessage(
-				"some other log message",
-				1,
-				time.Unix(0, 0),
-				"APP",
-				"some other source instance")
+			messages <- loggingaction.LogMessage{
+				Message:        "some log message",
+				MessageType:    "OUT",
+				Timestamp:      time.Unix(0, 0),
+				SourceType:     "STG",
+				SourceInstance: "some source instance"}
+			messages <- loggingaction.LogMessage{
+				Message:        "some other log message",
+				MessageType:    "OUT",
+				Timestamp:      time.Unix(0, 0),
+				SourceType:     "APP",
+				SourceInstance: "some other source instance"}
 			close(appState)
 			apiWarnings <- "some other warning"
 			close(apiWarnings)
@@ -81,7 +81,6 @@ var _ = Describe("Poll Start", func() {
 			Eventually(testUI.Out).Should(Say("\nStopping app..."))
 			Eventually(testUI.Out).Should(Say("\nStaging app and tracing logs..."))
 			Eventually(testUI.Out).Should(Say("\nWaiting for app to start..."))
-			Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 			Eventually(testUI.Err).Should(Say("some warning"))
 			Eventually(testUI.Err).Should(Say("some logErrhea"))
 			Eventually(testUI.Out).Should(Say("some log message"))

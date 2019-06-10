@@ -4,12 +4,13 @@ package v6fakes
 import (
 	"sync"
 
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3PushVersionActor struct {
-	GetStreamingLogsForApplicationByNameAndSpaceStub        func(string, string, v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpaceStub        func(string, string, v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error)
 	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
 	getStreamingLogsForApplicationByNameAndSpaceArgsForCall []struct {
 		arg1 string
@@ -17,13 +18,13 @@ type FakeV3PushVersionActor struct {
 		arg3 v3action.NOAAClient
 	}
 	getStreamingLogsForApplicationByNameAndSpaceReturns struct {
-		result1 <-chan *v3action.LogMessage
+		result1 <-chan *loggingaction.LogMessage
 		result2 <-chan error
 		result3 v3action.Warnings
 		result4 error
 	}
 	getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 <-chan *v3action.LogMessage
+		result1 <-chan *loggingaction.LogMessage
 		result2 <-chan error
 		result3 v3action.Warnings
 		result4 error
@@ -57,7 +58,7 @@ type FakeV3PushVersionActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpace(arg1 string, arg2 string, arg3 v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
+func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpace(arg1 string, arg2 string, arg3 v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)]
 	fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall = append(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall, struct {
@@ -83,7 +84,7 @@ func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpace
 	return len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpaceCalls(stub func(string, string, v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)) {
+func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpaceCalls(stub func(string, string, v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error)) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = stub
@@ -96,32 +97,32 @@ func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpace
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpaceReturns(result1 <-chan *v3action.LogMessage, result2 <-chan error, result3 v3action.Warnings, result4 error) {
+func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpaceReturns(result1 <-chan *loggingaction.LogMessage, result2 <-chan error, result3 v3action.Warnings, result4 error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = nil
 	fake.getStreamingLogsForApplicationByNameAndSpaceReturns = struct {
-		result1 <-chan *v3action.LogMessage
+		result1 <-chan *loggingaction.LogMessage
 		result2 <-chan error
 		result3 v3action.Warnings
 		result4 error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsOnCall(i int, result1 <-chan *v3action.LogMessage, result2 <-chan error, result3 v3action.Warnings, result4 error) {
+func (fake *FakeV3PushVersionActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsOnCall(i int, result1 <-chan *loggingaction.LogMessage, result2 <-chan error, result3 v3action.Warnings, result4 error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = nil
 	if fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 <-chan *v3action.LogMessage
+			result1 <-chan *loggingaction.LogMessage
 			result2 <-chan error
 			result3 v3action.Warnings
 			result4 error
 		})
 	}
 	fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 <-chan *v3action.LogMessage
+		result1 <-chan *loggingaction.LogMessage
 		result2 <-chan error
 		result3 v3action.Warnings
 		result4 error

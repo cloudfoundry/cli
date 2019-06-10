@@ -1,6 +1,8 @@
 package v2action_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
 	"context"
 	"errors"
 	"time"
@@ -19,7 +21,7 @@ import (
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
 
-var _ = FDescribe("Application Actions", func() {
+var _ = Describe("Application Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
@@ -659,9 +661,9 @@ var _ = FDescribe("Application Actions", func() {
 	Describe("StartApplication/RestartApplication", func() {
 		var (
 			app                Application
-			fakeLogCacheClient *v2actionfakes.FakeLogCacheClient
+			fakeLogCacheClient *loggingactionfakes.FakeLogCacheClient
 
-			messages <-chan *LogMessage
+			messages <-chan loggingaction.LogMessage
 			logErrs  <-chan error
 			appState <-chan ApplicationStateChange
 			warnings <-chan string
@@ -678,8 +680,7 @@ var _ = FDescribe("Application Actions", func() {
 				Instances: types.NullInt{Value: 2, IsSet: true},
 			}
 
-			// TODO change this to log cache client!
-			fakeLogCacheClient = new(v2actionfakes.FakeLogCacheClient)
+			fakeLogCacheClient = new(loggingactionfakes.FakeLogCacheClient)
 
 			fakeLogCacheClient.ReadStub = func(
 				ctx context.Context,
@@ -687,21 +688,7 @@ var _ = FDescribe("Application Actions", func() {
 				start time.Time,
 				opts ...logcache.ReadOption,
 			) ([]*loggregator_v2.Envelope, error) {
-				return []*loggregator_v2.Envelope{{
-					// 2 seconds in the past to get past Walk delay
-					Timestamp:  time.Now().Add(-2 * time.Second).UnixNano(),
-					SourceId:   "some-app-guid",
-					InstanceId: "some-source-instance",
-					Message: &loggregator_v2.Envelope_Log{
-						Log: &loggregator_v2.Log{
-							Payload: []byte("message"),
-							Type:    loggregator_v2.Log_OUT,
-						},
-					},
-					Tags: map[string]string{
-						"source_type": "some-source-type",
-					},
-				}}, nil
+				return nil, ctx.Err()
 			}
 
 			appCount := 0
@@ -862,6 +849,8 @@ var _ = FDescribe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("state-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(messages).Should(BeClosed())
+						Eventually(logErrs).Should(BeClosed())
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 						Eventually(errs).Should(Receive(MatchError(expectedErr)))
@@ -881,6 +870,8 @@ var _ = FDescribe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("state-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(messages).Should(BeClosed())
+						Eventually(logErrs).Should(BeClosed())
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 						Eventually(errs).Should(Receive(MatchError(actionerror.StartupTimeoutError{Name: "some-app"})))
 
@@ -904,6 +895,8 @@ var _ = FDescribe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("state-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(messages).Should(BeClosed())
+						Eventually(logErrs).Should(BeClosed())
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 						Eventually(errs).Should(Receive(MatchError(actionerror.ApplicationInstanceCrashedError{Name: "some-app"})))
@@ -928,6 +921,8 @@ var _ = FDescribe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("state-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(messages).Should(BeClosed())
+						Eventually(logErrs).Should(BeClosed())
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 						Eventually(errs).Should(Receive(MatchError(actionerror.ApplicationInstanceFlappingError{Name: "some-app"})))
@@ -947,6 +942,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
@@ -978,6 +975,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Consistently(appState).ShouldNot(Receive(Equal(ApplicationStateStarting)))
 
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
@@ -1039,6 +1038,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
@@ -1079,6 +1080,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
@@ -1143,6 +1146,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
@@ -1166,6 +1171,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
@@ -1200,6 +1207,8 @@ var _ = FDescribe("Application Actions", func() {
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(messages).Should(BeClosed())
+					Eventually(logErrs).Should(BeClosed())
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))

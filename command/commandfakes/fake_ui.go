@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -72,10 +73,10 @@ type FakeUI struct {
 	displayKeyValueTableForAppArgsForCall []struct {
 		arg1 [][]string
 	}
-	DisplayLogMessageStub        func(ui.LogMessage, bool)
+	DisplayLogMessageStub        func(loggingaction.LogMessage, bool)
 	displayLogMessageMutex       sync.RWMutex
 	displayLogMessageArgsForCall []struct {
-		arg1 ui.LogMessage
+		arg1 loggingaction.LogMessage
 		arg2 bool
 	}
 	DisplayNewlineStub        func()
@@ -623,10 +624,10 @@ func (fake *FakeUI) DisplayKeyValueTableForAppArgsForCall(i int) [][]string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeUI) DisplayLogMessage(arg1 ui.LogMessage, arg2 bool) {
+func (fake *FakeUI) DisplayLogMessage(arg1 loggingaction.LogMessage, arg2 bool) {
 	fake.displayLogMessageMutex.Lock()
 	fake.displayLogMessageArgsForCall = append(fake.displayLogMessageArgsForCall, struct {
-		arg1 ui.LogMessage
+		arg1 loggingaction.LogMessage
 		arg2 bool
 	}{arg1, arg2})
 	fake.recordInvocation("DisplayLogMessage", []interface{}{arg1, arg2})
@@ -642,13 +643,13 @@ func (fake *FakeUI) DisplayLogMessageCallCount() int {
 	return len(fake.displayLogMessageArgsForCall)
 }
 
-func (fake *FakeUI) DisplayLogMessageCalls(stub func(ui.LogMessage, bool)) {
+func (fake *FakeUI) DisplayLogMessageCalls(stub func(loggingaction.LogMessage, bool)) {
 	fake.displayLogMessageMutex.Lock()
 	defer fake.displayLogMessageMutex.Unlock()
 	fake.DisplayLogMessageStub = stub
 }
 
-func (fake *FakeUI) DisplayLogMessageArgsForCall(i int) (ui.LogMessage, bool) {
+func (fake *FakeUI) DisplayLogMessageArgsForCall(i int) (loggingaction.LogMessage, bool) {
 	fake.displayLogMessageMutex.RLock()
 	defer fake.displayLogMessageMutex.RUnlock()
 	argsForCall := fake.displayLogMessageArgsForCall[i]

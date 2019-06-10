@@ -1,6 +1,7 @@
 package command
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"io"
 	"time"
 
@@ -19,7 +20,7 @@ type UI interface {
 	DisplayInstancesTableForApp(table [][]string)
 	DisplayKeyValueTable(prefix string, table [][]string, padding int)
 	DisplayKeyValueTableForApp(table [][]string)
-	DisplayLogMessage(message ui.LogMessage, displayHeader bool)
+	DisplayLogMessage(message loggingaction.LogMessage, displayHeader bool)
 	DisplayNewline()
 	DisplayNonWrappingTable(prefix string, table [][]string, padding int)
 	DisplayOK()

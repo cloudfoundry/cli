@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"time"
 
@@ -351,14 +352,14 @@ var _ = Describe("v3-push Command", func() {
 
 						BeforeEach(func() {
 							allLogsWritten = make(chan bool)
-							fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-								logStream := make(chan *v3action.LogMessage)
+							fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
+								logStream := make(chan *loggingaction.LogMessage)
 								errorStream := make(chan error)
 
 								go func() {
-									logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
-									logStream <- v3action.NewLogMessage("Here are some other staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
-									logStream <- v3action.NewLogMessage("not from staging", 1, time.Now(), "potato", "sourceInstance")
+									logStream <- &loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
+									logStream <- &loggingaction.LogMessage{Message: "Here are some other staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
+									logStream <- &loggingaction.LogMessage{Message: "not from staging", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "sourceInstance"}
 									allLogsWritten <- true
 								}()
 

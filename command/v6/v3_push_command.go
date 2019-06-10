@@ -1,6 +1,7 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -27,7 +28,7 @@ type V3PushActor interface {
 //go:generate counterfeiter . V3PushVersionActor
 
 type V3PushVersionActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error)
 	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
 	RestartApplication(appGUID string) (v3action.Warnings, error)
 }
@@ -284,7 +285,7 @@ func (cmd V3PushCommand) processEvent(appName string, event pushaction.Event) bo
 	return false
 }
 
-func (cmd V3PushCommand) getLogs(logStream <-chan *v3action.LogMessage, errStream <-chan error) {
+func (cmd V3PushCommand) getLogs(logStream <-chan *loggingaction.LogMessage, errStream <-chan error) {
 	for {
 		select {
 		case logMessage, open := <-logStream:
@@ -292,7 +293,7 @@ func (cmd V3PushCommand) getLogs(logStream <-chan *v3action.LogMessage, errStrea
 				return
 			}
 			if logMessage.Staging() {
-				cmd.UI.DisplayLogMessage(logMessage, false)
+				cmd.UI.DisplayLogMessage(*logMessage, false)
 			}
 		case err, open := <-errStream:
 			if !open {

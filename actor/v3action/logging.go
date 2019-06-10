@@ -1,6 +1,7 @@
 package v3action
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"sort"
 	"sync"
 	"time"
@@ -15,64 +16,19 @@ const StagingLog = "STG"
 
 var flushInterval = 300 * time.Millisecond
 
-type LogMessage struct {
-	message        string
-	messageType    events.LogMessage_MessageType
-	timestamp      time.Time
-	sourceType     string
-	sourceInstance string
-}
-
-func (log LogMessage) Message() string {
-	return log.message
-}
-
-func (log LogMessage) Type() string {
-	if log.messageType == events.LogMessage_OUT {
-		return "OUT"
-	}
-	return "ERR"
-}
-
-func (log LogMessage) Staging() bool {
-	return log.sourceType == StagingLog
-}
-
-func (log LogMessage) Timestamp() time.Time {
-	return log.timestamp
-}
-
-func (log LogMessage) SourceType() string {
-	return log.sourceType
-}
-
-func (log LogMessage) SourceInstance() string {
-	return log.sourceInstance
-}
-
-func NewLogMessage(message string, messageType int, timestamp time.Time, sourceType string, sourceInstance string) *LogMessage {
-	return &LogMessage{
-		message:        message,
-		messageType:    events.LogMessage_MessageType(messageType),
-		timestamp:      timestamp,
-		sourceType:     sourceType,
-		sourceInstance: sourceInstance,
-	}
-}
-
-type LogMessages []*LogMessage
+type LogMessages []*loggingaction.LogMessage
 
 func (lm LogMessages) Len() int { return len(lm) }
 
 func (lm LogMessages) Less(i, j int) bool {
-	return lm[i].timestamp.Before(lm[j].timestamp)
+	return lm[i].Timestamp.Before(lm[j].Timestamp)
 }
 
 func (lm LogMessages) Swap(i, j int) {
 	lm[i], lm[j] = lm[j], lm[i]
 }
 
-func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error) {
+func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error) {
 	log.Info("Start Tailing Logs")
 
 	ready := actor.setOnConnectBlocker(client)
@@ -86,7 +42,7 @@ func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *
 	return outgoingLogStream, outgoingErrStream
 }
 
-func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error, Warnings, error) {
+func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return nil, nil, allWarnings, err
@@ -97,8 +53,8 @@ func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, 
 	return messages, logErrs, allWarnings, err
 }
 
-func (actor Actor) blockOnConnect(ready <-chan bool) (chan *LogMessage, chan error) {
-	outgoingLogStream := make(chan *LogMessage)
+func (actor Actor) blockOnConnect(ready <-chan bool) (chan *loggingaction.LogMessage, chan error) {
+	outgoingLogStream := make(chan *loggingaction.LogMessage)
 	outgoingErrStream := make(chan error, 1)
 
 	ticker := time.NewTicker(actor.Config.DialTimeout())
@@ -119,7 +75,7 @@ dance:
 	return outgoingLogStream, outgoingErrStream
 }
 
-func (Actor) flushLogs(logs LogMessages, messages chan<- *LogMessage) LogMessages {
+func (Actor) flushLogs(logs LogMessages, messages chan<- *loggingaction.LogMessage) LogMessages {
 	sort.Stable(logs)
 	for _, l := range logs {
 		messages <- l
@@ -141,7 +97,7 @@ func (Actor) setOnConnectBlocker(client NOAAClient) <-chan bool {
 	return ready
 }
 
-func (actor Actor) streamLogsBetween(incomingLogStream <-chan *events.LogMessage, incomingErrStream <-chan error, outgoingLogStream chan<- *LogMessage, outgoingErrStream chan<- error) {
+func (actor Actor) streamLogsBetween(incomingLogStream <-chan *events.LogMessage, incomingErrStream <-chan error, outgoingLogStream chan<- *loggingaction.LogMessage, outgoingErrStream chan<- error) {
 	log.Info("Processing Log Stream")
 
 	defer close(outgoingLogStream)
@@ -165,12 +121,12 @@ dance:
 				break
 			}
 
-			logsToBeSorted = append(logsToBeSorted, &LogMessage{
-				message:        string(event.GetMessage()),
-				messageType:    event.GetMessageType(),
-				timestamp:      time.Unix(0, event.GetTimestamp()),
-				sourceInstance: event.GetSourceInstance(),
-				sourceType:     event.GetSourceType(),
+			logsToBeSorted = append(logsToBeSorted, &loggingaction.LogMessage{
+				Message:        string(event.GetMessage()),
+				MessageType:    events.LogMessage_MessageType_name[int32(event.GetMessageType())],
+				Timestamp:      time.Unix(0, event.GetTimestamp()),
+				SourceInstance: event.GetSourceInstance(),
+				SourceType:     event.GetSourceType(),
 			})
 		case err, ok := <-incomingErrStream:
 			if !ok {

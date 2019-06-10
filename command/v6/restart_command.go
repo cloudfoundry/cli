@@ -1,6 +1,7 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
@@ -9,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v6/shared"
-	"github.com/cloudfoundry/noaa/consumer"
+	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,7 +19,7 @@ import (
 type RestartActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
-	RestartApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	RestartApplication(app v2action.Application, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 }
 
 type RestartCommand struct {
@@ -33,7 +34,7 @@ type RestartCommand struct {
 	SharedActor             command.SharedActor
 	Actor                   RestartActor
 	ApplicationSummaryActor shared.ApplicationSummaryActor
-	NOAAClient              *consumer.Consumer
+	LogCacheClient          *logcache.Client
 }
 
 func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
@@ -60,7 +61,7 @@ func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient, config)
 
 	return nil
 }
@@ -90,7 +91,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 		return err
 	}
 
-	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestartApplication(app, cmd.NOAAClient)
+	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestartApplication(app, cmd.LogCacheClient)
 	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 	if err != nil {
 		return err

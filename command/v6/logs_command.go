@@ -1,11 +1,8 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"context"
-	"crypto/tls"
-	"net"
-	"net/http"
-	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -18,8 +15,8 @@ import (
 //go:generate counterfeiter . LogsActor
 
 type LogsActor interface {
-	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.LogCacheClient) ([]v2action.LogMessage, v2action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.LogCacheClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error, context.CancelFunc)
+	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client loggingaction.LogCacheClient) ([]loggingaction.LogMessage, v2action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v2action.Warnings, error, context.CancelFunc)
 }
 
 type LogsCommand struct {
@@ -35,18 +32,6 @@ type LogsCommand struct {
 	LogCacheClient *logcache.Client
 }
 
-type tokenHTTPClient struct {
-	c           logcache.HTTPClient
-	accessToken func() string
-}
-
-func (c *tokenHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	req.Header.Set("Authorization", c.accessToken())
-
-	return c.c.Do(req)
-
-}
-
 func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
@@ -57,21 +42,7 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: config.SkipSSLValidation(),
-		},
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			KeepAlive: 30 * time.Second,
-			Timeout:   config.DialTimeout(),
-		}).DialContext,
-	}
-	cmd.LogCacheClient = logcache.NewClient(ccClient.LogCacheEndpoint(), logcache.WithHTTPClient(&tokenHTTPClient{
-		c:           &http.Client{Transport: tr},
-		accessToken: config.AccessToken,
-	}))
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient, config)
 
 	return nil
 }

@@ -2,6 +2,7 @@ package shared
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 )
@@ -23,7 +24,13 @@ func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7ac
 				break
 			}
 			if log.Staging() {
-				ui.DisplayLogMessage(log, false)
+				ui.DisplayLogMessage(loggingaction.LogMessage{
+					Message:        log.Message(),
+					MessageType:    log.Type(),
+					Timestamp:      log.Timestamp(),
+					SourceType:     log.SourceType(),
+					SourceInstance: log.SourceInstance(),
+				}, false)
 			}
 		case warnings, ok := <-warningsStream:
 			if !ok {

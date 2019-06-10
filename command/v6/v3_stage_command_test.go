@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"time"
 
@@ -103,13 +104,13 @@ var _ = Describe("v3-stage Command", func() {
 
 			BeforeEach(func() {
 				allLogsWritten = make(chan bool)
-				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-					logStream := make(chan *v3action.LogMessage)
+				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
+					logStream := make(chan *loggingaction.LogMessage)
 					errorStream := make(chan error)
 
 					go func() {
-						logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
-						logStream <- v3action.NewLogMessage("Here are some other staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
+						logStream <- &loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
+						logStream <- &loggingaction.LogMessage{Message: "Here are some other staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
 						allLogsWritten <- true
 					}()
 
@@ -227,14 +228,14 @@ var _ = Describe("v3-stage Command", func() {
 				allLogsWritten = make(chan bool)
 				expectedErr = errors.New("banana")
 
-				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-					logStream := make(chan *v3action.LogMessage)
+				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
+					logStream := make(chan *loggingaction.LogMessage)
 					errorStream := make(chan error)
 
 					go func() {
 						defer close(logStream)
 						defer close(errorStream)
-						logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
+						logStream <- &loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
 						errorStream <- expectedErr
 						allLogsWritten <- true
 					}()
@@ -278,7 +279,7 @@ var _ = Describe("v3-stage Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("something is wrong!")
-				logStream := make(chan *v3action.LogMessage)
+				logStream := make(chan *loggingaction.LogMessage)
 				errorStream := make(chan error)
 				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(logStream, errorStream, v3action.Warnings{"some-warning", "some-other-warning"}, expectedErr)
 			})

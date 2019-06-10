@@ -1,4 +1,4 @@
-package v2action
+package loggingaction
 
 import (
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"

@@ -1,6 +1,7 @@
 package shared_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"time"
 
@@ -22,7 +23,7 @@ var _ = Describe("V3PollStage", func() {
 		dropletStream         chan v3action.Droplet
 		warningsStream        chan v3action.Warnings
 		errStream             chan error
-		logStream             chan *v3action.LogMessage
+		logStream             chan *loggingaction.LogMessage
 		logErrStream          chan error
 		closeStreams          func()
 		writeEventsAsync      func(func())
@@ -68,7 +69,7 @@ var _ = Describe("V3PollStage", func() {
 		dropletStream = make(chan v3action.Droplet)
 		warningsStream = make(chan v3action.Warnings)
 		errStream = make(chan error)
-		logStream = make(chan *v3action.LogMessage)
+		logStream = make(chan *loggingaction.LogMessage)
 		logErrStream = make(chan error)
 
 		finishedWritingEvents = make(chan bool)
@@ -120,7 +121,7 @@ var _ = Describe("V3PollStage", func() {
 		Context("and the message is a staging message", func() {
 			BeforeEach(func() {
 				writeEventsAsync(func() {
-					logStream <- v3action.NewLogMessage("some-log-message", 1, time.Now(), v3action.StagingLog, "1")
+					logStream <- &loggingaction.LogMessage{Message: "some-log-message", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "1"}
 				})
 			})
 
@@ -136,7 +137,7 @@ var _ = Describe("V3PollStage", func() {
 		Context("and the message is not a staging message", func() {
 			BeforeEach(func() {
 				writeEventsAsync(func() {
-					logStream <- v3action.NewLogMessage("some-log-message", 1, time.Now(), "RUN", "1")
+					logStream <- &loggingaction.LogMessage{Message: "some-log-message", MessageType: "OUT", Timestamp: time.Now(), SourceType: "RUN", SourceInstance: "1"}
 				})
 			})
 

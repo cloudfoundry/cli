@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -192,16 +193,16 @@ var _ = Describe("push Command", func() {
 								return configStream, eventStream, warningsStream, errorStream
 							}
 
-							fakeRestartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
-								messages := make(chan *v2action.LogMessage)
+							fakeRestartActor.RestartApplicationStub = func(app v2action.Application, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+								messages := make(chan loggingaction.LogMessage)
 								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
 								go func() {
-									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
-									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+									messages <- loggingaction.LogMessage{Message: "log message 1", MessageType: "OUT", Timestamp: time.Unix(0, 0), SourceType: "STG", SourceInstance: "1"}
+									messages <- loggingaction.LogMessage{Message: "log message 2", MessageType: "OUT", Timestamp: time.Unix(0, 0), SourceType: "STG", SourceInstance: "1"}
 									appState <- v2action.ApplicationStateStopping
 									appState <- v2action.ApplicationStateStaging
 									appState <- v2action.ApplicationStateStarting

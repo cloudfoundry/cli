@@ -1,14 +1,17 @@
 package shared
 
 import (
+	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
 	"crypto/tls"
+	"github.com/cloudfoundry/noaa/consumer"
+	"net"
 	"net/http"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
 	"code.cloudfoundry.org/cli/command"
-	"github.com/cloudfoundry/noaa/consumer"
+	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
 
 type RequestLoggerOutput interface {
@@ -35,6 +38,35 @@ func (p DebugPrinter) Print(title string, dump string) {
 		output.DisplayDump(dump)
 	}
 
+}
+
+type tokenHTTPClient struct {
+	c           logcache.HTTPClient
+	accessToken func() string
+}
+
+func (c *tokenHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Authorization", c.accessToken())
+
+	return c.c.Do(req)
+}
+
+// NewLogCacheClient returns back a configured Log Cache Client.
+func NewLogCacheClient(ccClient *ccv2.Client, config command.Config) *logcache.Client {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: config.SkipSSLValidation(),
+		},
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			KeepAlive: 30 * time.Second,
+			Timeout:   config.DialTimeout(),
+		}).DialContext,
+	}
+	return logcache.NewClient(ccClient.LogCacheEndpoint(), logcache.WithHTTPClient(&tokenHTTPClient{
+		c:           &http.Client{Transport: tr},
+		accessToken: config.AccessToken,
+	}))
 }
 
 // NewNOAAClient returns back a configured NOAA Client.

@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"os"
-	"strings"
-
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"os"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
@@ -505,7 +505,13 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 				return
 			}
 			if logMessage.Staging() {
-				cmd.UI.DisplayLogMessage(logMessage, false)
+				cmd.UI.DisplayLogMessage(loggingaction.LogMessage{
+					Message:        logMessage.Message(),
+					MessageType:    logMessage.Type(),
+					Timestamp:      logMessage.Timestamp(),
+					SourceType:     logMessage.SourceType(),
+					SourceInstance: logMessage.SourceInstance(),
+				}, false)
 			}
 		case err, open := <-errStream:
 			if !open {

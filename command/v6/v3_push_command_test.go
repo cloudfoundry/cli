@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"os"
 	"time"
@@ -61,13 +62,13 @@ func FillInValues(tuples []Step, state pushaction.PushPlan) func(pushaction.Push
 }
 
 type LogEvent struct {
-	Log   *v3action.LogMessage
+	Log   *loggingaction.LogMessage
 	Error error
 }
 
-func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedError error) func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-	return func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-		logStream := make(chan *v3action.LogMessage)
+func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedError error) func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
+	return func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
+		logStream := make(chan *loggingaction.LogMessage)
 		errStream := make(chan error)
 		go func() {
 			defer close(logStream)
@@ -281,11 +282,12 @@ var _ = Describe("v3-push Command", func() {
 
 					When("there are no logging errors", func() {
 						BeforeEach(func() {
+
 							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 								[]LogEvent{
-									{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
-									{Log: v3action.NewLogMessage("log-message-2", 1, time.Now(), v3action.StagingLog, "source-instance")},
-									{Log: v3action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
+									{Log: &loggingaction.LogMessage{Message: "log-message-1", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "source-instance"}},
+									{Log: &loggingaction.LogMessage{Message: "log-message-2", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "source-instance"}},
+									{Log: &loggingaction.LogMessage{Message: "log-message-3", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "source-instance"}},
 								},
 								v3action.Warnings{"log-warning-1", "log-warning-2"},
 								nil,
@@ -315,7 +317,7 @@ var _ = Describe("v3-push Command", func() {
 								[]LogEvent{
 									{Error: errors.New("some-random-err")},
 									{Error: actionerror.NOAATimeoutError{}},
-									{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
+									{Log: &loggingaction.LogMessage{Message: "log-message-1", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "source-instance"}},
 								},
 								v3action.Warnings{"log-warning-1", "log-warning-2"},
 								nil,

@@ -1,6 +1,7 @@
 package v3action_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"errors"
 	"time"
 
@@ -28,32 +29,14 @@ var _ = Describe("Logging Actions", func() {
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
 
-	Describe("LogMessage", func() {
-		Describe("Staging", func() {
-			When("the log is a staging log", func() {
-				It("returns true", func() {
-					message := NewLogMessage("", 0, time.Now(), "STG", "")
-					Expect(message.Staging()).To(BeTrue())
-				})
-			})
-
-			When("the log is any other kind of log", func() {
-				It("returns true", func() {
-					message := NewLogMessage("", 0, time.Now(), "APP", "")
-					Expect(message.Staging()).To(BeFalse())
-				})
-			})
-		})
-	})
-
 	Describe("GetStreamingLogs", func() {
 		var (
 			expectedAppGUID string
 
-			messages <-chan *LogMessage
+			messages <-chan *loggingaction.LogMessage
 			errs     <-chan error
 
-			message *LogMessage
+			message *loggingaction.LogMessage
 		)
 
 		BeforeEach(func() {
@@ -137,26 +120,26 @@ var _ = Describe("Logging Actions", func() {
 
 			It("converts them to log messages, sorts them, and passes them through the messages channel", func() {
 				Eventually(messages).Should(Receive(&message))
-				Expect(message.Message()).To(Equal("message-3"))
-				Expect(message.Type()).To(Equal("OUT"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 0)))
-				Expect(message.SourceType()).To(Equal("some-source-type"))
-				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
+				Expect(message.Message).To(Equal("message-3"))
+				Expect(message.MessageType).To(Equal("OUT"))
+				Expect(message.Timestamp).To(Equal(time.Unix(0, 0)))
+				Expect(message.SourceType).To(Equal("some-source-type"))
+				Expect(message.SourceInstance).To(Equal("some-source-instance"))
 
 				Eventually(messages).Should(Receive(&message))
-				Expect(message.Message()).To(Equal("message-1"))
-				Expect(message.Type()).To(Equal("OUT"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 10)))
+				Expect(message.Message).To(Equal("message-1"))
+				Expect(message.MessageType).To(Equal("OUT"))
+				Expect(message.Timestamp).To(Equal(time.Unix(0, 10)))
 
 				Eventually(messages).Should(Receive(&message))
-				Expect(message.Message()).To(Equal("message-4"))
-				Expect(message.Type()).To(Equal("ERR"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 15)))
+				Expect(message.Message).To(Equal("message-4"))
+				Expect(message.MessageType).To(Equal("ERR"))
+				Expect(message.Timestamp).To(Equal(time.Unix(0, 15)))
 
 				Eventually(messages).Should(Receive(&message))
-				Expect(message.Message()).To(Equal("message-2"))
-				Expect(message.Type()).To(Equal("ERR"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 20)))
+				Expect(message.Message).To(Equal("message-2"))
+				Expect(message.MessageType).To(Equal("ERR"))
+				Expect(message.Timestamp).To(Equal(time.Unix(0, 20)))
 			})
 		})
 
@@ -321,7 +304,7 @@ var _ = Describe("Logging Actions", func() {
 			var (
 				expectedAppGUID string
 
-				messages <-chan *LogMessage
+				messages <-chan *loggingaction.LogMessage
 				logErrs  <-chan error
 			)
 
@@ -400,18 +383,18 @@ var _ = Describe("Logging Actions", func() {
 				Expect(warnings).To(ConsistOf("some-app-warnings"))
 
 				message := <-messages
-				Expect(message.Message()).To(Equal("message-1"))
-				Expect(message.Type()).To(Equal("OUT"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 10)))
-				Expect(message.SourceType()).To(Equal("some-source-type"))
-				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
+				Expect(message.Message).To(Equal("message-1"))
+				Expect(message.MessageType).To(Equal("OUT"))
+				Expect(message.Timestamp).To(Equal(time.Unix(0, 10)))
+				Expect(message.SourceType).To(Equal("some-source-type"))
+				Expect(message.SourceInstance).To(Equal("some-source-instance"))
 
 				message = <-messages
-				Expect(message.Message()).To(Equal("message-2"))
-				Expect(message.Type()).To(Equal("ERR"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 20)))
-				Expect(message.SourceType()).To(Equal("some-source-type"))
-				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
+				Expect(message.Message).To(Equal("message-2"))
+				Expect(message.MessageType).To(Equal("ERR"))
+				Expect(message.Timestamp).To(Equal(time.Unix(0, 20)))
+				Expect(message.SourceType).To(Equal("some-source-type"))
+				Expect(message.SourceInstance).To(Equal("some-source-instance"))
 			})
 		})
 
