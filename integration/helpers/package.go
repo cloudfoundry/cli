@@ -36,7 +36,11 @@ func VerifyAppPackageContentsV3(appName string, files ...string) {
 }
 
 func getFirstAppPackageGuid(appName string) string {
-	session := CF("v3-packages", appName)
+	commandName := "v3-packages"
+	if V7 {
+		commandName = "packages"
+	}
+	session := CF(commandName, appName)
 	Eventually(session).Should(Exit(0))
 
 	myRegexp, err := regexp.Compile(GUIDRegex)
