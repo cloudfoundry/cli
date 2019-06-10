@@ -3,7 +3,6 @@ package global
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -19,7 +18,7 @@ var _ = Describe("service command", func() {
 
 		service     string
 		servicePlan string
-		broker      *fakeservicebroker.FakeServiceBroker
+		broker      helpers.ServiceBroker
 	)
 
 	BeforeEach(func() {
@@ -30,9 +29,10 @@ var _ = Describe("service command", func() {
 		sourceSpaceName = helpers.NewSpaceName()
 		helpers.SetupCF(orgName, sourceSpaceName)
 
-		broker = fakeservicebroker.New().Register()
-		service = broker.ServiceName()
-		servicePlan = broker.ServicePlanName()
+		domain := helpers.DefaultSharedDomain()
+		service = helpers.PrefixedRandomName("SERVICE")
+		servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+		broker = helpers.CreateBroker(domain, service, servicePlan)
 
 		Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 		Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
@@ -75,7 +75,7 @@ var _ = Describe("service command", func() {
 
 			Context("AND service broker does not allow service instance sharing", func() {
 				BeforeEach(func() {
-					broker.Services[0].Metadata.Shareable = false
+					broker.Configure(false)
 					broker.Update()
 				})
 

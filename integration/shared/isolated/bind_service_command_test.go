@@ -8,7 +8,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -86,17 +85,23 @@ var _ = Describe("bind-service command", func() {
 
 	When("the environment is setup correctly", func() {
 		var (
-			org      string
-			space    string
-			username string
+			org         string
+			space       string
+			service     string
+			servicePlan string
+			domain      string
+			username    string
 		)
 
 		BeforeEach(func() {
 			org = helpers.NewOrgName()
 			space = helpers.NewSpaceName()
+			service = helpers.PrefixedRandomName("SERVICE")
+			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 			username, _ = helpers.GetCredentials()
 
 			helpers.SetupCF(org, space)
+			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
@@ -298,18 +303,19 @@ var _ = Describe("bind-service command", func() {
 			})
 
 			When("the service is provided by a broker", func() {
-				var broker *fakeservicebroker.FakeServiceBroker
-
-				AfterEach(func() {
-					broker.Destroy()
-				})
 
 				When("the service binding is blocking", func() {
-					BeforeEach(func() {
-						broker = fakeservicebroker.New().Register()
+					var broker helpers.ServiceBroker
 
-						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
-						Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance)).Should(Exit(0))
+					BeforeEach(func() {
+						broker = helpers.CreateBroker(domain, service, servicePlan)
+
+						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						broker.Destroy()
 					})
 
 					It("binds the service to the app, displays OK and TIP", func() {
@@ -327,18 +333,24 @@ var _ = Describe("bind-service command", func() {
 				})
 
 				When("the service binding is asynchronous", func() {
+					var broker helpers.ServiceBroker
+
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 
-						broker = fakeservicebroker.New().Async().Register()
+						broker = helpers.CreateAsyncBroker(domain, service, servicePlan)
 
-						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
-						Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance)).Should(Exit(0))
+						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 
 						Eventually(func() *Session {
 							session := helpers.CF("service", serviceInstance)
 							return session.Wait()
 						}, time.Minute*5, time.Second*5).Should(Say("create succeeded"))
+					})
+
+					AfterEach(func() {
+						broker.Destroy()
 					})
 
 					It("binds the service to the app, displays OK and TIP", func() {

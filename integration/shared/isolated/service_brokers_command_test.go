@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,27 +46,29 @@ var _ = Describe("service-brokers command", func() {
 
 		When("there is a broker", func() {
 			var (
-				orgName   string
-				spaceName string
-				broker    *fakeservicebroker.FakeServiceBroker
+				orgName string
+				broker  helpers.ServiceBroker
 			)
 
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
-				spaceName = helpers.NewSpaceName()
+				spaceName := helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().Register()
+				serviceName := helpers.PrefixedRandomName("SERVICE")
+				servicePlan := helpers.PrefixedRandomName("SERVICE-PLAN")
+				domain := helpers.DefaultSharedDomain()
+				broker = helpers.CreateBroker(domain, serviceName, servicePlan)
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Delete()
 			})
 
 			It("prints a table of service brokers", func() {
 				Eventually(session).Should(Say("Getting service brokers as admin..."))
 				Eventually(session).Should(Say(`name\s+url`))
-				Eventually(session).Should(Say(`%s\s+%s`, broker.Name(), broker.URL()))
+				Eventually(session).Should(Say(`%s\s+%s`, broker.Name, broker.URL()))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -82,7 +83,6 @@ var _ = Describe("service-brokers command", func() {
 
 				AfterEach(func() {
 					helpers.LoginCF()
-					helpers.TargetOrgAndSpace(orgName, spaceName)
 					helpers.DeleteUser(unprivilegedUsername)
 				})
 
