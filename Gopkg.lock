@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:3a37dbf0d1953b95ec5a13b9e1ba2a3c49fa46ba2b809dee2252017746be444b"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "5f9ff16f99a0345f98f147765db0e36aef91c795"
+  version = "v6.45.0"
+
+[[projects]]
   digest = "1:286c64923387f8c88d79d737547f3dbc70e9d7e1343e9769c84e4647aac31aaa"
   name = "code.cloudfoundry.org/diego-ssh"
   packages = [
@@ -281,11 +293,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b2e830172ec6af4ca4b25e816796f25ebc0dd668632bc6fa5ee1b90d15bd0c96"
+  digest = "1:28e7c24ad20bfc7a42f4410ae42b60a5b90a866352e5a25a2f0edb84836e4102"
   name = "github.com/lunixbochs/vtclean"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "d14193dfc626125c831501c1c42340b4248e1f5a"
+  revision = "88cfb0c2efe8ed7b0ccf0af83db39359829027bb"
 
 [[projects]]
   branch = "master"
