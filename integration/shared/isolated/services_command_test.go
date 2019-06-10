@@ -175,7 +175,7 @@ var _ = Describe("services command", func() {
 
 			service = broker.ServiceName()
 			planWithMaintenanceInfo = broker.Services[0].Plans[0].Name
-			broker.Services[0].Plans[0].SetMaintenanceInfoVersion("1.2.3")
+			broker.Services[0].Plans[0].SetMaintenanceInfo("1.2.3", "")
 			planWithNoMaintenanceInfo = broker.Services[0].Plans[1].Name
 			broker.Services[0].Plans[1].RemoveMaintenanceInfo()
 
@@ -186,7 +186,7 @@ var _ = Describe("services command", func() {
 			Eventually(helpers.CF("create-service", service, planWithNoMaintenanceInfo, serviceInstanceWithNoMaintenanceInfo)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, planWithMaintenanceInfo, serviceInstanceWithOldMaintenanceInfo)).Should(Exit(0))
 
-			broker.Services[0].Plans[0].SetMaintenanceInfoVersion("2.0.0")
+			broker.Services[0].Plans[0].SetMaintenanceInfo("2.0.0", "")
 			broker.Update()
 			Eventually(helpers.CF("create-service", service, planWithMaintenanceInfo, serviceInstanceWithNewMaintenanceInfo)).Should(Exit(0))
 

@@ -429,6 +429,28 @@ var _ = Describe("service command", func() {
 						})
 					})
 				})
+
+				When("Upgrade available", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionMaintenanceInfoInSummaryV2)
+					})
+					It("displays description of upgrade when available", func() {
+						By("Having a service instance with no maintenance_info in the plan")
+						session := helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
+						Eventually(session).Should(Say("There is no upgrade available for this service."))
+
+						By("Adding maintenance_info to the service plan")
+						broker.Services[0].Plans[0].SetMaintenanceInfo("3.0.0", "Stemcell update.\nExpect downtime.")
+						broker.Update()
+
+						session = helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
+						Eventually(session).Should(Say("Showing available upgrade details for this service...."))
+						Eventually(session).Should(Say("upgrade description: Stemcell update.\nExpect downtime."))
+						Eventually(session).Should(Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'`, serviceInstanceName))
+					})
+				})
 			})
 		})
 	})

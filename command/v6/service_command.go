@@ -93,6 +93,7 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 		cmd.displayManagedServiceInstanceSummary(serviceInstanceSummary)
 		cmd.displayManagedServiceInstanceLastOperation(serviceInstanceSummary)
 		cmd.displayBoundApplicationsIfExists(serviceInstanceSummary)
+		cmd.displayUpgradeInformation(serviceInstanceSummary)
 		return nil
 	}
 
@@ -218,4 +219,28 @@ func (cmd ServiceCommand) displayBoundApplicationsIfExists(serviceInstanceSummar
 	}
 
 	cmd.UI.DisplayTableWithHeader("", boundAppsTable, 3)
+}
+
+func (cmd ServiceCommand) displayUpgradeInformation(serviceInstanceSummary v2action.ServiceInstanceSummary) {
+	cmd.UI.DisplayNewline()
+
+	if !serviceInstanceSummary.UpgradeSupported() {
+		cmd.UI.DisplayText("Upgrades are not supported by this broker.")
+		return
+	}
+
+	if !serviceInstanceSummary.UpgradeAvailable() {
+		cmd.UI.DisplayText("There is no upgrade available for this service.")
+		return
+	}
+
+	cmd.UI.DisplayText("Showing available upgrade details for this service....")
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("upgrade description: {{.Description}}", map[string]interface{}{
+		"Description": serviceInstanceSummary.ServicePlan.MaintenanceInfo.Description,
+	})
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("TIP: You can upgrade using 'cf update-service {{.InstanceName}} --upgrade'", map[string]interface{}{
+		"InstanceName": serviceInstanceSummary.Name,
+	})
 }

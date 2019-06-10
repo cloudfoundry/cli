@@ -32,7 +32,8 @@ var _ = Describe("Service Plan", func() {
 						"description": "some-description",
 						"free": true,
 						"maintenance_info": {
-						  "version": "1.2.3"
+              "version": "1.2.3",
+              "description": "fake description for maintenance info"
 						}
 					}
 				}`
@@ -57,7 +58,8 @@ var _ = Describe("Service Plan", func() {
 					Description: "some-description",
 					Free:        true,
 					MaintenanceInfo: MaintenanceInfo{
-						Version: "1.2.3",
+						Version:     "1.2.3",
+						Description: "fake description for maintenance info",
 					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

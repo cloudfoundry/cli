@@ -106,7 +106,7 @@ func (cmd ServicesCommand) Execute(args []string) error {
 				strings.Join(boundAppNames, ", "),
 				fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State),
 				summary.Service.ServiceBrokerName,
-				summary.UpgradeAvailable(),
+				upgradeAvailableSummary(summary),
 			},
 		)
 	}
@@ -131,4 +131,14 @@ func sortBoundApps(serviceInstance v2action.ServiceInstanceSummary) {
 		func(i, j int) bool {
 			return sorting.LessIgnoreCase(serviceInstance.BoundApplications[i].AppName, serviceInstance.BoundApplications[j].AppName)
 		})
+}
+
+func upgradeAvailableSummary(s v2action.ServiceInstanceSummary) string {
+	if s.UpgradeSupported() {
+		if s.UpgradeAvailable() {
+			return "yes"
+		}
+		return "no"
+	}
+	return ""
 }

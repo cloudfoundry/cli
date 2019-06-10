@@ -257,7 +257,9 @@ var _ = Describe("service Command", func() {
 										CreatedAt:   "some-created-at-time",
 									},
 								},
-								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
+								ServicePlan: v2action.ServicePlan{
+									Name: "some-plan",
+								},
 								Service: v2action.Service{
 									Label:            "some-service",
 									Description:      "some-description",
@@ -268,7 +270,8 @@ var _ = Describe("service Command", func() {
 							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 								returnedSummary,
 								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
-								nil)
+								nil,
+							)
 						})
 
 						When("the service instance is not shared and is not shareable", func() {
@@ -691,6 +694,91 @@ var _ = Describe("service Command", func() {
 								Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
 							})
 
+						})
+
+						When("the service instance does not support an upgrade", func() {
+							It("displays a message indicating that there are no upgrade available", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say(`Showing info of service some-service-instance in org some-org / space some-space as some-user\.\.\.`))
+								Expect(testUI.Out).To(Say(`name:\s+some-service-instance`))
+								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+
+								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line between 'bound apps' and 'upgrade available' messages")
+								Expect(testUI.Out).To(Say("Upgrades are not supported by this broker."))
+
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							})
+						})
+
+						When("the service instance does not have an upgrade available", func() {
+							BeforeEach(func() {
+								maintenanceInfo := ccv2.MaintenanceInfo{
+									Version:     "2.0.0",
+									Description: "This is the maintenance description",
+								}
+
+								returnedSummary.ServicePlan.MaintenanceInfo = maintenanceInfo
+								returnedSummary.ServiceInstance.MaintenanceInfo = maintenanceInfo
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									returnedSummary,
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays a message indicating that there are no upgrade available", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say(`Showing info of service some-service-instance in org some-org / space some-space as some-user\.\.\.`))
+								Expect(testUI.Out).To(Say(`name:\s+some-service-instance`))
+								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+
+								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line between 'bound apps' and 'upgrade available' messages")
+								Expect(testUI.Out).To(Say("There is no upgrade available for this service."))
+
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							})
+						})
+
+						When("the service instance has an upgrade available", func() {
+							BeforeEach(func() {
+								returnedSummary.ServicePlan.MaintenanceInfo = ccv2.MaintenanceInfo{
+									Version:     "2.0.0",
+									Description: "This is the maintenance description",
+								}
+
+								returnedSummary.ServiceInstance.MaintenanceInfo = ccv2.MaintenanceInfo{
+									Version:     "1.0.0",
+									Description: "This is old maintenance description",
+								}
+
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									returnedSummary,
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays a message with the upgrade available description", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say(`Showing info of service some-service-instance in org some-org / space some-space as some-user\.\.\.`))
+								Expect(testUI.Out).To(Say(`name:\s+some-service-instance`))
+								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+
+								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line between 'bound apps' and 'upgrade available' messages")
+								Expect(testUI.Out).To(Say("Showing available upgrade details for this service...."))
+								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line between messages")
+								Expect(testUI.Out).To(Say("upgrade description: This is the maintenance description"))
+								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line before tips")
+								Expect(testUI.Out).To(Say("TIP: You can upgrade using 'cf update-service some-service-instance --upgrade'"))
+
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							})
 						})
 					})
 
