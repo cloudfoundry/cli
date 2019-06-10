@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:3a37dbf0d1953b95ec5a13b9e1ba2a3c49fa46ba2b809dee2252017746be444b"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "5f9ff16f99a0345f98f147765db0e36aef91c795"
+  version = "v6.45.0"
+
+[[projects]]
   digest = "1:286c64923387f8c88d79d737547f3dbc70e9d7e1343e9769c84e4647aac31aaa"
   name = "code.cloudfoundry.org/diego-ssh"
   packages = [
@@ -147,7 +159,7 @@
   name = "github.com/cloudfoundry/cli-plugin-repo"
   packages = ["web"]
   pruneopts = "NUT"
-  revision = "e3bb94a32f8ffc29d1040354d8f081b07dc6e489"
+  revision = "c1aff369a397b6557c77b446d3b4b724e13f6e6e"
 
 [[projects]]
   branch = "master"
