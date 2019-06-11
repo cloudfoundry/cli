@@ -2,6 +2,8 @@ package v6_test
 
 import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
+	"context"
 	"errors"
 	"os"
 	"time"
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -62,20 +63,20 @@ func FillInValues(tuples []Step, state pushaction.PushPlan) func(pushaction.Push
 }
 
 type LogEvent struct {
-	Log   *loggingaction.LogMessage
+	Log   loggingaction.LogMessage
 	Error error
 }
 
-func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedError error) func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
-	return func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
-		logStream := make(chan *loggingaction.LogMessage)
+func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedError error) func(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc) {
+	return func(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc) {
+		logStream := make(chan loggingaction.LogMessage)
 		errStream := make(chan error)
 		go func() {
 			defer close(logStream)
 			defer close(errStream)
 
 			for _, log := range logevents {
-				if log.Log != nil {
+				if (log.Log != loggingaction.LogMessage{}) {
 					logStream <- log.Log
 				}
 				if log.Error != nil {
@@ -84,22 +85,22 @@ func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedEr
 			}
 		}()
 
-		return logStream, errStream, passedWarnings, passedError
+		return logStream, errStream, passedWarnings, passedError, func() {}
 	}
 }
 
 var _ = Describe("v3-push Command", func() {
 	var (
-		cmd              V3PushCommand
-		testUI           *ui.UI
-		fakeConfig       *commandfakes.FakeConfig
-		fakeSharedActor  *commandfakes.FakeSharedActor
-		fakeActor        *v6fakes.FakeV3PushActor
-		fakeVersionActor *v6fakes.FakeV3PushVersionActor
-		fakeProgressBar  *v6fakes.FakeProgressBar
-		fakeNOAAClient   *v3actionfakes.FakeNOAAClient
-		binaryName       string
-		executeErr       error
+		cmd                V3PushCommand
+		testUI             *ui.UI
+		fakeConfig         *commandfakes.FakeConfig
+		fakeSharedActor    *commandfakes.FakeSharedActor
+		fakeActor          *v6fakes.FakeV3PushActor
+		fakeVersionActor   *v6fakes.FakeV3PushVersionActor
+		fakeProgressBar    *v6fakes.FakeProgressBar
+		fakeLogCacheClient *loggingactionfakes.FakeLogCacheClient
+		binaryName         string
+		executeErr         error
 
 		appName   string
 		userName  string
@@ -114,21 +115,21 @@ var _ = Describe("v3-push Command", func() {
 		fakeActor = new(v6fakes.FakeV3PushActor)
 		fakeVersionActor = new(v6fakes.FakeV3PushVersionActor)
 		fakeProgressBar = new(v6fakes.FakeProgressBar)
-		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
+		fakeLogCacheClient = new(loggingactionfakes.FakeLogCacheClient)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = V3PushCommand{
-			RequiredArgs: flag.AppName{AppName: "some-app"},
-			UI:           testUI,
-			Config:       fakeConfig,
-			Actor:        fakeActor,
-			VersionActor: fakeVersionActor,
-			SharedActor:  fakeSharedActor,
-			ProgressBar:  fakeProgressBar,
-			NOAAClient:   fakeNOAAClient,
+			RequiredArgs:   flag.AppName{AppName: "some-app"},
+			UI:             testUI,
+			Config:         fakeConfig,
+			Actor:          fakeActor,
+			VersionActor:   fakeVersionActor,
+			SharedActor:    fakeSharedActor,
+			ProgressBar:    fakeProgressBar,
+			LogCacheClient: fakeLogCacheClient,
 		}
 
 		appName = "some-app"
@@ -285,9 +286,9 @@ var _ = Describe("v3-push Command", func() {
 
 							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 								[]LogEvent{
-									{Log: &loggingaction.LogMessage{Message: "log-message-1", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "source-instance"}},
-									{Log: &loggingaction.LogMessage{Message: "log-message-2", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "source-instance"}},
-									{Log: &loggingaction.LogMessage{Message: "log-message-3", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "source-instance"}},
+									{Log: loggingaction.LogMessage{Message: "log-message-1", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "source-instance"}},
+									{Log: loggingaction.LogMessage{Message: "log-message-2", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "source-instance"}},
+									{Log: loggingaction.LogMessage{Message: "log-message-3", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "source-instance"}},
 								},
 								v3action.Warnings{"log-warning-1", "log-warning-2"},
 								nil,
@@ -316,8 +317,7 @@ var _ = Describe("v3-push Command", func() {
 							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 								[]LogEvent{
 									{Error: errors.New("some-random-err")},
-									{Error: actionerror.NOAATimeoutError{}},
-									{Log: &loggingaction.LogMessage{Message: "log-message-1", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "source-instance"}},
+									{Log: loggingaction.LogMessage{Message: "log-message-1", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "source-instance"}},
 								},
 								v3action.Warnings{"log-warning-1", "log-warning-2"},
 								nil,
@@ -330,7 +330,6 @@ var _ = Describe("v3-push Command", func() {
 							Expect(testUI.Err).To(Say("log-warning-1"))
 							Expect(testUI.Err).To(Say("log-warning-2"))
 							Eventually(testUI.Err).Should(Say("some-random-err"))
-							Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 
 							Eventually(testUI.Out).Should(Say("log-message-1"))
 						})

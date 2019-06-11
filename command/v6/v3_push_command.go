@@ -2,6 +2,7 @@ package v6
 
 import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"context"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -28,7 +29,7 @@ type V3PushActor interface {
 //go:generate counterfeiter . V3PushVersionActor
 
 type V3PushVersionActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc)
 	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
 	RestartApplication(appGUID string) (v3action.Warnings, error)
 }
@@ -65,7 +66,7 @@ type V3PushCommand struct {
 
 	UI                  command.UI
 	Config              command.Config
-	NOAAClient          v3action.NOAAClient
+	LogCacheClient      loggingaction.LogCacheClient
 	Actor               V3PushActor
 	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
@@ -104,7 +105,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
 
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
 
 	return nil
 }
@@ -248,6 +249,7 @@ func (cmd V3PushCommand) processApplyStreams(
 func (cmd V3PushCommand) processEvent(appName string, event pushaction.Event) bool {
 	log.Infoln("received apply event:", event)
 
+	stopStreaming := func() {}
 	switch event {
 	case pushaction.SkippingApplicationCreation:
 		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
@@ -272,11 +274,14 @@ func (cmd V3PushCommand) processEvent(appName string, event pushaction.Event) bo
 	case pushaction.StartingStaging:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Staging app and tracing logs...")
-		logStream, errStream, warnings, _ := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		var logStream <-chan loggingaction.LogMessage
+		var errStream <-chan error
+		var warnings v3action.Warnings
+		logStream, errStream, warnings, _, stopStreaming = cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 		cmd.UI.DisplayWarnings(warnings)
 		go cmd.getLogs(logStream, errStream)
 	case pushaction.StagingComplete:
-		cmd.NOAAClient.Close()
+		stopStreaming()
 	case pushaction.Complete:
 		return true
 	default:
@@ -285,7 +290,7 @@ func (cmd V3PushCommand) processEvent(appName string, event pushaction.Event) bo
 	return false
 }
 
-func (cmd V3PushCommand) getLogs(logStream <-chan *loggingaction.LogMessage, errStream <-chan error) {
+func (cmd V3PushCommand) getLogs(logStream <-chan loggingaction.LogMessage, errStream <-chan error) {
 	for {
 		select {
 		case logMessage, open := <-logStream:
@@ -293,15 +298,11 @@ func (cmd V3PushCommand) getLogs(logStream <-chan *loggingaction.LogMessage, err
 				return
 			}
 			if logMessage.Staging() {
-				cmd.UI.DisplayLogMessage(*logMessage, false)
+				cmd.UI.DisplayLogMessage(logMessage, false)
 			}
 		case err, open := <-errStream:
 			if !open {
 				return
-			}
-			_, ok := err.(actionerror.NOAATimeoutError)
-			if ok {
-				cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
 			}
 			cmd.UI.DisplayWarning(err.Error())
 		}

@@ -2,6 +2,8 @@ package v6_test
 
 import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
+	"context"
 	"errors"
 	"time"
 
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -30,21 +31,21 @@ import (
 
 var _ = Describe("v3-zdt-push Command", func() {
 	var (
-		cmd             V3ZeroDowntimePushCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		fakeZdtActor    *v6fakes.FakeV3ZeroDowntimeVersionActor
-		fakeV3PushActor *v6fakes.FakeOriginalV3PushActor
-		fakeV2PushActor *v6fakes.FakeOriginalV2PushActor
-		fakeV2AppActor  *sharedfakes.FakeV2AppActor
-		binaryName      string
-		executeErr      error
-		app             string
-		userName        string
-		spaceName       string
-		orgName         string
+		cmd                V3ZeroDowntimePushCommand
+		testUI             *ui.UI
+		fakeConfig         *commandfakes.FakeConfig
+		fakeSharedActor    *commandfakes.FakeSharedActor
+		fakeLogCacheClient *loggingactionfakes.FakeLogCacheClient
+		fakeZdtActor       *v6fakes.FakeV3ZeroDowntimeVersionActor
+		fakeV3PushActor    *v6fakes.FakeOriginalV3PushActor
+		fakeV2PushActor    *v6fakes.FakeOriginalV2PushActor
+		fakeV2AppActor     *sharedfakes.FakeV2AppActor
+		binaryName         string
+		executeErr         error
+		app                string
+		userName           string
+		spaceName          string
+		orgName            string
 	)
 
 	BeforeEach(func() {
@@ -55,9 +56,10 @@ var _ = Describe("v3-zdt-push Command", func() {
 		fakeV3PushActor = new(v6fakes.FakeOriginalV3PushActor)
 		fakeV2PushActor = new(v6fakes.FakeOriginalV2PushActor)
 		fakeV2AppActor = new(sharedfakes.FakeV2AppActor)
-		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
+		fakeLogCacheClient = new(loggingactionfakes.FakeLogCacheClient)
 
 		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
+		fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, nil, nil, func() {})
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -87,7 +89,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 			ZdtActor:            fakeZdtActor,
 			OriginalV2PushActor: fakeV2PushActor,
 
-			NOAAClient:          fakeNOAAClient,
+			LogCacheClient:      fakeLogCacheClient,
 			AppSummaryDisplayer: appSummaryDisplayer,
 			PackageDisplayer:    packageDisplayer,
 		}
@@ -350,7 +352,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 						var expectedErr error
 						BeforeEach(func() {
 							expectedErr = errors.New("something is wrong!")
-							fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, v3action.Warnings{"some-logging-warning", "some-other-logging-warning"}, expectedErr)
+							fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, v3action.Warnings{"some-logging-warning", "some-other-logging-warning"}, expectedErr, func() {})
 						})
 
 						It("returns the error and displays warnings", func() {
@@ -383,18 +385,18 @@ var _ = Describe("v3-zdt-push Command", func() {
 
 						BeforeEach(func() {
 							allLogsWritten = make(chan bool)
-							fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
-								logStream := make(chan *loggingaction.LogMessage)
+							fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc) {
+								logStream := make(chan loggingaction.LogMessage)
 								errorStream := make(chan error)
 
 								go func() {
-									logStream <- &loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
-									logStream <- &loggingaction.LogMessage{Message: "Here are some other staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
-									logStream <- &loggingaction.LogMessage{Message: "not from staging", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "sourceInstance"}
+									logStream <- loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "sourceInstance"}
+									logStream <- loggingaction.LogMessage{Message: "Here are some other staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "sourceInstance"}
+									logStream <- loggingaction.LogMessage{Message: "not from staging", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "sourceInstance"}
 									allLogsWritten <- true
 								}()
 
-								return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
+								return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil, func() {}
 							}
 						})
 
@@ -478,10 +480,10 @@ var _ = Describe("v3-zdt-push Command", func() {
 								Expect(testUI.Err).To(Say("steve for all I care"))
 
 								Expect(fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-								appName, spaceGUID, noaaClient := fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+								appName, spaceGUID, LogCacheClient := fakeZdtActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
 								Expect(appName).To(Equal(app))
 								Expect(spaceGUID).To(Equal("some-space-guid"))
-								Expect(noaaClient).To(Equal(fakeNOAAClient))
+								Expect(LogCacheClient).To(Equal(fakeLogCacheClient))
 
 								guidArg, _ := fakeZdtActor.StagePackageArgsForCall(0)
 								Expect(guidArg).To(Equal("some-guid"))
@@ -1396,7 +1398,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 													MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 												},
 												InstanceDetails: []v3action.ProcessInstance{
-													v3action.ProcessInstance{
+													{
 														Index:       0,
 														State:       constant.ProcessInstanceRunning,
 														MemoryUsage: 4000000,

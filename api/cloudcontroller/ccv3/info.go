@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -38,6 +39,11 @@ type Info struct {
 // AppSSHEndpoint returns the HREF for SSHing into an app container.
 func (info Info) AppSSHEndpoint() string {
 	return info.Links.AppSSH.HREF
+}
+
+func (client *Client) LogCacheEndpoint() string {
+	uaaURL := client.UAA()
+	return strings.Replace(uaaURL, "uaa", "log-cache", 1)
 }
 
 // AppSSHHostKeyFingerprint returns the SSH key fingerprint of the SSH proxy

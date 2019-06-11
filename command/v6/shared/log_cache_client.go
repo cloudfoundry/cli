@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
 	"crypto/tls"
 	"github.com/cloudfoundry/noaa/consumer"
@@ -8,8 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
@@ -37,7 +36,6 @@ func (p DebugPrinter) Print(title string, dump string) {
 		output.DisplayType(title, time.Now())
 		output.DisplayDump(dump)
 	}
-
 }
 
 type tokenHTTPClient struct {
@@ -52,7 +50,7 @@ func (c *tokenHTTPClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 // NewLogCacheClient returns back a configured Log Cache Client.
-func NewLogCacheClient(ccClient *ccv2.Client, config command.Config) *logcache.Client {
+func NewLogCacheClient(logCacheEndpoint string, config command.Config) *logcache.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: config.SkipSSLValidation(),
@@ -63,7 +61,7 @@ func NewLogCacheClient(ccClient *ccv2.Client, config command.Config) *logcache.C
 			Timeout:   config.DialTimeout(),
 		}).DialContext,
 	}
-	return logcache.NewClient(ccClient.LogCacheEndpoint(), logcache.WithHTTPClient(&tokenHTTPClient{
+	return logcache.NewClient(logCacheEndpoint, logcache.WithHTTPClient(&tokenHTTPClient{
 		c:           &http.Client{Transport: tr},
 		accessToken: config.AccessToken,
 	}))

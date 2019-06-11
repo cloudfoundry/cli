@@ -59,7 +59,7 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
 
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient, config)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
 
 	return nil
 }

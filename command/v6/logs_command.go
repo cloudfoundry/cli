@@ -42,7 +42,7 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient, config)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
 
 	return nil
 }

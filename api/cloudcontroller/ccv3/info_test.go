@@ -130,6 +130,12 @@ var _ = Describe("Info", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf("warning 1", "warning 2"))
 		})
+
+		It("returns back the log cache endpoint", func() {
+			logCacheEndpoint := client.LogCacheEndpoint()
+
+			Expect(logCacheEndpoint).To(Equal("https://log-cache.bosh-lite.com"))
+		})
 	})
 
 	When("the cloud controller encounters an error", func() {

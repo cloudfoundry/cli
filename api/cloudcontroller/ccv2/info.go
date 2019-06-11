@@ -86,8 +86,8 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 }
 
 func (client *Client) LogCacheEndpoint() string {
-	apiURL := client.AuthorizationEndpoint()
-	return strings.Replace(apiURL, "login", "log-cache", 1)
+	authURL := client.AuthorizationEndpoint()
+	return strings.Replace(authURL, "login", "log-cache", 1)
 }
 
 // MinCLIVersion returns the minimum CLI version required for the targeted

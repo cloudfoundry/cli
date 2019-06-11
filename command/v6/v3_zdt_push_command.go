@@ -2,6 +2,7 @@ package v6
 
 import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"context"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -29,7 +30,7 @@ type V3ZeroDowntimeVersionActor interface {
 	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetCurrentDropletByApplication(appGUID string) (v3action.Droplet, v3action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc)
 	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
 	SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
@@ -54,7 +55,7 @@ type V3ZeroDowntimePushCommand struct {
 
 	UI                  command.UI
 	Config              command.Config
-	NOAAClient          v3action.NOAAClient
+	LogCacheClient      loggingaction.LogCacheClient
 	Actor               V3PushActor
 	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
@@ -72,7 +73,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
@@ -91,7 +92,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.OriginalV2PushActor = pushaction.NewActor(v2Actor, v3actor, sharedActor)
 
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
 
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:         cmd.UI,
@@ -377,18 +378,20 @@ func (cmd V3ZeroDowntimePushCommand) stagePackage(pkg v3action.Package, userName
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  userName,
 	})
-
-	logStream, logErrStream, logWarnings, logErr := cmd.ZdtActor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	logStream, logErrStream, logWarnings, logErr, stopStreaming := cmd.ZdtActor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return "", logErr
 	}
 
+	defer stopStreaming()
 	buildStream, warningsStream, errStream := cmd.ZdtActor.StagePackage(pkg.GUID, cmd.RequiredArgs.AppName)
+
 	droplet, err := shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
 		return "", err
 	}
+	stopStreaming()
 
 	cmd.UI.DisplayOK()
 	return droplet.GUID, nil

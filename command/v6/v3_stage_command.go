@@ -2,6 +2,7 @@ package v6
 
 import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"context"
 	"strings"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 //go:generate counterfeiter . V3StageActor
 
 type V3StageActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
 }
 
@@ -25,11 +26,11 @@ type V3StageCommand struct {
 	usage               interface{}  `usage:"CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID"`
 	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 
-	UI          command.UI
-	Config      command.Config
-	NOAAClient  v3action.NOAAClient
-	SharedActor command.SharedActor
-	Actor       V3StageActor
+	UI             command.UI
+	Config         command.Config
+	LogCacheClient loggingaction.LogCacheClient
+	SharedActor    command.SharedActor
+	Actor          V3StageActor
 }
 
 func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
@@ -37,13 +38,13 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
 
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
 
 	return nil
 }
@@ -68,11 +69,12 @@ func (cmd V3StageCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	logStream, logErrStream, logWarnings, logErr, stopStreaming := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return logErr
 	}
+	defer stopStreaming()
 
 	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)
 	var droplet v3action.Droplet
@@ -80,6 +82,7 @@ func (cmd V3StageCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	stopStreaming()
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("Package staged")

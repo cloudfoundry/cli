@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"github.com/cloudfoundry/sonde-go/events"
 	"os"
 	"strings"
 
@@ -12,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/command"
@@ -25,6 +25,16 @@ import (
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 )
+
+//go:generate counterfeiter . NOAAClient
+
+// NOAAClient is a client for getting logs.
+type NOAAClient interface {
+	Close() error
+	RecentLogs(appGUID string, authToken string) ([]*events.LogMessage, error)
+	SetOnConnectCallback(cb func())
+	TailingLogs(appGUID, authToken string) (<-chan *events.LogMessage, <-chan error)
+}
 
 //go:generate counterfeiter . ProgressBar
 
@@ -98,7 +108,7 @@ type PushCommand struct {
 
 	Config          command.Config
 	UI              command.UI
-	NOAAClient      v3action.NOAAClient
+	NOAAClient      NOAAClient
 	Actor           PushActor
 	VersionActor    V7ActorForPush
 	SharedActor     command.SharedActor

@@ -2,6 +2,8 @@ package v6_test
 
 import (
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
+	"context"
 	"errors"
 	"time"
 
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -29,20 +30,20 @@ import (
 
 var _ = Describe("v3-push Command", func() {
 	var (
-		cmd             V3PushCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		fakeActor       *v6fakes.FakeOriginalV3PushActor
-		fakeV2PushActor *v6fakes.FakeOriginalV2PushActor
-		fakeV2AppActor  *sharedfakes.FakeV2AppActor
-		binaryName      string
-		executeErr      error
-		app             string
-		userName        string
-		spaceName       string
-		orgName         string
+		cmd                V3PushCommand
+		testUI             *ui.UI
+		fakeConfig         *commandfakes.FakeConfig
+		fakeSharedActor    *commandfakes.FakeSharedActor
+		fakeLogCacheClient *loggingactionfakes.FakeLogCacheClient
+		fakeActor          *v6fakes.FakeOriginalV3PushActor
+		fakeV2PushActor    *v6fakes.FakeOriginalV2PushActor
+		fakeV2AppActor     *sharedfakes.FakeV2AppActor
+		binaryName         string
+		executeErr         error
+		app                string
+		userName           string
+		spaceName          string
+		orgName            string
 	)
 
 	BeforeEach(func() {
@@ -52,9 +53,10 @@ var _ = Describe("v3-push Command", func() {
 		fakeActor = new(v6fakes.FakeOriginalV3PushActor)
 		fakeV2PushActor = new(v6fakes.FakeOriginalV2PushActor)
 		fakeV2AppActor = new(sharedfakes.FakeV2AppActor)
-		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
+		fakeLogCacheClient = new(loggingactionfakes.FakeLogCacheClient)
 
 		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
+		fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, nil, nil, func() {})
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -84,7 +86,7 @@ var _ = Describe("v3-push Command", func() {
 			OriginalActor:       fakeActor,
 			OriginalV2PushActor: fakeV2PushActor,
 
-			NOAAClient:          fakeNOAAClient,
+			LogCacheClient:      fakeLogCacheClient,
 			AppSummaryDisplayer: appSummaryDisplayer,
 			PackageDisplayer:    packageDisplayer,
 		}
@@ -319,7 +321,7 @@ var _ = Describe("v3-push Command", func() {
 						var expectedErr error
 						BeforeEach(func() {
 							expectedErr = errors.New("something is wrong!")
-							fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, v3action.Warnings{"some-logging-warning", "some-other-logging-warning"}, expectedErr)
+							fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, v3action.Warnings{"some-logging-warning", "some-other-logging-warning"}, expectedErr, func() {})
 						})
 
 						It("returns the error and displays warnings", func() {
@@ -352,18 +354,18 @@ var _ = Describe("v3-push Command", func() {
 
 						BeforeEach(func() {
 							allLogsWritten = make(chan bool)
-							fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *loggingaction.LogMessage, <-chan error, v3action.Warnings, error) {
-								logStream := make(chan *loggingaction.LogMessage)
+							fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client loggingaction.LogCacheClient) (<-chan loggingaction.LogMessage, <-chan error, v3action.Warnings, error, context.CancelFunc) {
+								logStream := make(chan loggingaction.LogMessage)
 								errorStream := make(chan error)
 
 								go func() {
-									logStream <- &loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
-									logStream <- &loggingaction.LogMessage{Message: "Here are some other staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: v3action.StagingLog, SourceInstance: "sourceInstance"}
-									logStream <- &loggingaction.LogMessage{Message: "not from staging", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "sourceInstance"}
+									logStream <- loggingaction.LogMessage{Message: "Here are some staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "sourceInstance"}
+									logStream <- loggingaction.LogMessage{Message: "Here are some other staging logs!", MessageType: "OUT", Timestamp: time.Now(), SourceType: "STG", SourceInstance: "sourceInstance"}
+									logStream <- loggingaction.LogMessage{Message: "not from staging", MessageType: "OUT", Timestamp: time.Now(), SourceType: "potato", SourceInstance: "sourceInstance"}
 									allLogsWritten <- true
 								}()
 
-								return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
+								return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil, func() {}
 							}
 						})
 
@@ -450,7 +452,7 @@ var _ = Describe("v3-push Command", func() {
 								appName, spaceGUID, noaaClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
 								Expect(appName).To(Equal(app))
 								Expect(spaceGUID).To(Equal("some-space-guid"))
-								Expect(noaaClient).To(Equal(fakeNOAAClient))
+								Expect(noaaClient).To(Equal(fakeLogCacheClient))
 
 								guidArg, _ := fakeActor.StagePackageArgsForCall(0)
 								Expect(guidArg).To(Equal("some-guid"))
