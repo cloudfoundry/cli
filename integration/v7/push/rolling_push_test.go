@@ -68,7 +68,7 @@ var _ = Describe("push with --strategy rolling", func() {
 			helpers.WithCrashingApp(func(appDir string) {
 				session := helpers.CustomCF(helpers.CFEnv{
 					WorkingDirectory: appDir,
-					EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
+					EnvVars:          map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
 				}, PushCommandName, appName, "--strategy", "rolling")
 				Eventually(session).Should(Say(`Updating app %s\.\.\.`, appName))
 				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
