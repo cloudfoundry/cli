@@ -226,10 +226,17 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 			Path:       path,
 		}
 	}
-	_, apiWarnings, err = actor.CloudControllerClient.DeleteRoute(routes[0].GUID)
 
+	jobURL, apiWarnings, err := actor.CloudControllerClient.DeleteRoute(routes[0].GUID)
 	actorWarnings = Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	pollJobWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, Warnings(pollJobWarnings)...)
 
 	return allWarnings, err
 }

@@ -462,8 +462,11 @@ var _ = Describe("Route Actions", func() {
 					ccv3.Warnings{"get-routes-warning"},
 					nil,
 				)
-				fakeCloudControllerClient.DeleteRouteReturns(ccv3.JobURL("https://job.com"), ccv3.Warnings{"delete-warning"}, nil)
-
+				fakeCloudControllerClient.DeleteRouteReturns(
+					ccv3.JobURL("https://jobs/job_guid"),
+					ccv3.Warnings{"delete-warning"},
+					nil,
+				)
 			})
 
 			It("delegates to the cloud controller client", func() {
@@ -471,12 +474,14 @@ var _ = Describe("Route Actions", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "delete-warning"))
 
+				// Get the domain
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetDomainsArgsForCall(0)
 				Expect(query).To(ConsistOf([]ccv3.Query{
 					{Key: ccv3.NameFilter, Values: []string{"domain.com"}},
 				}))
 
+				// Get the route based on the domain GUID
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
 				Expect(query).To(ConsistOf([]ccv3.Query{
@@ -485,10 +490,15 @@ var _ = Describe("Route Actions", func() {
 					{Key: "paths", Values: []string{"/path"}},
 				}))
 
+				// Delete the route asynchronously
 				Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(1))
 				passedRouteGuid := fakeCloudControllerClient.DeleteRouteArgsForCall(0)
-
 				Expect(passedRouteGuid).To(Equal("route-guid"))
+
+				// Poll the delete job
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				responseJobUrl := fakeCloudControllerClient.PollJobArgsForCall(0)
+				Expect(responseJobUrl).To(Equal(ccv3.JobURL("https://jobs/job_guid")))
 			})
 
 			It("only passes in queries that are not blank", func() {
@@ -558,6 +568,26 @@ var _ = Describe("Route Actions", func() {
 					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
 					Expect(err).To(MatchError("delete-route-error"))
 					Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "delete-route-warning"))
+				})
+			})
+
+			When("polling the job fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(
+						ccv3.Warnings{"poll-job-warning"},
+						errors.New("async-route-delete-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
+					Expect(err).To(MatchError("async-route-delete-error"))
+					Expect(warnings).To(ConsistOf(
+						"get-domains-warning",
+						"get-routes-warning",
+						"delete-warning",
+						"poll-job-warning",
+					))
 				})
 			})
 

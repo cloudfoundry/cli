@@ -172,6 +172,10 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Exit(0))
 
 							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+
+							session = helpers.CF("routes")
+							Consistently(session).ShouldNot(Say(`%s`, domainName))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 
@@ -186,6 +190,10 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Exit(0))
 
 							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+
+							session = helpers.CF("routes")
+							Consistently(session).ShouldNot(Say(`%s\s+%s`, hostname, domainName))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 
@@ -200,6 +208,10 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Exit(0))
 
 							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+
+							session = helpers.CF("routes")
+							Consistently(session).ShouldNot(Say(`%s\s+%s`, domainName, path))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 
@@ -215,6 +227,10 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Exit(0))
 
 							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+
+							session = helpers.CF("routes")
+							Consistently(session).ShouldNot(Say(`%s\s+%s\s+%s`, hostname, domainName, pathString))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 
@@ -230,6 +246,10 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Exit(0))
 
 							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+
+							session = helpers.CF("routes")
+							Consistently(session).ShouldNot(Say(`%s\s+%s\s+\/%s`, hostname, domainName, pathString))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
