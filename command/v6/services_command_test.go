@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
@@ -43,6 +44,8 @@ var _ = Describe("services Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionMaintenanceInfoInSummaryV2)
 	})
 
 	JustBeforeEach(func() {
@@ -196,6 +199,16 @@ var _ = Describe("services Command", func() {
 					Expect(testUI.Out).To(Say(`instance-2\s+some-service-2\s+some-plan\s+broker-2\s+no`))
 					Expect(testUI.Out).To(Say(`instance-3\s+user-provided\s+$`))
 					Expect(testUI.Err).To(Say("get-summary-warnings"))
+				})
+
+				When("CC version is too old to show upgrade information", func() {
+					BeforeEach(func() {
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
+					})
+
+					It("shows a tip with a minimum service upgrade version required", func() {
+						Expect(testUI.Out).To(Say("TIP: Please upgrade to CC API v%s or higher for individual service upgrades", ccversion.MinVersionMaintenanceInfoInSummaryV2))
+					})
 				})
 			})
 		})

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/sorting"
@@ -16,6 +17,7 @@ import (
 //go:generate counterfeiter . ServiceInstancesActor
 
 type ServiceInstancesActor interface {
+	CloudControllerAPIVersion() string
 	GetServiceInstancesSummaryBySpace(spaceGUID string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)
 }
 
@@ -111,6 +113,19 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		)
 	}
 	cmd.UI.DisplayTableWithHeader("", table, 3)
+
+	isOutdated, err := command.CheckVersionOutdated(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionMaintenanceInfoInSummaryV2)
+	if err != nil {
+		return err
+	}
+
+	if isOutdated {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("TIP: Please upgrade to CC API v{{.version}} or higher for individual service upgrades",
+			map[string]interface{}{
+				"version": ccversion.MinVersionMaintenanceInfoInSummaryV2,
+			})
+	}
 
 	return nil
 }
