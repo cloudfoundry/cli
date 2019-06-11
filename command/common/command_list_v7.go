@@ -102,7 +102,7 @@ type commandList struct {
 	Login                              v6.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v6.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
 	Logs                               v6.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
-	MapRoute                           v6.MapRouteCommand                           `command:"map-route" description:"Add a url route to an app"`
+	MapRoute                           v7.MapRouteCommand                           `command:"map-route" description:"Map a route to an app"`
 	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
 	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
