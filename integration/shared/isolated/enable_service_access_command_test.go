@@ -3,6 +3,7 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -130,11 +131,10 @@ var _ = Describe("enable service access command", func() {
 			var (
 				orgName      string
 				spaceName    string
-				domain       string
 				service      string
 				servicePlan  string
-				broker       helpers.ServiceBroker
-				secondBroker helpers.ServiceBroker
+				broker       *fakeservicebroker.FakeServiceBroker
+				secondBroker *fakeservicebroker.FakeServiceBroker
 			)
 
 			BeforeEach(func() {
@@ -142,11 +142,9 @@ var _ = Describe("enable service access command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 
-				domain = helpers.DefaultSharedDomain()
-				service = helpers.PrefixedRandomName("SERVICE")
-				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-
-				broker = helpers.CreateBroker(domain, service, servicePlan)
+				broker = fakeservicebroker.New().Register()
+				service = broker.ServiceName()
+				servicePlan = broker.ServicePlanName()
 			})
 
 			AfterEach(func() {
@@ -163,7 +161,7 @@ var _ = Describe("enable service access command", func() {
 
 					session = helpers.CF("service-access", "-e", service)
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+					Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 					Eventually(session).Should(Say("%s\\s+%s\\s+all",
 						service,
 						servicePlan,
@@ -185,7 +183,7 @@ var _ = Describe("enable service access command", func() {
 
 						session = helpers.CF("service-access", "-e", service)
 						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+						Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 						Eventually(session).Should(Say("%s\\s+%s\\s+all\\s",
 							service,
 							servicePlan,
@@ -201,7 +199,7 @@ var _ = Describe("enable service access command", func() {
 
 							session = helpers.CF("service-access", "-e", service)
 							Eventually(session).Should(Exit(0))
-							Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+							Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 							Eventually(session).Should(Say("%s\\s+%s\\s+all",
 								service,
 								servicePlan,
@@ -215,7 +213,10 @@ var _ = Describe("enable service access command", func() {
 			When("two services with the same name are registered", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
-					secondBroker = helpers.CreateBroker(domain, service, servicePlan)
+					secondBroker = fakeservicebroker.New()
+					secondBroker.Services[0].Name = service
+					secondBroker.Services[0].Plans[0].Name = servicePlan
+					secondBroker.Register()
 				})
 
 				AfterEach(func() {
@@ -224,14 +225,14 @@ var _ = Describe("enable service access command", func() {
 
 				When("a service name and broker name are provided", func() {
 					It("displays an informative message, exits 0, and enables access to the service", func() {
-						session := helpers.CF("enable-service-access", service, "-b", secondBroker.Name)
-						Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as admin...", service, secondBroker.Name))
+						session := helpers.CF("enable-service-access", service, "-b", secondBroker.Name())
+						Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as admin...", service, secondBroker.Name()))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
-						session = helpers.CF("service-access", "-b", secondBroker.Name)
+						session = helpers.CF("service-access", "-b", secondBroker.Name())
 						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name))
+						Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name()))
 						Eventually(session).Should(Say("%s\\s+%s\\s+all",
 							service,
 							servicePlan,
@@ -246,9 +247,9 @@ var _ = Describe("enable service access command", func() {
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 
-							session = helpers.CF("service-access", "-b", secondBroker.Name)
+							session = helpers.CF("service-access", "-b", secondBroker.Name())
 							Eventually(session).Should(Exit(0))
-							Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name))
+							Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name()))
 							Eventually(session).Should(Say("%s\\s+%s\\s+none",
 								service,
 								servicePlan,
@@ -278,7 +279,7 @@ var _ = Describe("enable service access command", func() {
 
 					session = helpers.CF("service-access", "-e", service)
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+					Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 					Eventually(session).Should(Say("%s\\s+%s\\s+all",
 						service,
 						servicePlan,
@@ -304,7 +305,7 @@ var _ = Describe("enable service access command", func() {
 
 					session = helpers.CF("service-access", "-e", service)
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+					Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 					Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+%s",
 						service,
 						servicePlan,
@@ -381,7 +382,7 @@ var _ = Describe("enable service access command", func() {
 
 						session = helpers.CF("service-access", "-e", service)
 						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+						Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 						Eventually(session).Should(Say("%s\\s+%s\\s+all",
 							service,
 							servicePlan,
@@ -399,7 +400,7 @@ var _ = Describe("enable service access command", func() {
 
 						session = helpers.CF("service-access", "-e", service)
 						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+						Eventually(session).Should(Say("broker:\\s+%s", broker.Name()))
 						Eventually(session).Should(Say("%s\\s+%s\\s+all",
 							service,
 							servicePlan,

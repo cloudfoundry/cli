@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -63,22 +64,12 @@ var _ = Describe("bind-route-service command", func() {
 				domain = helpers.DefaultSharedDomain()
 
 				serviceInstanceName = helpers.PrefixedRandomName("instance")
-				servicePlanName := "fake-plan"
-				serviceName := "fake-service"
-				broker := helpers.NewServiceBroker(
-					helpers.NewServiceBrokerName(),
-					helpers.NewAssets().ServiceBroker,
-					helpers.DefaultSharedDomain(),
-					serviceName,
-					servicePlanName,
-				)
-				broker.Push()
-				broker.Service.Requires = `["route_forwarding"]`
-				broker.Configure(true)
-				broker.Create()
+				broker := fakeservicebroker.New()
+				broker.Services[0].Requires = []string{"route_forwarding"}
+				broker.Register()
 
-				Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
-				Eventually(helpers.CF("create-service", serviceName, servicePlanName, serviceInstanceName)).Should(Exit(0))
+				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+				Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstanceName)).Should(Exit(0))
 				Eventually(helpers.CF("create-route", spaceName, domain, "--hostname", host)).Should(Exit(0))
 			})
 
