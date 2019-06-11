@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
@@ -45,6 +46,8 @@ var _ = Describe("service Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd.RequiredArgs.ServiceInstance = "some-service-instance"
+
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionMaintenanceInfoInSummaryV2)
 	})
 
 	JustBeforeEach(func() {
@@ -778,6 +781,30 @@ var _ = Describe("service Command", func() {
 
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							})
+						})
+
+						When("the version of CC API is less than minimum version supporting maintenance_info", func() {
+							BeforeEach(func() {
+								fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionUpdateServiceInstanceMaintenanceInfoV2)
+							})
+
+							It("should not output anything about upgrades", func() {
+								Consistently(testUI.Out).ShouldNot(Say("There is no upgrade available for this service."))
+								Consistently(testUI.Out).ShouldNot(Say("Upgrades are not supported by this broker."))
+								Consistently(testUI.Out).ShouldNot(Say("Showing available upgrade details for this service...."))
+								Consistently(testUI.Out).ShouldNot(Say("upgrade description: This is the maintenance description"))
+								Consistently(testUI.Out).ShouldNot(Say("TIP: You can upgrade using 'cf update-service some-service-instance --upgrade'"))
+							})
+						})
+
+						When("the version of CC API is broken", func() {
+							BeforeEach(func() {
+								fakeActor.CloudControllerAPIVersionReturns("broken")
+							})
+
+							It("should fail", func() {
+								Expect(executeErr).To(HaveOccurred())
 							})
 						})
 					})

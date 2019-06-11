@@ -16,7 +16,7 @@ func WarnIfCLIVersionBelowAPIDefinedMinimum(config Config, apiVersion string, ui
 	minVer := config.MinCLIVersion()
 	currentVer := config.BinaryVersion()
 
-	isOutdated, err := checkVersionOutdated(currentVer, minVer)
+	isOutdated, err := CheckVersionOutdated(currentVer, minVer)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func WarnIfCLIVersionBelowAPIDefinedMinimum(config Config, apiVersion string, ui
 }
 
 func WarnIfAPIVersionBelowSupportedMinimum(apiVersion string, ui UI) error {
-	isOutdated, err := checkVersionOutdated(apiVersion, ccversion.MinSupportedV2ClientVersion)
+	isOutdated, err := CheckVersionOutdated(apiVersion, ccversion.MinSupportedV2ClientVersion)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func checkVersionNewerThan(current, maximum string) (bool, error) {
 	return false, nil
 }
 
-func checkVersionOutdated(current string, minimum string) (bool, error) {
+func CheckVersionOutdated(current string, minimum string) (bool, error) {
 	if current == version.DefaultVersion || minimum == "" {
 		return false, nil
 	}
