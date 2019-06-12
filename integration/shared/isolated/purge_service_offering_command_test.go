@@ -248,7 +248,7 @@ var _ = Describe("purge-service-offering command", func() {
 						helpers.SetupCF(orgName, spaceName)
 
 						broker1 = fakeservicebroker.New().Register()
-						broker2 = fakeservicebroker.New()
+						broker2 = fakeservicebroker.New().WithNameSuffix("other")
 						broker2.Services[0].Name = broker1.ServiceName()
 						broker2.Register()
 

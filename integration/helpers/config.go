@@ -44,11 +44,32 @@ func SetHomeDir() string {
 	homeDir, err := ioutil.TempDir("", "cli-integration-test")
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(os.Setenv("CF_HOME", homeDir)).To(Succeed())
-	Expect(os.Setenv("CF_PLUGIN_HOME", homeDir)).To(Succeed())
+	setHomeDirsTo(homeDir, homeDir)
 
 	GinkgoWriter.Write([]byte(fmt.Sprintln("\nHOME DIR>", homeDir)))
 	return homeDir
+}
+
+// WithRandomHomeDir sets CF_HOME and CF_PLUGIN_HOME to a temp directory and outputs
+// the created directory through GinkgoWriter. Then it executes the provided function
+// 'action'. Finally, it’s restoring the previous CF_HOME and CF_PLUGIN_HOME.
+func WithRandomHomeDir(action func()) {
+	oldHomeDir, oldPluginHomeDir := getHomeDirs()
+	homeDir := SetHomeDir()
+	action()
+	setHomeDirsTo(oldHomeDir, oldPluginHomeDir)
+	DestroyHomeDir(homeDir)
+}
+
+func getHomeDirs() (string, string) {
+	homeDir := os.Getenv("CF_HOME")
+	pluginHomeDir := os.Getenv("CF_PLUGIN_HOME")
+	return homeDir, pluginHomeDir
+}
+
+func setHomeDirsTo(homeDir string, pluginHomeDir string) {
+	Expect(os.Setenv("CF_HOME", homeDir)).To(Succeed())
+	Expect(os.Setenv("CF_PLUGIN_HOME", pluginHomeDir)).To(Succeed())
 }
 
 // SetupSynchronizedSuite runs a setup function in its own CF context, creating

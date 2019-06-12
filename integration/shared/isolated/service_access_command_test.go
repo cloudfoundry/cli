@@ -145,7 +145,7 @@ var _ = Describe("service-access command", func() {
 				BeforeEach(func() {
 					helpers.SetupCF(orgName, spaceName)
 
-					otherBroker = fakeservicebroker.New().WithName(helpers.GenerateLowerName(helpers.NewServiceBrokerName, broker.Name()))
+					otherBroker = fakeservicebroker.New().WithNameSuffix("other")
 					otherBroker.Services[0].Plans[1].Name = helpers.GenerateLowerName(helpers.NewPlanName, otherBroker.Services[0].Plans[0].Name)
 					otherBroker.Register()
 
@@ -207,6 +207,12 @@ var _ = Describe("service-access command", func() {
 
 						By("displaying brokers that were enabled in the provided org")
 						session = helpers.CF("service-access", "-o", otherOrgName)
+						Eventually(session).Should(Say(`broker:\s+%s`, broker.Name()))
+						Eventually(session).Should(Say(`%s\s+%s\s+limited\s+%s`,
+							broker.Services[0].Name,
+							broker.Services[0].Plans[0].Name,
+							otherOrgName,
+						))
 						Eventually(session).Should(Say(`broker:\s+%s`, otherBroker.Name()))
 						Eventually(session).Should(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
@@ -215,12 +221,6 @@ var _ = Describe("service-access command", func() {
 						Eventually(session).Should(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
 							otherBroker.Services[0].Plans[0].Name,
-						))
-						Eventually(session).Should(Say(`broker:\s+%s`, broker.Name()))
-						Eventually(session).Should(Say(`%s\s+%s\s+limited\s+%s`,
-							broker.Services[0].Name,
-							broker.Services[0].Plans[0].Name,
-							otherOrgName,
 						))
 
 						Eventually(session).Should(Exit(0))
