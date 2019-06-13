@@ -129,7 +129,7 @@ var _ = Describe("start command", func() {
 					It("displays app already started and exits 0", func() {
 						session := helpers.CF("start", appName)
 
-						Eventually(session.Err).Should(Say("App %s is already started", appName))
+						Eventually(session).Should(Say(`App '%s' is already started\.`, appName))
 						Eventually(session).Should(Say("OK"))
 
 						Eventually(session).Should(Exit(0))

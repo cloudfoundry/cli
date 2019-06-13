@@ -221,11 +221,11 @@ var _ = Describe("start Command", func() {
 		It("says that the app failed to start", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(testUI.Out).ToNot(Say("Starting"))
+			Expect(testUI.Out).To(Say(`App 'some-app' is already started\.`))
 			Expect(testUI.Out).To(Say("OK"))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
-			Expect(testUI.Err).To(Say("App some-app is already started"))
 
 			Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
 		})

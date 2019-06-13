@@ -73,7 +73,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	}
 
 	if app.Started() {
-		cmd.UI.DisplayWarning("App {{.AppName}} is already started.",
+		cmd.UI.DisplayText("App '{{.AppName}}' is already started.",
 			map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
