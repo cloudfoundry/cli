@@ -773,7 +773,7 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
 
 								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line between 'bound apps' and 'upgrade available' messages")
-								Expect(testUI.Out).To(Say("Showing available upgrade details for this service...."))
+								Expect(testUI.Out).To(Say("Showing available upgrade details for this service..."))
 								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line between messages")
 								Expect(testUI.Out).To(Say("upgrade description: This is the maintenance description"))
 								Expect(testUI.Out).To(Say("\n\n"), "Expect an empty line before tips")
@@ -792,7 +792,7 @@ var _ = Describe("service Command", func() {
 							It("should not output anything about upgrades", func() {
 								Consistently(testUI.Out).ShouldNot(Say("There is no upgrade available for this service."))
 								Consistently(testUI.Out).ShouldNot(Say("Upgrades are not supported by this broker."))
-								Consistently(testUI.Out).ShouldNot(Say("Showing available upgrade details for this service...."))
+								Consistently(testUI.Out).ShouldNot(Say("Showing available upgrade details for this service..."))
 								Consistently(testUI.Out).ShouldNot(Say("upgrade description: This is the maintenance description"))
 								Consistently(testUI.Out).ShouldNot(Say("TIP: You can upgrade using 'cf update-service some-service-instance --upgrade'"))
 							})

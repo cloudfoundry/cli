@@ -446,7 +446,7 @@ var _ = Describe("service command", func() {
 
 						session = helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-						Eventually(session).Should(Say("Showing available upgrade details for this service...."))
+						Eventually(session).Should(Say("Showing available upgrade details for this service..."))
 						Eventually(session).Should(Say("upgrade description: Stemcell update.\nExpect downtime."))
 						Eventually(session).Should(Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'`, serviceInstanceName))
 					})

@@ -245,7 +245,7 @@ func (cmd ServiceCommand) displayUpgradeInformation(serviceInstanceSummary v2act
 		return
 	}
 
-	cmd.UI.DisplayText("Showing available upgrade details for this service....")
+	cmd.UI.DisplayText("Showing available upgrade details for this service...")
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("upgrade description: {{.Description}}", map[string]interface{}{
 		"Description": serviceInstanceSummary.ServicePlan.MaintenanceInfo.Description,
