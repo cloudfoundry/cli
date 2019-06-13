@@ -26,8 +26,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//go:generate counterfeiter . NOAAClient
-
 // NOAAClient is a client for getting logs.
 type NOAAClient interface {
 	Close() error
