@@ -173,3 +173,19 @@ required = ["github.com/gorilla/websocket"]
 [[constraint]]
   name = "github.com/cloudfoundry/bosh-cli"
   version = "5.5.1"
+
+[[constraint]]
+  name = "code.cloudfoundry.org/go-loggregator"
+  version = "7.3.0"
+
+[[override]]
+  name = "github.com/golang/protobuf"
+  revision = "347cf4a86c1cb8d262994d8ef5924d4576c5b331"
+
+[[override]]
+  name = "google.golang.org/genproto"
+  revision = "8ac453e89fca495c0d17f98932642f392e2a11f3"
+
+[[override]]
+  name = "google.golang.org/grpc"
+  revision = "17f244982151bfccb47f61319960fc6d8348ec40"
