@@ -157,11 +157,18 @@ var _ = Describe("create-package command", func() {
 
 						It("returns an error", func() {
 							session := helpers.CF("create-package", appName, "-p", emptyDir)
-							// TODO: Modify this after changing code if necessary
 							Eventually(session.Err).Should(Say("No app files found in '%s'", regexp.QuoteMeta(emptyDir)))
 							Eventually(session).Should(Exit(1))
 						})
 					})
+				})
+
+				When("the path does *not* exist", func() {
+						It("returns an error", func() {
+							session := helpers.CF("create-package", appName, "-p", "/this/directory/for/sure/does/not/exist")
+							Eventually(session.Err).Should(Say(`The specified path '/this/directory/for/sure/does/not/exist' does not exist\.`))
+							Eventually(session).Should(Exit(1))
+						})
 				})
 
 				When("the path is a zip file", func() {
