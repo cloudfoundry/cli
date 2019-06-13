@@ -53,6 +53,7 @@ var _ = Describe("bind-route-service command", func() {
 				domain              string
 				host                string
 				serviceInstanceName string
+				broker              *fakeservicebroker.FakeServiceBroker
 			)
 
 			BeforeEach(func() {
@@ -64,7 +65,7 @@ var _ = Describe("bind-route-service command", func() {
 				domain = helpers.DefaultSharedDomain()
 
 				serviceInstanceName = helpers.PrefixedRandomName("instance")
-				broker := fakeservicebroker.New()
+				broker = fakeservicebroker.New()
 				broker.Services[0].Requires = []string{"route_forwarding"}
 				broker.Register()
 
@@ -74,6 +75,7 @@ var _ = Describe("bind-route-service command", func() {
 			})
 
 			AfterEach(func() {
+				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
 			})
 

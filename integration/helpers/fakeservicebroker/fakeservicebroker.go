@@ -3,6 +3,7 @@ package fakeservicebroker
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -13,6 +14,7 @@ type FakeServiceBroker struct {
 	Services  []service
 	domain    string
 	behaviors behaviors
+	reusable  bool
 }
 
 func New() *FakeServiceBroker {
@@ -23,8 +25,9 @@ func New() *FakeServiceBroker {
 	firstPlanName := integrationNameGenerator()
 
 	return &FakeServiceBroker{
-		name:   helpers.NewServiceBrokerName(),
-		domain: helpers.DefaultSharedDomain(),
+		name:     generateReusableBrokerName(""),
+		reusable: true,
+		domain:   helpers.DefaultSharedDomain(),
 		Services: []service{
 			{
 				Name:                 helpers.PrefixedRandomName("INTEGRATION-SERVICE"),
@@ -121,6 +124,12 @@ func New() *FakeServiceBroker {
 
 func (f *FakeServiceBroker) WithName(name string) *FakeServiceBroker {
 	f.name = name
+	f.reusable = false
+	return f
+}
+
+func (f *FakeServiceBroker) WithNameSuffix(suffix string) *FakeServiceBroker {
+	f.name = generateReusableBrokerName(suffix + "-")
 	return f
 }
 
@@ -134,7 +143,7 @@ func (f *FakeServiceBroker) Async() *FakeServiceBroker {
 }
 
 func (f *FakeServiceBroker) Deploy() *FakeServiceBroker {
-	f.pushApp()
+	f.pushAppIfNecessary()
 	f.configure()
 	return f
 }
@@ -178,4 +187,32 @@ func (f *FakeServiceBroker) ServicePlanName() string {
 
 func (f *FakeServiceBroker) Name() string {
 	return f.name
+}
+
+func Setup() {
+	helpers.WithRandomHomeDir(func() {
+		helpers.SetAPI()
+		helpers.LoginCF()
+		helpers.CreateOrgAndSpaceUnlessExists(itsOrg, itsSpace)
+	})
+}
+
+func Cleanup() {
+	helpers.WithRandomHomeDir(func() {
+		helpers.SetAPI()
+		helpers.LoginCF()
+		helpers.CreateOrgAndSpaceUnlessExists(itsOrg, itsSpace)
+		helpers.TargetOrgAndSpace(itsOrg, itsSpace)
+
+		broker := New()
+		otherBroker := New().WithNameSuffix("other")
+
+		if os.Getenv("KEEP_FAKE_SERVICE_BROKERS") == "true" {
+			broker.stopReusing()
+			otherBroker.stopReusing()
+		}
+
+		broker.cleanup()
+		otherBroker.cleanup()
+	})
 }

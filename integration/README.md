@@ -53,6 +53,7 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/shared/global in
 - `CF_INT_CLIENT_ID` - the ID for the integration client credentials identity.
 - `CF_INT_CLIENT_SECRET` - the secret for the integration client credentials identity.
 - `CF_CLI_EXPERIMENTAL` - Will enable both experimental functionality of the CF CLI and tests for that functionality. Will default to `false` if not set.
+- `KEEP_FAKE_SERVICE_BROKERS` - If `true`, will not delete any deployed reusable fake service broker apps. Useful for local development: allows for faster test suite re-runs. Will default to `false` if not set.
 
 ### The test suite does not cleanup after itself!
 In order to focus on clean test code and performance of each test, we have decided to not cleanup after each test. However, in order to facilitate [clean up scripts](https://github.com/cloudfoundry/cli/blob/master/bin/cleanup-integration), we are trying to keep consistent naming across organizations, spaces, etc.

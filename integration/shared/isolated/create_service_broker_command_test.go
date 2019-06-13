@@ -71,7 +71,7 @@ var _ = Describe("create-service-broker command", func() {
 					orgName = helpers.NewOrgName()
 					spaceName = helpers.NewSpaceName()
 					helpers.SetupCF(orgName, spaceName)
-					broker = fakeservicebroker.New().Deploy()
+					broker = fakeservicebroker.New().WithName(brokerName).Deploy()
 					helpers.ClearTarget()
 				})
 
@@ -123,7 +123,7 @@ var _ = Describe("create-service-broker command", func() {
 						spaceName = helpers.NewSpaceName()
 						helpers.SetupCF(orgName, spaceName)
 
-						broker = fakeservicebroker.New().Deploy()
+						broker = fakeservicebroker.New().WithName(brokerName).Deploy()
 					})
 
 					AfterEach(func() {

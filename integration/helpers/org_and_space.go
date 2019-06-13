@@ -34,11 +34,34 @@ func CreateAndTargetOrg() string {
 	return org
 }
 
-// CreateOrgAndSpace creates a randomly-named org and a randomly-named space in that org.
+// CreateOrgAndSpace creates an org and a space in that org with specified names.
 func CreateOrgAndSpace(org string, space string) {
 	CreateOrg(org)
 	TargetOrg(org)
 	CreateSpace(space)
+}
+
+// CreateOrgAndSpaceUnlessExists creates an org and a space in that org with
+// specified names only if these don't exist yet.
+func CreateOrgAndSpaceUnlessExists(org string, space string) {
+	session := CF("org", org)
+	Eventually(session).Should(Exit())
+	if session.ExitCode() != 0 {
+		CreateOrgAndSpace(org, space)
+		return
+	}
+
+	WithRandomHomeDir(func() {
+		SetAPI()
+		LoginCF()
+		TargetOrg(org)
+
+		session = CF("space", space)
+		Eventually(session).Should(Exit())
+		if session.ExitCode() != 0 {
+			CreateSpace(space)
+		}
+	})
 }
 
 // CreateOrg creates an org with the given name using 'cf create-org'.
