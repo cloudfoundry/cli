@@ -44,7 +44,7 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	}
 
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config, ui)
 
 	return nil
 }

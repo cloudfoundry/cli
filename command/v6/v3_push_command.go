@@ -105,7 +105,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
 
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config, ui)
 
 	return nil
 }

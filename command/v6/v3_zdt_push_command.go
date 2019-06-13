@@ -92,7 +92,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.OriginalV2PushActor = pushaction.NewActor(v2Actor, v3actor, sharedActor)
 
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config, ui)
 
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:         cmd.UI,

@@ -59,7 +59,7 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
 
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.LogCacheEndpoint(), config, ui)
 
 	return nil
 }
