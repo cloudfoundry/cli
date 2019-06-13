@@ -202,12 +202,10 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 		path = "/" + path
 	}
 
-	queryArray := []ccv3.Query{{Key: "domain_guids", Values: []string{domain.GUID}}}
-	if hostname != "" {
-		queryArray = append(queryArray, ccv3.Query{Key: "hosts", Values: []string{hostname}})
-	}
-	if path != "" {
-		queryArray = append(queryArray, ccv3.Query{Key: "paths", Values: []string{path}})
+	queryArray := []ccv3.Query{
+		{Key: "domain_guids", Values: []string{domain.GUID}},
+		{Key: "hosts", Values: []string{hostname}},
+		{Key: "paths", Values: []string{path}},
 	}
 
 	routes, apiWarnings, err := actor.CloudControllerClient.GetRoutes(queryArray...)

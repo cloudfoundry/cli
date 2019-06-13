@@ -515,6 +515,8 @@ var _ = Describe("Route Actions", func() {
 				query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
 				Expect(query).To(ConsistOf([]ccv3.Query{
 					{Key: "domain_guids", Values: []string{"domain-guid"}},
+					{Key: "hosts", Values: []string{""}},
+					{Key: "paths", Values: []string{""}},
 				}))
 
 				Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(1))
