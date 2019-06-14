@@ -83,16 +83,25 @@ var _ = Describe("Service Instance Summary Actions", func() {
 		})
 
 		DescribeTable("UpgradeAvailable",
-			func(versionFromPlan, versionFromServiceInstance, expectedResult string) {
+			func(versionFromPlan, versionFromServiceInstance string, expectedResult bool) {
 				summary.MaintenanceInfo.Version = versionFromServiceInstance
 				summary.ServicePlan.MaintenanceInfo.Version = versionFromPlan
 				Expect(summary.UpgradeAvailable()).To(Equal(expectedResult))
 			},
-			Entry("values are the same", "2.0.0", "2.0.0", "no"),
-			Entry("values are different", "3.0.0", "2.0.0", "yes"),
-			Entry("values are both empty", "", "", ""),
-			Entry("plan has value but instance does not", "1.0.0", "", "yes"),
-			Entry("instance has value but plan does not", "", "1.0.0", ""),
+			Entry("values are the same", "2.0.0", "2.0.0", false),
+			Entry("values are different", "3.0.0", "2.0.0", true),
+			Entry("values are both empty", "", "", false),
+			Entry("plan has value but instance does not", "1.0.0", "", true),
+			Entry("instance has value but plan does not", "", "1.0.0", false),
+		)
+
+		DescribeTable("UpgradeSupported",
+			func(versionFromPlan string, expectedResult bool) {
+				summary.ServicePlan.MaintenanceInfo.Version = versionFromPlan
+				Expect(summary.UpgradeSupported()).To(Equal(expectedResult))
+			},
+			Entry("plan has value", "1.0.0", true),
+			Entry("plan does not have value", "", false),
 		)
 	})
 

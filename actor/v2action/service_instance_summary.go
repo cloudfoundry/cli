@@ -49,14 +49,13 @@ func (s ServiceInstanceSummary) IsSharedTo() bool {
 	return s.ServiceInstanceShareType == ServiceInstanceIsSharedTo
 }
 
-func (s ServiceInstanceSummary) UpgradeAvailable() string {
-	if s.ServicePlan.MaintenanceInfo.Version == "" {
-		return ""
-	}
-	if s.ServicePlan.MaintenanceInfo.Version == s.ServiceInstance.MaintenanceInfo.Version {
-		return "no"
-	}
-	return "yes"
+func (s ServiceInstanceSummary) UpgradeSupported() bool {
+	return s.ServicePlan.MaintenanceInfo.Version != ""
+}
+
+func (s ServiceInstanceSummary) UpgradeAvailable() bool {
+	return s.UpgradeSupported() &&
+		s.ServicePlan.MaintenanceInfo.Version != s.ServiceInstance.MaintenanceInfo.Version
 }
 
 type BoundApplication struct {

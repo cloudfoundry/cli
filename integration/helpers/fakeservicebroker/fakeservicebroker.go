@@ -47,7 +47,8 @@ func New() *FakeServiceBroker {
 						ID:          helpers.RandomName(),
 						Description: helpers.PrefixedRandomName("fake plan description"),
 						MaintenanceInfo: &maintenanceInfo{
-							Version: "2.0.0",
+							Version:     "2.0.0",
+							Description: "OS image update.\nExpect downtime.",
 						},
 					},
 					{
@@ -55,7 +56,8 @@ func New() *FakeServiceBroker {
 						ID:          helpers.RandomName(),
 						Description: helpers.PrefixedRandomName("fake plan description"),
 						MaintenanceInfo: &maintenanceInfo{
-							Version: "2.0.0",
+							Version:     "2.0.0",
+							Description: "OS image update.\nExpect downtime.",
 						},
 					},
 				},

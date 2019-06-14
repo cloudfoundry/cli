@@ -108,8 +108,9 @@ type plan struct {
 	MaintenanceInfo *maintenanceInfo `json:"maintenance_info,omitempty"`
 }
 
-func (p *plan) SetMaintenanceInfoVersion(version string) {
+func (p *plan) SetMaintenanceInfo(version, description string) {
 	p.MaintenanceInfo.Version = version
+	p.MaintenanceInfo.Description = description
 }
 
 func (p *plan) RemoveMaintenanceInfo() {
@@ -117,7 +118,8 @@ func (p *plan) RemoveMaintenanceInfo() {
 }
 
 type maintenanceInfo struct {
-	Version string `json:"version"`
+	Version     string `json:"version"`
+	Description string `json:"description"`
 }
 
 type responseMock struct {

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/sorting"
@@ -16,6 +17,7 @@ import (
 //go:generate counterfeiter . ServiceInstancesActor
 
 type ServiceInstancesActor interface {
+	CloudControllerAPIVersion() string
 	GetServiceInstancesSummaryBySpace(spaceGUID string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)
 }
 
@@ -106,11 +108,24 @@ func (cmd ServicesCommand) Execute(args []string) error {
 				strings.Join(boundAppNames, ", "),
 				fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State),
 				summary.Service.ServiceBrokerName,
-				summary.UpgradeAvailable(),
+				upgradeAvailableSummary(summary),
 			},
 		)
 	}
 	cmd.UI.DisplayTableWithHeader("", table, 3)
+
+	isOutdated, err := command.CheckVersionOutdated(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionMaintenanceInfoInSummaryV2)
+	if err != nil {
+		return err
+	}
+
+	if isOutdated {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("TIP: Please upgrade to CC API v{{.version}} or higher for individual service upgrades",
+			map[string]interface{}{
+				"version": ccversion.MinVersionMaintenanceInfoInSummaryV2,
+			})
+	}
 
 	return nil
 }
@@ -131,4 +146,14 @@ func sortBoundApps(serviceInstance v2action.ServiceInstanceSummary) {
 		func(i, j int) bool {
 			return sorting.LessIgnoreCase(serviceInstance.BoundApplications[i].AppName, serviceInstance.BoundApplications[j].AppName)
 		})
+}
+
+func upgradeAvailableSummary(s v2action.ServiceInstanceSummary) string {
+	if s.UpgradeSupported() {
+		if s.UpgradeAvailable() {
+			return "yes"
+		}
+		return "no"
+	}
+	return ""
 }

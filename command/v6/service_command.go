@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -17,6 +18,7 @@ import (
 type ServiceActor interface {
 	GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
 	GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstanceSummary, v2action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type ServiceCommand struct {
@@ -93,6 +95,16 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 		cmd.displayManagedServiceInstanceSummary(serviceInstanceSummary)
 		cmd.displayManagedServiceInstanceLastOperation(serviceInstanceSummary)
 		cmd.displayBoundApplicationsIfExists(serviceInstanceSummary)
+
+		isOutdated, err := command.CheckVersionOutdated(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionMaintenanceInfoInSummaryV2)
+		if err != nil {
+			return err
+		}
+
+		if !isOutdated {
+			cmd.displayUpgradeInformation(serviceInstanceSummary)
+		}
+
 		return nil
 	}
 
@@ -218,4 +230,28 @@ func (cmd ServiceCommand) displayBoundApplicationsIfExists(serviceInstanceSummar
 	}
 
 	cmd.UI.DisplayTableWithHeader("", boundAppsTable, 3)
+}
+
+func (cmd ServiceCommand) displayUpgradeInformation(serviceInstanceSummary v2action.ServiceInstanceSummary) {
+	cmd.UI.DisplayNewline()
+
+	if !serviceInstanceSummary.UpgradeSupported() {
+		cmd.UI.DisplayText("Upgrades are not supported by this broker.")
+		return
+	}
+
+	if !serviceInstanceSummary.UpgradeAvailable() {
+		cmd.UI.DisplayText("There is no upgrade available for this service.")
+		return
+	}
+
+	cmd.UI.DisplayText("Showing available upgrade details for this service...")
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("upgrade description: {{.Description}}", map[string]interface{}{
+		"Description": serviceInstanceSummary.ServicePlan.MaintenanceInfo.Description,
+	})
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("TIP: You can upgrade using 'cf update-service {{.InstanceName}} --upgrade'", map[string]interface{}{
+		"InstanceName": serviceInstanceSummary.Name,
+	})
 }

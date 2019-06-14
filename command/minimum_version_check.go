@@ -12,7 +12,7 @@ func MinimumCCAPIVersionCheck(current string, minimum string, customCommand ...s
 		command = customCommand[0]
 	}
 
-	isOutdated, err := checkVersionOutdated(current, minimum)
+	isOutdated, err := CheckVersionOutdated(current, minimum)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func MinimumUAAAPIVersionCheck(current string, minimum string, customCommand ...
 		command = customCommand[0]
 	}
 
-	isOutdated, err := checkVersionOutdated(current, minimum)
+	isOutdated, err := CheckVersionOutdated(current, minimum)
 	if err != nil {
 		return err
 	}
