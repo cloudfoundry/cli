@@ -99,12 +99,14 @@ var _ = Describe("delete-shared-domain Command", func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
 
-				fakeActor.DeleteSharedDomainReturns(v7action.Warnings{"some-warning"}, nil)
+				fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning"}, nil)
+
+				fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning"}, nil)
 			})
 
 			It("delegates to the Actor", func() {
-				actualName := fakeActor.DeleteSharedDomainArgsForCall(0)
-				Expect(actualName).To(Equal(domain))
+				domain := fakeActor.DeleteDomainArgsForCall(0)
+				Expect(domain).To(Equal(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}))
 			})
 
 			It("deletes the shared domain", func() {
@@ -127,7 +129,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Out).To(Say("'some-domain.com' has not been deleted."))
-				Expect(fakeActor.DeleteSharedDomainCallCount()).To(Equal(0))
+				Expect(fakeActor.DeleteDomainCallCount()).To(Equal(0))
 			})
 		})
 
@@ -141,7 +143,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Out).To(Say(`\'some-domain.com\' has not been deleted.`))
-				Expect(fakeActor.DeleteSharedDomainCallCount()).To(Equal(0))
+				Expect(fakeActor.DeleteDomainCallCount()).To(Equal(0))
 			})
 		})
 
@@ -158,7 +160,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 				Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
 				Expect(testUI.Out).To(Say(`Really delete the shared domain some-domain.com\? \[yN\]`))
 
-				Expect(fakeActor.DeleteSharedDomainCallCount()).To(Equal(0))
+				Expect(fakeActor.DeleteDomainCallCount()).To(Equal(0))
 			})
 		})
 	})
@@ -171,7 +173,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 		When("deleting the shared domain errors", func() {
 			Context("generic error", func() {
 				BeforeEach(func() {
-					fakeActor.DeleteSharedDomainReturns(v7action.Warnings{"some-warning"}, errors.New("some-error"))
+					fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning"}, errors.New("some-error"))
 				})
 
 				It("displays all warnings, and returns the erorr", func() {
@@ -185,7 +187,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 		When("the shared domain doesn't exist", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteSharedDomainReturns(v7action.Warnings{"some-warning"}, actionerror.DomainNotFoundError{Name: "some-domain.com"})
+				fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"some-warning"}, actionerror.DomainNotFoundError{Name: "some-domain.com"})
 			})
 
 			It("displays all warnings, that the domain wasn't found, and does not error", func() {
@@ -200,7 +202,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 		When("the shared domain exists", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteSharedDomainReturns(v7action.Warnings{"some-warning"}, nil)
+				fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning"}, nil)
 			})
 
 			It("displays all warnings, and does not error", func() {

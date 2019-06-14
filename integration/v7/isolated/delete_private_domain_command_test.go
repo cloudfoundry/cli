@@ -106,6 +106,10 @@ var _ = Describe("delete-private-domain command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("\n\nTIP: Run 'cf domains' to view available domains."))
 				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("domains")
+				Consistently(session).ShouldNot(Say(`%s\s+private`, domainName))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 

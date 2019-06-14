@@ -12,7 +12,8 @@ import (
 //go:generate counterfeiter . DeleteSharedDomainActor
 
 type DeleteSharedDomainActor interface {
-	DeleteSharedDomain(domainName string) (v7action.Warnings, error)
+	DeleteDomain(domain v7action.Domain) (v7action.Warnings, error)
+	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
 }
 
 type DeleteSharedDomainCommand struct {
@@ -46,6 +47,7 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	domainName := cmd.RequiredArgs.Domain
 
 	currentUser, err := cmd.Config.CurrentUser()
 	if err != nil {
@@ -56,7 +58,7 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 
 	if !cmd.Force {
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the shared domain {{.DomainName}}?", map[string]interface{}{
-			"DomainName": cmd.RequiredArgs.Domain,
+			"DomainName": domainName,
 		})
 
 		if promptErr != nil {
@@ -65,27 +67,33 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 
 		if !response {
 			cmd.UI.DisplayText("'{{.DomainName}}' has not been deleted.", map[string]interface{}{
-				"DomainName": cmd.RequiredArgs.Domain,
+				"DomainName": domainName,
 			})
 			return nil
 		}
 	}
 	cmd.UI.DisplayTextWithFlavor("Deleting domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
-		"DomainName": cmd.RequiredArgs.Domain,
+		"DomainName": domainName,
 		"Username":   currentUser.Name,
 	})
 
-	warnings, err := cmd.Actor.DeleteSharedDomain(cmd.RequiredArgs.Domain)
+	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
 	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
-		switch err.(type) {
-		case actionerror.DomainNotFoundError:
+		if _, ok := err.(actionerror.DomainNotFoundError); ok {
 			cmd.UI.DisplayTextWithFlavor("Domain {{.DomainName}} does not exist", map[string]interface{}{
 				"DomainName": cmd.RequiredArgs.Domain,
 			})
-		default:
-			return err
+			cmd.UI.DisplayOK()
+			return nil
 		}
+	}
+
+	warnings, err = cmd.Actor.DeleteDomain(domain)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayOK()

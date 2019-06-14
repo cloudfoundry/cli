@@ -1,8 +1,6 @@
 package v7action
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
@@ -43,52 +41,20 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 	return allWarnings, err
 }
 
-func (actor Actor) DeleteSharedDomain(domainName string) (Warnings, error) {
+func (actor Actor) DeleteDomain(domain Domain) (Warnings, error) {
 	allWarnings := Warnings{}
-	domain, warnings, err := actor.GetDomainByName(domainName)
-	allWarnings = append(allWarnings, warnings...)
 
-	if err != nil {
-		return allWarnings, err
-	}
-
-	_, apiWarnings, err := actor.CloudControllerClient.DeleteDomain(domain.GUID)
+	jobURL, apiWarnings, err := actor.CloudControllerClient.DeleteDomain(domain.GUID)
 
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
 
-	return allWarnings, err
-}
-
-func (actor Actor) DeletePrivateDomain(domainName string) (Warnings, error) {
-	allWarnings := Warnings{}
-	domain, warnings, err := actor.GetDomainByName(domainName)
-
-	allWarnings = append(allWarnings, warnings...)
-
 	if err != nil {
 		return allWarnings, err
 	}
-	_, apiWarnings, err := actor.CloudControllerClient.DeleteDomain(domain.GUID)
 
-	actorWarnings := Warnings(apiWarnings)
-	allWarnings = append(allWarnings, actorWarnings...)
-
-	return allWarnings, err
-}
-
-func (actor Actor) CheckSharedDomain(domainName string) (Warnings, error) {
-	allWarnings := Warnings{}
-	domain, warnings, err := actor.GetDomainByName(domainName)
-
-	allWarnings = append(allWarnings, warnings...)
-
-	if err != nil {
-		return allWarnings, err
-	}
-	if domain.Shared() {
-		err = fmt.Errorf("Domain '%s' is a shared domain, not a private domain.", domainName)
-	}
+	pollJobWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, Warnings(pollJobWarnings)...)
 
 	return allWarnings, err
 }

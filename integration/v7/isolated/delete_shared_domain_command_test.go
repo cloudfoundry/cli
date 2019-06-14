@@ -92,6 +92,10 @@ var _ = Describe("delete-shared-domain command", func() {
 				Consistently(session).ShouldNot(Say("Are you sure"))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("domains")
+				Consistently(session).ShouldNot(Say(`%s\s+shared`, domainName))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

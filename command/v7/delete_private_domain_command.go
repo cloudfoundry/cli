@@ -7,13 +7,14 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"fmt"
 )
 
 //go:generate counterfeiter . DeletePrivateDomainActor
 
 type DeletePrivateDomainActor interface {
-	DeletePrivateDomain(domainName string) (v7action.Warnings, error)
-	CheckSharedDomain(domainName string) (v7action.Warnings, error)
+	DeleteDomain(domain v7action.Domain) (v7action.Warnings, error)
+	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
 }
 
 type DeletePrivateDomainCommand struct {
@@ -43,7 +44,7 @@ func (cmd *DeletePrivateDomainCommand) Setup(config command.Config, ui command.U
 }
 
 func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
-	domain := cmd.RequiredArgs.Domain
+	domainName := cmd.RequiredArgs.Domain
 	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
@@ -54,26 +55,27 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 		return err
 	}
 
-	shareCheckWarnings, shareCheckErr := cmd.Actor.CheckSharedDomain(domain)
-
-	if shareCheckErr != nil {
-		if _, ok := shareCheckErr.(actionerror.DomainNotFoundError); ok {
+	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		if _, ok := err.(actionerror.DomainNotFoundError); ok {
 			cmd.UI.DisplayTextWithFlavor("Domain {{.DomainName}} does not exist", map[string]interface{}{
 				"DomainName": cmd.RequiredArgs.Domain,
 			})
 			cmd.UI.DisplayOK()
 			return nil
 		}
+	}
 
-		cmd.UI.DisplayWarnings(shareCheckWarnings)
-		return shareCheckErr
+	if domain.Shared() {
+		return fmt.Errorf("Domain '%s' is a shared domain, not a private domain.", domainName)
 	}
 
 	cmd.UI.DisplayText("Deleting the private domain will remove associated routes which will make apps with this domain unreachable.")
 
 	if !cmd.Force {
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the private domain {{.DomainName}}?", map[string]interface{}{
-			"DomainName": domain,
+			"DomainName": domainName,
 		})
 
 		if promptErr != nil {
@@ -82,25 +84,21 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 
 		if !response {
 			cmd.UI.DisplayText("'{{.DomainName}}' has not been deleted.", map[string]interface{}{
-				"DomainName": domain,
+				"DomainName": domainName,
 			})
 			return nil
 		}
 	}
 	cmd.UI.DisplayTextWithFlavor("Deleting private domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
-		"DomainName": domain,
+		"DomainName": domainName,
 		"Username":   currentUser.Name,
 	})
 
-	warnings, err := cmd.Actor.DeletePrivateDomain(domain)
+	warnings, err = cmd.Actor.DeleteDomain(domain)
 	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
-		switch err.(type) {
-		case actionerror.DomainNotFoundError:
-			cmd.UI.DisplayText(err.Error())
-		default:
-			return err
-		}
+		return err
 	}
 
 	cmd.UI.DisplayOK()
