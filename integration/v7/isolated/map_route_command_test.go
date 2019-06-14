@@ -22,9 +22,9 @@ var _ = Describe("map-route command", func() {
 				Eventually(session).Should(Say(`\n`))
 
 				Eventually(session).Should(Say(`EXAMPLES:`))
-				Eventually(session).Should(Say(`cf map-route my-app example.com\s+# example.com`))
-				Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost\s+# myhost.example.com`))
-				Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo\s+# myhost.example.com/foo`))
+				Eventually(session).Should(Say(`cf map-route my-app example.com                              # example.com`))
+				Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost            # myhost.example.com`))
+				Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`))
 				Eventually(session).Should(Say(`\n`))
 
 				Eventually(session).Should(Say(`OPTIONS:`))

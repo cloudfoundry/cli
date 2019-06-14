@@ -14,7 +14,7 @@ type MapRouteActor interface{}
 
 type MapRouteCommand struct {
 	RequiredArgs    flag.AppDomain `positional-args:"yes"`
-	usage           interface{}    `usage:"CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                             # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	usage           interface{}    `usage:"CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
 	Hostname        string         `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path            string         `long:"path" description:"Path for the HTTP route"`
 	relatedCommands interface{}    `related_commands:"create-route, routes, unmap-route"`
