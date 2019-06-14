@@ -107,6 +107,25 @@ var _ = Describe("stage command", func() {
 
 				Eventually(session).Should(Exit(0))
 			})
+
+			When("the package belongs to a different app", func() {
+				var otherAppName string
+
+				BeforeEach(func() {
+					otherAppName = helpers.PrefixedRandomName("app")
+					Eventually(helpers.CF("create-app", otherAppName)).Should(Exit(0))
+				})
+
+				It("errors saying the package does *not* exist", func() {
+					session := helpers.CF("stage", otherAppName, "--package-guid", packageGUID)
+					userName, _ := helpers.GetCredentials()
+
+					Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, otherAppName, orgName, spaceName, userName))
+					Eventually(session.Err).Should(Say(`Package with guid '%s' not found in app '%s'.`, packageGUID, otherAppName))
+
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 
 		When("the app does not exist", func() {
@@ -132,7 +151,7 @@ var _ = Describe("stage command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say(`Unable to use package\. Ensure that the package exists and you have access to it\.`))
+				Eventually(session.Err).Should(Say(`Package with guid '%s' not found in app '%s'.`, "some-package-guid", appName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

@@ -32,9 +32,20 @@ var _ = Describe("Build Actions", func() {
 			warningsStream <-chan Warnings
 			errorStream    <-chan error
 
+			appName     string
+			appGUID     string
 			buildGUID   string
 			dropletGUID string
+			spaceGUID   string
+			packageGUID string
 		)
+
+		BeforeEach(func() {
+			appName = "some-app"
+			appGUID = "app-guid"
+			spaceGUID = "space-guid"
+			packageGUID = "some-package-guid"
+		})
 
 		AfterEach(func() {
 			Eventually(errorStream).Should(BeClosed())
@@ -43,11 +54,76 @@ var _ = Describe("Build Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			dropletStream, warningsStream, errorStream = actor.StagePackage("some-package-guid", "some-app")
+			dropletStream, warningsStream, errorStream = actor.StagePackage(packageGUID, appName, spaceGUID)
+		})
+
+		When("finding the app fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("I am a tomato")
+				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-apps-warning"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+			})
+		})
+
+		When("app is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, ccv3.Warnings{"get-apps-warning"}, nil)
+			})
+
+			It("returns the error and warnings", func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+				Eventually(errorStream).Should(Receive(MatchError(actionerror.ApplicationNotFoundError{Name: appName})))
+			})
+		})
+
+		When("finding the package fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("I am a passion fruit")
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetPackagesReturns([]ccv3.Package{}, ccv3.Warnings{"get-packages-warning"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
+				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+			})
+		})
+
+		When("the package belongs to a different app", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{},
+					ccv3.Warnings{"get-packages-warning"},
+					nil,
+				)
+			})
+
+			It("returns a not found error and warnings", func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
+				Eventually(errorStream).Should(Receive(MatchError(actionerror.PackageNotFoundInAppError{GUID: packageGUID, AppName: appName})))
+			})
 		})
 
 		When("the creation is successful", func() {
 			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{{GUID: packageGUID}},
+					ccv3.Warnings{"get-packages-warning"},
+					nil,
+				)
+
 				buildGUID = "some-build-guid"
 				dropletGUID = "some-droplet-guid"
 				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{GUID: buildGUID, State: constant.BuildStaging}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, nil)
@@ -67,6 +143,8 @@ var _ = Describe("Build Actions", func() {
 				// 	})
 
 				// 	It("returns the warnings and the droplet error", func() {
+				//    Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+				//    Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
 				// 		Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
 				// 		Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
 				// 		Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
@@ -82,6 +160,8 @@ var _ = Describe("Build Actions", func() {
 				// 	})
 
 				It("polls until build is finished and returns the final droplet", func() {
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
 					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
 					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
 					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
@@ -89,6 +169,17 @@ var _ = Describe("Build Actions", func() {
 
 					Eventually(dropletStream).Should(Receive(Equal(Droplet{GUID: dropletGUID, State: constant.DropletStaged, CreatedAt: "some-time"})))
 					Consistently(errorStream).ShouldNot(Receive())
+
+					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{appName}},
+						{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					}))
+
+					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(Equal([]ccv3.Query{
+						{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+					}))
 
 					Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.CreateBuildArgsForCall(0)).To(Equal(ccv3.Build{
@@ -116,6 +207,8 @@ var _ = Describe("Build Actions", func() {
 					})
 
 					It("returns an error and all warnings", func() {
+						Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+						Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
 						Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
 						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
 						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
@@ -156,6 +249,8 @@ var _ = Describe("Build Actions", func() {
 				})
 
 				It("returns the error and warnings", func() {
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
 					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
 					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
 					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
@@ -166,12 +261,22 @@ var _ = Describe("Build Actions", func() {
 
 		When("creation errors", func() {
 			var expectedErr error
+
 			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{{GUID: packageGUID}},
+					ccv3.Warnings{"get-packages-warning"},
+					nil,
+				)
+
 				expectedErr = errors.New("I am a banana")
 				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, expectedErr)
 			})
 
 			It("returns the error and warnings", func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-apps-warning")))
+				Eventually(warningsStream).Should(Receive(ConsistOf("get-packages-warning")))
 				Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
 				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 			})

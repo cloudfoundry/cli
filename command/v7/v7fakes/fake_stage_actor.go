@@ -28,11 +28,12 @@ type FakeStageActor struct {
 		result3 v7action.Warnings
 		result4 error
 	}
-	StagePackageStub        func(string, string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	StagePackageStub        func(string, string, string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 	stagePackageMutex       sync.RWMutex
 	stagePackageArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	stagePackageReturns struct {
 		result1 <-chan v7action.Droplet
@@ -119,17 +120,18 @@ func (fake *FakeStageActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsO
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeStageActor) StagePackage(arg1 string, arg2 string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+func (fake *FakeStageActor) StagePackage(arg1 string, arg2 string, arg3 string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
 	fake.stagePackageMutex.Lock()
 	ret, specificReturn := fake.stagePackageReturnsOnCall[len(fake.stagePackageArgsForCall)]
 	fake.stagePackageArgsForCall = append(fake.stagePackageArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("StagePackage", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("StagePackage", []interface{}{arg1, arg2, arg3})
 	fake.stagePackageMutex.Unlock()
 	if fake.StagePackageStub != nil {
-		return fake.StagePackageStub(arg1, arg2)
+		return fake.StagePackageStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -144,17 +146,17 @@ func (fake *FakeStageActor) StagePackageCallCount() int {
 	return len(fake.stagePackageArgsForCall)
 }
 
-func (fake *FakeStageActor) StagePackageCalls(stub func(string, string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)) {
+func (fake *FakeStageActor) StagePackageCalls(stub func(string, string, string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)) {
 	fake.stagePackageMutex.Lock()
 	defer fake.stagePackageMutex.Unlock()
 	fake.StagePackageStub = stub
 }
 
-func (fake *FakeStageActor) StagePackageArgsForCall(i int) (string, string) {
+func (fake *FakeStageActor) StagePackageArgsForCall(i int) (string, string, string) {
 	fake.stagePackageMutex.RLock()
 	defer fake.stagePackageMutex.RUnlock()
 	argsForCall := fake.stagePackageArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeStageActor) StagePackageReturns(result1 <-chan v7action.Droplet, result2 <-chan v7action.Warnings, result3 <-chan error) {

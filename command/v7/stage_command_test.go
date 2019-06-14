@@ -30,7 +30,7 @@ var _ = Describe("stage Command", func() {
 
 		binaryName  string
 		executeErr  error
-		app         string
+		appName     string
 		packageGUID string
 	)
 
@@ -45,11 +45,11 @@ var _ = Describe("stage Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		app = "some-app"
+		appName = "some-app"
 		packageGUID = "some-package-guid"
 
 		cmd = v7.StageCommand{
-			RequiredArgs: flag.AppName{AppName: app},
+			RequiredArgs: flag.AppName{AppName: appName},
 			PackageGUID:  packageGUID,
 
 			UI:          testUI,
@@ -121,7 +121,7 @@ var _ = Describe("stage Command", func() {
 				const dropletCreateTime = "2017-08-14T21:16:42Z"
 
 				BeforeEach(func() {
-					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+					fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
 						dropletStream := make(chan v7action.Droplet)
 						warningsStream := make(chan v7action.Warnings)
 						errorStream := make(chan error)
@@ -149,7 +149,7 @@ var _ = Describe("stage Command", func() {
 					createdAtTimeParsed, err := time.Parse(time.RFC3339, dropletCreateTime)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as steve...", app))
+					Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as steve...", appName))
 					Expect(testUI.Out).To(Say("\n\n"))
 					Expect(testUI.Out).To(Say("Package staged"))
 					Expect(testUI.Out).To(Say(`droplet guid:\s+some-droplet-guid`))
@@ -163,8 +163,10 @@ var _ = Describe("stage Command", func() {
 				It("stages the package", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
-					guidArg, _ := fakeActor.StagePackageArgsForCall(0)
+					guidArg, appNameArg, spaceGUIDArg := fakeActor.StagePackageArgsForCall(0)
 					Expect(guidArg).To(Equal(packageGUID))
+					Expect(appNameArg).To(Equal(appName))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 				})
 
 				It("displays staging logs and their warnings", func() {
@@ -174,14 +176,16 @@ var _ = Describe("stage Command", func() {
 					Expect(testUI.Err).To(Say("steve for all I care"))
 
 					Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID, noaaClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal(app))
+					appNameArg, spaceGUID, noaaClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+					Expect(appNameArg).To(Equal(appName))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(noaaClient).To(Equal(fakeNOAAClient))
 
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
-					guidArg, _ := fakeActor.StagePackageArgsForCall(0)
+					guidArg, appNameArg, spaceGUIDArg := fakeActor.StagePackageArgsForCall(0)
 					Expect(guidArg).To(Equal(packageGUID))
+					Expect(appNameArg).To(Equal(appName))
+					Expect(spaceGUIDArg).To(Equal(spaceGUID))
 				})
 			})
 
@@ -190,7 +194,7 @@ var _ = Describe("stage Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("any gibberish")
-					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+					fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
 						dropletStream := make(chan v7action.Droplet)
 						warningsStream := make(chan v7action.Warnings)
 						errorStream := make(chan error)
@@ -242,7 +246,7 @@ var _ = Describe("stage Command", func() {
 					return logStream, errorStream, v7action.Warnings{"steve for all I care"}, nil
 				}
 
-				fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+				fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
 					dropletStream := make(chan v7action.Droplet)
 					warningsStream := make(chan v7action.Warnings)
 					errorStream := make(chan error)

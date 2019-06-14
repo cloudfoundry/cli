@@ -16,7 +16,7 @@ import (
 
 type StageActor interface {
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
-	StagePackage(packageGUID string, appName string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 }
 
 type StageCommand struct {
@@ -74,7 +74,12 @@ func (cmd StageCommand) Execute(args []string) error {
 		return logErr
 	}
 
-	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)
+	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(
+		cmd.PackageGUID,
+		cmd.RequiredArgs.AppName,
+		cmd.Config.TargetedSpace().GUID,
+	)
+
 	var droplet v7action.Droplet
 	droplet, err = shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {

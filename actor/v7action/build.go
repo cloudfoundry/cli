@@ -15,7 +15,7 @@ type Build struct {
 	GUID string
 }
 
-func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Droplet, <-chan Warnings, <-chan error) {
+func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan Droplet, <-chan Warnings, <-chan error) {
 	dropletStream := make(chan Droplet)
 	warningsStream := make(chan Warnings)
 	errorStream := make(chan error)
@@ -24,8 +24,34 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 		defer close(warningsStream)
 		defer close(errorStream)
 
+		apps, warnings, err := actor.GetApplicationsByNamesAndSpace([]string{appName}, spaceGUID)
+		warningsStream <- warnings
+		if err != nil {
+			if _, ok := err.(actionerror.ApplicationsNotFoundError); ok {
+				err = actionerror.ApplicationNotFoundError{Name: appName}
+			}
+			errorStream <- err
+			return
+		}
+		app := apps[0]
+
+		pkgs, allWarnings, err := actor.CloudControllerClient.GetPackages(ccv3.Query{
+			Key: ccv3.AppGUIDFilter, Values: []string{app.GUID},
+		})
+		warningsStream <- Warnings(allWarnings)
+		if err != nil {
+			errorStream <- err
+			return
+		}
+
+		if len(pkgs) == 0 {
+			err = actionerror.PackageNotFoundInAppError{GUID: packageGUID, AppName: appName}
+			errorStream <- err
+			return
+		}
+
 		build := ccv3.Build{PackageGUID: packageGUID}
-		build, allWarnings, err := actor.CloudControllerClient.CreateBuild(build)
+		build, allWarnings, err = actor.CloudControllerClient.CreateBuild(build)
 		warningsStream <- Warnings(allWarnings)
 
 		if err != nil {
