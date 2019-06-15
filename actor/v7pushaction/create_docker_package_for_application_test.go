@@ -46,7 +46,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 	})
 
 	JustBeforeEach(func() {
-		events = EventFollower(func(eventStream chan<- Event) {
+		events = EventFollower(func(eventStream chan<- *PushEvent) {
 			returnedPushPlan, warnings, executeErr = actor.CreateDockerPackageForApplication(paramPlan, eventStream, fakeProgressBar)
 		})
 	})

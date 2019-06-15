@@ -1,7 +1,7 @@
 package v7pushaction
 
-func (actor Actor) StagePackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	eventStream <- StartingStaging
+func (actor Actor) StagePackageForApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
+	eventStream <- &PushEvent{Plan: pushPlan, Event: StartingStaging}
 
 	var allWarnings Warnings
 	build, warnings, err := actor.V7Actor.StageApplicationPackage(pushPlan.PackageGUID)
@@ -10,7 +10,7 @@ func (actor Actor) StagePackageForApplication(pushPlan PushPlan, eventStream cha
 		return pushPlan, allWarnings, err
 	}
 
-	eventStream <- PollingBuild
+	eventStream <- &PushEvent{Plan: pushPlan, Event: PollingBuild}
 
 	droplet, warnings, err := actor.V7Actor.PollBuild(build.GUID, pushPlan.Application.Name)
 	allWarnings = append(allWarnings, warnings...)
@@ -19,7 +19,7 @@ func (actor Actor) StagePackageForApplication(pushPlan PushPlan, eventStream cha
 	}
 	pushPlan.DropletGUID = droplet.GUID
 
-	eventStream <- StagingComplete
+	eventStream <- &PushEvent{Plan: pushPlan, Event: StagingComplete}
 
 	return pushPlan, allWarnings, nil
 }

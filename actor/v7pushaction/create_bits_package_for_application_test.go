@@ -45,7 +45,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 	})
 
 	JustBeforeEach(func() {
-		events = EventFollower(func(eventStream chan<- Event) {
+		events = EventFollower(func(eventStream chan<- *PushEvent) {
 			returnedPushPlan, warnings, executeErr = actor.CreateBitsPackageForApplication(paramPlan, eventStream, fakeProgressBar)
 		})
 	})

@@ -36,7 +36,7 @@ var _ = Describe("StagePackageForApplication", func() {
 	})
 
 	JustBeforeEach(func() {
-		events = EventFollower(func(eventStream chan<- Event) {
+		events = EventFollower(func(eventStream chan<- *PushEvent) {
 			returnedPushPlan, warnings, executeErr = actor.StagePackageForApplication(paramPlan, eventStream, nil)
 		})
 	})

@@ -44,7 +44,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 	})
 
 	JustBeforeEach(func() {
-		events = EventFollower(func(eventStream chan<- Event) {
+		events = EventFollower(func(eventStream chan<- *PushEvent) {
 			returnedPushPlan, warnings, executeErr = actor.CreateDropletForApplication(paramPlan, eventStream, fakeProgressBar)
 		})
 	})

@@ -6,18 +6,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestParser) (<-chan []PushPlan, <-chan Event, <-chan Warnings, <-chan error) {
-	pushPlansStream := make(chan []PushPlan)
-	eventStream := make(chan Event)
-	warningsStream := make(chan Warnings)
-	errorStream := make(chan error)
+func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestParser) ([]string, <-chan *PushEvent) {
+	pushEventStream := make(chan *PushEvent)
 
 	go func() {
-		log.Debug("starting space preparation go routine")
-		defer close(pushPlansStream)
-		defer close(eventStream)
-		defer close(warningsStream)
-		defer close(errorStream)
+		log.Debug("starting apply manifest go routine")
+		defer close(pushEventStream)
 
 		var warnings v7action.Warnings
 		var err error
@@ -27,34 +21,38 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestPar
 			var manifest []byte
 			manifest, err = getManifest(pushPlans, manifestParser)
 			if err != nil {
-				errorStream <- err
+				pushEventStream <- &PushEvent{Err: err}
 				return
 			}
-			eventStream <- ApplyManifest
+			pushEventStream <- &PushEvent{Event: ApplyManifest}
 			warnings, err = actor.V7Actor.SetSpaceManifest(pushPlans[0].SpaceGUID, manifest, pushPlans[0].NoRouteFlag)
 			successEvent = ApplyManifestComplete
 		} else {
 			_, warnings, err = actor.V7Actor.CreateApplicationInSpace(pushPlans[0].Application, pushPlans[0].SpaceGUID)
 			if _, ok := err.(actionerror.ApplicationAlreadyExistsError); ok {
-				eventStream <- SkippingApplicationCreation
+				pushEventStream <- &PushEvent{Event: SkippingApplicationCreation, Plan: pushPlans[0]}
 				successEvent = ApplicationAlreadyExists
 				err = nil
 			} else {
-				eventStream <- CreatingApplication
+				pushEventStream <- &PushEvent{Event: CreatingApplication, Plan: pushPlans[0]}
 				successEvent = CreatedApplication
 			}
 		}
 
-		warningsStream <- Warnings(warnings)
 		if err != nil {
-			errorStream <- err
+			pushEventStream <- &PushEvent{Err: err, Warnings: Warnings(warnings), Plan: pushPlans[0]}
 			return
 		}
-		pushPlansStream <- pushPlans
-		eventStream <- successEvent
+
+		pushEventStream <- &PushEvent{Event: successEvent, Err: nil, Warnings: Warnings(warnings), Plan: pushPlans[0]}
 	}()
 
-	return pushPlansStream, eventStream, warningsStream, errorStream
+	var appNames []string
+	for _, plan := range pushPlans {
+		appNames = append(appNames, plan.Application.Name)
+	}
+
+	return appNames, pushEventStream
 }
 
 func getManifest(plans []PushPlan, parser ManifestParser) ([]byte, error) {

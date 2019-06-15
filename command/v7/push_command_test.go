@@ -28,65 +28,24 @@ import (
 )
 
 type Step struct {
+	Plan     v7pushaction.PushPlan
 	Error    error
 	Event    v7pushaction.Event
 	Warnings v7pushaction.Warnings
 }
 
-func FillInEvents(tuples []Step) (<-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
-	eventStream := make(chan v7pushaction.Event)
-	warningsStream := make(chan v7pushaction.Warnings)
-	errorStream := make(chan error)
+func FillInEvents(steps []Step) <-chan *v7pushaction.PushEvent {
+	eventStream := make(chan *v7pushaction.PushEvent)
 
 	go func() {
 		defer close(eventStream)
-		defer close(warningsStream)
-		defer close(errorStream)
 
-		for _, tuple := range tuples {
-			warningsStream <- tuple.Warnings
-			if tuple.Error != nil {
-				errorStream <- tuple.Error
-				return
-			} else {
-				eventStream <- tuple.Event
-			}
+		for _, step := range steps {
+			eventStream <- &v7pushaction.PushEvent{Plan: step.Plan, Warnings: step.Warnings, Err: step.Error, Event: step.Event}
 		}
 	}()
 
-	return eventStream, warningsStream, errorStream
-}
-
-func FillInValues(tuples []Step, state v7pushaction.PushPlan) func(v7pushaction.PushPlan, v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
-	return func(v7pushaction.PushPlan, v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
-		stateStream := make(chan v7pushaction.PushPlan)
-
-		eventStream := make(chan v7pushaction.Event)
-		warningsStream := make(chan v7pushaction.Warnings)
-		errorStream := make(chan error)
-
-		go func() {
-			defer close(stateStream)
-			defer close(eventStream)
-			defer close(warningsStream)
-			defer close(errorStream)
-
-			for _, tuple := range tuples {
-				warningsStream <- tuple.Warnings
-				if tuple.Error != nil {
-					errorStream <- tuple.Error
-					return
-				} else {
-					eventStream <- tuple.Event
-				}
-			}
-
-			stateStream <- state
-			eventStream <- v7pushaction.Complete
-		}()
-
-		return stateStream, eventStream, warningsStream, errorStream
-	}
+	return eventStream
 }
 
 type LogEvent struct {
@@ -183,13 +142,7 @@ var _ = Describe("push Command", func() {
 		})
 
 		BeforeEach(func() {
-			pushPlanChannel := make(chan []v7pushaction.PushPlan, 1)
-			pushPlanChannel <- []v7pushaction.PushPlan{
-				{Application: v7action.Application{Name: appName1}},
-				{Application: v7action.Application{Name: appName2}},
-			}
-			close(pushPlanChannel)
-			events, warnings, errors := FillInEvents([]Step{
+			events := FillInEvents([]Step{
 				{
 					Warnings: v7pushaction.Warnings{"some-warning-1"},
 					Event:    v7pushaction.ApplyManifest,
@@ -200,9 +153,11 @@ var _ = Describe("push Command", func() {
 				},
 			})
 
-			fakeActor.PrepareSpaceReturns(pushPlanChannel, events, warnings, errors)
+			fakeActor.PrepareSpaceReturns([]string{appName1, appName2}, events)
 
-			fakeActor.ActualizeStub = FillInValues([]Step{{}}, v7pushaction.PushPlan{})
+			fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+				return FillInEvents([]Step{})
+			}
 		})
 
 		When("checking target fails", func() {
@@ -393,53 +348,68 @@ var _ = Describe("push Command", func() {
 									Describe("delegating to Actor.Actualize", func() {
 										When("Actualize returns success", func() {
 											BeforeEach(func() {
-												fakeActor.ActualizeStub = FillInValues([]Step{
-													{},
-												}, v7pushaction.PushPlan{Application: v7action.Application{GUID: "potato"}})
+												fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+													return FillInEvents([]Step{
+														{Plan: v7pushaction.PushPlan{Application: v7action.Application{GUID: "potato"}}},
+													})
+												}
 											})
 
 											Describe("actualize events", func() {
 												BeforeEach(func() {
-													fakeActor.ActualizeStub = FillInValues([]Step{
-														{
-															Event:    v7pushaction.SkippingApplicationCreation,
-															Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
-														},
-														{
-															Event:    v7pushaction.CreatingApplication,
-															Warnings: v7pushaction.Warnings{"app creation warnings"},
-														},
-														{
-															Event: v7pushaction.CreatingAndMappingRoutes,
-														},
-														{
-															Event:    v7pushaction.CreatedRoutes,
-															Warnings: v7pushaction.Warnings{"routes warnings"},
-														},
-														{
-															Event: v7pushaction.CreatingArchive,
-														},
-														{
-															Event:    v7pushaction.UploadingApplicationWithArchive,
-															Warnings: v7pushaction.Warnings{"upload app archive warning"},
-														},
-														{
-															Event:    v7pushaction.RetryUpload,
-															Warnings: v7pushaction.Warnings{"retry upload warning"},
-														},
-														{
-															Event: v7pushaction.UploadWithArchiveComplete,
-														},
-														{
-															Event: v7pushaction.RestartingApplication,
-														},
-														{
-															Event: v7pushaction.StartingDeployment,
-														},
-														{
-															Event: v7pushaction.WaitingForDeployment,
-														},
-													}, v7pushaction.PushPlan{})
+													fakeActor.ActualizeStub = func(pushPlan v7pushaction.PushPlan, _ v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+														return FillInEvents([]Step{
+															{
+																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event:    v7pushaction.SkippingApplicationCreation,
+																Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
+															},
+															{
+																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event:    v7pushaction.CreatingApplication,
+																Warnings: v7pushaction.Warnings{"app creation warnings"},
+															},
+															{
+																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event: v7pushaction.CreatingAndMappingRoutes,
+															},
+															{
+																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event:    v7pushaction.CreatedRoutes,
+																Warnings: v7pushaction.Warnings{"routes warnings"},
+															},
+															{
+																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event: v7pushaction.CreatingArchive,
+															},
+															{
+																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event:    v7pushaction.UploadingApplicationWithArchive,
+																Warnings: v7pushaction.Warnings{"upload app archive warning"},
+															},
+															{
+																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event:    v7pushaction.RetryUpload,
+																Warnings: v7pushaction.Warnings{"retry upload warning"},
+															},
+															{
+																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event: v7pushaction.UploadWithArchiveComplete,
+															},
+															{
+																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event: v7pushaction.RestartingApplication,
+															},
+															{
+																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event: v7pushaction.StartingDeployment,
+															},
+															{
+																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Event: v7pushaction.WaitingForDeployment,
+															},
+														})
+													}
 												})
 
 												It("actualizes the application and displays events/warnings", func() {
@@ -498,11 +468,11 @@ var _ = Describe("push Command", func() {
 
 											Describe("staging logs", func() {
 												BeforeEach(func() {
-													fakeActor.ActualizeStub = FillInValues([]Step{
-														{
-															Event: v7pushaction.StartingStaging,
-														},
-													}, v7pushaction.PushPlan{})
+													fakeActor.ActualizeStub = func(pushPlan v7pushaction.PushPlan, _ v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+														return FillInEvents([]Step{
+															{Plan: pushPlan, Event: v7pushaction.StartingStaging},
+														})
+													}
 												})
 
 												When("there are no logging errors", func() {
@@ -611,11 +581,11 @@ var _ = Describe("push Command", func() {
 										When("actualize returns an error", func() {
 											When("the error is generic", func() {
 												BeforeEach(func() {
-													fakeActor.ActualizeStub = FillInValues([]Step{
-														{
-															Error: errors.New("anti avant garde naming"),
-														},
-													}, v7pushaction.PushPlan{})
+													fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+														return FillInEvents([]Step{
+															{Error: errors.New("anti avant garde naming")},
+														})
+													}
 												})
 
 												It("returns the error", func() {
@@ -625,11 +595,11 @@ var _ = Describe("push Command", func() {
 
 											When("the error is a startup timeout error", func() {
 												BeforeEach(func() {
-													fakeActor.ActualizeStub = FillInValues([]Step{
-														{
-															Error: actionerror.StartupTimeoutError{},
-														},
-													}, v7pushaction.PushPlan{})
+													fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+														return FillInEvents([]Step{
+															{Error: actionerror.StartupTimeoutError{}},
+														})
+													}
 												})
 
 												It("returns the StartupTimeoutError and prints warnings", func() {
@@ -642,11 +612,11 @@ var _ = Describe("push Command", func() {
 
 											When("the error is a process crashed error", func() {
 												BeforeEach(func() {
-													fakeActor.ActualizeStub = FillInValues([]Step{
-														{
-															Error: actionerror.AllInstancesCrashedError{},
-														},
-													}, v7pushaction.PushPlan{})
+													fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
+														return FillInEvents([]Step{
+															{Error: actionerror.AllInstancesCrashedError{}},
+														})
+													}
 												})
 
 												It("returns the ApplicationUnableToStartError", func() {
@@ -696,19 +666,15 @@ var _ = Describe("push Command", func() {
 						})
 
 						When("Actor.PrepareSpace has an error", func() {
-							var pushPlansChannel chan []v7pushaction.PushPlan
-
 							BeforeEach(func() {
-								pushPlansChannel = make(chan []v7pushaction.PushPlan)
-								close(pushPlansChannel)
-								events, warnings, errors := FillInEvents([]Step{
+								events := FillInEvents([]Step{
 									{
 										Warnings: v7pushaction.Warnings{"prepare-space-warning-1"},
 										Error:    errors.New("prepare-space-error-1"),
 									},
 								})
 
-								fakeActor.PrepareSpaceReturns(pushPlansChannel, events, warnings, errors)
+								fakeActor.PrepareSpaceReturns([]string{appName1, appName2}, events)
 							})
 
 							It("returns the error", func() {
@@ -723,37 +689,6 @@ var _ = Describe("push Command", func() {
 							It("does not delegate to Actualize", func() {
 								Expect(fakeActor.ActualizeCallCount()).To(Equal(0))
 							})
-						})
-
-						When("Actor.PrepareSpace has no errors but returns no apps", func() {
-							var pushPlansChannel chan []v7pushaction.PushPlan
-
-							BeforeEach(func() {
-								pushPlansChannel = make(chan []v7pushaction.PushPlan)
-								close(pushPlansChannel)
-								events, warnings, errors := FillInEvents([]Step{
-									{
-										Warnings: v7pushaction.Warnings{"prepare-no-app-or-manifest-space-warning"},
-										Error:    nil,
-									},
-								})
-
-								fakeActor.PrepareSpaceReturns(pushPlansChannel, events, warnings, errors)
-							})
-
-							It("returns the error", func() {
-								Expect(executeErr).To(MatchError(translatableerror.AppNameOrManifestRequiredError{}))
-								Expect(testUI.Err).To(Say("prepare-no-app-or-manifest-space-warning"))
-							})
-
-							It("does not delegate to UpdateApplicationSettings", func() {
-								Expect(fakeActor.UpdateApplicationSettingsCallCount()).To(Equal(0))
-							})
-
-							It("does not delegate to Actualize", func() {
-								Expect(fakeActor.ActualizeCallCount()).To(Equal(0))
-							})
-
 						})
 					})
 				})

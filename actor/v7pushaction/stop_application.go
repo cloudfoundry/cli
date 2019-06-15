@@ -5,17 +5,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) StopApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
+func (actor Actor) StopApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
 	var warnings v7action.Warnings
 	var err error
 
 	log.Info("Stopping Application")
-	eventStream <- StoppingApplication
+	eventStream <- &PushEvent{Plan: pushPlan, Event: StoppingApplication}
 	warnings, err = actor.V7Actor.StopApplication(pushPlan.Application.GUID)
 	if err != nil {
 		return pushPlan, Warnings(warnings), err
 	}
-	eventStream <- StoppingApplicationComplete
+	eventStream <- &PushEvent{Plan: pushPlan, Event: StoppingApplicationComplete}
 
 	return pushPlan, Warnings(warnings), nil
 }

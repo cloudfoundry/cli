@@ -12,8 +12,8 @@ import (
 
 const PushRetries = 3
 
-func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	pkg, warnings, err := actor.CreateAndUploadApplicationBits(pushPlan, progressBar, eventStream)
+func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (PushPlan, Warnings, error) {
+	pkg, warnings, err := actor.CreateAndUploadApplicationBits(pushPlan, eventStream, progressBar)
 	if err != nil {
 		return pushPlan, warnings, err
 	}
@@ -25,28 +25,28 @@ func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStrea
 	return pushPlan, append(warnings, pollWarnings...), err
 }
 
-func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar ProgressBar, eventStream chan<- Event) (v7action.Package, Warnings, error) {
-	log.WithField("Path", plan.BitsPath).Info("creating archive")
+func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (v7action.Package, Warnings, error) {
+	log.WithField("Path", pushPlan.BitsPath).Info("creating archive")
 	var allWarnings Warnings
 
-	eventStream <- ResourceMatching
-	matchedResources, unmatchedResources, warnings, err := actor.MatchResources(plan.AllResources)
+	eventStream <- &PushEvent{Plan: pushPlan, Event: ResourceMatching}
+	matchedResources, unmatchedResources, warnings, err := actor.MatchResources(pushPlan.AllResources)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return v7action.Package{}, allWarnings, err
 	}
 
-	eventStream <- CreatingPackage
-	log.WithField("GUID", plan.Application.GUID).Info("creating package")
-	pkg, createPackageWarnings, err := actor.V7Actor.CreateBitsPackageByApplication(plan.Application.GUID)
+	eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingPackage}
+	log.WithField("GUID", pushPlan.Application.GUID).Info("creating package")
+	pkg, createPackageWarnings, err := actor.V7Actor.CreateBitsPackageByApplication(pushPlan.Application.GUID)
 	allWarnings = append(allWarnings, createPackageWarnings...)
 	if err != nil {
 		return v7action.Package{}, allWarnings, err
 	}
 
 	if len(unmatchedResources) > 0 {
-		eventStream <- CreatingArchive
-		archivePath, archiveErr := actor.CreateAndReturnArchivePath(plan, unmatchedResources)
+		eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingArchive}
+		archivePath, archiveErr := actor.CreateAndReturnArchivePath(pushPlan, unmatchedResources)
 		if archiveErr != nil {
 			return v7action.Package{}, allWarnings, archiveErr
 		}
@@ -54,22 +54,22 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 
 		// Uploading package/app bits
 		for count := 0; count < PushRetries; count++ {
-			eventStream <- ReadingArchive
-			log.WithField("GUID", plan.Application.GUID).Info("reading archive")
+			eventStream <- &PushEvent{Plan: pushPlan, Event: ReadingArchive}
+			log.WithField("GUID", pushPlan.Application.GUID).Info("reading archive")
 			file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
 			if readErr != nil {
 				return v7action.Package{}, allWarnings, readErr
 			}
 			defer file.Close()
 
-			eventStream <- UploadingApplicationWithArchive
+			eventStream <- &PushEvent{Plan: pushPlan, Event: UploadingApplicationWithArchive}
 			progressReader := progressBar.NewProgressBarWrapper(file, size)
 			var uploadWarnings v7action.Warnings
 			pkg, uploadWarnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, progressReader, size)
 			allWarnings = append(allWarnings, uploadWarnings...)
 
 			if _, ok := err.(ccerror.PipeSeekError); ok {
-				eventStream <- RetryUpload
+				eventStream <- &PushEvent{Plan: pushPlan, Event: RetryUpload}
 				continue
 			}
 			break
@@ -82,9 +82,9 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 			return v7action.Package{}, allWarnings, err
 		}
 
-		eventStream <- UploadWithArchiveComplete
+		eventStream <- &PushEvent{Plan: pushPlan, Event: UploadWithArchiveComplete}
 	} else {
-		eventStream <- UploadingApplication
+		eventStream <- &PushEvent{Plan: pushPlan, Event: UploadingApplication}
 		var uploadWarnings v7action.Warnings
 		pkg, uploadWarnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, nil, 0)
 		allWarnings = append(allWarnings, uploadWarnings...)
@@ -95,15 +95,15 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 	return pkg, allWarnings, nil
 }
 
-func (actor Actor) CreateAndReturnArchivePath(plan PushPlan, unmatchedResources []sharedaction.V3Resource) (string, error) {
+func (actor Actor) CreateAndReturnArchivePath(pushPlan PushPlan, unmatchedResources []sharedaction.V3Resource) (string, error) {
 	// translate between v3 and v2 resources
 	var v2Resources []sharedaction.Resource
 	for _, resource := range unmatchedResources {
 		v2Resources = append(v2Resources, resource.ToV2Resource())
 	}
 
-	if plan.Archive {
-		return actor.SharedActor.ZipArchiveResources(plan.BitsPath, v2Resources)
+	if pushPlan.Archive {
+		return actor.SharedActor.ZipArchiveResources(pushPlan.BitsPath, v2Resources)
 	}
-	return actor.SharedActor.ZipDirectoryResources(plan.BitsPath, v2Resources)
+	return actor.SharedActor.ZipDirectoryResources(pushPlan.BitsPath, v2Resources)
 }

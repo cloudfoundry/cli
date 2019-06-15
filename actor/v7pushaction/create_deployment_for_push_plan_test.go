@@ -38,7 +38,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 	})
 
 	JustBeforeEach(func() {
-		events = EventFollower(func(eventStream chan<- Event) {
+		events = EventFollower(func(eventStream chan<- *PushEvent) {
 			returnedPushPlan, warnings, executeErr = actor.CreateDeploymentForApplication(paramPlan, eventStream, fakeProgressBar)
 		})
 	})

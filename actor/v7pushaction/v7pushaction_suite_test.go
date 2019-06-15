@@ -38,8 +38,8 @@ func getTestPushActor() (*Actor, *v7pushactionfakes.FakeV7Actor, *v7pushactionfa
 	return actor, fakeV7Actor, fakeSharedActor
 }
 
-func EventFollower(wrapper func(eventStream chan<- Event)) []Event {
-	eventStream := make(chan Event)
+func EventFollower(wrapper func(eventStream chan<- *PushEvent)) []Event {
+	eventStream := make(chan *PushEvent)
 	closed := make(chan bool)
 
 	var events []Event
@@ -51,7 +51,7 @@ func EventFollower(wrapper func(eventStream chan<- Event)) []Event {
 				close(closed)
 				return
 			}
-			events = append(events, event)
+			events = append(events, event.Event)
 		}
 	}()
 

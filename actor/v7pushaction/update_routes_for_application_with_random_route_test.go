@@ -44,7 +44,7 @@ var _ = Describe("UpdateRoutesForApplicationWithRandomRoute", func() {
 	})
 
 	JustBeforeEach(func() {
-		events = EventFollower(func(eventStream chan<- Event) {
+		events = EventFollower(func(eventStream chan<- *PushEvent) {
 			_, warnings, executeErr = actor.UpdateRoutesForApplicationWithRandomRoute(paramPlan, eventStream, nil)
 		})
 	})

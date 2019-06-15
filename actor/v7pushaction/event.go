@@ -1,5 +1,12 @@
 package v7pushaction
 
+type PushEvent struct {
+	Event    Event
+	Plan     PushPlan
+	Err      error
+	Warnings Warnings
+}
+
 type Event string
 
 const (

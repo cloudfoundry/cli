@@ -38,11 +38,11 @@ type ProgressBar interface {
 type PushActor interface {
 	CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser v7pushaction.ManifestParser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	// Prepare the space by creating needed apps/applying the manifest
-	PrepareSpace(pushPlans []v7pushaction.PushPlan, parser v7pushaction.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpace(pushPlans []v7pushaction.PushPlan, parser v7pushaction.ManifestParser) ([]string, <-chan *v7pushaction.PushEvent)
 	// UpdateApplicationSettings figures out the state of the world.
 	UpdateApplicationSettings(pushPlans []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
 	// Actualize applies any necessary changes.
-	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
 }
 
 //go:generate counterfeiter . V7ActorForPush
@@ -182,8 +182,8 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	pushPlansStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(pushPlans, cmd.ManifestParser)
-	appNames, err := cmd.processStreamsFromPrepareSpace(pushPlansStream, eventStream, warningsStream, errorStream)
+	appNames, eventStream := cmd.Actor.PrepareSpace(pushPlans, cmd.ManifestParser)
+	err = cmd.eventStreamHandler(eventStream)
 
 	if err != nil {
 		return err
@@ -212,8 +212,8 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	for _, plan := range pushPlans {
 		log.WithField("app_name", plan.Application.Name).Info("actualizing")
-		planStream, eventStream, warningsStream, errorStream := cmd.Actor.Actualize(plan, cmd.ProgressBar)
-		err := cmd.processApplyStreams(plan.Application.Name, planStream, eventStream, warningsStream, errorStream)
+		eventStream := cmd.Actor.Actualize(plan, cmd.ProgressBar)
+		err := cmd.eventStreamHandler(eventStream)
 
 		if cmd.shouldDisplaySummary(err) {
 			summaryErr := cmd.displayAppSummary(plan)
@@ -287,126 +287,17 @@ func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 	return nil
 }
 
-func (cmd PushCommand) processStreamsFromPrepareSpace(
-	pushPlansStream <-chan []v7pushaction.PushPlan,
-	eventStream <-chan v7pushaction.Event,
-	warningsStream <-chan v7pushaction.Warnings,
-	errorStream <-chan error,
-) ([]string, error) {
-	var namesClosed, eventClosed, warningsClosed, errClosed bool
-	var appNames []string
-	var err error
-
-	for {
-		select {
-		case plans, ok := <-pushPlansStream:
-			if !ok {
-				if !namesClosed {
-					log.Debug("processing config stream closed")
-				}
-				namesClosed = true
-				break
-			}
-			for _, plan := range plans {
-				appNames = append(appNames, plan.Application.Name)
-			}
-		case event, ok := <-eventStream:
-			if !ok {
-				if !eventClosed {
-					log.Debug("processing event stream closed")
-				}
-				eventClosed = true
-				break
-			}
-			_, err := cmd.processEvent(event, cmd.OptionalArgs.AppName)
-			if err != nil {
-				return nil, err
-			}
-		case warnings, ok := <-warningsStream:
-			if !ok {
-				if !warningsClosed {
-					log.Debug("processing warnings stream closed")
-				}
-				warningsClosed = true
-				break
-			}
-			cmd.UI.DisplayWarnings(warnings)
-		case receivedError, ok := <-errorStream:
-			if !ok {
-				if !errClosed {
-					log.Debug("processing error stream closed")
-				}
-				errClosed = true
-				break
-			}
-			return nil, receivedError
+func (cmd PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushEvent) error {
+	for event := range eventStream {
+		cmd.UI.DisplayWarnings(event.Warnings)
+		if event.Err != nil {
+			return event.Err
 		}
-
-		if namesClosed && eventClosed && warningsClosed && errClosed {
-			break
-		}
-	}
-
-	return appNames, err
-}
-
-func (cmd PushCommand) processApplyStreams(
-	appName string,
-	planStream <-chan v7pushaction.PushPlan,
-	eventStream <-chan v7pushaction.Event,
-	warningsStream <-chan v7pushaction.Warnings,
-	errorStream <-chan error,
-) error {
-	var planClosed, eventClosed, warningsClosed, errClosed, complete bool
-
-	for {
-		select {
-		case _, ok := <-planStream:
-			if !ok {
-				if !planClosed {
-					log.Debug("processing config stream closed")
-				}
-				planClosed = true
-				break
-			}
-		case event, ok := <-eventStream:
-			if !ok {
-				if !eventClosed {
-					log.Debug("processing event stream closed")
-				}
-				eventClosed = true
-				break
-			}
-			var err error
-			complete, err = cmd.processEvent(event, appName)
-			if err != nil {
-				return err
-			}
-		case warnings, ok := <-warningsStream:
-			if !ok {
-				if !warningsClosed {
-					log.Debug("processing warnings stream closed")
-				}
-				warningsClosed = true
-				break
-			}
-			cmd.UI.DisplayWarnings(warnings)
-		case err, ok := <-errorStream:
-			if !ok {
-				if !errClosed {
-					log.Debug("processing error stream closed")
-				}
-				errClosed = true
-				break
-			}
+		_, err := cmd.processEvent(event.Event, event.Plan.Application.Name)
+		if err != nil {
 			return err
 		}
-
-		if planClosed && eventClosed && warningsClosed && complete {
-			break
-		}
 	}
-
 	return nil
 }
 
