@@ -455,7 +455,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2f853a86c2a5f407020543d2db12d00b6408e0726ce6d55231d9a4b5b2f2a189"
+  digest = "1:90d51692e0c17ce68b8d2e4dbb36a21d7e7ff72230af4dad8a4eb0ad7a0eb8e5"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -468,7 +468,7 @@
     "ssh/terminal",
   ]
   pruneopts = "NUT"
-  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
+  revision = "5c40567a22f818bd14a1ea7245dad9f8ef0691aa"
 
 [[projects]]
   branch = "master"
