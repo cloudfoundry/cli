@@ -79,7 +79,7 @@ var _ = Describe("get-health-check command", func() {
 		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start")).Should(Exit(0))
 				})
 			})
 
@@ -89,7 +89,6 @@ var _ = Describe("get-health-check command", func() {
 				Eventually(session).Should(Say(`Getting health check type for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 				Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout\n`))
 				Eventually(session).Should(Say(`web\s+port\s+1\n`))
-				Eventually(session).Should(Say(`console\s+process\s+1\n`))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -105,7 +104,6 @@ var _ = Describe("get-health-check command", func() {
 					Eventually(session).Should(Say(`Getting health check type for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 					Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout\n`))
 					Eventually(session).Should(Say(`web\s+http\s+/\s+1\n`))
-					Eventually(session).Should(Say(`console\s+process\s+1\n`))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -122,7 +120,6 @@ var _ = Describe("get-health-check command", func() {
 					Eventually(session).Should(Say(`Getting health check type for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 					Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout\n`))
 					Eventually(session).Should(Say(`web\s+http\s+/some-endpoint\s+1\n`))
-					Eventually(session).Should(Say(`console\s+process\s+1\n`))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -171,7 +168,6 @@ var _ = Describe("get-health-check command", func() {
 					Eventually(session).Should(Say(`Getting health check type for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 					Eventually(session).Should(Say("\n\n"))
 					Eventually(session).Should(Say(`web\s+process\s+\d+`))
-					Eventually(session).Should(Say(`console\s+process\s+\d+`))
 
 					Eventually(session).Should(Exit(0))
 				})

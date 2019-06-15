@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -87,15 +89,26 @@ var _ = Describe("set-health-check command", func() {
 		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start")).Should(Exit(0))
 				})
 			})
 
 			When("the process type is set", func() {
 				It("displays the health check types for each process", func() {
+					packageGUID := helpers.GetFirstAppPackageGuid(appName)
+					stageSession := helpers.CF("stage", appName, "--package-guid", packageGUID)
+					Eventually(stageSession).Should(Exit(0))
+
+					regex := regexp.MustCompile(`droplet guid:\s+(.+)`)
+					matches := regex.FindStringSubmatch(string(stageSession.Out.Contents()))
+					Expect(matches).To(HaveLen(2))
+
+					dropletGUID := matches[1]
+					setDropletSession := helpers.CF("set-droplet", appName, "--droplet-guid", dropletGUID)
+					Eventually(setDropletSession).Should(Exit(0))
+
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "console")
 					Eventually(session).Should(Say(`Updating health check type for app %s process console in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`TIP: An app restart is required for the change to take effect\.`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
@@ -111,7 +124,6 @@ var _ = Describe("set-health-check command", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck", "--invocation-timeout", "2")
 					Eventually(session).Should(Say(`Updating health check type for app %s process web in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`TIP: An app restart is required for the change to take effect\.`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
@@ -127,13 +139,11 @@ var _ = Describe("set-health-check command", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck")
 					Eventually(session).Should(Say(`Updating health check type for app %s process web in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`TIP: An app restart is required for the change to take effect\.`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
 					Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout`))
 					Eventually(session).Should(Say(`web\s+http\s+/healthcheck\s+1`))
-					Eventually(session).Should(Say(`console\s+process\s+1`))
 
 					Eventually(session).Should(Exit(0))
 				})

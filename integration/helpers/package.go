@@ -35,7 +35,7 @@ func VerifyAppPackageContentsV3(appName string, files ...string) {
 	Expect(seenFiles).To(ConsistOf(files))
 }
 
-func getFirstAppPackageGuid(appName string) string {
+func GetFirstAppPackageGuid(appName string) string {
 	commandName := "v3-packages"
 	if V7 {
 		commandName = "packages"
@@ -52,7 +52,7 @@ func getFirstAppPackageGuid(appName string) string {
 }
 
 func downloadFirstAppPackage(appName string, tmpZipFilepath string) {
-	appGUID := getFirstAppPackageGuid(appName)
+	appGUID := GetFirstAppPackageGuid(appName)
 	session := CF("curl", fmt.Sprintf("/v3/packages/%s/download", appGUID), "--output", tmpZipFilepath)
 	Eventually(session).Should(Exit(0))
 }
