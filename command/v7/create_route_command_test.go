@@ -140,7 +140,7 @@ var _ = Describe("create-route Command", func() {
 
 		When("creating the route errors", func() {
 			BeforeEach(func() {
-				fakeActor.CreateRouteReturns(v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("err-create-route"))
+				fakeActor.CreateRouteReturns(v7action.Route{}, v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("err-create-route"))
 			})
 
 			It("returns an error and displays warnings", func() {
@@ -152,7 +152,7 @@ var _ = Describe("create-route Command", func() {
 
 		When("creating the route is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateRouteReturns(v7action.Warnings{"warnings-1", "warnings-2"}, nil)
+				fakeActor.CreateRouteReturns(v7action.Route{}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
 			It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
@@ -198,7 +198,7 @@ var _ = Describe("create-route Command", func() {
 
 		When("the route already exists", func() {
 			BeforeEach(func() {
-				fakeActor.CreateRouteReturns(v7action.Warnings{"some-warning"}, actionerror.RouteAlreadyExistsError{Err: errors.New("api error for a route that already exists")})
+				fakeActor.CreateRouteReturns(v7action.Route{}, v7action.Warnings{"some-warning"}, actionerror.RouteAlreadyExistsError{Err: errors.New("api error for a route that already exists")})
 			})
 
 			It("displays all warnings, that the route already exists, and does not error", func() {

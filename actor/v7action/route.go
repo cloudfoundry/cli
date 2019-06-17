@@ -16,31 +16,31 @@ type Route struct {
 	SpaceName  string
 }
 
-func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path string) (Warnings, error) {
+func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path string) (Route, Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
-		return allWarnings, err
+		return Route{}, allWarnings, err
 	}
 
 	org, warnings, err := actor.GetOrganizationByName(orgName)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return Route{}, allWarnings, err
 	}
 
 	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return Route{}, allWarnings, err
 	}
 
 	if path != "" && string(path[0]) != "/" {
 		path = "/" + path
 	}
-	_, apiWarnings, err := actor.CloudControllerClient.CreateRoute(ccv3.Route{
+	route, apiWarnings, err := actor.CloudControllerClient.CreateRoute(ccv3.Route{
 		SpaceGUID:  space.GUID,
 		DomainGUID: domain.GUID,
 		Host:       hostname,
@@ -51,10 +51,18 @@ func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path st
 	allWarnings = append(allWarnings, actorWarnings...)
 
 	if _, ok := err.(ccerror.RouteNotUniqueError); ok {
-		return allWarnings, actionerror.RouteAlreadyExistsError{Err: err}
+		return Route{}, allWarnings, actionerror.RouteAlreadyExistsError{Err: err}
 	}
 
-	return allWarnings, err
+	return Route{
+		GUID:       route.GUID,
+		Host:       route.Host,
+		Path:       route.Path,
+		SpaceGUID:  route.SpaceGUID,
+		DomainGUID: route.DomainGUID,
+		SpaceName:  spaceName,
+		DomainName: domainName,
+	}, allWarnings, err
 }
 
 func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error) {
@@ -79,12 +87,13 @@ func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error)
 	}
 
 	domainGUIDsSet := map[string]struct{}{}
-	for _, route := range routes {
-		domainGUIDsSet[route.DomainGUID] = struct{}{}
-	}
 	domainGUIDs := []string{}
-	for elem := range domainGUIDsSet {
-		domainGUIDs = append(domainGUIDs, elem)
+	for _, route := range routes {
+		if _, ok := domainGUIDsSet[route.DomainGUID]; ok {
+			continue
+		}
+		domainGUIDsSet[route.DomainGUID] = struct{}{}
+		domainGUIDs = append(domainGUIDs, route.DomainGUID)
 	}
 
 	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
@@ -203,9 +212,9 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 	}
 
 	queryArray := []ccv3.Query{
-		{Key: "domain_guids", Values: []string{domain.GUID}},
-		{Key: "hosts", Values: []string{hostname}},
-		{Key: "paths", Values: []string{path}},
+		{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
+		{Key: ccv3.HostnameFilter, Values: []string{hostname}},
+		{Key: ccv3.PathFilter, Values: []string{path}},
 	}
 
 	routes, apiWarnings, err := actor.CloudControllerClient.GetRoutes(queryArray...)

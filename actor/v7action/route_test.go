@@ -31,7 +31,7 @@ var _ = Describe("Route Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateRoute("org-name", "space-name", "domain-name", "hostname", path)
+			_, warnings, executeErr = actor.CreateRoute("org-name", "space-name", "domain-name", "hostname", path)
 		})
 
 		When("the API layer calls are successful", func() {
