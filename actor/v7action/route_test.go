@@ -614,4 +614,134 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetRouteByAttributesAndSpace", func() {
+		var (
+			domainGUID = "domain-guid"
+			hostname   = "hostname"
+			path       = "path"
+			spaceGUID  = "space-guid"
+
+			executeErr error
+			warnings   Warnings
+			route      Route
+		)
+
+		JustBeforeEach(func() {
+			route, warnings, executeErr = actor.GetRouteByAttributesAndSpace(domainGUID, hostname, path, spaceGUID)
+		})
+
+		When("The cc client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRoutesReturns(nil, ccv3.Warnings{"get-routes-warning"}, errors.New("scooby"))
+			})
+
+			It("returns and empty route, warnings, and the error", func() {
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-routes-warning"))
+				Expect(executeErr).To(MatchError(errors.New("scooby")))
+			})
+
+		})
+
+		When("the cc client succeeds and a route is found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRoutesReturns([]ccv3.Route{{
+					SpaceGUID:  spaceGUID,
+					DomainGUID: domainGUID,
+					Host:       hostname,
+					Path:       path,
+				}}, ccv3.Warnings{"get-routes-warning"}, nil)
+			})
+
+			It("returns the route and the warnings", func() {
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-routes-warning"))
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(route).To(Equal(Route{
+					SpaceGUID:  spaceGUID,
+					DomainGUID: domainGUID,
+					Host:       hostname,
+					Path:       path,
+				}))
+			})
+		})
+
+		When("the cc client succeeds and a route is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRoutesReturns([]ccv3.Route{}, ccv3.Warnings{"get-routes-warning"}, nil)
+			})
+
+			It("returns the route and the warnings", func() {
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-routes-warning"))
+				Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{}))
+			})
+		})
+	})
+
+	Describe("MapRoute", func() {
+		var (
+			routeGUID string
+			appGUID   string
+
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.MapRoute(routeGUID, appGUID)
+		})
+
+		BeforeEach(func() {
+			routeGUID = "route-guid"
+			appGUID = "app-guid"
+		})
+
+		When("the cloud controller client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.MapRouteReturns(ccv3.Warnings{"map-route-warning"}, errors.New("map-route-error"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("map-route-error")))
+				Expect(warnings).To(ConsistOf("map-route-warning"))
+			})
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.MapRouteReturns(ccv3.Warnings{"map-route-warning"}, nil)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("map-route-warning"))
+			})
+		})
+	})
 })

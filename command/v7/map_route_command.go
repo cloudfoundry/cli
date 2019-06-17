@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
@@ -10,7 +11,13 @@ import (
 
 //go:generate counterfeiter . MapRouteActor
 
-type MapRouteActor interface{}
+type MapRouteActor interface {
+	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
+	GetRouteByAttributesAndSpace(domainGUID string, hostname string, path string, spaceGUID string) (v7action.Route, v7action.Warnings, error)
+	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
+	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
+	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
+}
 
 type MapRouteCommand struct {
 	RequiredArgs    flag.AppDomain `positional-args:"yes"`
@@ -45,9 +52,66 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, err = cmd.Config.CurrentUser()
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
+
+	domain, warnings, err := cmd.Actor.GetDomainByName(cmd.RequiredArgs.Domain)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	spaceGUID := cmd.Config.TargetedSpace().GUID
+	apps, warnings, err := cmd.Actor.GetApplicationsByNamesAndSpace([]string{cmd.RequiredArgs.App}, spaceGUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	route, warnings, err := cmd.Actor.GetRouteByAttributesAndSpace(domain.GUID, cmd.Hostname, cmd.Path, spaceGUID)
+	fqdn := desiredFQDN(domain.Name, cmd.Hostname, cmd.Path)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
+			return err
+		}
+		cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
+			map[string]interface{}{
+				"FQDN":      fqdn,
+				"User":      user.Name,
+				"SpaceName": cmd.Config.TargetedSpace().Name,
+				"OrgName":   cmd.Config.TargetedOrganization().Name,
+			})
+		route, warnings, err = cmd.Actor.CreateRoute(
+			cmd.Config.TargetedOrganization().Name,
+			cmd.Config.TargetedSpace().Name,
+			domain.Name,
+			cmd.Hostname,
+			cmd.Path,
+		)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+		cmd.UI.DisplayOK()
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Mapping route {{.FQDN}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"FQDN":      fqdn,
+		"AppName":   cmd.RequiredArgs.App,
+		"User":      user.Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+	})
+	warnings, err = cmd.Actor.MapRoute(route.GUID, apps[0].GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayOK()
+
 	return nil
 }
+

@@ -152,3 +152,48 @@ func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
 
 	return fullRoutesList, warnings, err
 }
+
+func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error) {
+	type destinationProcess struct {
+		ProcessType string `json:"process_type"`
+	}
+
+	type destinationApp struct {
+		GUID    string              `json:"guid"`
+		Process *destinationProcess `json:"process,omitempty"`
+	}
+	type destination struct {
+		App destinationApp `json:"app"`
+	}
+
+	type body struct {
+		Destinations []destination `json:"destinations"`
+	}
+
+	requestBody := body{
+		Destinations: []destination{
+			{App: destinationApp{GUID: appGUID}},
+		},
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.MapRouteRequest,
+		URIParams: map[string]string{
+			"route_guid": routeGUID,
+		},
+		Body: bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}

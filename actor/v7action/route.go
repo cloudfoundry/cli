@@ -247,3 +247,38 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 
 	return allWarnings, err
 }
+
+func (actor Actor) GetRouteByAttributesAndSpace(domainGUID string, hostname string, path string, spaceGUID string) (Route, Warnings, error) {
+
+	if path != "" && string(path[0]) != "/" {
+		path = "/" + path
+	}
+
+	ccRoutes, ccWarnings, err := actor.CloudControllerClient.GetRoutes(
+		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+		ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
+		ccv3.Query{Key: ccv3.PathFilter, Values: []string{path}},
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
+
+	if err != nil {
+		return Route{}, Warnings(ccWarnings), err
+	}
+
+	if len(ccRoutes) < 1 {
+		return Route{}, Warnings(ccWarnings), actionerror.RouteNotFoundError{}
+	}
+
+	return Route{
+		GUID:       ccRoutes[0].GUID,
+		Host:       ccRoutes[0].Host,
+		Path:       ccRoutes[0].Path,
+		SpaceGUID:  ccRoutes[0].SpaceGUID,
+		DomainGUID: ccRoutes[0].DomainGUID,
+	}, Warnings(ccWarnings), nil
+}
+
+func (actor Actor) MapRoute(routeGUID string, appGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID)
+	return Warnings(warnings), err
+}

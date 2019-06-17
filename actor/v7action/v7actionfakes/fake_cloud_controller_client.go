@@ -2,11 +2,11 @@
 package v7actionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
-	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 type FakeCloudControllerClient struct {
@@ -864,6 +864,20 @@ type FakeCloudControllerClient struct {
 		result1 []ccv3.Stack
 		result2 ccv3.Warnings
 		result3 error
+	}
+	MapRouteStub        func(string, string) (ccv3.Warnings, error)
+	mapRouteMutex       sync.RWMutex
+	mapRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	mapRouteReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	mapRouteReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
 	}
 	PollJobStub        func(ccv3.JobURL) (ccv3.Warnings, error)
 	pollJobMutex       sync.RWMutex
@@ -5047,6 +5061,70 @@ func (fake *FakeCloudControllerClient) GetStacksReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) MapRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.mapRouteMutex.Lock()
+	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
+	fake.mapRouteArgsForCall = append(fake.mapRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("MapRoute", []interface{}{arg1, arg2})
+	fake.mapRouteMutex.Unlock()
+	if fake.MapRouteStub != nil {
+		return fake.MapRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.mapRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) MapRouteCallCount() int {
+	fake.mapRouteMutex.RLock()
+	defer fake.mapRouteMutex.RUnlock()
+	return len(fake.mapRouteArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) MapRouteCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.mapRouteMutex.Lock()
+	defer fake.mapRouteMutex.Unlock()
+	fake.MapRouteStub = stub
+}
+
+func (fake *FakeCloudControllerClient) MapRouteArgsForCall(i int) (string, string) {
+	fake.mapRouteMutex.RLock()
+	defer fake.mapRouteMutex.RUnlock()
+	argsForCall := fake.mapRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) MapRouteReturns(result1 ccv3.Warnings, result2 error) {
+	fake.mapRouteMutex.Lock()
+	defer fake.mapRouteMutex.Unlock()
+	fake.MapRouteStub = nil
+	fake.mapRouteReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) MapRouteReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.mapRouteMutex.Lock()
+	defer fake.mapRouteMutex.Unlock()
+	fake.MapRouteStub = nil
+	if fake.mapRouteReturnsOnCall == nil {
+		fake.mapRouteReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.mapRouteReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) PollJob(arg1 ccv3.JobURL) (ccv3.Warnings, error) {
 	fake.pollJobMutex.Lock()
 	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
@@ -6920,6 +6998,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpacesMutex.RUnlock()
 	fake.getStacksMutex.RLock()
 	defer fake.getStacksMutex.RUnlock()
+	fake.mapRouteMutex.RLock()
+	defer fake.mapRouteMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.resourceMatchMutex.RLock()

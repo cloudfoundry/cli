@@ -73,6 +73,15 @@ func (r Route) Create() {
 	}
 }
 
+// Create creates a route using the 'cf create-route' command.
+func (r Route) V7Create() {
+	if r.Port != 0 {
+		Eventually(CF("create-route", r.Domain, "--port", fmt.Sprint(r.Port))).Should(Exit(0))
+	} else {
+		Eventually(CF("create-route", r.Domain, "--hostname", r.Host, "--path", r.Path)).Should(Exit(0))
+	}
+}
+
 // Delete deletes a route using the 'cf delete-route' command.
 func (r Route) Delete() {
 	if r.Port != 0 {
