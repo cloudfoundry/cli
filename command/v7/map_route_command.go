@@ -114,4 +114,3 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 
 	return nil
 }
-
