@@ -88,6 +88,7 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 			cmd.UI.DisplayOK()
 			return nil
 		}
+		return err
 	}
 
 	warnings, err = cmd.Actor.DeleteDomain(domain)

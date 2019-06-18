@@ -96,15 +96,27 @@ var _ = Describe("delete-private-domain Command", func() {
 
 	When("the domain does not exist", func() {
 		BeforeEach(func() {
-			fakeActor.GetDomainByNameReturns(v7action.Domain{}, nil, actionerror.DomainNotFoundError{Name: "domain.com"})
+			fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, actionerror.DomainNotFoundError{Name: "domain.com"})
 		})
 
 		It("displays OK and returns with success", func() {
 			Expect(testUI.Out).To(Say("Domain some-domain.com does not exist"))
 			Expect(testUI.Out).To(Say("OK"))
+			Expect(testUI.Err).To(Say("get-domain-warnings"))
 			Expect(executeErr).ToNot(HaveOccurred())
 		})
 
+	})
+
+	When("the getting the domain errors", func() {
+		BeforeEach(func() {
+			fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
+		})
+
+		It("displays OK and returns with success", func() {
+			Expect(testUI.Err).To(Say("get-domain-warnings"))
+			Expect(executeErr).To(MatchError(errors.New("get-domain-error")))
+		})
 	})
 
 	When("the -f flag is NOT provided", func() {

@@ -1,13 +1,14 @@
 package v7
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"fmt"
 )
 
 //go:generate counterfeiter . DeletePrivateDomainActor
@@ -65,6 +66,7 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 			cmd.UI.DisplayOK()
 			return nil
 		}
+		return err
 	}
 
 	if domain.Shared() {

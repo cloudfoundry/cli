@@ -1,8 +1,9 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"errors"
+
+	"code.cloudfoundry.org/cli/actor/v7action"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -99,9 +100,9 @@ var _ = Describe("delete-shared-domain Command", func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
 
-				fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning"}, nil)
+				fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning1"}, nil)
 
-				fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning"}, nil)
+				fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning2"}, nil)
 			})
 
 			It("delegates to the Actor", func() {
@@ -112,10 +113,28 @@ var _ = Describe("delete-shared-domain Command", func() {
 			It("deletes the shared domain", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Err).To(Say("some-warning"))
+				Expect(testUI.Err).To(Say("some-warning1"))
+				Expect(testUI.Err).To(Say("some-warning2"))
 				Expect(testUI.Out).To(Say(`Deleting domain some-domain.com as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).NotTo(Say("Domain some-domain does not exist"))
+			})
+
+			When("GetDomainByName() errors", func() {
+				BeforeEach(func() {
+					fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning"}, errors.New("get-domain-by-name-errors"))
+				})
+
+				It("returns an error", func() {
+					Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
+					actualDomainName := fakeActor.GetDomainByNameArgsForCall(0)
+					Expect(actualDomainName).To(Equal(domain))
+
+					Expect(fakeActor.DeleteDomainCallCount()).To(Equal(0))
+
+					Expect(testUI.Err).To(Say("some-warning"))
+					Expect(executeErr).To(MatchError(errors.New("get-domain-by-name-errors")))
+				})
 			})
 		})
 
