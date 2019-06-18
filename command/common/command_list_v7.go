@@ -20,7 +20,6 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	V3ApplyManifest v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
 	V3CancelZdtPush v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
 	V3ZdtRestart    v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
@@ -31,6 +30,7 @@ type commandList struct {
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	App                                v7.AppCommand                                `command:"app" description:"Display health and status for an app"`
+	ApplyManifest                      v7.ApplyManifestCommand                      `command:"apply-manifest" description:"Applies manifest properties to a space"`
 	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`

@@ -18,7 +18,7 @@ var CommonHelpCategoryList = []HelpCategory{
 			{"push", "logs", "set-env"},
 			{"start", "ssh", "create-app-manifest"},
 			{"stop", "app", "delete"},
-			{"restart", "env", ""},
+			{"restart", "env", "apply-manifest"},
 			{"restage", "scale", ""},
 		},
 	},
@@ -51,6 +51,7 @@ var CommonHelpCategoryList = []HelpCategory{
 		CommandList: [][]string{
 			{"spaces", "create-space", "set-space-role"},
 			{"space-users", "delete-space", "unset-space-role"},
+			{"apply-manifest", "", ""},
 		},
 	},
 

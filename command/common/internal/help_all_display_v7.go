@@ -13,7 +13,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS:",
 		CommandList: [][]string{
-			{"apps", "app", "create-app"},
+			{"apps", "app", "create-app", "apply-manifest"},
 			{"push", "scale", "delete", "rename"},
 			{"start", "stop", "restart", "stage", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
@@ -49,7 +49,7 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "SPACES:",
 		CommandList: [][]string{
 			{"spaces", "space"},
-			{"create-space", "delete-space", "rename-space"},
+			{"create-space", "delete-space", "rename-space", "apply-manifest"},
 			{"allow-space-ssh", "disallow-space-ssh", "space-ssh-allowed"},
 		},
 	},
@@ -166,7 +166,7 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS (experimental):",
 		CommandList: [][]string{
-			{"v3-apply-manifest"},
+			{},
 		},
 	},
 }
