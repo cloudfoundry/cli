@@ -318,11 +318,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c5e8f29529638550780382db6e0ee0cfd13c728c080ded1229126e31dcd1965e"
+  digest = "1:70ef8268170621826f8c111ac1674afe75136f526f449453b4a6631c6dba1946"
   name = "github.com/mattn/go-runewidth"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "97311d9f7767e3d6f422ea06661bc2c7a19e8a5d"
+  revision = "703b5e6b11ae25aeb2af9ebb5d5fdf8fa2575211"
 
 [[projects]]
   branch = "master"
