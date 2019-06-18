@@ -17,11 +17,6 @@ resources:
     - ci
     - README.md
     - .github
-    - prevent_extra_args_v7.go
-    - actor/v7action
-    - actor/v7pushaction
-    - command/v7
-    - integration/v7
 
 - name: cli-i18n
   type: git
