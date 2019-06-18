@@ -120,6 +120,16 @@ func NewDomainName(prefix ...string) string {
 	return fmt.Sprintf("integration%s.com", PrefixedRandomName(""))
 }
 
+// NewHostName provides a random name prefixed with HOST
+func NewHostName() string {
+	return PrefixedRandomName("HOST")
+}
+
+// NewPath provides a random path prefixed with /PATH
+func NewPath() string {
+	return PrefixedRandomName("/PATH")
+}
+
 // PrefixedRandomName provides a random name with structure "namePrefix-randomstring"
 func PrefixedRandomName(namePrefix string) string {
 	return namePrefix + "-" + RandomName()
