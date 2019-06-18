@@ -60,14 +60,14 @@ var _ = Describe("unmap-route command", func() {
 			domainName string
 			userName   string
 			appName    = helpers.NewAppName()
-			route helpers.Route
+			route      helpers.Route
 		)
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
-			hostName   = helpers.NewHostName()
-			path       = helpers.NewPath()
+			hostName = helpers.NewHostName()
+			path = helpers.NewPath()
 			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
 			domainName = helpers.DefaultSharedDomain()
