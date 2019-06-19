@@ -281,11 +281,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b2e830172ec6af4ca4b25e816796f25ebc0dd668632bc6fa5ee1b90d15bd0c96"
+  digest = "1:28e7c24ad20bfc7a42f4410ae42b60a5b90a866352e5a25a2f0edb84836e4102"
   name = "github.com/lunixbochs/vtclean"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "d14193dfc626125c831501c1c42340b4248e1f5a"
+  revision = "88cfb0c2efe8ed7b0ccf0af83db39359829027bb"
 
 [[projects]]
   branch = "master"
