@@ -29,7 +29,7 @@ var _ = Describe("routes Command", func() {
 		binaryName      string
 	)
 
-	const tableHeaders = `space\s+host\s+domain\s+path`
+	const tableHeaders = `space\s+host\s+domain\s+path\s+apps`
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
@@ -111,7 +111,11 @@ var _ = Describe("routes Command", func() {
 			})
 
 			When("GetRoutesBySpace returns some routes", func() {
-				var routes []v7action.Route
+				var (
+					routes       []v7action.Route
+					apps         []v7action.Application
+					destinations []v7action.RouteDestination
+				)
 
 				BeforeEach(func() {
 					routes = []v7action.Route{
@@ -119,10 +123,36 @@ var _ = Describe("routes Command", func() {
 						{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
 						{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"},
 					}
+					apps = []v7action.Application{
+						{Name: "app1", GUID: "app-guid-1"},
+						{Name: "app2", GUID: "app-guid-2"},
+					}
+					destinations = []v7action.RouteDestination{
+						{GUID: "dst-guid-1", App: v7action.RouteDestinationApp{GUID: "app-guid-1"}},
+						{GUID: "dst-guid-2", App: v7action.RouteDestinationApp{GUID: "app-guid-2"}},
+					}
 
 					fakeActor.GetRoutesBySpaceReturns(
 						routes,
-						v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
+						v7action.Warnings{"actor-warning-1"},
+						nil,
+					)
+
+					fakeActor.GetApplicationsByGUIDsReturns(
+						apps,
+						v7action.Warnings{"actor-warning-2", "actor-warning-3"},
+						nil,
+					)
+
+					fakeActor.GetRouteDestinationsReturns(
+						[]v7action.RouteDestination{},
+						v7action.Warnings{"actor-warning-4"},
+						nil,
+					)
+
+					fakeActor.GetRouteDestinationsReturnsOnCall(0,
+						destinations,
+						v7action.Warnings{"actor-warning-4"},
 						nil,
 					)
 
@@ -150,9 +180,9 @@ var _ = Describe("routes Command", func() {
 				It("prints the list of routes in alphabetical order", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say(tableHeaders))
-					Expect(testUI.Out).To(Say(`space-1\s+domain1`))
+					Expect(testUI.Out).To(Say(`space-1\s+domain1\s+`))
 					Expect(testUI.Out).To(Say(`space-2\s+host-3\s+domain2\s+\/path\/2`))
-					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3`))
+					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1,app2`))
 				})
 
 				It("prints the flavor text", func() {

@@ -46,6 +46,7 @@ const (
 	GetPackagesRequest                                          = "GetPackages"
 	GetProcessRequest                                           = "GetProcess"
 	GetProcessStatsRequest                                      = "GetProcessStats"
+	GetRouteDestinationsRequest                                 = "GetRouteDestinations"
 	GetRoutesRequest                                            = "GetRoutes"
 	GetServiceBrokersRequest                                    = "GetServiceBrokers"
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
@@ -158,6 +159,7 @@ var APIRoutes = []Route{
 	{Resource: RoutesResource, Path: "/", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodPost, Name: PostRouteRequest},
 	{Resource: RoutesResource, Path: "/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
+	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodGet, Name: GetRouteDestinationsRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodPost, Name: MapRouteRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},

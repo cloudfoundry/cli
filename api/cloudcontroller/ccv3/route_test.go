@@ -539,4 +539,76 @@ var _ = Describe("Route", func() {
 			})
 		})
 	})
+
+	Describe("GetRouteDestinations", func() {
+		var (
+			routeGUID    = "some-route-guid"
+			destinations []RouteDestination
+			warnings     Warnings
+			executeErr   error
+		)
+
+		JustBeforeEach(func() {
+			destinations, warnings, executeErr = client.GetRouteDestinations(routeGUID)
+		})
+
+		When("the request succeeds", func() {
+			var (
+				response string
+			)
+
+			BeforeEach(func() {
+				response = `
+				{
+					"destinations": [
+						{
+							"guid": "destination-1-guid",
+							"app": {
+								"guid": "app-1-guid",
+								"process": {
+									"type": "web"
+								}
+							}
+						},
+						{
+							"guid": "destination-2-guid",
+							"app": {
+								"guid": "app-2-guid",
+								"process": {
+									"type": "worker"
+								}
+							}
+						}
+					]
+				}`
+			})
+
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/routes/some-route-guid/destinations"),
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+				})
+
+				It("returns destinations and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1"))
+
+					Expect(destinations).To(Equal([]RouteDestination{
+						{
+							GUID: "destination-1-guid",
+							App:  RouteDestinationApp{GUID: "app-1-guid", Process: struct{ Type string }{Type: "web"}},
+						},
+						{
+							GUID: "destination-2-guid",
+							App:  RouteDestinationApp{GUID: "app-2-guid", Process: struct{ Type string }{Type: "worker"}},
+						},
+					}))
+				})
+			})
+		})
+	})
 })

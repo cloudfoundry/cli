@@ -42,6 +42,8 @@ var _ = Describe("routes command", func() {
 			orgName   string
 			spaceName string
 			userName  string
+			appName1  string
+			appName2  string
 		)
 
 		BeforeEach(func() {
@@ -70,10 +72,16 @@ var _ = Describe("routes command", func() {
 				domainName = helpers.NewDomainName()
 
 				domain = helpers.NewDomain(orgName, domainName)
+				appName1 = helpers.NewAppName()
+				Eventually(helpers.CF("create-app", appName1)).Should(Exit(0))
 				domain.CreatePrivate()
-				Eventually(helpers.CF("create-route", domainName, "--hostname", "route1")).Should(Exit(0))
+				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1")).Should(Exit(0))
+
 				helpers.SetupCF(orgName, otherSpaceName)
-				Eventually(helpers.CF("create-route", domainName, "--hostname", "route2")).Should(Exit(0))
+				appName2 = helpers.NewAppName()
+				Eventually(helpers.CF("create-app", appName2)).Should(Exit(0))
+				Eventually(helpers.CF("map-route", appName2, domainName, "--hostname", "route2", "--path", "dodo")).Should(Exit(0))
+
 				helpers.SetupCF(orgName, spaceName)
 			})
 
@@ -85,7 +93,8 @@ var _ = Describe("routes command", func() {
 			It("lists all the routes", func() {
 				session := helpers.CF("routes")
 				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
+				Eventually(session).Should(Say(`space\s+host\s+domain\s+path\s+apps`))
+				Eventually(session).Should(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -93,8 +102,10 @@ var _ = Describe("routes command", func() {
 				It("lists all the routes in the org", func() {
 					session := helpers.CF("routes", "--orglevel")
 					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
-					Eventually(session).Should(Say(`%s\s+route1\s+%s`, spaceName, domainName))
-					Eventually(session).Should(Say(`%s\s+route2\s+%s`, otherSpaceName, domainName))
+					Eventually(session).Should(Say(`space\s+host\s+domain\s+path\s+apps`))
+
+					Eventually(session).Should(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
+					Eventually(session).Should(Say(`%s\s+route2\s+%s\s+\/dodo\s+%s`, otherSpaceName, domainName, appName2))
 					Eventually(session).Should(Exit(0))
 				})
 			})

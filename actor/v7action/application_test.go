@@ -98,6 +98,87 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
+	Describe("GetApplicationsByGUIDs", func() {
+		When("all of the requested apps exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "some-app-name",
+							GUID: "some-app-guid",
+						},
+						{
+							Name: "other-app-name",
+							GUID: "other-app-guid",
+						},
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns the applications and warnings", func() {
+				apps, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid", "other-app-guid"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(apps).To(ConsistOf(
+					Application{
+						Name: "some-app-name",
+						GUID: "some-app-guid",
+					},
+					Application{
+						Name: "other-app-name",
+						GUID: "other-app-guid",
+					},
+				))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"some-app-guid", "other-app-guid"}},
+				))
+			})
+		})
+
+		When("at least one of the requested apps does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "some-app-name",
+							GUID: "some-app-guid",
+						},
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns an ApplicationNotFoundError and the warnings", func() {
+				_, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid", "non-existent-app-guid"})
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(err).To(MatchError(actionerror.ApplicationsNotFoundError{}))
+			})
+		})
+
+		When("the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"some-warning"},
+					expectedError)
+			})
+
+			It("returns the warnings and the error", func() {
+				_, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid"})
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+	})
+
 	Describe("GetApplicationsByNameAndSpace", func() {
 		When("all of the requested apps exist", func() {
 			BeforeEach(func() {

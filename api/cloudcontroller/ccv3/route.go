@@ -86,6 +86,18 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type RouteDestinationApp struct {
+	GUID    string
+	Process struct {
+		Type string
+	}
+}
+
+type RouteDestination struct {
+	GUID string
+	App  RouteDestinationApp
+}
+
 func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 	bodyBytes, err := json.Marshal(route)
 	if err != nil {
@@ -126,6 +138,28 @@ func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
+func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRouteDestinationsRequest,
+		URIParams:   internal.Params{"route_guid": routeGUID},
+	})
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var destinationResponse struct {
+		Destinations []RouteDestination `json:"destinations"`
+	}
+
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &destinationResponse,
+	}
+
+	err = client.connection.Make(request, &response)
+	return destinationResponse.Destinations, response.Warnings, err
 }
 
 func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {

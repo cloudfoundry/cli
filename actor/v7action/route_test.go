@@ -744,4 +744,59 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetRouteDestinations", func() {
+		var (
+			routeGUID    string
+			destinations []RouteDestination
+
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			destinations, warnings, executeErr = actor.GetRouteDestinations(routeGUID)
+		})
+
+		BeforeEach(func() {
+			routeGUID = "route-guid"
+		})
+
+		When("the cloud controller client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteDestinationsReturns(
+					nil,
+					ccv3.Warnings{"get-destinations-warning"},
+					errors.New("get-destinations-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("get-destinations-error")))
+				Expect(warnings).To(ConsistOf("get-destinations-warning"))
+			})
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteDestinationsReturns(
+					[]ccv3.RouteDestination{
+						{GUID: "destination-guid-1", App: ccv3.RouteDestinationApp{GUID: "app-guid-1"}},
+						{GUID: "destination-guid-2", App: ccv3.RouteDestinationApp{GUID: "app-guid-2"}},
+					},
+					ccv3.Warnings{"get-destinations-warning"},
+					nil,
+				)
+			})
+
+			It("returns the destinations and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-destinations-warning"))
+				Expect(destinations).To(ConsistOf(
+					RouteDestination{GUID: "destination-guid-1", App: RouteDestinationApp{GUID: "app-guid-1"}},
+					RouteDestination{GUID: "destination-guid-2", App: RouteDestinationApp{GUID: "app-guid-2"}},
+				))
+			})
+		})
+	})
 })

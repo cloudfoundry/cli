@@ -49,6 +49,27 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string
 	return allWarnings, err
 }
 
+func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]Application, Warnings, error) {
+	apps, warnings, err := actor.CloudControllerClient.GetApplications(
+		ccv3.Query{Key: ccv3.GUIDFilter, Values: appGUIDs},
+	)
+
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	if len(apps) < len(appGUIDs) {
+		return nil, Warnings(warnings), actionerror.ApplicationsNotFoundError{}
+	}
+
+	actorApps := []Application{}
+	for _, a := range apps {
+		actorApps = append(actorApps, actor.convertCCToActorApplication(a))
+	}
+
+	return actorApps, Warnings(warnings), nil
+}
+
 func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]Application, Warnings, error) {
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.NameFilter, Values: appNames},

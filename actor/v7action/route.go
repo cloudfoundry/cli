@@ -6,6 +6,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
+type RouteDestination struct {
+	GUID string
+	App  RouteDestinationApp
+}
+type RouteDestinationApp ccv3.RouteDestinationApp
+
 type Route struct {
 	GUID       string
 	SpaceGUID  string
@@ -63,6 +69,20 @@ func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path st
 		SpaceName:  spaceName,
 		DomainName: domainName,
 	}, allWarnings, err
+}
+
+func (actor Actor) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {
+	destinations, warnings, err := actor.CloudControllerClient.GetRouteDestinations(routeGUID)
+
+	actorDestinations := []RouteDestination{}
+	for _, dst := range destinations {
+		actorDestinations = append(actorDestinations, RouteDestination{
+			GUID: dst.GUID,
+			App:  RouteDestinationApp(dst.App),
+		})
+	}
+
+	return actorDestinations, Warnings(warnings), err
 }
 
 func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error) {
