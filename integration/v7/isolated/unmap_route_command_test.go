@@ -40,13 +40,13 @@ var _ = Describe("unmap-route command", func() {
 		})
 	})
 
-	PWhen("the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "map-route", "app-name", "domain-name")
 		})
 	})
 
-	PWhen("The environment is set up correctly", func() {
+	When("The environment is set up correctly", func() {
 		var (
 			orgName    string
 			spaceName  string
@@ -73,8 +73,6 @@ var _ = Describe("unmap-route command", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "push", appName)
 				Eventually(session).Should(Exit(0))
-				session = helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
-				Eventually(session).Should(Exit(0))
 			})
 		})
 
@@ -83,6 +81,11 @@ var _ = Describe("unmap-route command", func() {
 		})
 
 		When("the route exists and is mapped to the app", func() {
+			BeforeEach(func() {
+				session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
+				Eventually(session).Should(Exit(0))
+			})
+
 			It("unmaps the route from the app", func() {
 				session := helpers.CF("unmap-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
 
@@ -92,10 +95,21 @@ var _ = Describe("unmap-route command", func() {
 			})
 		})
 
-		When("the route doesnt exist", func() {
-			It("creates the route and maps it to an app", func() {
-				session := helpers.CF("unmap-route", appName, domainName, "--hostname", "test", "--path", "route")
+		When("the route exists but is not mapped to the app", func() {
+			It("prints a message and exits with status 0", func() {
+				session := helpers.CF("unmap-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
 
+				Eventually(session).Should(Say("Route to be unmapped is not currently mapped to the application."))
+				Eventually(session).Should(Say(`OK`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the route doesnt exist", func() {
+			It("fails with a helpful message", func() {
+				session := helpers.CF("unmap-route", appName, domainName, "--hostname", "test", "--path", "does-not-exist")
+
+				Eventually(session.Err).Should(Say(`Route with host 'test', domain '%s', and path '/does-not-exist' not found.`, domainName))
 				Eventually(session).Should(Say(`FAILED`))
 				Eventually(session).Should(Exit(1))
 			})

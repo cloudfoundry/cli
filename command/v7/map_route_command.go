@@ -13,7 +13,7 @@ import (
 
 type MapRouteActor interface {
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
-	GetRouteByAttributes(domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
+	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
 	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
 	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
@@ -70,7 +70,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.GUID, cmd.Hostname, cmd.Path)
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, cmd.Path)
 	fqdn := desiredFQDN(domain.Name, cmd.Hostname, cmd.Path)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

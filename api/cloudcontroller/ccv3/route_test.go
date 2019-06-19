@@ -611,4 +611,84 @@ var _ = Describe("Route", func() {
 			})
 		})
 	})
+
+	Describe("UnmapRoute", func() {
+		var (
+			routeGUID       string
+			destinationGUID string
+			warnings        Warnings
+			executeErr      error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.UnmapRoute(routeGUID, destinationGUID)
+		})
+
+		When("route exists", func() {
+			routeGUID = "route-guid"
+			destinationGUID = "destination-guid"
+
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/routes/route-guid/destinations/destination-guid"),
+						RespondWith(http.StatusNoContent, nil, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+						}),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Isolation segment not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/routes/route-guid/destinations/destination-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+						}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

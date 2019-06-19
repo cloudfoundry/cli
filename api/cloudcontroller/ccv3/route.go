@@ -231,3 +231,21 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 
 	return response.Warnings, err
 }
+
+func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.UnmapRouteRequest,
+		URIParams: map[string]string{
+			"route_guid":       routeGUID,
+			"destination_guid": destinationGUID,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}

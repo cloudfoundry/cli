@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type RouteDestination struct {
@@ -83,6 +84,25 @@ func (actor Actor) GetRouteDestinations(routeGUID string) ([]RouteDestination, W
 	}
 
 	return actorDestinations, Warnings(warnings), err
+}
+
+func (actor Actor) GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (RouteDestination, Warnings, error) {
+	allDestinations, warnings, err := actor.GetRouteDestinations(routeGUID)
+	if err != nil {
+		return RouteDestination{}, warnings, err
+	}
+
+	for _, destination := range allDestinations {
+		if destination.App.GUID == appGUID && destination.App.Process.Type == constant.ProcessTypeWeb {
+			return destination, warnings, nil
+		}
+	}
+
+	return RouteDestination{}, warnings, actionerror.RouteDestinationNotFoundError{
+		AppGUID:     appGUID,
+		ProcessType: constant.ProcessTypeWeb,
+		RouteGUID:   routeGUID,
+	}
 }
 
 func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error) {
@@ -268,7 +288,7 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 	return allWarnings, err
 }
 
-func (actor Actor) GetRouteByAttributes(domainGUID string, hostname string, path string) (Route, Warnings, error) {
+func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (Route, Warnings, error) {
 	if path != "" && string(path[0]) != "/" {
 		path = "/" + path
 	}
@@ -284,7 +304,12 @@ func (actor Actor) GetRouteByAttributes(domainGUID string, hostname string, path
 	}
 
 	if len(ccRoutes) < 1 {
-		return Route{}, Warnings(ccWarnings), actionerror.RouteNotFoundError{}
+		return Route{}, Warnings(ccWarnings), actionerror.RouteNotFoundError{
+			DomainName: domainName,
+			DomainGUID: domainGUID,
+			Host:       hostname,
+			Path:       path,
+		}
 	}
 
 	return Route{
@@ -298,5 +323,10 @@ func (actor Actor) GetRouteByAttributes(domainGUID string, hostname string, path
 
 func (actor Actor) MapRoute(routeGUID string, appGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.MapRoute(routeGUID, appGUID)
+	return Warnings(warnings), err
+}
+
+func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.UnmapRoute(routeGUID, destinationGUID)
 	return Warnings(warnings), err
 }

@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
@@ -11,6 +12,11 @@ import (
 //go:generate counterfeiter . UnmapRouteActor
 
 type UnmapRouteActor interface {
+	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
+	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
+	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
+	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
+	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
 }
 
 type UnmapRouteCommand struct {
@@ -41,5 +47,63 @@ func (cmd *UnmapRouteCommand) Setup(config command.Config, ui command.UI) error 
 }
 
 func (cmd UnmapRouteCommand) Execute(args []string) error {
+	err := cmd.SharedActor.CheckTarget(true, true)
+	if err != nil {
+		return err
+	}
+
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	domain, warnings, err := cmd.Actor.GetDomainByName(cmd.RequiredArgs.Domain)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	spaceGUID := cmd.Config.TargetedSpace().GUID
+	apps, warnings, err := cmd.Actor.GetApplicationsByNamesAndSpace([]string{cmd.RequiredArgs.App}, spaceGUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, cmd.Path)
+	fqdn := desiredFQDN(domain.Name, cmd.Hostname, cmd.Path)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Removing route {{.FQDN}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"FQDN":      fqdn,
+		"AppName":   cmd.RequiredArgs.App,
+		"User":      user.Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+	})
+
+	destination, warnings, err := cmd.Actor.GetRouteDestinationByAppGUID(route.GUID, apps[0].GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		if _, ok := err.(actionerror.RouteDestinationNotFoundError); ok {
+			cmd.UI.DisplayText("Route to be unmapped is not currently mapped to the application.")
+			cmd.UI.DisplayOK()
+			return nil
+		}
+
+		return err
+	}
+
+	warnings, err = cmd.Actor.UnmapRoute(route.GUID, destination.GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayOK()
+
 	return nil
 }

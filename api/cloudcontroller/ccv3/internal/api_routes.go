@@ -89,6 +89,7 @@ const (
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
+	UnmapRouteRequest                                           = "UnmapRoute"
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
@@ -161,6 +162,7 @@ var APIRoutes = []Route{
 	{Resource: RoutesResource, Path: "/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodGet, Name: GetRouteDestinationsRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodPost, Name: MapRouteRequest},
+	{Resource: RoutesResource, Path: "/:route_guid/destinations/:destination_guid", Method: http.MethodDelete, Name: UnmapRouteRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},
 	{Resource: ServiceInstancesResource, Path: "/", Method: http.MethodGet, Name: GetServiceInstancesRequest},
