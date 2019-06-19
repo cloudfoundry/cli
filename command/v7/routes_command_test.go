@@ -182,7 +182,7 @@ var _ = Describe("routes Command", func() {
 					Expect(testUI.Out).To(Say(tableHeaders))
 					Expect(testUI.Out).To(Say(`space-1\s+domain1\s+`))
 					Expect(testUI.Out).To(Say(`space-2\s+host-3\s+domain2\s+\/path\/2`))
-					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1,app2`))
+					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1, app2`))
 				})
 
 				It("prints the flavor text", func() {

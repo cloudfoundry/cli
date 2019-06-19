@@ -148,5 +148,5 @@ func convertAppsToAppNames(apps []v7action.Application) string {
 	for _, app := range apps {
 		appNames = append(appNames, app.Name)
 	}
-	return strings.Join(appNames, ",")
+	return strings.Join(appNames, ", ")
 }
