@@ -84,4 +84,3 @@ func (matcher *CommandInCategoryMatcher) NegatedFailureMessage(actual interface{
 	panic("Not implemented. Are you sure you want to negate this test?")
 	return "Not implemented. Are you sure you want to negate this test?"
 }
-
