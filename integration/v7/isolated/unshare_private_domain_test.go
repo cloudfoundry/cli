@@ -39,6 +39,7 @@ var _ = Describe("Unshare Private Domain", func() {
 				session := helpers.CF("unshare-private-domain", sharedToOrgName, domainName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})
@@ -68,6 +69,7 @@ var _ = Describe("Unshare Private Domain", func() {
 				helpers.TargetOrg(sharedToOrgName)
 				session = helpers.CF("domains")
 				Consistently(session).Should(Not(Say("%s", domainName)))
+				Eventually(session).Should(Exit(0))
 			})
 
 		})
@@ -96,6 +98,7 @@ var _ = Describe("Unshare Private Domain", func() {
 				helpers.TargetOrg(sharedToOrgName)
 				session = helpers.CF("domains")
 				Eventually(session).Should(Say("%s", domainName))
+				Eventually(session).Should(Exit(0))
 			})
 
 		})
