@@ -59,20 +59,19 @@ type FakeMapRouteActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRouteByAttributesAndSpaceStub        func(string, string, string, string) (v7action.Route, v7action.Warnings, error)
-	getRouteByAttributesAndSpaceMutex       sync.RWMutex
-	getRouteByAttributesAndSpaceArgsForCall []struct {
+	GetRouteByAttributesStub        func(string, string, string) (v7action.Route, v7action.Warnings, error)
+	getRouteByAttributesMutex       sync.RWMutex
+	getRouteByAttributesArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
-		arg4 string
 	}
-	getRouteByAttributesAndSpaceReturns struct {
+	getRouteByAttributesReturns struct {
 		result1 v7action.Route
 		result2 v7action.Warnings
 		result3 error
 	}
-	getRouteByAttributesAndSpaceReturnsOnCall map[int]struct {
+	getRouteByAttributesReturnsOnCall map[int]struct {
 		result1 v7action.Route
 		result2 v7action.Warnings
 		result3 error
@@ -303,69 +302,68 @@ func (fake *FakeMapRouteActor) GetDomainByNameReturnsOnCall(i int, result1 v7act
 	}{result1, result2, result3}
 }
 
-func (fake *FakeMapRouteActor) GetRouteByAttributesAndSpace(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Route, v7action.Warnings, error) {
-	fake.getRouteByAttributesAndSpaceMutex.Lock()
-	ret, specificReturn := fake.getRouteByAttributesAndSpaceReturnsOnCall[len(fake.getRouteByAttributesAndSpaceArgsForCall)]
-	fake.getRouteByAttributesAndSpaceArgsForCall = append(fake.getRouteByAttributesAndSpaceArgsForCall, struct {
+func (fake *FakeMapRouteActor) GetRouteByAttributes(arg1 string, arg2 string, arg3 string) (v7action.Route, v7action.Warnings, error) {
+	fake.getRouteByAttributesMutex.Lock()
+	ret, specificReturn := fake.getRouteByAttributesReturnsOnCall[len(fake.getRouteByAttributesArgsForCall)]
+	fake.getRouteByAttributesArgsForCall = append(fake.getRouteByAttributesArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("GetRouteByAttributesAndSpace", []interface{}{arg1, arg2, arg3, arg4})
-	fake.getRouteByAttributesAndSpaceMutex.Unlock()
-	if fake.GetRouteByAttributesAndSpaceStub != nil {
-		return fake.GetRouteByAttributesAndSpaceStub(arg1, arg2, arg3, arg4)
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3})
+	fake.getRouteByAttributesMutex.Unlock()
+	if fake.GetRouteByAttributesStub != nil {
+		return fake.GetRouteByAttributesStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getRouteByAttributesAndSpaceReturns
+	fakeReturns := fake.getRouteByAttributesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeMapRouteActor) GetRouteByAttributesAndSpaceCallCount() int {
-	fake.getRouteByAttributesAndSpaceMutex.RLock()
-	defer fake.getRouteByAttributesAndSpaceMutex.RUnlock()
-	return len(fake.getRouteByAttributesAndSpaceArgsForCall)
+func (fake *FakeMapRouteActor) GetRouteByAttributesCallCount() int {
+	fake.getRouteByAttributesMutex.RLock()
+	defer fake.getRouteByAttributesMutex.RUnlock()
+	return len(fake.getRouteByAttributesArgsForCall)
 }
 
-func (fake *FakeMapRouteActor) GetRouteByAttributesAndSpaceCalls(stub func(string, string, string, string) (v7action.Route, v7action.Warnings, error)) {
-	fake.getRouteByAttributesAndSpaceMutex.Lock()
-	defer fake.getRouteByAttributesAndSpaceMutex.Unlock()
-	fake.GetRouteByAttributesAndSpaceStub = stub
+func (fake *FakeMapRouteActor) GetRouteByAttributesCalls(stub func(string, string, string) (v7action.Route, v7action.Warnings, error)) {
+	fake.getRouteByAttributesMutex.Lock()
+	defer fake.getRouteByAttributesMutex.Unlock()
+	fake.GetRouteByAttributesStub = stub
 }
 
-func (fake *FakeMapRouteActor) GetRouteByAttributesAndSpaceArgsForCall(i int) (string, string, string, string) {
-	fake.getRouteByAttributesAndSpaceMutex.RLock()
-	defer fake.getRouteByAttributesAndSpaceMutex.RUnlock()
-	argsForCall := fake.getRouteByAttributesAndSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+func (fake *FakeMapRouteActor) GetRouteByAttributesArgsForCall(i int) (string, string, string) {
+	fake.getRouteByAttributesMutex.RLock()
+	defer fake.getRouteByAttributesMutex.RUnlock()
+	argsForCall := fake.getRouteByAttributesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeMapRouteActor) GetRouteByAttributesAndSpaceReturns(result1 v7action.Route, result2 v7action.Warnings, result3 error) {
-	fake.getRouteByAttributesAndSpaceMutex.Lock()
-	defer fake.getRouteByAttributesAndSpaceMutex.Unlock()
-	fake.GetRouteByAttributesAndSpaceStub = nil
-	fake.getRouteByAttributesAndSpaceReturns = struct {
+func (fake *FakeMapRouteActor) GetRouteByAttributesReturns(result1 v7action.Route, result2 v7action.Warnings, result3 error) {
+	fake.getRouteByAttributesMutex.Lock()
+	defer fake.getRouteByAttributesMutex.Unlock()
+	fake.GetRouteByAttributesStub = nil
+	fake.getRouteByAttributesReturns = struct {
 		result1 v7action.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeMapRouteActor) GetRouteByAttributesAndSpaceReturnsOnCall(i int, result1 v7action.Route, result2 v7action.Warnings, result3 error) {
-	fake.getRouteByAttributesAndSpaceMutex.Lock()
-	defer fake.getRouteByAttributesAndSpaceMutex.Unlock()
-	fake.GetRouteByAttributesAndSpaceStub = nil
-	if fake.getRouteByAttributesAndSpaceReturnsOnCall == nil {
-		fake.getRouteByAttributesAndSpaceReturnsOnCall = make(map[int]struct {
+func (fake *FakeMapRouteActor) GetRouteByAttributesReturnsOnCall(i int, result1 v7action.Route, result2 v7action.Warnings, result3 error) {
+	fake.getRouteByAttributesMutex.Lock()
+	defer fake.getRouteByAttributesMutex.Unlock()
+	fake.GetRouteByAttributesStub = nil
+	if fake.getRouteByAttributesReturnsOnCall == nil {
+		fake.getRouteByAttributesReturnsOnCall = make(map[int]struct {
 			result1 v7action.Route
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getRouteByAttributesAndSpaceReturnsOnCall[i] = struct {
+	fake.getRouteByAttributesReturnsOnCall[i] = struct {
 		result1 v7action.Route
 		result2 v7action.Warnings
 		result3 error
@@ -445,8 +443,8 @@ func (fake *FakeMapRouteActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
 	fake.getDomainByNameMutex.RLock()
 	defer fake.getDomainByNameMutex.RUnlock()
-	fake.getRouteByAttributesAndSpaceMutex.RLock()
-	defer fake.getRouteByAttributesAndSpaceMutex.RUnlock()
+	fake.getRouteByAttributesMutex.RLock()
+	defer fake.getRouteByAttributesMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

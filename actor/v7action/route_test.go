@@ -615,12 +615,11 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
-	Describe("GetRouteByAttributesAndSpace", func() {
+	Describe("GetRouteByAttributes", func() {
 		var (
 			domainGUID = "domain-guid"
 			hostname   = "hostname"
 			path       = "path"
-			spaceGUID  = "space-guid"
 
 			executeErr error
 			warnings   Warnings
@@ -628,7 +627,7 @@ var _ = Describe("Route Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			route, warnings, executeErr = actor.GetRouteByAttributesAndSpace(domainGUID, hostname, path, spaceGUID)
+			route, warnings, executeErr = actor.GetRouteByAttributes(domainGUID, hostname, path)
 		})
 
 		When("The cc client errors", func() {
@@ -643,7 +642,6 @@ var _ = Describe("Route Actions", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
 					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
-					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -655,7 +653,6 @@ var _ = Describe("Route Actions", func() {
 		When("the cc client succeeds and a route is found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRoutesReturns([]ccv3.Route{{
-					SpaceGUID:  spaceGUID,
 					DomainGUID: domainGUID,
 					Host:       hostname,
 					Path:       path,
@@ -669,13 +666,11 @@ var _ = Describe("Route Actions", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
 					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
-					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(route).To(Equal(Route{
-					SpaceGUID:  spaceGUID,
 					DomainGUID: domainGUID,
 					Host:       hostname,
 					Path:       path,
@@ -695,7 +690,6 @@ var _ = Describe("Route Actions", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
 					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
-					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))

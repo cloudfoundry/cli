@@ -268,8 +268,7 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 	return allWarnings, err
 }
 
-func (actor Actor) GetRouteByAttributesAndSpace(domainGUID string, hostname string, path string, spaceGUID string) (Route, Warnings, error) {
-
+func (actor Actor) GetRouteByAttributes(domainGUID string, hostname string, path string) (Route, Warnings, error) {
 	if path != "" && string(path[0]) != "/" {
 		path = "/" + path
 	}
@@ -278,7 +277,6 @@ func (actor Actor) GetRouteByAttributesAndSpace(domainGUID string, hostname stri
 		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 		ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
 		ccv3.Query{Key: ccv3.PathFilter, Values: []string{path}},
-		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 	)
 
 	if err != nil {
