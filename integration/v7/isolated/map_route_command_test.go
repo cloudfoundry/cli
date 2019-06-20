@@ -17,7 +17,8 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(session).To(HaveCommandInCategoryWithDescription("map-route", "ROUTES", "Map a route to an app"))
 		})
-		It("Displays command usage to output", func() {
+
+		It("displays command usage to output", func() {
 			session := helpers.CF("map-route", "--help")
 			Eventually(session).Should(Say(`NAME:`))
 			Eventually(session).Should(Say(`map-route - Map a route to an app\n`))
@@ -51,18 +52,21 @@ var _ = Describe("map-route command", func() {
 		})
 	})
 
-	When("The environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName    string
 			spaceName  string
 			domainName string
-			hostName   = "jarjar"
-			path       = "/binks"
+			hostName   string
+			path       string
 			userName   string
-			appName    = helpers.NewAppName()
+			appName    string
 		)
 
 		BeforeEach(func() {
+			appName = helpers.NewAppName()
+			hostName = helpers.NewHostName()
+			path = helpers.NewPath()
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
@@ -79,6 +83,7 @@ var _ = Describe("map-route command", func() {
 			var (
 				route helpers.Route
 			)
+
 			BeforeEach(func() {
 				route = helpers.NewRoute(spaceName, domainName, hostName, path)
 				route.V7Create()
@@ -97,16 +102,15 @@ var _ = Describe("map-route command", func() {
 			})
 		})
 
-		When("the route doesnt exist", func() {
+		When("the route does *not* exist", func() {
 			It("creates the route and maps it to an app", func() {
-				session := helpers.CF("map-route", appName, domainName, "--hostname", "test", "--path", "route")
-				Eventually(session).Should(Say(`Creating route %s.%s/%s for org %s / space %s as %s\.\.\.`, "test", domainName, "route", orgName, spaceName, userName))
+				session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--path", path)
+				Eventually(session).Should(Say(`Creating route %s.%s%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
 				Eventually(session).Should(Say(`OK`))
-				Eventually(session).Should(Say(`Mapping route %s.%s/%s to app %s in org %s / space %s as %s\.\.\.`, "test", domainName, "route", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say(`OK`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
-
 	})
 })

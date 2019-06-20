@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . MapRouteActor
 
 type MapRouteActor interface {
-	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
 	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
 	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
@@ -64,7 +64,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 	}
 
 	spaceGUID := cmd.Config.TargetedSpace().GUID
-	apps, warnings, err := cmd.Actor.GetApplicationsByNamesAndSpace([]string{cmd.RequiredArgs.App}, spaceGUID)
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.App, spaceGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 	})
-	warnings, err = cmd.Actor.MapRoute(route.GUID, apps[0].GUID)
+	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
