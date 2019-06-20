@@ -30,7 +30,7 @@ TARGET = v7
 ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120 -tags "V7"
 endif
 
-all: test build
+all: lint test build
 
 build: out/cf ## Compile and build a new `cf` binary
 
@@ -224,7 +224,7 @@ rsrc.syso:
 
 test: units ## (synonym for units)
 
-units: lint build ## Ensure the code looks good, compiles, and passes unit tests
+units: build ## Ensure the code looks good, compiles, and passes unit tests
 	ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
@@ -239,7 +239,7 @@ units-non-plugin:
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
 	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
 
-units-full: lint build units-plugin units-non-plugin
+units-full: build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"
 
 version: ## Print the version number of what would be built
