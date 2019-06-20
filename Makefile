@@ -45,8 +45,11 @@ endif
 clean: ## Remove all files from the `out` directory
 	rm -f $(wildcard out/cf*)
 
-format: ## Run go fmt
-	go fmt ./...
+custom-lint: ## Run our custom linters
+	@echo "style linting files:" # this list will grow as we cleanup all the code
+	@bash -c "go run bin/style/main.go api util"
+	@echo "No lint errors!"
+	@echo
 
 fly-windows-experimental: check-target-env
 	CF_TEST_SUITE=./integration/shared/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
@@ -65,6 +68,9 @@ fly-windows-global: check-target-env
 
 fly-windows-units:
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./ --tag "cli-windows"
+
+format: ## Run go fmt
+	go fmt ./...
 
 golangci-lint: ## Run golangci-lint to validate code quality
 	golangci-lint run
@@ -131,11 +137,7 @@ i: integration-tests-full
 integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
 
-lint: ## Run our custom linters
-	@echo "style linting files:" # this list will grow as we cleanup all the code
-	@bash -c "go run bin/style/main.go api util"
-	@echo "No lint errors!"
-	@echo
+lint: format custom-lint golangci-lint ## Runs all linters and formatters
 
 ifeq ($(TARGET),v6)
 out/cf: out/cf6
@@ -219,7 +221,7 @@ rsrc.syso:
 
 test: units ## (synonym for units)
 
-units: format vet lint build golangci-lint ## Ensure the code looks good, compiles, and passes unit tests
+units: lint build ## Ensure the code looks good, compiles, and passes unit tests
 	ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
@@ -234,19 +236,13 @@ units-non-plugin:
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
 	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
 
-units-full: format vet lint build units-plugin units-non-plugin
+units-full: lint build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"
 
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-GO_VERSION=$$(go version)
-vet: ## Run go vet
-	@echo  "Vetting packages for potential issues..."
-	go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version
-	@echo
-
-.PHONY: all build clean format version vet lint
+.PHONY: all build clean format version lint custom-lint golangci-lint
 .PHONY: test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY: check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
 .PHONY: help

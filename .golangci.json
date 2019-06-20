@@ -35,22 +35,24 @@
   "linters":{
     "disable-all": true,
     "enable": [
-      "errcheck",
-      "unused",
-      "gosimple",
-      "structcheck",
-      "varcheck",
-      "ineffassign",
       "deadcode",
-      "typecheck",
-      "interfacer",
-      "goconst",
-      "unconvert",
       "depguard",
-      "misspell",
+      "errcheck",
       "gochecknoinits",
+      "goconst",
       "gocritic",
-      "staticcheck"
+      "goimports",
+      "gosimple",
+      "govet",
+      "ineffassign",
+      "interfacer",
+      "misspell",
+      "staticcheck",
+      "structcheck",
+      "typecheck",
+      "unconvert",
+      "unused",
+      "varcheck"
     ]
   },
   "linters-settings": {
