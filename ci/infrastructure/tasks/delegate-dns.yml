@@ -1,0 +1,70 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
+    tag: v6.15.0
+
+inputs:
+- name: bbl-state
+
+params:
+  BBL_GCP_SERVICE_ACCOUNT_KEY:
+  GCP_ENVIRONMENT_DOMAIN:
+  GCP_PARENT_ZONE_NAME:
+  GCP_PROJECT:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -eu
+
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+    apt -y --quiet update
+    apt -y --quiet install dnsutils
+    apt -y --quiet install google-cloud-sdk
+
+    cat << EOF | gcloud --quiet auth activate-service-account --key-file=/dev/stdin
+    $BBL_GCP_SERVICE_ACCOUNT_KEY
+    EOF
+    gcloud --quiet config set project "$GCP_PROJECT"
+
+    old_nameservers=$(gcloud dns record-sets list --zone="$GCP_PARENT_ZONE_NAME" --format=json | jq -r ".[] | select(.name==\"$GCP_ENVIRONMENT_DOMAIN.\") | .rrdatas | join(\" \")")
+    pushd bbl-state/vars
+      new_nameservers=$(terraform output --json system_domain_dns_servers | jq -r 'join(" ")')
+    popd
+
+    gcloud --quiet dns record-sets transaction start \
+      --zone="$GCP_PARENT_ZONE_NAME"
+
+    gcloud --quiet dns record-sets transaction remove \
+      --zone="$GCP_PARENT_ZONE_NAME" \
+      --name="$GCP_ENVIRONMENT_DOMAIN." \
+      --ttl 300 \
+      --type NS \
+      $old_nameservers
+
+    gcloud --quiet dns record-sets transaction add \
+      --zone="$GCP_PARENT_ZONE_NAME" \
+      --name="$GCP_ENVIRONMENT_DOMAIN." \
+      --ttl 300 \
+      --type NS \
+      $new_nameservers
+
+    gcloud --quiet dns record-sets transaction execute \
+      --zone="$GCP_PARENT_ZONE_NAME"
+
+    echo "Confirming changes have been applied..."
+    while [[ "$(gcloud --quiet dns record-sets changes list --zone="$GCP_PARENT_ZONE_NAME" --filter 'status:pending' --format json | jq '. | length')" != "0" ]]; do sleep 5; done
+
+    echo "Confirming DNS has propagated..."
+    until host "api.$GCP_ENVIRONMENT_DOMAIN"; do sleep 5; done
+
+    echo "Done!"
