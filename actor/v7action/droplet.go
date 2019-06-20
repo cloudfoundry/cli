@@ -1,11 +1,12 @@
 package v7action
 
 import (
+	"io"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"io"
 )
 
 // Droplet represents a Cloud Controller droplet.

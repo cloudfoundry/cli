@@ -1,8 +1,9 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/types"
 	"errors"
+
+	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"

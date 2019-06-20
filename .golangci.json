@@ -1,8 +1,10 @@
 {
-  "run":{
+  "run": {
     "concurrency": 4,
     "deadline": "3m",
-    "build-tags": ["V7"],
+    "build-tags": [
+      "V7"
+    ],
     "skip-dirs": [
       "^cf",
       "^ci",
@@ -32,7 +34,7 @@
       "integration/helpers/fake_server.go"
     ]
   },
-  "linters":{
+  "linters": {
     "disable-all": true,
     "enable": [
       "deadcode",
@@ -56,10 +58,10 @@
     ]
   },
   "linters-settings": {
-    "errcheck":{
+    "errcheck": {
       "check-blank": true
     },
-    "goconst":{
+    "goconst": {
       "min-len": "2",
       "min-occurrences": 3
     },
@@ -67,22 +69,20 @@
       "locale": "US"
     }
   },
-  "issues":{
+  "issues": {
     "max-same-issue": 0,
-    "exclude":[
+    "exclude": [
       "Error return value of `client.GetApplicationTasks` is not checked",
       "Error return value of `logger.output.Stop` is not checked",
       "Error return value of `request.ResetBody` is not checked",
       "Error return value of `GinkgoWriter.Write` is not checked",
       "Error return value of `c.terminalHelper.RestoreTerminal` is not checked",
-
       "U1000: field `allproxy` is unused",
       "U1000: field `dockerPassword` is unused",
       "U1000: field `envCFStagingTimeout` is unused",
       "U1000: field `envCFStartupTimeout` is unused",
       "U1000: field `relatedCommands` is unused",
       "U1000: field `usage` is unused",
-
       "`allproxy` is unused",
       "`dockerPassword` is unused",
       "`envCFStagingTimeout` is unused",
@@ -90,7 +90,7 @@
       "`relatedCommands` is unused",
       "`usage` is unused"
     ],
-    "exclude-rules":[
+    "exclude-rules": [
       {
         "path": "_test.go",
         "linters": [

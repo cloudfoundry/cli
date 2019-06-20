@@ -1,9 +1,10 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/command/flag"
 	"errors"
 	"regexp"
+
+	"code.cloudfoundry.org/cli/command/flag"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"

@@ -1,9 +1,10 @@
 package flag
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"github.com/jessevdk/go-flags"
-	"strings"
 )
 
 type DeploymentStrategy struct {

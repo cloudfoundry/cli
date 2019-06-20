@@ -2,11 +2,12 @@ package sharedaction_test
 
 import (
 	"archive/zip"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/sharedaction"

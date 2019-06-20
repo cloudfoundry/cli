@@ -1,8 +1,9 @@
 package isolated
 
 import (
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"regexp"
+
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"

@@ -75,6 +75,9 @@ format: ## Run go fmt
 golangci-lint: ## Run golangci-lint to validate code quality
 	golangci-lint run
 
+golangci-lint-fix: ## Run golangci-lint --fix to try to autofix issues
+	golangci-lint run --fix
+
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
 
@@ -242,7 +245,7 @@ units-full: lint build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-.PHONY: all build clean format version lint custom-lint golangci-lint
+.PHONY: all build clean format version lint custom-lint golangci-lint golangci-lint-fix
 .PHONY: test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY: check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
 .PHONY: help

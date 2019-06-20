@@ -2,13 +2,14 @@ package ccv3
 
 import (
 	"bytes"
+	"encoding/json"
+	"io"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
-	"encoding/json"
-	"io"
 )
 
 // Droplet represents a Cloud Controller droplet's metadata. A droplet is a set of

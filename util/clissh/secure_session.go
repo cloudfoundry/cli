@@ -1,8 +1,9 @@
 package clissh
 
 import (
-	"golang.org/x/crypto/ssh"
 	"io"
+
+	"golang.org/x/crypto/ssh"
 )
 
 //go:generate counterfeiter . SecureSession

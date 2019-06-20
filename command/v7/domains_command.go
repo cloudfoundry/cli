@@ -1,13 +1,14 @@
 package v7
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
-	"sort"
 )
 
 //go:generate counterfeiter . DomainsActor

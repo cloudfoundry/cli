@@ -96,12 +96,10 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 				break
 			}
 
-			if removeErr != nil && !os.IsNotExist(err) {
-				if _, isPathError := removeErr.(*os.PathError); isPathError {
-					time.Sleep(50 * time.Millisecond)
-				} else {
-					err = removeErr
-				}
+			if _, isPathError := removeErr.(*os.PathError); isPathError {
+				time.Sleep(50 * time.Millisecond)
+			} else {
+				err = removeErr
 			}
 		}
 

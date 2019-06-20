@@ -1,14 +1,15 @@
 package push
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"fmt"
+	"io/ioutil"
+	"os"
+
+	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"io/ioutil"
-	"os"
 )
 
 var _ = Describe("--droplet flag", func() {

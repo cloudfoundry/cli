@@ -1,13 +1,14 @@
 package isolated
 
 import (
+	"regexp"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"regexp"
 )
 
 var _ = Describe("delete-shared-domain command", func() {

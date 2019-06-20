@@ -1,8 +1,9 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"fmt"
+
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 

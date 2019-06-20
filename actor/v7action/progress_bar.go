@@ -1,10 +1,11 @@
 package v7action
 
 import (
-	"gopkg.in/cheggaaa/pb.v1"
 	"io"
 	"os"
 	"time"
+
+	"gopkg.in/cheggaaa/pb.v1"
 )
 
 //go:generate counterfeiter . SimpleProgressBar
