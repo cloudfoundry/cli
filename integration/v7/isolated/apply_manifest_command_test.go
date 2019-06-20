@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -41,14 +42,22 @@ var _ = Describe("apply-manifest command", func() {
 	})
 
 	Describe("help", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("apply-manifest", "APPS", "Apply manifest properties to a space"))
+		})
+
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("apply-manifest", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("apply-manifest - Applies manifest properties to a space"))
+				Eventually(session).Should(Say("apply-manifest - Apply manifest properties to a space"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf apply-manifest -f APP_MANIFEST_PATH"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("create-app, create-app-manifest, push"))
 
 				Eventually(session).Should(Exit(0))
 			})

@@ -30,7 +30,7 @@ type commandList struct {
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	App                                v7.AppCommand                                `command:"app" description:"Display health and status for an app"`
-	ApplyManifest                      v7.ApplyManifestCommand                      `command:"apply-manifest" description:"Applies manifest properties to a space"`
+	ApplyManifest                      v7.ApplyManifestCommand                      `command:"apply-manifest" description:"Apply manifest properties to a space"`
 	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`

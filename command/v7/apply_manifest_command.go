@@ -15,8 +15,9 @@ type ApplyManifestActor interface {
 }
 
 type ApplyManifestCommand struct {
-	PathToManifest flag.PathWithExistenceCheck `short:"f" description:"Path to app manifest" required:"true"`
-	usage          interface{}                 `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
+	PathToManifest  flag.PathWithExistenceCheck `short:"f" description:"Path to app manifest" required:"true"`
+	usage           interface{}                 `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
+	relatedCommands interface{}                 `related_commands:"create-app, create-app-manifest, push"`
 
 	UI          command.UI
 	Config      command.Config
