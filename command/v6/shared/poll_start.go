@@ -83,8 +83,8 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 				apiError = err
 			}
 			// if an api error occurred, exit immediately
-			return
+			return apiError
 		}
 	}
-	return
+	return nil
 }
