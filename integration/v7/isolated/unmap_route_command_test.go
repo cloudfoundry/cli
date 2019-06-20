@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -9,34 +11,38 @@ import (
 )
 
 var _ = Describe("unmap-route command", func() {
-	Describe("help", func() {
-		When("--help flag is set", func() {
-			It("Displays command usage to output", func() {
-				session := helpers.CF("unmap-route", "--help")
-				Eventually(session).Should(Say(`NAME:`))
-				Eventually(session).Should(Say(`unmap-route - Remove a route from an app\n`))
-				Eventually(session).Should(Say(`\n`))
+	Context("help", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("unmap-route", "ROUTES", "Remove a route from an app"))
+		})
 
-				Eventually(session).Should(Say(`USAGE:`))
-				Eventually(session).Should(Say(`\s+cf unmap-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
-				Eventually(session).Should(Say(`\n`))
+		It("Displays command usage to output", func() {
+			session := helpers.CF("unmap-route", "--help")
+			Eventually(session).Should(Say(`NAME:`))
+			Eventually(session).Should(Say(`unmap-route - Remove a route from an app\n`))
+			Eventually(session).Should(Say(`\n`))
 
-				Eventually(session).Should(Say(`EXAMPLES:`))
-				Eventually(session).Should(Say(`cf unmap-route my-app example.com                              # example.com`))
-				Eventually(session).Should(Say(`cf unmap-route my-app example.com --hostname myhost            # myhost.example.com`))
-				Eventually(session).Should(Say(`cf unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`))
-				Eventually(session).Should(Say(`\n`))
+			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`\s+cf unmap-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
+			Eventually(session).Should(Say(`\n`))
 
-				Eventually(session).Should(Say(`OPTIONS:`))
-				Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route`))
-				Eventually(session).Should(Say(`--path\s+Path used to identify the HTTP route`))
-				Eventually(session).Should(Say(`\n`))
+			Eventually(session).Should(Say(`EXAMPLES:`))
+			Eventually(session).Should(Say(`cf unmap-route my-app example.com                              # example.com`))
+			Eventually(session).Should(Say(`cf unmap-route my-app example.com --hostname myhost            # myhost.example.com`))
+			Eventually(session).Should(Say(`cf unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`))
+			Eventually(session).Should(Say(`\n`))
 
-				Eventually(session).Should(Say(`SEE ALSO:`))
-				Eventually(session).Should(Say(`delete-route, map-route, routes`))
+			Eventually(session).Should(Say(`OPTIONS:`))
+			Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route`))
+			Eventually(session).Should(Say(`--path\s+Path used to identify the HTTP route`))
+			Eventually(session).Should(Say(`\n`))
 
-				Eventually(session).Should(Exit(0))
-			})
+			Eventually(session).Should(Say(`SEE ALSO:`))
+			Eventually(session).Should(Say(`delete-route, map-route, routes`))
+
+			Eventually(session).Should(Exit(0))
 		})
 	})
 

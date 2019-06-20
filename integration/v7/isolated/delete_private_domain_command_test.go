@@ -1,17 +1,23 @@
 package isolated
 
 import (
-	"regexp"
-
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"regexp"
 )
 
 var _ = Describe("delete-private-domain command", func() {
-	When("--help flag is given", func() {
+	Context("Help", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("delete-private-domain", "DOMAINS", "Delete a private domain"))
+		})
+
 		It("Displays command usage to output", func() {
 			session := helpers.CF("delete-private-domain", "--help")
 

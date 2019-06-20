@@ -1,18 +1,24 @@
 package isolated
 
 import (
-	"fmt"
-	"regexp"
-
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"regexp"
 )
 
 var _ = Describe("create-shared-domain command", func() {
 	Context("Help", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("create-shared-domain", "DOMAINS", "Create a domain that can be used by all orgs (admin-only)"))
+		})
+
 		It("displays the help information", func() {
 			session := helpers.CF("create-shared-domain", "--help")
 			Eventually(session).Should(Say("NAME:\n"))

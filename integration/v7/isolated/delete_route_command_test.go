@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -12,6 +13,12 @@ import (
 
 var _ = Describe("delete-route command", func() {
 	Context("Help", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("delete-route", "ROUTES", "Delete a route"))
+		})
+
 		It("displays the help information", func() {
 			session := helpers.CF("delete-route", "--help")
 			Eventually(session).Should(Say(`NAME:`))
