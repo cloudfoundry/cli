@@ -45,8 +45,6 @@ func SetHomeDir() string {
 	Expect(err).NotTo(HaveOccurred())
 
 	setHomeDirsTo(homeDir, homeDir)
-
-	GinkgoWriter.Write([]byte(fmt.Sprintln("\nHOME DIR>", homeDir)))
 	return homeDir
 }
 
@@ -68,6 +66,8 @@ func getHomeDirs() (string, string) {
 }
 
 func setHomeDirsTo(homeDir string, pluginHomeDir string) {
+	GinkgoWriter.Write([]byte(fmt.Sprintln("\nHOME DIR>", homeDir)))
+
 	Expect(os.Setenv("CF_HOME", homeDir)).To(Succeed())
 	Expect(os.Setenv("CF_PLUGIN_HOME", pluginHomeDir)).To(Succeed())
 }

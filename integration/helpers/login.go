@@ -152,6 +152,17 @@ func SetupCF(org string, space string) {
 	TargetOrgAndSpace(org, space)
 }
 
+// SetupCFWithGeneratedOrgAndSpaceNames logs in to the CLI with LoginCF, creates the org and
+// space with generated names, and targets that org and space. Returns the generated org so
+// that it can be deleted easily in cleanup step of the test.
+func SetupCFWithGeneratedOrgAndSpaceNames() string {
+	org := NewOrgName()
+	space := NewSpaceName()
+
+	SetupCF(org, space)
+	return org
+}
+
 // SwitchToNoRole logs out of the CLI and logs back in as a newly-created user without a role.
 func SwitchToNoRole() string {
 	username, password := CreateUser()

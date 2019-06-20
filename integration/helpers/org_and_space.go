@@ -44,16 +44,17 @@ func CreateOrgAndSpace(org string, space string) {
 // CreateOrgAndSpaceUnlessExists creates an org and a space in that org with
 // specified names only if these don't exist yet.
 func CreateOrgAndSpaceUnlessExists(org string, space string) {
-	session := CF("org", org)
-	Eventually(session).Should(Exit())
-	if session.ExitCode() != 0 {
-		CreateOrgAndSpace(org, space)
-		return
-	}
-
 	WithRandomHomeDir(func() {
 		SetAPI()
 		LoginCF()
+
+		session := CF("org", org)
+		Eventually(session).Should(Exit())
+		if session.ExitCode() != 0 {
+			CreateOrgAndSpace(org, space)
+			return
+		}
+
 		TargetOrg(org)
 
 		session = CF("space", space)
