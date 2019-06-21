@@ -9,19 +9,19 @@ import (
 )
 
 type FakeUnmapRouteActor struct {
-	GetApplicationsByNamesAndSpaceStub        func([]string, string) ([]v7action.Application, v7action.Warnings, error)
-	getApplicationsByNamesAndSpaceMutex       sync.RWMutex
-	getApplicationsByNamesAndSpaceArgsForCall []struct {
-		arg1 []string
+	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
+	getApplicationByNameAndSpaceMutex       sync.RWMutex
+	getApplicationByNameAndSpaceArgsForCall []struct {
+		arg1 string
 		arg2 string
 	}
-	getApplicationsByNamesAndSpaceReturns struct {
-		result1 []v7action.Application
+	getApplicationByNameAndSpaceReturns struct {
+		result1 v7action.Application
 		result2 v7action.Warnings
 		result3 error
 	}
-	getApplicationsByNamesAndSpaceReturnsOnCall map[int]struct {
-		result1 []v7action.Application
+	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v7action.Application
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -92,73 +92,68 @@ type FakeUnmapRouteActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUnmapRouteActor) GetApplicationsByNamesAndSpace(arg1 []string, arg2 string) ([]v7action.Application, v7action.Warnings, error) {
-	var arg1Copy []string
-	if arg1 != nil {
-		arg1Copy = make([]string, len(arg1))
-		copy(arg1Copy, arg1)
-	}
-	fake.getApplicationsByNamesAndSpaceMutex.Lock()
-	ret, specificReturn := fake.getApplicationsByNamesAndSpaceReturnsOnCall[len(fake.getApplicationsByNamesAndSpaceArgsForCall)]
-	fake.getApplicationsByNamesAndSpaceArgsForCall = append(fake.getApplicationsByNamesAndSpaceArgsForCall, struct {
-		arg1 []string
+func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
+	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
+		arg1 string
 		arg2 string
-	}{arg1Copy, arg2})
-	fake.recordInvocation("GetApplicationsByNamesAndSpace", []interface{}{arg1Copy, arg2})
-	fake.getApplicationsByNamesAndSpaceMutex.Unlock()
-	if fake.GetApplicationsByNamesAndSpaceStub != nil {
-		return fake.GetApplicationsByNamesAndSpaceStub(arg1, arg2)
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
+	fake.getApplicationByNameAndSpaceMutex.Unlock()
+	if fake.GetApplicationByNameAndSpaceStub != nil {
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationsByNamesAndSpaceReturns
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeUnmapRouteActor) GetApplicationsByNamesAndSpaceCallCount() int {
-	fake.getApplicationsByNamesAndSpaceMutex.RLock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
-	return len(fake.getApplicationsByNamesAndSpaceArgsForCall)
+func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpaceCallCount() int {
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeUnmapRouteActor) GetApplicationsByNamesAndSpaceCalls(stub func([]string, string) ([]v7action.Application, v7action.Warnings, error)) {
-	fake.getApplicationsByNamesAndSpaceMutex.Lock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
-	fake.GetApplicationsByNamesAndSpaceStub = stub
+func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v7action.Application, v7action.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
 }
 
-func (fake *FakeUnmapRouteActor) GetApplicationsByNamesAndSpaceArgsForCall(i int) ([]string, string) {
-	fake.getApplicationsByNamesAndSpaceMutex.RLock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
-	argsForCall := fake.getApplicationsByNamesAndSpaceArgsForCall[i]
+func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeUnmapRouteActor) GetApplicationsByNamesAndSpaceReturns(result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationsByNamesAndSpaceMutex.Lock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
-	fake.GetApplicationsByNamesAndSpaceStub = nil
-	fake.getApplicationsByNamesAndSpaceReturns = struct {
-		result1 []v7action.Application
+func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpaceReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = nil
+	fake.getApplicationByNameAndSpaceReturns = struct {
+		result1 v7action.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUnmapRouteActor) GetApplicationsByNamesAndSpaceReturnsOnCall(i int, result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationsByNamesAndSpaceMutex.Lock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
-	fake.GetApplicationsByNamesAndSpaceStub = nil
-	if fake.getApplicationsByNamesAndSpaceReturnsOnCall == nil {
-		fake.getApplicationsByNamesAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Application
+func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = nil
+	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Application
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getApplicationsByNamesAndSpaceReturnsOnCall[i] = struct {
-		result1 []v7action.Application
+	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v7action.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -433,8 +428,8 @@ func (fake *FakeUnmapRouteActor) UnmapRouteReturnsOnCall(i int, result1 v7action
 func (fake *FakeUnmapRouteActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationsByNamesAndSpaceMutex.RLock()
-	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getDomainByNameMutex.RLock()
 	defer fake.getDomainByNameMutex.RUnlock()
 	fake.getRouteByAttributesMutex.RLock()

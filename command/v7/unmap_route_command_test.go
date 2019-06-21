@@ -126,7 +126,7 @@ var _ = Describe("unmap-route Command", func() {
 				Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
 				Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
 
-				Expect(fakeActor.GetApplicationsByNamesAndSpaceCallCount()).To(Equal(0))
+				Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(0))
 				Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(0))
 				Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
 			})
@@ -143,8 +143,8 @@ var _ = Describe("unmap-route Command", func() {
 
 			When("getting the app errors", func() {
 				BeforeEach(func() {
-					fakeActor.GetApplicationsByNamesAndSpaceReturns(
-						[]v7action.Application{},
+					fakeActor.GetApplicationByNameAndSpaceReturns(
+						v7action.Application{},
 						v7action.Warnings{"get-app-warnings"},
 						errors.New("get-app-error"),
 					)
@@ -158,10 +158,9 @@ var _ = Describe("unmap-route Command", func() {
 					Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
 					Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
 
-					Expect(fakeActor.GetApplicationsByNamesAndSpaceCallCount()).To(Equal(1))
-					actualAppNames, actualSpaceGUID := fakeActor.GetApplicationsByNamesAndSpaceArgsForCall(0)
-					Expect(len(actualAppNames)).To(Equal(1))
-					Expect(actualAppNames[0]).To(Equal(appName))
+					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+					actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(actualAppName).To(Equal(appName))
 					Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 					Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(0))
@@ -171,8 +170,8 @@ var _ = Describe("unmap-route Command", func() {
 
 			When("getting the app succeeds", func() {
 				BeforeEach(func() {
-					fakeActor.GetApplicationsByNamesAndSpaceReturns(
-						[]v7action.Application{{Name: "app", GUID: "app-guid"}},
+					fakeActor.GetApplicationByNameAndSpaceReturns(
+						v7action.Application{Name: "app", GUID: "app-guid"},
 						v7action.Warnings{"get-app-warnings"},
 						nil,
 					)
@@ -196,10 +195,9 @@ var _ = Describe("unmap-route Command", func() {
 						Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
 						Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
 
-						Expect(fakeActor.GetApplicationsByNamesAndSpaceCallCount()).To(Equal(1))
-						actualAppNames, actualSpaceGUID := fakeActor.GetApplicationsByNamesAndSpaceArgsForCall(0)
-						Expect(len(actualAppNames)).To(Equal(1))
-						Expect(actualAppNames[0]).To(Equal(appName))
+						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+						Expect(actualAppName).To(Equal(appName))
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
