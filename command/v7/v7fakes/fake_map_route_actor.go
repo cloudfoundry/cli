@@ -77,6 +77,22 @@ type FakeMapRouteActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetRouteDestinationByAppGUIDStub        func(string, string) (v7action.RouteDestination, v7action.Warnings, error)
+	getRouteDestinationByAppGUIDMutex       sync.RWMutex
+	getRouteDestinationByAppGUIDArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getRouteDestinationByAppGUIDReturns struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRouteDestinationByAppGUIDReturnsOnCall map[int]struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}
 	MapRouteStub        func(string, string) (v7action.Warnings, error)
 	mapRouteMutex       sync.RWMutex
 	mapRouteArgsForCall []struct {
@@ -367,6 +383,73 @@ func (fake *FakeMapRouteActor) GetRouteByAttributesReturnsOnCall(i int, result1 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeMapRouteActor) GetRouteDestinationByAppGUID(arg1 string, arg2 string) (v7action.RouteDestination, v7action.Warnings, error) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	ret, specificReturn := fake.getRouteDestinationByAppGUIDReturnsOnCall[len(fake.getRouteDestinationByAppGUIDArgsForCall)]
+	fake.getRouteDestinationByAppGUIDArgsForCall = append(fake.getRouteDestinationByAppGUIDArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetRouteDestinationByAppGUID", []interface{}{arg1, arg2})
+	fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	if fake.GetRouteDestinationByAppGUIDStub != nil {
+		return fake.GetRouteDestinationByAppGUIDStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRouteDestinationByAppGUIDReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeMapRouteActor) GetRouteDestinationByAppGUIDCallCount() int {
+	fake.getRouteDestinationByAppGUIDMutex.RLock()
+	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
+	return len(fake.getRouteDestinationByAppGUIDArgsForCall)
+}
+
+func (fake *FakeMapRouteActor) GetRouteDestinationByAppGUIDCalls(stub func(string, string) (v7action.RouteDestination, v7action.Warnings, error)) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	fake.GetRouteDestinationByAppGUIDStub = stub
+}
+
+func (fake *FakeMapRouteActor) GetRouteDestinationByAppGUIDArgsForCall(i int) (string, string) {
+	fake.getRouteDestinationByAppGUIDMutex.RLock()
+	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
+	argsForCall := fake.getRouteDestinationByAppGUIDArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeMapRouteActor) GetRouteDestinationByAppGUIDReturns(result1 v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	fake.GetRouteDestinationByAppGUIDStub = nil
+	fake.getRouteDestinationByAppGUIDReturns = struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeMapRouteActor) GetRouteDestinationByAppGUIDReturnsOnCall(i int, result1 v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	fake.GetRouteDestinationByAppGUIDStub = nil
+	if fake.getRouteDestinationByAppGUIDReturnsOnCall == nil {
+		fake.getRouteDestinationByAppGUIDReturnsOnCall = make(map[int]struct {
+			result1 v7action.RouteDestination
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRouteDestinationByAppGUIDReturnsOnCall[i] = struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeMapRouteActor) MapRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
@@ -442,6 +525,8 @@ func (fake *FakeMapRouteActor) Invocations() map[string][][]interface{} {
 	defer fake.getDomainByNameMutex.RUnlock()
 	fake.getRouteByAttributesMutex.RLock()
 	defer fake.getRouteByAttributesMutex.RUnlock()
+	fake.getRouteDestinationByAppGUIDMutex.RLock()
+	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

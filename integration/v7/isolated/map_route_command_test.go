@@ -92,13 +92,29 @@ var _ = Describe("map-route command", func() {
 			AfterEach(func() {
 				route.Delete()
 			})
+			When("route is already mapped to app", func() {
+				BeforeEach(func() {
+					session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
+					Eventually(session).Should(Exit(0))
+				})
+				It("exits 0 with helpful message saying that the route is already mapped to the app", func() {
+					session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
 
-			It("maps the route to an app", func() {
-				session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
+					Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s.%s%s'\.`, appName, hostName, domainName, path))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Exit(0))
 
-				Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`OK`))
-				Eventually(session).Should(Exit(0))
+				})
+			})
+			When("route is not yet mapped to the app", func() {
+				It("maps the route to an app", func() {
+					session := helpers.CF("map-route", appName, domainName, "--hostname", route.Host, "--path", route.Path)
+
+					Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 

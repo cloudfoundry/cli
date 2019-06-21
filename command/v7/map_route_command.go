@@ -16,6 +16,7 @@ type MapRouteActor interface {
 	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
 	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
 	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
+	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
 }
 
@@ -105,6 +106,21 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 	})
+	dest, warnings, err := cmd.Actor.GetRouteDestinationByAppGUID(route.GUID, app.GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		if _, ok := err.(actionerror.RouteDestinationNotFoundError); !ok {
+			return err
+		}
+	}
+	if dest.GUID != "" {
+		cmd.UI.DisplayText("App '{{ .AppName }}' is already mapped to route '{{ .FQDN }}'.", map[string]interface{}{
+			"AppName": cmd.RequiredArgs.App,
+			"FQDN":    fqdn,
+		})
+		cmd.UI.DisplayOK()
+		return nil
+	}
 	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
