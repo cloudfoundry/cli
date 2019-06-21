@@ -93,7 +93,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 					time.Sleep(5 * time.Second)
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Say(`name:\s+%s`, appName))
-					Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3,5} \d{4}`))
+					Eventually(session).Should(Say(`last uploaded:\s+%s`, helpers.ReadableDateTimeRegex))
 					Eventually(session).Should(Say(`stack:\s+%s`, stackName))
 					Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 					Eventually(session).Should(Say(`type:\s+web`))
