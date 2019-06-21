@@ -24,10 +24,12 @@ UNAME_S := $(shell uname -s)
 
 ifndef TARGET_V7
 TARGET = v6
+export GOFLAGS =
 ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
 else
 TARGET = v7
-ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120 -tags "V7"
+export GOFLAGS = '-tags=V7'
+ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120
 endif
 
 all: lint test build
