@@ -253,7 +253,7 @@ func (client *Client) GetUserProvidedServiceInstances(filters ...Filter) ([]Serv
 }
 
 type MaintenanceInfo struct {
-	Version     string `json:"version"`
+	Version     string `json:"version,omitempty"`
 	Description string `json:"description,omitempty"`
 }
 
