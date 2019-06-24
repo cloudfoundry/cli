@@ -28,7 +28,7 @@ export GOFLAGS =
 ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
 else
 TARGET = v7
-export GOFLAGS = '-tags=V7'
+export GOFLAGS = -tags=V7
 ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120
 endif
 
