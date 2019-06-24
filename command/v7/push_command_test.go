@@ -1160,5 +1160,23 @@ var _ = Describe("push Command", func() {
 					"--droplet", "--docker-image, -o", "--docker-username", "-p",
 				},
 			}),
+
+		Entry("when strategy 'rolling' and no-start flags are passed",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+				cmd.NoStart = true
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-start", "--strategy=rolling",
+				},
+			}),
+
+		Entry("when strategy is not set and no-start flags are passed",
+			func() {
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyDefault}
+				cmd.NoStart = true
+			},
+			nil),
 	)
 })

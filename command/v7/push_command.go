@@ -671,6 +671,14 @@ func (cmd PushCommand) ValidateFlags() error {
 				"-p",
 			},
 		}
+
+	case cmd.NoStart && cmd.Strategy == flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-start",
+				"--strategy=rolling",
+			},
+		}
 	}
 
 	return nil
