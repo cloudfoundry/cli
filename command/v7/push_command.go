@@ -59,7 +59,7 @@ type V7ActorForPush interface {
 type ManifestParser interface {
 	v7pushaction.ManifestParser
 	ContainsMultipleApps() bool
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error
 	ContainsPrivateDockerImages() bool
 }
 
@@ -540,7 +540,7 @@ func (cmd PushCommand) ReadManifest() error {
 
 	if exists {
 		log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-		err = cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
+		err = cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars, cmd.OptionalArgs.AppName)
 		if err != nil {
 			log.Errorln("reading manifest:", err)
 			return err

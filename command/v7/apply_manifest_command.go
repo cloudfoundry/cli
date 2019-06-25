@@ -61,7 +61,7 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		"Username":     user.Name,
 	})
 
-	err = cmd.Parser.InterpolateAndParse(pathToManifest, nil, nil)
+	err = cmd.Parser.InterpolateAndParse(pathToManifest, nil, nil, "")
 	if err != nil {
 		return err
 	}

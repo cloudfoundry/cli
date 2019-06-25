@@ -967,8 +967,9 @@ var _ = Describe("push Command", func() {
 					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.PWD))
 
 					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+					actualManifestPath, _, _, appName := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 					Expect(actualManifestPath).To(Equal("/manifest/path"))
+					Expect(appName).To(Equal(""))
 				})
 			})
 
@@ -1010,8 +1011,9 @@ var _ = Describe("push Command", func() {
 				Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(somePath))
 
 				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				actualManifestPath, _, _, appName := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 				Expect(actualManifestPath).To(Equal("/manifest/path"))
+				Expect(appName).To(Equal(""))
 			})
 		})
 
@@ -1030,7 +1032,7 @@ var _ = Describe("push Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, actualVarsFiles, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				_, actualVarsFiles, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 				Expect(actualVarsFiles).To(Equal(varsFiles))
 			})
 		})
@@ -1050,8 +1052,23 @@ var _ = Describe("push Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, _, actualVars := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				_, _, actualVars, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 				Expect(actualVars).To(Equal(vars))
+			})
+		})
+
+		When("an app name is provided", func() {
+			BeforeEach(func() {
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+				cmd.OptionalArgs.AppName = "some-app-name"
+			})
+
+			It("passes vars files to the manifest parser", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				_, _, _, appName := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(appName).To(Equal("some-app-name"))
 			})
 		})
 	})

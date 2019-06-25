@@ -68,7 +68,7 @@ applications:
 				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
-				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
+				err = parser.InterpolateAndParse(pathToManifest, nil, nil, "")
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -85,7 +85,7 @@ applications:
 				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
-				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
+				err = parser.InterpolateAndParse(pathToManifest, nil, nil, "")
 				Expect(err).To(HaveOccurred())
 			})
 
@@ -172,6 +172,7 @@ applications:
 			pathToManifest   string
 			pathsToVarsFiles []string
 			vars             []template.VarKV
+			appName          string
 
 			executeErr error
 
@@ -184,6 +185,7 @@ applications:
 			Expect(tempFile.Close()).ToNot(HaveOccurred())
 			pathToManifest = tempFile.Name()
 			vars = nil
+			appName = ""
 
 			pathsToVarsFiles = nil
 		})
@@ -196,10 +198,10 @@ applications:
 		})
 
 		JustBeforeEach(func() {
-			executeErr = parser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, vars)
+			executeErr = parser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, vars, appName)
 		})
 
-		Context("regardless of whether the manifest needs interpolation", func() {
+		When("the manifest does *not* need interpolation", func() {
 			BeforeEach(func() {
 				rawManifest = []byte(`---
 applications:
@@ -220,18 +222,6 @@ applications:
 				Expect(parser.AppNames()).To(ConsistOf("spark", "flame"))
 				Expect(parser.PathToManifest).To(Equal(pathToManifest))
 				Expect(parser.FullRawManifest()).To(MatchYAML(rawManifest))
-			})
-		})
-
-		Context("invalid yaml is passed", func() {
-			BeforeEach(func() {
-				rawManifest = []byte("\t\t")
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("parses the manifest properly", func() {
-				Expect(executeErr).To(HaveOccurred())
 			})
 		})
 
@@ -381,6 +371,75 @@ applications:
 				})
 			})
 		})
+
+		When("invalid yaml is passed", func() {
+			BeforeEach(func() {
+				rawManifest = []byte("\t\t")
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("parses the manifest properly", func() {
+				Expect(executeErr).To(HaveOccurred())
+			})
+		})
+
+		When("passing an app name override", func() {
+			BeforeEach(func() {
+				appName = "mashed-potato"
+			})
+
+			When("there is only one app", func() {
+				When("the app has a name", func() {
+					BeforeEach(func() {
+						rawManifest = []byte(`---
+applications:
+- name: spark
+  instances: 2
+`)
+						err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("sets its name in the raw manifest", func() {
+						Expect(parser.FullRawManifest()).To(MatchYAML(`---
+applications:
+- name: mashed-potato
+  instances: 2
+`))
+					})
+
+					It("sets its name in the application object", func() {
+						Expect(parser.Applications).To(HaveLen(1))
+						Expect(parser.Applications[0].Name).To(Equal("mashed-potato"))
+					})
+				})
+
+				When("the app does *not* have a name", func() {
+					BeforeEach(func() {
+						rawManifest = []byte(`---
+applications:
+- instances: 2
+`)
+						err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("sets its name in the raw manifest", func() {
+						Expect(parser.FullRawManifest()).To(MatchYAML(`---
+applications:
+- name: mashed-potato
+  instances: 2
+`))
+					})
+
+					It("sets its name in the application object", func() {
+						Expect(parser.Applications).To(HaveLen(1))
+						Expect(parser.Applications[0].Name).To(Equal("mashed-potato"))
+					})
+				})
+			})
+		})
 	})
 
 	Describe("RawAppManifest", func() {
@@ -425,7 +484,7 @@ applications:
 			pathToManifest = tempFile.Name()
 			err = ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 			Expect(err).ToNot(HaveOccurred())
-			err = parser.InterpolateAndParse(pathToManifest, nil, nil)
+			err = parser.InterpolateAndParse(pathToManifest, nil, nil, "")
 			Expect(err).ToNot(HaveOccurred())
 			rawAppManifest, executeErr = parser.RawAppManifest(appName)
 		})

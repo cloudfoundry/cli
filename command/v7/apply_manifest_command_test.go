@@ -115,8 +115,9 @@ var _ = Describe("apply-manifest Command", func() {
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
-				path, _, _ := fakeParser.InterpolateAndParseArgsForCall(0)
+				path, _, _, appName := fakeParser.InterpolateAndParseArgsForCall(0)
 				Expect(path).To(Equal(providedPath))
+				Expect(appName).To(Equal(""))
 
 				Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
 				spaceGUIDArg, actualBytes, actualNoRoute := fakeActor.SetSpaceManifestArgsForCall(0)

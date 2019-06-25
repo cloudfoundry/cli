@@ -118,7 +118,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
-				path, _, _ := fakeParser.InterpolateAndParseArgsForCall(0)
+				path, _, _, _ := fakeParser.InterpolateAndParseArgsForCall(0)
 				Expect(path).To(Equal(providedPath))
 
 				Expect(fakeActor.ApplyApplicationManifestCallCount()).To(Equal(1))

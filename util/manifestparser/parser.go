@@ -36,7 +36,7 @@ func (parser Parser) AppNames() []string {
 	return names
 }
 
-func (parser *Parser) Apps(appName string) ([]Application, error) {
+func (parser Parser) Apps(appName string) ([]Application, error) {
 	if appName == "" {
 		return parser.Applications, nil
 	}
@@ -69,14 +69,16 @@ func (parser Parser) FullRawManifest() []byte {
 	return parser.rawManifest
 }
 
-func (parser *Parser) GetPathToManifest() string {
+func (parser Parser) GetPathToManifest() string {
 	return parser.PathToManifest
 }
 
 // InterpolateAndParse reads the manifest at the provided paths, interpolates
 // variables if a vars file is provided, and sets the current manifest to the
 // resulting manifest.
-func (parser *Parser) InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error {
+// An app name can also be passed to override the name of an app in case there
+// is only one app specified.
+func (parser *Parser) InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error {
 	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return err
@@ -113,7 +115,7 @@ func (parser *Parser) InterpolateAndParse(pathToManifest string, pathsToVarsFile
 	}
 
 	parser.PathToManifest = pathToManifest
-	return parser.parse(rawManifest)
+	return parser.parse(rawManifest, appName)
 }
 
 func (parser Parser) RawAppManifest(appName string) ([]byte, error) {
@@ -127,7 +129,7 @@ func (parser Parser) RawAppManifest(appName string) ([]byte, error) {
 	return nil, AppNotInManifestError{Name: appName}
 }
 
-func (parser *Parser) parse(manifestBytes []byte) error {
+func (parser *Parser) parse(manifestBytes []byte, appName string) error {
 	parser.rawManifest = manifestBytes
 	pathToManifest := parser.GetPathToManifest()
 	var raw manifest
@@ -137,22 +139,25 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 		return err
 	}
 
-	parser.Applications = raw.Applications
-
-	if len(parser.Applications) == 0 {
+	if len(raw.Applications) == 0 {
 		return errors.New("must have at least one application")
 	}
 
-	for index, application := range parser.Applications {
-		if application.Name == "" {
+	if len(raw.Applications) == 1 && appName != "" {
+		raw.Applications[0].Name = appName
+		raw.Applications[0].FullUnmarshalledApplication["name"] = appName
+	}
+
+	for i := range raw.Applications {
+		if raw.Applications[i].Name == "" {
 			return errors.New("Found an application with no name specified")
 		}
 
-		if application.Path == "" {
+		if raw.Applications[i].Path == "" {
 			continue
 		}
 
-		var finalPath = application.Path
+		var finalPath = raw.Applications[i].Path
 		if !filepath.IsAbs(finalPath) {
 			finalPath = filepath.Join(filepath.Dir(pathToManifest), finalPath)
 		}
@@ -160,14 +165,20 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 		if err != nil {
 			if os.IsNotExist(err) {
 				return InvalidManifestApplicationPathError{
-					Path: application.Path,
+					Path: raw.Applications[i].Path,
 				}
 			}
 			return err
 		}
-		parser.Applications[index].Path = finalPath
-
+		raw.Applications[i].Path = finalPath
 	}
+
+	parser.Applications = raw.Applications
+	parser.rawManifest, err = yaml.Marshal(raw)
+	if err != nil {
+		return err
+	}
+
 	parser.hasParsed = true
 	return nil
 }

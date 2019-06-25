@@ -63,12 +63,13 @@ type FakeManifestParser struct {
 	fullRawManifestReturnsOnCall map[int]struct {
 		result1 []byte
 	}
-	InterpolateAndParseStub        func(string, []string, []template.VarKV) error
+	InterpolateAndParseStub        func(string, []string, []template.VarKV, string) error
 	interpolateAndParseMutex       sync.RWMutex
 	interpolateAndParseArgsForCall []struct {
 		arg1 string
 		arg2 []string
 		arg3 []template.VarKV
+		arg4 string
 	}
 	interpolateAndParseReturns struct {
 		result1 error
@@ -364,7 +365,7 @@ func (fake *FakeManifestParser) FullRawManifestReturnsOnCall(i int, result1 []by
 	}{result1}
 }
 
-func (fake *FakeManifestParser) InterpolateAndParse(arg1 string, arg2 []string, arg3 []template.VarKV) error {
+func (fake *FakeManifestParser) InterpolateAndParse(arg1 string, arg2 []string, arg3 []template.VarKV, arg4 string) error {
 	var arg2Copy []string
 	if arg2 != nil {
 		arg2Copy = make([]string, len(arg2))
@@ -381,11 +382,12 @@ func (fake *FakeManifestParser) InterpolateAndParse(arg1 string, arg2 []string, 
 		arg1 string
 		arg2 []string
 		arg3 []template.VarKV
-	}{arg1, arg2Copy, arg3Copy})
-	fake.recordInvocation("InterpolateAndParse", []interface{}{arg1, arg2Copy, arg3Copy})
+		arg4 string
+	}{arg1, arg2Copy, arg3Copy, arg4})
+	fake.recordInvocation("InterpolateAndParse", []interface{}{arg1, arg2Copy, arg3Copy, arg4})
 	fake.interpolateAndParseMutex.Unlock()
 	if fake.InterpolateAndParseStub != nil {
-		return fake.InterpolateAndParseStub(arg1, arg2, arg3)
+		return fake.InterpolateAndParseStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
@@ -400,17 +402,17 @@ func (fake *FakeManifestParser) InterpolateAndParseCallCount() int {
 	return len(fake.interpolateAndParseArgsForCall)
 }
 
-func (fake *FakeManifestParser) InterpolateAndParseCalls(stub func(string, []string, []template.VarKV) error) {
+func (fake *FakeManifestParser) InterpolateAndParseCalls(stub func(string, []string, []template.VarKV, string) error) {
 	fake.interpolateAndParseMutex.Lock()
 	defer fake.interpolateAndParseMutex.Unlock()
 	fake.InterpolateAndParseStub = stub
 }
 
-func (fake *FakeManifestParser) InterpolateAndParseArgsForCall(i int) (string, []string, []template.VarKV) {
+func (fake *FakeManifestParser) InterpolateAndParseArgsForCall(i int) (string, []string, []template.VarKV, string) {
 	fake.interpolateAndParseMutex.RLock()
 	defer fake.interpolateAndParseMutex.RUnlock()
 	argsForCall := fake.interpolateAndParseArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeManifestParser) InterpolateAndParseReturns(result1 error) {

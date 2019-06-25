@@ -14,7 +14,7 @@ import (
 
 type ManifestParser interface {
 	v3action.ManifestParser
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error
 }
 
 //go:generate counterfeiter . V3ApplyManifestActor
@@ -71,7 +71,7 @@ func (cmd V3ApplyManifestCommand) Execute(args []string) error {
 		"Username":     user.Name,
 	})
 
-	err = cmd.Parser.InterpolateAndParse(pathToManifest, nil, nil)
+	err = cmd.Parser.InterpolateAndParse(pathToManifest, nil, nil, "")
 	if err != nil {
 		return err
 	}
