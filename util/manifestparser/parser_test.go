@@ -220,7 +220,7 @@ applications:
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(parser.AppNames()).To(ConsistOf("spark", "flame"))
-				Expect(parser.PathToManifest).To(Equal(pathToManifest))
+				Expect(parser.GetPathToManifest()).To(Equal(pathToManifest))
 				Expect(parser.FullRawManifest()).To(MatchYAML(rawManifest))
 			})
 		})
@@ -436,6 +436,49 @@ applications:
 					It("sets its name in the application object", func() {
 						Expect(parser.Applications).To(HaveLen(1))
 						Expect(parser.Applications[0].Name).To(Equal("mashed-potato"))
+					})
+				})
+			})
+
+			When("there are multiple apps", func() {
+				BeforeEach(func() {
+					rawManifest = []byte(`---
+applications:
+- name: app-1
+  instances: 2
+- name: app-2
+  instances: 5
+`)
+					err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				When("the override matches an app", func() {
+					BeforeEach(func() {
+						appName = "app-2"
+					})
+
+					It("keeps only the matching app in the raw manifest", func() {
+						Expect(parser.FullRawManifest()).To(MatchYAML(`---
+applications:
+- name: app-2
+  instances: 5
+`))
+					})
+
+					It("keeps only the matching app in the applications list", func() {
+						Expect(parser.Applications).To(HaveLen(1))
+						Expect(parser.Applications[0].Name).To(Equal("app-2"))
+					})
+				})
+
+				When("the override does *not* match an app", func() {
+					BeforeEach(func() {
+						appName = "does-not-exist"
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError(AppNotInManifestError{Name: "does-not-exist"}))
 					})
 				})
 			})

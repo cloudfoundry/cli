@@ -10,12 +10,7 @@ import (
 func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser ManifestParser, overrides FlagOverrides) ([]PushPlan, error) {
 	var pushPlans []PushPlan
 
-	eligibleApps, err := actor.getEligibleApplications(parser, appNameArg)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, manifestApplication := range eligibleApps {
+	for _, manifestApplication := range getEligibleApplications(parser, appNameArg) {
 		plan := PushPlan{
 			OrgGUID:   orgGUID,
 			SpaceGUID: spaceGUID,
@@ -36,11 +31,11 @@ func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID 
 	return pushPlans, nil
 }
 
-func (Actor) getEligibleApplications(parser ManifestParser, appNameArg string) ([]manifestparser.Application, error) {
+func getEligibleApplications(parser ManifestParser, appName string) []manifestparser.Application {
 	if parser.ContainsManifest() {
-		return parser.Apps(appNameArg)
+		return parser.Apps()
 	}
 	manifestApp := manifestparser.Application{}
-	manifestApp.Name = appNameArg
-	return []manifestparser.Application{manifestApp}, nil
+	manifestApp.Name = appName
+	return []manifestparser.Application{manifestApp}
 }

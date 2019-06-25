@@ -9,18 +9,15 @@ import (
 )
 
 type FakeManifestParser struct {
-	AppsStub        func(string) ([]manifestparser.Application, error)
+	AppsStub        func() []manifestparser.Application
 	appsMutex       sync.RWMutex
 	appsArgsForCall []struct {
-		arg1 string
 	}
 	appsReturns struct {
 		result1 []manifestparser.Application
-		result2 error
 	}
 	appsReturnsOnCall map[int]struct {
 		result1 []manifestparser.Application
-		result2 error
 	}
 	ContainsManifestStub        func() bool
 	containsManifestMutex       sync.RWMutex
@@ -59,22 +56,21 @@ type FakeManifestParser struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeManifestParser) Apps(arg1 string) ([]manifestparser.Application, error) {
+func (fake *FakeManifestParser) Apps() []manifestparser.Application {
 	fake.appsMutex.Lock()
 	ret, specificReturn := fake.appsReturnsOnCall[len(fake.appsArgsForCall)]
 	fake.appsArgsForCall = append(fake.appsArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("Apps", []interface{}{arg1})
+	}{})
+	fake.recordInvocation("Apps", []interface{}{})
 	fake.appsMutex.Unlock()
 	if fake.AppsStub != nil {
-		return fake.AppsStub(arg1)
+		return fake.AppsStub()
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
 	fakeReturns := fake.appsReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *FakeManifestParser) AppsCallCount() int {
@@ -83,43 +79,33 @@ func (fake *FakeManifestParser) AppsCallCount() int {
 	return len(fake.appsArgsForCall)
 }
 
-func (fake *FakeManifestParser) AppsCalls(stub func(string) ([]manifestparser.Application, error)) {
+func (fake *FakeManifestParser) AppsCalls(stub func() []manifestparser.Application) {
 	fake.appsMutex.Lock()
 	defer fake.appsMutex.Unlock()
 	fake.AppsStub = stub
 }
 
-func (fake *FakeManifestParser) AppsArgsForCall(i int) string {
-	fake.appsMutex.RLock()
-	defer fake.appsMutex.RUnlock()
-	argsForCall := fake.appsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeManifestParser) AppsReturns(result1 []manifestparser.Application, result2 error) {
+func (fake *FakeManifestParser) AppsReturns(result1 []manifestparser.Application) {
 	fake.appsMutex.Lock()
 	defer fake.appsMutex.Unlock()
 	fake.AppsStub = nil
 	fake.appsReturns = struct {
 		result1 []manifestparser.Application
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
-func (fake *FakeManifestParser) AppsReturnsOnCall(i int, result1 []manifestparser.Application, result2 error) {
+func (fake *FakeManifestParser) AppsReturnsOnCall(i int, result1 []manifestparser.Application) {
 	fake.appsMutex.Lock()
 	defer fake.appsMutex.Unlock()
 	fake.AppsStub = nil
 	if fake.appsReturnsOnCall == nil {
 		fake.appsReturnsOnCall = make(map[int]struct {
 			result1 []manifestparser.Application
-			result2 error
 		})
 	}
 	fake.appsReturnsOnCall[i] = struct {
 		result1 []manifestparser.Application
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
 func (fake *FakeManifestParser) ContainsManifest() bool {

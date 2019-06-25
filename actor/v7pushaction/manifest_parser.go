@@ -5,7 +5,7 @@ import "code.cloudfoundry.org/cli/util/manifestparser"
 //go:generate counterfeiter . ManifestParser
 
 type ManifestParser interface {
-	Apps(appName string) ([]manifestparser.Application, error)
+	Apps() []manifestparser.Application
 	ContainsManifest() bool
 	FullRawManifest() []byte
 	RawAppManifest(appName string) ([]byte, error)

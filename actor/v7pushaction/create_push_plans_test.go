@@ -62,75 +62,33 @@ var _ = Describe("CreatePushPlans", func() {
 	}
 
 	Describe("Manifest", func() {
-		When("There are multiple apps", func() {
-			BeforeEach(func() {
-				fakeManifestParser.AppsReturns([]manifestparser.Application{
-					{
-						ApplicationModel: manifestparser.ApplicationModel{
-							Name: "my-app",
-						},
-						FullUnmarshalledApplication: nil,
+		BeforeEach(func() {
+			fakeManifestParser.AppsReturns([]manifestparser.Application{
+				{
+					ApplicationModel: manifestparser.ApplicationModel{
+						Name: "my-app",
 					},
-					{
-						ApplicationModel: manifestparser.ApplicationModel{
-							Name: "spencers-app",
-						},
-						FullUnmarshalledApplication: nil,
+					FullUnmarshalledApplication: nil,
+				},
+				{
+					ApplicationModel: manifestparser.ApplicationModel{
+						Name: "spencers-app",
 					},
-				}, nil)
-
-				fakeManifestParser.ContainsManifestReturns(true)
-
-				appNameArg = ""
+					FullUnmarshalledApplication: nil,
+				},
 			})
 
-			AssertNoExecuteErr()
-			AssertPushPlanLength(2)
+			fakeManifestParser.ContainsManifestReturns(true)
 
-			It("it creates pushPlans based on the apps in the manifest", func() {
-				Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
-				Expect(pushPlans[1].Application.Name).To(Equal("spencers-app"))
-			})
+			appNameArg = ""
 		})
 
-		When("There is an appName specified", func() {
-			When("And that appName is NOT present in the manifest", func() {
-				BeforeEach(func() {
-					fakeManifestParser.AppsReturns(nil, manifestparser.AppNotInManifestError{Name: appNameArg})
+		AssertNoExecuteErr()
+		AssertPushPlanLength(2)
 
-					fakeManifestParser.ContainsManifestReturns(true)
-
-					appNameArg = "my-app"
-				})
-
-				It("it returns an AppNotInManifestError", func() {
-					Expect(executeErr).To(MatchError(manifestparser.AppNotInManifestError{Name: appNameArg}))
-				})
-			})
-			When("And that appName is present in the manifest", func() {
-				BeforeEach(func() {
-					fakeManifestParser.AppsReturns([]manifestparser.Application{
-						{
-							ApplicationModel: manifestparser.ApplicationModel{
-								Name: "my-app",
-							},
-							FullUnmarshalledApplication: nil,
-						},
-					}, nil)
-
-					fakeManifestParser.ContainsManifestReturns(true)
-
-					appNameArg = "my-app"
-					flagOverrides.DockerImage = "image"
-				})
-
-				AssertNoExecuteErr()
-				AssertPushPlanLength(1)
-
-				It("it creates pushPlans based on the named app in the manifest", func() {
-					Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
-				})
-			})
+		It("it creates pushPlans based on the apps in the manifest", func() {
+			Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
+			Expect(pushPlans[1].Application.Name).To(Equal("spencers-app"))
 		})
 	})
 
