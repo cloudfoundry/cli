@@ -209,7 +209,7 @@ func Cleanup() {
 		broker := New()
 		otherBroker := New().WithNameSuffix("other")
 
-		if os.Getenv("KEEP_FAKE_SERVICE_BROKERS") == "true" {
+		if os.Getenv("KEEP_FAKE_SERVICE_BROKERS") != "true" {
 			broker.stopReusing()
 			otherBroker.stopReusing()
 		}
