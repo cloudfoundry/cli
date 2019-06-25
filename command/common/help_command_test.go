@@ -1,3 +1,5 @@
+//+build !V7
+
 package common_test
 
 import (

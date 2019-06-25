@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"regexp"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,19 +35,27 @@ var _ = Describe("create-app-manifest command", func() {
 	})
 
 	Context("Help", func() {
-		It("displays the help information", func() {
-			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", "--help")
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("create-app-manifest - Create an app manifest for an app that has been pushed successfully"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`cf create-app-manifest APP_NAME \[-p \/path\/to\/<app-name>_manifest\.yml\]`))
-			Eventually(session).Should(Say(""))
-			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("apps, push"))
+		When("--help flag is set", func() {
+			It("appears in cf help -a", func() {
+				session := helpers.CF("help", "-a")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(HaveCommandInCategoryWithDescription("create-app-manifest", "APPS", "Create an app manifest for an app that has been pushed successfully"))
+			})
 
-			Eventually(session).Should(Exit(0))
+			It("displays the help information", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("create-app-manifest - Create an app manifest for an app that has been pushed successfully"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say(`cf create-app-manifest APP_NAME \[-p \/path\/to\/<app-name>_manifest\.yml\]`))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("apps, push"))
+
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 

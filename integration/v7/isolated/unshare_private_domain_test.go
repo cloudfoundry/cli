@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -8,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Unshare Private Domain", func() {
+var _ = Describe("unshare-private-domain command", func() {
 	var (
 		domainName      string
 		owningOrgName   string
@@ -21,15 +22,23 @@ var _ = Describe("Unshare Private Domain", func() {
 	})
 
 	Describe("Help Text", func() {
-		It("Displays the help text", func() {
-			session := helpers.CF("unshare-private-domain", "--help")
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("unshare-private-domain - Unshare a private domain with a specific org"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf unshare-private-domain ORG DOMAIN"))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("delete-private-domain, domains"))
-			Eventually(session).Should(Exit(0))
+		When("--help flag is set", func() {
+			It("appears in cf help -a", func() {
+				session := helpers.CF("help", "-a")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(HaveCommandInCategoryWithDescription("unshare-private-domain", "ORG ADMIN", "Unshare a private domain with a specific org"))
+			})
+
+			It("Displays the help text", func() {
+				session := helpers.CF("unshare-private-domain", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("unshare-private-domain - Unshare a private domain with a specific org"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf unshare-private-domain ORG DOMAIN"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("delete-private-domain, domains"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 

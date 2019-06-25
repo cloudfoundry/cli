@@ -3,6 +3,8 @@ package isolated
 import (
 	"fmt"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -25,6 +27,12 @@ var _ = Describe("restart-app-instance command", func() {
 	})
 
 	When("--help flag is set", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("restart-app-instance", "APPS", "Terminate, then instantiate an app instance"))
+		})
+
 		It("Displays command usage to output", func() {
 			session := helpers.CF("restart-app-instance", "--help")
 			Eventually(session).Should(Say("NAME:"))

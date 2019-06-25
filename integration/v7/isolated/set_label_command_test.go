@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,6 +17,12 @@ import (
 var _ = Describe("set-label command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
+			It("appears in cf help -a", func() {
+				session := helpers.CF("help", "-a")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(HaveCommandInCategoryWithDescription("set-label", "METADATA", "Set a label (key-value pairs) for an API resource"))
+			})
+
 			It("Displays command usage to output", func() {
 				session := helpers.CF("set-label", "--help")
 

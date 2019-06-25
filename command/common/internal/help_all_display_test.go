@@ -4,7 +4,6 @@ package internal_test
 
 import (
 	"reflect"
-	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/command/common"
@@ -39,9 +38,9 @@ var _ = Describe("test help all display", func() {
 		}
 	})
 
-	It("matches up (not including experimental commands)", func() {
-		sort.Strings(fromCommandList)
-		sort.Strings(fromHelpAllDisplay)
-		Expect(fromCommandList).To(ConsistOf(fromHelpAllDisplay))
+	It("lists all commands from command list in at least one category", func() {
+		for _, command := range fromCommandList {
+			Expect(fromHelpAllDisplay).To(ContainElement(command))
+		}
 	})
 })

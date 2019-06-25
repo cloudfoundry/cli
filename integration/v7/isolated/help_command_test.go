@@ -4,6 +4,7 @@ import (
 	"os/exec"
 	"strings"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -13,6 +14,12 @@ import (
 )
 
 var _ = Describe("help command", func() {
+	It("appears in cf help -a", func() {
+		session := helpers.CF("help", "-a")
+		Eventually(session).Should(Exit(0))
+		Expect(session).To(HaveCommandInCategoryWithDescription("help", "GETTING STARTED", "Show help"))
+	})
+
 	DescribeTable("displays help for common commands",
 		func(setup func() *exec.Cmd) {
 			cmd := setup()

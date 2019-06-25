@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,19 +13,27 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Logs Command", func() {
+var _ = Describe("logs Command", func() {
 	Describe("help", func() {
-		It("displays command usage to output", func() {
-			session := helpers.CF("logs", "--help")
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("logs - Tail or show recent logs for an app"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf logs APP_NAME"))
-			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say(`--recent\s+Dump recent logs instead of tailing`))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("app, apps, ssh"))
-			Eventually(session).Should(Exit(0))
+		When("--help flag is set", func() {
+			It("appears in cf help -a", func() {
+				session := helpers.CF("help", "-a")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(HaveCommandInCategoryWithDescription("logs", "APPS", "Tail or show recent logs for an app"))
+			})
+
+			It("displays command usage to output", func() {
+				session := helpers.CF("logs", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("logs - Tail or show recent logs for an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf logs APP_NAME"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--recent\s+Dump recent logs instead of tailing`))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("app, apps, ssh"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 

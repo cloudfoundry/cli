@@ -3,6 +3,8 @@ package isolated
 import (
 	"regexp"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,15 +14,23 @@ import (
 
 var _ = Describe("share-private-domain command", func() {
 	Context("Help", func() {
-		It("displays the help information", func() {
-			session := helpers.CF("share-private-domain", "--help")
-			Eventually(session).Should(Say("NAME:\n"))
-			Eventually(session).Should(Say(regexp.QuoteMeta("share-private-domain - Share a private domain with a specific org")))
-			Eventually(session).Should(Say("USAGE:\n"))
-			Eventually(session).Should(Say(regexp.QuoteMeta("cf share-private-domain ORG DOMAIN")))
-			Eventually(session).Should(Say("SEE ALSO:\n"))
-			Eventually(session).Should(Say("create-private-domain, domains, unshare-private-domain"))
-			Eventually(session).Should(Exit(0))
+		When("--help flag is set", func() {
+			It("appears in cf help -a", func() {
+				session := helpers.CF("help", "-a")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(HaveCommandInCategoryWithDescription("share-private-domain", "ORG ADMIN", "Share a private domain with a specific org"))
+			})
+
+			It("displays the help information", func() {
+				session := helpers.CF("share-private-domain", "--help")
+				Eventually(session).Should(Say("NAME:\n"))
+				Eventually(session).Should(Say(regexp.QuoteMeta("share-private-domain - Share a private domain with a specific org")))
+				Eventually(session).Should(Say("USAGE:\n"))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf share-private-domain ORG DOMAIN")))
+				Eventually(session).Should(Say("SEE ALSO:\n"))
+				Eventually(session).Should(Say("create-private-domain, domains, unshare-private-domain"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 

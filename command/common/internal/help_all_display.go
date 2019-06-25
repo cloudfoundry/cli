@@ -59,6 +59,7 @@ var HelpCategoryList = []HelpCategory{
 			{"domains"},
 			{"create-private-domain", "delete-private-domain"},
 			{"create-shared-domain", "delete-shared-domain"},
+			{"router-groups"},
 		},
 	},
 	{

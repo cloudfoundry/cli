@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -24,20 +25,28 @@ var _ = Describe("target command", func() {
 	})
 
 	Context("help", func() {
-		It("displays help", func() {
-			session := helpers.CF("target", "--help")
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("   target - Set or view the targeted org or space"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`   cf target \[-o ORG\] \[-s SPACE\]`))
-			Eventually(session).Should(Say("ALIAS:"))
-			Eventually(session).Should(Say("   t"))
-			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("   -o      Organization"))
-			Eventually(session).Should(Say("   -s      Space"))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("   create-org, create-space, login, orgs, spaces"))
-			Eventually(session).Should(Exit(0))
+		When("--help flag is set", func() {
+			It("appears in cf help -a", func() {
+				session := helpers.CF("help", "-a")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(HaveCommandInCategoryWithDescription("target", "GETTING STARTED", "Set or view the targeted org or space"))
+			})
+
+			It("displays help", func() {
+				session := helpers.CF("target", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("   target - Set or view the targeted org or space"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say(`   cf target \[-o ORG\] \[-s SPACE\]`))
+				Eventually(session).Should(Say("ALIAS:"))
+				Eventually(session).Should(Say("   t"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("   -o      Organization"))
+				Eventually(session).Should(Say("   -s      Space"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("   create-org, create-space, login, orgs, spaces"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 

@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -10,6 +11,12 @@ import (
 
 var _ = Describe("buildpacks command", func() {
 	When("--help is passed", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("buildpacks", "BUILDPACKS", "List all buildpacks"))
+		})
+
 		It("displays the help message", func() {
 			session := helpers.CF("buildpacks", "--help")
 			Eventually(session).Should(Say("NAME:"))

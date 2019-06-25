@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,6 +23,12 @@ var _ = Describe("delete command", func() {
 	})
 
 	When("--help flag is set", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("delete", "APPS", "Delete an app"))
+		})
+
 		It("Displays command usage to output", func() {
 			session := helpers.CF("delete", "--help")
 			Eventually(session).Should(Say("NAME:"))
