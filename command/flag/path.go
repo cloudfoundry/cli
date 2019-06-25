@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	flags "github.com/jessevdk/go-flags"
+	"code.cloudfoundry.org/cli/util/manifestparser"
+	"github.com/jessevdk/go-flags"
 )
 
 type Path string
@@ -28,18 +29,46 @@ func (PathWithExistenceCheck) Complete(prefix string) []flags.Completion {
 }
 
 func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
-	_, err := os.Stat(path)
+	_, err := checkIfFileExists(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return &flags.Error{
-				Type:    flags.ErrRequired,
-				Message: fmt.Sprintf("The specified path '%s' does not exist.", path),
-			}
-		}
 		return err
 	}
 
 	*p = PathWithExistenceCheck(path)
+	return nil
+}
+
+type ManifestPathWithExistenceCheck string
+
+func (ManifestPathWithExistenceCheck) Complete(prefix string) []flags.Completion {
+	return completeWithTilde(prefix)
+}
+
+func (p *ManifestPathWithExistenceCheck) UnmarshalFlag(path string) error {
+	fileInfo, err := checkIfFileExists(path)
+	if err != nil {
+		return err
+	}
+
+	if fileInfo.IsDir() {
+		locator := manifestparser.NewLocator()
+		pathToFile, existsInDirectory, err := locator.Path(path)
+		if err != nil {
+			return err
+		}
+
+		if !existsInDirectory {
+			return &flags.Error{
+				Type:    flags.ErrRequired,
+				Message: fmt.Sprintf("The specified directory '%s' does not contain a file named 'manifest.yml'.", path),
+			}
+		}
+
+		*p = ManifestPathWithExistenceCheck(pathToFile)
+	} else {
+		*p = ManifestPathWithExistenceCheck(path)
+	}
+
 	return nil
 }
 
@@ -181,4 +210,18 @@ func completeWithTilde(prefix string) []flags.Completion {
 			}
 			return path
 		})
+}
+
+func checkIfFileExists(path string) (os.FileInfo, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, &flags.Error{
+				Type:    flags.ErrRequired,
+				Message: fmt.Sprintf("The specified path '%s' does not exist.", path),
+			}
+		}
+		return nil, err
+	}
+	return fileInfo, nil
 }

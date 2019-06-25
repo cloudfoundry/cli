@@ -64,26 +64,6 @@ var _ = Describe("apply-manifest command", func() {
 		})
 	})
 
-	When("the -f flag is not given an arg", func() {
-		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
-			session := helpers.CF("apply-manifest", "-f")
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-f'"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	When("the -f flag path does not exist", func() {
-		It("tells the user that the provided path doesn't exist, prints help text, and exits 1", func() {
-			session := helpers.CF("apply-manifest", "-f", "path/that/does/not/exist")
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'path/that/does/not/exist' does not exist."))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "apply-manifest", "-f", manifestPath)
@@ -99,106 +79,148 @@ var _ = Describe("apply-manifest command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		When("the app exists", func() {
+		When("the app name in the manifest is missing", func() {
 			BeforeEach(func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+				helpers.WriteManifest(manifestPath, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"instances": 3,
+						},
+					},
 				})
 			})
 
-			When("the app name in the manifest is missing", func() {
-				BeforeEach(func() {
-					helpers.WriteManifest(manifestPath, map[string]interface{}{
-						"applications": []map[string]interface{}{
-							{
-								"instances": 3,
-							},
-						},
-					})
-				})
+			It("reports an error", func() {
+				session := helpers.CF("apply-manifest", "-f", manifestPath)
+				Eventually(session.Err).Should(Say("Found an application with no name specified"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
 
-				It("reports an error", func() {
-					session := helpers.CF("apply-manifest", "-f", manifestPath)
-					Eventually(session.Err).Should(Say("Found an application with no name specified"))
-					Eventually(session).Should(Say("FAILED"))
+		When("there is a CC error", func() {
+			BeforeEach(func() {
+				helpers.WriteManifest(manifestPath, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name":      appName,
+							"instances": -1,
+						},
+					},
+				})
+			})
+
+			It("displays the error", func() {
+				session := helpers.CF("apply-manifest", "-f", manifestPath)
+				Eventually(session.Err).Should(Say("Instances must be greater than or equal to 0"))
+				Eventually(session).Should(Say("FAILED"))
+
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("-f is provided", func() {
+			When("the -f flag is not given an arg", func() {
+				It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
+					session := helpers.CF("apply-manifest", "-f")
+
+					Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-f'"))
+					Eventually(session).Should(Say("NAME:"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
 
-			When("the app name in the manifest does exist", func() {
-				When("the instances value is negative", func() {
-					BeforeEach(func() {
-						helpers.WriteManifest(manifestPath, map[string]interface{}{
-							"applications": []map[string]interface{}{
-								{
-									"name":      appName,
-									"instances": -1,
-								},
-							},
-						})
-					})
+			When("the -f flag points to a directory that does not have a manifest.yml file", func() {
+				var (
+					emptyDir string
+					err      error
+				)
 
-					It("reports an error", func() {
-						session := helpers.CF("apply-manifest", "-f", manifestPath)
-						Eventually(session.Err).Should(Say("Instances must be greater than or equal to 0"))
-						Eventually(session).Should(Say("FAILED"))
-
-						Eventually(session).Should(Exit(1))
-					})
+				BeforeEach(func() {
+					emptyDir, err = ioutil.TempDir("", "empty")
+					Expect(err).NotTo(HaveOccurred())
 				})
 
-				When("the instances value is more than the space quota limit", func() {
-					BeforeEach(func() {
-						Eventually(helpers.CF("create-space-quota", "some-space-quota-name", "-a", "4")).Should(Exit(0))
-						Eventually(helpers.CF("set-space-quota", spaceName, "some-space-quota-name")).Should(Exit(0))
-						helpers.WriteManifest(manifestPath, map[string]interface{}{
-							"applications": []map[string]interface{}{
-								{
-									"name":      appName,
-									"instances": 5,
-								},
-							},
-						})
-					})
-
-					It("reports an error", func() {
-						session := helpers.CF("apply-manifest", "-f", manifestPath)
-						Eventually(session.Err).Should(Say("memory space_quota_exceeded, app_instance_limit space_app_instance_limit_exceeded"))
-						Eventually(session).Should(Say("FAILED"))
-
-						Eventually(session).Should(Exit(1))
-					})
+				AfterEach(func() {
+					Expect(os.RemoveAll(emptyDir)).ToNot(HaveOccurred())
 				})
 
-				When("instances are specified correctly", func() {
-					BeforeEach(func() {
-						helpers.WriteManifest(manifestPath, map[string]interface{}{
-							"applications": []map[string]interface{}{
-								{
-									"name":      appName,
-									"instances": 3,
-								},
-							},
-						})
-					})
+				It("tells the user that the provided path doesn't exist, prints help text, and exits 1", func() {
+					session := helpers.CF("apply-manifest", "-f", emptyDir)
 
-					It("rescales the app", func() {
-						session := helpers.CF("app", appName)
-						userName, _ := helpers.GetCredentials()
-						Eventually(session).Should(Say(`instances:\s+%s`, "1/1"))
-						Eventually(session).Should(Exit())
-
-						session = helpers.CF("apply-manifest", "-f", manifestPath)
-						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
-						Eventually(session).Should(Exit())
-
-						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say(`instances:\s+%s`, `\d/3`))
-						Eventually(session).Should(Exit())
-					})
+					Eventually(session.Err).Should(Say("Incorrect Usage: The specified directory '%s' does not contain a file named 'manifest.yml'.", emptyDir))
+					Eventually(session).Should(Say("NAME:"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 
+			When("the -f flag points to a file that does not exist", func() {
+				It("tells the user that the provided path doesn't exist, prints help text, and exits 1", func() {
+					session := helpers.CF("apply-manifest", "-f", "path/that/does/not/exist")
+
+					Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'path/that/does/not/exist' does not exist."))
+					Eventually(session).Should(Say("NAME:"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the manifest exists where -f points", func() {
+				It("applies the manifest successfully", func() {
+					userName, _ := helpers.GetCredentials()
+					helpers.WriteManifest(filepath.Join(appDir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name":      appName,
+								"instances": 3,
+							},
+						},
+					})
+
+					session := helpers.CF("apply-manifest", "-f", appDir)
+					Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+					Eventually(session).Should(Exit())
+
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say(`instances:\s+%s`, `\d/3`))
+					Eventually(session).Should(Exit())
+				})
+			})
+		})
+
+		When("-f is not provided", func() {
+			When("a properly formatted manifest is present in the pwd", func() {
+				It("autodetects and applies the manifest", func() {
+					userName, _ := helpers.GetCredentials()
+					helpers.WriteManifest(filepath.Join(appDir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name":      appName,
+								"instances": 3,
+							},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "apply-manifest")
+					Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+					Eventually(session).Should(Exit())
+
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say(`instances:\s+%s`, `\d/3`))
+					Eventually(session).Should(Exit())
+				})
+			})
+
+			When("the current directory does not have a manifest", func() {
+				It("fails nicely", func() {
+					currentDir, err := os.Getwd()
+					Expect(err).NotTo(HaveOccurred())
+					session := helpers.CF("apply-manifest")
+
+					Eventually(session.Err).Should(Say("Could not find 'manifest.yml' file in %s", currentDir))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 	})
 })

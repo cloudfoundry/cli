@@ -233,6 +233,47 @@ var _ = Describe("path types", func() {
 		})
 	})
 
+	Describe("ManifestPathWithExistenceCheck", func() {
+		var manifestPathWithExistenceCheck ManifestPathWithExistenceCheck
+
+		BeforeEach(func() {
+			manifestPathWithExistenceCheck = ManifestPathWithExistenceCheck("")
+		})
+
+		// The Complete method is not tested because it shares the same code as
+		// Path.Complete().
+
+		Describe("UnmarshalFlag", func() {
+			When("the path does not exist", func() {
+				It("returns a path does not exist error", func() {
+					err := manifestPathWithExistenceCheck.UnmarshalFlag("./some-dir/some-file")
+					Expect(err).To(MatchError(&flags.Error{
+						Type:    flags.ErrRequired,
+						Message: "The specified path './some-dir/some-file' does not exist.",
+					}))
+				})
+			})
+
+			When("the path is a directory, and exists, but does not contain a manifest.{yml,yaml} file", func() {
+				It("returns a path does not exist error", func() {
+					err := manifestPathWithExistenceCheck.UnmarshalFlag(tempDir)
+					Expect(err).To(MatchError(&flags.Error{
+						Type:    flags.ErrRequired,
+						Message: "The specified directory '" + tempDir + "' does not contain a file named 'manifest.yml'.",
+					}))
+				})
+			})
+
+			When("the path exists", func() {
+				It("sets the path", func() {
+					err := manifestPathWithExistenceCheck.UnmarshalFlag("abc")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(manifestPathWithExistenceCheck).To(BeEquivalentTo("abc"))
+				})
+			})
+		})
+	})
+
 	Describe("JSONOrFileWithValidation", func() {
 		var jsonOrFile JSONOrFileWithValidation
 

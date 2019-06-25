@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -25,6 +26,7 @@ var _ = Describe("apply-manifest Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeApplyManifestActor
 		fakeParser      *v7fakes.FakeManifestParser
+		fakeLocator     *v7fakes.FakeManifestLocator
 		binaryName      string
 		executeErr      error
 	)
@@ -35,16 +37,19 @@ var _ = Describe("apply-manifest Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeApplyManifestActor)
 		fakeParser = new(v7fakes.FakeManifestParser)
+		fakeLocator = new(v7fakes.FakeManifestLocator)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = ApplyManifestCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			Parser:      fakeParser,
+			UI:              testUI,
+			Config:          fakeConfig,
+			SharedActor:     fakeSharedActor,
+			Actor:           fakeActor,
+			Parser:          fakeParser,
+			ManifestLocator: fakeLocator,
+			CWD:             "fake-directory",
 		}
 	})
 
@@ -94,51 +99,92 @@ var _ = Describe("apply-manifest Command", func() {
 				GUID: "some-space-guid",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-
-			providedPath = "some-manifest-path"
-			cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
 		})
 
-		When("the parse is successful", func() {
+		When("the manifest location is specified with `-f`", func() {
 			BeforeEach(func() {
-				fakeActor.SetSpaceManifestReturns(
-					v7action.Warnings{"some-manifest-warning"},
-					nil,
-				)
-				fakeParser.FullRawManifestReturns([]byte("manifesto"))
+				providedPath = "some-manifest-path"
+				cmd.PathToManifest = flag.ManifestPathWithExistenceCheck(providedPath)
 			})
 
-			It("displays the success text", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("Applying manifest %s in org some-org / space some-space as steve...", regexp.QuoteMeta(providedPath)))
-				Expect(testUI.Err).To(Say("some-manifest-warning"))
-				Expect(testUI.Out).To(Say("OK"))
-
-				Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
-				path, _, _, appName := fakeParser.InterpolateAndParseArgsForCall(0)
-				Expect(path).To(Equal(providedPath))
-				Expect(appName).To(Equal(""))
-
-				Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
-				spaceGUIDArg, actualBytes, actualNoRoute := fakeActor.SetSpaceManifestArgsForCall(0)
-				Expect(actualBytes).To(Equal([]byte("manifesto")))
-				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
-				Expect(actualNoRoute).To(BeFalse())
+			It("does not try to locate the manifest file", func() {
+				Expect(fakeLocator.PathCallCount()).To(Equal(0))
 			})
 		})
 
-		When("the parse errors", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("oooooh nooooos")
-				fakeParser.InterpolateAndParseReturns(expectedErr)
+		When("the manifest location is not specified with `-f`", func() {
+			When("looking for the manifest file errors", func() {
+				BeforeEach(func() {
+					fakeLocator.PathReturns("", false, errors.New("some-error"))
+				})
+				It("returns the error", func() {
+					Expect(fakeLocator.PathCallCount()).To(Equal(1))
+					Expect(fakeLocator.PathArgsForCall(0)).To(Equal(cmd.CWD))
+					Expect(executeErr).To(MatchError("some-error"))
+				})
 			})
 
-			It("returns back the parse error", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
+			When("the manifest file does not exist in the current directory", func() {
+				BeforeEach(func() {
+					fakeLocator.PathReturns("", false, nil)
+				})
 
-				Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
+				It("returns a descriptive error", func() {
+					Expect(executeErr).To(MatchError(translatableerror.ManifestFileNotFoundInDirectoryError{
+						PathToManifest: cmd.CWD,
+					}))
+				})
+			})
+
+			When("the manifest file exists in the current directory", func() {
+				var resolvedPath = "/fake/manifest.yml"
+
+				BeforeEach(func() {
+					fakeLocator.PathReturns(resolvedPath, true, nil)
+				})
+
+				When("the manifest is successfully parsed", func() {
+					BeforeEach(func() {
+						fakeActor.SetSpaceManifestReturns(
+							v7action.Warnings{"some-manifest-warning"},
+							nil,
+						)
+						fakeParser.FullRawManifestReturns([]byte("manifesto"))
+					})
+
+					It("displays the success text", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Applying manifest %s in org some-org / space some-space as steve...", regexp.QuoteMeta(resolvedPath)))
+						Expect(testUI.Err).To(Say("some-manifest-warning"))
+						Expect(testUI.Out).To(Say("OK"))
+
+						Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
+						path, _, _, appName := fakeParser.InterpolateAndParseArgsForCall(0)
+						Expect(path).To(Equal(resolvedPath))
+						Expect(appName).To(Equal(""))
+
+						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
+						spaceGUIDArg, actualBytes, actualNoRoute := fakeActor.SetSpaceManifestArgsForCall(0)
+						Expect(actualBytes).To(Equal([]byte("manifesto")))
+						Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+						Expect(actualNoRoute).To(BeFalse())
+					})
+				})
+
+				When("the manifest is unparseable", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("oooooh nooooos")
+						fakeParser.InterpolateAndParseReturns(expectedErr)
+					})
+
+					It("returns back the parse error", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+
+						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
+					})
+				})
 			})
 		})
 	})

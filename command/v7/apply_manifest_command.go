@@ -1,10 +1,13 @@
 package v7
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
@@ -15,18 +18,21 @@ type ApplyManifestActor interface {
 }
 
 type ApplyManifestCommand struct {
-	PathToManifest  flag.PathWithExistenceCheck `short:"f" description:"Path to app manifest" required:"true"`
-	usage           interface{}                 `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
-	relatedCommands interface{}                 `related_commands:"create-app, create-app-manifest, push"`
+	PathToManifest  flag.ManifestPathWithExistenceCheck `short:"f" description:"Path to app manifest"`
+	usage           interface{}                         `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
+	relatedCommands interface{}                         `related_commands:"create-app, create-app-manifest, push"`
 
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       ApplyManifestActor
-	Parser      ManifestParser
+	UI              command.UI
+	Config          command.Config
+	SharedActor     command.SharedActor
+	ManifestLocator ManifestLocator
+	Actor           ApplyManifestActor
+	Parser          ManifestParser
+	CWD             string
 }
 
 func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) error {
+
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
@@ -36,14 +42,17 @@ func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) err
 		return err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+
+	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.Parser = manifestparser.NewParser()
 
-	return nil
+	currentDir, err := os.Getwd()
+	cmd.CWD = currentDir
+
+	return err
 }
 
 func (cmd ApplyManifestCommand) Execute(args []string) error {
-	pathToManifest := string(cmd.PathToManifest)
-
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -54,14 +63,31 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
+	var manifestReadPath = string(cmd.PathToManifest)
+
+	if manifestReadPath == "" {
+		locatorPath := cmd.CWD
+		resolvedPath, exists, err := cmd.ManifestLocator.Path(locatorPath)
+
+		if err != nil {
+			return err
+		}
+
+		if !exists {
+			return translatableerror.ManifestFileNotFoundInDirectoryError{PathToManifest: locatorPath}
+		}
+
+		manifestReadPath = resolvedPath
+	}
+
 	cmd.UI.DisplayTextWithFlavor("Applying manifest {{.ManifestPath}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"ManifestPath": pathToManifest,
+		"ManifestPath": manifestReadPath,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
 		"Username":     user.Name,
 	})
 
-	err = cmd.Parser.InterpolateAndParse(pathToManifest, nil, nil, "")
+	err = cmd.Parser.InterpolateAndParse(manifestReadPath, nil, nil, "")
 	if err != nil {
 		return err
 	}
