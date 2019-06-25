@@ -135,6 +135,7 @@ var _ = Describe("update-service command", func() {
 					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.ServicePlanName())
 					Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("No changes were made"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
