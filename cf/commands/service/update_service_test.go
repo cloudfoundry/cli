@@ -91,7 +91,6 @@ var _ = Describe("update-service command", func() {
 	})
 
 	Context("when no flags are passed", func() {
-
 		Context("when the instance exists", func() {
 			It("prints a user indicating it is a no-op", func() {
 				callUpdateService([]string{"my-service"})
@@ -100,6 +99,69 @@ var _ = Describe("update-service command", func() {
 					[]string{"OK"},
 					[]string{"No changes were made"},
 				))
+			})
+		})
+	})
+
+	Context("when same plan is provided", func() {
+		Context("when the instance exists", func() {
+			BeforeEach(func() {
+				serviceInstance := models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Name: "my-service-instance",
+						GUID: "my-service-instance-guid",
+						LastOperation: models.LastOperationFields{
+							Type:        "update",
+							State:       "in progress",
+							Description: "fake service instance description",
+						},
+					},
+					ServiceOffering: models.ServiceOfferingFields{
+						Label: "murkydb",
+						GUID:  "murkydb-guid",
+					},
+					ServicePlan: models.ServicePlanFields{
+						GUID: "murkydb-spark-guid",
+					},
+				}
+
+				servicePlans := []models.ServicePlanFields{{
+					Name: "spark",
+					GUID: "murkydb-spark-guid",
+				}, {
+					Name: "flare",
+					GUID: "murkydb-flare-guid",
+				}}
+				serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
+				planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
+			})
+
+			It("prints a user indicating it is a no-op", func() {
+				callUpdateService([]string{"-p", "spark", "my-service-instance"})
+
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Updating service", "my-service-instance", "as", "my-user", "..."},
+					[]string{"OK"},
+					[]string{"No changes were made"},
+				))
+			})
+
+			Context("when params changed", func() {
+				It("successfully updates a service but omits the plan GUID from the request", func() {
+					callUpdateService([]string{"-p", "spark", "-c", `{"foo": "bar"}`, "my-service-instance"})
+
+					Expect(ui.Outputs()).To(ContainSubstrings(
+						[]string{"Updating service", "my-service-instance", "as", "my-user", "..."},
+						[]string{"OK"},
+						[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
+					))
+					Expect(serviceRepo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service-instance"))
+
+					instanceGUID, planGUID, params, _ := serviceRepo.UpdateServiceInstanceArgsForCall(0)
+					Expect(instanceGUID).To(Equal("my-service-instance-guid"))
+					Expect(planGUID).To(Equal(""))
+					Expect(params).To(Equal(map[string]interface{}{"foo": "bar"}))
+				})
 			})
 		})
 	})
@@ -128,8 +190,7 @@ var _ = Describe("update-service command", func() {
 			}, {
 				Name: "flare",
 				GUID: "murkydb-flare-guid",
-			},
-			}
+			}}
 			serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 			planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
 		})

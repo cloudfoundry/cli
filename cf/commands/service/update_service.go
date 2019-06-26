@@ -101,9 +101,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) error {
 	tagsSet := c.IsSet("t")
 	tagsList := c.String("t")
 
-	if planName == "" && params == "" && tagsSet == false {
-		cmd.ui.Ok()
-		cmd.ui.Say(T("No changes were made"))
+	if !cmd.ensureThereAreChanges(planName, params, tagsSet) {
 		return nil
 	}
 
@@ -122,13 +120,23 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) error {
 
 	var plan models.ServicePlanFields
 	if planName != "" {
-		plan, err = cmd.findPlan(serviceInstance, planName)
+		foundPlan, err := cmd.findPlan(serviceInstance, planName)
 		if err != nil {
 			return err
+		}
+
+		if planIsTheSame(serviceInstance, foundPlan) {
+			planName = ""
+		} else {
+			plan = foundPlan
 		}
 	}
 
 	cmd.printUpdatingServiceInstanceMessage(serviceInstanceName)
+
+	if !cmd.ensureThereAreChanges(planName, params, tagsSet) {
+		return nil
+	}
 
 	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.GUID, plan.GUID, paramsMap, tags)
 	if err != nil {
@@ -164,6 +172,23 @@ func (cmd *UpdateService) printUpdatingServiceInstanceMessage(serviceInstanceNam
 			"ServiceName": terminal.EntityNameColor(serviceInstanceName),
 			"UserName":    terminal.EntityNameColor(cmd.config.Username()),
 		}))
+}
+
+func (cmd *UpdateService) ensureThereAreChanges(planName string, params string, tagsSet bool) bool {
+	if planName == "" && params == "" && tagsSet == false {
+		cmd.ui.Ok()
+		cmd.ui.Say(T("No changes were made"))
+		return false
+	}
+
+	return true
+}
+
+func planIsTheSame(serviceInstance models.ServiceInstance, plan models.ServicePlanFields) bool {
+	oldPlanGUID := serviceInstance.ServicePlan.GUID
+	newPlanGUID := plan.GUID
+
+	return oldPlanGUID == newPlanGUID
 }
 
 func printSuccessMessageForServiceInstance(serviceInstanceName string, serviceRepo api.ServiceRepository, ui terminal.UI) error {
