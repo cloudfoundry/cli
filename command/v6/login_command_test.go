@@ -713,7 +713,7 @@ var _ = Describe("login Command", func() {
 			})
 		})
 
-		Describe("Targeting Org and Space", func() {
+		Describe("Targeting Org", func() {
 			BeforeEach(func() {
 				cmd.APIEndpoint = "example.com"
 				cmd.Username = "some-user"
@@ -1035,6 +1035,16 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
 				})
+			})
+		})
+
+		Describe("Targeting Space", func() {
+			BeforeEach(func() {
+				cmd.APIEndpoint = "example.com"
+				cmd.Username = "some-user"
+				cmd.Password = "some-password"
+				fakeConfig.APIVersionReturns("3.4.5")
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
 			})
 
 			When("an org has been successfully targeted", func() {
