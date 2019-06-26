@@ -147,7 +147,6 @@ func (parser *Parser) parse(manifestBytes []byte, appName string) error {
 
 		if raw.Applications[i].Name == appName {
 			filteredIndex = i
-			break
 		}
 
 		if raw.Applications[i].Path == "" {

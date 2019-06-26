@@ -441,15 +441,32 @@ applications:
 			})
 
 			When("there are multiple apps", func() {
+				var (
+					app1FullPath string
+					app2FullPath string
+				)
+
 				BeforeEach(func() {
+					manifestDir := filepath.Dir(pathToManifest)
+					app1FullPath = filepath.Join(manifestDir, "app1")
+					app2FullPath = filepath.Join(manifestDir, "app2")
+
+					var err error
+					err = os.MkdirAll(app1FullPath, 0777)
+					Expect(err).ToNot(HaveOccurred())
+					err = os.MkdirAll(app2FullPath, 0777)
+					Expect(err).ToNot(HaveOccurred())
+
 					rawManifest = []byte(`---
 applications:
 - name: app-1
   instances: 2
+  path: ./app1
 - name: app-2
   instances: 5
+  path: ./app2
 `)
-					err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+					err = ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -461,14 +478,16 @@ applications:
 					It("keeps only the matching app in the raw manifest", func() {
 						Expect(parser.FullRawManifest()).To(MatchYAML(`---
 applications:
-- name: app-2
-  instances: 5
+- instances: 5
+  name: app-2
+  path: ./app2
 `))
 					})
 
 					It("keeps only the matching app in the applications list", func() {
 						Expect(parser.Applications).To(HaveLen(1))
 						Expect(parser.Applications[0].Name).To(Equal("app-2"))
+						Expect(parser.Applications[0].Path).To(Equal(app2FullPath))
 					})
 				})
 
