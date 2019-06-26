@@ -1,6 +1,7 @@
 package manifestparser_test
 
 import (
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -487,7 +488,7 @@ applications:
 					It("keeps only the matching app in the applications list", func() {
 						Expect(parser.Applications).To(HaveLen(1))
 						Expect(parser.Applications[0].Name).To(Equal("app-2"))
-						Expect(parser.Applications[0].Path).To(Equal(app2FullPath))
+						Expect(parser.Applications[0].Path).To(matchers.MatchPath(app2FullPath))
 					})
 				})
 
@@ -557,7 +558,6 @@ applications:
 		})
 
 		When("marshaling does not error", func() {
-
 			It("returns just the app's manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(string(rawAppManifest)).To(MatchYAML(fmt.Sprintf(`applications:
