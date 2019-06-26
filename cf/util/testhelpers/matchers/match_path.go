@@ -3,12 +3,13 @@ package matchers
 import (
 	"fmt"
 	"github.com/onsi/gomega"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 type PathMatcher struct {
-	actualPath   interface{}
+	actualPath   string
 	expectedPath string
 }
 
@@ -21,9 +22,21 @@ func (matcher *PathMatcher) Match(actual interface{}) (success bool, err error) 
 	if !ok {
 		return false, fmt.Errorf("MatchPath: Actual must be a string, got %T", actual)
 	}
-	matcher.actualPath = actualPath
 
-	return strings.EqualFold(regexp.QuoteMeta(matcher.expectedPath), regexp.QuoteMeta(actualPath)), nil
+	resolvedActualPath, err := resolveSymLinks(actualPath)
+	if err != nil {
+		return false, err
+	}
+
+	resolvedExpectedPath, err := resolveSymLinks(matcher.expectedPath)
+	if err != nil {
+		return false, err
+	}
+
+	matcher.actualPath = resolvedActualPath
+	matcher.expectedPath = resolvedExpectedPath
+
+	return strings.EqualFold(regexp.QuoteMeta(matcher.expectedPath), regexp.QuoteMeta(matcher.actualPath)), nil
 }
 
 func (matcher *PathMatcher) FailureMessage(actual interface{}) string {
@@ -32,4 +45,14 @@ func (matcher *PathMatcher) FailureMessage(actual interface{}) string {
 
 func (matcher *PathMatcher) NegatedFailureMessage(actual interface{}) string {
 	return fmt.Sprintf("Expected:\n %v\n not to match actual:\n%v\n", matcher.expectedPath, matcher.actualPath)
+}
+
+func resolveSymLinks(path string) (string, error) {
+	theRealDir, err := filepath.EvalSymlinks(filepath.Dir(path))
+
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(theRealDir, filepath.Base(path)), nil
 }

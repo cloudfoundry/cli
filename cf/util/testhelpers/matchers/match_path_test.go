@@ -3,10 +3,10 @@ package matchers_test
 import (
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"errors"
-
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	. "github.com/onsi/gomega"
+	"io/ioutil"
 )
 
 var _ = Describe("MatchPath", func() {
@@ -17,7 +17,9 @@ var _ = Describe("MatchPath", func() {
 	)
 
 	BeforeEach(func() {
-		expected = "/path/to/expected"
+		var err error
+		expected, err = ioutil.TempDir("", "expected")
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("Match", func() {
@@ -45,7 +47,9 @@ var _ = Describe("MatchPath", func() {
 
 		When("Actual does not match expected", func() {
 			BeforeEach(func() {
-				actual = "/path/to/something/else"
+				var err error
+				actual, err = ioutil.TempDir("", "something-else")
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns an error", func() {
@@ -55,26 +59,13 @@ var _ = Describe("MatchPath", func() {
 		})
 
 		When("Actual does match expected", func() {
-			When("Not Windows", func() {
-				BeforeEach(func() {
-					actual = "/PATH/to/expected"
-				})
-
-				It("matches successfully", func() {
-					Expect(success).To(BeTrue())
-					Expect(executeErr).To(BeNil())
-				})
+			BeforeEach(func() {
+				actual = expected
 			})
 
-			When("Windows", func() {
-				BeforeEach(func() {
-					actual = `\\PATH\\to\\expected`
-					expected = `\\PATH\\to\\expected`
-				})
-				It("matches successfully", func() {
-					Expect(success).To(BeTrue())
-					Expect(executeErr).To(BeNil())
-				})
+			It("matches successfully", func() {
+				Expect(executeErr).To(BeNil())
+				Expect(success).To(BeTrue())
 			})
 		})
 	})
