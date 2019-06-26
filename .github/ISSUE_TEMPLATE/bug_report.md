@@ -6,6 +6,7 @@ about: Create a report to help us improve
 
 **Please fill out the issue checklist below and provide ALL the requested information.**
 
+- [ ] I reviewed open and closed github issues that may be related to my problem.
 - [ ] I tried updating to the latest version of the CF CLI to see if it fixed my problem.
 - [ ] I attempted to run the command with `CF_TRACE=1` to help debug the issue.
 - [ ] I am reporting a bug that others will be able to reproduce.
