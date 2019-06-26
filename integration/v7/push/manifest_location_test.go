@@ -59,7 +59,7 @@ var _ = Describe("reading of the manifest based on location", func() {
 		})
 	})
 
-	When("the manifest exists in some other directory", func() {
+	When("the path to the manifest is specified", func() {
 		var workingDir string
 
 		BeforeEach(func() {
@@ -110,6 +110,16 @@ var _ = Describe("reading of the manifest based on location", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", workingDir, "--no-start")
 					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		When("the path to the manifest is a directory", func() {
+			When("there's no manifest in that directory", func() {
+				It("should give a helpful error", func() {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: workingDir}, PushCommandName, "-f", workingDir, "--no-start")
+					Eventually(session.Err).Should(Say("Incorrect Usage: The specified directory '%s' does not contain a file named 'manifest.yml'.", workingDir))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

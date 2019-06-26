@@ -861,7 +861,7 @@ var _ = Describe("push Command", func() {
 				Entry("no flags are specified", func() {}),
 				Entry("path is specified",
 					func() {
-						cmd.PathToManifest = flag.PathWithExistenceCheck("/some/path")
+						cmd.PathToManifest = flag.ManifestPathWithExistenceCheck("/some/path")
 					}),
 				Entry("no-start is specified",
 					func() {
@@ -1000,7 +1000,7 @@ var _ = Describe("push Command", func() {
 
 		When("The -f flag is specified", func() {
 			BeforeEach(func() {
-				cmd.PathToManifest = flag.PathWithExistenceCheck(somePath)
+				cmd.PathToManifest = flag.ManifestPathWithExistenceCheck(somePath)
 				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 			})
 
