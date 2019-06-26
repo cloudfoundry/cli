@@ -21,6 +21,7 @@ func (matcher *PathMatcher) Match(actual interface{}) (success bool, err error) 
 	if !ok {
 		return false, fmt.Errorf("MatchPath: Actual must be a string, got %T", actual)
 	}
+	matcher.actualPath = actualPath
 
 	return strings.EqualFold(regexp.QuoteMeta(matcher.expectedPath), regexp.QuoteMeta(actualPath)), nil
 }

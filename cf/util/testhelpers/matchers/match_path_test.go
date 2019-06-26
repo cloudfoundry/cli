@@ -81,17 +81,21 @@ var _ = Describe("MatchPath", func() {
 
 	Describe("FailureMessage", func() {
 		It("shows expected and actual", func() {
+			actual = "actual"
+			expected = "expected"
 			matcher = MatchPath(expected)
 			matcher.Match(actual)
-			Expect(matcher.FailureMessage("does not matter")).To(MatchRegexp("(?s)/path/to/expected.*to match actual.*nil"))
+			Expect(matcher.FailureMessage("does not matter")).To(MatchRegexp("(?s)expected.*to match actual.*actual"))
 		})
 	})
 
 	Describe("NegatedFailureMessage", func() {
 		It("shows expected and actual", func() {
+			actual = "actual"
+			expected = "expected"
 			matcher = MatchPath(expected)
 			matcher.Match(actual)
-			Expect(matcher.NegatedFailureMessage("does not matter")).To(MatchRegexp("(?s)/path/to/expected.*not to match actual.*nil"))
+			Expect(matcher.NegatedFailureMessage("does not matter")).To(MatchRegexp("(?s)expected.*not to match actual.*actual"))
 		})
 	})
 })
