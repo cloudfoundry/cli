@@ -91,7 +91,7 @@ var _ = Describe("Metadata", func() {
   "errors": [
     {
       "code": 10008,
-      "detail": "Metadata key error: label 'invalid*key' contains invalid characters",
+      "detail": "Metadata label key error: 'invalid*key' contains invalid characters",
       "title": "CF-UnprocessableEntity"
     }
   ]
@@ -123,7 +123,7 @@ var _ = Describe("Metadata", func() {
 
 				It("returns the error and all warnings", func() {
 					Expect(executeErr).To(MatchError(ccerror.UnprocessableEntityError{
-						Message: "Metadata key error: label 'invalid*key' contains invalid characters",
+						Message: "Metadata label key error: 'invalid*key' contains invalid characters",
 					}))
 				})
 			})
@@ -192,7 +192,7 @@ var _ = Describe("Metadata", func() {
   "errors": [
     {
       "code": 10008,
-      "detail": "Metadata key error: label 'invalid*key' contains invalid characters",
+      "detail": "Metadata label key error: 'invalid*key' contains invalid characters",
       "title": "CF-UnprocessableEntity"
     }
   ]
@@ -224,7 +224,7 @@ var _ = Describe("Metadata", func() {
 
 				It("returns the error and all warnings", func() {
 					Expect(executeErr).To(MatchError(ccerror.UnprocessableEntityError{
-						Message: "Metadata key error: label 'invalid*key' contains invalid characters",
+						Message: "Metadata label key error: 'invalid*key' contains invalid characters",
 					}))
 				})
 			})
@@ -293,7 +293,7 @@ var _ = Describe("Metadata", func() {
   "errors": [
     {
       "code": 10008,
-      "detail": "Metadata key error: label 'invalid*key' contains invalid characters",
+      "detail": "Metadata label key error: 'invalid*key' contains invalid characters",
       "title": "CF-UnprocessableEntity"
     }
   ]
@@ -325,7 +325,7 @@ var _ = Describe("Metadata", func() {
 
 				It("returns the error and all warnings", func() {
 					Expect(executeErr).To(MatchError(ccerror.UnprocessableEntityError{
-						Message: "Metadata key error: label 'invalid*key' contains invalid characters",
+						Message: "Metadata label key error: 'invalid*key' contains invalid characters",
 					}))
 				})
 			})
