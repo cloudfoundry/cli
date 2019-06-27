@@ -734,6 +734,30 @@ var _ = Describe("Service Instance", func() {
 			})
 		})
 
+		When("when maintenance_info is empty ", func() {
+			BeforeEach(func() {
+				requestBody := map[string]interface{}{
+					"maintenance_info": map[string]interface{}{},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, fmt.Sprintf("/v2/service_instances/%s", instanceGUID), "accepts_incomplete=true"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"warning-1,warning-2"}}),
+					),
+				)
+			})
+
+			It("sends a request and returns all warnings from the response", func() {
+				priorRequests := len(server.ReceivedRequests())
+				warnings, err := client.UpdateServiceInstanceMaintenanceInfo(instanceGUID, ccv2.MaintenanceInfo{})
+				Expect(server.ReceivedRequests()).To(HaveLen(priorRequests + 1))
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+			})
+		})
+
 		When("the endpoint returns an error", func() {
 			BeforeEach(func() {
 				response := `{
