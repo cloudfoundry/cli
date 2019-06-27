@@ -148,7 +148,7 @@ var _ = Describe("apply-manifest command", func() {
 				It("tells the user that the provided path doesn't exist, prints help text, and exits 1", func() {
 					session := helpers.CF("apply-manifest", "-f", emptyDir)
 
-					Eventually(session.Err).Should(Say("Incorrect Usage: The specified directory '%s' does not contain a file named 'manifest.yml'.", emptyDir))
+					Eventually(session.Err).Should(helpers.SayPath("Incorrect Usage: The specified directory '%s' does not contain a file named 'manifest.yml'.", emptyDir))
 					Eventually(session).Should(Say("NAME:"))
 					Eventually(session).Should(Exit(1))
 				})
