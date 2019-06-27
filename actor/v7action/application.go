@@ -50,6 +50,11 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string
 }
 
 func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]Application, Warnings, error) {
+	uniqueAppGUIDs := map[string]bool{}
+	for _, appGUID := range appGUIDs {
+		uniqueAppGUIDs[appGUID] = true
+	}
+
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.GUIDFilter, Values: appGUIDs},
 	)
@@ -58,7 +63,7 @@ func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]Application, War
 		return nil, Warnings(warnings), err
 	}
 
-	if len(apps) < len(appGUIDs) {
+	if len(apps) < len(uniqueAppGUIDs) {
 		return nil, Warnings(warnings), actionerror.ApplicationsNotFoundError{}
 	}
 
@@ -71,6 +76,11 @@ func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]Application, War
 }
 
 func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]Application, Warnings, error) {
+	uniqueAppNames := map[string]bool{}
+	for _, appName := range appNames {
+		uniqueAppNames[appName] = true
+	}
+
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.NameFilter, Values: appNames},
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
@@ -80,7 +90,7 @@ func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID s
 		return nil, Warnings(warnings), err
 	}
 
-	if len(apps) < len(appNames) {
+	if len(apps) < len(uniqueAppNames) {
 		return nil, Warnings(warnings), actionerror.ApplicationsNotFoundError{}
 	}
 

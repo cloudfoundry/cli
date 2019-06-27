@@ -160,6 +160,27 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
+		When("a single app has two routes", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "some-app-name",
+							GUID: "some-app-guid",
+						},
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns an ApplicationNotFoundError and the warnings", func() {
+				_, warnings, err := actor.GetApplicationsByGUIDs([]string{"some-app-guid", "some-app-guid"})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-warning"))
+			})
+		})
+
 		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
@@ -238,6 +259,26 @@ var _ = Describe("Application Actions", func() {
 				_, warnings, err := actor.GetApplicationsByNamesAndSpace([]string{"some-app-name", "other-app-name"}, "some-space-guid")
 				Expect(warnings).To(ConsistOf("some-warning"))
 				Expect(err).To(MatchError(actionerror.ApplicationsNotFoundError{}))
+			})
+		})
+
+		When("a given app has two routes", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "some-app-name",
+						},
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns an ApplicationNotFoundError and the warnings", func() {
+				_, warnings, err := actor.GetApplicationsByNamesAndSpace([]string{"some-app-name", "some-app-name"}, "some-space-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
 
