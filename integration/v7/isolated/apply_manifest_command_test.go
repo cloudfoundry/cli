@@ -216,7 +216,7 @@ var _ = Describe("apply-manifest command", func() {
 					Expect(err).NotTo(HaveOccurred())
 					session := helpers.CF("apply-manifest")
 
-					Eventually(session.Err).Should(Say(`Could not find 'manifest.yml' file in %s`, currentDir))
+					Eventually(session.Err).Should(helpers.SayPath(`Could not find 'manifest.yml' file in %s`, currentDir))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
