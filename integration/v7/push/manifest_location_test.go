@@ -118,7 +118,7 @@ var _ = Describe("reading of the manifest based on location", func() {
 			When("there's no manifest in that directory", func() {
 				It("should give a helpful error", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: workingDir}, PushCommandName, "-f", workingDir, "--no-start")
-					Eventually(session.Err).Should(Say("Incorrect Usage: The specified directory '%s' does not contain a file named 'manifest.yml'.", workingDir))
+					Eventually(session.Err).Should(helpers.SayPath("Incorrect Usage: The specified directory '%s' does not contain a file named 'manifest.yml'.", workingDir))
 					Eventually(session).Should(Exit(1))
 				})
 			})
