@@ -1120,6 +1120,22 @@ var _ = Describe("login Command", func() {
 						})
 					})
 				})
+				When("-s was not passed", func() {
+					When("only one space is available", func() {
+						It("targets this space", func() {
+							BeforeEach(func() {
+								// fakeActor.GetOrganizationsReturns(
+								// 	[]v3action.Organization{v3action.Organization{
+								// 		GUID: "some-org-guid",
+								// 		Name: "some-org-name",
+								// 	}},
+								// 	v3action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+								// 	nil,
+								// )
+							})
+						})
+					})
+				})
 			})
 		})
 	})

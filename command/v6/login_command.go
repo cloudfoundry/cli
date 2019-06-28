@@ -121,9 +121,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	}
 	cmd.UI.DisplayWarning("Using experimental login command, some behavior may be different")
 
-	var err error
-
-	err = cmd.getAPI()
+	err := cmd.getAPI()
 	if err != nil {
 		return err
 	}
@@ -144,7 +142,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	}
 
 	var authErr error
-	if cmd.SSO == true || cmd.SSOPasscode != "" {
+	if cmd.SSO || cmd.SSOPasscode != "" {
 		if cmd.SSO && cmd.SSOPasscode != "" {
 			return translatableerror.ArgumentCombinationError{Args: []string{"--sso-passcode", "--sso"}}
 		}
@@ -185,7 +183,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		}
 	}
 
-	targetedOrg := cmd.Config.TargetedOrganization()
+	targetedOrg := cmd.Config.TargetedOrganization() //WIERD
 
 	if targetedOrg.GUID != "" {
 
@@ -208,6 +206,8 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			cmd.UI.DisplayTextWithFlavor("Targeted space: {{.Space}}", map[string]interface{}{
 				"Space": space.Name,
 			})
+		} else {
+			//PLACEHOLDER
 		}
 		cmd.UI.DisplayNewline()
 	}

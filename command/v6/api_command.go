@@ -30,12 +30,12 @@ type APICommand struct {
 }
 
 func (cmd *APICommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, uaaClient, err := shared.NewClients(config, ui, false)
+	ccClient, _, err := shared.NewClients(config, ui, false)
 	if err != nil {
 		return err
 	}
 
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
+	cmd.Actor = v2action.NewActor(ccClient, nil, config)
 	cmd.UI = ui
 	cmd.Config = config
 	return nil

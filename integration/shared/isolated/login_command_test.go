@@ -645,7 +645,7 @@ var _ = Describe("login command", func() {
 		})
 	})
 
-	Describe("Target Space", func() {
+	FDescribe("Target Space", func() {
 		var (
 			orgName  string
 			username string
@@ -664,6 +664,7 @@ var _ = Describe("login command", func() {
 			var spaceName string
 
 			BeforeEach(func() {
+				helpers.TurnOnExperimentalLogin()
 				spaceName = helpers.NewSpaceName()
 				session := helpers.CF("create-space", "-o", orgName, spaceName)
 				Eventually(session).Should(Exit(0))
