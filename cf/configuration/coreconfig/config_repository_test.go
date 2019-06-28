@@ -186,6 +186,17 @@ var _ = Describe("Configuration Repository", func() {
 				Expect(config.UserGUID()).To(BeEmpty())
 			})
 		})
+
+		Context("with an empty access token", func() {
+			BeforeEach(func() {
+				config.SetAccessToken("")
+			})
+
+			It("returns an empty string", func() {
+				Expect(config.UserGUID()).To(BeEmpty())
+			})
+		})
+
 	})
 
 	Describe("Username", func() {
@@ -208,6 +219,16 @@ var _ = Describe("Configuration Repository", func() {
 				Expect(config.Username()).To(BeEmpty())
 			})
 		})
+
+		Context("with an empty access token", func() {
+			BeforeEach(func() {
+				config.SetAccessToken("")
+			})
+
+			It("returns an empty string", func() {
+				Expect(config.Username()).To(BeEmpty())
+			})
+		})
 	})
 
 	Describe("UserEmail", func() {
@@ -224,6 +245,16 @@ var _ = Describe("Configuration Repository", func() {
 		Context("with an invalid access token", func() {
 			BeforeEach(func() {
 				config.SetAccessToken(InvalidAccessToken)
+			})
+
+			It("returns an empty string", func() {
+				Expect(config.UserEmail()).To(BeEmpty())
+			})
+		})
+
+		Context("with an empty access token", func() {
+			BeforeEach(func() {
+				config.SetAccessToken("")
 			})
 
 			It("returns an empty string", func() {
