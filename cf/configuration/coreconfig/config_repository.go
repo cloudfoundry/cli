@@ -296,7 +296,12 @@ func (c *ConfigRepository) UserGUID() (guid string) {
 
 func (c *ConfigRepository) Username() (name string) {
 	c.read(func() {
-		name = NewTokenInfo(c.data.AccessToken).Username
+		t := NewTokenInfo(c.data.AccessToken)
+		if t.Username != "" {
+			name = t.Username
+		} else {
+			name = t.ClientID
+		}
 	})
 	return
 }

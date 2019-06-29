@@ -8,6 +8,7 @@ import (
 
 type TokenInfo struct {
 	Username string `json:"user_name"`
+	ClientID string `json:"client_id"`
 	Email    string `json:"email"`
 	UserGUID string `json:"user_id"`
 }
