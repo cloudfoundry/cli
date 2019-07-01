@@ -40,7 +40,7 @@ func (actor Actor) ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) 
 }
 
 func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (Space, Warnings, error) {
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
 	)
@@ -49,16 +49,16 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 		return Space{}, Warnings(warnings), err
 	}
 
-	if len(spaces) == 0 {
+	if len(ccv3Spaces) == 0 {
 		return Space{}, Warnings(warnings), actionerror.SpaceNotFoundError{Name: spaceName}
 	}
 
-	return Space(spaces[0]), Warnings(warnings), nil
+	return Space(ccv3Spaces[0]), Warnings(warnings), nil
 }
 
 // GetOrganizationSpaces returns a list of spaces in the specified org
 func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
-	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
 		Key:    ccv3.OrganizationGUIDFilter,
 		Values: []string{orgGUID},
 	})
@@ -66,9 +66,9 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, err
 		return []Space{}, Warnings(warnings), err
 	}
 
-	spaces := make([]Space, len(ccv2Spaces))
-	for i, ccv2Space := range ccv2Spaces {
-		spaces[i] = Space(ccv2Space)
+	spaces := make([]Space, len(ccv3Spaces))
+	for i, ccv3Space := range ccv3Spaces {
+		spaces[i] = Space(ccv3Space)
 	}
 
 	return spaces, Warnings(warnings), nil
