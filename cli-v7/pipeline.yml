@@ -12,12 +12,6 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    ignore_paths: &ciPaths
-    - bin
-    - ci
-    - integration
-    - README.md
-    - .github
 
 - name: cli-i18n
   type: git
@@ -30,7 +24,12 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    paths: *ciPaths
+    paths:
+    - bin
+    - ci
+    - integration
+    - README.md
+    - .github
 
 - name: cli-wiki
   type: git
