@@ -164,11 +164,4 @@ var HelpCategoryList = []HelpCategory{
 	},
 }
 
-var ExperimentalHelpCategoryList = []HelpCategory{
-	{
-		CategoryName: "APPS (experimental):",
-		CommandList: [][]string{
-			{},
-		},
-	},
-}
+var ExperimentalHelpCategoryList = []HelpCategory{}
