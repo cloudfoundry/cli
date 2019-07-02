@@ -238,6 +238,21 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 	return actorRoutes, allWarnings, nil
 }
 
+func (actor Actor) DeleteOrphanedRoutes(spaceGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	jobURL, warnings, err := actor.CloudControllerClient.DeleteOrphanedRoutes(spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, warnings...)
+
+	return allWarnings, err
+}
+
 func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
@@ -328,15 +343,5 @@ func (actor Actor) MapRoute(routeGUID string, appGUID string) (Warnings, error) 
 
 func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.UnmapRoute(routeGUID, destinationGUID)
-	return Warnings(warnings), err
-}
-
-func (actor Actor) DeleteOrphanedRoutes(spaceGUID string) (Warnings, error) {
-	jobURL, warnings, err := actor.CloudControllerClient.DeleteOrphanedRoutes(spaceGUID)
-	if err != nil {
-		return Warnings(warnings), err
-	}
-	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
-
 	return Warnings(warnings), err
 }

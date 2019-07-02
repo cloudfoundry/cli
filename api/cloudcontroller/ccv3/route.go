@@ -123,6 +123,24 @@ func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 	return ccRoute, response.Warnings, err
 }
 
+func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteOrphanedRoutesRequest,
+		URIParams: map[string]string{
+			"space_guid": spaceGUID,
+		},
+		Query: []Query{{Key: UnmappedFilter, Values: []string{"true"}}},
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
 func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		URIParams: map[string]string{
@@ -248,22 +266,4 @@ func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warni
 	err = client.connection.Make(request, &response)
 
 	return response.Warnings, err
-}
-
-func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteOrphanedRoutesRequest,
-		URIParams: map[string]string{
-			"space_guid": spaceGUID,
-		},
-		Query: []Query{{Key: UnmappedFilter, Values: []string{"true"}}},
-	})
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
