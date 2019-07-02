@@ -913,8 +913,8 @@ var _ = Describe("Application Actions", func() {
 					ccv3.Warnings{"get-deployment-warning"},
 					nil,
 				)
-				fakeConfig.StartupTimeoutReturns(time.Millisecond * 5 * 4)
-				fakeConfig.PollingIntervalReturns(time.Millisecond * 7) // should run 3 times
+				fakeConfig.StartupTimeoutReturns(time.Millisecond * 5)
+				fakeConfig.PollingIntervalReturns(time.Millisecond * 8) // should run once
 			})
 
 			When("--no-wait is not specified", func() {
@@ -924,10 +924,10 @@ var _ = Describe("Application Actions", func() {
 
 				It("returns the timeout error", func() {
 					Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
-					Expect(warnings).To(ConsistOf("get-deployment-warning", "get-deployment-warning", "get-deployment-warning"))
+					Expect(warnings).To(ConsistOf("get-deployment-warning"))
 
 					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(3))
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 				})
 			})
 		})
