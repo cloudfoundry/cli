@@ -27,6 +27,7 @@ var _ = Describe("Actor", func() {
 				actor.SetupAllResourcesForPushPlan,
 				SetupDeploymentStrategyForPushPlan,
 				SetupNoStartForPushPlan,
+				SetupNoWaitForPushPlan,
 				SetupSkipRouteCreationForPushPlan,
 				SetupScaleWebProcessForPushPlan,
 				SetupUpdateWebProcessForPushPlan,

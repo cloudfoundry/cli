@@ -53,7 +53,9 @@ var _ = Describe("RestartApplication", func() {
 				Expect(events).To(ConsistOf(RestartingApplication, RestartingApplicationComplete))
 
 				Expect(fakeV7Actor.RestartApplicationCallCount()).To(Equal(1))
-				Expect(fakeV7Actor.RestartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+				givenAppGUID, givenNoWait := fakeV7Actor.RestartApplicationArgsForCall(0)
+				Expect(givenAppGUID).To(Equal("some-app-guid"))
+				Expect(givenNoWait).To(Equal(false))
 				Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
 			})
 		})
@@ -68,6 +70,18 @@ var _ = Describe("RestartApplication", func() {
 				Expect(warnings).To(ConsistOf("some-restarting-warning"))
 				Expect(events).To(ConsistOf(RestartingApplication))
 			})
+		})
+	})
+
+	When("the noWait flag is set", func() {
+		BeforeEach(func() {
+			paramPlan.NoWait = true
+		})
+
+		It("calls RestartApplication with the flag value", func() {
+			Expect(fakeV7Actor.RestartApplicationCallCount()).To(Equal(1))
+			_, givenNoWait := fakeV7Actor.RestartApplicationArgsForCall(0)
+			Expect(givenNoWait).To(Equal(true))
 		})
 	})
 })

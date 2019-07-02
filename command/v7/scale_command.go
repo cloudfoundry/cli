@@ -20,7 +20,7 @@ type ScaleActor interface {
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
-	PollStart(appGUID string) (v7action.Warnings, error)
+	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
 type ScaleCommand struct {
@@ -91,7 +91,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return nil
 	}
 
-	warnings, err = cmd.Actor.PollStart(app.GUID)
+	warnings, err = cmd.Actor.PollStart(app.GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 
 	showErr := cmd.showCurrentScale(user.Name, err)

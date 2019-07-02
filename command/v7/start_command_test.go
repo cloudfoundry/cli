@@ -119,8 +119,9 @@ var _ = Describe("start Command", func() {
 			Expect(appGUID).To(Equal("some-app-guid"))
 
 			Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-			appGUID = fakeActor.PollStartArgsForCall(0)
+			appGUID, noWait := fakeActor.PollStartArgsForCall(0)
 			Expect(appGUID).To(Equal("some-app-guid"))
+			Expect(noWait).To(Equal(false))
 		})
 	})
 

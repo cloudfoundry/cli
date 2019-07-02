@@ -15,7 +15,7 @@ import (
 type RestartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
-	PollStart(appGUID string) (v7action.Warnings, error)
+	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 }
@@ -96,7 +96,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayText("\nWaiting for app to start...")
-	warnings, err = cmd.Actor.PollStart(app.GUID)
+	warnings, err = cmd.Actor.PollStart(app.GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

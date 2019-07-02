@@ -55,9 +55,10 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 
 			It("waits for the app to start", func() {
 				Expect(fakeV7Actor.PollStartForRollingCallCount()).To(Equal(1))
-				givenAppGUID, givenDeploymentGUID := fakeV7Actor.PollStartForRollingArgsForCall(0)
+				givenAppGUID, givenDeploymentGUID, noWait := fakeV7Actor.PollStartForRollingArgsForCall(0)
 				Expect(givenAppGUID).To(Equal("some-app-guid"))
 				Expect(givenDeploymentGUID).To(Equal("some-deployment-guid"))
+				Expect(noWait).To(Equal(false))
 			})
 
 			It("returns errors and warnings", func() {
@@ -131,6 +132,17 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 
 			It("records deployment events", func() {
 				Expect(events).To(ConsistOf(StartingDeployment, WaitingForDeployment))
+			})
+		})
+
+		When("the noWait flag is set", func() {
+			BeforeEach(func() {
+				paramPlan.NoWait = true
+			})
+
+			It("passes in the noWait flag", func() {
+				_, _, noWait := fakeV7Actor.PollStartForRollingArgsForCall(0)
+				Expect(noWait).To(Equal(true))
 			})
 		})
 	})

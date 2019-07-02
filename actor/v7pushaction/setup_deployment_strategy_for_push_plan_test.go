@@ -35,7 +35,7 @@ var _ = Describe("SetupDeploymentStrategyForPushPlan", func() {
 			overrides.Strategy = "rolling"
 		})
 
-		It("sets the droplet path on the push plan", func() {
+		It("sets the strategy on the push plan", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(expectedPushPlan.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 		})

@@ -51,7 +51,7 @@ type PushActor interface {
 type V7ActorForPush interface {
 	AppActor
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
-	RestartApplication(appGUID string) (v7action.Warnings, error)
+	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
 //go:generate counterfeiter . ManifestParser
@@ -85,6 +85,7 @@ type PushCommand struct {
 	NoManifest              bool                                `long:"no-manifest" description:""`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
+	NoWait                  bool                                `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
 	AppPath                 flag.PathWithExistenceCheck         `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                        `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
@@ -565,6 +566,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value, Instances: cmd.Instances.NullInt,
 		Memory:            cmd.Memory.NullUint64,
 		NoStart:           cmd.NoStart,
+		NoWait:            cmd.NoWait,
 		ProvidedAppPath:   string(cmd.AppPath),
 		SkipRouteCreation: cmd.NoRoute,
 		StartCommand:      cmd.StartCommand.FilteredString,

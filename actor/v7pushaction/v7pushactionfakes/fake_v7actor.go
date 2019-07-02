@@ -198,10 +198,11 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollStartStub        func(string) (v7action.Warnings, error)
+	PollStartStub        func(string, bool) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
 	pollStartArgsForCall []struct {
 		arg1 string
+		arg2 bool
 	}
 	pollStartReturns struct {
 		result1 v7action.Warnings
@@ -211,11 +212,12 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	PollStartForRollingStub        func(string, string) (v7action.Warnings, error)
+	PollStartForRollingStub        func(string, string, bool) (v7action.Warnings, error)
 	pollStartForRollingMutex       sync.RWMutex
 	pollStartForRollingArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 bool
 	}
 	pollStartForRollingReturns struct {
 		result1 v7action.Warnings
@@ -240,10 +242,11 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	RestartApplicationStub        func(string) (v7action.Warnings, error)
+	RestartApplicationStub        func(string, bool) (v7action.Warnings, error)
 	restartApplicationMutex       sync.RWMutex
 	restartApplicationArgsForCall []struct {
 		arg1 string
+		arg2 bool
 	}
 	restartApplicationReturns struct {
 		result1 v7action.Warnings
@@ -1210,16 +1213,17 @@ func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 v7action.Packag
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollStart(arg1 string) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollStart(arg1 string, arg2 bool) (v7action.Warnings, error) {
 	fake.pollStartMutex.Lock()
 	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
 	fake.pollStartArgsForCall = append(fake.pollStartArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("PollStart", []interface{}{arg1})
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("PollStart", []interface{}{arg1, arg2})
 	fake.pollStartMutex.Unlock()
 	if fake.PollStartStub != nil {
-		return fake.PollStartStub(arg1)
+		return fake.PollStartStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -1234,17 +1238,17 @@ func (fake *FakeV7Actor) PollStartCallCount() int {
 	return len(fake.pollStartArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartCalls(stub func(string) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollStartCalls(stub func(string, bool) (v7action.Warnings, error)) {
 	fake.pollStartMutex.Lock()
 	defer fake.pollStartMutex.Unlock()
 	fake.PollStartStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartArgsForCall(i int) string {
+func (fake *FakeV7Actor) PollStartArgsForCall(i int) (string, bool) {
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	argsForCall := fake.pollStartArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV7Actor) PollStartReturns(result1 v7action.Warnings, result2 error) {
@@ -1273,17 +1277,18 @@ func (fake *FakeV7Actor) PollStartReturnsOnCall(i int, result1 v7action.Warnings
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollStartForRolling(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollStartForRolling(arg1 string, arg2 string, arg3 bool) (v7action.Warnings, error) {
 	fake.pollStartForRollingMutex.Lock()
 	ret, specificReturn := fake.pollStartForRollingReturnsOnCall[len(fake.pollStartForRollingArgsForCall)]
 	fake.pollStartForRollingArgsForCall = append(fake.pollStartForRollingArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("PollStartForRolling", []interface{}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("PollStartForRolling", []interface{}{arg1, arg2, arg3})
 	fake.pollStartForRollingMutex.Unlock()
 	if fake.PollStartForRollingStub != nil {
-		return fake.PollStartForRollingStub(arg1, arg2)
+		return fake.PollStartForRollingStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -1298,17 +1303,17 @@ func (fake *FakeV7Actor) PollStartForRollingCallCount() int {
 	return len(fake.pollStartForRollingArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(string, string, bool) (v7action.Warnings, error)) {
 	fake.pollStartForRollingMutex.Lock()
 	defer fake.pollStartForRollingMutex.Unlock()
 	fake.PollStartForRollingStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (string, string) {
+func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (string, string, bool) {
 	fake.pollStartForRollingMutex.RLock()
 	defer fake.pollStartForRollingMutex.RUnlock()
 	argsForCall := fake.pollStartForRollingArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeV7Actor) PollStartForRollingReturns(result1 v7action.Warnings, result2 error) {
@@ -1408,16 +1413,17 @@ func (fake *FakeV7Actor) ResourceMatchReturnsOnCall(i int, result1 []sharedactio
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) RestartApplication(arg1 string) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) RestartApplication(arg1 string, arg2 bool) (v7action.Warnings, error) {
 	fake.restartApplicationMutex.Lock()
 	ret, specificReturn := fake.restartApplicationReturnsOnCall[len(fake.restartApplicationArgsForCall)]
 	fake.restartApplicationArgsForCall = append(fake.restartApplicationArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("RestartApplication", []interface{}{arg1})
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("RestartApplication", []interface{}{arg1, arg2})
 	fake.restartApplicationMutex.Unlock()
 	if fake.RestartApplicationStub != nil {
-		return fake.RestartApplicationStub(arg1)
+		return fake.RestartApplicationStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -1432,17 +1438,17 @@ func (fake *FakeV7Actor) RestartApplicationCallCount() int {
 	return len(fake.restartApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) RestartApplicationCalls(stub func(string) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) RestartApplicationCalls(stub func(string, bool) (v7action.Warnings, error)) {
 	fake.restartApplicationMutex.Lock()
 	defer fake.restartApplicationMutex.Unlock()
 	fake.RestartApplicationStub = stub
 }
 
-func (fake *FakeV7Actor) RestartApplicationArgsForCall(i int) string {
+func (fake *FakeV7Actor) RestartApplicationArgsForCall(i int) (string, bool) {
 	fake.restartApplicationMutex.RLock()
 	defer fake.restartApplicationMutex.RUnlock()
 	argsForCall := fake.restartApplicationArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV7Actor) RestartApplicationReturns(result1 v7action.Warnings, result2 error) {

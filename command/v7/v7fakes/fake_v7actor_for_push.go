@@ -62,10 +62,11 @@ type FakeV7ActorForPush struct {
 		result3 v7action.Warnings
 		result4 error
 	}
-	RestartApplicationStub        func(string) (v7action.Warnings, error)
+	RestartApplicationStub        func(string, bool) (v7action.Warnings, error)
 	restartApplicationMutex       sync.RWMutex
 	restartApplicationArgsForCall []struct {
 		arg1 string
+		arg2 bool
 	}
 	restartApplicationReturns struct {
 		result1 v7action.Warnings
@@ -286,16 +287,17 @@ func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceRetu
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV7ActorForPush) RestartApplication(arg1 string) (v7action.Warnings, error) {
+func (fake *FakeV7ActorForPush) RestartApplication(arg1 string, arg2 bool) (v7action.Warnings, error) {
 	fake.restartApplicationMutex.Lock()
 	ret, specificReturn := fake.restartApplicationReturnsOnCall[len(fake.restartApplicationArgsForCall)]
 	fake.restartApplicationArgsForCall = append(fake.restartApplicationArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("RestartApplication", []interface{}{arg1})
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("RestartApplication", []interface{}{arg1, arg2})
 	fake.restartApplicationMutex.Unlock()
 	if fake.RestartApplicationStub != nil {
-		return fake.RestartApplicationStub(arg1)
+		return fake.RestartApplicationStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -310,17 +312,17 @@ func (fake *FakeV7ActorForPush) RestartApplicationCallCount() int {
 	return len(fake.restartApplicationArgsForCall)
 }
 
-func (fake *FakeV7ActorForPush) RestartApplicationCalls(stub func(string) (v7action.Warnings, error)) {
+func (fake *FakeV7ActorForPush) RestartApplicationCalls(stub func(string, bool) (v7action.Warnings, error)) {
 	fake.restartApplicationMutex.Lock()
 	defer fake.restartApplicationMutex.Unlock()
 	fake.RestartApplicationStub = stub
 }
 
-func (fake *FakeV7ActorForPush) RestartApplicationArgsForCall(i int) string {
+func (fake *FakeV7ActorForPush) RestartApplicationArgsForCall(i int) (string, bool) {
 	fake.restartApplicationMutex.RLock()
 	defer fake.restartApplicationMutex.RUnlock()
 	argsForCall := fake.restartApplicationArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV7ActorForPush) RestartApplicationReturns(result1 v7action.Warnings, result2 error) {

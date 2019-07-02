@@ -43,10 +43,11 @@ type FakeStartActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollStartStub        func(string) (v7action.Warnings, error)
+	PollStartStub        func(string, bool) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
 	pollStartArgsForCall []struct {
 		arg1 string
+		arg2 bool
 	}
 	pollStartReturns struct {
 		result1 v7action.Warnings
@@ -209,16 +210,17 @@ func (fake *FakeStartActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeStartActor) PollStart(arg1 string) (v7action.Warnings, error) {
+func (fake *FakeStartActor) PollStart(arg1 string, arg2 bool) (v7action.Warnings, error) {
 	fake.pollStartMutex.Lock()
 	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
 	fake.pollStartArgsForCall = append(fake.pollStartArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("PollStart", []interface{}{arg1})
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("PollStart", []interface{}{arg1, arg2})
 	fake.pollStartMutex.Unlock()
 	if fake.PollStartStub != nil {
-		return fake.PollStartStub(arg1)
+		return fake.PollStartStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -233,17 +235,17 @@ func (fake *FakeStartActor) PollStartCallCount() int {
 	return len(fake.pollStartArgsForCall)
 }
 
-func (fake *FakeStartActor) PollStartCalls(stub func(string) (v7action.Warnings, error)) {
+func (fake *FakeStartActor) PollStartCalls(stub func(string, bool) (v7action.Warnings, error)) {
 	fake.pollStartMutex.Lock()
 	defer fake.pollStartMutex.Unlock()
 	fake.PollStartStub = stub
 }
 
-func (fake *FakeStartActor) PollStartArgsForCall(i int) string {
+func (fake *FakeStartActor) PollStartArgsForCall(i int) (string, bool) {
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	argsForCall := fake.pollStartArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeStartActor) PollStartReturns(result1 v7action.Warnings, result2 error) {

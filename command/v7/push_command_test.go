@@ -898,6 +898,7 @@ var _ = Describe("push Command", func() {
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
 			cmd.NoStart = true
+			cmd.NoWait = true
 			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
 			cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 10, IsSet: true}}
 		})
@@ -920,6 +921,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 			Expect(overrides.SkipRouteCreation).To(BeTrue())
 			Expect(overrides.NoStart).To(BeTrue())
+			Expect(overrides.NoWait).To(BeTrue())
 			Expect(overrides.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 			Expect(overrides.Instances).To(Equal(types.NullInt{Value: 10, IsSet: true}))
 		})
