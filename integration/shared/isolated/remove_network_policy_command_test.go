@@ -42,7 +42,7 @@ var _ = Describe("remove-network-policy command", func() {
 		})
 	})
 
-	When("the org and space are properly targetted", func() {
+	When("the org and space are properly targeted", func() {
 		var (
 			orgName   string
 			spaceName string

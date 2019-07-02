@@ -77,7 +77,7 @@ var _ = Describe("service-brokers Command", func() {
 		})
 	})
 
-	When("the user is logged in and a space is targetted", func() {
+	When("the user is logged in and a space is targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",

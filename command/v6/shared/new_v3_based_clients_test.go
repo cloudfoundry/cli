@@ -113,7 +113,7 @@ var _ = Describe("New V3 Based Clients", func() {
 		})
 	})
 
-	When("not targetting", func() {
+	When("not targeting", func() {
 		It("does not target and returns no UAA client", func() {
 			ccClient, uaaClient, err := NewV3BasedClients(fakeConfig, testUI, false, "")
 			Expect(err).ToNot(HaveOccurred())

@@ -565,7 +565,7 @@ var _ = Describe("login command", func() {
 
 				When("user does not select an organization", func() {
 					// allowed to change
-					It("succesfully logs in but does not target any org", func() {
+					It("successfully logs in but does not target any org", func() {
 						input := NewBuffer()
 						_, err := input.Write([]byte("\n"))
 						Expect(err).ToNot(HaveOccurred())

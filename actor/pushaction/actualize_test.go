@@ -354,7 +354,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("polling package", func() {
-		When("the the polling is succesful", func() {
+		When("the the polling is successful", func() {
 			BeforeEach(func() {
 				fakeV3Actor.PollPackageReturns(v3action.Package{}, v3action.Warnings{"some-poll-package-warning"}, nil)
 			})
@@ -419,7 +419,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("polling build", func() {
-		When("the the polling is succesful", func() {
+		When("the the polling is successful", func() {
 			BeforeEach(func() {
 				fakeV3Actor.PollBuildReturns(v3action.Droplet{}, v3action.Warnings{"some-poll-build-warning"}, nil)
 			})

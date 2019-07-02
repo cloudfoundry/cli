@@ -105,7 +105,7 @@ var _ = Describe("Process Actions", func() {
 			process, warnings, err = actor.GetProcessByTypeAndApplication(processType, appGUID)
 		})
 
-		When("getting the application process is succesful", func() {
+		When("getting the application process is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
 					ccv3.Process{

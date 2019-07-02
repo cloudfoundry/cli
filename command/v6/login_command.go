@@ -448,7 +448,7 @@ func (cmd *LoginCommand) showStatus() {
 	orgName := cmd.Config.TargetedOrganizationName()
 	if orgName == "" {
 		cmd.UI.DisplayKeyValueTable("", tableContent, 3)
-		cmd.displayNotTargetted()
+		cmd.displayNotTargeted()
 		return
 	}
 	tableContent = append(tableContent, []string{cmd.UI.TranslateText("Org:"), orgName})
@@ -475,7 +475,7 @@ func (cmd *LoginCommand) displayNotLoggedIn() {
 	)
 }
 
-func (cmd *LoginCommand) displayNotTargetted() {
+func (cmd *LoginCommand) displayNotTargeted() {
 	cmd.UI.DisplayText("No org or space targeted, use '{{.CFTargetCommand}} -o ORG -s SPACE'",
 		map[string]interface{}{
 			"CFTargetCommand": fmt.Sprintf("%s target", cmd.Config.BinaryName()),

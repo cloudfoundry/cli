@@ -99,7 +99,7 @@ var _ = Describe("api command", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("clears the targetted context", func() {
+			It("clears the targeted context", func() {
 				session := helpers.CF("api", "--unset")
 
 				Eventually(session).Should(Say("Unsetting api endpoint..."))

@@ -80,7 +80,7 @@ var _ = Describe("create-service-key command", func() {
 			Expect(callCreateService([]string{"non-exist-service-instance", "fake-service-key"})).To(BeFalse())
 		})
 
-		It("fails when space is not targetted", func() {
+		It("fails when space is not targeted", func() {
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "no targeted space"})
 			Expect(callCreateService([]string{"non-exist-service-instance", "fake-service-key"})).To(BeFalse())
 		})

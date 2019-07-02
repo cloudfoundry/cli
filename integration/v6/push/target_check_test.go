@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("push targetting", func() {
+var _ = Describe("push targeting", func() {
 	AfterEach(func() {
 		helpers.SetAPI()
 		helpers.LoginCF()

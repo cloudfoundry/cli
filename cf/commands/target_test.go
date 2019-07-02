@@ -285,7 +285,7 @@ var _ = Describe("target command", func() {
 				expectSpaceToBeCleared()
 			})
 
-			Context("when an org is targetted", func() {
+			Context("when an org is targeted", func() {
 				var org models.Organization
 				BeforeEach(func() {
 					org = models.Organization{}

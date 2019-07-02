@@ -78,7 +78,7 @@ var _ = Describe("service-keys command", func() {
 			Expect(callListServiceKeys([]string{"non-exist-service-instance"})).To(BeFalse())
 		})
 
-		It("fails when space is not targetted", func() {
+		It("fails when space is not targeted", func() {
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "no targeted space"})
 			Expect(callListServiceKeys([]string{"non-exist-service-instance"})).To(BeFalse())
 		})

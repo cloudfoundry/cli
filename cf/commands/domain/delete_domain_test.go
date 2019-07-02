@@ -66,7 +66,7 @@ var _ = Describe("delete-domain command", func() {
 			Expect(runCommand("foo.com")).To(BeFalse())
 		})
 
-		It("fails when the an org is not targetted", func() {
+		It("fails when the an org is not targeted", func() {
 			targetedOrganizationReq := new(requirementsfakes.FakeTargetedOrgRequirement)
 			targetedOrganizationReq.ExecuteReturns(errors.New("not targeted"))
 			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrganizationReq)

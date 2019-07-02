@@ -189,7 +189,7 @@ var _ = Describe("bind-service command", func() {
 						})
 					})
 
-					When("the file contians invalid json", func() {
+					When("the file contains invalid json", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{i-am-very-bad-json")
@@ -274,7 +274,7 @@ var _ = Describe("bind-service command", func() {
 					})
 				})
 
-				When("configuration paramters are provided as in-line JSON", func() {
+				When("configuration parameters are provided as in-line JSON", func() {
 					When("the JSON is invalid", func() {
 						It("displays FAILED and the invalid configuration error", func() {
 							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-am-invalid-json")

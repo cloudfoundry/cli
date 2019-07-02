@@ -192,7 +192,7 @@ var _ = Describe("enable service access command", func() {
 					})
 
 					When("enabling access globally", func() {
-						It("should disbale org level access first", func() {
+						It("should disable org level access first", func() {
 							session := helpers.CF("enable-service-access", service)
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))

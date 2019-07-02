@@ -415,7 +415,7 @@ var _ = Describe("target Command", func() {
 								)
 							})
 
-							It("displays all warnings, sets the org, and clears the existing targetted space from the config", func() {
+							It("displays all warnings, sets the org, and clears the existing targeted space from the config", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Err).To(Say("warning-1"))
