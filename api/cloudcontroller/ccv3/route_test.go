@@ -691,4 +691,88 @@ var _ = Describe("Route", func() {
 			})
 		})
 	})
+
+	Describe("DeleteOrphanedRoutes", func() {
+		var (
+			spaceGUID  string
+			warnings   Warnings
+			executeErr error
+			jobURL     JobURL
+		)
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteOrphanedRoutes(spaceGUID)
+		})
+
+		When("the API succeeds", func() {
+			BeforeEach(func() {
+				spaceGUID = "space-guid"
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/spaces/space-guid/routes", "unmapped=true"),
+						RespondWith(
+							http.StatusAccepted,
+							nil,
+							http.Header{"X-Cf-Warnings": {"orphaned-warning"}, "Location": {"job-url"}},
+						),
+					),
+				)
+			})
+
+			It("returns the warnings and a job", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("orphaned-warning"))
+				Expect(jobURL).To(Equal(JobURL("job-url")))
+			})
+		})
+
+		When("the API fails", func() {
+			BeforeEach(func() {
+				spaceGUID = "space-guid"
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Isolation segment not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/spaces/space-guid/routes", "unmapped=true"),
+						RespondWith(
+							http.StatusTeapot,
+							response,
+							http.Header{"X-Cf-Warnings": {"orphaned-warning"}},
+						),
+					),
+				)
+			})
+
+			It("returns the warnings and a job", func() {
+
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("orphaned-warning"))
+			})
+		})
+	})
 })

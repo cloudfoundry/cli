@@ -938,4 +938,81 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 	})
+
+	Describe("DeleteOrphanedRoutes", func() {
+		var (
+			spaceGUID string
+
+			warnings   Warnings
+			executeErr error
+		)
+		BeforeEach(func() {
+			spaceGUID = "space-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DeleteOrphanedRoutes(spaceGUID)
+		})
+
+		When("the cloud controller client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteOrphanedRoutesReturns(
+					ccv3.JobURL("job"),
+					ccv3.Warnings{"delete-orphaned-routes-warning"},
+					nil,
+				)
+			})
+
+			It("deletes orphaned routes", func() {
+				Expect(fakeCloudControllerClient.DeleteOrphanedRoutesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.DeleteOrphanedRoutesArgsForCall(0)).To(Equal(spaceGUID))
+			})
+
+			When("polling the job succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"poll-job-warning"}, nil)
+				})
+				It("returns the error and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("delete-orphaned-routes-warning", "poll-job-warning"))
+
+					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv3.JobURL("job")))
+				})
+			})
+
+			When("polling the job errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"poll-job-warning"}, errors.New("poll-error"))
+				})
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError("poll-error"))
+					Expect(warnings).To(ConsistOf("delete-orphaned-routes-warning", "poll-job-warning"))
+
+					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv3.JobURL("job")))
+				})
+			})
+		})
+
+		When("the cloud controller client error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteOrphanedRoutesReturns(
+					ccv3.JobURL(""),
+					ccv3.Warnings{"delete-orphaned-routes-warning"},
+					errors.New("orphaned-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("orphaned-error"))
+				Expect(warnings).To(ConsistOf("delete-orphaned-routes-warning"))
+
+				Expect(fakeCloudControllerClient.DeleteOrphanedRoutesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.DeleteOrphanedRoutesArgsForCall(0)).To(Equal(spaceGUID))
+
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
+			})
+		})
+	})
 })

@@ -35,6 +35,8 @@ const (
 	PathFilter QueryKey = "path"
 	// StackFilter is a query parameter for listing objects by stack name
 	StackFilter QueryKey = "stacks"
+	// Unmapped filter is a query parameter specifying unmapped routes
+	UnmappedFilter QueryKey = "unmapped"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"

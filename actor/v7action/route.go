@@ -330,3 +330,13 @@ func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warning
 	warnings, err := actor.CloudControllerClient.UnmapRoute(routeGUID, destinationGUID)
 	return Warnings(warnings), err
 }
+
+func (actor Actor) DeleteOrphanedRoutes(spaceGUID string) (Warnings, error) {
+	jobURL, warnings, err := actor.CloudControllerClient.DeleteOrphanedRoutes(spaceGUID)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
+
+	return Warnings(warnings), err
+}

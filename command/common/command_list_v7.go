@@ -66,7 +66,7 @@ type commandList struct {
 	DeleteIsolationSegment             v6.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
 	DeleteLabel                        v7.DeleteLabelCommand                        `command:"delete-label" description:"Delete a label (key-value pairs) for an API resource"`
 	DeleteOrg                          v6.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
-	DeleteOrphanedRoutes               v6.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app)"`
+	DeleteOrphanedRoutes               v7.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app or service instance)"`
 	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" description:"Delete a private domain"`
 	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
 	DeleteRoute                        v7.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`

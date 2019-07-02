@@ -15,6 +15,7 @@ const (
 	DeleteDomainRequest                                         = "DeleteDomainRequest"
 	DeleteIsolationSegmentRelationshipOrganizationRequest       = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                               = "DeleteIsolationSegment"
+	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
 	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
@@ -175,6 +176,7 @@ var APIRoutes = []Route{
 	{Resource: SpacesResource, Path: "/:space_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostSpaceActionApplyManifestRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/routes", Method: http.MethodDelete, Name: DeleteOrphanedRoutesRequest},
 	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
 }
