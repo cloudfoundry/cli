@@ -12,6 +12,7 @@ import (
 type CloudControllerClient interface {
 	AppSSHEndpoint() string
 	AppSSHHostKeyFingerprint() string
+	CheckRoute(domainGUID string, hostname string, path string) (bool, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	CreateApplicationDeployment(appGUID string, dropletGUID string) (string, ccv3.Warnings, error)

@@ -794,8 +794,8 @@ var _ = Describe("Route Actions", func() {
 				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
 				Expect(actualQueries).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/" + path}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -818,8 +818,8 @@ var _ = Describe("Route Actions", func() {
 				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
 				Expect(actualQueries).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/" + path}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -842,8 +842,8 @@ var _ = Describe("Route Actions", func() {
 				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
 				Expect(actualQueries).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-					ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/" + path}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))

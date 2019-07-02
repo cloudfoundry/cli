@@ -25,10 +25,14 @@ const (
 	SpaceGUIDFilter QueryKey = "space_guids"
 	// DomainGUIDFilter is a qeury param for listing objects by domain_guid
 	DomainGUIDFilter QueryKey = "domain_guids"
-	// HostFilter is a query param for listing objects by hostname
-	HostnameFilter QueryKey = "hosts"
-	// PathFilter is a query param for listing objects by path
-	PathFilter QueryKey = "paths"
+	// HostsFilter is a query param for listing objects by hostname
+	HostsFilter QueryKey = "hosts"
+	// HostFilter is a query param for getting an object with the given host
+	HostFilter QueryKey = "host"
+	// PathsFilter is a query param for listing objects by path
+	PathsFilter QueryKey = "paths"
+	// PathFilter is a query param for getting an object with the given host
+	PathFilter QueryKey = "path"
 	// StackFilter is a query parameter for listing objects by stack name
 	StackFilter QueryKey = "stacks"
 

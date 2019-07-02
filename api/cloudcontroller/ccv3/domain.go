@@ -130,6 +130,40 @@ func (sharedOrgs *SharedOrgs) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// CheckRoute checks whether the route with the given domain GUID, hostname,
+// and path exists in the foundation.
+func (client Client) CheckRoute(domainGUID string, hostname string, path string) (bool, Warnings, error) {
+	var query []Query
+
+	if hostname != "" {
+		query = append(query, Query{Key: HostFilter, Values: []string{hostname}})
+	}
+
+	if path != "" {
+		query = append(query, Query{Key: PathFilter, Values: []string{path}})
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetDomainRouteReservationsRequest,
+		URIParams:   map[string]string{"domain_guid": domainGUID},
+		Query:       query,
+	})
+	if err != nil {
+		return false, nil, err
+	}
+
+	var responseJson struct {
+		MatchingRoute bool `json:"matching_route"`
+	}
+
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseJson,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseJson.MatchingRoute, response.Warnings, err
+}
+
 func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 	bodyBytes, err := json.Marshal(domain)
 	if err != nil {

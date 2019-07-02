@@ -21,6 +21,88 @@ var _ = Describe("Domain Actions", func() {
 		actor, fakeCloudControllerClient, _, _, _ = NewTestActor()
 	})
 
+	Describe("CheckRoute", func() {
+		var (
+			domainName string
+			hostname   string
+			path       string
+
+			matches    bool
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			domainName = "domain-name"
+			hostname = "host"
+			path = "/path"
+
+			fakeCloudControllerClient.GetDomainsReturns(
+				[]ccv3.Domain{{GUID: "domain-guid"}},
+				ccv3.Warnings{"get-domains-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.CheckRouteReturns(
+				true,
+				ccv3.Warnings{"check-route-warning-1", "check-route-warning-2"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			matches, warnings, executeErr = actor.CheckRoute(domainName, hostname, path)
+		})
+
+		It("delegates to the cloud controller client", func() {
+			Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+			givenQuery := fakeCloudControllerClient.GetDomainsArgsForCall(0)
+			Expect(givenQuery).To(Equal([]ccv3.Query{
+				{Key: ccv3.NameFilter, Values: []string{domainName}},
+			}))
+
+			Expect(fakeCloudControllerClient.CheckRouteCallCount()).To(Equal(1))
+			givenDomainGUID, givenHostname, givenPath := fakeCloudControllerClient.CheckRouteArgsForCall(0)
+			Expect(givenDomainGUID).To(Equal("domain-guid"))
+			Expect(givenHostname).To(Equal(hostname))
+			Expect(givenPath).To(Equal(path))
+
+			Expect(matches).To(BeTrue())
+			Expect(warnings).To(ConsistOf("get-domains-warning", "check-route-warning-1", "check-route-warning-2"))
+			Expect(executeErr).NotTo(HaveOccurred())
+		})
+
+		When("getting the domain by name errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{{GUID: "domain-guid"}},
+					ccv3.Warnings{"get-domains-warning"},
+					errors.New("domain not found"),
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(warnings).To(ConsistOf("get-domains-warning"))
+				Expect(executeErr).To(MatchError("domain not found"))
+			})
+		})
+
+		When("checking the route errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CheckRouteReturns(
+					true,
+					ccv3.Warnings{"check-route-warning-1", "check-route-warning-2"},
+					errors.New("failed to check route"),
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(warnings).To(ConsistOf("get-domains-warning", "check-route-warning-1", "check-route-warning-2"))
+				Expect(executeErr).To(MatchError("failed to check route"))
+			})
+		})
+	})
+
 	Describe("create shared domain", func() {
 		It("delegates to the cloud controller client", func() {
 			fakeCloudControllerClient.CreateDomainReturns(ccv3.Domain{}, ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))

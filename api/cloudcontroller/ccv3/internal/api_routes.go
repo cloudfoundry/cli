@@ -31,6 +31,7 @@ const (
 	GetDeploymentRequest                                        = "GetDeployment"
 	GetDeploymentsRequest                                       = "GetDeployments"
 	GetDomainRequest                                            = "GetDomain"
+	GetDomainRouteReservationsRequest                           = "GetDomainRouteReservations"
 	GetDomainsRequest                                           = "GetDomains"
 	GetDropletRequest                                           = "GetDroplet"
 	GetDropletsRequest                                          = "GetDroplets"
@@ -130,6 +131,7 @@ var APIRoutes = []Route{
 	{Resource: DomainsResource, Path: "/:domain_guid", Method: http.MethodGet, Name: GetDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations", Method: http.MethodPost, Name: SharePrivateDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations/:org_guid", Method: http.MethodDelete, Name: DeleteSharedOrgFromDomainRequest},
+	{Resource: DomainsResource, Path: "/:domain_guid/route_reservations", Method: http.MethodGet, Name: GetDomainRouteReservationsRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodPost, Name: PostDropletRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},

@@ -253,8 +253,8 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 
 	queryArray := []ccv3.Query{
 		{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
-		{Key: ccv3.HostnameFilter, Values: []string{hostname}},
-		{Key: ccv3.PathFilter, Values: []string{path}},
+		{Key: ccv3.HostsFilter, Values: []string{hostname}},
+		{Key: ccv3.PathsFilter, Values: []string{path}},
 	}
 
 	routes, apiWarnings, err := actor.CloudControllerClient.GetRoutes(queryArray...)
@@ -295,8 +295,8 @@ func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, ho
 
 	ccRoutes, ccWarnings, err := actor.CloudControllerClient.GetRoutes(
 		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-		ccv3.Query{Key: ccv3.HostnameFilter, Values: []string{hostname}},
-		ccv3.Query{Key: ccv3.PathFilter, Values: []string{path}},
+		ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+		ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
 	)
 
 	if err != nil {

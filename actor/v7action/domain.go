@@ -14,6 +14,21 @@ func (domain Domain) Shared() bool {
 	return domain.OrganizationGUID == ""
 }
 
+func (actor Actor) CheckRoute(domainName string, hostname string, path string) (bool, Warnings, error) {
+	var allWarnings Warnings
+
+	domain, warnings, err := actor.GetDomainByName(domainName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return false, allWarnings, err
+	}
+
+	matches, checkRouteWarnings, err := actor.CloudControllerClient.CheckRoute(domain.GUID, hostname, path)
+	allWarnings = append(allWarnings, checkRouteWarnings...)
+
+	return matches, allWarnings, err
+}
+
 func (actor Actor) CreateSharedDomain(domainName string, internal bool) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.CreateDomain(ccv3.Domain{
 		Name:     domainName,

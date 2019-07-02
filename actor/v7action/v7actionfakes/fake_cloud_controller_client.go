@@ -30,6 +30,23 @@ type FakeCloudControllerClient struct {
 	appSSHHostKeyFingerprintReturnsOnCall map[int]struct {
 		result1 string
 	}
+	CheckRouteStub        func(string, string, string) (bool, ccv3.Warnings, error)
+	checkRouteMutex       sync.RWMutex
+	checkRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	checkRouteReturns struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}
+	checkRouteReturnsOnCall map[int]struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
 	cloudControllerAPIVersionArgsForCall []struct {
@@ -1420,6 +1437,74 @@ func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturnsOnCall(i i
 	fake.appSSHHostKeyFingerprintReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) CheckRoute(arg1 string, arg2 string, arg3 string) (bool, ccv3.Warnings, error) {
+	fake.checkRouteMutex.Lock()
+	ret, specificReturn := fake.checkRouteReturnsOnCall[len(fake.checkRouteArgsForCall)]
+	fake.checkRouteArgsForCall = append(fake.checkRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CheckRoute", []interface{}{arg1, arg2, arg3})
+	fake.checkRouteMutex.Unlock()
+	if fake.CheckRouteStub != nil {
+		return fake.CheckRouteStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.checkRouteReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CheckRouteCallCount() int {
+	fake.checkRouteMutex.RLock()
+	defer fake.checkRouteMutex.RUnlock()
+	return len(fake.checkRouteArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CheckRouteCalls(stub func(string, string, string) (bool, ccv3.Warnings, error)) {
+	fake.checkRouteMutex.Lock()
+	defer fake.checkRouteMutex.Unlock()
+	fake.CheckRouteStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CheckRouteArgsForCall(i int) (string, string, string) {
+	fake.checkRouteMutex.RLock()
+	defer fake.checkRouteMutex.RUnlock()
+	argsForCall := fake.checkRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCloudControllerClient) CheckRouteReturns(result1 bool, result2 ccv3.Warnings, result3 error) {
+	fake.checkRouteMutex.Lock()
+	defer fake.checkRouteMutex.Unlock()
+	fake.CheckRouteStub = nil
+	fake.checkRouteReturns = struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CheckRouteReturnsOnCall(i int, result1 bool, result2 ccv3.Warnings, result3 error) {
+	fake.checkRouteMutex.Lock()
+	defer fake.checkRouteMutex.Unlock()
+	fake.CheckRouteStub = nil
+	if fake.checkRouteReturnsOnCall == nil {
+		fake.checkRouteReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.checkRouteReturnsOnCall[i] = struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) CloudControllerAPIVersion() string {
@@ -7045,6 +7130,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.appSSHEndpointMutex.RUnlock()
 	fake.appSSHHostKeyFingerprintMutex.RLock()
 	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
+	fake.checkRouteMutex.RLock()
+	defer fake.checkRouteMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
