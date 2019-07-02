@@ -681,6 +681,14 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--strategy=rolling",
 			},
 		}
+
+	case cmd.NoStart && cmd.NoWait:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-start",
+				"--no-wait",
+			},
+		}
 	}
 
 	return nil

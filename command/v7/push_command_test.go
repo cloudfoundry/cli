@@ -1197,5 +1197,16 @@ var _ = Describe("push Command", func() {
 				cmd.NoStart = true
 			},
 			nil),
+
+		Entry("when no-start and no-wait flags are passed",
+			func() {
+				cmd.NoStart = true
+				cmd.NoWait = true
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-start", "--no-wait",
+				},
+			}),
 	)
 })
