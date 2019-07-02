@@ -883,33 +883,34 @@ var _ = Describe("Application Actions", func() {
 
 		When("getting the deployment fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetDeploymentReturns(ccv3.Deployment{}, ccv3.Warnings{"get-deployment-warning"}, errors.New("get-deployment-error"))
+				fakeCloudControllerClient.GetDeploymentReturns(
+					ccv3.Deployment{},
+					ccv3.Warnings{"get-deployment-warning"},
+					errors.New("get-deployment-error"),
+				)
 			})
 
 			It("returns warnings and the error", func() {
-				// check err and warnings
 				Expect(executeErr).To(MatchError("get-deployment-error"))
 				Expect(warnings).To(ConsistOf("get-deployment-warning"))
 
-				// check number of calls to get dep = 1
-				// check get dep params
 				Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
 
-				// check number of calls to APIs involved in getting processes = 0
 				Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(0))
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(0))
 
-				// check fake config timeout call number = 0
 				Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-
 			})
 		})
 
 		When("getting the deployment times out", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentReturns(
-					ccv3.Deployment{State: constant.DeploymentDeploying, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+					ccv3.Deployment{
+						State:        constant.DeploymentDeploying,
+						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+					},
 					ccv3.Warnings{"get-deployment-warning"},
 					nil,
 				)
@@ -935,19 +936,28 @@ var _ = Describe("Application Actions", func() {
 		When("getting the deployment is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
-					ccv3.Deployment{State: constant.DeploymentDeploying, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+					ccv3.Deployment{
+						State:        constant.DeploymentDeploying,
+						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+					},
 					ccv3.Warnings{"get-deployment-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
-					ccv3.Deployment{State: constant.DeploymentDeploying, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+					ccv3.Deployment{
+						State:        constant.DeploymentDeploying,
+						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+					},
 					ccv3.Warnings{"get-deployment-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetDeploymentReturnsOnCall(2,
-					ccv3.Deployment{State: constant.DeploymentDeployed, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+					ccv3.Deployment{
+						State:        constant.DeploymentDeployed,
+						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+					},
 					ccv3.Warnings{"get-deployment-warning"},
 					nil,
 				)
@@ -959,84 +969,81 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("does not get the processes or poll the deployment", func() {
-
-					// assert we do not get the app processes and instead use those on the deployment
 					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(0))
 				})
 
 				When("getting the instances fails", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceStarting},
-						},
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning1"},
 							errors.New("some-instance-error"),
 						)
 					})
 
 					It("does not check the deployment a second time", func() {
-						// assert we only get the deployment once (not poll it)
-
 						Expect(executeErr.Error()).To(Equal("some-instance-error"))
 						Expect(warnings).To(ConsistOf("get-deployment-warning", "poll-process-warning1"))
 
 						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(1))
 					})
-
 				})
 
-				When("the polling times out on the second loop", func() {
+				When("the polling times out on the first loop", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetDeploymentReturns(
-							ccv3.Deployment{State: constant.DeploymentDeployed, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+							ccv3.Deployment{
+								State:        constant.DeploymentDeployed,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
 							ccv3.Warnings{"get-deployment-warning"},
 							nil,
 						)
-						fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceStarting},
-						},
+
+						fakeCloudControllerClient.GetProcessInstancesReturns(
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning"},
 							nil,
 						)
 
-						fakeConfig.StartupTimeoutReturns(time.Millisecond * 5 * 4)
-						fakeConfig.PollingIntervalReturns(time.Millisecond * 7)
+						fakeConfig.StartupTimeoutReturns(time.Millisecond * 5)
+						fakeConfig.PollingIntervalReturns(time.Millisecond * 8)
 					})
 
 					It("returns the timeout error", func() {
-
-						// check get dep params
-						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(3))
-						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(3))
+						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
 
 						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
-						Expect(warnings).To(ConsistOf("get-deployment-warning", "poll-process-warning",
-							"get-deployment-warning", "poll-process-warning",
-							"get-deployment-warning", "poll-process-warning"))
+						Expect(warnings).To(ConsistOf("get-deployment-warning", "poll-process-warning"))
 
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(3))
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 					})
-
 				})
 
-				// assert we poll the processes
 				When("polling instances take time to become healthy", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceStarting},
-						},
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning1"},
 							nil,
 						)
 
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceRunning},
-							{State: constant.ProcessInstanceStarting},
-						},
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceRunning},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning2"},
 							nil,
 						)
@@ -1049,86 +1056,101 @@ var _ = Describe("Application Actions", func() {
 						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("new-web-guid"))
 						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(1)).To(Equal("new-web-guid"))
 						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(2))
-
 					})
 				})
 
 				When("the deployment is cancelled", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceStarting},
-						},
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning1"},
 							nil,
 						)
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceStarting},
-						},
+
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning2"},
 							nil,
 						)
 
 						fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
-							ccv3.Deployment{State: constant.DeploymentDeploying, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+							ccv3.Deployment{
+								State:        constant.DeploymentDeploying,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
 							ccv3.Warnings{"get-deployment-warning1"},
 							nil,
 						)
 
 						fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
-							ccv3.Deployment{State: constant.DeploymentDeploying, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+							ccv3.Deployment{
+								State:        constant.DeploymentDeploying,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
 							ccv3.Warnings{"get-deployment-warning2"},
 							nil,
 						)
 
 						fakeCloudControllerClient.GetDeploymentReturnsOnCall(2,
-							ccv3.Deployment{State: constant.DeploymentCanceled, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+							ccv3.Deployment{
+								State:        constant.DeploymentCanceled,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
 							ccv3.Warnings{"get-deployment-warning3"},
 							nil,
 						)
 					})
 
 					It("stops polling and returns an error", func() {
-
 						Expect(executeErr.Error()).To(Equal("Deployment has been canceled"))
 						Expect(warnings).To(ConsistOf("get-deployment-warning1", "poll-process-warning1",
 							"get-deployment-warning2", "poll-process-warning2", "get-deployment-warning3"))
 
 						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(3))
 						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
-
 					})
-
 				})
 
 				When("All instances are crashing", func() {
-					// assert we return an error
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceStarting},
-						},
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
 							ccv3.Warnings{"poll-process-warning1"},
 							nil,
 						)
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
-							{State: constant.ProcessInstanceCrashed},
-						},
+
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceCrashed},
+							},
 							ccv3.Warnings{"poll-process-warning2"},
 							nil,
 						)
-						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(2, []ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceCrashed},
-							{State: constant.ProcessInstanceCrashed},
-						},
+
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(2,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceCrashed},
+								{State: constant.ProcessInstanceCrashed},
+							},
 							ccv3.Warnings{"poll-process-warning3"},
 							nil,
 						)
 
 						fakeCloudControllerClient.GetDeploymentReturns(
-							ccv3.Deployment{State: constant.DeploymentDeploying, NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}}},
+							ccv3.Deployment{
+								State:        constant.DeploymentDeploying,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
 							ccv3.Warnings{"get-deployment-warning"},
 							nil,
 						)
@@ -1142,7 +1164,6 @@ var _ = Describe("Application Actions", func() {
 						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(3))
 						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(3))
 					})
-
 				})
 			})
 
@@ -1152,16 +1173,17 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("polls the deployment 3 times", func() {
-					// assert we only get the deployment once (not poll it)
 					Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(3))
-
 					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-
 				})
 
 				When("getting the application processes fails", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationProcessesReturns(nil, ccv3.Warnings{"get-app-warning-1", "get-app-warning-2"}, errors.New("some-error"))
+						fakeCloudControllerClient.GetApplicationProcessesReturns(
+							nil,
+							ccv3.Warnings{"get-app-warning-1", "get-app-warning-2"},
+							errors.New("some-error"),
+						)
 					})
 
 					It("returns the error and all warnings", func() {
@@ -1253,9 +1275,7 @@ var _ = Describe("Application Actions", func() {
 			When("application process exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{
-							GUID: "some-process-guid",
-						},
+						ccv3.Process{GUID: "some-process-guid"},
 						ccv3.Warnings{"some-process-warning"},
 						nil,
 					)
@@ -1372,6 +1392,7 @@ var _ = Describe("Application Actions", func() {
 
 		When("starting the application fails", func() {
 			var expectedErr error
+
 			BeforeEach(func() {
 				expectedErr = errors.New("some set start-application error")
 				fakeCloudControllerClient.UpdateApplicationStartReturns(
@@ -1458,6 +1479,7 @@ var _ = Describe("Application Actions", func() {
 
 			When("polling the application start errors", func() {
 				var expectedErr error
+
 				BeforeEach(func() {
 					expectedErr = errors.New("some polling error")
 					fakeCloudControllerClient.GetApplicationProcessesReturns(nil, ccv3.Warnings{"get-process-warnings"}, expectedErr)
@@ -1472,6 +1494,7 @@ var _ = Describe("Application Actions", func() {
 
 		When("restarting the application fails", func() {
 			var expectedErr error
+
 			BeforeEach(func() {
 				expectedErr = errors.New("some set restart-application error")
 				fakeCloudControllerClient.UpdateApplicationRestartReturns(
