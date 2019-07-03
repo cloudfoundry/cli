@@ -203,7 +203,7 @@ var _ = Describe("CopySource", func() {
 				})
 
 				Describe("when a space is provided, but not an org", func() {
-					It("send the correct target appplication for the current org and target space", func() {
+					It("sends the correct target appplication for the current org and target space", func() {
 						space := models.Space{}
 						space.Name = "space-name"
 						space.GUID = "model-space-guid"
@@ -219,6 +219,21 @@ var _ = Describe("CopySource", func() {
 							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space space-name as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
+						))
+					})
+
+					It("reflects the capitalization of the actual space name", func() {
+						spaceRepo.FindByNameReturns(models.Space{
+							SpaceFields: models.SpaceFields{
+								Name: "SPACE-NAME",
+								GUID: "space-guid",
+							},
+						}, nil)
+
+						ok := runCommand("-s", "space-name", "source-app", "target-app")
+						Expect(ok).To(BeTrue())
+						Expect(ui.Outputs()).To(ContainSubstrings(
+							[]string{"Copying source from app source-app to target app target-app in org my-org / space SPACE-NAME as my-user..."},
 						))
 					})
 
@@ -281,6 +296,23 @@ var _ = Describe("CopySource", func() {
 						Expect(ok).To(BeTrue())
 						Expect(ui.Outputs()).ToNot(ContainSubstrings(
 							[]string{"FAILED"},
+						))
+					})
+
+					It("reflects the capitalization of the actual space name", func() {
+						orgRepo.FindByNameReturns(models.Organization{
+							Spaces: []models.SpaceFields{
+								{
+									Name: "SPACE-NAME",
+									GUID: "space-guid",
+								},
+							},
+						}, nil)
+
+						ok := runCommand("-o", "org-name", "-s", "space-name", "source-app", "target-app")
+						Expect(ok).To(BeTrue())
+						Expect(ui.Outputs()).To(ContainSubstrings(
+							[]string{"Copying source from app source-app to target app target-app in org org-name / space SPACE-NAME as my-user..."},
 						))
 					})
 
