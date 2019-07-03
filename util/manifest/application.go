@@ -25,7 +25,7 @@ type Application struct {
 	// for starting an application.
 	HealthCheckTimeout uint64
 	// HealthCheckType specifies the mechanism used to determine if the application
-	// is healthy (e.g. a port being open, or an HTTP status).
+	// is healthy (e.g., an open port or an HTTP endpoint).
 	HealthCheckType string
 	Hostname        string
 	Instances       types.NullInt
