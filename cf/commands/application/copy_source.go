@@ -3,6 +3,7 @@ package application
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/cf/api/applications"
 	"code.cloudfoundry.org/cli/cf/api/authentication"
@@ -161,7 +162,7 @@ func (cmd *CopySource) findSpaceGUID(targetOrg, targetSpace string) (string, err
 	var space models.SpaceFields
 	var foundSpace bool
 	for _, s := range org.Spaces {
-		if s.Name == targetSpace {
+		if strings.EqualFold(s.Name, targetSpace) {
 			space = s
 			foundSpace = true
 		}

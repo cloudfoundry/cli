@@ -236,7 +236,7 @@ var _ = Describe("CopySource", func() {
 				})
 
 				Describe("when an org and space name are passed as parameters", func() {
-					It("send the correct target application for the space and org", func() {
+					It("sends the correct target application for the space and org", func() {
 						orgRepo.FindByNameReturns(models.Organization{
 							Spaces: []models.SpaceFields{
 								{
@@ -265,6 +265,22 @@ var _ = Describe("CopySource", func() {
 							[]string{"Copying source from app source-app to target app target-app in org org-name / space space-name as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
+						))
+					})
+					It("is case-insensitive for space name", func() {
+						orgRepo.FindByNameReturns(models.Organization{
+							Spaces: []models.SpaceFields{
+								{
+									Name: "SPACE-NAME",
+									GUID: "space-guid",
+								},
+							},
+						}, nil)
+
+						ok := runCommand("-o", "org-name", "-s", "space-name", "source-app", "target-app")
+						Expect(ok).To(BeTrue())
+						Expect(ui.Outputs()).ToNot(ContainSubstrings(
+							[]string{"FAILED"},
 						))
 					})
 
