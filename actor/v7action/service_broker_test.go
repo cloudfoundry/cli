@@ -6,7 +6,6 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -80,25 +79,21 @@ var _ = Describe("Service Broker Actions", func() {
 	})
 
 	Describe("CreateServiceBroker", func() {
+		const (
+			name      = "name"
+			url       = "url"
+			username  = "username"
+			password  = "password"
+			spaceGUID = "space-guid"
+		)
+
 		var (
 			warnings       Warnings
 			executionError error
-
-			serviceBroker = ServiceBroker{
-				Name: "name",
-				URL:  "url",
-				Credentials: ServiceBrokerCredentials{
-					Type: constant.BasicCredentials,
-					Data: ServiceBrokerCredentialsData{
-						Username: "username",
-						Password: "password",
-					},
-				},
-			}
 		)
 
 		JustBeforeEach(func() {
-			warnings, executionError = actor.CreateServiceBroker(serviceBroker)
+			warnings, executionError = actor.CreateServiceBroker(name, username, password, url, spaceGUID)
 		})
 
 		When("the client request is successful", func() {
@@ -114,8 +109,12 @@ var _ = Describe("Service Broker Actions", func() {
 
 			It("passes the service broker credentials to the client", func() {
 				Expect(fakeCloudControllerClient.CreateServiceBrokerCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)).
-					To(Equal(serviceBroker))
+				n, u, p, l, s := fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)
+				Expect(n).To(Equal(name))
+				Expect(u).To(Equal(username))
+				Expect(p).To(Equal(password))
+				Expect(l).To(Equal(url))
+				Expect(s).To(Equal(spaceGUID))
 			})
 		})
 

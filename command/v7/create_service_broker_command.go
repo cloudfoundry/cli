@@ -3,16 +3,16 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 //go:generate counterfeiter . CreateServiceBrokerActor
 
 type CreateServiceBrokerActor interface {
-	CreateServiceBroker(v7action.ServiceBroker) (v7action.Warnings, error)
+	CreateServiceBroker(name, user, password, url, spaceGUID string) (v7action.Warnings, error)
 }
 
 type CreateServiceBrokerCommand struct {
@@ -43,7 +43,7 @@ func (cmd *CreateServiceBrokerCommand) Setup(config command.Config, ui command.U
 }
 
 func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(cmd.SpaceScoped, cmd.SpaceScoped)
 	if err != nil {
 		return err
 	}
@@ -53,28 +53,29 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor(
-		"Creating service broker {{.ServiceBroker}} as {{.Username}}...",
-		map[string]interface{}{
-			"Username":      user.Name,
-			"ServiceBroker": cmd.RequiredArgs.ServiceBroker,
-		},
-	)
-
-	serviceBroker := v7action.ServiceBroker{
-		Name: cmd.RequiredArgs.ServiceBroker,
-		URL:  cmd.RequiredArgs.URL,
-		Credentials: v7action.ServiceBrokerCredentials{
-			Type: constant.BasicCredentials,
-			Data: v7action.ServiceBrokerCredentialsData{
-				Username: cmd.RequiredArgs.Username,
-				Password: cmd.RequiredArgs.Password,
+	var space configv3.Space
+	if cmd.SpaceScoped {
+		space = cmd.Config.TargetedSpace()
+		cmd.UI.DisplayTextWithFlavor(
+			"Creating service broker {{.ServiceBroker}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
+			map[string]interface{}{
+				"Username":      user.Name,
+				"ServiceBroker": cmd.RequiredArgs.ServiceBroker,
+				"Org":           cmd.Config.TargetedOrganizationName(),
+				"Space":         space.Name,
 			},
-		},
-		SpaceGUID: "",
+		)
+	} else {
+		cmd.UI.DisplayTextWithFlavor(
+			"Creating service broker {{.ServiceBroker}} as {{.Username}}...",
+			map[string]interface{}{
+				"Username":      user.Name,
+				"ServiceBroker": cmd.RequiredArgs.ServiceBroker,
+			},
+		)
 	}
 
-	warnings, err := cmd.Actor.CreateServiceBroker(serviceBroker)
+	warnings, err := cmd.Actor.CreateServiceBroker(cmd.RequiredArgs.ServiceBroker, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password, cmd.RequiredArgs.URL, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err == nil {
