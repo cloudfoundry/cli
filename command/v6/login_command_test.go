@@ -1122,17 +1122,49 @@ var _ = Describe("login Command", func() {
 				})
 				When("-s was not passed", func() {
 					When("only one space is available", func() {
-						It("targets this space", func() {
-							BeforeEach(func() {
-								// fakeActor.GetOrganizationsReturns(
-								// 	[]v3action.Organization{v3action.Organization{
-								// 		GUID: "some-org-guid",
-								// 		Name: "some-org-name",
-								// 	}},
-								// 	v3action.Warnings{"some-org-warning-1", "some-org-warning-2"},
-								// 	nil,
-								// )
+						BeforeEach(func() {
+							spaces := make([]v3action.Space, 1)
+
+							space := v3action.Space{
+								GUID:             "some-space-guid",
+								Name:             "some-space-name",
+								OrganizationGUID: "some-org-guid",
+							}
+
+							spaces[0] = space
+
+							fakeActor.GetOrganizationSpacesReturns(
+								spaces,
+								v3action.Warnings{"some-warning-1", "some-warning-2"},
+								nil,
+							)
+
+							fakeConfig.TargetedSpaceReturns(configv3.Space{
+										GUID:             "some-space-guid",
+										Name:             "some-space-name",
+										OrganizationGUID: "some-org-guid",
 							})
+						})
+						FIt("targets this space", func() {
+							// expect no error
+							Expect(executeErr).NotTo(HaveOccurred())
+							// config set space information was called with our space guid and space name
+							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+
+							firstArg, secondArg, _ := fakeConfig.SetSpaceInformationArgsForCall(0)
+							Expect(firstArg).To(Equal("some-space-guid"))
+							Expect(secondArg).To(Equal("some-space-name"))
+
+							// the UI to contain warnings 1 and 2 ....
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+							// the UI to contain targeted space ....
+							Expect(testUI.Out).To(Say(`Targeted space: some-space-name`))
+
+
+
+							Expect(testUI.Out).To(Say(`Space:\s+some-space-name'`))
+							Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE'`))
 						})
 					})
 				})

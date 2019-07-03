@@ -46,6 +46,24 @@ func (actor Actor) ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) 
 	return isoSegName, allWarnings, nil
 }
 
+// GetOrganizationSpaces returns a list of spaces in the specified org
+func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
+	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+		Key:    ccv3.OrganizationGUIDFilter,
+		Values: []string{orgGUID},
+	})
+	if err != nil {
+		return []Space{}, Warnings(warnings), err
+	}
+
+	spaces := make([]Space, len(ccv3Spaces))
+	for i, ccv3Space := range ccv3Spaces {
+		spaces[i] = actor.convertCCToActorSpace(ccv3Space)
+	}
+
+	return spaces, Warnings(warnings), nil
+}
+
 func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (Space, Warnings, error) {
 	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
