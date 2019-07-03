@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -13,7 +14,7 @@ var _ = Describe("create-service-broker command", func() {
 	var brokerName string
 
 	BeforeEach(func() {
-		helpers.SkipIfV7AndVersionLessThan("3.72.0")
+		helpers.SkipIfV7AndVersionLessThan(ccversion.MinVersionCreateServiceBrokerV3)
 
 		brokerName = helpers.NewServiceBrokerName()
 
@@ -92,7 +93,7 @@ var _ = Describe("create-service-broker command", func() {
 
 			When("the --space-scoped flag is passed", func() {
 				BeforeEach(func() {
-					helpers.SkipIfV7AndVersionLessThan("3.74.0")
+					helpers.SkipIfV7AndVersionLessThan(ccversion.MinVersionCreateSpaceScopedServiceBrokerV3)
 				})
 
 				When("no org or space is targeted", func() {

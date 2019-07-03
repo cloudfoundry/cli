@@ -14,7 +14,9 @@ const (
 	MinVersionUpdateServiceInstanceMaintenanceInfoV2 = "2.135.0"
 	MinVersionMaintenanceInfoInSummaryV2             = "2.138.0"
 
-	MinVersionShareServiceV3     = "3.36.0"
-	MinVersionZeroDowntimePushV3 = "3.57.0"
-	MinVersionSpacesGUIDsParamV3 = "3.56.0"
+	MinVersionShareServiceV3                   = "3.36.0"
+	MinVersionZeroDowntimePushV3               = "3.57.0"
+	MinVersionSpacesGUIDsParamV3               = "3.56.0"
+	MinVersionCreateServiceBrokerV3            = "3.72.0"
+	MinVersionCreateSpaceScopedServiceBrokerV3 = "3.75.0"
 )
