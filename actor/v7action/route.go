@@ -44,9 +44,6 @@ func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path st
 		return Route{}, allWarnings, err
 	}
 
-	if path != "" && string(path[0]) != "/" {
-		path = "/" + path
-	}
 	route, apiWarnings, err := actor.CloudControllerClient.CreateRoute(ccv3.Route{
 		SpaceGUID:  space.GUID,
 		DomainGUID: domain.GUID,
@@ -262,10 +259,6 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 		return allWarnings, err
 	}
 
-	if path != "" && string(path[0]) != "/" {
-		path = "/" + path
-	}
-
 	queryArray := []ccv3.Query{
 		{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
 		{Key: ccv3.HostsFilter, Values: []string{hostname}},
@@ -304,10 +297,6 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 }
 
 func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (Route, Warnings, error) {
-	if path != "" && string(path[0]) != "/" {
-		path = "/" + path
-	}
-
 	ccRoutes, ccWarnings, err := actor.CloudControllerClient.GetRoutes(
 		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 		ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},

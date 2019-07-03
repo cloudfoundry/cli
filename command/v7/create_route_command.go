@@ -16,11 +16,11 @@ type CreateRouteActor interface {
 }
 
 type CreateRouteCommand struct {
-	RequiredArgs    flag.Domain `positional-args:"yes"`
-	usage           interface{} `usage:"CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo"`
-	Hostname        string      `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
-	Path            string      `long:"path" description:"Path for the HTTP route"`
-	relatedCommands interface{} `related_commands:"check-route, domains, map-route, routes, unmap-route"`
+	RequiredArgs    flag.Domain      `positional-args:"yes"`
+	usage           interface{}      `usage:"CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo"`
+	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
+	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
+	relatedCommands interface{}      `related_commands:"check-route, domains, map-route, routes, unmap-route"`
 
 	UI          command.UI
 	Config      command.Config
@@ -55,7 +55,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 	domain := cmd.RequiredArgs.Domain
 	hostname := cmd.Hostname
-	pathName := cmd.Path
+	pathName := cmd.Path.Path
 	spaceName := cmd.Config.TargetedSpace().Name
 	orgName := cmd.Config.TargetedOrganization().Name
 	fqdn := desiredFQDN(domain, hostname, pathName)
@@ -98,11 +98,7 @@ func desiredFQDN(domain, hostname, path string) string {
 	fqdn += domain
 
 	if path != "" {
-		if string(path[0]) == "/" {
-			fqdn += path
-		} else {
-			fqdn += "/" + path
-		}
+		fqdn += path
 	}
 
 	return fqdn

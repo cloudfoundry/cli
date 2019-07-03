@@ -6,12 +6,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("RoutePath", func() {
-	var routePath RoutePath
+var _ = Describe("V7RoutePath", func() {
+	var routePath V7RoutePath
 
 	Describe("UnmarshalFlag", func() {
 		BeforeEach(func() {
-			routePath = RoutePath{}
+			routePath = V7RoutePath{}
 		})
 
 		When("passed a path beginning with a slash", func() {
@@ -27,6 +27,14 @@ var _ = Describe("RoutePath", func() {
 				err := routePath.UnmarshalFlag("banana")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(routePath.Path).To(Equal("/banana"))
+			})
+		})
+
+		When("passed an empty string", func() {
+			It("leaves the string as empty", func() {
+				err := routePath.UnmarshalFlag("")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(routePath.Path).To(Equal(""))
 			})
 		})
 	})

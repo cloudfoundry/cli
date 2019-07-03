@@ -5,11 +5,11 @@ import (
 	"strings"
 )
 
-type RoutePath struct {
+type V6RoutePath struct {
 	Path string
 }
 
-func (h *RoutePath) UnmarshalFlag(val string) error {
+func (h *V6RoutePath) UnmarshalFlag(val string) error {
 	if !strings.HasPrefix(val, "/") {
 		h.Path = fmt.Sprintf("/%s", val)
 	} else {

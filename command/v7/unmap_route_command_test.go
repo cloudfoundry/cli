@@ -61,7 +61,7 @@ var _ = Describe("unmap-route Command", func() {
 		cmd = UnmapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
-			Path:         path,
+			Path:         flag.V7RoutePath{Path: path},
 			UI:           testUI,
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,

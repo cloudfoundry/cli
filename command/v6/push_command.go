@@ -61,7 +61,7 @@ type PushCommand struct {
 	NoStart             bool                                    `long:"no-start" description:"Do not start an app after pushing"`
 	AppPath             flag.PathWithExistenceCheck             `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	RandomRoute         bool                                    `long:"random-route" description:"Create a random route for this app"`
-	RoutePath           flag.RoutePath                          `long:"route-path" description:"Path for the route"`
+	RoutePath           flag.V6RoutePath                        `long:"route-path" description:"Path for the route"`
 	StackName           string                                  `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	VarsFilePaths       []flag.PathWithExistenceCheck           `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	Vars                []template.VarKV                        `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`

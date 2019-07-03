@@ -21,11 +21,11 @@ type MapRouteActor interface {
 }
 
 type MapRouteCommand struct {
-	RequiredArgs    flag.AppDomain `positional-args:"yes"`
-	usage           interface{}    `usage:"CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
-	Hostname        string         `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
-	Path            string         `long:"path" description:"Path for the HTTP route"`
-	relatedCommands interface{}    `related_commands:"create-route, routes, unmap-route"`
+	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
+	usage           interface{}      `usage:"CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
+	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
+	relatedCommands interface{}      `related_commands:"create-route, routes, unmap-route"`
 
 	UI          command.UI
 	Config      command.Config
@@ -71,8 +71,9 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, cmd.Path)
-	fqdn := desiredFQDN(domain.Name, cmd.Hostname, cmd.Path)
+	path := cmd.Path.Path
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
+	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
@@ -90,7 +91,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			cmd.Config.TargetedSpace().Name,
 			domain.Name,
 			cmd.Hostname,
-			cmd.Path,
+			path,
 		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {

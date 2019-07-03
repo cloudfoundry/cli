@@ -559,12 +559,12 @@ var _ = Describe("v3-push Command", func() {
 
 			// 	When("--route-path is given", func() {
 			// 		BeforeEach(func() {
-			// 			cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
+			// 			cmd.V6RoutePath = flag.V6RoutePath{Path: "/some-path"}
 			// 		})
 
 			// 		It("sets --route-path on the command line settings", func() {
 			// 			Expect(commandLineSettingsErr).ToNot(HaveOccurred())
-			// 			Expect(settings.RoutePath).To(Equal("/some-path"))
+			// 			Expect(settings.V6RoutePath).To(Equal("/some-path"))
 			// 		})
 			// 	})
 
@@ -751,14 +751,14 @@ var _ = Describe("v3-push Command", func() {
 
 		// 	Entry("--random-route and --route-path",
 		// 		func() {
-		// 			cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+		// 			cmd.V6RoutePath = flag.V6RoutePath{Path: "/bananas"}
 		// 			cmd.RandomRoute = true
 		// 		},
 		// 		translatableerror.ArgumentCombinationError{Args: []string{"--random-route", "--route-path"}}),
 
 		// 	Entry("--route-path and --no-route",
 		// 		func() {
-		// 			cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+		// 			cmd.V6RoutePath = flag.V6RoutePath{Path: "/bananas"}
 		// 			cmd.NoRoute = true
 		// 		},
 		// 		translatableerror.ArgumentCombinationError{Args: []string{"--route-path", "--no-route"}}),

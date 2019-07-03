@@ -58,7 +58,7 @@ var _ = Describe("map-route Command", func() {
 		cmd = MapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
-			Path:         path,
+			Path:         flag.V7RoutePath{Path: path},
 			UI:           testUI,
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,

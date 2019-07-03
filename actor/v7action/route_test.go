@@ -72,28 +72,6 @@ var _ = Describe("Route Actions", func() {
 				BeforeEach(func() {
 					path = "/path-name"
 				})
-				It("returns the route with '/<path>' and prints warnings", func() {
-					Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-orgs-warning", "get-domains-warning", "get-spaces-warning"))
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
-					passedRoute := fakeCloudControllerClient.CreateRouteArgsForCall(0)
-
-					Expect(passedRoute).To(Equal(
-						ccv3.Route{
-							SpaceGUID:  "space-guid",
-							DomainGUID: "domain-guid",
-							Host:       "hostname",
-							Path:       "/path-name",
-						},
-					))
-				})
-			})
-
-			When("the input path does not start with '/'", func() {
-				BeforeEach(func() {
-					path = "path-name"
-				})
 
 				It("returns the route with '/<path>' and prints warnings", func() {
 					Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-orgs-warning", "get-domains-warning", "get-spaces-warning"))
@@ -112,7 +90,6 @@ var _ = Describe("Route Actions", func() {
 					))
 				})
 			})
-
 		})
 
 		When("the API call to get the domain returns an error", func() {
@@ -623,7 +600,7 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("delegates to the cloud controller client", func() {
-				warnings, executeErr := actor.DeleteRoute("domain.com", "hostname", "path")
+				warnings, executeErr := actor.DeleteRoute("domain.com", "hostname", "/path")
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning", "delete-warning"))
 
@@ -756,7 +733,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns the error", func() {
-					warnings, err := actor.DeleteRoute("domain.com", "hostname", "path")
+					warnings, err := actor.DeleteRoute("domain.com", "hostname", "/path")
 					Expect(err).To(Equal(actionerror.RouteNotFoundError{
 						DomainName: "domain.com",
 						Host:       "hostname",
@@ -773,7 +750,7 @@ var _ = Describe("Route Actions", func() {
 			domainName = "some-domain.com"
 			domainGUID = "domain-guid"
 			hostname   = "hostname"
-			path       = "path"
+			path       = "/path"
 
 			executeErr error
 			warnings   Warnings
@@ -795,7 +772,7 @@ var _ = Describe("Route Actions", func() {
 				Expect(actualQueries).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -819,7 +796,7 @@ var _ = Describe("Route Actions", func() {
 				Expect(actualQueries).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -843,7 +820,7 @@ var _ = Describe("Route Actions", func() {
 				Expect(actualQueries).To(ConsistOf(
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/" + path}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
 				))
 
 				Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -851,7 +828,7 @@ var _ = Describe("Route Actions", func() {
 					DomainName: domainName,
 					DomainGUID: domainGUID,
 					Host:       hostname,
-					Path:       "/" + path,
+					Path:       path,
 				}))
 			})
 		})

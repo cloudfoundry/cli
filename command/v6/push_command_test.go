@@ -989,7 +989,7 @@ var _ = Describe("push Command", func() {
 
 				When("--route-path is given", func() {
 					BeforeEach(func() {
-						cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
+						cmd.RoutePath = flag.V6RoutePath{Path: "/some-path"}
 					})
 
 					It("sets --route-path on the command line settings", func() {
@@ -1175,14 +1175,14 @@ var _ = Describe("push Command", func() {
 
 			Entry("--random-route and --route-path",
 				func() {
-					cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+					cmd.RoutePath = flag.V6RoutePath{Path: "/bananas"}
 					cmd.RandomRoute = true
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--random-route", "--route-path"}}),
 
 			Entry("--route-path and --no-route",
 				func() {
-					cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+					cmd.RoutePath = flag.V6RoutePath{Path: "/bananas"}
 					cmd.NoRoute = true
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--route-path", "--no-route"}}),

@@ -52,7 +52,7 @@ type V3PushCommand struct {
 	NoStart bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
 	AppPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute         bool
-	// RoutePath           flag.RoutePath
+	// V6RoutePath           flag.V6RoutePath
 	// StackName           string
 	// VarsFilePaths []flag.PathWithExistenceCheck
 	// Vars []template.VarKV

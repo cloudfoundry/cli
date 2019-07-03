@@ -20,11 +20,11 @@ type UnmapRouteActor interface {
 }
 
 type UnmapRouteCommand struct {
-	RequiredArgs    flag.AppDomain `positional-args:"yes"`
-	Hostname        string         `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
-	Path            string         `long:"path" description:"Path used to identify the HTTP route"`
-	usage           interface{}    `usage:"CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
-	relatedCommands interface{}    `related_commands:"delete-route, map-route, routes"`
+	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
+	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
+	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
+	usage           interface{}      `usage:"CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	relatedCommands interface{}      `related_commands:"delete-route, map-route, routes"`
 
 	UI          command.UI
 	Config      command.Config
@@ -70,8 +70,9 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, cmd.Path)
-	fqdn := desiredFQDN(domain.Name, cmd.Hostname, cmd.Path)
+	path := cmd.Path.Path
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
+	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

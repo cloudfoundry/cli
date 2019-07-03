@@ -57,7 +57,7 @@ var _ = Describe("create-route Command", func() {
 				Domain: domainName,
 			},
 			Hostname:    hostname,
-			Path:        path,
+			Path:        flag.V7RoutePath{Path: path},
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
@@ -110,22 +110,7 @@ var _ = Describe("create-route Command", func() {
 			})
 		})
 
-		When("passing in a path without a '/'", func() {
-
-			BeforeEach(func() {
-				path = "lion"
-			})
-
-			It("prints information about the created route ", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(testUI.Out).To(Say(`Creating route %s/%s for org %s / space %s as the-user\.\.\.`, domainName, path, orgName, spaceName))
-				Expect(testUI.Out).To(Say("Route %s/%s has been created.", domainName, path))
-				Expect(testUI.Out).To(Say("OK"))
-			})
-		})
-
-		When("passing in a path with a '/'", func() {
-
+		When("passing in a path", func() {
 			BeforeEach(func() {
 				path = "/lion"
 			})

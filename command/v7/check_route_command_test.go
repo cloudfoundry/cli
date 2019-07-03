@@ -159,7 +159,7 @@ var _ = Describe("check-route Command", func() {
 
 		When("passing hostname and path flags", func() {
 			BeforeEach(func() {
-				cmd.Path = "/some-path"
+				cmd.Path.Path = "/some-path"
 				cmd.Hostname = "some-host"
 
 				fakeActor.CheckRouteReturns(
