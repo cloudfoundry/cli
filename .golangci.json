@@ -48,7 +48,6 @@
       "govet",
       "ineffassign",
       "interfacer",
-      "misspell",
       "staticcheck",
       "structcheck",
       "typecheck",
