@@ -4,8 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
-type ServiceBrokerCredentials = ccv3.ServiceBrokerCredentials
-type ServiceBrokerCredentialsData = ccv3.ServiceBrokerCredentialsData
 type ServiceBroker = ccv3.ServiceBroker
 
 func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
@@ -17,7 +15,7 @@ func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	return serviceBrokers, Warnings(warnings), nil
 }
 
-func (actor Actor) CreateServiceBroker(serviceBroker ServiceBroker) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.CreateServiceBroker(serviceBroker)
+func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.CreateServiceBroker(name, username, password, url, spaceGUID)
 	return Warnings(warnings), err
 }

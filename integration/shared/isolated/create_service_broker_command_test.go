@@ -13,7 +13,6 @@ var _ = Describe("create-service-broker command", func() {
 	var brokerName string
 
 	BeforeEach(func() {
-		// TODO: remove that when capi-release is cut with v3 create-service-broker functionality
 		helpers.SkipIfV7AndVersionLessThan("3.72.0")
 
 		brokerName = helpers.NewServiceBrokerName()
@@ -93,9 +92,7 @@ var _ = Describe("create-service-broker command", func() {
 
 			When("the --space-scoped flag is passed", func() {
 				BeforeEach(func() {
-					// TODO: replace skip with versioned skip when
-					// https://www.pivotaltracker.com/story/show/166063310 is resolved.
-					helpers.SkipIfV7()
+					helpers.SkipIfV7AndVersionLessThan("3.74.0")
 				})
 
 				When("no org or space is targeted", func() {
