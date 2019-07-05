@@ -33,7 +33,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		fakeActor       *v6fakes.FakeOriginalV3PushActor
+		fakeActor       *v6fakes.FakeV3PushActor
 		fakeV2PushActor *v6fakes.FakeOriginalV2PushActor
 		fakeV2AppActor  *sharedfakes.FakeV2AppActor
 		binaryName      string
@@ -48,7 +48,7 @@ var _ = Describe("v3-push Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v6fakes.FakeOriginalV3PushActor)
+		fakeActor = new(v6fakes.FakeV3PushActor)
 		fakeV2PushActor = new(v6fakes.FakeOriginalV2PushActor)
 		fakeV2AppActor = new(sharedfakes.FakeV2AppActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
@@ -80,7 +80,7 @@ var _ = Describe("v3-push Command", func() {
 			UI:                  testUI,
 			Config:              fakeConfig,
 			SharedActor:         fakeSharedActor,
-			OriginalActor:       fakeActor,
+			Actor:               fakeActor,
 			OriginalV2PushActor: fakeV2PushActor,
 
 			NOAAClient:          fakeNOAAClient,

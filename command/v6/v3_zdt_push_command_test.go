@@ -35,7 +35,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
 		fakeZdtActor    *v6fakes.FakeV3ZeroDowntimeVersionActor
-		fakeV3PushActor *v6fakes.FakeOriginalV3PushActor
+		fakeV3PushActor *v6fakes.FakeV3PushActor
 		fakeV2PushActor *v6fakes.FakeOriginalV2PushActor
 		fakeV2AppActor  *sharedfakes.FakeV2AppActor
 		binaryName      string
@@ -51,7 +51,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeZdtActor = new(v6fakes.FakeV3ZeroDowntimeVersionActor)
-		fakeV3PushActor = new(v6fakes.FakeOriginalV3PushActor)
+		fakeV3PushActor = new(v6fakes.FakeV3PushActor)
 		fakeV2PushActor = new(v6fakes.FakeOriginalV2PushActor)
 		fakeV2AppActor = new(sharedfakes.FakeV2AppActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
