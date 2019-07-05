@@ -66,7 +66,7 @@ var _ = Describe("pushes specified app from single manifest file", func() {
 
 				Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
 				Eventually(session).Should(Say(`\+\s+name:\s+%s`, firstApp))
-				Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, dir))
+				Eventually(session).Should(helpers.SayPath(`path:\s+%s`, dir))
 				Eventually(session).Should(Say(`\s+routes:`))
 				Eventually(session).Should(Say(`(?i)\+\s+%s.%s`, firstApp, helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Say(`Mapping routes\.\.\.`))

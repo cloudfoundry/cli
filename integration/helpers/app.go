@@ -22,12 +22,11 @@ import (
 // staticfile_buildpack" so that your app will correctly start up with the
 // proper buildpack.
 func WithHelloWorldApp(f func(dir string)) {
-	dir, err := ioutil.TempDir("", "simple-app")
-	Expect(err).ToNot(HaveOccurred())
+	dir := TempDirAbsolutePath("", "simple-app")
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
@@ -40,12 +39,11 @@ func WithHelloWorldApp(f func(dir string)) {
 // (typically CF Push). It has multiple endpoints which are helpful when testing
 // http healthchecks.
 func WithMultiEndpointApp(f func(dir string)) {
-	dir, err := ioutil.TempDir("", "simple-app")
-	Expect(err).ToNot(HaveOccurred())
+	dir := TempDirAbsolutePath("", "simple-app")
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	tempfile = filepath.Join(dir, "other_endpoint.html")
@@ -67,13 +65,12 @@ func WithMultiEndpointApp(f func(dir string)) {
 // staticfile_buildpack" so that your app will correctly start up with the
 // proper buildpack.
 func WithNoResourceMatchedApp(f func(dir string)) {
-	dir, err := ioutil.TempDir("", "simple-app")
-	Expect(err).ToNot(HaveOccurred())
+	dir := TempDirAbsolutePath("", "simple-app")
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
 
-	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024))), 0666)
+	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024))), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -87,11 +84,10 @@ func WithMultiBuildpackApp(f func(dir string)) {
 // WithProcfileApp creates an application to use with your CLI command
 // that contains Procfile defining web and worker processes.
 func WithProcfileApp(f func(dir string)) {
-	dir, err := ioutil.TempDir("", "simple-ruby-app")
-	Expect(err).ToNot(HaveOccurred())
+	dir := TempDirAbsolutePath("", "simple-ruby-app")
 	defer os.RemoveAll(dir)
 
-	err = ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
+	err := ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
 web: ruby -run -e httpd . -p $PORT
 console: bundle exec irb`,
 	), 0666)
@@ -120,11 +116,10 @@ BUNDLED WITH
 // WithCrashingApp creates an application to use with your CLI command
 // that will not successfully start its `web` process
 func WithCrashingApp(f func(dir string)) {
-	dir, err := ioutil.TempDir("", "crashing-ruby-app")
-	Expect(err).ToNot(HaveOccurred())
+	dir := TempDirAbsolutePath("", "crashing-ruby-app")
 	defer os.RemoveAll(dir)
 
-	err = ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
+	err := ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
 web: bogus bogus`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
@@ -154,12 +149,11 @@ BUNDLED WITH
 // staticfile_buildpack" so that your app will correctly start up with the
 // proper buildpack.
 func WithBananaPantsApp(f func(dir string)) {
-	dir, err := ioutil.TempDir("", "simple-app")
-	Expect(err).ToNot(HaveOccurred())
+	dir := TempDirAbsolutePath("", "simple-app")
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err = ioutil.WriteFile(tempfile, []byte("Banana Pants"), 0666)
+	err := ioutil.WriteFile(tempfile, []byte("Banana Pants"), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)

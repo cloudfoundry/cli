@@ -21,7 +21,8 @@ var _ = Describe("Locator", func() {
 
 	Describe("Path", func() {
 		var (
-			filepathOrDirectory string
+			originalFilepathOrDirectory string
+			filepathOrDirectory         string
 
 			expectedPath string
 			exists       bool
@@ -33,6 +34,8 @@ var _ = Describe("Locator", func() {
 		BeforeEach(func() {
 			var err error
 			workingDir, err = ioutil.TempDir("", "manifest-locator-working-dir")
+			Expect(err).ToNot(HaveOccurred())
+			workingDir, err = filepath.EvalSymlinks(workingDir)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -126,6 +129,22 @@ var _ = Describe("Locator", func() {
 				Expect(executeErr).To(HaveOccurred())
 				Expect(expectedPath).To(BeEmpty())
 				Expect(exists).To(BeFalse())
+			})
+		})
+
+		When("the path to the manifest is a symbolic link", func() {
+			BeforeEach(func() {
+				originalFilepathOrDirectory = filepath.Join(workingDir, "some-manifest.yml")
+				Expect(ioutil.WriteFile(originalFilepathOrDirectory, nil, 0600)).To(Succeed())
+				filepathOrDirectory = filepath.Join(workingDir, "link-to-some-manifest.yml")
+				err := os.Symlink(originalFilepathOrDirectory, filepathOrDirectory)
+				Expect(err).To(BeNil())
+			})
+
+			It("returns the absolute path, not the symbolic link", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(expectedPath).To(Equal(originalFilepathOrDirectory))
+				Expect(exists).To(BeTrue())
 			})
 		})
 	})

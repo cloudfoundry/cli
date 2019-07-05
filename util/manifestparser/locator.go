@@ -26,11 +26,16 @@ func (loc Locator) Path(filepathOrDirectory string) (string, bool, error) {
 		return "", false, err
 	}
 
-	if info.IsDir() {
-		return loc.handleDir(filepathOrDirectory)
+	resolvedFilepathOrDirectory, err := filepath.EvalSymlinks(filepathOrDirectory)
+	if err != nil {
+		return "", false, err
 	}
 
-	return loc.handleFilepath(filepathOrDirectory)
+	if info.IsDir() {
+		return loc.handleDir(resolvedFilepathOrDirectory)
+	}
+
+	return loc.handleFilepath(resolvedFilepathOrDirectory)
 }
 
 func (loc Locator) handleDir(dir string) (string, bool, error) {

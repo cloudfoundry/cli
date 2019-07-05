@@ -30,7 +30,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 
 					Eventually(session).Should(Say(`Getting app info\.\.\.`))
 					Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
-					Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, appDir))
+					Eventually(session).Should(helpers.SayPath(`path:\s+%s`, appDir))
 					Eventually(session).Should(Say("routes:"))
 					Eventually(session).Should(Say(`Mapping routes\.\.\.`))
 					Eventually(session).Should(Say(`Comparing local files to remote cache\.\.\.`))
@@ -49,9 +49,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 			var emptyDir string
 
 			BeforeEach(func() {
-				var err error
-				emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
-				Expect(err).ToNot(HaveOccurred())
+				emptyDir = helpers.TempDirAbsolutePath("", "integration-push-path-empty")
 			})
 
 			AfterEach(func() {
@@ -60,7 +58,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 
 			It("returns an error", func() {
 				session := helpers.CF(PushCommandName, appName, "-p", emptyDir)
-				Eventually(session.Err).Should(helpers.SayPath("No app files found in '(/private)?%s'", emptyDir))
+				Eventually(session.Err).Should(helpers.SayPath("No app files found in '%s'", emptyDir))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -90,7 +88,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 
 			Eventually(session).Should(Say(`Getting app info\.\.\.`))
 			Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
-			Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, archive))
+			Eventually(session).Should(helpers.SayPath(`path:\s+%s`, archive))
 			Eventually(session).Should(Say("routes:"))
 			Eventually(session).Should(Say(`Mapping routes\.\.\.`))
 			Eventually(session).Should(Say(`Comparing local files to remote cache\.\.\.`))

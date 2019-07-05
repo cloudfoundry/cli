@@ -1,7 +1,6 @@
 package push
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -63,9 +62,7 @@ var _ = Describe("reading of the manifest based on location", func() {
 		var workingDir string
 
 		BeforeEach(func() {
-			var err error
-			workingDir, err = ioutil.TempDir("", "manifest-working-dir")
-			Expect(err).ToNot(HaveOccurred())
+			workingDir = helpers.TempDirAbsolutePath("", "manifest-working-dir")
 		})
 
 		AfterEach(func() {

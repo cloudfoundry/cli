@@ -23,9 +23,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
-		var err error
-		tempDir, err = ioutil.TempDir("", "create-manifest")
-		Expect(err).ToNot(HaveOccurred())
+		tempDir = helpers.TempDirAbsolutePath("", "create-manifest")
 
 		manifestFilePath = filepath.Join(tempDir, fmt.Sprintf("%s_manifest.yml", appName))
 	})

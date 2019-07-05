@@ -1,7 +1,7 @@
 package isolated
 
 import (
-	"io/ioutil"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -28,9 +28,7 @@ var _ = Describe("apply-manifest command", func() {
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
 
-		var err error
-		appDir, err = ioutil.TempDir("", "simple-app")
-		Expect(err).NotTo(HaveOccurred())
+		appDir = helpers.TempDirAbsolutePath("", "simple-app")
 
 		manifestPath = filepath.Join(appDir, "manifest.yml")
 		// Ensure the file exists at the minimum
@@ -133,12 +131,10 @@ var _ = Describe("apply-manifest command", func() {
 			When("the -f flag points to a directory that does not have a manifest.yml file", func() {
 				var (
 					emptyDir string
-					err      error
 				)
 
 				BeforeEach(func() {
-					emptyDir, err = ioutil.TempDir("", "empty")
-					Expect(err).NotTo(HaveOccurred())
+					emptyDir = helpers.TempDirAbsolutePath("", "empty")
 				})
 
 				AfterEach(func() {
@@ -201,7 +197,8 @@ var _ = Describe("apply-manifest command", func() {
 					})
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "apply-manifest")
-					Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
+					formatString := fmt.Sprintf("Applying manifest %%s in org %s / space %s as %s...", orgName, spaceName, userName)
+					Eventually(session).Should(helpers.SayPath(formatString, manifestPath))
 					Eventually(session).Should(Exit())
 
 					session = helpers.CF("app", appName)
