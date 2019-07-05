@@ -54,15 +54,13 @@ type V3ZeroDowntimePushCommand struct {
 	UI                  command.UI
 	Config              command.Config
 	NOAAClient          v3action.NOAAClient
-	Actor               V3PushActor
-	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
 	AppSummaryDisplayer shared.AppSummaryDisplayer
 	PackageDisplayer    shared.PackageDisplayer
 	ProgressBar         ProgressBar
 
 	ZdtActor            V3ZeroDowntimeVersionActor
-	OriginalV3PushActor OriginalV3PushActor
+	V3PushActor         V3PushActor
 	OriginalV2PushActor OriginalV2PushActor
 }
 
@@ -77,7 +75,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	}
 	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)
 	cmd.ZdtActor = v3actor
-	cmd.OriginalV3PushActor = v3actor
+	cmd.V3PushActor = v3actor
 
 	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -95,7 +93,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:         cmd.UI,
 		Config:     cmd.Config,
-		Actor:      cmd.OriginalV3PushActor,
+		Actor:      cmd.V3PushActor,
 		V2AppActor: v2AppActor,
 		AppName:    cmd.RequiredArgs.AppName,
 	}

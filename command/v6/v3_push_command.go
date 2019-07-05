@@ -19,9 +19,9 @@ type OriginalV2PushActor interface {
 	CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error)
 }
 
-//go:generate counterfeiter . OriginalV3PushActor
+//go:generate counterfeiter . V3PushActor
 
-type OriginalV3PushActor interface {
+type V3PushActor interface {
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
@@ -34,21 +34,6 @@ type OriginalV3PushActor interface {
 	StartApplication(appGUID string) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	UpdateApplication(app v3action.Application) (v3action.Application, v3action.Warnings, error)
-}
-
-//go:generate counterfeiter . V3PushActor
-
-type V3PushActor interface {
-	Actualize(state pushaction.PushPlan, progressBar pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
-	Conceptualize(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushPlan, pushaction.Warnings, error)
-}
-
-//go:generate counterfeiter . V3PushVersionActor
-
-type V3PushVersionActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
-	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
-	RestartApplication(appGUID string) (v3action.Warnings, error)
 }
 
 type V3PushCommand struct {
@@ -67,14 +52,12 @@ type V3PushCommand struct {
 	UI                  command.UI
 	Config              command.Config
 	NOAAClient          v3action.NOAAClient
-	Actor               V3PushActor
-	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
 	AppSummaryDisplayer shared.AppSummaryDisplayer
 	PackageDisplayer    shared.PackageDisplayer
 	ProgressBar         ProgressBar
 
-	OriginalActor       OriginalV3PushActor
+	Actor               V3PushActor
 	OriginalV2PushActor OriginalV2PushActor
 }
 
@@ -88,7 +71,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)
-	cmd.OriginalActor = v3actor
+	cmd.Actor = v3actor
 
 	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -106,7 +89,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:         cmd.UI,
 		Config:     cmd.Config,
-		Actor:      cmd.OriginalActor,
+		Actor:      cmd.Actor,
 		V2AppActor: v2AppActor,
 		AppName:    cmd.RequiredArgs.AppName,
 	}
@@ -207,7 +190,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		}
 	}()
 
-	err = cmd.OriginalActor.PollStart(app.GUID, warnings)
+	err = cmd.Actor.PollStart(app.GUID, warnings)
 	done <- true
 
 	if err != nil {
@@ -264,7 +247,7 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 		appToCreate.LifecycleBuildpacks = cmd.Buildpacks
 	}
 
-	app, warnings, err := cmd.OriginalActor.CreateApplicationInSpace(
+	app, warnings, err := cmd.Actor.CreateApplicationInSpace(
 		appToCreate,
 		cmd.Config.TargetedSpace().GUID,
 	)
@@ -285,7 +268,7 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 }
 
 func (cmd V3PushCommand) getApplication() (v3action.Application, error) {
-	app, warnings, err := cmd.OriginalActor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Application{}, err
@@ -314,7 +297,7 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 		appToUpdate.LifecycleBuildpacks = cmd.Buildpacks
 	}
 
-	app, warnings, err := cmd.OriginalActor.UpdateApplication(appToUpdate)
+	app, warnings, err := cmd.Actor.UpdateApplication(appToUpdate)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Application{}, err
@@ -349,9 +332,9 @@ func (cmd V3PushCommand) createPackage() (v3action.Package, error) {
 	)
 
 	if isDockerImage {
-		pkg, warnings, err = cmd.OriginalActor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, v3action.DockerImageCredentials{Path: cmd.DockerImage.Path, Username: cmd.DockerUsername, Password: cmd.Config.DockerPassword()})
+		pkg, warnings, err = cmd.Actor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, v3action.DockerImageCredentials{Path: cmd.DockerImage.Path, Username: cmd.DockerUsername, Password: cmd.Config.DockerPassword()})
 	} else {
-		pkg, warnings, err = cmd.OriginalActor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath))
+		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath))
 	}
 
 	cmd.UI.DisplayWarnings(warnings)
@@ -371,13 +354,13 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 		"Username":  userName,
 	})
 
-	logStream, logErrStream, logWarnings, logErr := cmd.OriginalActor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return "", logErr
 	}
 
-	buildStream, warningsStream, errStream := cmd.OriginalActor.StagePackage(pkg.GUID, cmd.RequiredArgs.AppName)
+	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(pkg.GUID, cmd.RequiredArgs.AppName)
 	droplet, err := shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
 		return "", err
@@ -396,7 +379,7 @@ func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName stri
 		"Username":    userName,
 	})
 
-	warnings, err := cmd.OriginalActor.SetApplicationDropletByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, dropletGUID)
+	warnings, err := cmd.Actor.SetApplicationDropletByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, dropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -414,7 +397,7 @@ func (cmd V3PushCommand) startApplication(appGUID string, userName string) error
 		"Username":  userName,
 	})
 
-	warnings, err := cmd.OriginalActor.StartApplication(appGUID)
+	warnings, err := cmd.Actor.StartApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -431,7 +414,7 @@ func (cmd V3PushCommand) stopApplication(appGUID string, userName string) error 
 		"CurrentUser":  userName,
 	})
 
-	warnings, err := cmd.OriginalActor.StopApplication(appGUID)
+	warnings, err := cmd.Actor.StopApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
