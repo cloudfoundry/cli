@@ -24,6 +24,7 @@ var _ = Describe("update-buildpack command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		buildpackName = helpers.NewBuildpackName()
 		username, _ = helpers.GetCredentials()
 	})

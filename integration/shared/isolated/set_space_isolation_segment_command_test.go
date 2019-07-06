@@ -14,6 +14,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 	var isolationSegmentName string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		organizationName = helpers.NewOrgName()
 		isolationSegmentName = helpers.NewIsolationSegmentName()
 		spaceName = helpers.NewSpaceName()

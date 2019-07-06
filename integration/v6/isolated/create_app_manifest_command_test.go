@@ -46,6 +46,7 @@ var _ = Describe("create-app-manifest command", func() {
 	var tempDir string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		var err error
 		tempDir, err = ioutil.TempDir("", "create-manifest")

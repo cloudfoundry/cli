@@ -18,6 +18,8 @@ var _ = Describe("bind-security-group command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+
 		orgName = helpers.NewOrgName()
 		secGroupName = helpers.NewSecurityGroupName()
 		someOrgName = helpers.NewOrgName()

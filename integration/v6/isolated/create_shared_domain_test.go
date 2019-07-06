@@ -37,6 +37,7 @@ var _ = Describe("create-shared-domain command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		helpers.SetupCF(orgName, spaceName)

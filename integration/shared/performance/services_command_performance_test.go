@@ -22,6 +22,7 @@ var _ = Describe("services command performance", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 		helpers.TargetOrgAndSpace(perfOrg, perfSpace)
 

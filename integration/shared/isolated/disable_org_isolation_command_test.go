@@ -13,6 +13,7 @@ var _ = Describe("disable-org-isolation command", func() {
 	var isolationSegmentName string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		organizationName = helpers.NewOrgName()
 		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})

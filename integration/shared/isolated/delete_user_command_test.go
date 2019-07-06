@@ -11,6 +11,10 @@ import (
 )
 
 var _ = Describe("delete-user command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("the logged in user is authorized to delete-users", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()

@@ -16,6 +16,11 @@ import (
 )
 
 var _ = Describe("auth command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Context("Help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("auth", "--help")

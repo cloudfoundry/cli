@@ -21,6 +21,7 @@ var _ = Describe("pushing a docker image", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

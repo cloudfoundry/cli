@@ -19,6 +19,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		managedServiceInstanceName = helpers.PrefixedRandomName("si")
 		userProvidedServiceInstanceName = helpers.PrefixedRandomName("usi")

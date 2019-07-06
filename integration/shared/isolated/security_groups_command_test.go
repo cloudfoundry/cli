@@ -9,9 +9,14 @@ import (
 )
 
 var _ = Describe("security-groups command", func() {
+
 	var (
 		session *Session
 	)
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
 
 	Describe("help", func() {
 		When("--help flag is provided", func() {

@@ -11,6 +11,11 @@ import (
 )
 
 var _ = Describe("run-task command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("run-task", "--help")

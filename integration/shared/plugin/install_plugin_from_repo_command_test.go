@@ -14,6 +14,10 @@ import (
 )
 
 var _ = Describe("install-plugin (from repo) command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("installing a plugin from a specific repo", func() {
 		When("the repo and the plugin name are swapped", func() {
 			var repoServer *Server

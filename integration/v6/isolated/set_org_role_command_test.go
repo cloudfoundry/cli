@@ -10,6 +10,10 @@ import (
 )
 
 var _ = Describe("set-org-role command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help text and argument validation", func() {
 		When("-h is passed", func() {
 			It("prints the help text", func() {

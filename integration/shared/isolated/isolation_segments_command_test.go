@@ -9,6 +9,11 @@ import (
 )
 
 var _ = Describe("isolation-segments command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {

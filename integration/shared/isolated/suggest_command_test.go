@@ -1,15 +1,19 @@
 package isolated
 
 import (
-	"os/exec"
-
+	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"os/exec"
 )
 
 var _ = Describe("Suggest Command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("a command is provided that is almost a command", func() {
 		It("gives suggestions", func() {
 			command := exec.Command("cf", "logn")

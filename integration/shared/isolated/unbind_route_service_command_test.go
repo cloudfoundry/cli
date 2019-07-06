@@ -11,6 +11,9 @@ import (
 )
 
 var _ = Describe("unbind-route-service command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
 	Describe("help", func() {
 		It("includes a description of the options", func() {
 			session := helpers.CF("help", "unbind-route-service")

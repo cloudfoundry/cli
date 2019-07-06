@@ -12,6 +12,10 @@ import (
 )
 
 var _ = Describe("delete-orphaned-routes command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help text", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("delete-orphaned-routes", "--help")

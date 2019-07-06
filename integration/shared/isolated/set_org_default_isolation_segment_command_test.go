@@ -15,6 +15,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})

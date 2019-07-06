@@ -12,6 +12,10 @@ import (
 )
 
 var _ = Describe("Logs Command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help", func() {
 		It("displays command usage to output", func() {
 			session := helpers.CF("logs", "--help")

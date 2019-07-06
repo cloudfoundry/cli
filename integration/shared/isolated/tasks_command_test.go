@@ -16,6 +16,7 @@ var _ = Describe("tasks command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.PrefixedRandomName("APP")
 	})
 

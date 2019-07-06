@@ -9,6 +9,11 @@ import (
 )
 
 var _ = Describe("delete-org command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "delete-org", "some-org")

@@ -14,6 +14,7 @@ var _ = Describe("service command", func() {
 	var serviceInstanceName string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		serviceInstanceName = helpers.PrefixedRandomName("SI")
 	})
 

@@ -15,6 +15,10 @@ import (
 )
 
 var _ = Describe("create-service command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {

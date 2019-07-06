@@ -16,6 +16,10 @@ import (
 )
 
 var _ = Describe("ssh command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help", func() {
 		When("--help flag is provided", func() {
 			It("displays command usage to output", func() {

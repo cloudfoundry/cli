@@ -15,6 +15,7 @@ var _ = Describe("push with --no-start", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

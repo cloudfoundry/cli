@@ -12,6 +12,9 @@ import (
 )
 
 var _ = Describe("buildpacks command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
 
 	When("--help is passed", func() {
 		It("displays the help message", func() {

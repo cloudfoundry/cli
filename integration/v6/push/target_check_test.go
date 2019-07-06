@@ -9,6 +9,10 @@ import (
 )
 
 var _ = Describe("push targetting", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	AfterEach(func() {
 		helpers.SetAPI()
 		helpers.LoginCF()

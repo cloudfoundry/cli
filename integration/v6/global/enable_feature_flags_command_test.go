@@ -10,6 +10,7 @@ import (
 
 var _ = Describe("enable-feature-flags command", func() {
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 	})
 

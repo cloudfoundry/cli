@@ -18,6 +18,7 @@ var _ = Describe("push with different domain values", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		domainName = helpers.NewDomainName("http-domain")
 	})

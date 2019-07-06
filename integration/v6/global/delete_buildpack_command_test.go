@@ -17,6 +17,7 @@ var _ = Describe("delete-buildpack command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 		buildpackName = helpers.NewBuildpackName()
 	})

@@ -17,6 +17,7 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		firstApp = helpers.NewAppName()
 		secondApp = helpers.NewAppName()
 	})

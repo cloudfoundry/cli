@@ -32,6 +32,7 @@ var _ = Describe("env command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		spaceName := helpers.NewSpaceName()
 		orgName = helpers.NewOrgName()
 		helpers.SetupCF(orgName, spaceName)

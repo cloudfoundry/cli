@@ -24,6 +24,10 @@ var _ = Describe("install-plugin command", func() {
 		pluginPath string
 	)
 
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	AfterEach(func() {
 		pluginsHomeDirContents, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
 		if os.IsNotExist(err) {

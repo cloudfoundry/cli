@@ -20,6 +20,7 @@ var _ = Describe("push with only an app name", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		username, _ = helpers.GetCredentials()
 	})

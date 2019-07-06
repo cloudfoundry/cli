@@ -11,6 +11,11 @@ import (
 )
 
 var _ = Describe("add-network-policy command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {

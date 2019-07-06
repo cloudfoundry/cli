@@ -9,6 +9,11 @@ import (
 )
 
 var _ = Describe("create-org", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("invoked with --help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-org", "--help")

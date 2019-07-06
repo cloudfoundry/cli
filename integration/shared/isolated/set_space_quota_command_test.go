@@ -15,6 +15,7 @@ var _ = Describe("set-space-quota command", func() {
 		quotaName string
 	)
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 

@@ -20,6 +20,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

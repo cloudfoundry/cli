@@ -9,6 +9,10 @@ import (
 )
 
 var _ = Describe("help text", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF(PushCommandName, "--help")

@@ -16,6 +16,7 @@ var _ = Describe("Config", func() {
 	var configDir string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		configDir = filepath.Join(homeDir, ".cf")
 	})
 

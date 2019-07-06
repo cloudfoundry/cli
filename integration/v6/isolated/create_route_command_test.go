@@ -11,6 +11,10 @@ import (
 )
 
 var _ = Describe("create-route command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Context("Help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-route", "--help")

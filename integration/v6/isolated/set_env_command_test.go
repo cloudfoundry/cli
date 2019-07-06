@@ -9,6 +9,10 @@ import (
 )
 
 var _ = Describe("set-env command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	When("the --help flag provided", func() {
 		It("displays the usage text", func() {
 			session := helpers.CF("set-env", "--help")

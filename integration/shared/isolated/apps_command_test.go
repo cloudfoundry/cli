@@ -18,6 +18,7 @@ var _ = XDescribe("apps command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName1 = helpers.NewAppName()

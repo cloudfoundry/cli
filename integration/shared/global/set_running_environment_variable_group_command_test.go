@@ -20,6 +20,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 
 		key1 = helpers.PrefixedRandomName("key1")

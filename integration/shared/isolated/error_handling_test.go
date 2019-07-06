@@ -9,6 +9,10 @@ import (
 )
 
 var _ = Describe("curl command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	It("returns the expected request", func() {
 		session := helpers.CF("curl", "/v2/banana")
 		Eventually(session).Should(Say(`"error_code": "CF-NotFound"`))

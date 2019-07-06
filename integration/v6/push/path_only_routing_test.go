@@ -18,6 +18,7 @@ var _ = Describe("push with route path", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

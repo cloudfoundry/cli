@@ -13,6 +13,7 @@ import (
 
 var _ = Describe("plugin API", func() {
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		installTestPlugin()
 	})
 

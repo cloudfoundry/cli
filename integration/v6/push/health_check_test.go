@@ -18,6 +18,7 @@ var _ = Describe("push/update an app using health check type", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		username, _ = helpers.GetCredentials()
 	})

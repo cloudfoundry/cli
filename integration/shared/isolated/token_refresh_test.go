@@ -11,6 +11,10 @@ import (
 )
 
 var _ = Describe("Token Refreshing", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("password grant type", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()

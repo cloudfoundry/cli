@@ -27,6 +27,7 @@ var _ = Describe("push with a manifest and vars files via process substitution",
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		instances = 4
 

@@ -13,6 +13,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 	var spaceName string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		organizationName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 	})

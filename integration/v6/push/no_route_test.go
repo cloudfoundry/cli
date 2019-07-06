@@ -16,6 +16,7 @@ var _ = Describe("no-route property", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

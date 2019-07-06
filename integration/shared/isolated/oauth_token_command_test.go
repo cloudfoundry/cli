@@ -12,6 +12,11 @@ import (
 )
 
 var _ = Describe("oauth-token command", func() {
+
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Context("help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("oauth-token", "--help")

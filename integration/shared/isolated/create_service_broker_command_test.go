@@ -14,6 +14,7 @@ var _ = Describe("create-service-broker command", func() {
 	var brokerName string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfV7AndVersionLessThan(ccversion.MinVersionCreateServiceBrokerV3)
 
 		brokerName = helpers.NewServiceBrokerName()

@@ -20,6 +20,7 @@ var _ = Describe("when a droplet is provided", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 
 		helpers.WithHelloWorldApp(func(appDir string) {

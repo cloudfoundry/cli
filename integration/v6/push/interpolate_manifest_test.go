@@ -22,6 +22,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		instances = 4
 

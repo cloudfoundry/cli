@@ -10,6 +10,10 @@ import (
 )
 
 var _ = Describe("internationalization", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	DescribeTable("outputs help in different languages",
 		func(setup func() *Session) {
 			session := setup()

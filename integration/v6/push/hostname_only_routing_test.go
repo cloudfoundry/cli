@@ -18,6 +18,7 @@ var _ = Describe("push with hostname", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

@@ -11,6 +11,10 @@ import (
 )
 
 var _ = Describe("push flag combination errors", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	DescribeTable("path and",
 		func(expectedError string, flags ...string) {
 			appName := helpers.NewAppName()

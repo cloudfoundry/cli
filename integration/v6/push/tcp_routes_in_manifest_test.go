@@ -19,6 +19,7 @@ var _ = Describe("TCP routes in manifest", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		app = helpers.NewAppName()
 		domain = helpers.NewDomain(organization, helpers.NewDomainName())
 		route1 = helpers.NewTCPRoute(space, domain.Name, 1024)

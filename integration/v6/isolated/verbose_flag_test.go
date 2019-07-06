@@ -18,6 +18,10 @@ import (
 )
 
 var _ = Describe("Verbose", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Context("v2 legacy", func() {
 		DescribeTable("displays verbose output",
 			func(command func() *Session) {

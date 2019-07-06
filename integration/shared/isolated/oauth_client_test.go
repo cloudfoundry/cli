@@ -31,6 +31,7 @@ var _ = Describe("custom oauth client id", func() {
 	var configPath string
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		configPath = filepath.Join(homeDir, ".cf", "config.json")
 	})
 

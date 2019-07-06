@@ -17,6 +17,7 @@ var _ = Describe("target command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 
 		orgName = helpers.NewOrgName()

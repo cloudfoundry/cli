@@ -15,6 +15,7 @@ var _ = Describe("check-route command", func() {
 		route     helpers.Route
 	)
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 

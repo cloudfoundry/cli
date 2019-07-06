@@ -15,6 +15,7 @@ var _ = Describe("push with different instances values", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

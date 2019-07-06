@@ -76,6 +76,9 @@ func LoginAs(username, password string) {
 // and CF_INT_PASSWORD environment variables, respectively, defaulting to "admin" for
 // each if either is not set.
 func LoginCF() string {
+	if ClientCredentialsTestMode() {
+		return LoginCFWithClientCredentials()
+	}
 	username, password := GetCredentials()
 	LoginAs(username, password)
 	return username

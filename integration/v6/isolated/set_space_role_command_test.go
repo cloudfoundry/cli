@@ -9,6 +9,10 @@ import (
 )
 
 var _ = Describe("set-space-role command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help text and argument validation", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
