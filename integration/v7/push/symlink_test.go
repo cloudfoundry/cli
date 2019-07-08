@@ -40,6 +40,7 @@ var _ = Describe("push with symlink path", func() {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: symlinkedPath}, PushCommandName, appName)
+					// TODO: uncomment when v7 push supports diffing
 					// Eventually(session).Should(helpers.SayPath(`path:\s+%s`, dir))
 					Eventually(session).Should(Exit(0))
 				})
@@ -52,6 +53,7 @@ var _ = Describe("push with symlink path", func() {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
 					session := helpers.CF(PushCommandName, appName, "-p", symlinkedPath)
+					// TODO: uncomment when v7 push supports diffing
 					// Eventually(session).Should(helpers.SayPath(`path:\s+%s`, dir))
 					Eventually(session).Should(Exit(0))
 				})
@@ -81,6 +83,7 @@ var _ = Describe("push with symlink path", func() {
 				Expect(os.Symlink(archive, symlinkedPath)).ToNot(HaveOccurred())
 
 				session := helpers.CF(PushCommandName, appName, "-p", symlinkedPath)
+				// TODO: uncomment when v7 push supports diffing
 				// Eventually(session).Should(helpers.SayPath(`path:\s+%s`, archive))
 				Eventually(session).Should(Exit(0))
 			})
@@ -89,7 +92,6 @@ var _ = Describe("push with symlink path", func() {
 		Context("push with a single app manifest", func() {
 			When("the path property is a symlinked path", func() {
 				It("should push with the absolute path of the app", func() {
-					Skip("pending what ado about manifest")
 					helpers.WithHelloWorldApp(func(dir string) {
 						Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
@@ -103,7 +105,8 @@ var _ = Describe("push with symlink path", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: runningDir}, PushCommandName)
-						Eventually(session).Should(helpers.SayPath(`path:\s+%s`, dir))
+						// TODO: uncomment when v7 push supports diffing
+						// Eventually(session).Should(helpers.SayPath(`path:\s+%s`, archive))
 						Eventually(session).Should(Exit(0))
 					})
 				})
