@@ -1,14 +1,15 @@
 package push
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("push with symlink path", func() {
