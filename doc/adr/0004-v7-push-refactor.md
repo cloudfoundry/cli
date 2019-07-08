@@ -29,10 +29,10 @@ Both the `Conceptualize` and `Actualize` parts of the push process have been spl
 
 For our purposes, "hexagonal architecture" means the following:
 
-- There is one place in the code responsible for called a given sequence of functions in order. The output of one function is passed in as input to the next function.
+- There is one place in the code responsible for calling a given sequence of functions in order. The output of one function is passed in as input to the next function.
 - All of these functions have the same signature.
-- The central place where the functions are called is agnostic to what the functions are and what they are doing.
-- By doing this, any new features/branches/logic should be added to one or more of these functions (or, a new function should be added to encapsulate it). We generally shouldn't need to touch the place where the functions are called.
+- The central place where the functions are called is agnostic to what the functions are doing.
+- Any new features/branches/logic should be added to one or more of these functions (or, a new function should be added to encapsulate it). We generally shouldn't need to touch the place where the functions are called.
 
 ### Splitting up `Conceptualize`
 
@@ -65,7 +65,7 @@ return pushPlans, nil
 
 This is the central place where all of the "prepare push plan" functions are called. We loop through `actor.PreparePushPlanSequence`, an array of functions, and call each one with a push plan. They each have the opportunity to **return a modified push plan**, which then gets **passed into the next function**.
 
-In this case, each function is also called with `overrides` and `manifestApplication`, which represent user input (in the form of flags and manifest properties, respectively). This lets each function inspect the user input and modify the push plan accordingly, if they so choose.
+In this case, each function is also called with `overrides` and `manifestApplication`, which represent user input (in the form of flags and manifest properties, respectively). This lets each function inspect the user input and modify the push plan accordingly.
 
 When this loop completes, the original push plan has flowed through each function in the sequence and has been modified to include information based on the given flags/manifest.
 
@@ -92,17 +92,24 @@ This is just a simple array with a bunch of functions that all conform to the co
 Here is an example of one of them:
 
 ```go
-func SetupSkipRouteCreationForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
-	pushPlan.SkipRouteCreation = manifestApp.NoRoute
-	pushPlan.NoRouteFlag = overrides.SkipRouteCreation
+func SetupScaleWebProcessForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+	if overrides.Memory.IsSet || overrides.Disk.IsSet || overrides.Instances.IsSet {
+		pushPlan.ScaleWebProcessNeedsUpdate = true
 
+		pushPlan.ScaleWebProcess = v7action.Process{
+			Type:       constant.ProcessTypeWeb,
+			DiskInMB:   overrides.Disk,
+			Instances:  overrides.Instances,
+			MemoryInMB: overrides.Memory,
+		}
+	}
 	return pushPlan, nil
 }
 ```
 
-This simple function populates fields on the push plan based on one flag and one manifest property. It returns the enhanced push plan. It's easy to test on its own, since it doesn't do very much.
+This simple function populates fields on the push plan based on flag overrides and returns the enhanced push plan, making it easy to test on its own.
 
-When all of the functions have run and updated the push plan, the "actualize" step doesn't need to know about flags and manifest properties anymore; it only needs to receive a push plan. All user input has been resolved and combined into the push plan object.
+When all of the functions have run and updated the push plan, the "actualize" step doesn't need to know about flags and manifest properties anymore; it only needs to receive a push plan because all user input has been resolved and combined into the push plan object.
 
 ### Splitting up `Actualize`
 
@@ -120,11 +127,11 @@ for _, changeAppFunc := range actor.ChangeApplicationSequence(plan) {
 }
 ```
 
-This is quite similar to the loop through `actor.PreparePushPlanSequence` above. We loop through `actor.ChangeApplicationSequence(plan)`, which returns an array of functions, and we call each one with the push plan. Each one returns a push plan that then gets passed in to the next one.
+This is quite similar to the loop through `actor.PreparePushPlanSequence` above. We loop through `actor.ChangeApplicationSequence(plan)`, which returns an array of functions, and we call each one with the push plan. Each one returns a push plan that then gets passed in to the next function.
 
-_The rest of the code there is just keeping track of a few streams to report progress, errors, and warnings, but this is not the focus of this ADR (and we may end up changing this as well)._
+_Note: The rest of that code uses streams to report progress, errors, and warnings, but this is not the focus of this ADR (and we may end up changing this as well)._
 
-The **biggest difference** here is that instead of being a static list of functions (like `actor.PreparePushPlanSequence`), `actor.ChangeApplicationSequence` is a function that takes in a push plan and returns an array of `ChangeApplicationFunc`s. This is because the requirements for "actualize" are a little more complex than those for "conceptualize": we want to dynamically build up the sequence of actions we run based on the push plan, rather than run the same sequence every time.
+The **biggest difference** from `Conceputalize` is that instead of being a static list of functions (like `actor.PreparePushPlanSequence`), `actor.ChangeApplicationSequence` is a function that takes in a push plan and returns an array of `ChangeApplicationFunc`s. This allows us to dynamically build up the sequence of actions we run based on the push plan, rather than run the same sequence every time.
 
 Let's look at how that works:
 
@@ -138,7 +145,7 @@ actor.ChangeApplicationSequence = func(plan PushPlan) []ChangeApplicationFunc {
 }
 ```
 
-This function is responsible for building up the sequence based on the given plan. It delegates to three helpers, each of which build up a subsequence of actions based on the given plan. Here's one of them:
+This function is responsible for building up the sequence based on the given plan. It delegates to three helpers, each of which builds up a subsequence of actions. Here's one of them:
 
 ```go
 func ShouldCreateBitsPackage(plan PushPlan) bool {
@@ -161,7 +168,7 @@ func (actor Actor) GetPrepareApplicationSourceSequence(plan PushPlan) []ChangeAp
 }
 ```
 
-In this case, we only want to include one of these three functions in the final sequence (they are mutually exclusive). We branch on properties of the push plan (populated as part of the "conceptualize" step) and determine which function we should append to the list.
+In this case, we only want to include one of these three functions in the final sequence, which is determined based on properties of the push plan.
 
 Since all of these functions are small and straightforward on their own, they are easy to unit test. They can be **composed together in different sequences to build up different push workflows** (based on different flags/manifests), and this is where the refactor really starts to pay off.
 
