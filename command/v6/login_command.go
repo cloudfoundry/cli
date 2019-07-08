@@ -27,6 +27,7 @@ type LoginActor interface {
 	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
 	GetLoginPrompts() map[string]coreconfig.AuthPrompt
 	GetOrganizationByName(orgName string) (v3action.Organization, v3action.Warnings, error)
+	GetOrganizationSpaces(orgName string) ([]v3action.Space, v3action.Warnings, error)
 	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 	GetOrganizations() ([]v3action.Organization, v3action.Warnings, error)
 	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
@@ -121,9 +122,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	}
 	cmd.UI.DisplayWarning("Using experimental login command, some behavior may be different")
 
-	var err error
-
-	err = cmd.getAPI()
+	err := cmd.getAPI()
 	if err != nil {
 		return err
 	}
@@ -144,7 +143,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	}
 
 	var authErr error
-	if cmd.SSO == true || cmd.SSOPasscode != "" {
+	if cmd.SSO || cmd.SSOPasscode != "" {
 		if cmd.SSO && cmd.SSOPasscode != "" {
 			return translatableerror.ArgumentCombinationError{Args: []string{"--sso-passcode", "--sso"}}
 		}
@@ -188,7 +187,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	targetedOrg := cmd.Config.TargetedOrganization()
 
 	if targetedOrg.GUID != "" {
-
 		cmd.UI.DisplayTextWithFlavor("Targeted org: {{.Organization}}", map[string]interface{}{
 			"Organization": cmd.Config.TargetedOrganizationName(),
 		})
@@ -199,16 +197,19 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			if err != nil {
 				return err
 			}
-			// the "AllowSSH" field is not returned by v3, and is never read from the config.
-			// persist `true` to maintain compatibility in the config file.
-			// TODO: this field should be removed entirely in v7
-			cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
+			cmd.targetSpace(space)
+		} else {
+			spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(targetedOrg.GUID)
+			cmd.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return err
+			}
 
-			cmd.UI.DisplayNewline()
-			cmd.UI.DisplayTextWithFlavor("Targeted space: {{.Space}}", map[string]interface{}{
-				"Space": space.Name,
-			})
+			if len(spaces) == 1 {
+				cmd.targetSpace(spaces[0])
+			}
 		}
+
 		cmd.UI.DisplayNewline()
 	}
 
@@ -221,6 +222,15 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	return nil
+}
+
+func (cmd *LoginCommand) targetSpace(space v3action.Space) {
+	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
+
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayTextWithFlavor("Targeted space: {{.Space}}", map[string]interface{}{
+		"Space": space.Name,
+	})
 }
 
 func (cmd *LoginCommand) getAPI() error {

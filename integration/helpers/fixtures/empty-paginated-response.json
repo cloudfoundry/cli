@@ -1,0 +1,15 @@
+{
+   "pagination": {
+      "total_results": 0,
+      "total_pages": 1,
+      "first": {
+         "href": "https://api.example.com/v3/some-resource?some_query=some-value&page=1&per_page=50"
+      },
+      "last": {
+         "href": "https://api.example.com/v3/some-resource?some_query=some-value&page=1&per_page=50"
+      },
+      "next": null,
+      "previous": null
+   },
+   "resources": []
+}

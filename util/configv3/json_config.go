@@ -149,6 +149,9 @@ func (config *Config) SetRefreshToken(refreshToken string) {
 }
 
 // SetSpaceInformation sets the currently targeted space.
+// The "AllowSSH" field is not returned by v3, and is never read from the config.
+// Persist `true` to maintain compatibility in the config file.
+// TODO: this field should be removed entirely in v7
 func (config *Config) SetSpaceInformation(guid string, name string, allowSSH bool) {
 	config.V7SetSpaceInformation(guid, name)
 	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH

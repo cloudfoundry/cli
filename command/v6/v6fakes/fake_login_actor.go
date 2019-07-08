@@ -49,6 +49,21 @@ type FakeLoginActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	GetOrganizationSpacesStub        func(string) ([]v3action.Space, v3action.Warnings, error)
+	getOrganizationSpacesMutex       sync.RWMutex
+	getOrganizationSpacesArgsForCall []struct {
+		arg1 string
+	}
+	getOrganizationSpacesReturns struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}
+	getOrganizationSpacesReturnsOnCall map[int]struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}
 	GetOrganizationsStub        func() ([]v3action.Organization, v3action.Warnings, error)
 	getOrganizationsMutex       sync.RWMutex
 	getOrganizationsArgsForCall []struct {
@@ -276,6 +291,72 @@ func (fake *FakeLoginActor) GetOrganizationByNameReturnsOnCall(i int, result1 v3
 	}{result1, result2, result3}
 }
 
+func (fake *FakeLoginActor) GetOrganizationSpaces(arg1 string) ([]v3action.Space, v3action.Warnings, error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
+	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationSpaces", []interface{}{arg1})
+	fake.getOrganizationSpacesMutex.Unlock()
+	if fake.GetOrganizationSpacesStub != nil {
+		return fake.GetOrganizationSpacesStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getOrganizationSpacesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeLoginActor) GetOrganizationSpacesCallCount() int {
+	fake.getOrganizationSpacesMutex.RLock()
+	defer fake.getOrganizationSpacesMutex.RUnlock()
+	return len(fake.getOrganizationSpacesArgsForCall)
+}
+
+func (fake *FakeLoginActor) GetOrganizationSpacesCalls(stub func(string) ([]v3action.Space, v3action.Warnings, error)) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = stub
+}
+
+func (fake *FakeLoginActor) GetOrganizationSpacesArgsForCall(i int) string {
+	fake.getOrganizationSpacesMutex.RLock()
+	defer fake.getOrganizationSpacesMutex.RUnlock()
+	argsForCall := fake.getOrganizationSpacesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeLoginActor) GetOrganizationSpacesReturns(result1 []v3action.Space, result2 v3action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = nil
+	fake.getOrganizationSpacesReturns = struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLoginActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []v3action.Space, result2 v3action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = nil
+	if fake.getOrganizationSpacesReturnsOnCall == nil {
+		fake.getOrganizationSpacesReturnsOnCall = make(map[int]struct {
+			result1 []v3action.Space
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationSpacesReturnsOnCall[i] = struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeLoginActor) GetOrganizations() ([]v3action.Organization, v3action.Warnings, error) {
 	fake.getOrganizationsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationsReturnsOnCall[len(fake.getOrganizationsArgsForCall)]
@@ -473,6 +554,8 @@ func (fake *FakeLoginActor) Invocations() map[string][][]interface{} {
 	defer fake.getLoginPromptsMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
+	fake.getOrganizationSpacesMutex.RLock()
+	defer fake.getOrganizationSpacesMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()
 	defer fake.getOrganizationsMutex.RUnlock()
 	fake.getSpaceByNameAndOrganizationMutex.RLock()

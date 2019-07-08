@@ -30,6 +30,17 @@ func AddFiftyOneOrgs(server *ghttp.Server) {
 	)
 }
 
+// AddEmptyPaginatedResponse adds a mock handler to the given server which returns
+// a response with no resources.
+func AddEmptyPaginatedResponse(server *ghttp.Server, path string) {
+	AddHandler(server,
+		http.MethodGet,
+		path,
+		http.StatusOK,
+		fixtureData("empty-paginated-response.json"),
+	)
+}
+
 func fixtureData(name string) []byte {
 	wd := os.Getenv("GOPATH")
 	fp := filepath.Join(wd, "src", "code.cloudfoundry.org", "cli", "integration", "helpers", "fixtures", name)

@@ -1120,6 +1120,51 @@ var _ = Describe("login Command", func() {
 						})
 					})
 				})
+
+				When("-s was not passed", func() {
+					When("only one space is available", func() {
+						BeforeEach(func() {
+							spaces := []v3action.Space{
+								{
+									GUID:             "some-space-guid",
+									Name:             "some-space-name",
+									OrganizationGUID: "targeted-org-guid",
+								},
+							}
+
+							fakeActor.GetOrganizationSpacesReturns(
+								spaces,
+								v3action.Warnings{"some-warning-1", "some-warning-2"},
+								nil,
+							)
+
+							fakeConfig.TargetedSpaceReturns(configv3.Space{
+								GUID: "some-space-guid",
+								Name: "some-space-name",
+							})
+						})
+
+						It("targets this space", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+
+							Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
+							Expect(fakeActor.GetOrganizationSpacesArgsForCall(0)).To(Equal("targeted-org-guid"))
+
+							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+
+							firstArg, secondArg, _ := fakeConfig.SetSpaceInformationArgsForCall(0)
+							Expect(firstArg).To(Equal("some-space-guid"))
+							Expect(secondArg).To(Equal("some-space-name"))
+
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+
+							Expect(testUI.Out).To(Say(`Targeted space: some-space-name`))
+							Expect(testUI.Out).To(Say(`Space:\s+some-space-name`))
+							Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE`))
+						})
+					})
+				})
 			})
 		})
 	})
