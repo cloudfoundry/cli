@@ -29,7 +29,7 @@ var _ = Describe("Actor", func() {
 			BeforeEach(func() {
 				plan = PushPlan{
 					ApplicationNeedsUpdate: true,
-					NoRouteFlag:            true,
+					SkipRouteCreation:      true,
 				}
 			})
 
@@ -48,11 +48,21 @@ var _ = Describe("Actor", func() {
 			})
 		})
 
+		When("the plan specifies random route", func() {
+			BeforeEach(func() {
+				plan = PushPlan{SkipRouteCreation: true}
+			})
+
+			It("returns a sequence including updating the routes for the app", func() {
+				Expect(sequence).To(BeEmpty())
+			})
+		})
+
 		When("the plan requires scaling the web process", func() {
 			BeforeEach(func() {
 				plan = PushPlan{
 					ScaleWebProcessNeedsUpdate: true,
-					NoRouteFlag:                true,
+					SkipRouteCreation:          true,
 				}
 			})
 
@@ -65,7 +75,7 @@ var _ = Describe("Actor", func() {
 			BeforeEach(func() {
 				plan = PushPlan{
 					UpdateWebProcessNeedsUpdate: true,
-					NoRouteFlag:                 true,
+					SkipRouteCreation:           true,
 				}
 			})
 

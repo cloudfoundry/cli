@@ -39,7 +39,7 @@ var _ = Describe("Actor", func() {
 		BeforeEach(func() {
 			plan = PushPlan{
 				ApplicationNeedsUpdate:            true,
-				NoRouteFlag:                       true,
+				SkipRouteCreation:                 true,
 				DockerImageCredentialsNeedsUpdate: false,
 			}
 		})

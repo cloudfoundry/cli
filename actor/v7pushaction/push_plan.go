@@ -19,6 +19,7 @@ type PushPlan struct {
 	NoStart           bool
 	NoWait            bool
 	NoRouteFlag       bool
+	RandomRoute       bool
 	SkipRouteCreation bool
 	Strategy          constant.DeploymentStrategy
 
@@ -58,7 +59,7 @@ type FlagOverrides struct {
 	NoStart             bool
 	NoWait              bool
 	ProvidedAppPath     string
-	SkipRouteCreation   bool
+	NoRoute             bool
 	StartCommand        types.FilteredString
 	Strategy            constant.DeploymentStrategy
 }

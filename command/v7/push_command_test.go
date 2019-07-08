@@ -919,7 +919,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
 			Expect(overrides.Disk).To(Equal(types.NullUint64{Value: 1024, IsSet: true}))
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
-			Expect(overrides.SkipRouteCreation).To(BeTrue())
+			Expect(overrides.NoRoute).To(BeTrue())
 			Expect(overrides.NoStart).To(BeTrue())
 			Expect(overrides.NoWait).To(BeTrue())
 			Expect(overrides.Strategy).To(Equal(constant.DeploymentStrategyRolling))

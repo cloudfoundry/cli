@@ -564,13 +564,13 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		HealthCheckEndpoint: cmd.HealthCheckHTTPEndpoint,
 		HealthCheckType:     cmd.HealthCheckType.Type,
 		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value, Instances: cmd.Instances.NullInt,
-		Memory:            cmd.Memory.NullUint64,
-		NoStart:           cmd.NoStart,
-		NoWait:            cmd.NoWait,
-		ProvidedAppPath:   string(cmd.AppPath),
-		SkipRouteCreation: cmd.NoRoute,
-		StartCommand:      cmd.StartCommand.FilteredString,
-		Strategy:          cmd.Strategy.Name,
+		Memory:          cmd.Memory.NullUint64,
+		NoStart:         cmd.NoStart,
+		NoWait:          cmd.NoWait,
+		ProvidedAppPath: string(cmd.AppPath),
+		NoRoute:         cmd.NoRoute,
+		StartCommand:    cmd.StartCommand.FilteredString,
+		Strategy:        cmd.Strategy.Name,
 	}, nil
 }
 

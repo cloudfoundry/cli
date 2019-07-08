@@ -40,7 +40,7 @@ path: /my/path
 `)
 			})
 
-			It("unmarshals the name", func() {
+			It("unmarshals the path", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(application.Path).To(Equal("/my/path"))
 			})
@@ -55,7 +55,7 @@ docker:
 `)
 			})
 
-			It("unmarshals the name", func() {
+			It("unmarshals the docker properties", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(application.Docker.Image).To(Equal("some-image"))
 				Expect(application.Docker.Username).To(Equal("some-username"))
@@ -69,9 +69,22 @@ no-route: true
 `)
 			})
 
-			It("unmarshals the name", func() {
+			It("unmarshals the no-route property", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(application.NoRoute).To(BeTrue())
+			})
+		})
+
+		Context("when random-route is provided", func() {
+			BeforeEach(func() {
+				rawYAML = []byte(`---
+random-route: true
+`)
+			})
+
+			It("unmarshals the random-route property", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(application.RandomRoute).To(BeTrue())
 			})
 		})
 	})

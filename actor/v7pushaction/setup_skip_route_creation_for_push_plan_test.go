@@ -31,12 +31,13 @@ var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 
 	When("flag overrides specifies skipping route creation", func() {
 		BeforeEach(func() {
-			overrides.SkipRouteCreation = true
+			overrides.NoRoute = true
 		})
 
-		It("sets SkipRouteCreation on the push plan", func() {
+		It("sets NoRoute and SkipRouteCreation on the push plan", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(expectedPushPlan.NoRouteFlag).To(BeTrue())
+			Expect(expectedPushPlan.SkipRouteCreation).To(BeTrue())
 		})
 	})
 
@@ -51,4 +52,14 @@ var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 		})
 	})
 
+	When("manifest specifies random route", func() {
+		BeforeEach(func() {
+			manifestApp.RandomRoute = true
+		})
+
+		It("sets SkipRouteCreation on the push plan", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(expectedPushPlan.SkipRouteCreation).To(BeTrue())
+		})
+	})
 })

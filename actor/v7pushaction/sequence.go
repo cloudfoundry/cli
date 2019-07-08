@@ -7,7 +7,7 @@ func ShouldUpdateApplication(plan PushPlan) bool {
 }
 
 func ShouldUpdateRoutes(plan PushPlan) bool {
-	return !(plan.SkipRouteCreation || plan.NoRouteFlag)
+	return !plan.SkipRouteCreation
 }
 
 func ShouldScaleWebProcess(plan PushPlan) bool {
