@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
@@ -15,7 +14,6 @@ import (
 var _ = Describe("UpdateWebProcessForApplication", func() {
 	var (
 		actor       *Actor
-		fakeV2Actor *v7pushactionfakes.FakeV2Actor
 		fakeV7Actor *v7pushactionfakes.FakeV7Actor
 
 		paramPlan PushPlan
@@ -27,7 +25,7 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeV2Actor, fakeV7Actor, _ = getTestPushActor()
+		actor, _, fakeV7Actor, _ = getTestPushActor()
 
 		paramPlan = PushPlan{
 			Application: v7action.Application{
@@ -58,28 +56,26 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 
 		When("route creation and mapping is successful", func() {
 			BeforeEach(func() {
-				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(
-					v2action.Route{},
-					v2action.Warnings{"route-warning"},
+				fakeV7Actor.GetRouteByAttributesReturns(
+					v7action.Route{},
+					v7action.Warnings{"route-warning"},
 					actionerror.RouteNotFoundError{},
 				)
 
-				fakeV2Actor.CreateRouteReturns(
-					v2action.Route{
-						GUID: "some-route-guid",
-						Host: "some-app",
-						Domain: v2action.Domain{
-							Name: "some-domain",
-							GUID: "some-domain-guid",
-						},
-						SpaceGUID: "some-space-guid",
+				fakeV7Actor.CreateRouteReturns(
+					v7action.Route{
+						GUID:       "some-route-guid",
+						Host:       "some-app",
+						DomainName: "some-domain",
+						DomainGUID: "some-domain-guid",
+						SpaceGUID:  "some-space-guid",
 					},
-					v2action.Warnings{"route-create-warning"},
+					v7action.Warnings{"route-create-warning"},
 					nil,
 				)
 
-				fakeV2Actor.MapRouteToApplicationReturns(
-					v2action.Warnings{"map-warning"},
+				fakeV7Actor.MapRouteReturns(
+					v7action.Warnings{"map-warning"},
 					nil,
 				)
 			})

@@ -15,7 +15,7 @@ type MapRouteActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
 	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
-	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
+	CreateRoute(spaceGUID, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
 }
@@ -87,8 +87,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
 			})
 		route, warnings, err = cmd.Actor.CreateRoute(
-			cmd.Config.TargetedOrganization().Name,
-			cmd.Config.TargetedSpace().Name,
+			cmd.Config.TargetedSpace().GUID,
 			domain.Name,
 			cmd.Hostname,
 			path,

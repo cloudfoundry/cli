@@ -1,6 +1,9 @@
 package v7action
 
 import (
+	"fmt"
+	"path"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -11,6 +14,7 @@ type RouteDestination struct {
 	GUID string
 	App  RouteDestinationApp
 }
+
 type RouteDestinationApp ccv3.RouteDestinationApp
 
 type Route struct {
@@ -23,7 +27,7 @@ type Route struct {
 	SpaceName  string
 }
 
-func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path string) (Route, Warnings, error) {
+func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (Route, Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -32,20 +36,8 @@ func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path st
 		return Route{}, allWarnings, err
 	}
 
-	org, warnings, err := actor.GetOrganizationByName(orgName)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return Route{}, allWarnings, err
-	}
-
-	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return Route{}, allWarnings, err
-	}
-
 	route, apiWarnings, err := actor.CloudControllerClient.CreateRoute(ccv3.Route{
-		SpaceGUID:  space.GUID,
+		SpaceGUID:  spaceGUID,
 		DomainGUID: domain.GUID,
 		Host:       hostname,
 		Path:       path,
@@ -64,7 +56,7 @@ func (actor Actor) CreateRoute(orgName, spaceName, domainName, hostname, path st
 		Path:       route.Path,
 		SpaceGUID:  route.SpaceGUID,
 		DomainGUID: route.DomainGUID,
-		SpaceName:  spaceName,
+		SpaceName:  spaceGUID,
 		DomainName: domainName,
 	}, allWarnings, err
 }
@@ -333,4 +325,18 @@ func (actor Actor) MapRoute(routeGUID string, appGUID string) (Warnings, error) 
 func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.UnmapRoute(routeGUID, destinationGUID)
 	return Warnings(warnings), err
+}
+
+func (r Route) String() string {
+	routeString := r.DomainName
+
+	if r.Host != "" {
+		routeString = fmt.Sprintf("%s.%s", r.Host, routeString)
+	}
+
+	if r.Path != "" {
+		routeString = path.Join(routeString, r.Path)
+	}
+
+	return routeString
 }

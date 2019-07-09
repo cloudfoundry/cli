@@ -30,6 +30,7 @@ var _ = Describe("create-route Command", func() {
 		binaryName string
 		domainName string
 		spaceName  string
+		spaceGUID  string
 		orgName    string
 		hostname   string
 		path       string
@@ -43,6 +44,7 @@ var _ = Describe("create-route Command", func() {
 
 		domainName = "example.com"
 		spaceName = "space"
+		spaceGUID = "space-guid"
 		orgName = "org"
 		hostname = ""
 		path = ""
@@ -86,7 +88,7 @@ var _ = Describe("create-route Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: spaceName,
-				GUID: "some-space-guid",
+				GUID: spaceGUID,
 			})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: orgName,
@@ -150,10 +152,9 @@ var _ = Describe("create-route Command", func() {
 
 			It("creates the route", func() {
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
-				Expect(expectedOrgName).To(Equal(orgName))
+				expectedSpaceGUID, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
+				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 				Expect(expectedDomainName).To(Equal(domainName))
-				Expect(expectedSpaceName).To(Equal(spaceName))
 				Expect(expectedHostname).To(Equal(hostname))
 			})
 
@@ -172,10 +173,9 @@ var _ = Describe("create-route Command", func() {
 
 				It("creates the route", func() {
 					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-					expectedOrgName, expectedSpaceName, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
-					Expect(expectedOrgName).To(Equal(orgName))
+					expectedSpaceGUID, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
+					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 					Expect(expectedDomainName).To(Equal(domainName))
-					Expect(expectedSpaceName).To(Equal(spaceName))
 					Expect(expectedHostname).To(Equal(hostname))
 				})
 			})

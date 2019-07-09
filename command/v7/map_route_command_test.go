@@ -32,9 +32,7 @@ var _ = Describe("map-route Command", func() {
 		hostname        string
 		path            string
 		orgGUID         string
-		orgName         string
 		spaceGUID       string
-		spaceName       string
 	)
 
 	BeforeEach(func() {
@@ -51,9 +49,7 @@ var _ = Describe("map-route Command", func() {
 		hostname = "host"
 		path = `path`
 		orgGUID = "some-org-guid"
-		orgName = "some-org"
 		spaceGUID = "some-space-guid"
-		spaceName = "some-space"
 
 		cmd = MapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
@@ -248,9 +244,8 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualPath).To(Equal(path))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualOrgName, actualSpaceName, actualDomainName, actualHostname, actualPath := fakeActor.CreateRouteArgsForCall(0)
-						Expect(actualOrgName).To(Equal(orgName))
-						Expect(actualSpaceName).To(Equal(spaceName))
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath = fakeActor.CreateRouteArgsForCall(0)
+						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))

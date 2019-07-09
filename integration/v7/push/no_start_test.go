@@ -28,6 +28,7 @@ var _ = Describe("push with --no-start", func() {
 				Eventually(session).Should(Say(`Waiting for API to complete processing files\.\.\.`))
 				Eventually(session).Should(Say(`\s+name:\s+%s`, appName))
 				Eventually(session).Should(Say(`requested state:\s+stopped`))
+				Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Exit(0))
 			})
 

@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . CreateRouteActor
 
 type CreateRouteActor interface {
-	CreateRoute(orgName, spaceName, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
+	CreateRoute(spaceGUID, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
 }
 
 type CreateRouteCommand struct {
@@ -58,6 +58,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	pathName := cmd.Path.Path
 	spaceName := cmd.Config.TargetedSpace().Name
 	orgName := cmd.Config.TargetedOrganization().Name
+	spaceGUID := cmd.Config.TargetedSpace().GUID
 	fqdn := desiredFQDN(domain, hostname, pathName)
 
 	cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
@@ -68,7 +69,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	_, warnings, err := cmd.Actor.CreateRoute(orgName, spaceName, domain, hostname, pathName)
+	_, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
