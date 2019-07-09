@@ -55,6 +55,40 @@ var _ = Describe("push with --strategy rolling", func() {
 		})
 	})
 
+	When("canceling the deployment", func() {
+		BeforeEach(func() {
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+					PushCommandName, appName,
+				)).Should(Exit(0))
+			})
+		})
+
+		It("displays the deployment cancellation message", func() {
+			helpers.WithHelloWorldApp(func(appDir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+					PushCommandName, appName, "--strategy", "rolling",
+				)
+
+				Eventually(session).Should(Say(`Updating app %s\.\.\.`, appName))
+				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+				Eventually(session).Should(Say(`Getting app info\.\.\.`))
+				Eventually(session).Should(Say(`Packaging files to upload\.\.\.`))
+				Eventually(session).Should(Say(`Uploading files\.\.\.`))
+				Eventually(session).Should(Say(`100.00%`))
+				Eventually(session).Should(Say(`Waiting for API to complete processing files\.\.\.`))
+				Eventually(session).Should(Say(`Staging app and tracing logs\.\.\.`))
+				Eventually(session).Should(Say(`Starting deployment for app %s\.\.\.`, appName))
+				Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+
+				Eventually(helpers.CF("cancel-deployment", appName)).Should(Exit(0))
+				Eventually(session).Should(Say(`FAILED`))
+				Eventually(session.Err).Should(Say(`Deployment has been canceled`))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+
 	When("the app crashes", func() {
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(appDir string) {

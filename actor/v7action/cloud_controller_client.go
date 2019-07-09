@@ -14,6 +14,7 @@ type CloudControllerClient interface {
 	AppSSHHostKeyFingerprint() string
 	CheckRoute(domainGUID string, hostname string, path string) (bool, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
+	CancelDeployment(deploymentGUID string) (ccv3.Warnings, error)
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	CreateApplicationDeployment(appGUID string, dropletGUID string) (string, ccv3.Warnings, error)
 	CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
@@ -47,6 +48,7 @@ type CloudControllerClient interface {
 	GetBuildpacks(query ...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)
 	GetDefaultDomain(orgGuid string) (ccv3.Domain, ccv3.Warnings, error)
 	GetDeployment(guid string) (ccv3.Deployment, ccv3.Warnings, error)
+	GetDeployments(query ...ccv3.Query) ([]ccv3.Deployment, ccv3.Warnings, error)
 	GetDomain(GUID string) (ccv3.Domain, ccv3.Warnings, error)
 	GetDomains(query ...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error)
 	GetDroplet(guid string) (ccv3.Droplet, ccv3.Warnings, error)

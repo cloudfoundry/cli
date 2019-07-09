@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -35,6 +36,128 @@ var _ = Describe("Deployment Actions", func() {
 			Expect(returnedDeploymentGUID).To(Equal("some-deployment-guid"))
 			Expect(warnings).To(Equal(Warnings{"create-warning-1", "create-warning-2"}))
 			Expect(executeErr).To(MatchError("create-error"))
+		})
+	})
+
+	Describe("GetLatestDeploymentForApp", func() {
+		var (
+			executeErr error
+			warnings   Warnings
+			deployment Deployment
+
+			appGUID string
+		)
+
+		BeforeEach(func() {
+			appGUID = "some-app-guid"
+		})
+
+		JustBeforeEach(func() {
+			deployment, warnings, executeErr = actor.GetLatestDeploymentForApp(appGUID)
+		})
+
+		It("delegates to the CC client", func() {
+			Expect(fakeCloudControllerClient.GetDeploymentsCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetDeploymentsArgsForCall(0)).To(Equal(
+				[]ccv3.Query{
+					{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+					{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+					{Key: ccv3.PerPage, Values: []string{"1"}},
+				},
+			))
+		})
+
+		When("the cc client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDeploymentsReturns(
+					[]ccv3.Deployment{},
+					ccv3.Warnings{"get-deployments-warning"},
+					errors.New("get-deployments-error"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError("get-deployments-error"))
+				Expect(warnings).To(ConsistOf("get-deployments-warning"))
+			})
+		})
+
+		When("there are no deployments returned", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDeploymentsReturns(
+					[]ccv3.Deployment{},
+					ccv3.Warnings{"get-deployments-warning"},
+					nil,
+				)
+			})
+
+			It("returns a deployment not found error and warnings", func() {
+				Expect(executeErr).To(Equal(actionerror.DeploymentNotFoundError{}))
+				Expect(warnings).To(ConsistOf("get-deployments-warning"))
+			})
+
+		})
+
+		When("everything succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDeploymentsReturns(
+					[]ccv3.Deployment{{GUID: "dep-guid"}},
+					ccv3.Warnings{"get-deployments-warning"},
+					nil,
+				)
+			})
+
+			It("returns a deployment not found error and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-deployments-warning"))
+				Expect(deployment).To(Equal(Deployment{GUID: "dep-guid"}))
+			})
+
+		})
+	})
+
+	Describe("CancelDeployment", func() {
+		var (
+			deploymentGUID string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			deploymentGUID = "dep-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.CancelDeployment(deploymentGUID)
+		})
+
+		It("delegates to the cc client", func() {
+			Expect(fakeCloudControllerClient.CancelDeploymentCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.CancelDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
+		})
+
+		When("the client fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CancelDeploymentReturns(ccv3.Warnings{"cancel-deployment-warnings"}, errors.New("cancel-deployment-error"))
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).To(MatchError("cancel-deployment-error"))
+				Expect(warnings).To(ConsistOf("cancel-deployment-warnings"))
+			})
+
+		})
+
+		When("the client succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CancelDeploymentReturns(ccv3.Warnings{"cancel-deployment-warnings"}, nil)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("cancel-deployment-warnings"))
+			})
 		})
 	})
 })
