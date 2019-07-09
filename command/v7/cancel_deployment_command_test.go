@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = FDescribe("Cancel deployment command", func() {
+var _ = Describe("Cancel deployment command", func() {
 	var (
 		cmd             CancelDeploymentCommand
 		testUI          *ui.UI
