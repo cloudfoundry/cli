@@ -39,6 +39,7 @@ type commandList struct {
 	BindService                        v6.BindServiceCommand                        `command:"bind-service" alias:"bs" description:"Bind a service instance to an app"`
 	BindStagingSecurityGroup           v6.BindStagingSecurityGroupCommand           `command:"bind-staging-security-group" description:"Bind a security group to the list of security groups to be used for staging applications"`
 	Buildpacks                         v7.BuildpacksCommand                         `command:"buildpacks" description:"List all buildpacks"`
+	CancelDeployment                   v7.CancelDeploymentCommand                   `command:"cancel-deployment" description:"Cancel the most recent deployment for an app. Resets the current droplet to the previous deployment's droplet."`
 	CheckRoute                         v7.CheckRouteCommand                         `command:"check-route" description:"Perform a check to determine whether a route currently exists or not"`
 	Config                             v6.ConfigCommand                             `command:"config" description:"Write default values to the config"`
 	CopySource                         v6.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`

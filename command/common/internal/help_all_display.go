@@ -15,6 +15,7 @@ var HelpCategoryList = []HelpCategory{
 		CommandList: [][]string{
 			{"apps", "app", "create-app", "apply-manifest"},
 			{"push", "scale", "delete", "rename"},
+			{"cancel-deployment"},
 			{"start", "stop", "restart", "stage", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
 			{"packages", "create-package"},
