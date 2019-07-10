@@ -30,7 +30,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 	)
 
 	BeforeEach(func() {
-		actor, _, fakeV7Actor, fakeSharedActor = getTestPushActor()
+		actor, fakeV7Actor, fakeSharedActor = getTestPushActor()
 
 		fakeProgressBar = new(v7pushactionfakes.FakeProgressBar)
 

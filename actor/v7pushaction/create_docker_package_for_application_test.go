@@ -28,7 +28,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 	)
 
 	BeforeEach(func() {
-		actor, _, fakeV7Actor, _ = getTestPushActor()
+		actor, fakeV7Actor, _ = getTestPushActor()
 
 		fakeProgressBar = new(v7pushactionfakes.FakeProgressBar)
 

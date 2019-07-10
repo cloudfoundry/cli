@@ -30,7 +30,7 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 	)
 
 	BeforeEach(func() {
-		actor, _, _, fakeSharedActor = getTestPushActor()
+		actor, _, fakeSharedActor = getTestPushActor()
 
 		pushPlan = PushPlan{}
 		overrides = FlagOverrides{}

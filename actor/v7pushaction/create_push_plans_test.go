@@ -33,7 +33,7 @@ var _ = Describe("CreatePushPlans", func() {
 	}
 
 	BeforeEach(func() {
-		pushActor, _, _, _ = getTestPushActor()
+		pushActor, _, _ = getTestPushActor()
 		pushActor.PreparePushPlanSequence = []UpdatePushPlanFunc{testUpdatePlan, testUpdatePlan}
 
 		appNameArg = "my-app"

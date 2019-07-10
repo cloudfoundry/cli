@@ -14,7 +14,7 @@ var _ = Describe("Actor", func() {
 	)
 
 	BeforeEach(func() {
-		actor, _, _, _ = getTestPushActor()
+		actor, _, _ = getTestPushActor()
 	})
 
 	Describe("PreparePushPlanSequence", func() {

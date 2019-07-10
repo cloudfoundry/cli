@@ -11,7 +11,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
@@ -117,20 +116,14 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClient, uaaClient, err := v6shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
 
 	v7actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient)
 	cmd.VersionActor = v7actor
-	ccClientV2, uaaClientV2, err := v6shared.NewClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-
-	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.Actor = v7pushaction.NewActor(v2Actor, v7actor, sharedActor)
+	cmd.Actor = v7pushaction.NewActor(v7actor, sharedActor)
 
 	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 

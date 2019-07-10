@@ -25,7 +25,7 @@ var _ = Describe("StagePackageForApplication", func() {
 	)
 
 	BeforeEach(func() {
-		actor, _, fakeV7Actor, _ = getTestPushActor()
+		actor, fakeV7Actor, _ = getTestPushActor()
 
 		paramPlan = PushPlan{
 			Application: v7action.Application{

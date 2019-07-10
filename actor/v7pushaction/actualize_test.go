@@ -108,7 +108,7 @@ var _ = Describe("Actualize", func() {
 	}
 
 	BeforeEach(func() {
-		actor, _, _, _ = getTestPushActor()
+		actor, _, _ = getTestPushActor()
 
 		successfulChangeAppFuncCallCount = 0
 		warningChangeAppFuncCallCount = 0

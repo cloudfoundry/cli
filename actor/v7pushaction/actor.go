@@ -12,7 +12,6 @@ type Warnings []string
 // Actor handles all business logic for Cloud Controller v2 operations.
 type Actor struct {
 	SharedActor SharedActor
-	V2Actor     V2Actor
 	V7Actor     V7Actor
 
 	PreparePushPlanSequence   []UpdatePushPlanFunc
@@ -26,10 +25,9 @@ const ProtocolRegexp = "^https?://|^tcp://"
 const URLRegexp = "^(?:https?://|tcp://)?(?:(?:[\\w-]+\\.)|(?:[*]\\.))+\\w+(?:\\:\\d+)?(?:/.*)*(?:\\.\\w+)?$"
 
 // NewActor returns a new actor.
-func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor {
+func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 	actor := &Actor{
 		SharedActor: sharedActor,
-		V2Actor:     v2Actor,
 		V7Actor:     v3Actor,
 
 		startWithProtocol: regexp.MustCompile(ProtocolRegexp),

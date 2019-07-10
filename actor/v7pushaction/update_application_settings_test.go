@@ -26,7 +26,7 @@ var _ = Describe("UpdateApplicationSettings", func() {
 	)
 
 	BeforeEach(func() {
-		actor, _, fakeV7Actor, _ = getTestPushActor()
+		actor, fakeV7Actor, _ = getTestPushActor()
 
 		spaceGUID = "space"
 
