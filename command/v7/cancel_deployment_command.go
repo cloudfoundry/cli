@@ -56,7 +56,7 @@ func (cmd *CancelDeploymentCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText(
+	cmd.UI.DisplayTextWithFlavor(
 		"Canceling deployment for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.UserName}}...",
 		map[string]interface{}{
 			"AppName":   cmd.RequiredArgs.AppName,
