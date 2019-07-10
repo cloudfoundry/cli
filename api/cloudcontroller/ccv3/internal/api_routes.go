@@ -24,6 +24,7 @@ const (
 	GetApplicationManifestRequest                               = "GetApplicationManifest"
 	GetApplicationProcessRequest                                = "GetApplicationProcess"
 	GetApplicationProcessesRequest                              = "GetApplicationProcesses"
+	GetApplicationRoutesRequest                                 = "GetApplicationRoutes"
 	GetApplicationTasksRequest                                  = "GetApplicationTasks"
 	GetApplicationsRequest                                      = "GetApplications"
 	GetBuildRequest                                             = "GetBuild"
@@ -113,6 +114,7 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/:app_guid/processes/:type/actions/scale", Method: http.MethodPost, Name: PostApplicationProcessActionScaleRequest},
 	{Resource: AppsResource, Path: "/:app_guid/processes/:type/instances/:index", Method: http.MethodDelete, Name: DeleteApplicationProcessInstanceRequest},
 	{Resource: AppsResource, Path: "/:app_guid/relationships/current_droplet", Method: http.MethodPatch, Name: PatchApplicationCurrentDropletRequest},
+	{Resource: AppsResource, Path: "/:app_guid/routes", Method: http.MethodGet, Name: GetApplicationRoutesRequest},
 	{Resource: AppsResource, Path: "/:app_guid/tasks", Method: http.MethodGet, Name: GetApplicationTasksRequest},
 	{Resource: AppsResource, Path: "/:app_guid/tasks", Method: http.MethodPost, Name: PostApplicationTasksRequest},
 	{Resource: BuildpacksResource, Path: "/", Method: http.MethodGet, Name: GetBuildpacksRequest},

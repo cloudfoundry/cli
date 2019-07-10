@@ -478,6 +478,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetApplicationRoutesStub        func(string) ([]ccv3.Route, ccv3.Warnings, error)
+	getApplicationRoutesMutex       sync.RWMutex
+	getApplicationRoutesArgsForCall []struct {
+		arg1 string
+	}
+	getApplicationRoutesReturns struct {
+		result1 []ccv3.Route
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getApplicationRoutesReturnsOnCall map[int]struct {
+		result1 []ccv3.Route
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetApplicationTasksStub        func(string, ...ccv3.Query) ([]ccv3.Task, ccv3.Warnings, error)
 	getApplicationTasksMutex       sync.RWMutex
 	getApplicationTasksArgsForCall []struct {
@@ -3449,6 +3464,72 @@ func (fake *FakeCloudControllerClient) GetApplicationProcessesReturnsOnCall(i in
 	}
 	fake.getApplicationProcessesReturnsOnCall[i] = struct {
 		result1 []ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRoutes(arg1 string) ([]ccv3.Route, ccv3.Warnings, error) {
+	fake.getApplicationRoutesMutex.Lock()
+	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
+	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
+	fake.getApplicationRoutesMutex.Unlock()
+	if fake.GetApplicationRoutesStub != nil {
+		return fake.GetApplicationRoutesStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationRoutesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRoutesCallCount() int {
+	fake.getApplicationRoutesMutex.RLock()
+	defer fake.getApplicationRoutesMutex.RUnlock()
+	return len(fake.getApplicationRoutesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRoutesCalls(stub func(string) ([]ccv3.Route, ccv3.Warnings, error)) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRoutesArgsForCall(i int) string {
+	fake.getApplicationRoutesMutex.RLock()
+	defer fake.getApplicationRoutesMutex.RUnlock()
+	argsForCall := fake.getApplicationRoutesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRoutesReturns(result1 []ccv3.Route, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = nil
+	fake.getApplicationRoutesReturns = struct {
+		result1 []ccv3.Route
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationRoutesReturnsOnCall(i int, result1 []ccv3.Route, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = nil
+	if fake.getApplicationRoutesReturnsOnCall == nil {
+		fake.getApplicationRoutesReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Route
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationRoutesReturnsOnCall[i] = struct {
+		result1 []ccv3.Route
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -7436,6 +7517,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationProcessByTypeMutex.RUnlock()
 	fake.getApplicationProcessesMutex.RLock()
 	defer fake.getApplicationProcessesMutex.RUnlock()
+	fake.getApplicationRoutesMutex.RLock()
+	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()
 	defer fake.getApplicationTasksMutex.RUnlock()
 	fake.getApplicationsMutex.RLock()

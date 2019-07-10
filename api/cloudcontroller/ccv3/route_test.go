@@ -276,10 +276,12 @@ var _ = Describe("Route", func() {
 					},
 					"resources": [
 						{
-							"guid": "route-1-guid"
+							"guid": "route-1-guid",
+							"url": "hello"
 						},
 						{
-							"guid": "route-2-guid"
+							"guid": "route-2-guid",
+							"url": "bye"
 						}
 					]
 				}`, server.URL())
@@ -322,9 +324,11 @@ var _ = Describe("Route", func() {
 					Expect(routes).To(Equal([]Route{
 						Route{
 							GUID: "route-1-guid",
+							URL:  "hello",
 						},
 						Route{
 							GUID: "route-2-guid",
+							URL:  "bye",
 						},
 						Route{
 							GUID: "route-3-guid",
@@ -358,9 +362,11 @@ var _ = Describe("Route", func() {
 					Expect(routes).To(Equal([]Route{
 						Route{
 							GUID: "route-1-guid",
+							URL:  "hello",
 						},
 						Route{
 							GUID: "route-2-guid",
+							URL:  "bye",
 						},
 						Route{
 							GUID: "route-3-guid",
@@ -772,6 +778,146 @@ var _ = Describe("Route", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("orphaned-warning"))
+			})
+		})
+	})
+
+	Describe("GetApplicationRoutes", func() {
+		var (
+			appGUID string
+
+			routes     []Route
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			appGUID = "some-app-guid"
+		})
+
+		JustBeforeEach(func() {
+			routes, warnings, executeErr = client.GetApplicationRoutes(appGUID)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				body := `{
+	"resources": [
+		{
+			"guid": "route-guid",
+			"host": "host",
+			"path": "/path",
+			"url": "host.domain.com/path",
+			"relationships": {
+				"space": {
+					"data": {
+						"guid": "space-guid"
+					}
+				},
+				"domain": {
+					"data": {
+						"guid": "domain-guid"
+					}
+				}
+			}
+		}, {
+			"guid": "route2-guid",
+			"host": "",
+			"path": "",
+			"url": "domain.com",
+			"relationships": {
+				"space": {
+					"data": {
+						"guid": "space-guid"
+					}
+				},
+				"domain": {
+					"data": {
+						"guid": "domain2-guid"
+					}
+				}
+			}
+		}
+	]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/routes"),
+						RespondWith(
+							http.StatusOK,
+							body,
+							http.Header{"X-Cf-Warnings": {"get-app-routes-warning"}, "Location": {"job-url"}},
+						),
+					),
+				)
+			})
+
+			It("returns an array of routes", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-app-routes-warning"))
+
+				Expect(routes).To(ConsistOf(
+					Route{
+						GUID:       "route-guid",
+						DomainGUID: "domain-guid",
+						SpaceGUID:  "space-guid",
+						Host:       "host",
+						Path:       "/path",
+						URL:        "host.domain.com/path",
+					},
+					Route{
+						GUID:       "route2-guid",
+						DomainGUID: "domain2-guid",
+						SpaceGUID:  "space-guid",
+						Host:       "",
+						Path:       "",
+						URL:        "domain.com",
+					},
+				))
+			})
+		})
+
+		When("there is a cc error", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+		{
+      "code": 10010,
+      "detail": "Isolation segment not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/routes"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"get-app-routes-warning"}, "Location": {"job-url"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("get-app-routes-warning"))
 			})
 		})
 	})

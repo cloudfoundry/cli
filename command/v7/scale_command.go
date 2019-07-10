@@ -3,12 +3,10 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
@@ -38,7 +36,6 @@ type ScaleCommand struct {
 	Config      command.Config
 	Actor       ScaleActor
 	SharedActor command.SharedActor
-	RouteActor  v7action.RouteActor
 }
 
 func (cmd *ScaleCommand) Setup(config command.Config, ui command.UI) error {
@@ -52,12 +49,6 @@ func (cmd *ScaleCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
-
-	ccClientV2, _, err := sharedV2.NewClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-	cmd.RouteActor = v2action.NewActor(ccClientV2, uaaClient, config)
 
 	return nil
 }
@@ -209,7 +200,7 @@ func (cmd ScaleCommand) showCurrentScale(userName string, runningErr error) erro
 		"Username":  userName,
 	})
 
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
+	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

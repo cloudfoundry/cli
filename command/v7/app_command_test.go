@@ -228,7 +228,7 @@ var _ = Describe("app Command", func() {
 				Expect(testUI.Err).To(Say("warning-2"))
 
 				Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-				appName, spaceGUID, withObfuscatedValues, _ := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+				appName, spaceGUID, withObfuscatedValues := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 				Expect(appName).To(Equal("some-app"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(withObfuscatedValues).To(BeFalse())

@@ -2,11 +2,9 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
@@ -14,7 +12,7 @@ import (
 
 type StartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
+	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.ApplicationSummary, v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 }
@@ -30,7 +28,6 @@ type StartCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       StartActor
-	RouteActor  v7action.RouteActor
 }
 
 func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
@@ -43,14 +40,7 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClientV2, uaaClientV2, err := v6shared.NewClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
-	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.RouteActor = v2Actor
 
 	return nil
 }
@@ -106,7 +96,6 @@ func (cmd StartCommand) Execute(args []string) error {
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		false,
-		cmd.RouteActor,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

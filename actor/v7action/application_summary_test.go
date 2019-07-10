@@ -3,7 +3,7 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -69,7 +69,6 @@ var _ = Describe("Application Summary Actions", func() {
 			appName              string
 			spaceGUID            string
 			withObfuscatedValues bool
-			fakeRouteActor       *v7actionfakes.FakeRouteActor
 
 			summary    ApplicationSummary
 			warnings   Warnings
@@ -80,12 +79,11 @@ var _ = Describe("Application Summary Actions", func() {
 			appName = "some-app-name"
 			spaceGUID = "some-space-guid"
 			withObfuscatedValues = true
-			fakeRouteActor = new(v7actionfakes.FakeRouteActor)
 		})
 
 		Context("when a route actor is not provided", func() {
 			JustBeforeEach(func() {
-				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues, nil)
+				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
 			})
 
 			When("retrieving the application is successful", func() {
@@ -421,51 +419,51 @@ var _ = Describe("Application Summary Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues, fakeRouteActor)
+				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
 			})
 
 			When("getting the routes is successful", func() {
 				BeforeEach(func() {
-					routes := v2action.Routes{
+					routes := []ccv3.Route{
 						{GUID: "some-route-guid"},
 						{GUID: "some-other-route-guid"},
 					}
 
-					fakeRouteActor.GetApplicationRoutesReturns(routes, v2action.Warnings{"v2-routes-warnings"}, nil)
+					fakeCloudControllerClient.GetApplicationRoutesReturns(routes, ccv3.Warnings{"routes-warnings"}, nil)
 				})
 
 				It("retrieves and sets the application routes", func() {
-					Expect(warnings).To(ConsistOf("some-warning", "v2-routes-warnings"))
+					Expect(warnings).To(ConsistOf("some-warning", "routes-warnings"))
 					Expect(summary.Routes).To(ConsistOf(
-						v2action.Route{GUID: "some-route-guid"},
-						v2action.Route{GUID: "some-other-route-guid"},
+						v7action.Route{GUID: "some-route-guid"},
+						v7action.Route{GUID: "some-other-route-guid"},
 					))
 
-					Expect(fakeRouteActor.GetApplicationRoutesCallCount()).To(Equal(1))
-					Expect(fakeRouteActor.GetApplicationRoutesArgsForCall(0)).To(Equal("some-app-guid"))
+					Expect(fakeCloudControllerClient.GetApplicationRoutesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationRoutesArgsForCall(0)).To(Equal("some-app-guid"))
 				})
 			})
 
 			When("getting the application routes errors", func() {
 				When("a generic error is returned", func() {
 					BeforeEach(func() {
-						fakeRouteActor.GetApplicationRoutesReturns(nil, v2action.Warnings{"v2-routes-warnings"}, errors.New("some-error"))
+						fakeCloudControllerClient.GetApplicationRoutesReturns(nil, ccv3.Warnings{"routes-warnings"}, errors.New("some-error"))
 					})
 
 					It("returns warnings and the error", func() {
 						Expect(executeErr).To(MatchError("some-error"))
-						Expect(warnings).To(ConsistOf("some-warning", "v2-routes-warnings"))
+						Expect(warnings).To(ConsistOf("some-warning", "routes-warnings"))
 					})
 				})
 
 				When("a ResourceNotFoundError is returned", func() {
 					BeforeEach(func() {
-						fakeRouteActor.GetApplicationRoutesReturns(nil, v2action.Warnings{"v2-routes-warnings"}, ccerror.ResourceNotFoundError{})
+						fakeCloudControllerClient.GetApplicationRoutesReturns(nil, ccv3.Warnings{"routes-warnings"}, ccerror.ResourceNotFoundError{})
 					})
 
 					It("adds warnings and continues", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("some-warning", "v2-routes-warnings"))
+						Expect(warnings).To(ConsistOf("some-warning", "routes-warnings"))
 					})
 				})
 			})

@@ -2,22 +2,15 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
-
-//go:generate counterfeiter . RouteActor
-
-type RouteActor interface {
-	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
-}
 
 // ApplicationSummary represents an application with its processes and droplet.
 type ApplicationSummary struct {
 	Application
 	CurrentDroplet   Droplet
 	ProcessSummaries ProcessSummaries
-	Routes           v2action.Routes
+	Routes           []Route
 }
 
 func (a ApplicationSummary) GetIsolationSegmentName() (string, bool) {
@@ -35,7 +28,7 @@ func (a ApplicationSummary) hasIsolationSegment() bool {
 
 // GetApplicationSummaryByNameAndSpace returns an application with process and
 // instance stats.
-func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor RouteActor) (ApplicationSummary, Warnings, error) {
+func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
@@ -55,17 +48,15 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID
 		}
 	}
 
-	var appRoutes v2action.Routes
-	if routeActor != nil {
-		routes, warnings, err := routeActor.GetApplicationRoutes(app.GUID)
-		allWarnings = append(allWarnings, Warnings(warnings)...)
-		if err != nil {
-			if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
-				return ApplicationSummary{}, allWarnings, err
-			}
+	var appRoutes []Route
+	routes, warnings, err := actor.GetApplicationRoutes(app.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
+			return ApplicationSummary{}, allWarnings, err
 		}
-		appRoutes = routes
 	}
+	appRoutes = routes
 
 	summary := ApplicationSummary{
 		Application:      app,

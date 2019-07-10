@@ -1,6 +1,8 @@
 package v7pushaction
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	log "github.com/sirupsen/logrus"
@@ -15,7 +17,7 @@ func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID
 		log.Errorln("getting default route:", err)
 		return warnings, err
 	}
-	log.WithField("defaultRoute", defaultRoute.String()).Debug("calculated default route")
+	log.WithField("defaultRoute", fmt.Sprint(defaultRoute)).Debug("calculated default route")
 
 	route, getRouteWarnings, err := actor.V7Actor.GetRouteByAttributes(defaultRoute.DomainName, defaultRoute.DomainGUID, defaultRoute.Host, defaultRoute.Path)
 	warnings = append(warnings, getRouteWarnings...)

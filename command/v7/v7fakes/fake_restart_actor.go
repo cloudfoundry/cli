@@ -25,13 +25,12 @@ type FakeRestartActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationSummaryByNameAndSpaceStub        func(string, string, bool, v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
+	GetApplicationSummaryByNameAndSpaceStub        func(string, string, bool) (v7action.ApplicationSummary, v7action.Warnings, error)
 	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
 	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 bool
-		arg4 v7action.RouteActor
 	}
 	getApplicationSummaryByNameAndSpaceReturns struct {
 		result1 v7action.ApplicationSummary
@@ -154,19 +153,18 @@ func (fake *FakeRestartActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpace(arg1 string, arg2 string, arg3 bool, arg4 v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error) {
+func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v7action.ApplicationSummary, v7action.Warnings, error) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
 	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 bool
-		arg4 v7action.RouteActor
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3, arg4})
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3, arg4)
+		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -181,17 +179,17 @@ func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceCallCount() int
 	return len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceCalls(stub func(string, string, bool, v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)) {
+func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceCalls(stub func(string, string, bool) (v7action.ApplicationSummary, v7action.Warnings, error)) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationSummaryByNameAndSpaceStub = stub
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool, v7action.RouteActor) {
+func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
 	argsForCall := fake.getApplicationSummaryByNameAndSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {

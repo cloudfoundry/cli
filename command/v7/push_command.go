@@ -103,7 +103,6 @@ type PushCommand struct {
 	Actor           PushActor
 	VersionActor    V7ActorForPush
 	SharedActor     command.SharedActor
-	RouteActor      v7action.RouteActor
 	ProgressBar     ProgressBar
 	PWD             string
 	ManifestLocator ManifestLocator
@@ -131,7 +130,6 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	}
 
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.RouteActor = v2Actor
 	cmd.Actor = v7pushaction.NewActor(v2Actor, v7actor, sharedActor)
 
 	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
@@ -284,7 +282,6 @@ func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 		plan.Application.Name,
 		cmd.Config.TargetedSpace().GUID,
 		true,
-		cmd.RouteActor,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

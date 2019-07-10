@@ -39,7 +39,7 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.ApplicationSummar
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
 		isoRow,
-		{display.UI.TranslateText("routes:"), summary.Routes.Summary()},
+		{display.UI.TranslateText("routes:"), routeSummary(summary.Routes)},
 		{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		lifecycleInfo,
@@ -48,6 +48,14 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.ApplicationSummar
 	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
 	display.displayProcessTable(summary, displayStartCommand)
+}
+
+func routeSummary(rs []v7action.Route) string {
+	formattedRoutes := []string{}
+	for _, route := range rs {
+		formattedRoutes = append(formattedRoutes, route.URL)
+	}
+	return strings.Join(formattedRoutes, ", ")
 }
 
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {

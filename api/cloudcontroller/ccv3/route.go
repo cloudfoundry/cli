@@ -15,6 +15,7 @@ type Route struct {
 	DomainGUID string
 	Host       string
 	Path       string
+	URL        string
 }
 
 func (r Route) MarshalJSON() ([]byte, error) {
@@ -57,6 +58,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 		GUID string `json:"guid,omitempty"`
 		Host string `json:"host,omitempty"`
 		Path string `json:"path,omitempty"`
+		URL  string `json:"url,omitempty"`
 
 		Relationships struct {
 			Space struct {
@@ -82,6 +84,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	r.SpaceGUID = alias.Relationships.Space.Data.GUID
 	r.DomainGUID = alias.Relationships.Domain.Data.GUID
 	r.Path = alias.Path
+	r.URL = alias.URL
 
 	return nil
 }
@@ -156,6 +159,31 @@ func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
+func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetApplicationRoutesRequest,
+		URIParams:   internal.Params{"app_guid": appGUID},
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullRoutesList []Route
+	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
+		if route, ok := item.(Route); ok {
+			fullRoutesList = append(fullRoutesList, route)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Route{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullRoutesList, warnings, err
 }
 
 func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {

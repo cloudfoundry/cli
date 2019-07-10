@@ -1,9 +1,6 @@
 package v7action
 
 import (
-	"fmt"
-	"path"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -25,6 +22,7 @@ type Route struct {
 	Path       string
 	DomainName string
 	SpaceName  string
+	URL        string
 }
 
 func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (Route, Warnings, error) {
@@ -106,58 +104,7 @@ func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error)
 		return nil, allWarnings, err
 	}
 
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: []string{spaceGUID},
-	})
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	domainGUIDsSet := map[string]struct{}{}
-	domainGUIDs := []string{}
-	for _, route := range routes {
-		if _, ok := domainGUIDsSet[route.DomainGUID]; ok {
-			continue
-		}
-		domainGUIDsSet[route.DomainGUID] = struct{}{}
-		domainGUIDs = append(domainGUIDs, route.DomainGUID)
-	}
-
-	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: domainGUIDs,
-	})
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	spacesByGUID := map[string]ccv3.Space{}
-	for _, space := range spaces {
-		spacesByGUID[space.GUID] = space
-	}
-
-	domainsByGUID := map[string]ccv3.Domain{}
-	for _, domain := range domains {
-		domainsByGUID[domain.GUID] = domain
-	}
-
-	actorRoutes := []Route{}
-	for _, route := range routes {
-		actorRoutes = append(actorRoutes, Route{
-			GUID:       route.GUID,
-			Host:       route.Host,
-			Path:       route.Path,
-			SpaceGUID:  route.SpaceGUID,
-			DomainGUID: route.DomainGUID,
-			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
-			DomainName: domainsByGUID[route.DomainGUID].Name,
-		})
-	}
-
-	return actorRoutes, allWarnings, nil
+	return actor.createActionRoutes(routes, spaceGUID, allWarnings)
 }
 
 func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
@@ -327,16 +274,74 @@ func (actor Actor) UnmapRoute(routeGUID string, destinationGUID string) (Warning
 	return Warnings(warnings), err
 }
 
-func (r Route) String() string {
-	routeString := r.DomainName
+func (actor Actor) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {
+	allWarnings := Warnings{}
 
-	if r.Host != "" {
-		routeString = fmt.Sprintf("%s.%s", r.Host, routeString)
+	routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(appGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
 	}
 
-	if r.Path != "" {
-		routeString = path.Join(routeString, r.Path)
+	if len(routes) == 0 {
+		return nil, allWarnings, err
 	}
 
-	return routeString
+	return actor.createActionRoutes(routes, routes[0].SpaceGUID, allWarnings)
+}
+
+func (actor Actor) createActionRoutes(routes []ccv3.Route, spaceGUID string, allWarnings Warnings) ([]Route, Warnings, error) {
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+		Key:    ccv3.GUIDFilter,
+		Values: []string{routes[0].SpaceGUID},
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	domainGUIDsSet := map[string]struct{}{}
+	domainGUIDs := []string{}
+	for _, route := range routes {
+		if _, ok := domainGUIDsSet[route.DomainGUID]; ok {
+			continue
+		}
+		domainGUIDsSet[route.DomainGUID] = struct{}{}
+		domainGUIDs = append(domainGUIDs, route.DomainGUID)
+	}
+
+	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
+		Key:    ccv3.GUIDFilter,
+		Values: domainGUIDs,
+	})
+
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+	spacesByGUID := map[string]ccv3.Space{}
+	for _, space := range spaces {
+		spacesByGUID[space.GUID] = space
+	}
+
+	domainsByGUID := map[string]ccv3.Domain{}
+	for _, domain := range domains {
+		domainsByGUID[domain.GUID] = domain
+	}
+
+	actorRoutes := []Route{}
+	for _, route := range routes {
+		actorRoutes = append(actorRoutes, Route{
+			GUID:       route.GUID,
+			Host:       route.Host,
+			Path:       route.Path,
+			URL:        route.URL,
+			SpaceGUID:  route.SpaceGUID,
+			DomainGUID: route.DomainGUID,
+			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
+			DomainName: domainsByGUID[route.DomainGUID].Name,
+		})
+	}
+
+	return actorRoutes, allWarnings, err
 }
