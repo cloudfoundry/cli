@@ -116,7 +116,33 @@ var _ = Describe("delete-label command", func() {
 				Expect(len(org.Metadata.Labels)).To(Equal(1))
 				Expect(org.Metadata.Labels["pci"]).To(Equal("true"))
 			})
+		})
 
+		When("Deleting labels from a space", func() {
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				session := helpers.CF("set-label", "space", spaceName, "pci=true", "public-facing=false")
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("deletes the specified labels on the space", func() {
+				session := helpers.CF("delete-label", "space", spaceName, "public-facing")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
+				Consistently(session).ShouldNot(Say("\n\nOK"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				spaceGUID := helpers.GetSpaceGUID(spaceName)
+				session = helpers.CF("curl", fmt.Sprintf("/v3/spaces/%s", spaceGUID))
+				Eventually(session).Should(Exit(0))
+				spaceJSON := session.Out.Contents()
+
+				var space commonResource
+				Expect(json.Unmarshal(spaceJSON, &space)).To(Succeed())
+				Expect(len(space.Metadata.Labels)).To(Equal(1))
+				Expect(space.Metadata.Labels["pci"]).To(Equal("true"))
+			})
 		})
 	})
 })

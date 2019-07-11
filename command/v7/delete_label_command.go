@@ -15,6 +15,7 @@ import (
 type DeleteLabelActor interface {
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type DeleteLabelCommand struct {
@@ -54,6 +55,8 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 		err = cmd.executeApp(user.Name, labels)
 	case Org:
 		err = cmd.executeOrg(user.Name, labels)
+	case Space:
+		err = cmd.executeSpace(user.Name, labels)
 	default:
 		err = errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.RequiredArgs.ResourceType}))
 	}
@@ -98,6 +101,25 @@ func (cmd DeleteLabelCommand) executeOrg(username string, labels map[string]type
 	})
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, labels)
+
+	cmd.UI.DisplayWarnings(warnings)
+
+	return err
+}
+
+func (cmd DeleteLabelCommand) executeSpace(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(true, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Deleting label(s) for space {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"OrgName":      cmd.Config.TargetedOrganization().Name,
+		"User":         username,
+	})
+
+	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID, labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 

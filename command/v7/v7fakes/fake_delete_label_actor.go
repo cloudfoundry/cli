@@ -39,6 +39,21 @@ type FakeDeleteLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateSpaceLabelsBySpaceNameStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	updateSpaceLabelsBySpaceNameMutex       sync.RWMutex
+	updateSpaceLabelsBySpaceNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 map[string]types.NullString
+	}
+	updateSpaceLabelsBySpaceNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateSpaceLabelsBySpaceNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -172,6 +187,71 @@ func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameRetu
 	}{result1, result2}
 }
 
+func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
+	ret, specificReturn := fake.updateSpaceLabelsBySpaceNameReturnsOnCall[len(fake.updateSpaceLabelsBySpaceNameArgsForCall)]
+	fake.updateSpaceLabelsBySpaceNameArgsForCall = append(fake.updateSpaceLabelsBySpaceNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 map[string]types.NullString
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateSpaceLabelsBySpaceName", []interface{}{arg1, arg2, arg3})
+	fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
+	if fake.UpdateSpaceLabelsBySpaceNameStub != nil {
+		return fake.UpdateSpaceLabelsBySpaceNameStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateSpaceLabelsBySpaceNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameCallCount() int {
+	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
+	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
+	return len(fake.updateSpaceLabelsBySpaceNameArgsForCall)
+}
+
+func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
+	defer fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
+	fake.UpdateSpaceLabelsBySpaceNameStub = stub
+}
+
+func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameArgsForCall(i int) (string, string, map[string]types.NullString) {
+	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
+	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
+	argsForCall := fake.updateSpaceLabelsBySpaceNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
+	defer fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
+	fake.UpdateSpaceLabelsBySpaceNameStub = nil
+	fake.updateSpaceLabelsBySpaceNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
+	defer fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
+	fake.UpdateSpaceLabelsBySpaceNameStub = nil
+	if fake.updateSpaceLabelsBySpaceNameReturnsOnCall == nil {
+		fake.updateSpaceLabelsBySpaceNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateSpaceLabelsBySpaceNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeDeleteLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -179,6 +259,8 @@ func (fake *FakeDeleteLabelActor) Invocations() map[string][][]interface{} {
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
+	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
+	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
