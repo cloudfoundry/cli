@@ -4,6 +4,7 @@ const (
 	MinSupportedV2ClientVersion = "2.100.0"
 	MinSupportedV3ClientVersion = "3.35.0"
 
+	MinVersionTagsOnUserProvidedServices             = "2.104.0"
 	MinVersionAsyncBindingsV2                        = "2.120.0"
 	MinVersionBuildpackStackAssociationV2            = "2.112.0"
 	MinVersionSymlinkedFilesV2                       = "2.107.0"

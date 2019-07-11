@@ -3,6 +3,7 @@ package isolated
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,6 +12,10 @@ import (
 )
 
 var _ = Describe("update-user-provided-service command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionTagsOnUserProvidedServices)
+	})
+
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
