@@ -823,10 +823,18 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`Password>`))
+
+					if !helpers.IsWindows() {
+						Eventually(session).Should(Say(`Password>`))
+					}
+
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`Password>`))
+
+					if !helpers.IsWindows() {
+						Eventually(session).Should(Say(`Password>`))
+					}
+
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
