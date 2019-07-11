@@ -98,6 +98,7 @@ type CloudControllerClient interface {
 	UpdateSpaceDeveloperByUsername(spaceGUID string, username string) (ccv2.Warnings, error)
 	UpdateSpaceManager(spaceGUID string, uaaID string) (ccv2.Warnings, error)
 	UpdateSpaceManagerByUsername(spaceGUID string, username string) (ccv2.Warnings, error)
+	UpdateUserProvidedServiceInstance(instanceGUID string, instance ccv2.UserProvidedServiceInstance) (ccv2.Warnings, error)
 	UploadApplicationPackage(appGUID string, existingResources []ccv2.Resource, newResources ccv2.Reader, newResourcesLength int64) (ccv2.Job, ccv2.Warnings, error)
 	UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error)
 	UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (ccv2.Job, ccv2.Warnings, error)

@@ -293,7 +293,7 @@ var _ = Describe("path types", func() {
 						tempPath = tempFile(`{"this is":"valid JSON"}`)
 					})
 
-					It("sets the path", func() {
+					It("reads and unmarshals the JSON from the file", func() {
 						err := jsonOrFile.UnmarshalFlag(tempPath)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(jsonOrFile).To(BeEquivalentTo(map[string]interface{}{
@@ -328,7 +328,7 @@ var _ = Describe("path types", func() {
 			})
 
 			When("the JSON is valid", func() {
-				It("sets the path", func() {
+				It("reads and unmarshals the JSON", func() {
 					err := jsonOrFile.UnmarshalFlag(`{"this is":"valid JSON"}`)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(jsonOrFile).To(BeEquivalentTo(map[string]interface{}{

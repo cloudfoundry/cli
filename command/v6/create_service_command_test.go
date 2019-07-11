@@ -117,7 +117,8 @@ var _ = Describe("create-service Command", func() {
 
 			Context("the user passes in tags", func() {
 				BeforeEach(func() {
-					cmd.Tags = []string{"tag-1", "tag-2"}
+					cmd.Tags.IsSet = true
+					cmd.Tags.Value = []string{"tag-1", "tag-2"}
 				})
 
 				It("passes the tags as args when creating the service instance", func() {

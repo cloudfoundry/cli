@@ -115,6 +115,7 @@ const (
 	PutSpaceManagerByUsernameRequest                     = "PutSpaceManagerByUsername"
 	PutSecurityGroupSpaceRequest                         = "PutSecurityGroupSpace"
 	PutSecurityGroupStagingSpaceRequest                  = "PutSecurityGroupStagingSpace"
+	PutUserProvidedServiceInstance                       = "PutUserProvidedServiceInstance"
 )
 
 // APIRoutes is a list of routes used by the rata library to construct request
@@ -217,6 +218,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/stacks", Method: http.MethodGet, Name: GetStacksRequest},
 	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: GetStackRequest},
 	{Path: "/v2/user_provided_service_instances", Method: http.MethodGet, Name: GetUserProvidedServiceInstancesRequest},
+	{Path: "/v2/user_provided_service_instances/:user_provided_service_instance_guid", Method: http.MethodPut, Name: PutUserProvidedServiceInstance},
 	{Path: "/v2/user_provided_service_instances/:user_provided_service_instance_guid/service_bindings", Method: http.MethodGet, Name: GetUserProvidedServiceInstanceServiceBindingsRequest},
 	{Path: "/v2/users", Method: http.MethodPost, Name: PostUserRequest},
 }
