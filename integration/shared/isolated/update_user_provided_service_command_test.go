@@ -191,13 +191,13 @@ var _ = Describe("update-user-provided-service command", func() {
 					Expect(os.Remove(path)).To(Succeed())
 				})
 
-				It("requests the credentials at a prompt", func() {
+				It("accepts a file path", func() {
 					session := helpers.CF("update-user-provided-service", serviceName, "-p", path)
 
-					// If the file does not exist or does not contain JSON, it's assumed to be a credential name,
-					// and the command will prompt the user to enter it, so we check this has not happened
-					Consistently(session).ShouldNot(Say(path))
+					By("checking that it does not interpret the file name as request for an interactive credential prompt")
+					Consistently(session.Out.Contents()).ShouldNot(ContainSubstring(path))
 
+					By("succeeding")
 					eventuallyExpectOKMessage(session, serviceName, orgName, spaceName, userName)
 					Eventually(session).Should(Exit(0))
 				})
