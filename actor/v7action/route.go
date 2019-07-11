@@ -293,7 +293,7 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]Route, Warnings, erro
 func (actor Actor) createActionRoutes(routes []ccv3.Route, spaceGUID string, allWarnings Warnings) ([]Route, Warnings, error) {
 	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
 		Key:    ccv3.GUIDFilter,
-		Values: []string{routes[0].SpaceGUID},
+		Values: []string{spaceGUID},
 	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
