@@ -174,7 +174,7 @@ var _ = Describe("login command", func() {
 						session = helpers.CF("login", "-a", apiURL)
 					}
 					Eventually(session).Should(Say("API endpoint: %s", apiURL))
-					Consistently(session).ShouldNot(Say("API endpoint:"))
+					Consistently(session).ShouldNot(Say("API endpoint>"))
 					session.Interrupt()
 					Eventually(session).Should(Exit())
 
