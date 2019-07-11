@@ -483,6 +483,102 @@ var _ = Describe("login command", func() {
 				Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
 			})
 
+			When("the -s flag is passed", func() {
+				It("targets the org and the space", func() {
+					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+
+					Eventually(session).Should(Say(`Targeted org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`\n\nTargeted space:\s+%s`, spaceName))
+
+					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`Space:\s+%s`, spaceName))
+					Eventually(session).Should(Exit(0))
+
+					sessionOutput := string(session.Out.Contents())
+					Expect(sessionOutput).To(MatchRegexp(`\S\n\n\n\nAPI`))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+			})
+		})
+
+		When("multiple spaces are available to the user", func() {
+			var (
+				spaceName  string
+				spaceName2 string
+			)
+
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				session := helpers.CF("create-space", "-o", orgName, spaceName)
+				Eventually(session).Should(Exit(0))
+				roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
+				Eventually(roleSession).Should(Exit(0))
+
+				spaceName2 = helpers.NewSpaceName()
+				session2 := helpers.CF("create-space", "-o", orgName, spaceName2)
+				Eventually(session2).Should(Exit(0))
+				roleSession2 := helpers.CF("set-space-role", username, orgName, spaceName2, "SpaceManager")
+				Eventually(roleSession2).Should(Exit(0))
+			})
+
+			When("the -s flag is passed", func() {
+				BeforeEach(func() {
+					orgName2 := helpers.NewOrgName()
+					session := helpers.CF("create-org", orgName2)
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("set-org-role", username, orgName2, "OrgManager")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("targets the org and the space", func() {
+					stdin := NewBuffer()
+					session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+					_, writeErr := stdin.Write([]byte(orgName + "\n"))
+					Expect(writeErr).ToNot(HaveOccurred())
+
+					Eventually(session).Should(Say(`Targeted org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`\n\nTargeted space:\s+%s`, spaceName))
+
+					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`Space:\s+%s`, spaceName))
+					Eventually(session).Should(Exit(0))
+
+					sessionOutput := string(session.Out.Contents())
+					Expect(sessionOutput).To(MatchRegexp(`\S\n\n\n\nAPI`))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+
+				When("the space name is invalid", func() {
+					BeforeEach(func() {
+						spaceName = "invalid-space-name"
+					})
+
+					It("the command fails and displays an error message. It targets the org but not the space.", func() {
+						stdin := NewBuffer()
+						session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+						_, writeErr := stdin.Write([]byte(orgName + "\n"))
+						Expect(writeErr).ToNot(HaveOccurred())
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
+
+						targetSession := helpers.CF("target")
+						Eventually(targetSession).Should(Exit(0))
+						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+						Eventually(targetSession).ShouldNot(Say(`space:\s+%s`, spaceName))
+						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
+					})
+				})
+			})
+
 		})
 
 	})
