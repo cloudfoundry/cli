@@ -53,6 +53,121 @@ var _ = Describe("login command", func() {
 		})
 	})
 
+	Describe("API Endpoint", func() {
+		When("the API endpoint is not set", func() {
+			BeforeEach(func() {
+				helpers.UnsetAPI()
+			})
+
+			When("the user does not provide the -a flag", func() {
+				It("prompts the user for an endpoint", func() {
+					input := NewBuffer()
+					_, err := input.Write([]byte("\n"))
+					Expect(err).ToNot(HaveOccurred())
+					session := helpers.CFWithStdin(input, "login")
+					Eventually(session).Should(Say("API endpoint:"))
+					session.Interrupt()
+					Eventually(session).Should(Exit())
+				})
+
+				When("the API endpoint provided at the prompt is unreachable", func() {
+					It("returns an error", func() {
+						input := NewBuffer()
+						_, err := input.Write([]byte("does.not.exist\n"))
+						Expect(err).ToNot(HaveOccurred())
+						session := helpers.CFWithStdin(input, "login")
+						Eventually(session).Should(Say("API endpoint:"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Request error: "))
+						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			When("the user provides the -a flag", func() {
+				It("sets the API endpoint and does not prompt the user for the API endpoint", func() {
+					var session *Session
+					if skipSSLValidation {
+						session = helpers.CF("login", "-a", apiURL, "--skip-ssl-validation")
+					} else {
+						session = helpers.CF("login", "-a", apiURL)
+					}
+					Eventually(session).Should(Say("API endpoint: %s", apiURL))
+					// TODO https://www.pivotaltracker.com/story/show/166938709/comments/204492216
+					//Consistently(session).ShouldNot(Say("API endpoint:"))
+					//session.Interrupt()
+					Eventually(session).Should(Exit())
+
+					session = helpers.CF("api")
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say("api endpoint:   %s", apiURL))
+				})
+
+				When("the provided API endpoint is unreachable", func() {
+					It("displays an error and fails", func() {
+						var session *Session
+						if skipSSLValidation {
+							session = helpers.CF("login", "-a", "does.not.exist", "--skip-ssl-validation")
+						} else {
+							session = helpers.CF("login", "-a", "does.not.exist")
+						}
+
+						Eventually(session).Should(Say("API endpoint: does.not.exist"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Request error: "))
+						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("the provided API endpoint has trailing slashes", func() {
+					It("removes the extra slashes", func() {
+						username, password := helpers.GetCredentials()
+						apiURLWithSlash := apiURL + "////"
+						session := helpers.CF("login", "-a", apiURLWithSlash, "-u", username, "-p", password, "--skip-ssl-validation")
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("api")
+						Eventually(session).Should(Say("api endpoint:\\s+%s\n", apiURL))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+		})
+
+		When("the API endpoint is already set", func() {
+			It("does not prompt the user for API endpoint", func() {
+				session := helpers.CF("login")
+				Consistently(session).ShouldNot(Say("API endpoint>"))
+				session.Interrupt()
+				Eventually(session).Should(Exit())
+			})
+
+			When("the user provides a new API endpoint with the -a flag", func() {
+				When("the provided API endpoint is unreachable", func() {
+					It("displays an error and does not change the API endpoint", func() {
+						var session *Session
+						if skipSSLValidation {
+							session = helpers.CF("login", "-a", "does.not.exist", "--skip-ssl-validation")
+						} else {
+							session = helpers.CF("login", "-a", "does.not.exist")
+						}
+						Eventually(session).Should(Say("API endpoint: does.not.exist"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Request error: "))
+						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session).Should(Exit(1))
+
+						apiSession := helpers.CF("api")
+						Eventually(apiSession).Should(Exit(0))
+						Eventually(apiSession).Should(Say("api endpoint:   %s", apiURL))
+					})
+				})
+			})
+		})
+	})
+
 	Describe("Target Space", func() {
 		var (
 			orgName  string

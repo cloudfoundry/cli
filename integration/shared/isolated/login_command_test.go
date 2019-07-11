@@ -133,13 +133,6 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("API Endpoint", func() {
-		BeforeEach(func() {
-			helpers.TurnOnExperimentalLogin()
-		})
-
-		AfterEach(func() {
-			helpers.TurnOffExperimentalLogin()
-		})
 
 		When("the API endpoint is not set", func() {
 			BeforeEach(func() {
@@ -152,7 +145,7 @@ var _ = Describe("login command", func() {
 					_, err := input.Write([]byte("\n"))
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CFWithStdin(input, "login")
-					Eventually(session).Should(Say("API endpoint:"))
+					Eventually(session).Should(Say("API endpoint>"))
 					session.Interrupt()
 					Eventually(session).Should(Exit())
 				})
@@ -163,10 +156,10 @@ var _ = Describe("login command", func() {
 						_, err := input.Write([]byte("does.not.exist\n"))
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(input, "login")
-						Eventually(session).Should(Say("API endpoint:"))
+						Eventually(session).Should(Say("API endpoint>"))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Request error: "))
-						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session).Should(Say("Error performing request: "))
+						Eventually(session).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -181,9 +174,8 @@ var _ = Describe("login command", func() {
 						session = helpers.CF("login", "-a", apiURL)
 					}
 					Eventually(session).Should(Say("API endpoint: %s", apiURL))
-					// TODO This currently because we dont have the user/password prompt implemented. Uncomment this line after we implement the other prompts
-					// Consistently(session).ShouldNot(Say("API endpoint:"))
-					// session.Interrupt()
+					Consistently(session).ShouldNot(Say("API endpoint:"))
+					session.Interrupt()
 					Eventually(session).Should(Exit())
 
 					session = helpers.CF("api")
@@ -202,8 +194,8 @@ var _ = Describe("login command", func() {
 
 						Eventually(session).Should(Say("API endpoint: does.not.exist"))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Request error: "))
-						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session).Should(Say("Error performing request: "))
+						Eventually(session).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -216,7 +208,7 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("api")
-						Eventually(session).Should(Say("api endpoint:\\s+%s\n", apiURL))
+						Eventually(session).Should(Say("api endpoint:\\s+%s///\n", apiURL))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -233,7 +225,7 @@ var _ = Describe("login command", func() {
 
 			When("the user provides a new API endpoint with the -a flag", func() {
 				When("the provided API endpoint is unreachable", func() {
-					It("displays an error and does not change the API endpoint", func() {
+					It("displays an error and unsets the API endpoint", func() {
 						var session *Session
 						if skipSSLValidation {
 							session = helpers.CF("login", "-a", "does.not.exist", "--skip-ssl-validation")
@@ -242,13 +234,13 @@ var _ = Describe("login command", func() {
 						}
 						Eventually(session).Should(Say("API endpoint: does.not.exist"))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Request error: "))
-						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session).Should(Say("Error performing request: "))
+						Eventually(session).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 						Eventually(session).Should(Exit(1))
 
 						apiSession := helpers.CF("api")
 						Eventually(apiSession).Should(Exit(0))
-						Eventually(apiSession).Should(Say("api endpoint:   %s", apiURL))
+						Expect(apiSession).Should(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
 					})
 				})
 			})
