@@ -38,7 +38,8 @@ var _ = Describe("CredentialsOrJSON", func() {
 	Describe("UnmarshalFlag", func() {
 		Describe("empty credentials", func() {
 			BeforeEach(func() {
-				credsOrJSON.UnmarshalFlag("")
+				err := credsOrJSON.UnmarshalFlag("")
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("is set", func() {
