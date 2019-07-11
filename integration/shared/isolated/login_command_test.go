@@ -395,16 +395,11 @@ var _ = Describe("login command", func() {
 		)
 
 		BeforeEach(func() {
-			helpers.TurnOnExperimentalLogin()
 			helpers.LoginCF()
 			orgName = helpers.NewOrgName()
 			session := helpers.CF("create-org", orgName)
 			Eventually(session).Should(Exit(0))
 			username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
-		})
-
-		AfterEach(func() {
-			helpers.TurnOffExperimentalLogin()
 		})
 
 		When("there is only one org available to the user", func() {
@@ -426,30 +421,6 @@ var _ = Describe("login command", func() {
 					Eventually(createOrgSession).Should(Exit(0))
 					setOrgRoleSession := helpers.CF("set-org-role", username, orgName, "OrgManager")
 					Eventually(setOrgRoleSession).Should(Exit(0))
-				})
-
-				When("there are more than 50 orgs", func() {
-					var server *ghttp.Server
-
-					BeforeEach(func() {
-						server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
-						helpers.AddLoginRoutes(server)
-						helpers.AddFiftyOneOrgs(server)
-						// handle request for spaces under "org20"
-						helpers.AddEmptyPaginatedResponse(server, "/v3/spaces?organization_guids=f6653aac-938e-4469-9a66-56a02796412b")
-					})
-
-					It("displays a message and prompt the user for the org name", func() {
-						input := NewBuffer()
-						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "org20"))) // "org20" is one of the orgs in the test fixture
-						Expect(wErr).ToNot(HaveOccurred())
-
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
-
-						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
-						Eventually(session).Should(Say("Org:\\s+org20"))
-						Eventually(session).Should(Exit(0))
-					})
 				})
 
 				When("user selects an organization by using numbered list", func() {
@@ -487,9 +458,8 @@ var _ = Describe("login command", func() {
 
 							session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
 
-							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org:")))
-							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
-							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
+							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
 
 							session.Interrupt()
 							Eventually(session).Should(Exit())
@@ -532,8 +502,8 @@ var _ = Describe("login command", func() {
 						} else {
 							session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
 						}
-						Eventually(session).Should(Say(`Org \(enter to skip\):`))
-						Consistently(session).ShouldNot(Say(`Org \(enter to skip\):`))
+
+						Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
 						Eventually(session).Should(Exit(0))
 
 						targetSession := helpers.CF("target")
@@ -552,7 +522,7 @@ var _ = Describe("login command", func() {
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
+						Eventually(session).Should(Say("Organization %s not found", orgName))
 
 						targetSession := helpers.CF("target")
 						Eventually(targetSession).Should(Exit(0))
@@ -589,7 +559,7 @@ var _ = Describe("login command", func() {
 
 					Eventually(session).Should(Exit(1))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
+					Eventually(session).Should(Say("Organization %s not found", orgName))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
