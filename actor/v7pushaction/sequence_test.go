@@ -38,23 +38,50 @@ var _ = Describe("Actor", func() {
 			})
 		})
 
+		When("the plan has existing routes", func() {
+			BeforeEach(func() {
+				plan = PushPlan{
+					ApplicationRoutes: []v7action.Route{
+						{GUID: "some-route-guid"},
+					},
+				}
+			})
+
+			When("--random-route is given", func() {
+				BeforeEach(func() {
+					plan.RandomRoute = true
+				})
+
+				It("does not add the random route function", func() {
+					Expect(sequence).To(BeEmpty())
+				})
+			})
+
+			When("no-route is not given", func() {
+
+				It("does not the map default route function", func() {
+					Expect(sequence).To(BeEmpty())
+				})
+			})
+		})
+
 		When("the plan requires updating routes", func() {
 			BeforeEach(func() {
 				plan = PushPlan{}
 			})
 
 			It("returns a sequence including updating the routes for the app", func() {
-				Expect(sequence).To(matchers.MatchFuncsByName(actor.UpdateRoutesForApplication))
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.UpdateRoutesForApplicationWithDefaultRoute))
 			})
 		})
 
 		When("the plan specifies random route", func() {
 			BeforeEach(func() {
-				plan = PushPlan{SkipRouteCreation: true}
+				plan = PushPlan{RandomRoute: true}
 			})
 
 			It("returns a sequence including updating the routes for the app", func() {
-				Expect(sequence).To(BeEmpty())
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.UpdateRoutesForApplicationWithRandomRoute))
 			})
 		})
 

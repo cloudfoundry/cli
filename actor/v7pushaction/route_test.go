@@ -2,6 +2,7 @@ package v7pushaction_test
 
 import (
 	"errors"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 
@@ -15,242 +16,176 @@ import (
 
 var _ = Describe("Routes", func() {
 	var (
-		actor       *Actor
-		fakeV7Actor *v7pushactionfakes.FakeV7Actor
+		actor                   *Actor
+		fakeV7Actor             *v7pushactionfakes.FakeV7Actor
+		fakeRandomWordGenerator *v7pushactionfakes.FakeRandomWordGenerator
 	)
 
 	BeforeEach(func() {
 		actor, fakeV7Actor, _ = getTestPushActor()
+
+		fakeRandomWordGenerator = new(v7pushactionfakes.FakeRandomWordGenerator)
+		actor.RandomWordGenerator = fakeRandomWordGenerator
 	})
 
-	Describe("CreateAndMapDefaultApplicationRoute", func() {
+	Describe("CreateAndMapRoute", func() {
 		var (
-			orgGUID     string
-			spaceGUID   string
-			application v7action.Application
-
 			warnings   Warnings
 			executeErr error
+
+			orgGUID   string
+			spaceGUID string
+			app       v7action.Application
+			gt        GenesisTechnique
 		)
 
 		BeforeEach(func() {
-			orgGUID = "some-org-guid"
-			spaceGUID = "some-space-guid"
-			application = v7action.Application{Name: "some-app", GUID: "some-app-guid"}
+			orgGUID = "org-guid"
+			spaceGUID = "space-guid"
+			app = v7action.Application{Name: "app-name", GUID: "app-guid"}
+			fakeV7Actor.GetDefaultDomainReturns(
+				v7action.Domain{GUID: "domain-guid", Name: "domain-name"},
+				v7action.Warnings{"get-default-domain-warning"},
+				nil,
+			)
+			fakeV7Actor.GetRouteByAttributesReturns(
+				v7action.Route{},
+				v7action.Warnings{"get-route-by-attribute-warning"},
+				actionerror.RouteNotFoundError{},
+			)
+			fakeV7Actor.CreateRouteStub = func(spaceGUID, domainName, host, path string) (v7action.Route, v7action.Warnings, error) {
+				return v7action.Route{GUID: "route-guid", SpaceGUID: spaceGUID, DomainGUID: "domain-guid", DomainName: domainName, Host: host, Path: path},
+					v7action.Warnings{"create-route-warning"},
+					nil
+			}
+			fakeV7Actor.MapRouteReturns(
+				v7action.Warnings{"map-route-warning"},
+				nil,
+			)
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateAndMapDefaultApplicationRoute(orgGUID, spaceGUID, application)
+			warnings, executeErr = actor.CreateAndMapRoute(orgGUID, spaceGUID, app, gt)
 		})
 
-		When("getting default domain errors", func() {
-			BeforeEach(func() {
-				fakeV7Actor.GetDefaultDomainReturns(
-					v7action.Domain{},
-					v7action.Warnings{"domain-warning"},
-					errors.New("some-error"))
+		When("the route does **not** exist", func() {
+			It("returns no error and all the warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-default-domain-warning", "get-route-by-attribute-warning", "create-route-warning", "map-route-warning"))
 			})
 
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError("some-error"))
-				Expect(warnings).To(ConsistOf("domain-warning"))
-			})
-		})
-
-		When("getting organization domains succeeds", func() {
-			BeforeEach(func() {
-				fakeV7Actor.GetDefaultDomainReturns(
-					v7action.Domain{
-						GUID: "some-domain-guid",
-						Name: "some-domain",
-					},
-					v7action.Warnings{"domain-warning"},
-					nil,
-				)
+			It("creates a route within the default domain", func() {
+				Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(1))
+				actualSpaceGUID, actualDomainName, actualHost, actualPath := fakeV7Actor.CreateRouteArgsForCall(0)
+				Expect(actualHost).To(Equal(app.Name))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualDomainName).To(Equal("domain-name"))
+				Expect(actualPath).To(Equal(""))
 			})
 
-			When("getting route fails", func() {
+			When("creating the route fails", func() {
 				BeforeEach(func() {
-					fakeV7Actor.GetRouteByAttributesReturns(
-						v7action.Route{},
-						v7action.Warnings{"route-warning"},
-						errors.New("route-error"),
-					)
+					fakeV7Actor.CreateRouteReturns(v7action.Route{}, v7action.Warnings{"create-route-warning"}, errors.New("create-route-error"))
 				})
 
-				It("returns error and warnings", func() {
-					Expect(executeErr).To(MatchError(errors.New("route-error")))
-					Expect(warnings).To(ConsistOf("domain-warning", "route-warning"))
-
-					Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1))
-					orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-
-					Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(0))
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("create-route-error"))
+					Expect(warnings).To(ConsistOf("get-default-domain-warning", "get-route-by-attribute-warning", "create-route-warning"))
 					Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(0))
 				})
 			})
 
-			When("the route already exists", func() {
-				BeforeEach(func() {
-					fakeV7Actor.GetRouteByAttributesReturns(
-						v7action.Route{GUID: "route-guid"},
-						v7action.Warnings{"route-warning"},
-						nil,
-					)
-				})
+			It("maps the created route to the app", func() {
+				Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(1))
+				actualRouteGUID, actualAppGUID := fakeV7Actor.MapRouteArgsForCall(0)
+				Expect(actualRouteGUID).To(Equal("route-guid"))
+				Expect(actualAppGUID).To(Equal(app.GUID))
+			})
+		})
 
-				When("mapping the route succeeds", func() {
-					BeforeEach(func() {
-						fakeV7Actor.MapRouteReturns(
-							v7action.Warnings{"map-route-warning"},
-							nil,
-						)
-					})
-
-					It("returns any warnings", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "map-route-warning"))
-
-						Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1))
-						orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
-						Expect(orgGUID).To(Equal("some-org-guid"))
-
-						Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(0))
-						Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(1))
-						routeGUID, appGUID := fakeV7Actor.MapRouteArgsForCall(0)
-						Expect(routeGUID).To(Equal("route-guid"))
-						Expect(appGUID).To(Equal("some-app-guid"))
-					})
-
-				})
-
-				When("mapping the route fails", func() {
-					BeforeEach(func() {
-						fakeV7Actor.MapRouteReturns(
-							v7action.Warnings{"map-route-warning"},
-							errors.New("map-route-error"),
-						)
-					})
-
-					It("returns error and warnings", func() {
-						Expect(executeErr).To(MatchError(errors.New("map-route-error")))
-						Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "map-route-warning"))
-
-						Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1))
-						orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
-						Expect(orgGUID).To(Equal("some-org-guid"))
-
-						Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(0))
-						Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(1))
-						routeGUID, appGUID := fakeV7Actor.MapRouteArgsForCall(0)
-						Expect(routeGUID).To(Equal("route-guid"))
-						Expect(appGUID).To(Equal("some-app-guid"))
-					})
-				})
+		When("the route exists", func() {
+			BeforeEach(func() {
+				fakeV7Actor.GetRouteByAttributesReturns(v7action.Route{GUID: "route-guid"}, v7action.Warnings{"get-route-by-attribute-warning"}, nil)
 			})
 
-			When("the route doest *not* exist", func() {
-				BeforeEach(func() {
-					fakeV7Actor.GetRouteByAttributesReturns(
-						v7action.Route{GUID: "route-guid"},
-						v7action.Warnings{"route-warning"},
-						actionerror.RouteNotFoundError{},
-					)
-				})
+			It("returns no error and all the warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-default-domain-warning", "get-route-by-attribute-warning", "map-route-warning"))
+			})
 
-				When("creating the route succeeds", func() {
-					BeforeEach(func() {
-						fakeV7Actor.CreateRouteReturns(
-							v7action.Route{GUID: "route-guid"},
-							v7action.Warnings{"create-route-warning"},
-							nil,
-						)
-					})
+			It("does **not** create the route", func() {
+				Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(0))
+			})
 
-					When("mapping the route succeeds", func() {
-						BeforeEach(func() {
-							fakeV7Actor.MapRouteReturns(
-								v7action.Warnings{"map-route-warning"},
-								nil,
-							)
-						})
+			It("maps the route to the app", func() {
+				Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(1))
+				actualRouteGUID, actualAppGUID := fakeV7Actor.MapRouteArgsForCall(0)
+				Expect(actualRouteGUID).To(Equal("route-guid"))
+				Expect(actualAppGUID).To(Equal(app.GUID))
+			})
+		})
 
-						It("returns any warnings", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
-							Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "create-route-warning", "map-route-warning"))
+		When("getting the default domain fails", func() {
+			BeforeEach(func() {
+				fakeV7Actor.GetDefaultDomainReturns(
+					v7action.Domain{},
+					v7action.Warnings{"get-default-domain-warning"},
+					errors.New("get-default-domain-error"),
+				)
+			})
 
-							Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1))
-							orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
-							Expect(orgGUID).To(Equal("some-org-guid"))
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("get-default-domain-error"))
+				Expect(warnings).To(ConsistOf("get-default-domain-warning"))
+				Expect(fakeV7Actor.GetRouteByAttributesCallCount()).To(Equal(0))
+				Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(0))
+				Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(0))
+			})
+		})
 
-							Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(1))
-							spaceGUID, domainName, host, path := fakeV7Actor.CreateRouteArgsForCall(0)
-							Expect(spaceGUID).To(Equal("some-space-guid"))
-							Expect(domainName).To(Equal("some-domain"))
-							Expect(host).To(Equal("some-app"))
-							Expect(path).To(Equal(""))
-							Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(1))
-							routeGUID, appGUID := fakeV7Actor.MapRouteArgsForCall(0)
-							Expect(routeGUID).To(Equal("route-guid"))
-							Expect(appGUID).To(Equal("some-app-guid"))
-						})
+		When("mapping the route fails", func() {
+			BeforeEach(func() {
+				fakeV7Actor.MapRouteReturns(
+					v7action.Warnings{"map-route-warning"},
+					errors.New("map-route-error"),
+				)
+			})
 
-					})
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("map-route-error"))
+				Expect(warnings).To(ConsistOf("get-default-domain-warning", "get-route-by-attribute-warning", "create-route-warning", "map-route-warning"))
+			})
+		})
 
-					When("mapping the route fails", func() {
-						BeforeEach(func() {
-							fakeV7Actor.MapRouteReturns(
-								v7action.Warnings{"map-route-warning"},
-								errors.New("map-route-error"),
-							)
-						})
+		When("random is true", func() {
+			BeforeEach(func() {
+				gt = RandomRoute
+				fakeRandomWordGenerator.RandomAdjectiveReturns("awesome")
+				fakeRandomWordGenerator.RandomNounReturns("sauce")
+			})
 
-						It("returns error and warnings", func() {
-							Expect(executeErr).To(MatchError(errors.New("map-route-error")))
-							Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "create-route-warning", "map-route-warning"))
+			It("creates and maps a route with a random host", func() {
+				Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(1))
+				actualSpaceGUID, actualDomainName, actualHost, actualPath := fakeV7Actor.CreateRouteArgsForCall(0)
+				Expect(actualHost).To(Equal(strings.Join([]string{app.Name, "awesome", "sauce"}, "-")))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualDomainName).To(Equal("domain-name"))
+				Expect(actualPath).To(Equal(""))
+			})
+		})
 
-							Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1))
-							orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
-							Expect(orgGUID).To(Equal("some-org-guid"))
+		When("random is false", func() {
+			BeforeEach(func() {
+				gt = DefaultRoute
+			})
 
-							Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(1))
-							spaceGUID, domainName, host, path := fakeV7Actor.CreateRouteArgsForCall(0)
-							Expect(spaceGUID).To(Equal("some-space-guid"))
-							Expect(domainName).To(Equal("some-domain"))
-							Expect(host).To(Equal("some-app"))
-							Expect(path).To(Equal(""))
-							Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(1))
-						})
-					})
-				})
-
-				When("creating the route fails", func() {
-					BeforeEach(func() {
-						fakeV7Actor.CreateRouteReturns(
-							v7action.Route{},
-							v7action.Warnings{"create-route-warning"},
-							errors.New("create-route-error"),
-						)
-					})
-
-					It("returns any warnings", func() {
-						Expect(executeErr).To(MatchError(errors.New("create-route-error")))
-						Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "create-route-warning"))
-
-						Expect(fakeV7Actor.GetDefaultDomainCallCount()).To(Equal(1))
-						orgGUID := fakeV7Actor.GetDefaultDomainArgsForCall(0)
-						Expect(orgGUID).To(Equal("some-org-guid"))
-
-						Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(1))
-						spaceGUID, domainName, host, path := fakeV7Actor.CreateRouteArgsForCall(0)
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-						Expect(domainName).To(Equal("some-domain"))
-						Expect(host).To(Equal("some-app"))
-						Expect(path).To(Equal(""))
-						Expect(fakeV7Actor.MapRouteCallCount()).To(Equal(0))
-					})
-				})
+			It("creates and maps a route with the app name as the host", func() {
+				Expect(fakeV7Actor.CreateRouteCallCount()).To(Equal(1))
+				actualSpaceGUID, actualDomainName, actualHost, actualPath := fakeV7Actor.CreateRouteArgsForCall(0)
+				Expect(actualHost).To(Equal(app.Name))
+				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualDomainName).To(Equal("domain-name"))
+				Expect(actualPath).To(Equal(""))
 			})
 		})
 	})

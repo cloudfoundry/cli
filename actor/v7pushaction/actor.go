@@ -4,6 +4,8 @@ package v7pushaction
 
 import (
 	"regexp"
+
+	"code.cloudfoundry.org/cli/util/randomword"
 )
 
 // Warnings is a list of warnings returned back from the cloud controller
@@ -16,6 +18,7 @@ type Actor struct {
 
 	PreparePushPlanSequence   []UpdatePushPlanFunc
 	ChangeApplicationSequence func(plan PushPlan) []ChangeApplicationFunc
+	RandomWordGenerator       RandomWordGenerator
 
 	startWithProtocol *regexp.Regexp
 	urlValidator      *regexp.Regexp
@@ -30,8 +33,9 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 		SharedActor: sharedActor,
 		V7Actor:     v3Actor,
 
-		startWithProtocol: regexp.MustCompile(ProtocolRegexp),
-		urlValidator:      regexp.MustCompile(URLRegexp),
+		RandomWordGenerator: new(randomword.Generator),
+		startWithProtocol:   regexp.MustCompile(ProtocolRegexp),
+		urlValidator:        regexp.MustCompile(URLRegexp),
 	}
 
 	actor.PreparePushPlanSequence = []UpdatePushPlanFunc{

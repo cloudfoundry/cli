@@ -62,4 +62,14 @@ var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 			Expect(expectedPushPlan.SkipRouteCreation).To(BeTrue())
 		})
 	})
+
+	When("flag overrides specify a random route", func() {
+		BeforeEach(func() {
+			overrides.RandomRoute = true
+		})
+		It("sets RandomRoute on the push plan", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(expectedPushPlan.RandomRoute).To(BeTrue())
+		})
+	})
 })

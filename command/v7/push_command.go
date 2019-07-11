@@ -86,6 +86,7 @@ type PushCommand struct {
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
 	NoWait                  bool                                `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
 	AppPath                 flag.PathWithExistenceCheck         `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	RandomRoute             bool                                `long:"random-route" description:"Create a random route for this app"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                        `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	Strategy                flag.DeploymentStrategy             `long:"strategy" description:"Deployment strategy, either rolling or null."`
@@ -559,6 +560,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		NoWait:          cmd.NoWait,
 		ProvidedAppPath: string(cmd.AppPath),
 		NoRoute:         cmd.NoRoute,
+		RandomRoute:     cmd.RandomRoute,
 		StartCommand:    cmd.StartCommand.FilteredString,
 		Strategy:        cmd.Strategy.Name,
 	}, nil
@@ -677,6 +679,13 @@ func (cmd PushCommand) ValidateFlags() error {
 			Args: []string{
 				"--no-start",
 				"--no-wait",
+			},
+		}
+	case cmd.NoRoute && cmd.RandomRoute:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-route",
+				"--random-route",
 			},
 		}
 	}

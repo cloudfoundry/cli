@@ -45,7 +45,7 @@ var _ = Describe("UpdateWebProcessForApplication", func() {
 
 	JustBeforeEach(func() {
 		events = EventFollower(func(eventStream chan<- Event) {
-			_, warnings, executeErr = actor.UpdateRoutesForApplication(paramPlan, eventStream, nil)
+			_, warnings, executeErr = actor.UpdateRoutesForApplicationWithDefaultRoute(paramPlan, eventStream, nil)
 		})
 	})
 

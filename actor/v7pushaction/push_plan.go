@@ -14,6 +14,7 @@ type PushPlan struct {
 	OrgGUID   string
 
 	Application            v7action.Application
+	ApplicationRoutes      []v7action.Route
 	ApplicationNeedsUpdate bool
 
 	NoStart           bool
@@ -60,6 +61,7 @@ type FlagOverrides struct {
 	NoWait              bool
 	ProvidedAppPath     string
 	NoRoute             bool
+	RandomRoute         bool
 	StartCommand        types.FilteredString
 	Strategy            constant.DeploymentStrategy
 }

@@ -897,6 +897,7 @@ var _ = Describe("push Command", func() {
 			cmd.DropletPath = flag.PathWithExistenceCheck("some-droplet.tgz")
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
+			cmd.RandomRoute = false
 			cmd.NoStart = true
 			cmd.NoWait = true
 			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
@@ -922,6 +923,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.NoRoute).To(BeTrue())
 			Expect(overrides.NoStart).To(BeTrue())
 			Expect(overrides.NoWait).To(BeTrue())
+			Expect(overrides.RandomRoute).To(BeFalse())
 			Expect(overrides.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 			Expect(overrides.Instances).To(Equal(types.NullInt{Value: 10, IsSet: true}))
 		})
@@ -1206,6 +1208,16 @@ var _ = Describe("push Command", func() {
 			translatableerror.ArgumentCombinationError{
 				Args: []string{
 					"--no-start", "--no-wait",
+				},
+			}),
+		Entry("when no-route and random-route flags are passed",
+			func() {
+				cmd.NoRoute = true
+				cmd.RandomRoute = true
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-route", "--random-route",
 				},
 			}),
 	)

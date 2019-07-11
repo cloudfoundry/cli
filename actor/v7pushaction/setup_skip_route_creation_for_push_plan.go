@@ -7,6 +7,7 @@ import (
 func SetupSkipRouteCreationForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
 	pushPlan.SkipRouteCreation = manifestApp.NoRoute || overrides.NoRoute || manifestApp.RandomRoute
 	pushPlan.NoRouteFlag = overrides.NoRoute
+	pushPlan.RandomRoute = overrides.RandomRoute
 
 	return pushPlan, nil
 }

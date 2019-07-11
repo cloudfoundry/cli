@@ -6,8 +6,12 @@ func ShouldUpdateApplication(plan PushPlan) bool {
 	return plan.ApplicationNeedsUpdate
 }
 
-func ShouldUpdateRoutes(plan PushPlan) bool {
-	return !plan.SkipRouteCreation
+func ShouldCreateAndMapRandomRoute(plan PushPlan) bool {
+	return !plan.SkipRouteCreation && plan.RandomRoute && len(plan.ApplicationRoutes) == 0
+}
+
+func ShouldCreateAndMapDefaultRoute(plan PushPlan) bool {
+	return !plan.SkipRouteCreation && !plan.RandomRoute && len(plan.ApplicationRoutes) == 0
 }
 
 func ShouldScaleWebProcess(plan PushPlan) bool {
@@ -57,10 +61,13 @@ func (actor Actor) GetUpdateSequence(plan PushPlan) []ChangeApplicationFunc {
 		updateSequence = append(updateSequence, actor.UpdateApplication)
 	}
 
-	if ShouldUpdateRoutes(plan) {
-		updateSequence = append(updateSequence, actor.UpdateRoutesForApplication)
+	if ShouldCreateAndMapDefaultRoute(plan) {
+		updateSequence = append(updateSequence, actor.UpdateRoutesForApplicationWithDefaultRoute)
 	}
 
+	if ShouldCreateAndMapRandomRoute(plan) {
+		updateSequence = append(updateSequence, actor.UpdateRoutesForApplicationWithRandomRoute)
+	}
 	if ShouldScaleWebProcess(plan) {
 		updateSequence = append(updateSequence, actor.ScaleWebProcessForApplication)
 	}

@@ -34,6 +34,7 @@ func getTestPushActor() (*Actor, *v7pushactionfakes.FakeV7Actor, *v7pushactionfa
 	fakeV7Actor := new(v7pushactionfakes.FakeV7Actor)
 	fakeSharedActor := new(v7pushactionfakes.FakeSharedActor)
 	actor := NewActor(fakeV7Actor, fakeSharedActor)
+	actor.RandomWordGenerator = new(v7pushactionfakes.FakeRandomWordGenerator)
 	return actor, fakeV7Actor, fakeSharedActor
 }
 

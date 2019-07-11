@@ -24,6 +24,15 @@ func (actor Actor) UpdateApplicationSettings(pushPlans []PushPlan) ([]PushPlan, 
 		pushPlan.Application.GUID = app.GUID
 		pushPlan.Application.State = app.State
 
+		routes, getWarnings, err := actor.V7Actor.GetApplicationRoutes(app.GUID)
+		warnings = append(warnings, Warnings(getWarnings)...)
+		if err != nil {
+			log.Errorln("Retrieving routes:", err)
+			return nil, warnings, err
+		}
+
+		pushPlan.ApplicationRoutes = routes
+
 		updatedPushPlans = append(updatedPushPlans, pushPlan)
 	}
 

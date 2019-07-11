@@ -19,6 +19,7 @@ type V7Actor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
 	GetApplicationDroplets(appName string, spaceGUID string) ([]v7action.Droplet, v7action.Warnings, error)
+	GetApplicationRoutes(appGUID string) ([]v7action.Route, v7action.Warnings, error)
 	GetDefaultDomain(orgGUID string) (v7action.Domain, v7action.Warnings, error)
 	GetDomain(domainGUID string) (v7action.Domain, v7action.Warnings, error)
 	GetRouteByAttributes(domainName, domainGUID, hostname, path string) (v7action.Route, v7action.Warnings, error)
