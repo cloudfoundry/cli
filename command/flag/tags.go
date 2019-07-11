@@ -1,10 +1,11 @@
 package flag
 
-import (
-	"strings"
-)
+import "strings"
 
-type Tags []string
+type Tags struct {
+	IsSet bool
+	Value []string
+}
 
 func (t *Tags) UnmarshalFlag(value string) error {
 	resultTags := []string{}
@@ -17,6 +18,7 @@ func (t *Tags) UnmarshalFlag(value string) error {
 		}
 	}
 
-	*t = Tags(resultTags)
+	t.IsSet = true
+	t.Value = resultTags
 	return nil
 }

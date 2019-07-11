@@ -13,39 +13,54 @@ var _ = Describe("Tags", func() {
 		tags = Tags{}
 	})
 
+	Describe("default value", func() {
+		It("is unset by default", func() {
+			Expect(tags.IsSet).To(BeFalse())
+		})
+
+		It("has an empty value", func() {
+			Expect(tags.Value).To(BeEmpty())
+		})
+	})
+
 	Describe("UnmarshalFlag", func() {
 		When("the empty string is provided", func() {
 			It("should return empty list", func() {
 				Expect(tags.UnmarshalFlag("")).To(Succeed())
-				Expect(tags).To(ConsistOf([]string{}))
+				Expect(tags.IsSet).To(BeTrue())
+				Expect(tags.Value).To(ConsistOf([]string{}))
 			})
 		})
 
 		When("single tag is provided", func() {
 			It("should return the string", func() {
 				Expect(tags.UnmarshalFlag("tag")).To(Succeed())
-				Expect(tags).To(ConsistOf([]string{"tag"}))
+				Expect(tags.IsSet).To(BeTrue())
+				Expect(tags.Value).To(ConsistOf([]string{"tag"}))
 			})
 		})
 
 		When("multiple comma separated tags are provided", func() {
 			It("should return the string", func() {
 				Expect(tags.UnmarshalFlag("tag1,tag2")).To(Succeed())
-				Expect(tags).To(ConsistOf([]string{"tag1", "tag2"}))
+				Expect(tags.IsSet).To(BeTrue())
+				Expect(tags.Value).To(ConsistOf([]string{"tag1", "tag2"}))
 			})
 		})
 
 		When("multiple tags with spaces are provided", func() {
 			It("should return the trimmed tags", func() {
 				Expect(tags.UnmarshalFlag(" tag1,  tag2")).To(Succeed())
-				Expect(tags).To(ConsistOf([]string{"tag1", "tag2"}))
+				Expect(tags.IsSet).To(BeTrue())
+				Expect(tags.Value).To(ConsistOf([]string{"tag1", "tag2"}))
 			})
 		})
 
 		When("multiple tags with excessive commas are provided", func() {
 			It("should return just the tags", func() {
 				Expect(tags.UnmarshalFlag(",tag1,tag2,")).To(Succeed())
-				Expect(tags).To(ConsistOf([]string{"tag1", "tag2"}))
+				Expect(tags.IsSet).To(BeTrue())
+				Expect(tags.Value).To(ConsistOf([]string{"tag1", "tag2"}))
 			})
 		})
 	})

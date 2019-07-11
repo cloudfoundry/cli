@@ -1401,6 +1401,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	UpdateUserProvidedServiceInstanceStub        func(string, ccv2.UserProvidedServiceInstance) (ccv2.Warnings, error)
+	updateUserProvidedServiceInstanceMutex       sync.RWMutex
+	updateUserProvidedServiceInstanceArgsForCall []struct {
+		arg1 string
+		arg2 ccv2.UserProvidedServiceInstance
+	}
+	updateUserProvidedServiceInstanceReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	updateUserProvidedServiceInstanceReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	UploadApplicationPackageStub        func(string, []ccv2.Resource, ccv2.Reader, int64) (ccv2.Job, ccv2.Warnings, error)
 	uploadApplicationPackageMutex       sync.RWMutex
 	uploadApplicationPackageArgsForCall []struct {
@@ -7609,6 +7623,70 @@ func (fake *FakeCloudControllerClient) UpdateSpaceManagerByUsernameReturnsOnCall
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateUserProvidedServiceInstance(arg1 string, arg2 ccv2.UserProvidedServiceInstance) (ccv2.Warnings, error) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.updateUserProvidedServiceInstanceReturnsOnCall[len(fake.updateUserProvidedServiceInstanceArgsForCall)]
+	fake.updateUserProvidedServiceInstanceArgsForCall = append(fake.updateUserProvidedServiceInstanceArgsForCall, struct {
+		arg1 string
+		arg2 ccv2.UserProvidedServiceInstance
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateUserProvidedServiceInstance", []interface{}{arg1, arg2})
+	fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	if fake.UpdateUserProvidedServiceInstanceStub != nil {
+		return fake.UpdateUserProvidedServiceInstanceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateUserProvidedServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateUserProvidedServiceInstanceCallCount() int {
+	fake.updateUserProvidedServiceInstanceMutex.RLock()
+	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
+	return len(fake.updateUserProvidedServiceInstanceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateUserProvidedServiceInstanceCalls(stub func(string, ccv2.UserProvidedServiceInstance) (ccv2.Warnings, error)) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	defer fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	fake.UpdateUserProvidedServiceInstanceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateUserProvidedServiceInstanceArgsForCall(i int) (string, ccv2.UserProvidedServiceInstance) {
+	fake.updateUserProvidedServiceInstanceMutex.RLock()
+	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
+	argsForCall := fake.updateUserProvidedServiceInstanceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateUserProvidedServiceInstanceReturns(result1 ccv2.Warnings, result2 error) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	defer fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	fake.UpdateUserProvidedServiceInstanceStub = nil
+	fake.updateUserProvidedServiceInstanceReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateUserProvidedServiceInstanceReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.updateUserProvidedServiceInstanceMutex.Lock()
+	defer fake.updateUserProvidedServiceInstanceMutex.Unlock()
+	fake.UpdateUserProvidedServiceInstanceStub = nil
+	if fake.updateUserProvidedServiceInstanceReturnsOnCall == nil {
+		fake.updateUserProvidedServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.updateUserProvidedServiceInstanceReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UploadApplicationPackage(arg1 string, arg2 []ccv2.Resource, arg3 ccv2.Reader, arg4 int64) (ccv2.Job, ccv2.Warnings, error) {
 	var arg2Copy []ccv2.Resource
 	if arg2 != nil {
@@ -8010,6 +8088,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSpaceManagerMutex.RUnlock()
 	fake.updateSpaceManagerByUsernameMutex.RLock()
 	defer fake.updateSpaceManagerByUsernameMutex.RUnlock()
+	fake.updateUserProvidedServiceInstanceMutex.RLock()
+	defer fake.updateUserProvidedServiceInstanceMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()
