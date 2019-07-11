@@ -14,23 +14,23 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("delete-label command", func() {
+var _ = Describe("unset-label command", func() {
 	When("--help flag is set", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
 			Eventually(session).Should(Exit(0))
-			Expect(session).To(HaveCommandInCategoryWithDescription("delete-label", "METADATA", "Delete a label (key-value pairs) for an API resource"))
+			Expect(session).To(HaveCommandInCategoryWithDescription("unset-label", "METADATA", "Unset a label (key-value pairs) for an API resource"))
 		})
 
 		It("Displays command usage to output", func() {
-			session := helpers.CF("delete-label", "--help")
+			session := helpers.CF("unset-label", "--help")
 
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say(`\s+delete-label - Delete a label \(key-value pairs\) for an API resource`))
+			Eventually(session).Should(Say(`\s+unset-label - Unset a label \(key-value pairs\) for an API resource`))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`\s+cf delete-label RESOURCE RESOURCE_NAME KEY`))
+			Eventually(session).Should(Say(`\s+cf unset-label RESOURCE RESOURCE_NAME KEY`))
 			Eventually(session).Should(Say("EXAMPLES:"))
-			Eventually(session).Should(Say(`\s+cf delete-label app dora ci_signature_sha2`))
+			Eventually(session).Should(Say(`\s+cf unset-label app dora ci_signature_sha2`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say("SEE ALSO:"))
@@ -60,7 +60,7 @@ var _ = Describe("delete-label command", func() {
 			helpers.CreateOrg(orgName)
 		})
 
-		When("deleting labels from an app", func() {
+		When("unsetting labels from an app", func() {
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				appName = helpers.PrefixedRandomName("app")
@@ -74,9 +74,9 @@ var _ = Describe("delete-label command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			It("deletes the specified labels on the app", func() {
-				session := helpers.CF("delete-label", "app", appName, "some-other-key", "some-third-key")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
+			It("unsets the specified labels on the app", func() {
+				session := helpers.CF("unset-label", "app", appName, "some-other-key", "some-third-key")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("\n\nOK"))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -93,15 +93,15 @@ var _ = Describe("delete-label command", func() {
 			})
 		})
 
-		When("Deleting labels from an org", func() {
+		When("unsetting labels from an org", func() {
 			BeforeEach(func() {
 				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
 				Eventually(session).Should(Exit(0))
 			})
 
-			It("deletes the specified labels on the org", func() {
-				session := helpers.CF("delete-label", "org", orgName, "public-facing")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting label(s) for org %s as %s...`), orgName, username))
+			It("unsets the specified labels on the org", func() {
+				session := helpers.CF("unset-label", "org", orgName, "public-facing")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for org %s as %s...`), orgName, username))
 				Consistently(session).ShouldNot(Say("\n\nOK"))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -118,7 +118,7 @@ var _ = Describe("delete-label command", func() {
 			})
 		})
 
-		When("Deleting labels from a space", func() {
+		When("unsetting labels from a space", func() {
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
@@ -126,9 +126,9 @@ var _ = Describe("delete-label command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			It("deletes the specified labels on the space", func() {
-				session := helpers.CF("delete-label", "space", spaceName, "public-facing")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
+			It("unsets the specified labels on the space", func() {
+				session := helpers.CF("unset-label", "space", spaceName, "public-facing")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
 				Consistently(session).ShouldNot(Say("\n\nOK"))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))

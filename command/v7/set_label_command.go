@@ -22,7 +22,7 @@ type SetLabelActor interface {
 
 type SetLabelCommand struct {
 	RequiredArgs flag.SetLabelArgs `positional-args:"yes"`
-	usage        interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label space business_space public-facing=false owner=jane_doe\n\nRESOURCES:\n   app\n   org\n   space\n\nSEE ALSO:\n   delete-label, labels"`
+	usage        interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label space business_space public-facing=false owner=jane_doe\n\nRESOURCES:\n   app\n   org\n   space\n\nSEE ALSO:\n   unset-label, labels"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor

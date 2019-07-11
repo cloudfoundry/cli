@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-type FakeDeleteLabelActor struct {
+type FakeUnsetLabelActor struct {
 	UpdateApplicationLabelsByApplicationNameStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	updateApplicationLabelsByApplicationNameMutex       sync.RWMutex
 	updateApplicationLabelsByApplicationNameArgsForCall []struct {
@@ -58,7 +58,7 @@ type FakeDeleteLabelActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
+func (fake *FakeUnsetLabelActor) UpdateApplicationLabelsByApplicationName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	ret, specificReturn := fake.updateApplicationLabelsByApplicationNameReturnsOnCall[len(fake.updateApplicationLabelsByApplicationNameArgsForCall)]
 	fake.updateApplicationLabelsByApplicationNameArgsForCall = append(fake.updateApplicationLabelsByApplicationNameArgsForCall, struct {
@@ -78,26 +78,26 @@ func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationName(arg1 
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameCallCount() int {
+func (fake *FakeUnsetLabelActor) UpdateApplicationLabelsByApplicationNameCallCount() int {
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	return len(fake.updateApplicationLabelsByApplicationNameArgsForCall)
 }
 
-func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+func (fake *FakeUnsetLabelActor) UpdateApplicationLabelsByApplicationNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
 	fake.UpdateApplicationLabelsByApplicationNameStub = stub
 }
 
-func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameArgsForCall(i int) (string, string, map[string]types.NullString) {
+func (fake *FakeUnsetLabelActor) UpdateApplicationLabelsByApplicationNameArgsForCall(i int) (string, string, map[string]types.NullString) {
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	argsForCall := fake.updateApplicationLabelsByApplicationNameArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeUnsetLabelActor) UpdateApplicationLabelsByApplicationNameReturns(result1 v7action.Warnings, result2 error) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
 	fake.UpdateApplicationLabelsByApplicationNameStub = nil
@@ -107,7 +107,7 @@ func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameReturn
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeUnsetLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
 	fake.UpdateApplicationLabelsByApplicationNameStub = nil
@@ -123,7 +123,7 @@ func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameReturn
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
+func (fake *FakeUnsetLabelActor) UpdateOrganizationLabelsByOrganizationName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationLabelsByOrganizationNameReturnsOnCall[len(fake.updateOrganizationLabelsByOrganizationNameArgsForCall)]
 	fake.updateOrganizationLabelsByOrganizationNameArgsForCall = append(fake.updateOrganizationLabelsByOrganizationNameArgsForCall, struct {
@@ -142,26 +142,26 @@ func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationName(arg
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameCallCount() int {
+func (fake *FakeUnsetLabelActor) UpdateOrganizationLabelsByOrganizationNameCallCount() int {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
 	return len(fake.updateOrganizationLabelsByOrganizationNameArgsForCall)
 }
 
-func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameCalls(stub func(string, map[string]types.NullString) (v7action.Warnings, error)) {
+func (fake *FakeUnsetLabelActor) UpdateOrganizationLabelsByOrganizationNameCalls(stub func(string, map[string]types.NullString) (v7action.Warnings, error)) {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
 	fake.UpdateOrganizationLabelsByOrganizationNameStub = stub
 }
 
-func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameArgsForCall(i int) (string, map[string]types.NullString) {
+func (fake *FakeUnsetLabelActor) UpdateOrganizationLabelsByOrganizationNameArgsForCall(i int) (string, map[string]types.NullString) {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
 	argsForCall := fake.updateOrganizationLabelsByOrganizationNameArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeUnsetLabelActor) UpdateOrganizationLabelsByOrganizationNameReturns(result1 v7action.Warnings, result2 error) {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
 	fake.UpdateOrganizationLabelsByOrganizationNameStub = nil
@@ -171,7 +171,7 @@ func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameRetu
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeUnsetLabelActor) UpdateOrganizationLabelsByOrganizationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
 	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
 	fake.UpdateOrganizationLabelsByOrganizationNameStub = nil
@@ -187,7 +187,7 @@ func (fake *FakeDeleteLabelActor) UpdateOrganizationLabelsByOrganizationNameRetu
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
+func (fake *FakeUnsetLabelActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
 	ret, specificReturn := fake.updateSpaceLabelsBySpaceNameReturnsOnCall[len(fake.updateSpaceLabelsBySpaceNameArgsForCall)]
 	fake.updateSpaceLabelsBySpaceNameArgsForCall = append(fake.updateSpaceLabelsBySpaceNameArgsForCall, struct {
@@ -207,26 +207,26 @@ func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameCallCount() int {
+func (fake *FakeUnsetLabelActor) UpdateSpaceLabelsBySpaceNameCallCount() int {
 	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
 	return len(fake.updateSpaceLabelsBySpaceNameArgsForCall)
 }
 
-func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+func (fake *FakeUnsetLabelActor) UpdateSpaceLabelsBySpaceNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
 	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
 	fake.UpdateSpaceLabelsBySpaceNameStub = stub
 }
 
-func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameArgsForCall(i int) (string, string, map[string]types.NullString) {
+func (fake *FakeUnsetLabelActor) UpdateSpaceLabelsBySpaceNameArgsForCall(i int) (string, string, map[string]types.NullString) {
 	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
 	argsForCall := fake.updateSpaceLabelsBySpaceNameArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeUnsetLabelActor) UpdateSpaceLabelsBySpaceNameReturns(result1 v7action.Warnings, result2 error) {
 	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
 	fake.UpdateSpaceLabelsBySpaceNameStub = nil
@@ -236,7 +236,7 @@ func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameReturns(result1 v7
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeUnsetLabelActor) UpdateSpaceLabelsBySpaceNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
 	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.Unlock()
 	fake.UpdateSpaceLabelsBySpaceNameStub = nil
@@ -252,7 +252,7 @@ func (fake *FakeDeleteLabelActor) UpdateSpaceLabelsBySpaceNameReturnsOnCall(i in
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteLabelActor) Invocations() map[string][][]interface{} {
+func (fake *FakeUnsetLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
@@ -268,7 +268,7 @@ func (fake *FakeDeleteLabelActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeDeleteLabelActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeUnsetLabelActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -280,4 +280,4 @@ func (fake *FakeDeleteLabelActor) recordInvocation(key string, args []interface{
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v7.DeleteLabelActor = new(FakeDeleteLabelActor)
+var _ v7.UnsetLabelActor = new(FakeUnsetLabelActor)

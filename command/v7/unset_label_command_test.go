@@ -18,29 +18,29 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("delete-label command", func() {
+var _ = Describe("unset-label command", func() {
 	var (
-		cmd             DeleteLabelCommand
+		cmd             UnsetLabelCommand
 		fakeConfig      *commandfakes.FakeConfig
 		testUI          *ui.UI
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDeleteLabelActor
+		fakeActor       *v7fakes.FakeUnsetLabelActor
 		executeErr      error
 	)
 
-	When("deleting labels on apps", func() {
+	When("unsetting labels on apps", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
-			fakeActor = new(v7fakes.FakeDeleteLabelActor)
-			cmd = DeleteLabelCommand{
+			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			cmd = UnsetLabelCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			}
-			cmd.RequiredArgs = flag.DeleteLabelArgs{
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "app",
 			}
 		})
@@ -86,8 +86,8 @@ var _ = Describe("delete-label command", func() {
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
-				It("informs the user that labels are being deleted", func() {
-					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Deleting label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
+				It("informs the user that labels are being removed", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
 				})
 
 				When("updating the app labels succeeds", func() {
@@ -147,19 +147,19 @@ var _ = Describe("delete-label command", func() {
 		})
 	})
 
-	When("deleting labels on orgs", func() {
+	When("Unsetting labels on orgs", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
-			fakeActor = new(v7fakes.FakeDeleteLabelActor)
-			cmd = DeleteLabelCommand{
+			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			cmd = UnsetLabelCommand{
 				Actor:       fakeActor,
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 			}
-			cmd.RequiredArgs = flag.DeleteLabelArgs{
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "org",
 			}
 		})
@@ -183,8 +183,8 @@ var _ = Describe("delete-label command", func() {
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
-				It("informs the user that labels are being deleted", func() {
-					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Deleting label(s) for org %s as some-user...`), orgName))
+				It("informs the user that labels are being removed", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for org %s as some-user...`), orgName))
 				})
 
 				When("updating the org labels succeeds", func() {
@@ -229,19 +229,19 @@ var _ = Describe("delete-label command", func() {
 		})
 	})
 
-	When("deleting labels on spaces", func() {
+	When("Unsetting labels on spaces", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
-			fakeActor = new(v7fakes.FakeDeleteLabelActor)
-			cmd = DeleteLabelCommand{
+			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			cmd = UnsetLabelCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			}
-			cmd.RequiredArgs = flag.DeleteLabelArgs{
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "space",
 			}
 		})
@@ -286,8 +286,8 @@ var _ = Describe("delete-label command", func() {
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
-				It("informs the user that labels are being deleted", func() {
-					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Deleting label(s) for space %s in org fake-org as some-user...`), spaceName))
+				It("informs the user that labels are being removed", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for space %s in org fake-org as some-user...`), spaceName))
 				})
 
 				When("updating the space labels succeeds", func() {
