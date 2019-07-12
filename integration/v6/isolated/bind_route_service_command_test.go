@@ -1,8 +1,9 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"regexp"
+
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -12,6 +13,10 @@ import (
 )
 
 var _ = Describe("bind-route-service command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	Describe("help", func() {
 		It("includes a description of the options", func() {
 			session := helpers.CF("help", "bind-route-service")
