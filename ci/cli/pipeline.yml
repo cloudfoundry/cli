@@ -244,6 +244,7 @@ groups:
   - units
   - build-binaries
   - integration-linux
+  - integration-linux-client-creds
   - integration-windows
   - integration-legacy
   - cats
@@ -381,6 +382,45 @@ jobs:
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
         CF_INT_IGNORE_API_VERSION_CHECK: false
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: integration-linux-client-creds
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: vars-store
+    - put: bosh-lock
+      resource: gcp-bosh-pool
+      timeout: 2h
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: |
+            Linux client-creds integration failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      params:
+        <<: *integration_params
+        CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
   ensure:
     put: gcp-bosh-pool
     params:
