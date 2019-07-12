@@ -9,10 +9,6 @@ import (
 )
 
 var _ = Describe("feature-flags command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
