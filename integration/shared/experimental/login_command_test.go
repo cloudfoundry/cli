@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -840,6 +842,68 @@ var _ = Describe("login command", func() {
 					Eventually(session.Err).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 					Eventually(session).Should(Exit(1))
 				})
+			})
+		})
+	})
+
+	Describe("Authenticating as a user, through a custom client", func() {
+		var (
+			accessTokenExpiration time.Duration
+			username              string
+			password              string
+			customClientID        string
+			customClientSecret    string
+		)
+
+		BeforeEach(func() {
+			customClientID, customClientSecret = helpers.SkipIfCustomClientCredentialsNotSet()
+
+			helpers.LoginCF()
+			username, password = helpers.CreateUser()
+
+			helpers.SetConfig(func(config *configv3.Config) {
+				config.ConfigFile.UAAOAuthClient = customClientID
+				config.ConfigFile.UAAOAuthClientSecret = customClientSecret
+				config.ConfigFile.UAAGrantType = ""
+			})
+
+			session := helpers.CF("login", "-u", username, "-p", password)
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("gets a token whose settings match those of the custom client", func() {
+			accessTokenExpiration = 120 // this was configured in the pipeline
+
+			config := helpers.GetConfig()
+
+			jwt := helpers.ParseTokenString(config.ConfigFile.AccessToken)
+			expires, expIsSet := jwt.Claims().Expiration()
+			Expect(expIsSet).To(BeTrue())
+
+			iat, iatIsSet := jwt.Claims().IssuedAt()
+
+			Expect(iatIsSet).To(BeTrue())
+			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
+		})
+
+		It("warns the user that this configuration is deprecated", func() {
+			deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
+
+			session := helpers.CF("login", "-u", username, "-p", password)
+			Eventually(session.Err).Should(Say(deprecationMessage))
+			Eventually(session).Should(Exit(0))
+		})
+
+		When("the token has expired", func() {
+			BeforeEach(func() {
+				helpers.SetConfig(func(config *configv3.Config) {
+					config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
+				})
+			})
+
+			It("re-authenticates using the custom client", func() {
+				session := helpers.CF("orgs")
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

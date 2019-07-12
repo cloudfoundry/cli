@@ -892,7 +892,6 @@ var _ = Describe("login command", func() {
 		)
 
 		BeforeEach(func() {
-			helpers.TurnOnExperimentalLogin()
 			customClientID, customClientSecret = helpers.SkipIfCustomClientCredentialsNotSet()
 
 			helpers.LoginCF()
@@ -908,10 +907,6 @@ var _ = Describe("login command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		AfterEach(func() {
-			helpers.TurnOffExperimentalLogin()
-		})
-
 		It("gets a token whose settings match those of the custom client", func() {
 			accessTokenExpiration = 120 // this was configured in the pipeline
 
@@ -925,14 +920,6 @@ var _ = Describe("login command", func() {
 
 			Expect(iatIsSet).To(BeTrue())
 			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
-		})
-
-		It("warns the user that this configuration is deprecated", func() {
-			deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
-
-			session := helpers.CF("login", "-u", username, "-p", password)
-			Eventually(session.Err).Should(Say(deprecationMessage))
-			Eventually(session).Should(Exit(0))
 		})
 
 		When("the token has expired", func() {
