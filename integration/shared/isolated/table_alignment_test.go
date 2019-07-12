@@ -10,7 +10,6 @@ import (
 
 var _ = Describe("table alignment", func() {
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 	})
 

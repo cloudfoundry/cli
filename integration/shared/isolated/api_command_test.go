@@ -19,11 +19,6 @@ import (
 )
 
 var _ = Describe("api command", func() {
-
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Context("no arguments", func() {
 		When("the api is set", func() {
 			When("the user is not logged in", func() {

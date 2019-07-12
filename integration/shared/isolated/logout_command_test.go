@@ -10,11 +10,6 @@ import (
 )
 
 var _ = Describe("logout command", func() {
-
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Context("help", func() {
 		It("displays help", func() {
 			session := helpers.CF("logout", "--help")

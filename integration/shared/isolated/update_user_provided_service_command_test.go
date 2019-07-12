@@ -13,6 +13,7 @@ import (
 
 var _ = Describe("update-user-provided-service command", func() {
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionTagsOnUserProvidedServices)
 	})
 

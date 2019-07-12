@@ -12,7 +12,6 @@ var _ = Describe("proxy", func() {
 	var proxyURL string
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		proxyURL = "127.0.0.1:9999"
 	})
 

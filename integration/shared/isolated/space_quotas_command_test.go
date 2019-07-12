@@ -20,7 +20,6 @@ var _ = Describe("space-quotas command", func() {
 		reservedRoutePorts string
 	)
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 		helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		quotaName = helpers.QuotaName()

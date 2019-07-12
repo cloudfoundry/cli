@@ -11,10 +11,6 @@ import (
 )
 
 var _ = Describe("config command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	DescribeTable("allows setting locale to",
 		func(locale string) {
 			session := helpers.CF("config", "--locale", locale)

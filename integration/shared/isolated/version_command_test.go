@@ -14,10 +14,6 @@ import (
 )
 
 var _ = Describe("version command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	DescribeTable("displays version",
 		func(arg string) {
 			session := helpers.CF(arg)

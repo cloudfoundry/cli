@@ -10,7 +10,6 @@ import (
 
 var _ = Describe("create-space-quota command", func() {
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 		helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 	})

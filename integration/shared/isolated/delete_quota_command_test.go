@@ -12,7 +12,6 @@ var _ = Describe("delete-quota command", func() {
 	var quotaName string
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.LoginCF()
 		helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		quotaName = helpers.QuotaName()

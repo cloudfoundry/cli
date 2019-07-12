@@ -21,8 +21,6 @@ var _ = Describe("copy-source command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 

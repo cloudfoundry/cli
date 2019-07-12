@@ -12,11 +12,6 @@ import (
 )
 
 var _ = Describe("oauth-token command", func() {
-
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Context("help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("oauth-token", "--help")
@@ -39,6 +34,7 @@ var _ = Describe("oauth-token command", func() {
 
 	When("the environment is setup correctly and user is logged in with password grant", func() {
 		BeforeEach(func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			helpers.LoginCF()
 		})
 
@@ -76,6 +72,10 @@ var _ = Describe("oauth-token command", func() {
 		})
 
 		When("the refresh token and oauth creds are valid", func() {
+			BeforeEach(func() {
+				helpers.SkipIfClientCredentialsTestMode()
+			})
+
 			It("refreshes the access token and displays it", func() {
 				existingAccessToken := helpers.GetConfig().ConfigFile.AccessToken
 

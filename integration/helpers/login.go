@@ -98,10 +98,12 @@ func LoginCFWithClientCredentials() string {
 	return username
 }
 
-// GetCredentials returns back the username and the password from the CF_INT_USERNAME and CF_INT_PASSWORD
-// environment variables, defaulting to "admin" for
-// each if either is not set.
+// GetCredentials returns back the credentials for the user or client to authenticate with Cloud Foundry.
 func GetCredentials() (string, string) {
+	if ClientCredentialsTestMode() {
+		return SkipIfClientCredentialsNotSet()
+	}
+
 	username := os.Getenv("CF_INT_USERNAME")
 	if username == "" {
 		username = "admin"
