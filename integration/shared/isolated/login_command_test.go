@@ -776,14 +776,15 @@ var _ = Describe("login command", func() {
 	Describe("User Credentials", func() {
 		When("the -u flag is provided", func() {
 			It("prompts the user for their password", func() {
+
+				helpers.SkipIfWindows()
+
 				username, password := helpers.GetCredentials()
 				buffer := NewBuffer()
 				_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", password)))
 				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(buffer, "login", "-u", username)
-				if !helpers.IsWindows() {
-					Eventually(session).Should(Say("Password> "))
-				}
+				Eventually(session).Should(Say("Password> "))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -815,6 +816,9 @@ var _ = Describe("login command", func() {
 
 			Context("and the credentials are incorrect", func() {
 				It("prompts twice, displays an error and fails", func() {
+
+					helpers.SkipIfWindows()
+
 					// Note: This test gets the desired behavior but accidentally. The legacy code does not support multiple tty inputs.
 					// For this test, when reading on the second and subsequent times, it gets a tty error but still will return
 					// a presumably blank entry to the CLI. This has the desired effect of multiple incorrect entries.
@@ -825,18 +829,10 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-
-					if !helpers.IsWindows() {
-						Eventually(session).Should(Say(`Password>`))
-					}
-
+					Eventually(session).Should(Say(`Password>`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-
-					if !helpers.IsWindows() {
-						Eventually(session).Should(Say(`Password>`))
-					}
-
+					Eventually(session).Should(Say(`Password>`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
