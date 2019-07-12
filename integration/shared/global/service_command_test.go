@@ -23,7 +23,6 @@ var _ = Describe("service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
 
 		serviceInstanceName = helpers.PrefixedRandomName("SI")

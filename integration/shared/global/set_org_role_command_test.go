@@ -12,7 +12,6 @@ import (
 var _ = Describe("set-org-role command", func() {
 	When("the set_roles_by_username flag is disabled", func() {
 		BeforeEach(func() {
-			helpers.SkipIfClientCredentialsTestMode()
 			helpers.LoginCF()
 			helpers.DisableFeatureFlag("set_roles_by_username")
 		})

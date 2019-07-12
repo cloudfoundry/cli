@@ -24,7 +24,6 @@ var _ = Describe("share-service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
 
 		sourceOrgName = helpers.NewOrgName()
@@ -223,6 +222,8 @@ var _ = Describe("share-service command", func() {
 						"CF_USERNAME": user,
 						"CF_PASSWORD": password,
 					}
+
+					helpers.LogoutCF()
 					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					helpers.TargetOrgAndSpace(sharedToOrgName, sharedToSpaceName)
 					sharedToSpaceGUID = helpers.GetSpaceGUID(sharedToSpaceName)

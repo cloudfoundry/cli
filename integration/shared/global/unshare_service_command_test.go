@@ -21,7 +21,6 @@ var _ = Describe("unshare-service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
 
 		sourceOrgName = helpers.NewOrgName()
@@ -214,6 +213,7 @@ var _ = Describe("unshare-service command", func() {
 								"CF_USERNAME": username,
 								"CF_PASSWORD": password,
 							}
+							helpers.LogoutCF()
 							Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 							helpers.TargetOrgAndSpace(sourceOrgName, sourceSpaceName)
 						})
@@ -359,6 +359,7 @@ var _ = Describe("unshare-service command", func() {
 						"CF_USERNAME": user,
 						"CF_PASSWORD": password,
 					}
+					helpers.LogoutCF()
 					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
 				})
@@ -378,6 +379,7 @@ var _ = Describe("unshare-service command", func() {
 						"CF_PASSWORD": password,
 					}
 					Eventually(helpers.CF("set-space-role", user, sourceOrgName, sourceSpaceName, "SpaceAuditor")).Should(Exit(0))
+					helpers.LogoutCF()
 					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
 				})
