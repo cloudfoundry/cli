@@ -781,7 +781,9 @@ var _ = Describe("login command", func() {
 				_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", password)))
 				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(buffer, "login", "-u", username)
-				Eventually(session).Should(Say("Password> "))
+				if !helpers.IsWindows() {
+					Eventually(session).Should(Say("Password> "))
+				}
 				Eventually(session).Should(Exit(0))
 			})
 		})
