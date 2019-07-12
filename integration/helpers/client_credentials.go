@@ -2,8 +2,10 @@ package helpers
 
 import (
 	"os"
+	"strconv"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 // SkipIfClientCredentialsNotSet will skip the test when either
@@ -34,11 +36,19 @@ func SkipIfCustomClientCredentialsNotSet() (string, string) {
 
 func SkipIfClientCredentialsTestMode() {
 	if ClientCredentialsTestMode() {
-		Skip("CF_INT_CLIENT_CREDENTIALS_TEST_MODE is set")
+		Skip("CF_INT_CLIENT_CREDENTIALS_TEST_MODE is enabled")
 	}
 }
 
 func ClientCredentialsTestMode() bool {
-	clientCredentialsTestMode := os.Getenv("CF_INT_CLIENT_CREDENTIALS_TEST_MODE")
-	return clientCredentialsTestMode != ""
+	envVar := os.Getenv("CF_INT_CLIENT_CREDENTIALS_TEST_MODE")
+
+	if envVar == "" {
+		return false
+	}
+
+	testMode, err := strconv.ParseBool(envVar)
+	Expect(err).ToNot(HaveOccurred(), "CF_INT_CLIENT_CREDENTIALS_TEST_MODE should be boolean")
+
+	return testMode
 }
