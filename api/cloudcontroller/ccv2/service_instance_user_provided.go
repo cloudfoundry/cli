@@ -49,17 +49,12 @@ type UserProvidedServiceInstance struct {
 	Credentials interface{} `json:"credentials,omitempty"`
 }
 
-func (u UserProvidedServiceInstance) WithTags(tags []string) UserProvidedServiceInstance {
-	if tags == nil {
-		tags = []string{}
+func (u UserProvidedServiceInstance) WithCredentials(creds map[string]interface{}) UserProvidedServiceInstance {
+	if creds == nil {
+		creds = make(map[string]interface{})
 	}
 
-	u.Tags = &tags
-	return u
-}
-
-func (u UserProvidedServiceInstance) WithSyslogDrainURL(url string) UserProvidedServiceInstance {
-	u.SyslogDrainURL = &url
+	u.Credentials = creds
 	return u
 }
 
@@ -68,12 +63,17 @@ func (u UserProvidedServiceInstance) WithRouteServiceURL(url string) UserProvide
 	return u
 }
 
-func (u UserProvidedServiceInstance) WithCredentials(creds map[string]interface{}) UserProvidedServiceInstance {
-	if creds == nil {
-		creds = make(map[string]interface{})
+func (u UserProvidedServiceInstance) WithSyslogDrainURL(url string) UserProvidedServiceInstance {
+	u.SyslogDrainURL = &url
+	return u
+}
+
+func (u UserProvidedServiceInstance) WithTags(tags []string) UserProvidedServiceInstance {
+	if tags == nil {
+		tags = []string{}
 	}
 
-	u.Credentials = creds
+	u.Tags = &tags
 	return u
 }
 

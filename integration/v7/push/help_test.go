@@ -74,7 +74,7 @@ var _ = Describe("help", func() {
 			Eventually(session).Should(Say(`-p\s+Path to app directory or to a zip file of the contents of the app directory`))
 			Eventually(session).Should(Say("ENVIRONMENT:"))
 			Eventually(session).Should(Say(`CF_DOCKER_PASSWORD=\s+Password used for private docker repository`))
-			Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for buildpack staging, in minutes`))
+			Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 			Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
 
 			Eventually(session).Should(Exit(0))

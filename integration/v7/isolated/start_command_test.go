@@ -42,7 +42,7 @@ var _ = Describe("start command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("st"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
-				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for buildpack staging, in minutes`))
+				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("apps, logs, restart, run-task, scale, ssh, stop"))

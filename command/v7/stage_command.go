@@ -25,7 +25,7 @@ type StageCommand struct {
 	usage           interface{}  `usage:"CF_NAME stage APP_NAME --package-guid PACKAGE_GUID"`
 	relatedCommands interface{}  `related_commands:"app, create-package, droplets, packages, push, set-droplet, stage"`
 
-	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 
 	UI          command.UI
 	Config      command.Config
