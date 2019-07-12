@@ -13,10 +13,6 @@ import (
 )
 
 var _ = Describe("help command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	DescribeTable("displays help for common commands",
 		func(setup func() *exec.Cmd) {
 			cmd := setup()

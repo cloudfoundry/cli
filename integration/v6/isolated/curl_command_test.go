@@ -16,10 +16,6 @@ import (
 )
 
 var _ = Describe("curl command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	var ExpectHelpText = func(session *Session) {
 		Eventually(session).Should(Say(`NAME:\n`))
 		Eventually(session).Should(Say(`curl - Executes a request to the targeted API endpoint\n`))

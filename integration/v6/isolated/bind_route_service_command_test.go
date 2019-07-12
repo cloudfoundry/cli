@@ -12,10 +12,6 @@ import (
 )
 
 var _ = Describe("bind-route-service command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Describe("help", func() {
 		It("includes a description of the options", func() {
 			session := helpers.CF("help", "bind-route-service")
