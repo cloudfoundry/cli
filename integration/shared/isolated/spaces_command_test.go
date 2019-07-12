@@ -12,7 +12,6 @@ var _ = Describe("spaces command", func() {
 	var orgName string
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 	})
 

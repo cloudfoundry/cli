@@ -16,7 +16,6 @@ var _ = Describe("unbind-security-group command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		securityGroupName = helpers.NewSecurityGroupName()
 		spaceName = helpers.NewSpaceName()

@@ -40,10 +40,6 @@ func expectSuccessTextAndExitCode(session *Session, user, orgName, spaceName str
 var _ = Describe("create-space", func() {
 	var spaceName string
 
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	When("invoked with --help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-space", "--help")

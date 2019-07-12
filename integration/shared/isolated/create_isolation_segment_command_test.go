@@ -12,7 +12,6 @@ var _ = Describe("create-isolation-segment command", func() {
 	var isolationSegmentName string
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})
 

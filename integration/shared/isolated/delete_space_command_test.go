@@ -9,11 +9,6 @@ import (
 )
 
 var _ = Describe("delete-space command", func() {
-
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Describe("help", func() {
 		It("shows usage", func() {
 			session := helpers.CF("help", "delete-space")
