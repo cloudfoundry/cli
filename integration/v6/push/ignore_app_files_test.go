@@ -19,7 +19,6 @@ var _ = Describe("ignoring files while gathering resources", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		firstApp = helpers.NewAppName()
 	})
 

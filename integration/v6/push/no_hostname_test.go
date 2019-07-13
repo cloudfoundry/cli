@@ -16,7 +16,6 @@ var _ = Describe("pushing with no-hostname", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		domainName = helpers.NewDomainName()
 	})

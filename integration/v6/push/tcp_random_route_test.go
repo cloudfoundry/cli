@@ -14,7 +14,6 @@ var _ = Describe("TCP random route", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = "short-app-name" // used on purpose to fit route length requirement
 	})
 

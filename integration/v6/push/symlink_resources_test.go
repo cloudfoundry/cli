@@ -19,7 +19,6 @@ var _ = Describe("push with symlinked resources", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionSymlinkedFilesV2)
 		appName = helpers.NewAppName()
 	})

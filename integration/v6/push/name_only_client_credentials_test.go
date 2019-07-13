@@ -16,7 +16,6 @@ var _ = Describe("push with only an app name when authenticated with client-cred
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		clientID = helpers.LoginCFWithClientCredentials()
 		helpers.TargetOrgAndSpace(organization, space)

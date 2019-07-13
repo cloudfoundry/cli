@@ -23,7 +23,6 @@ var _ = Describe("HTTP routes in manifest", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		app = helpers.NewAppName()
 		domain = helpers.NewDomain(organization, helpers.NewDomainName())
 		subdomain = helpers.NewDomain(organization, "sub."+domain.Name)

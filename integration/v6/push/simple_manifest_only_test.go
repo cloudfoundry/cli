@@ -21,7 +21,6 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		username, _ = helpers.GetCredentials()
 		stackName = helpers.PreferredStack()

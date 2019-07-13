@@ -20,7 +20,6 @@ var _ = Describe("pushing a path with the -p flag", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 
@@ -56,7 +55,6 @@ var _ = XDescribe("pushing a path from a manifest", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 

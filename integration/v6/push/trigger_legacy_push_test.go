@@ -22,7 +22,6 @@ var _ = Describe("triggering legacy push", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 		host = helpers.NewAppName()
 		defaultDomain = helpers.DefaultSharedDomain()

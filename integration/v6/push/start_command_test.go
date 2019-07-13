@@ -18,7 +18,6 @@ var _ = Describe("push with different start command values", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		appName = helpers.NewAppName()
 	})
 
