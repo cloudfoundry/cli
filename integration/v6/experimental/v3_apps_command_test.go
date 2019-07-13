@@ -17,7 +17,6 @@ var _ = Describe("v3-apps command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName1 = helpers.PrefixedRandomName("app1")

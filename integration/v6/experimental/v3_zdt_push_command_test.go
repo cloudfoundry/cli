@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -25,7 +26,6 @@ var _ = Describe("v3-zdt-push command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
@@ -580,7 +580,7 @@ var _ = Describe("v3-zdt-push command", func() {
 						// Story: https://www.pivotaltracker.com/story/show/150425459
 						// Eventually(session).Should(Say("buildpacks:.*ruby_buildpack, go_buildpack"))
 
-						Eventually(session).Should(Exit(0))
+						Eventually(session, 10*time.Minute).Should(Exit(0))
 					})
 				})
 

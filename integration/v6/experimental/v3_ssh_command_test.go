@@ -20,7 +20,7 @@ var _ = Describe("v3-ssh command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
+		helpers.SkipIfClientCredentialsTestMode() // client credentials cannot presently ssh
 		appName = helpers.PrefixedRandomName("app")
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
