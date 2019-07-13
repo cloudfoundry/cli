@@ -13,10 +13,6 @@ import (
 )
 
 var _ = Describe("install-plugin command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Context("installing a plugin from a local file", func() {
 		var pluginPath string
 

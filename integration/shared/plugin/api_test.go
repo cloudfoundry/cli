@@ -13,7 +13,6 @@ import (
 
 var _ = Describe("plugin API", func() {
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		installTestPlugin()
 	})
 
@@ -247,6 +246,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("UserEmail", func() {
 		It("gets the current user's Email", func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			username, _ := helpers.GetCredentials()
 			confirmTestPluginOutput("UserEmail", username)
 		})
@@ -254,6 +254,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("UserGuid", func() {
 		It("gets the current user's GUID", func() {
+			helpers.SkipIfClientCredentialsTestMode()
 			confirmTestPluginOutput("UserGuid", `[\w\d]+-[\w\d]+-[\w\d]+-[\w\d]+-[\w\d]+`)
 		})
 	})

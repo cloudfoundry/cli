@@ -15,10 +15,6 @@ import (
 )
 
 var _ = Describe("uninstall-plugin command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	When("the plugin is not executable", func() {
 		var binaryPath string
 

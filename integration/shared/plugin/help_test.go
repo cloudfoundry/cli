@@ -11,7 +11,6 @@ import (
 
 var _ = Describe("help", func() {
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		installTestPlugin()
 	})
 
