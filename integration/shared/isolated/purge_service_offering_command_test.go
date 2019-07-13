@@ -11,10 +11,6 @@ import (
 )
 
 var _ = Describe("purge-service-offering command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Describe("help", func() {
 		When("the --help flag is set", func() {
 			It("displays command usage to output", func() {

@@ -10,10 +10,6 @@ import (
 )
 
 var _ = Describe("delete-service command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	When("an api is targeted and the user is logged in", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()

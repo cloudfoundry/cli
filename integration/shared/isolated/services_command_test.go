@@ -16,7 +16,6 @@ var _ = Describe("services command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		userName, _ = helpers.GetCredentials()
 	})
 

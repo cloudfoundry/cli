@@ -20,7 +20,6 @@ var _ = Describe("unbind-service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		serviceInstance = helpers.PrefixedRandomName("si")
 		appName = helpers.PrefixedRandomName("app")
 	})

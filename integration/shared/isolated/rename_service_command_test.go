@@ -11,10 +11,6 @@ import (
 )
 
 var _ = Describe("rename-service command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	When("there is a service instance created", func() {
 		var (
 			instanceName string
