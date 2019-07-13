@@ -566,9 +566,9 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
+      passed: [integration-linux, integration-linux-client-creds, integration-windows, integration-experimental, integration-legacy]
     - get: cf-cli-binaries
-      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
+      passed: [integration-linux, integration-linux-client-creds, integration-windows, integration-experimental, integration-legacy]
       trigger: true
     - get: cli-ci
   - task: extract-binaries
@@ -648,11 +648,11 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
+      passed: [integration-linux, integration-linux-client-creds, integration-windows, integration-experimental, integration-legacy]
     - get: cf-acceptance-tests
     - get: cf-deployment-concourse-tasks
     - get: cf-cli-binaries
-      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
+      passed: [integration-linux, integration-linux-client-creds, integration-windows, integration-experimental, integration-legacy]
       trigger: true
     - get: cli-ci
     - get: vars-store
