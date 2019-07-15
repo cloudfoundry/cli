@@ -46,6 +46,17 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
+func (cmd SetLabelCommand) ValidateFlags() error {
+	if cmd.BuildpackStack != "" && ResourceType(cmd.RequiredArgs.ResourceType) != Buildpack {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--stack, -s",
+			},
+		}
+	}
+	return nil
+}
+
 func (cmd SetLabelCommand) Execute(args []string) error {
 
 	labels := make(map[string]types.NullString)
@@ -58,6 +69,11 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	}
 
 	username, err := cmd.Config.CurrentUserName()
+	if err != nil {
+		return err
+	}
+
+	err = cmd.ValidateFlags()
 	if err != nil {
 		return err
 	}
