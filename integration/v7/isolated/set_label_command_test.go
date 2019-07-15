@@ -36,6 +36,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+cf set-label space business_space public-facing=false owner=jane_doe`))
 				Eventually(session).Should(Say("RESOURCES:"))
 				Eventually(session).Should(Say(`\s+app`))
+				Eventually(session).Should(Say(`\s+buildpack`))
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say("SEE ALSO:"))
@@ -260,6 +261,130 @@ var _ = Describe("set-label command", func() {
 					Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
 					Expect(len(org.Metadata.Labels)).To(Equal(1))
 					Expect(org.Metadata.Labels["owner"]).To(Equal("beth"))
+				})
+			})
+		})
+
+		When("assigning label to buildpack", func() {
+			var (
+				buildpackName string
+			)
+
+			BeforeEach(func() {
+				buildpackName = helpers.NewBuildpackName()
+				stacks := helpers.FetchStacks()
+				helpers.BuildpackWithStack(func(buildpackPath string) {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "98")
+					Eventually(session).Should(Exit(0))
+				}, stacks[0])
+			})
+
+			It("sets the specified labels on the buildpack", func() {
+				session := helpers.CF("set-label", "buildpack", buildpackName, "pci=true", "public-facing=false")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as %s...`), buildpackName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, "")
+				session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
+				Eventually(session).Should(Exit(0))
+				buildpackJSON := session.Out.Contents()
+				var buildpack commonResource
+				Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+				Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+				Expect(buildpack.Metadata.Labels["pci"]).To(Equal("true"))
+				Expect(buildpack.Metadata.Labels["public-facing"]).To(Equal("false"))
+			})
+
+			When("the buildpack is unknown", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
+					Eventually(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the buildpack exists for multiple stacks", func() {
+				var stacks []string
+
+				BeforeEach(func() {
+					stacks = helpers.EnsureMinimumNumberOfStacks(2)
+
+					helpers.BuildpackWithStack(func(buildpackPath string) {
+						createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath, "99")
+						Eventually(createSession).Should(Exit(0))
+					}, stacks[1])
+				})
+
+				When("stack is not specified", func() {
+					It("displays an error", func() {
+						session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value")
+						Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("stack is specified", func() {
+					It("sets the specified labels on the correct buildpack", func() {
+						session := helpers.CF("set-label", "buildpack", buildpackName, "pci=true", "public-facing=false", "--stack", stacks[1])
+						Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as %s...`), buildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[1])
+						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
+						Eventually(session).Should(Exit(0))
+						buildpackJSON := session.Out.Contents()
+						var buildpack commonResource
+						Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+						Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+						Expect(buildpack.Metadata.Labels["pci"]).To(Equal("true"))
+						Expect(buildpack.Metadata.Labels["public-facing"]).To(Equal("false"))
+					})
+				})
+			})
+
+			When("the buildpack exists in general but does NOT exist for the specified stack", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value", "--stack", "FAKE")
+					Eventually(session.Err).Should(Say(fmt.Sprintf("Buildpack %s with stack FAKE not found", buildpackName)))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label has an empty key and an invalid value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "buildpack", buildpackName, "=test", "sha2=108&eb90d734")
+					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label does not include a '=' to separate the key and value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "buildpack", buildpackName, "test-label")
+					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "buildpack", buildpackName, "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+					buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, "")
+					session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
+					Eventually(session).Should(Exit(0))
+					buildpackJSON := session.Out.Contents()
+					var buildpack commonResource
+					Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+					Expect(len(buildpack.Metadata.Labels)).To(Equal(1))
+					Expect(buildpack.Metadata.Labels["owner"]).To(Equal("beth"))
 				})
 			})
 		})

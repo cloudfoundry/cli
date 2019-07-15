@@ -34,6 +34,12 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 			Body:        bytes.NewReader(metadataBtyes),
 			URIParams:   map[string]string{"app_guid": resourceGUID},
 		})
+	case "buildpack":
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.PatchBuildpackRequest,
+			Body:        bytes.NewReader(metadataBtyes),
+			URIParams:   map[string]string{"buildpack_guid": resourceGUID},
+		})
 	case "org":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchOrganizationRequest,
