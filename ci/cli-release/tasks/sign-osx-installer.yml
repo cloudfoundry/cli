@@ -5,6 +5,7 @@ params:
   CERT_COMMON_NAME:
   CERT_LOCATION:
   CERT_PASSWORD_LOCATION:
+  TARGET_V7:
 
 inputs:
 - name: certificates
@@ -21,7 +22,14 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/BUILD_VERSION)
+    if [ "$TARGET_V7" == "true" ]; then
+      VERSION=$(cat cli/BUILD_VERSION_V7)
+      SUFFIX="7"
+    else
+      VERSION=$(cat cli/BUILD_VERSION)
+      SUFFIX=""
+    fi
+
     CERT_PASSWORD=$(cat certificates/$CERT_PASSWORD_LOCATION)
 
     security create-keychain -p "" temp-keychain
@@ -33,5 +41,5 @@ run:
     productsign --timestamp \
       --sign "$CERT_COMMON_NAME" \
       --keychain temp-keychain \
-      edge-osx-installer-64/cf-cli-installer_edge_osx.pkg \
+      edge-osx-installer-64/cf${SUFFIX}-cli-installer_edge_osx.pkg \
       signed-osx-installer/cf-cli-installer_${VERSION}_osx.pkg

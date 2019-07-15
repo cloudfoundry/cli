@@ -1,12 +1,22 @@
 ---
 resources:
-- name: cli
+- name: cli-v6
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     submodules: true
     tag_filter: "v6*"
+    ignore_paths:
+    - ci
+
+- name: cli-v7
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    submodules: true
+    tag_filter: "v7*"
     ignore_paths:
     - ci
 
@@ -25,7 +35,7 @@ resources:
     private_key: ((homebrew-tap-github-private-key))
     branch: master
 
-- name: edge-linux-binary-32
+- name: edge-linux-binary-32-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -34,7 +44,16 @@ resources:
     versioned_file: master/cf-cli_edge_linux_i686.tgz
     region_name: us-west-1
 
-- name: edge-linux-binary-64
+- name: edge-linux-binary-32-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli_edge_linux_i686.tgz
+    region_name: us-west-1
+
+- name: edge-linux-binary-64-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -43,7 +62,16 @@ resources:
     versioned_file: master/cf-cli_edge_linux_x86-64.tgz
     region_name: us-west-1
 
-- name: edge-osx-binary-64
+- name: edge-linux-binary-64-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli_edge_linux_x86-64.tgz
+    region_name: us-west-1
+
+- name: edge-osx-binary-64-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -52,7 +80,16 @@ resources:
     versioned_file: master/cf-cli_edge_osx.tgz
     region_name: us-west-1
 
-- name: edge-windows-binary-32
+- name: edge-osx-binary-64-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli_edge_osx.tgz
+    region_name: us-west-1
+
+- name: edge-windows-binary-32-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -61,7 +98,16 @@ resources:
     versioned_file: master/cf-cli_edge_win32.zip
     region_name: us-west-1
 
-- name: edge-windows-binary-64
+- name: edge-windows-binary-32-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli_edge_win32.zip
+    region_name: us-west-1
+
+- name: edge-windows-binary-64-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -70,7 +116,16 @@ resources:
     versioned_file: master/cf-cli_edge_winx64.zip
     region_name: us-west-1
 
-- name: edge-deb-installer-32
+- name: edge-windows-binary-64-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli_edge_winx64.zip
+    region_name: us-west-1
+
+- name: edge-deb-installer-32-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -79,7 +134,16 @@ resources:
     versioned_file: master/cf-cli-installer_edge_i686.deb
     region_name: us-west-1
 
-- name: edge-deb-installer-64
+- name: edge-deb-installer-32-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_i686.deb
+    region_name: us-west-1
+
+- name: edge-deb-installer-64-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -88,7 +152,16 @@ resources:
     versioned_file: master/cf-cli-installer_edge_x86-64.deb
     region_name: us-west-1
 
-- name: edge-redhat-installer-32
+- name: edge-deb-installer-64-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_x86-64.deb
+    region_name: us-west-1
+
+- name: edge-redhat-installer-32-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -97,7 +170,16 @@ resources:
     versioned_file: master/cf-cli-installer_edge_i686.rpm
     region_name: us-west-1
 
-- name: edge-redhat-installer-64
+- name: edge-redhat-installer-32-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_i686.rpm
+    region_name: us-west-1
+
+- name: edge-redhat-installer-64-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -106,7 +188,16 @@ resources:
     versioned_file: master/cf-cli-installer_edge_x86-64.rpm
     region_name: us-west-1
 
-- name: edge-osx-installer-64
+- name: edge-redhat-installer-64-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_x86-64.rpm
+    region_name: us-west-1
+
+- name: edge-osx-installer-64-v6
   type: s3
   source:
     bucket: cf-cli-releases
@@ -115,23 +206,43 @@ resources:
     versioned_file: master/cf-cli-installer_edge_osx.pkg
     region_name: us-west-1
 
+- name: edge-osx-installer-64-v7
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_osx.pkg
+    region_name: us-west-1
+
 jobs:
-- name: create-and-sign-installers
+- name: create-and-sign-installers-v6
   serial: true
   plan:
   - aggregate:
-    - get: cli
     - get: cli-ci
+    - get: cli
+      resource: cli-v6
     - get: edge-linux-binary-32
+      resource: edge-linux-binary-32-v6
     - get: edge-linux-binary-64
+      resource: edge-linux-binary-64-v6
     - get: edge-osx-binary-64
+      resource: edge-osx-binary-64-v6
     - get: edge-windows-binary-32
+      resource: edge-windows-binary-32-v6
     - get: edge-windows-binary-64
+      resource: edge-windows-binary-64-v6
     - get: edge-deb-installer-32
+      resource: edge-deb-installer-32-v6
     - get: edge-deb-installer-64
+      resource: edge-deb-installer-64-v6
     - get: edge-redhat-installer-32
+      resource: edge-redhat-installer-32-v6
     - get: edge-redhat-installer-64
+      resource: edge-redhat-installer-64-v6
     - get: edge-osx-installer-64
+      resource: edge-osx-installer-64-v6
 
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
@@ -143,6 +254,8 @@ jobs:
   - aggregate:
     - task: repackage-binaries-and-installers
       file: cli-ci/ci/cli-release/tasks/repackage-binaries-and-installers.yml
+      params:
+        TARGET_V7: false
 
     - task: sign-osx-installer
       file: cli-ci/ci/cli-release/tasks/sign-osx-installer.yml
@@ -150,11 +263,13 @@ jobs:
         CERT_COMMON_NAME: ((osx-certificate-common-name))
         CERT_LOCATION: ((osx-certificate-location))
         CERT_PASSWORD_LOCATION: ((osx-certificate-password-location))
+        TARGET_V7: false
 
     - task: sign-redhat-installers
       file: cli-ci/ci/cli-release/tasks/sign-redhat-installers.yml
       params:
         GPG_KEY_LOCATION: ((gpg-key-location))
+        TARGET_V7: false
 
     - do:
       - task: sign-windows-binaries
@@ -162,30 +277,117 @@ jobs:
         params:
           CERT_LOCATION: ((windows-certificate-location))
           CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
+          TARGET_V7: false
       - task: create-windows-installers
         file: cli-ci/ci/cli/tasks/create-installers-windows.yml
+        params:
+          TARGET_V7: false
       - task: sign-and-repackage-installers-and-binaries
         file: cli-ci/ci/cli-release/tasks/sign-and-repackage-installers-and-binaries.yml
         params:
           CERT_LOCATION: ((windows-certificate-location))
           CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
+          TARGET_V7: false
 
   - task: upload-releases
     file: cli-ci/ci/cli-release/tasks/upload-releases.yml
     params:
       AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
       AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
+      TARGET_V7: false
 
-- name: update-claw
+- name: create-and-sign-installers-v7
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-ci
+    - get: cli
+      resource: cli-v7
+    - get: edge-linux-binary-32
+      resource: edge-linux-binary-32-v7
+    - get: edge-linux-binary-64
+      resource: edge-linux-binary-64-v7
+    - get: edge-osx-binary-64
+      resource: edge-osx-binary-64-v7
+    - get: edge-windows-binary-32
+      resource: edge-windows-binary-32-v7
+    - get: edge-windows-binary-64
+      resource: edge-windows-binary-64-v7
+    - get: edge-deb-installer-32
+      resource: edge-deb-installer-32-v7
+    - get: edge-deb-installer-64
+      resource: edge-deb-installer-64-v7
+    - get: edge-redhat-installer-32
+      resource: edge-redhat-installer-32-v7
+    - get: edge-redhat-installer-64
+      resource: edge-redhat-installer-64-v7
+    - get: edge-osx-installer-64
+      resource: edge-osx-installer-64-v7
+
+  - task: obtain-certificates
+    file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
+    params:
+      CERT_PATH: ((osx-certificate-store))
+  - task: copy-certificates
+    file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
+
+  - aggregate:
+    - task: repackage-binaries-and-installers
+      file: cli-ci/ci/cli-release/tasks/repackage-binaries-and-installers.yml
+      params:
+        TARGET_V7: true
+
+    - task: sign-osx-installer
+      file: cli-ci/ci/cli-release/tasks/sign-osx-installer.yml
+      params:
+        CERT_COMMON_NAME: ((osx-certificate-common-name))
+        CERT_LOCATION: ((osx-certificate-location))
+        CERT_PASSWORD_LOCATION: ((osx-certificate-password-location))
+        TARGET_V7: true
+
+    - task: sign-redhat-installers
+      file: cli-ci/ci/cli-release/tasks/sign-redhat-installers.yml
+      params:
+        GPG_KEY_LOCATION: ((gpg-key-location))
+        TARGET_V7: true
+
+    - do:
+      - task: sign-windows-binaries
+        file: cli-ci/ci/cli-release/tasks/sign-windows-binaries.yml
+        params:
+          CERT_LOCATION: ((windows-certificate-location))
+          CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
+          TARGET_V7: true
+      - task: create-windows-installers
+        file: cli-ci/ci/cli/tasks/create-installers-windows.yml
+        params:
+          TARGET_V7: true
+      - task: sign-and-repackage-installers-and-binaries
+        file: cli-ci/ci/cli-release/tasks/sign-and-repackage-installers-and-binaries.yml
+        params:
+          CERT_LOCATION: ((windows-certificate-location))
+          CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
+          TARGET_V7: true
+
+  - task: upload-releases
+    file: cli-ci/ci/cli-release/tasks/upload-releases.yml
+    params:
+      AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
+      AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
+      TARGET_V7: true
+
+- name: update-claw-v6
   serial: true
   plan:
   - aggregate:
     - get: cli
+      resource: cli-v6
       trigger: true
-      passed: [create-and-sign-installers]
+      passed: [create-and-sign-installers-v6]
     - get: cli-ci
     - get: edge-linux-binary-64
-      passed: [create-and-sign-installers]
+      resource: edge-linux-binary-64-v6
+      passed: [create-and-sign-installers-v6]
   - aggregate:
     - task: claw.run.pivotal.io
       file: cli-ci/ci/cli-release/tasks/update-claw.yml
@@ -204,13 +406,14 @@ jobs:
         CF_ORGANIZATION: ((oss-organization))
         CF_SPACE: ((oss-space))
 
-- name: update-debian-repo
+- name: update-debian-repo-v6
   serial: true
   plan:
   - aggregate:
     - get: cli
+      resource: cli-v6
       trigger: true
-      passed: [update-claw]
+      passed: [update-claw-v6]
     - get: cli-ci
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
@@ -227,13 +430,14 @@ jobs:
       GPG_KEY_LOCATION: ((gpg-key-location))
       KEY_ID_LOCATION: ((gpg-key-id-location))
 
-- name: update-homebrew
+- name: update-homebrew-v6
   serial: true
   plan:
   - aggregate:
     - get: cli
+      resource: cli-v6
       trigger: true
-      passed: [update-claw]
+      passed: [update-claw-v6]
     - get: cli-ci
     - get: homebrew-tap
   - task: update-brew-formula
@@ -242,13 +446,14 @@ jobs:
     params:
       repository: update-brew-formula-output/homebrew-tap
 
-- name: update-rpm-repo
+- name: update-rpm-repo-v6
   serial: true
   plan:
   - aggregate:
     - get: cli
+      resource: cli-v6
       trigger: true
-      passed: [update-claw]
+      passed: [update-claw-v6]
     - get: cli-ci
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
