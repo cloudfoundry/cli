@@ -9,6 +9,7 @@ image_resource:
 params:
   AWS_ACCESS_KEY_ID:
   AWS_SECRET_ACCESS_KEY:
+  TARGET_V7:
 
 inputs:
 - name: cli
@@ -27,9 +28,15 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/BUILD_VERSION)
+    if [ "$TARGET_V7" == "true" ]; then
+      VERSION=$(cat cli/BUILD_VERSION_V7)
+      BUCKET_PREFIX=v7-
+    else
+      VERSION=$(cat cli/BUILD_VERSION)
+      BUCKET_PREFIX=
+    fi
 
-    aws s3 cp repackaged-binaries-and-installers/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
-    aws s3 cp signed-osx-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
-    aws s3 cp signed-redhat-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
-    aws s3 cp signed-windows-zips/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
+    aws s3 cp repackaged-binaries-and-installers/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
+    aws s3 cp signed-osx-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
+    aws s3 cp signed-redhat-installer/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive
+    aws s3 cp signed-windows-zips/ s3://${BUCKET_PREFIX}cf-cli-releases/releases/v${VERSION}/ --recursive

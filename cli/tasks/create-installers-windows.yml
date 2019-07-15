@@ -8,5 +8,8 @@ inputs:
 outputs:
 - name: winstallers
 
+params:
+  TARGET_V7:
+
 run:
   path: cli-ci/ci/cli/tasks/create-installers-windows.bat

@@ -8,6 +8,7 @@ image_resource:
 
 params:
   GPG_KEY_LOCATION:
+  TARGET_V7:
 
 inputs:
 - name: certificates
@@ -33,7 +34,13 @@ run:
     EOF
     chmod 700 sign-rpm
 
-    VERSION=$(cat cli/BUILD_VERSION)
+    if [ "$TARGET_V7" == "true" ]; then
+      VERSION=$(cat cli/BUILD_VERSION_V7)
+      SUFFIX="7"
+    else
+      VERSION=$(cat cli/BUILD_VERSION)
+      SUFFIX=""
+    fi
 
     cat<< EOF >~/.rpmmacros
     %_gpg_name CF CLI Team <cf-cli-eng@pivotal.io>
@@ -46,8 +53,8 @@ run:
 
     gpg --import certificates/$GPG_KEY_LOCATION
 
-    ./sign-rpm edge-redhat-installer-32/cf-cli-installer_edge_i686.rpm
-    ./sign-rpm edge-redhat-installer-64/cf-cli-installer_edge_x86-64.rpm
+    ./sign-rpm edge-redhat-installer-32/cf${SUFFIX}-cli-installer_edge_i686.rpm
+    ./sign-rpm edge-redhat-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.rpm
 
-    mv edge-redhat-installer-32/cf-cli-installer_edge_i686.rpm signed-redhat-installer/cf-cli-installer_${VERSION}_i686.rpm
-    mv edge-redhat-installer-64/cf-cli-installer_edge_x86-64.rpm signed-redhat-installer/cf-cli-installer_${VERSION}_x86-64.rpm
+    mv edge-redhat-installer-32/cf${SUFFIX}-cli-installer_edge_i686.rpm signed-redhat-installer/cf-cli-installer_${VERSION}_i686.rpm
+    mv edge-redhat-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.rpm signed-redhat-installer/cf-cli-installer_${VERSION}_x86-64.rpm

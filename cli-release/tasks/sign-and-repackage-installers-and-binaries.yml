@@ -9,6 +9,7 @@ image_resource:
 params:
   CERT_LOCATION:
   CERT_PASSWORD_LOCATION:
+  TARGET_V7:
 
 inputs:
 - name: certificates
@@ -26,7 +27,11 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/BUILD_VERSION)
+    if [ "$TARGET_V7" == "true" ]; then
+      VERSION=$(cat cli/BUILD_VERSION_V7)
+    else
+      VERSION=$(cat cli/BUILD_VERSION)
+    fi
 
     awk 'sub("$", "\r")' cli/ci/license/NOTICE > NOTICE
     awk 'sub("$", "\r")' cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES > LICENSE
