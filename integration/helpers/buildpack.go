@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -91,4 +92,29 @@ func DeleteBuildpackIfOnOldCCAPI(buildpackName string) {
 		deleteSessions := CF("delete-buildpack", buildpackName, "-f")
 		Eventually(deleteSessions).Should(Exit())
 	}
+}
+
+type Buildpack struct {
+	Guid  string `json:"guid"`
+	Name  string `json:"name"`
+	Stack string `json:"stack"`
+}
+
+type BuildpackList struct {
+	Buildpacks []Buildpack `json:"resources"`
+}
+
+func BuildpackGUIDByNameAndStack(buildpackName string, stackName string) string {
+	url := "/v3/buildpacks?names=" + buildpackName
+	if stackName != "" {
+		url += "&stacks=" + stackName
+	}
+	session := CF("curl", url)
+	bytes := session.Wait().Out.Contents()
+
+	buildpacks := BuildpackList{}
+	err := json.Unmarshal(bytes, &buildpacks)
+	Expect(err).ToNot(HaveOccurred())
+
+	return buildpacks.Buildpacks[0].Guid
 }

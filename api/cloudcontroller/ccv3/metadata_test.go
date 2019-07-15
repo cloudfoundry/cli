@@ -330,5 +330,106 @@ var _ = Describe("Metadata", func() {
 				})
 			})
 		})
+
+		When("updating metadata on a buildpack", func() {
+			JustBeforeEach(func() {
+				resourceGUID = "some-guid"
+				updatedMetadata, warnings, executeErr = client.UpdateResourceMetadata("buildpack", resourceGUID, metadataToUpdate)
+			})
+
+			When("the buildpack is updated successfully", func() {
+				BeforeEach(func() {
+					response := `{
+					"guid": "some-guid",
+					"name": "some-buildpack-name",
+					"metadata": {
+						"labels": {
+							"k1":"v1",
+							"k2":"v2"
+						}
+					}
+				}`
+
+					expectedBody := map[string]interface{}{
+						"metadata": map[string]interface{}{
+							"labels": map[string]string{
+								"k1": "v1",
+								"k2": "v2",
+							},
+						},
+					}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/buildpacks/some-guid"),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+
+					metadataToUpdate = Metadata{
+						Labels: map[string]types.NullString{
+							"k1": types.NewNullString("v1"),
+							"k2": types.NewNullString("v2"),
+						},
+					}
+				})
+
+				It("should include the labels in the JSON", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(server.ReceivedRequests()).To(HaveLen(3))
+					Expect(len(warnings)).To(Equal(0))
+					Expect(updatedMetadata.Metadata.Labels).To(BeEquivalentTo(
+						map[string]types.NullString{
+							"k1": types.NewNullString("v1"),
+							"k2": types.NewNullString("v2"),
+						}))
+				})
+
+			})
+
+			When("Cloud Controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+ "errors": [
+   {
+     "code": 10008,
+     "detail": "Metadata label key error: 'invalid*key' contains invalid characters",
+     "title": "CF-UnprocessableEntity"
+   }
+ ]
+}`
+					expectedBody := map[string]interface{}{
+						"metadata": map[string]interface{}{
+							"labels": map[string]string{
+								"invalid*key": "v1",
+								"k2":          "v2",
+							},
+						},
+					}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/buildpacks/some-guid"),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusUnprocessableEntity, response, http.Header{}),
+						),
+					)
+
+					metadataToUpdate = Metadata{
+						Labels: map[string]types.NullString{
+							"invalid*key": types.NewNullString("v1"),
+							"k2":          types.NewNullString("v2"),
+						},
+					}
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.UnprocessableEntityError{
+						Message: "Metadata label key error: 'invalid*key' contains invalid characters",
+					}))
+				})
+			})
+		})
 	})
 })

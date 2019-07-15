@@ -47,10 +47,16 @@ func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spa
 		return appWarnings, err
 	}
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("app", app.GUID, ccv3.Metadata{Labels: labels})
-	if err != nil {
-		return append(appWarnings, updateWarnings...), err
-	}
 	return append(appWarnings, updateWarnings...), err
+}
+
+func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStack(buildpackName string, stack string, labels map[string]types.NullString) (Warnings, error) {
+	buildpack, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, stack)
+	if err != nil {
+		return warnings, err
+	}
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("buildpack", buildpack.GUID, ccv3.Metadata{Labels: labels})
+	return append(warnings, updateWarnings...), err
 }
 
 func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, labels map[string]types.NullString) (Warnings, error) {
@@ -59,9 +65,6 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 		return warnings, err
 	}
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("org", org.GUID, ccv3.Metadata{Labels: labels})
-	if err != nil {
-		return append(warnings, updateWarnings...), err
-	}
 	return append(warnings, updateWarnings...), err
 }
 
@@ -71,8 +74,5 @@ func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID strin
 		return warnings, err
 	}
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("space", space.GUID, ccv3.Metadata{Labels: labels})
-	if err != nil {
-		return append(warnings, updateWarnings...), err
-	}
 	return append(warnings, updateWarnings...), err
 }

@@ -17,9 +17,10 @@ import (
 type ResourceType string
 
 const (
-	App   ResourceType = "app"
-	Org   ResourceType = "org"
-	Space ResourceType = "space"
+	App       ResourceType = "app"
+	Buildpack ResourceType = "buildpack"
+	Org       ResourceType = "org"
+	Space     ResourceType = "space"
 )
 
 //go:generate counterfeiter . LabelsActor
