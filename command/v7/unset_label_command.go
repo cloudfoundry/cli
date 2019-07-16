@@ -20,7 +20,7 @@ type UnsetLabelActor interface {
 
 type UnsetLabelCommand struct {
 	RequiredArgs flag.UnsetLabelArgs `positional-args:"yes"`
-	usage        interface{}          `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n\nRESOURCES:\n   app\n\nSEE ALSO:\n   set-label, labels"`
+	usage        interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n\nRESOURCES:\n   app\n\nSEE ALSO:\n   set-label, labels"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
