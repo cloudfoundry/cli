@@ -36,26 +36,26 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_i686 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin cf/usr/share/doc/cf7-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-          cp cf/DEBIAN/copyright cf/usr/share/doc/cf7-cli/copyright
+          cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
-          cp ../../license/NOTICE cf/usr/share/doc/cf7-cli
-          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf7-cli/LICENSE
+          cp ../../license/NOTICE cf/usr/share/doc/cf-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
           cp control_v7.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
 
-          cp ../completion/cf7 cf/usr/share/bash-completion/completions/cf7
+          cp ../completion/cf7 cf/usr/share/bash-completion/completions/cf
 
-          cp $root/extracted-binaries/cf7-cli_linux_i686 cf/usr/bin/cf7
+          cp $root/extracted-binaries/cf7-cli_linux_i686 cf/usr/bin/cf
 
           fakeroot dpkg --build cf cf7-cli-installer_i686.deb
           mv cf7-cli-installer_i686.deb $root/packaged
@@ -68,26 +68,26 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_x86-64 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin cf/usr/share/doc/cf7-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-          cp cf/DEBIAN/copyright cf/usr/share/doc/cf7-cli/copyright
+          cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
-          cp ../../license/NOTICE cf/usr/share/doc/cf7-cli
-          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf7-cli/LICENSE
+          cp ../../license/NOTICE cf/usr/share/doc/cf-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
           cp control_v7.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
 
-          cp ../completion/cf7 cf/usr/share/bash-completion/completions/cf7
+          cp ../completion/cf7 cf/usr/share/bash-completion/completions/cf
 
-          cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf/usr/bin/cf7
+          cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf/usr/bin/cf
 
           fakeroot dpkg --build cf cf7-cli-installer_x86-64.deb
           mv cf7-cli-installer_x86-64.deb $root/packaged
@@ -97,10 +97,10 @@ run:
     echo "Building 32-bit RedHat package"
     (
       pushd cli-ci/ci/installers/rpm
-        cp $root/extracted-binaries/cf7-cli_linux_i686 cf7
+        cp $root/extracted-binaries/cf7-cli_linux_i686 cf
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-        cp ../completion/cf7 cf7.bash
+        cp ../completion/cf7 cf.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
@@ -111,10 +111,10 @@ run:
     echo "Building 64-bit RedHat package"
     (
       pushd cli-ci/ci/installers/rpm
-        cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf7
+        cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-        cp ../completion/cf7 cf7.bash
+        cp ../completion/cf7 cf.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
@@ -129,11 +129,11 @@ run:
       pushd cli-ci/ci/installers/osx
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
-        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf7-cli
+        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf-cli
 
-        cp $root/extracted-binaries/cf7-cli_osx cf-cli/usr/local/bin/cf7
-        cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf7-cli
-        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf7-cli/LICENSE
+        cp $root/extracted-binaries/cf7-cli_osx cf-cli/usr/local/bin/cf
+        cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf-cli
+        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf-cli/LICENSE
         chmod -R go-w cf-cli
         pushd cf-cli
           find usr | cpio -o --format=odc | gzip -c > ../Payload
