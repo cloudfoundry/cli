@@ -78,7 +78,8 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		return err
 	}
 
-	switch ResourceType(cmd.RequiredArgs.ResourceType) {
+	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
+	switch ResourceType(resourceTypeString) {
 	case App:
 		err = cmd.executeApp(username, labels)
 	case Buildpack:

@@ -168,6 +168,30 @@ var _ = Describe("set-label command", func() {
 						Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{Args: []string{"app", "--stack, -s"}}))
 					})
 				})
+
+				When("the resource type argument is not lowercase", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "ApP",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateApplicationLabelsByApplicationNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					It("sets the provided labels on the app", func() {
+						name, spaceGUID, labels := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass app name")
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString("BAR"),
+							"ENV": types.NewNullString("FAKE"),
+						}))
+					})
+				})
 			})
 
 			When("fetching the current user's name fails", func() {
@@ -330,6 +354,29 @@ var _ = Describe("set-label command", func() {
 						Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{Args: []string{"org", "--stack, -s"}}))
 					})
 				})
+
+				When("the resource type argument is not lowercase", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "OrG",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateOrganizationLabelsByOrganizationNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					It("sets the provided labels on the org", func() {
+						name, labels := fakeActor.UpdateOrganizationLabelsByOrganizationNameArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass org name")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString("BAR"),
+							"ENV": types.NewNullString("FAKE"),
+						}))
+					})
+				})
 			})
 
 			When("fetching the current user's name fails", func() {
@@ -477,6 +524,30 @@ var _ = Describe("set-label command", func() {
 					It("complains about the missing equal sign", func() {
 						Expect(executeErr).To(MatchError("Metadata error: no value provided for label 'MISSING_EQUALS'"))
 						Expect(executeErr).To(HaveOccurred())
+					})
+				})
+
+				When("the resource type argument is not lowercase", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "bUiLdPaCk",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					It("sets the provided labels on the org", func() {
+						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+						Expect(stack).To(Equal(""), "failed to pass buildpack stack")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString("BAR"),
+							"ENV": types.NewNullString("FAKE"),
+						}))
 					})
 				})
 			})
@@ -635,6 +706,30 @@ var _ = Describe("set-label command", func() {
 
 					It("complains about the --stack flag being present", func() {
 						Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{Args: []string{"space", "--stack, -s"}}))
+					})
+				})
+
+				When("the resource type argument is not lowercase", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "sPaCe",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateSpaceLabelsBySpaceNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					It("sets the provided labels on the app", func() {
+						name, orgGUID, labels := fakeActor.UpdateSpaceLabelsBySpaceNameArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass space name")
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString("BAR"),
+							"ENV": types.NewNullString("FAKE"),
+						}))
 					})
 				})
 			})

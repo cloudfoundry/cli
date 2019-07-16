@@ -3,6 +3,7 @@ package v7
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -61,7 +62,9 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	switch ResourceType(cmd.RequiredArgs.ResourceType) {
+
+	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
+	switch ResourceType(resourceTypeString) {
 	case App:
 		labels, warnings, err = cmd.fetchAppLabels(username)
 	case Org:
