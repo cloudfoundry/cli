@@ -532,7 +532,7 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string) (string, error) {
 	var (
 		choice string
-		err error
+		err    error
 	)
 
 	if len(choices) < 50 {
