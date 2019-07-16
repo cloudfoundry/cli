@@ -494,52 +494,30 @@ func (cmd *LoginCommand) displayNotTargetted() {
 }
 
 func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action.Organization, error) {
-
 	var (
 		chosenOrgName string
 		err           error
 	)
 
-	if len(orgs) < 50 {
-		orgNames := make([]string, len(orgs))
-		for i, org := range orgs {
-			orgNames[i] = org.Name
-		}
-
-		for {
-			cmd.UI.DisplayText("Select an org:")
-			chosenOrgName, err = cmd.UI.DisplayTextMenu(orgNames, "Org")
-			if err != ui.ErrInvalidIndex {
-				break
-			}
-		}
-
-		if err != nil {
-			if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
-				return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
-			} else if err == io.EOF {
-				return v3action.Organization{}, nil
-			}
-
-			return v3action.Organization{}, err
-		}
-
-		if chosenOrgName == "" {
-			return v3action.Organization{}, nil
-		}
-
-	} else {
-		cmd.UI.DisplayText("Select an org:")
-		cmd.UI.DisplayText("There are too many options to display; please type in the name.")
-		defaultChoice := "enter to skip"
-		chosenOrgName, err = cmd.UI.DisplayOptionalTextPrompt(defaultChoice, "Org")
-		if chosenOrgName == defaultChoice {
-			return v3action.Organization{}, nil
-		}
+	orgNames := make([]string, len(orgs))
+	for i, org := range orgs {
+		orgNames[i] = org.Name
 	}
 
+	chosenOrgName, err = cmd.promptMenu(orgNames, "Select an org:", "Org")
+
 	if err != nil {
+		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
+			return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
+		} else if err == io.EOF {
+			return v3action.Organization{}, nil
+		}
+
 		return v3action.Organization{}, err
+	}
+
+	if chosenOrgName == "" {
+		return v3action.Organization{}, nil
 	}
 
 	for _, org := range orgs {
@@ -549,4 +527,31 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 	}
 
 	return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: chosenOrgName}
+}
+
+func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string) (string, error) {
+	var (
+		choice string
+		err error
+	)
+
+	if len(choices) < 50 {
+		for {
+			cmd.UI.DisplayText(text)
+			choice, err = cmd.UI.DisplayTextMenu(choices, prompt)
+			if err != ui.ErrInvalidIndex {
+				break
+			}
+		}
+	} else {
+		cmd.UI.DisplayText(text)
+		cmd.UI.DisplayText("There are too many options to display; please type in the name.")
+		defaultChoice := "enter to skip"
+		choice, err = cmd.UI.DisplayOptionalTextPrompt(defaultChoice, prompt)
+		if choice == defaultChoice {
+			return "", nil
+		}
+	}
+
+	return choice, err
 }
