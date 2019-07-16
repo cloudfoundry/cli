@@ -31,7 +31,7 @@ type LabelsActor interface {
 
 type LabelsCommand struct {
 	RequiredArgs flag.LabelsArgs `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   space\n   org\n\nSEE ALSO:\n   set-label, delete-label"`
+	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   space\n   org\n\nSEE ALSO:\n   set-label, unset-label"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor

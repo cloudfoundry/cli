@@ -34,7 +34,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say(`\s+set-label, delete-label`))
+			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
 		})
 	})

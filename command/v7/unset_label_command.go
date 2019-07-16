@@ -10,23 +10,24 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-//go:generate counterfeiter . DeleteLabelActor
+//go:generate counterfeiter . UnsetLabelActor
 
-type DeleteLabelActor interface {
+type UnsetLabelActor interface {
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
-type DeleteLabelCommand struct {
-	RequiredArgs flag.DeleteLabelArgs `positional-args:"yes"`
-	usage        interface{}          `usage:"CF_NAME delete-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf delete-label app dora ci_signature_sha2\n\nRESOURCES:\n   app\n\nSEE ALSO:\n   set-label, labels"`
+type UnsetLabelCommand struct {
+	RequiredArgs flag.UnsetLabelArgs `positional-args:"yes"`
+	usage        interface{}          `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n\nRESOURCES:\n   app\n\nSEE ALSO:\n   set-label, labels"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
-	Actor        DeleteLabelActor
+	Actor        UnsetLabelActor
 }
 
-func (cmd *DeleteLabelCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *UnsetLabelCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
@@ -38,7 +39,7 @@ func (cmd *DeleteLabelCommand) Setup(config command.Config, ui command.UI) error
 	return nil
 }
 
-func (cmd DeleteLabelCommand) Execute(args []string) error {
+func (cmd UnsetLabelCommand) Execute(args []string) error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
@@ -54,6 +55,8 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 		err = cmd.executeApp(user.Name, labels)
 	case Org:
 		err = cmd.executeOrg(user.Name, labels)
+	case Space:
+		err = cmd.executeSpace(user.Name, labels)
 	default:
 		err = errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.RequiredArgs.ResourceType}))
 	}
@@ -66,13 +69,13 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd DeleteLabelCommand) executeApp(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeApp(username string, labels map[string]types.NullString) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting label(s) for app {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for app {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
@@ -86,18 +89,37 @@ func (cmd DeleteLabelCommand) executeApp(username string, labels map[string]type
 	return err
 }
 
-func (cmd DeleteLabelCommand) executeOrg(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeOrg(username string, labels map[string]types.NullString) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting label(s) for org {{.ResourceName}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for org {{.ResourceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"User":         username,
 	})
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, labels)
+
+	cmd.UI.DisplayWarnings(warnings)
+
+	return err
+}
+
+func (cmd UnsetLabelCommand) executeSpace(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(true, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for space {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"OrgName":      cmd.Config.TargetedOrganization().Name,
+		"User":         username,
+	})
+
+	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID, labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 

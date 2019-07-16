@@ -18,29 +18,29 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("delete-label command", func() {
+var _ = Describe("unset-label command", func() {
 	var (
-		cmd             DeleteLabelCommand
+		cmd             UnsetLabelCommand
 		fakeConfig      *commandfakes.FakeConfig
 		testUI          *ui.UI
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDeleteLabelActor
+		fakeActor       *v7fakes.FakeUnsetLabelActor
 		executeErr      error
 	)
 
-	When("deleting labels on apps", func() {
+	When("unsetting labels on apps", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
-			fakeActor = new(v7fakes.FakeDeleteLabelActor)
-			cmd = DeleteLabelCommand{
+			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			cmd = UnsetLabelCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			}
-			cmd.RequiredArgs = flag.DeleteLabelArgs{
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "app",
 			}
 		})
@@ -86,8 +86,8 @@ var _ = Describe("delete-label command", func() {
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
-				It("informs the user that labels are being deleted", func() {
-					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Deleting label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
+				It("informs the user that labels are being removed", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
 				})
 
 				When("updating the app labels succeeds", func() {
@@ -147,19 +147,19 @@ var _ = Describe("delete-label command", func() {
 		})
 	})
 
-	When("deleting labels on orgs", func() {
+	When("Unsetting labels on orgs", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
-			fakeActor = new(v7fakes.FakeDeleteLabelActor)
-			cmd = DeleteLabelCommand{
+			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			cmd = UnsetLabelCommand{
 				Actor:       fakeActor,
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 			}
-			cmd.RequiredArgs = flag.DeleteLabelArgs{
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "org",
 			}
 		})
@@ -183,8 +183,8 @@ var _ = Describe("delete-label command", func() {
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
-				It("informs the user that labels are being deleted", func() {
-					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Deleting label(s) for org %s as some-user...`), orgName))
+				It("informs the user that labels are being removed", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for org %s as some-user...`), orgName))
 				})
 
 				When("updating the org labels succeeds", func() {
@@ -217,6 +217,124 @@ var _ = Describe("delete-label command", func() {
 			})
 
 			When("fetching the current user's name fails", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("could not get user"))
+				})
+			})
+		})
+	})
+
+	When("Unsetting labels on spaces", func() {
+		BeforeEach(func() {
+			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+			fakeConfig = new(commandfakes.FakeConfig)
+			fakeSharedActor = new(commandfakes.FakeSharedActor)
+			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			cmd = UnsetLabelCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			}
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
+				ResourceType: "space",
+			}
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("doesn't error", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+
+		It("checks that the user is logged in and targeted to an org and space", func() {
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(checkOrg).To(BeTrue())
+			Expect(checkSpace).To(BeFalse())
+		})
+
+		When("checking the target fails", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(errors.New("Target not found"))
+			})
+
+			It("we expect an error to be returned", func() {
+				Expect(executeErr).To(MatchError("Target not found"))
+			})
+		})
+
+		When("checking the target succeeds", func() {
+			var spaceName string
+
+			BeforeEach(func() {
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
+				spaceName = "spiff"
+				cmd.RequiredArgs.ResourceName = spaceName
+			})
+
+			When("getting the current user succeeds", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+				})
+
+				It("informs the user that labels are being removed", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for space %s in org fake-org as some-user...`), spaceName))
+				})
+
+				When("updating the space labels succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.UpdateSpaceLabelsBySpaceNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+							nil)
+					})
+
+					It("does not return an error", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
+
+					It("passes the correct parameters into the actor", func() {
+						expectedMap := map[string]types.NullString{
+							"some-label":     types.NewNullString(),
+							"some-other-key": types.NewNullString()}
+
+						Expect(fakeActor.UpdateSpaceLabelsBySpaceNameCallCount()).To(Equal(1))
+						actualSpaceName, orgGUID, labelsMap := fakeActor.UpdateSpaceLabelsBySpaceNameArgsForCall(0)
+						Expect(actualSpaceName).To(Equal(spaceName))
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(labelsMap).To(Equal(expectedMap))
+					})
+				})
+
+				When("updating the space labels fails", func() {
+					BeforeEach(func() {
+						fakeActor.UpdateSpaceLabelsBySpaceNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+							errors.New("api call failed"))
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("api call failed"))
+					})
+				})
+			})
+			When("getting the user fails", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
