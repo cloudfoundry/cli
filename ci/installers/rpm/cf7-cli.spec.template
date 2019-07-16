@@ -12,16 +12,16 @@ Cloud Foundry CLI is the official command line client for Cloud Foundry.
 
 %install
 %{__rm} -rf %{buildroot}
-%{__install} -Dp -m0755 %{SOURCEURL0}/cf7 %{buildroot}%{_bindir}/cf7
-%{__install} -Dp -m0644 %{SOURCEURL0}/LICENSE %{buildroot}%{_defaultdocdir}/cf7-cli/LICENSE
-%{__install} -Dp -m0644 %{SOURCEURL0}/NOTICE %{buildroot}%{_defaultdocdir}/cf7-cli/NOTICE
-%{__install} -Dp -m0644 %{SOURCEURL0}/cf7.bash %{buildroot}%{_sysconfdir}/bash_completion.d/cf7.bash
+%{__install} -Dp -m0755 %{SOURCEURL0}/cf %{buildroot}%{_bindir}/cf
+%{__install} -Dp -m0644 %{SOURCEURL0}/LICENSE %{buildroot}%{_defaultdocdir}/cf-cli/LICENSE
+%{__install} -Dp -m0644 %{SOURCEURL0}/NOTICE %{buildroot}%{_defaultdocdir}/cf-cli/NOTICE
+%{__install} -Dp -m0644 %{SOURCEURL0}/cf.bash %{buildroot}%{_sysconfdir}/bash_completion.d/cf.bash
 
 %clean
 %{__rm} -rf %{buildroot}
 
 %files
-%{_bindir}/cf7
-%{_sysconfdir}/bash_completion.d/cf7.bash
-%license %{_defaultdocdir}/cf7-cli/LICENSE
-%license %{_defaultdocdir}/cf7-cli/NOTICE
+%{_bindir}/cf
+%{_sysconfdir}/bash_completion.d/cf.bash
+%license %{_defaultdocdir}/cf-cli/LICENSE
+%license %{_defaultdocdir}/cf-cli/NOTICE
