@@ -1164,6 +1164,57 @@ var _ = Describe("login Command", func() {
 							Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE`))
 						})
 					})
+
+					When("more than one space is available", func() {
+						BeforeEach(func() {
+							spaces := []v3action.Space{
+								{
+									GUID:             "some-space-guid",
+									Name:             "some-space-name",
+									OrganizationGUID: "targeted-org-guid",
+								},
+								{
+									GUID:             "some-space-guid1",
+									Name:             "some-space-name1",
+									OrganizationGUID: "targeted-org-guid1",
+								},
+								{
+									GUID:             "some-space-guid2",
+									Name:             "some-space-name2",
+									OrganizationGUID: "targeted-org-guid2",
+								},
+							}
+
+							fakeActor.GetOrganizationSpacesReturns(
+								spaces,
+								v3action.Warnings{},
+								nil,
+							)
+						})
+
+						It("displays a numbered list of spaces", func() {
+							Expect(testUI.Out).To(Say("Select a space:"))
+							Expect(testUI.Out).To(Say("1. some-space-name"))
+							Expect(testUI.Out).To(Say("2. some-space-name1"))
+							Expect(testUI.Out).To(Say("3. some-space-name2"))
+							Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+						})
+
+						When("I select that an entry", func() {
+							BeforeEach(func() {
+								input.Write([]byte("2\n"))
+							})
+
+							It("targets that space", func() {
+								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+								guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+								Expect(guid).To(Equal("some-space-guid1"))
+								Expect(name).To(Equal("some-space-name1"))
+								Expect(allowSSH).To(BeTrue())
+								Expect(executeErr).NotTo(HaveOccurred())
+							})
+						})
+					})
 				})
 			})
 		})

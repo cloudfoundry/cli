@@ -207,6 +207,9 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 			if len(spaces) == 1 {
 				cmd.targetSpace(spaces[0])
+			} else {
+				chosenSpace, _ := cmd.promptChosenSpace(spaces)
+				cmd.targetSpace(chosenSpace)
 			}
 		}
 
@@ -527,6 +530,26 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 	}
 
 	return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: chosenOrgName}
+}
+
+func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Space, error) {
+	var (
+		chosenSpaceName string
+	)
+
+	spaceNames := make([]string, len(spaces))
+	for i, space := range spaces {
+		spaceNames[i] = space.Name
+	}
+
+	chosenSpaceName, _ = cmd.promptMenu(spaceNames, "Select a space:", "Space")
+
+	for _, space := range spaces {
+		if space.Name == chosenSpaceName {
+			return space, nil
+		}
+	}
+	return v3action.Space{}, nil
 }
 
 func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string) (string, error) {

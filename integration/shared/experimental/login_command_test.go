@@ -581,6 +581,25 @@ var _ = Describe("login command", func() {
 				})
 			})
 
+			When("the -s flag is not passed", func() {
+				It("prompts the user to pick their space by list position", func() {
+					input := NewBuffer()
+					_, err := input.Write([]byte("1\n"))
+					Expect(err).ToNot(HaveOccurred())
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					re := regexp.MustCompile("1\\. (?P<SpaceName>.*)\n")
+					submatches := re.FindStringSubmatch(string(session.Out.Contents()))
+					Expect(submatches).ToNot(BeNil())
+					expectedSpaceName := submatches[1]
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
+				})
+			})
 		})
 
 	})
