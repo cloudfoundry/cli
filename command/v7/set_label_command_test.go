@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 	"regexp"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -30,6 +31,21 @@ var _ = Describe("set-label command", func() {
 
 		executeErr error
 	)
+
+	checkBuildpackArgFunc := func() {
+		BeforeEach(func() {
+			cmd.BuildpackStack = "cflinuxfs3"
+		})
+
+		It("displays an argument combination error", func() {
+			argumentCombinationError := translatableerror.ArgumentCombinationError{
+				Args: []string{strings.ToLower(cmd.RequiredArgs.ResourceType), "--stack, -s"},
+			}
+
+			Expect(executeErr).To(MatchError(argumentCombinationError))
+		})
+
+	}
 
 	When("setting labels on apps", func() {
 
@@ -219,6 +235,10 @@ var _ = Describe("set-label command", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
 		})
+
+		When("when the --stack flag is specified", func() {
+			checkBuildpackArgFunc()
+		})
 	})
 
 	When("setting labels on orgs", func() {
@@ -403,6 +423,10 @@ var _ = Describe("set-label command", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
 		})
+
+		When("when the --stack flag is specified", func() {
+			checkBuildpackArgFunc()
+		})
 	})
 
 	When("setting labels on buildpacks", func() {
@@ -576,6 +600,18 @@ var _ = Describe("set-label command", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
 		})
+
+		When("setting the stack argument", func() {
+
+			BeforeEach(func() {
+				cmd.BuildpackStack = "cflinuxfs3"
+			})
+
+			It("does not display an argument combination error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+		})
 	})
 
 	When("setting labels on spaces", func() {
@@ -695,18 +731,7 @@ var _ = Describe("set-label command", func() {
 				})
 
 				When("when the --stack flag is specified", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs = flag.SetLabelArgs{
-							ResourceType: "space",
-							ResourceName: resourceName,
-							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
-						}
-						cmd.BuildpackStack = "im-a-stack"
-					})
-
-					It("complains about the --stack flag being present", func() {
-						Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{Args: []string{"space", "--stack, -s"}}))
-					})
+					checkBuildpackArgFunc()
 				})
 
 				When("the resource type argument is not lowercase", func() {

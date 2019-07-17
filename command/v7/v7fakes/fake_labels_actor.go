@@ -26,6 +26,22 @@ type FakeLabelsActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetBuildpackLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
+	getBuildpackLabelsMutex       sync.RWMutex
+	getBuildpackLabelsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getBuildpackLabelsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getBuildpackLabelsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetOrganizationLabelsStub        func(string) (map[string]types.NullString, v7action.Warnings, error)
 	getOrganizationLabelsMutex       sync.RWMutex
 	getOrganizationLabelsArgsForCall []struct {
@@ -122,6 +138,73 @@ func (fake *FakeLabelsActor) GetApplicationLabelsReturnsOnCall(i int, result1 ma
 		})
 	}
 	fake.getApplicationLabelsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetBuildpackLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getBuildpackLabelsMutex.Lock()
+	ret, specificReturn := fake.getBuildpackLabelsReturnsOnCall[len(fake.getBuildpackLabelsArgsForCall)]
+	fake.getBuildpackLabelsArgsForCall = append(fake.getBuildpackLabelsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetBuildpackLabels", []interface{}{arg1, arg2})
+	fake.getBuildpackLabelsMutex.Unlock()
+	if fake.GetBuildpackLabelsStub != nil {
+		return fake.GetBuildpackLabelsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getBuildpackLabelsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeLabelsActor) GetBuildpackLabelsCallCount() int {
+	fake.getBuildpackLabelsMutex.RLock()
+	defer fake.getBuildpackLabelsMutex.RUnlock()
+	return len(fake.getBuildpackLabelsArgsForCall)
+}
+
+func (fake *FakeLabelsActor) GetBuildpackLabelsCalls(stub func(string, string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getBuildpackLabelsMutex.Lock()
+	defer fake.getBuildpackLabelsMutex.Unlock()
+	fake.GetBuildpackLabelsStub = stub
+}
+
+func (fake *FakeLabelsActor) GetBuildpackLabelsArgsForCall(i int) (string, string) {
+	fake.getBuildpackLabelsMutex.RLock()
+	defer fake.getBuildpackLabelsMutex.RUnlock()
+	argsForCall := fake.getBuildpackLabelsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeLabelsActor) GetBuildpackLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getBuildpackLabelsMutex.Lock()
+	defer fake.getBuildpackLabelsMutex.Unlock()
+	fake.GetBuildpackLabelsStub = nil
+	fake.getBuildpackLabelsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetBuildpackLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getBuildpackLabelsMutex.Lock()
+	defer fake.getBuildpackLabelsMutex.Unlock()
+	fake.GetBuildpackLabelsStub = nil
+	if fake.getBuildpackLabelsReturnsOnCall == nil {
+		fake.getBuildpackLabelsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getBuildpackLabelsReturnsOnCall[i] = struct {
 		result1 map[string]types.NullString
 		result2 v7action.Warnings
 		result3 error
@@ -266,6 +349,8 @@ func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationLabelsMutex.RLock()
 	defer fake.getApplicationLabelsMutex.RUnlock()
+	fake.getBuildpackLabelsMutex.RLock()
+	defer fake.getBuildpackLabelsMutex.RUnlock()
 	fake.getOrganizationLabelsMutex.RLock()
 	defer fake.getOrganizationLabelsMutex.RUnlock()
 	fake.getSpaceLabelsMutex.RLock()

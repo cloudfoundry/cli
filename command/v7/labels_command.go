@@ -29,11 +29,13 @@ type LabelsActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
+	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 }
 
 type LabelsCommand struct {
 	RequiredArgs flag.LabelsArgs `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   space\n   org\n\nSEE ALSO:\n   set-label, unset-label"`
+	StackName    string          `long:"stack" short:"s" description:"required when more than one buildpack has the same name"`
+	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n\nSEE ALSO:\n   set-label, unset-label"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
@@ -70,6 +72,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchOrgLabels(username)
 	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
+	case Buildpack:
+		labels, warnings, err = cmd.fetchBuildpackLabels(username)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
@@ -131,6 +135,22 @@ func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.Nul
 	cmd.UI.DisplayNewline()
 
 	return cmd.Actor.GetSpaceLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID)
+}
+
+func (cmd LabelsCommand) fetchBuildpackLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Getting labels for buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
+		"BuildpackName": cmd.RequiredArgs.ResourceName,
+		"Username":      username,
+	})
+
+	cmd.UI.DisplayNewline()
+
+	return cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.StackName)
 }
 
 func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
