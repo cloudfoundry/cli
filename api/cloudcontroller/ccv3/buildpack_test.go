@@ -58,7 +58,11 @@ var _ = Describe("Buildpacks", func() {
 							"stack": "windows64",
 							"position": 1,
 							"enabled": true,
-							"locked": false
+							"locked": false,
+							"unlocked": false,
+							"metadata": {
+								"labels": {}
+							}
 						},
 						{
 							"guid": "guid2",
@@ -67,7 +71,10 @@ var _ = Describe("Buildpacks", func() {
 							"stack": "cflinuxfs3",
 							"position": 2,
 							"enabled": false,
-							"locked": true
+							"locked": true,
+							"metadata": {
+								"labels": {}
+							}
 						}
 					]
 				}`, server.URL())
@@ -83,7 +90,10 @@ var _ = Describe("Buildpacks", func() {
 							"stack": "cflinuxfs2",
 							"position": 3,
 							"enabled": true,
-							"locked": false
+							"locked": false,
+							"metadata": {
+								"labels": {}
+							}
 						}
 					]
 				}`
@@ -119,6 +129,7 @@ var _ = Describe("Buildpacks", func() {
 						Locked:   types.NullBool{Value: false, IsSet: true},
 						Stack:    "windows64",
 						State:    "AWAITING_UPLOAD",
+						Metadata: &Metadata{Labels: map[string]types.NullString{}},
 					},
 					Buildpack{
 						Name:     "staticfile_buildpack",
@@ -128,6 +139,7 @@ var _ = Describe("Buildpacks", func() {
 						Locked:   types.NullBool{Value: true, IsSet: true},
 						Stack:    "cflinuxfs3",
 						State:    "AWAITING_UPLOAD",
+						Metadata: &Metadata{Labels: map[string]types.NullString{}},
 					},
 					Buildpack{
 						Name:     "go_buildpack",
@@ -137,6 +149,7 @@ var _ = Describe("Buildpacks", func() {
 						Locked:   types.NullBool{Value: false, IsSet: true},
 						Stack:    "cflinuxfs2",
 						State:    "AWAITING_UPLOAD",
+						Metadata: &Metadata{Labels: map[string]types.NullString{}},
 					},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))

@@ -407,5 +407,125 @@ var _ = Describe("labels command", func() {
 				})
 			})
 		})
+
+		Describe("for buildpacks", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				cmd.RequiredArgs = flag.LabelsArgs{
+					ResourceType: "buildpack",
+					ResourceName: "my-buildpack",
+				}
+				fakeLabelsActor.GetBuildpackLabelsReturns(
+					map[string]types.NullString{
+						"some-other-label": types.NewNullString("some-other-value"),
+						"some-label":       types.NewNullString("some-value"),
+					},
+					v7action.Warnings{},
+					nil)
+			})
+
+			It("doesn't error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("checks that the user is logged in", func() {
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+				Expect(checkOrg).To(BeFalse())
+				Expect(checkSpace).To(BeFalse())
+			})
+
+			It("displays a message that it is retrieving the labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for buildpack my-buildpack as some-user...`)))
+			})
+
+			It("retrieves the labels associated with the buidpack", func() {
+				Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
+			})
+
+			It("displays the labels that are associated with the buildpack, alphabetically", func() {
+				Expect(testUI.Out).To(Say(`key\s+value`))
+				Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+				Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+			})
+
+			When("CAPI returns warnings", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetBuildpackLabelsReturns(
+						map[string]types.NullString{
+							"some-other-label": types.NewNullString("some-other-value"),
+							"some-label":       types.NewNullString("some-value"),
+						},
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						nil)
+				})
+
+				It("prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+			})
+
+			When("there is an error retrieving the buildpack", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetBuildpackLabelsReturns(
+						map[string]types.NullString{},
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						errors.New("boom"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+
+				It("still prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+
+				It("doesn't say ok", func() {
+					Expect(testUI.Out).ToNot(Say("OK"))
+				})
+			})
+
+			When("checking targeted org and space fails", func() {
+				BeforeEach(func() {
+					fakeSharedActor.CheckTargetReturns(errors.New("nope"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("nope"))
+				})
+			})
+
+			When("fetching the current user's name fails", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "Buildpack",
+						ResourceName: "fake-buildpack",
+					}
+					cmd.StackName = "another-great-stack"
+				})
+
+				It("retrieves the labels associated with the buildpack", func() {
+					Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
+					buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
+					Expect(buildpackName).To(Equal("fake-buildpack"))
+					Expect(stackName).To(Equal("another-great-stack"))
+				})
+			})
+		})
 	})
 })

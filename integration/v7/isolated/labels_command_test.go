@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"fmt"
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -31,8 +32,9 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+cf labels app dora`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
-			Eventually(session).Should(Say(`\s+space`))
+			Eventually(session).Should(Say(`\s+buildpack`))
 			Eventually(session).Should(Say(`\s+org`))
+			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
@@ -41,14 +43,16 @@ var _ = Describe("labels command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
-			orgName   string
-			spaceName string
-			appName   string
-			username  string
+			orgName       string
+			spaceName     string
+			appName       string
+			username      string
+			buildpackName string
 		)
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
+			buildpackName = helpers.NewBuildpackName()
 			username, _ = helpers.GetCredentials()
 			helpers.LoginCF()
 			helpers.CreateOrg(orgName)
@@ -72,6 +76,7 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("set-label", "app", appName, "some-other-key=some-other-value", "some-key=some-value")
 					Eventually(session).Should(Exit(0))
 				})
+
 				It("lists the labels", func() {
 					session := helpers.CF("labels", "app", appName)
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app %s in org %s / space %s as %s...\n\n"), appName, orgName, spaceName, username))
@@ -180,6 +185,112 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("labels", "space", "non-existent-space")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), "non-existent-space", orgName, username))
 					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		Describe("buildpack labels", func() {
+			BeforeEach(func() {
+				helpers.SetupBuildpackWithStack(buildpackName, "cflinuxfs3")
+			})
+			AfterEach(func() {
+				session := helpers.CF("delete-buildpack", buildpackName, "-f")
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("there are labels set on the buildpack", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "buildpack", buildpackName, "some-other-key=some-other-value", "some-key=some-value")
+					Eventually(session).Should(Exit(0))
+				})
+				It("lists the labels", func() {
+					session := helpers.CF("labels", "buildpack", buildpackName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Eventually(session).Should(Say(`some-key\s+some-value`))
+					Eventually(session).Should(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("there are multiple buildpacks with the same name", func() {
+				var newStackName = "my-stack"
+				BeforeEach(func() {
+					helpers.SetupBuildpackWithStack(buildpackName, newStackName)
+					session := helpers.CF("set-label", "buildpack", buildpackName, "-s", newStackName,
+						"my-stack-some-other-key=some-other-value", "some-key=some-value")
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("set-label", "buildpack", buildpackName, "--stack", "cflinuxfs3",
+						"cfl2=var2", "cfl1=var1")
+					Eventually(session).Should(Exit(0))
+				})
+				AfterEach(func() {
+					session := helpers.CF("delete-buildpack", buildpackName, "-s", newStackName, "-f")
+					Eventually(session).Should(Exit(0))
+				})
+				It("fails when the buildpack is ambiguous", func() {
+					session := helpers.CF("labels", "buildpack", buildpackName)
+					Eventually(session.Err).Should(Say(fmt.Sprintf(`Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.`, buildpackName)))
+					Eventually(session).Should(Say(`FAILED`))
+				})
+				It("lists the labels for both buildpacks", func() {
+					session := helpers.CF("labels", "buildpack", buildpackName, "-s", newStackName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Eventually(session).Should(Say(`my-stack-some-other-key\s+some-other-value`))
+					Eventually(session).Should(Say(`some-key\s+some-value`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("labels", "buildpack", buildpackName, "--stack", "cflinuxfs3")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Eventually(session).Should(Say(`cfl1\s+var1`))
+					Eventually(session).Should(Say(`cfl2\s+var2`))
+					Eventually(session).Should(Exit(0))
+
+				})
+				When("there is also a buildpack with the same name but has no stack", func() {
+					BeforeEach(func() {
+						helpers.SetupBuildpackWithoutStack(buildpackName)
+						session := helpers.CF("set-label", "buildpack", buildpackName,
+							"nostack1=var1", "nostack2=var2")
+						Eventually(session).Should(Exit(0))
+
+					})
+					AfterEach(func() {
+						session := helpers.CF("delete-buildpack", buildpackName, "-f")
+						Eventually(session).Should(Exit(0))
+
+					})
+					It("uses the no-stack buildpack when no stack is specified", func() {
+
+						session := helpers.CF("labels", "buildpack", buildpackName)
+						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+						Eventually(session).Should(Say(`key\s+value`))
+						Eventually(session).Should(Say(`nostack1\s+var1`))
+						Eventually(session).Should(Say(`nostack2\s+var2`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("there are no labels set on the buildpack", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "buildpack", buildpackName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Eventually(session).Should(Say("No labels found."))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the buildpack does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "buildpack", "non-existent-buildpack")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), "non-existent-buildpack", username))
+					Eventually(session.Err).Should(Say("Buildpack 'non-existent-buildpack' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
