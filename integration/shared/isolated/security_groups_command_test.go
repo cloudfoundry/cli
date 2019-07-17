@@ -9,14 +9,9 @@ import (
 )
 
 var _ = Describe("security-groups command", func() {
-
 	var (
 		session *Session
 	)
-
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
 
 	Describe("help", func() {
 		When("--help flag is provided", func() {
@@ -50,6 +45,8 @@ var _ = Describe("security-groups command", func() {
 
 		When("there are security groups", func() {
 			var (
+				username string
+
 				securityGroup1 helpers.SecurityGroup
 				securityGroup2 helpers.SecurityGroup
 				securityGroup3 helpers.SecurityGroup
@@ -78,6 +75,8 @@ var _ = Describe("security-groups command", func() {
 
 			BeforeEach(func() {
 				helpers.ClearTarget()
+
+				username, _ = helpers.GetCredentials()
 
 				// Create Security Groups, Organizations, and Spaces with predictable and unique names for testing sorting
 				securityGroup1 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-1"), "tcp", "11.1.1.0/24", "80,443", "SG1")
@@ -148,7 +147,7 @@ var _ = Describe("security-groups command", func() {
 			})
 
 			It("lists the security groups", func() {
-				Eventually(session).Should(Say("Getting security groups as admin"))
+				Eventually(session).Should(Say("Getting security groups as %s", username))
 				Eventually(session).Should(Say(`OK\n\n`))
 				Eventually(session).Should(Say(`\s+name\s+organization\s+space\s+lifecycle`))
 				// How to test alphabetization with auto-generated names?  Here's how.
