@@ -249,4 +249,76 @@ var _ = Describe("Labels", func() {
 			})
 		})
 	})
+
+	Context("UpdateStackLabelsByStackName", func() {
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateStackLabelsByStackName(resourceName, labels)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetStacksReturns(
+					[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+					ccv3.Warnings([]string{"warning-1", "warning-2"}),
+					nil,
+				)
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					ccv3.ResourceMetadata{},
+					ccv3.Warnings{"set-stack-metadata"},
+					nil,
+				)
+			})
+
+			It("sets the stack labels", func() {
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, stackGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(resourceType).To(BeEquivalentTo("stack"))
+				Expect(stackGUID).To(BeEquivalentTo("some-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-stack-metadata"))
+			})
+		})
+
+		When("there are client errors", func() {
+			When("fetching the stack fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetStacksReturns(
+						[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
+						errors.New("get-stacks-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-failure-1", "warning-failure-2"))
+					Expect(executeErr).To(MatchError("get-stacks-error"))
+				})
+			})
+
+			When("updating the stack fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetStacksReturns(
+						[]ccv3.Stack{ccv3.Stack{GUID: "some-guid"}},
+						ccv3.Warnings([]string{"warning-1", "warning-2"}),
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
+						ccv3.ResourceMetadata{},
+						ccv3.Warnings{"set-stack"},
+						errors.New("update-stack-error"),
+					)
+				})
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-stack"))
+					Expect(executeErr).To(MatchError("update-stack-error"))
+				})
+			})
+		})
+	})
 })

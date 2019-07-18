@@ -39,6 +39,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+buildpack`))
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+space`))
+				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say(`\s+unset-label, labels`))
 
@@ -69,6 +70,10 @@ var _ = Describe("set-label command", func() {
 			orgName = helpers.NewOrgName()
 			helpers.CreateOrg(orgName)
 			stackNameBase = helpers.NewStackName()
+		})
+		AfterEach(func() {
+			session := helpers.CF("delete-org", "-f", orgName)
+			Eventually(session).Should(Exit(0))
 		})
 
 		When("assigning label to app", func() {
@@ -271,6 +276,7 @@ var _ = Describe("set-label command", func() {
 		When("assigning label to buildpack", func() {
 			var (
 				buildpackName string
+				stacks        []string
 			)
 
 			BeforeEach(func() {
@@ -488,5 +494,83 @@ var _ = Describe("set-label command", func() {
 				})
 			})
 		})
+
+		When("assigning label to stack", func() {
+			var (
+				stackName string
+				stackGUID string
+			)
+
+			BeforeEach(func() {
+				stackName, stackGUID = helpers.CreateStackWithGUID()
+			})
+			AfterEach(func() {
+				deleteResourceByGUID(stackGUID, "stacks")
+			})
+
+			It("sets the specified labels on the stack", func() {
+				session := helpers.CF("set-label", "stack", stackName, "pci=true", "public-facing=false")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for stack %s as %s...`), stackName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("curl", fmt.Sprintf("/v3/stacks/%s", stackGUID))
+				Eventually(session).Should(Exit(0))
+				stackJSON := session.Out.Contents()
+				var stack commonResource
+				Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
+				Expect(len(stack.Metadata.Labels)).To(Equal(2))
+				Expect(stack.Metadata.Labels["pci"]).To(Equal("true"))
+				Expect(stack.Metadata.Labels["public-facing"]).To(Equal("false"))
+			})
+
+			When("the stack is unknown", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "stack", "non-existent-stack", "some-key=some-value")
+					Eventually(session.Err).Should(Say("Stack 'non-existent-stack' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label has an empty key and an invalid value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "stack", stackName, "=test", "sha2=108&eb90d734")
+					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label does not include a '=' to separate the key and value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "stack", stackName, "test-label")
+					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "stack", stackName, "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("curl", fmt.Sprintf("/v3/stacks/%s", stackGUID))
+					Eventually(session).Should(Exit(0))
+					stackJSON := session.Out.Contents()
+					var stack commonResource
+					Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
+					Expect(len(stack.Metadata.Labels)).To(Equal(1))
+					Expect(stack.Metadata.Labels["owner"]).To(Equal("beth"))
+				})
+			})
+		})
 	})
 })
+
+func deleteResourceByGUID(guid string, urlType string) {
+	session := helpers.CF("curl", "-v", "-X", "DELETE",
+		fmt.Sprintf("/v3/%s/%s", urlType, guid))
+	Eventually(session).Should(Exit(0))
+	Eventually(session).Should(Say(`(?:204 No Content|202 Accepted)`))
+}

@@ -89,3 +89,12 @@ func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID str
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
 	return append(warnings, updateWarnings...), err
 }
+
+func (actor *Actor) UpdateStackLabelsByStackName(stackName string, labels map[string]types.NullString) (Warnings, error) {
+	stack, warnings, err := actor.GetStackByName(stackName)
+	if err != nil {
+		return warnings, err
+	}
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("stack", stack.GUID, ccv3.Metadata{Labels: labels})
+	return append(warnings, updateWarnings...), err
+}

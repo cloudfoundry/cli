@@ -21,11 +21,12 @@ type SetLabelActor interface {
 	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type SetLabelCommand struct {
 	RequiredArgs   flag.SetLabelArgs `positional-args:"yes"`
-	usage          interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label space business_space public-facing=false owner=jane_doe\n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n\nSEE ALSO:\n   unset-label, labels"`
+	usage          interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label space business_space public-facing=false owner=jane_doe\n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n   stack\n\nSEE ALSO:\n   unset-label, labels"`
 	BuildpackStack string            `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 
 	UI          command.UI
@@ -46,17 +47,6 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd SetLabelCommand) ValidateFlags() error {
-	if cmd.BuildpackStack != "" && ResourceType(cmd.RequiredArgs.ResourceType) != Buildpack {
-		return translatableerror.ArgumentCombinationError{
-			Args: []string{
-				cmd.RequiredArgs.ResourceType, "--stack, -s",
-			},
-		}
-	}
-	return nil
-}
-
 func (cmd SetLabelCommand) Execute(args []string) error {
 
 	labels := make(map[string]types.NullString)
@@ -69,11 +59,6 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	}
 
 	username, err := cmd.Config.CurrentUserName()
-	if err != nil {
-		return err
-	}
-
-	err = cmd.ValidateFlags()
 	if err != nil {
 		return err
 	}
@@ -92,6 +77,8 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		err = cmd.executeOrg(username, labels)
 	case Space:
 		err = cmd.executeSpace(username, labels)
+	case Stack:
+		err = cmd.executeStack(username, labels)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
@@ -112,7 +99,7 @@ func (cmd SetLabelCommand) executeApp(username string, labels map[string]types.N
 
 	appName := cmd.RequiredArgs.ResourceName
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
 	cmd.UI.DisplayTextWithFlavor(
 		preFlavoringText,
 		map[string]interface{}{
@@ -167,7 +154,7 @@ func (cmd SetLabelCommand) executeOrg(username string, labels map[string]types.N
 		return err
 	}
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
 	cmd.UI.DisplayTextWithFlavor(
 		preFlavoringText,
 		map[string]interface{}{
@@ -192,7 +179,7 @@ func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types
 
 	spaceName := cmd.RequiredArgs.ResourceName
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
 	cmd.UI.DisplayTextWithFlavor(
 		preFlavoringText,
 		map[string]interface{}{
@@ -212,6 +199,27 @@ func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types
 	}
 
 	return nil
+}
+
+func (cmd SetLabelCommand) executeStack(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return err
+	}
+
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"User":         username,
+		},
+	)
+
+	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
+	cmd.UI.DisplayWarnings(warnings)
+
+	return err
 }
 
 func (cmd SetLabelCommand) canonicalResourceTypeForName() ResourceType {

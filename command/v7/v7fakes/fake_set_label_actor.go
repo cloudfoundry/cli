@@ -69,6 +69,20 @@ type FakeSetLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateStackLabelsByStackNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
+	updateStackLabelsByStackNameMutex       sync.RWMutex
+	updateStackLabelsByStackNameArgsForCall []struct {
+		arg1 string
+		arg2 map[string]types.NullString
+	}
+	updateStackLabelsByStackNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateStackLabelsByStackNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -332,6 +346,70 @@ func (fake *FakeSetLabelActor) UpdateSpaceLabelsBySpaceNameReturnsOnCall(i int, 
 	}{result1, result2}
 }
 
+func (fake *FakeSetLabelActor) UpdateStackLabelsByStackName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateStackLabelsByStackNameMutex.Lock()
+	ret, specificReturn := fake.updateStackLabelsByStackNameReturnsOnCall[len(fake.updateStackLabelsByStackNameArgsForCall)]
+	fake.updateStackLabelsByStackNameArgsForCall = append(fake.updateStackLabelsByStackNameArgsForCall, struct {
+		arg1 string
+		arg2 map[string]types.NullString
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateStackLabelsByStackName", []interface{}{arg1, arg2})
+	fake.updateStackLabelsByStackNameMutex.Unlock()
+	if fake.UpdateStackLabelsByStackNameStub != nil {
+		return fake.UpdateStackLabelsByStackNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateStackLabelsByStackNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameCallCount() int {
+	fake.updateStackLabelsByStackNameMutex.RLock()
+	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
+	return len(fake.updateStackLabelsByStackNameArgsForCall)
+}
+
+func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameCalls(stub func(string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateStackLabelsByStackNameMutex.Lock()
+	defer fake.updateStackLabelsByStackNameMutex.Unlock()
+	fake.UpdateStackLabelsByStackNameStub = stub
+}
+
+func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameArgsForCall(i int) (string, map[string]types.NullString) {
+	fake.updateStackLabelsByStackNameMutex.RLock()
+	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
+	argsForCall := fake.updateStackLabelsByStackNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateStackLabelsByStackNameMutex.Lock()
+	defer fake.updateStackLabelsByStackNameMutex.Unlock()
+	fake.UpdateStackLabelsByStackNameStub = nil
+	fake.updateStackLabelsByStackNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateStackLabelsByStackNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateStackLabelsByStackNameMutex.Lock()
+	defer fake.updateStackLabelsByStackNameMutex.Unlock()
+	fake.UpdateStackLabelsByStackNameStub = nil
+	if fake.updateStackLabelsByStackNameReturnsOnCall == nil {
+		fake.updateStackLabelsByStackNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateStackLabelsByStackNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -343,6 +421,8 @@ func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
 	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
+	fake.updateStackLabelsByStackNameMutex.RLock()
+	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
