@@ -208,8 +208,14 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			if len(spaces) == 1 {
 				cmd.targetSpace(spaces[0])
 			} else {
-				chosenSpace, _ := cmd.promptChosenSpace(spaces)
-				cmd.targetSpace(chosenSpace)
+				var emptySpace v3action.Space
+				chosenSpace, err := cmd.promptChosenSpace(spaces)
+				if err != nil {
+					return err
+				}
+				if chosenSpace != emptySpace {
+					cmd.targetSpace(chosenSpace)
+				}
 			}
 		}
 
@@ -497,17 +503,12 @@ func (cmd *LoginCommand) displayNotTargetted() {
 }
 
 func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action.Organization, error) {
-	var (
-		chosenOrgName string
-		err           error
-	)
-
 	orgNames := make([]string, len(orgs))
 	for i, org := range orgs {
 		orgNames[i] = org.Name
 	}
 
-	chosenOrgName, err = cmd.promptMenu(orgNames, "Select an org:", "Org")
+	chosenOrgName, err := cmd.promptMenu(orgNames, "Select an org:", "Org")
 
 	if err != nil {
 		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
@@ -533,16 +534,20 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 }
 
 func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Space, error) {
-	var (
-		chosenSpaceName string
-	)
-
 	spaceNames := make([]string, len(spaces))
 	for i, space := range spaces {
 		spaceNames[i] = space.Name
 	}
 
-	chosenSpaceName, _ = cmd.promptMenu(spaceNames, "Select a space:", "Space")
+	chosenSpaceName, err := cmd.promptMenu(spaceNames, "Select a space:", "Space")
+	if err != nil {
+		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
+			return v3action.Space{}, translatableerror.SpaceNotFoundError{Name: invalidChoice.Choice}
+		} else if err == io.EOF {
+			return v3action.Space{}, nil
+		}
+		return v3action.Space{}, translatableerror.SpaceNotFoundError{Name: chosenSpaceName}
+	}
 
 	for _, space := range spaces {
 		if space.Name == chosenSpaceName {

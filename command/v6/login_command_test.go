@@ -1200,20 +1200,102 @@ var _ = Describe("login Command", func() {
 							Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
 						})
 
-						When("I select that an entry", func() {
-							BeforeEach(func() {
-								input.Write([]byte("2\n"))
-							})
+						When("the user selects a space by list position", func() {
+							When("the position is valid", func() {
+								BeforeEach(func() {
+									input.Write([]byte("2\n"))
+								})
 
-							It("targets that space", func() {
-								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
-								guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
-								Expect(guid).To(Equal("some-space-guid1"))
-								Expect(name).To(Equal("some-space-name1"))
-								Expect(allowSSH).To(BeTrue())
-								Expect(executeErr).NotTo(HaveOccurred())
+								It("targets that space", func() {
+									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+									guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+									Expect(guid).To(Equal("some-space-guid1"))
+									Expect(name).To(Equal("some-space-name1"))
+									Expect(allowSSH).To(BeTrue())
+									Expect(executeErr).NotTo(HaveOccurred())
+								})
+							})
+							When("the position is invalid", func() {
+								BeforeEach(func() {
+									input.Write([]byte("100\n"))
+								})
+
+								It("reprompts the user", func() {
+									Expect(testUI.Out).To(Say("Select a space:"))
+									Expect(testUI.Out).To(Say("1. some-space-name"))
+									Expect(testUI.Out).To(Say("2. some-space-name1"))
+									Expect(testUI.Out).To(Say("3. some-space-name2"))
+									Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+									Expect(testUI.Out).To(Say("1. some-space-name"))
+									Expect(testUI.Out).To(Say("2. some-space-name1"))
+									Expect(testUI.Out).To(Say("3. some-space-name2"))
+									Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+								})
+
 							})
 						})
+
+						When("the user selects a space by name", func() {
+							When("the list contains that space", func() {
+								BeforeEach(func() {
+									input.Write([]byte("some-space-name2\n"))
+								})
+
+								It("prompts the user to select a space", func() {
+									Expect(testUI.Out).To(Say("Select a space:"))
+									Expect(testUI.Out).To(Say("1. some-space-name"))
+									Expect(testUI.Out).To(Say("2. some-space-name1"))
+									Expect(testUI.Out).To(Say("3. some-space-name2"))
+									Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+									Expect(executeErr).ToNot(HaveOccurred())
+								})
+
+								It("targets that space", func() {
+									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+									guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+									Expect(guid).To(Equal("some-space-guid2"))
+									Expect(name).To(Equal("some-space-name2"))
+									Expect(allowSSH).To(BeTrue())
+									Expect(executeErr).NotTo(HaveOccurred())
+								})
+							})
+
+							When("the space is not in the list", func() {
+								BeforeEach(func() {
+									input.Write([]byte("invalid-space\n"))
+								})
+
+								It("returns an error", func() {
+									Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "invalid-space"}))
+								})
+
+								It("does not target the space", func() {
+									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
+								})
+							})
+
+							When("the user exits the prompt early", func() {
+								var fakeUI *commandfakes.FakeUI
+
+								BeforeEach(func() {
+									fakeUI = new(commandfakes.FakeUI)
+									cmd.UI = fakeUI
+								})
+
+								When("the prompt returns with an EOF", func() {
+									BeforeEach(func() {
+										fakeUI.DisplayTextMenuReturns("", io.EOF)
+									})
+									It("selects no space and returns no error", func() {
+										Expect(executeErr).ToNot(HaveOccurred())
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
+									})
+								})
+
+							})
+
+						})
+
 					})
 				})
 			})
