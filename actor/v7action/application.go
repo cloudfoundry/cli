@@ -280,10 +280,10 @@ func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, no
 		time.Sleep(actor.Config.PollingInterval())
 	}
 
-	checkDeployment := false // no need to check deployment first time through this loop
+	shouldCheckDeployment := false // no need to check deployment first time through this loop
 	for time.Now().Before(timeout) {
 		if noWait {
-			if checkDeployment {
+			if shouldCheckDeployment {
 				// Did the user cancel the deployment, or did it fail?
 				_, warnings, err := actor.checkDeployment(deploymentGUID, noWait)
 				allWarnings = append(allWarnings, warnings...)
@@ -291,7 +291,7 @@ func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, no
 					return allWarnings, err
 				}
 			} else {
-				checkDeployment = true
+				shouldCheckDeployment = true
 			}
 		}
 
@@ -374,14 +374,21 @@ func (actor Actor) checkDeployment(deploymentGUID string, noWait bool) (*ccv3.De
 		return nil, allWarnings, err
 	}
 
-	switch {
-	case deployment.State == constant.DeploymentCanceled:
-		return nil, allWarnings, errors.New("Deployment has been canceled")
-	case deployment.State == constant.DeploymentFailed:
-		return nil, allWarnings, errors.New("Deployment has failed")
-	case noWait || deployment.State == constant.DeploymentDeployed:
-		return &deployment, allWarnings, nil
-	default:
-		return nil, allWarnings, nil
+	switch deployment.StatusValue {
+	case constant.DeploymentStatusValueDeploying:
+		if noWait {
+			return &deployment, allWarnings, nil
+		}
+	case constant.DeploymentStatusValueFinalized:
+		switch deployment.StatusReason {
+		case constant.DeploymentStatusReasonCanceled:
+			return nil, allWarnings, errors.New("Deployment has been canceled")
+		case constant.DeploymentStatusReasonSuperseded:
+			return nil, allWarnings, errors.New("Deployment has been superseded")
+		case constant.DeploymentStatusReasonDeployed:
+			return &deployment, allWarnings, nil
+		}
 	}
+
+	return nil, allWarnings, nil
 }

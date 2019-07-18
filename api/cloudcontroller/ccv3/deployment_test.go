@@ -192,7 +192,11 @@ var _ = Describe("Task", func() {
 			BeforeEach(func() {
 				response = `{
 				    "guid": "some-deployment-guid",
-					"state": "DEPLOYING",
+					"state": "DEPLOYED",
+					"status": {
+						"value": "FINALIZED",
+						"reason": "SUPERSEDED"
+					},
 					"droplet": {
  					  "guid": "some-droplet-guid"
 					},
@@ -222,7 +226,9 @@ var _ = Describe("Task", func() {
 				Expect(warnings).To(ConsistOf("warning"))
 				Expect(deployment).To(Not(BeNil()))
 				Expect(deployment.GUID).To(Equal("some-deployment-guid"))
-				Expect(deployment.State).To(Equal(constant.DeploymentDeploying))
+				Expect(deployment.State).To(Equal(constant.DeploymentDeployed))
+				Expect(deployment.StatusValue).To(Equal(constant.DeploymentStatusValueFinalized))
+				Expect(deployment.StatusReason).To(Equal(constant.DeploymentStatusReasonSuperseded))
 			})
 		})
 

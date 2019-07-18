@@ -908,7 +908,7 @@ var _ = Describe("Application Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentReturns(
 					ccv3.Deployment{
-						State:        constant.DeploymentDeploying,
+						StatusValue:  constant.DeploymentStatusValueDeploying,
 						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 					},
 					ccv3.Warnings{"get-deployment-warning"},
@@ -937,7 +937,7 @@ var _ = Describe("Application Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
 					ccv3.Deployment{
-						State:        constant.DeploymentDeploying,
+						StatusValue:  constant.DeploymentStatusValueDeploying,
 						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 					},
 					ccv3.Warnings{"get-deployment-warning"},
@@ -946,7 +946,7 @@ var _ = Describe("Application Actions", func() {
 
 				fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
 					ccv3.Deployment{
-						State:        constant.DeploymentDeploying,
+						StatusValue:  constant.DeploymentStatusValueDeploying,
 						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 					},
 					ccv3.Warnings{"get-deployment-warning"},
@@ -955,7 +955,8 @@ var _ = Describe("Application Actions", func() {
 
 				fakeCloudControllerClient.GetDeploymentReturnsOnCall(2,
 					ccv3.Deployment{
-						State:        constant.DeploymentDeployed,
+						StatusValue:  constant.DeploymentStatusValueFinalized,
+						StatusReason: constant.DeploymentStatusReasonDeployed,
 						NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 					},
 					ccv3.Warnings{"get-deployment-warning"},
@@ -996,7 +997,8 @@ var _ = Describe("Application Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetDeploymentReturns(
 							ccv3.Deployment{
-								State:        constant.DeploymentDeployed,
+								StatusValue:  constant.DeploymentStatusValueFinalized,
+								StatusReason: constant.DeploymentStatusReasonDeployed,
 								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 							},
 							ccv3.Warnings{"get-deployment-warning"},
@@ -1059,7 +1061,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				When("the deployment is cancelled", func() {
+				When("the deployment is canceled", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
 							[]ccv3.ProcessInstance{
@@ -1081,7 +1083,7 @@ var _ = Describe("Application Actions", func() {
 
 						fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
 							ccv3.Deployment{
-								State:        constant.DeploymentDeploying,
+								StatusValue:  constant.DeploymentStatusValueDeploying,
 								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 							},
 							ccv3.Warnings{"get-deployment-warning1"},
@@ -1090,7 +1092,7 @@ var _ = Describe("Application Actions", func() {
 
 						fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
 							ccv3.Deployment{
-								State:        constant.DeploymentDeploying,
+								StatusValue:  constant.DeploymentStatusValueDeploying,
 								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 							},
 							ccv3.Warnings{"get-deployment-warning2"},
@@ -1099,7 +1101,8 @@ var _ = Describe("Application Actions", func() {
 
 						fakeCloudControllerClient.GetDeploymentReturnsOnCall(2,
 							ccv3.Deployment{
-								State:        constant.DeploymentCanceled,
+								StatusValue:  constant.DeploymentStatusValueFinalized,
+								StatusReason: constant.DeploymentStatusReasonCanceled,
 								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 							},
 							ccv3.Warnings{"get-deployment-warning3"},
@@ -1108,7 +1111,66 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("stops polling and returns an error", func() {
-						Expect(executeErr.Error()).To(Equal("Deployment has been canceled"))
+						Expect(executeErr).To(MatchError("Deployment has been canceled"))
+						Expect(warnings).To(ConsistOf("get-deployment-warning1", "poll-process-warning1",
+							"get-deployment-warning2", "poll-process-warning2", "get-deployment-warning3"))
+
+						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(3))
+						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
+					})
+				})
+
+				When("the deployment is superseded", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
+							ccv3.Warnings{"poll-process-warning1"},
+							nil,
+						)
+
+						fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+							[]ccv3.ProcessInstance{
+								{State: constant.ProcessInstanceStarting},
+								{State: constant.ProcessInstanceStarting},
+							},
+							ccv3.Warnings{"poll-process-warning2"},
+							nil,
+						)
+
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
+							ccv3.Deployment{
+								StatusValue:  constant.DeploymentStatusValueDeploying,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
+							ccv3.Warnings{"get-deployment-warning1"},
+							nil,
+						)
+
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(1,
+							ccv3.Deployment{
+								StatusValue:  constant.DeploymentStatusValueDeploying,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
+							ccv3.Warnings{"get-deployment-warning2"},
+							nil,
+						)
+
+						fakeCloudControllerClient.GetDeploymentReturnsOnCall(2,
+							ccv3.Deployment{
+								StatusValue:  constant.DeploymentStatusValueFinalized,
+								StatusReason: constant.DeploymentStatusReasonSuperseded,
+								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
+							},
+							ccv3.Warnings{"get-deployment-warning3"},
+							nil,
+						)
+					})
+
+					It("stops polling and returns an error", func() {
+						Expect(executeErr).To(MatchError("Deployment has been superseded"))
 						Expect(warnings).To(ConsistOf("get-deployment-warning1", "poll-process-warning1",
 							"get-deployment-warning2", "poll-process-warning2", "get-deployment-warning3"))
 
@@ -1148,7 +1210,7 @@ var _ = Describe("Application Actions", func() {
 
 						fakeCloudControllerClient.GetDeploymentReturns(
 							ccv3.Deployment{
-								State:        constant.DeploymentDeploying,
+								StatusValue:  constant.DeploymentStatusValueDeploying,
 								NewProcesses: []ccv3.Process{{Type: "new-web", GUID: "new-web-guid"}},
 							},
 							ccv3.Warnings{"get-deployment-warning"},

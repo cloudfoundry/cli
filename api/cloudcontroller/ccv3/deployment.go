@@ -13,6 +13,8 @@ import (
 type Deployment struct {
 	GUID          string
 	State         constant.DeploymentState
+	StatusValue   constant.DeploymentStatusValue
+	StatusReason  constant.DeploymentStatusReason
 	DropletGUID   string
 	CreatedAt     string
 	UpdatedAt     string
@@ -47,8 +49,12 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 		CreatedAt     string                   `json:"created_at,omitempty"`
 		Relationships Relationships            `json:"relationships,omitempty"`
 		State         constant.DeploymentState `json:"state,omitempty"`
-		Droplet       Droplet                  `json:"droplet,omitempty"`
-		NewProcesses  []Process                `json:"new_processes,omitempty"`
+		Status        struct {
+			Value  constant.DeploymentStatusValue  `json:"value"`
+			Reason constant.DeploymentStatusReason `json:"reason"`
+		} `json:"status"`
+		Droplet      Droplet   `json:"droplet,omitempty"`
+		NewProcesses []Process `json:"new_processes,omitempty"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccDeployment)
 	if err != nil {
@@ -59,6 +65,8 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	d.CreatedAt = ccDeployment.CreatedAt
 	d.Relationships = ccDeployment.Relationships
 	d.State = ccDeployment.State
+	d.StatusValue = ccDeployment.Status.Value
+	d.StatusReason = ccDeployment.Status.Reason
 	d.DropletGUID = ccDeployment.Droplet.GUID
 	d.NewProcesses = ccDeployment.NewProcesses
 
