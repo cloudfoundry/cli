@@ -61,12 +61,33 @@ func CreateStack(names ...string) string {
 		`{"name":"%s","description":"CF CLI integration test stack, please delete"}`,
 		name,
 	)
-	session := CF("curl", "-v", "-X", "POST", "/v2/stacks", "-d", requestBody)
+	session := CF("curl", "-v", "-X", "POST", "/v3/stacks", "-d", requestBody)
 
 	Eventually(session).Should(Say("201 Created"))
 	Eventually(session).Should(Exit(0))
 
 	return name
+}
+
+// CreateStackWithGUID creates a stack with a random name and returns its name and guid
+func CreateStackWithGUID() (string, string) {
+	type StackStruct struct {
+		GUID string `json:"guid"`
+	}
+	name := NewStackName()
+	requestBody := fmt.Sprintf(
+		`{"name":"%s","description":"CF CLI integration test stack, please delete"}`,
+		name,
+	)
+	session := CF("curl", "-X", "POST", "/v3/stacks", "-d", requestBody)
+
+	Eventually(session).Should(Exit(0))
+	thisStack := StackStruct{}
+	err := json.Unmarshal(session.Out.Contents(), &thisStack)
+	Expect(err).ToNot(HaveOccurred())
+	stackGUID := thisStack.GUID
+	Expect(len(stackGUID)).ToNot(Equal(0))
+	return name, stackGUID
 }
 
 // DeleteStack deletes a specific stack
@@ -75,7 +96,7 @@ func DeleteStack(name string) {
 	Eventually(session).Should(Exit(0))
 	guid := strings.TrimSpace(string(session.Out.Contents()))
 
-	session = CF("curl", "-v", "-X", "DELETE", "/v2/stacks/"+guid)
+	session = CF("curl", "-v", "-X", "DELETE", "/v3/stacks/"+guid)
 
 	Eventually(session).Should(Say("204 No Content"))
 	Eventually(session).Should(Exit(0))

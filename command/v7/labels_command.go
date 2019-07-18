@@ -21,6 +21,7 @@ const (
 	Buildpack ResourceType = "buildpack"
 	Org       ResourceType = "org"
 	Space     ResourceType = "space"
+	Stack     ResourceType = "stack"
 )
 
 //go:generate counterfeiter . LabelsActor

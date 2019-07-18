@@ -3,7 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -52,8 +52,14 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 			Body:        bytes.NewReader(metadataBtyes),
 			URIParams:   map[string]string{"space_guid": resourceGUID},
 		})
+	case "stack":
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.PatchStackRequest,
+			Body:        bytes.NewReader(metadataBtyes),
+			URIParams:   map[string]string{"stack_guid": resourceGUID},
+		})
 	default:
-		return ResourceMetadata{}, nil, errors.New("unknown resource type requested")
+		return ResourceMetadata{}, nil, fmt.Errorf("unknown resource type (%s) requested", resource)
 	}
 
 	if err != nil {
