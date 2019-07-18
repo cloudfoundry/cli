@@ -302,7 +302,7 @@ var _ = Describe("login command", func() {
 
 				When("user selects an organization by using numbered list", func() {
 					// required
-					It("prompts the user for org and target the selected org", func() {
+					It("prompts the user for org and targets the selected org", func() {
 						input := NewBuffer()
 						_, err := input.Write([]byte("1\n"))
 						Expect(err).ToNot(HaveOccurred())
@@ -599,6 +599,68 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Exit(0))
 					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
 				})
+
+				It("reprompts the user if an invalid number is entered", func() {
+					input := NewBuffer()
+					_, err := input.Write([]byte("4\n"))
+					Expect(err).ToNot(HaveOccurred())
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Space (enter to skip):")))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Space (enter to skip):")))
+					session.Interrupt()
+					Eventually(session).Should(Exit())
+				})
+
+				It("prompts the user to pick their space by name", func() {
+					input := NewBuffer()
+					_, err := input.Write([]byte(spaceName + "\n"))
+					Expect(err).ToNot(HaveOccurred())
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+
+				It("allows the user to skip picking a space", func() {
+					input := NewBuffer()
+					_, err := input.Write([]byte("\n"))
+					Expect(err).ToNot(HaveOccurred())
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`No space targeted, use 'cf target -s SPACE'`))
+				})
+
+				When("the input space name is invalid", func() {
+					BeforeEach(func() {
+						spaceName = "invalid-space-name"
+					})
+
+					It("the command fails and displays an error message. It does not target the space.", func() {
+						input := NewBuffer()
+						_, err := input.Write([]byte(spaceName + "\n"))
+						Expect(err).ToNot(HaveOccurred())
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
+
+						targetSession := helpers.CF("target")
+						Eventually(targetSession).Should(Exit(0))
+						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+						Eventually(targetSession).ShouldNot(Say(`space:\s+%s`, spaceName))
+						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
+					})
+				})
+
 			})
 		})
 
