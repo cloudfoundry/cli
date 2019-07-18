@@ -9,9 +9,10 @@ import (
 )
 
 //go:generate counterfeiter . CancelDeploymentActor
+
 type CancelDeploymentActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetLatestDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
+	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
 	CancelDeployment(deploymentGUID string) (v7action.Warnings, error)
 }
 
@@ -72,7 +73,7 @@ func (cmd *CancelDeploymentCommand) Execute(args []string) error {
 		return err
 	}
 
-	deployment, warnings, err := cmd.Actor.GetLatestDeploymentForApp(application.GUID)
+	deployment, warnings, err := cmd.Actor.GetLatestActiveDeploymentForApp(application.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

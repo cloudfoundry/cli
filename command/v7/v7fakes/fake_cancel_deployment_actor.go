@@ -38,17 +38,17 @@ type FakeCancelDeploymentActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetLatestDeploymentForAppStub        func(string) (v7action.Deployment, v7action.Warnings, error)
-	getLatestDeploymentForAppMutex       sync.RWMutex
-	getLatestDeploymentForAppArgsForCall []struct {
+	GetLatestActiveDeploymentForAppStub        func(string) (v7action.Deployment, v7action.Warnings, error)
+	getLatestActiveDeploymentForAppMutex       sync.RWMutex
+	getLatestActiveDeploymentForAppArgsForCall []struct {
 		arg1 string
 	}
-	getLatestDeploymentForAppReturns struct {
+	getLatestActiveDeploymentForAppReturns struct {
 		result1 v7action.Deployment
 		result2 v7action.Warnings
 		result3 error
 	}
-	getLatestDeploymentForAppReturnsOnCall map[int]struct {
+	getLatestActiveDeploymentForAppReturnsOnCall map[int]struct {
 		result1 v7action.Deployment
 		result2 v7action.Warnings
 		result3 error
@@ -187,66 +187,66 @@ func (fake *FakeCancelDeploymentActor) GetApplicationByNameAndSpaceReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCancelDeploymentActor) GetLatestDeploymentForApp(arg1 string) (v7action.Deployment, v7action.Warnings, error) {
-	fake.getLatestDeploymentForAppMutex.Lock()
-	ret, specificReturn := fake.getLatestDeploymentForAppReturnsOnCall[len(fake.getLatestDeploymentForAppArgsForCall)]
-	fake.getLatestDeploymentForAppArgsForCall = append(fake.getLatestDeploymentForAppArgsForCall, struct {
+func (fake *FakeCancelDeploymentActor) GetLatestActiveDeploymentForApp(arg1 string) (v7action.Deployment, v7action.Warnings, error) {
+	fake.getLatestActiveDeploymentForAppMutex.Lock()
+	ret, specificReturn := fake.getLatestActiveDeploymentForAppReturnsOnCall[len(fake.getLatestActiveDeploymentForAppArgsForCall)]
+	fake.getLatestActiveDeploymentForAppArgsForCall = append(fake.getLatestActiveDeploymentForAppArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("GetLatestDeploymentForApp", []interface{}{arg1})
-	fake.getLatestDeploymentForAppMutex.Unlock()
-	if fake.GetLatestDeploymentForAppStub != nil {
-		return fake.GetLatestDeploymentForAppStub(arg1)
+	fake.recordInvocation("GetLatestActiveDeploymentForApp", []interface{}{arg1})
+	fake.getLatestActiveDeploymentForAppMutex.Unlock()
+	if fake.GetLatestActiveDeploymentForAppStub != nil {
+		return fake.GetLatestActiveDeploymentForAppStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getLatestDeploymentForAppReturns
+	fakeReturns := fake.getLatestActiveDeploymentForAppReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeCancelDeploymentActor) GetLatestDeploymentForAppCallCount() int {
-	fake.getLatestDeploymentForAppMutex.RLock()
-	defer fake.getLatestDeploymentForAppMutex.RUnlock()
-	return len(fake.getLatestDeploymentForAppArgsForCall)
+func (fake *FakeCancelDeploymentActor) GetLatestActiveDeploymentForAppCallCount() int {
+	fake.getLatestActiveDeploymentForAppMutex.RLock()
+	defer fake.getLatestActiveDeploymentForAppMutex.RUnlock()
+	return len(fake.getLatestActiveDeploymentForAppArgsForCall)
 }
 
-func (fake *FakeCancelDeploymentActor) GetLatestDeploymentForAppCalls(stub func(string) (v7action.Deployment, v7action.Warnings, error)) {
-	fake.getLatestDeploymentForAppMutex.Lock()
-	defer fake.getLatestDeploymentForAppMutex.Unlock()
-	fake.GetLatestDeploymentForAppStub = stub
+func (fake *FakeCancelDeploymentActor) GetLatestActiveDeploymentForAppCalls(stub func(string) (v7action.Deployment, v7action.Warnings, error)) {
+	fake.getLatestActiveDeploymentForAppMutex.Lock()
+	defer fake.getLatestActiveDeploymentForAppMutex.Unlock()
+	fake.GetLatestActiveDeploymentForAppStub = stub
 }
 
-func (fake *FakeCancelDeploymentActor) GetLatestDeploymentForAppArgsForCall(i int) string {
-	fake.getLatestDeploymentForAppMutex.RLock()
-	defer fake.getLatestDeploymentForAppMutex.RUnlock()
-	argsForCall := fake.getLatestDeploymentForAppArgsForCall[i]
+func (fake *FakeCancelDeploymentActor) GetLatestActiveDeploymentForAppArgsForCall(i int) string {
+	fake.getLatestActiveDeploymentForAppMutex.RLock()
+	defer fake.getLatestActiveDeploymentForAppMutex.RUnlock()
+	argsForCall := fake.getLatestActiveDeploymentForAppArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCancelDeploymentActor) GetLatestDeploymentForAppReturns(result1 v7action.Deployment, result2 v7action.Warnings, result3 error) {
-	fake.getLatestDeploymentForAppMutex.Lock()
-	defer fake.getLatestDeploymentForAppMutex.Unlock()
-	fake.GetLatestDeploymentForAppStub = nil
-	fake.getLatestDeploymentForAppReturns = struct {
+func (fake *FakeCancelDeploymentActor) GetLatestActiveDeploymentForAppReturns(result1 v7action.Deployment, result2 v7action.Warnings, result3 error) {
+	fake.getLatestActiveDeploymentForAppMutex.Lock()
+	defer fake.getLatestActiveDeploymentForAppMutex.Unlock()
+	fake.GetLatestActiveDeploymentForAppStub = nil
+	fake.getLatestActiveDeploymentForAppReturns = struct {
 		result1 v7action.Deployment
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCancelDeploymentActor) GetLatestDeploymentForAppReturnsOnCall(i int, result1 v7action.Deployment, result2 v7action.Warnings, result3 error) {
-	fake.getLatestDeploymentForAppMutex.Lock()
-	defer fake.getLatestDeploymentForAppMutex.Unlock()
-	fake.GetLatestDeploymentForAppStub = nil
-	if fake.getLatestDeploymentForAppReturnsOnCall == nil {
-		fake.getLatestDeploymentForAppReturnsOnCall = make(map[int]struct {
+func (fake *FakeCancelDeploymentActor) GetLatestActiveDeploymentForAppReturnsOnCall(i int, result1 v7action.Deployment, result2 v7action.Warnings, result3 error) {
+	fake.getLatestActiveDeploymentForAppMutex.Lock()
+	defer fake.getLatestActiveDeploymentForAppMutex.Unlock()
+	fake.GetLatestActiveDeploymentForAppStub = nil
+	if fake.getLatestActiveDeploymentForAppReturnsOnCall == nil {
+		fake.getLatestActiveDeploymentForAppReturnsOnCall = make(map[int]struct {
 			result1 v7action.Deployment
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getLatestDeploymentForAppReturnsOnCall[i] = struct {
+	fake.getLatestActiveDeploymentForAppReturnsOnCall[i] = struct {
 		result1 v7action.Deployment
 		result2 v7action.Warnings
 		result3 error
@@ -260,8 +260,8 @@ func (fake *FakeCancelDeploymentActor) Invocations() map[string][][]interface{} 
 	defer fake.cancelDeploymentMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getLatestDeploymentForAppMutex.RLock()
-	defer fake.getLatestDeploymentForAppMutex.RUnlock()
+	fake.getLatestActiveDeploymentForAppMutex.RLock()
+	defer fake.getLatestActiveDeploymentForAppMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -39,7 +40,7 @@ var _ = Describe("Deployment Actions", func() {
 		})
 	})
 
-	Describe("GetLatestDeploymentForApp", func() {
+	Describe("GetLatestActiveDeploymentForApp", func() {
 		var (
 			executeErr error
 			warnings   Warnings
@@ -53,7 +54,7 @@ var _ = Describe("Deployment Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			deployment, warnings, executeErr = actor.GetLatestDeploymentForApp(appGUID)
+			deployment, warnings, executeErr = actor.GetLatestActiveDeploymentForApp(appGUID)
 		})
 
 		It("delegates to the CC client", func() {
@@ -61,6 +62,7 @@ var _ = Describe("Deployment Actions", func() {
 			Expect(fakeCloudControllerClient.GetDeploymentsArgsForCall(0)).To(Equal(
 				[]ccv3.Query{
 					{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+					{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueDeploying)}},
 					{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
 					{Key: ccv3.PerPage, Values: []string{"1"}},
 				},
@@ -92,7 +94,7 @@ var _ = Describe("Deployment Actions", func() {
 			})
 
 			It("returns a deployment not found error and warnings", func() {
-				Expect(executeErr).To(Equal(actionerror.DeploymentNotFoundError{}))
+				Expect(executeErr).To(Equal(actionerror.ActiveDeploymentNotFoundError{}))
 				Expect(warnings).To(ConsistOf("get-deployments-warning"))
 			})
 

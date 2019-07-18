@@ -77,7 +77,7 @@ var _ = Describe("Cancel Deployment", func() {
 			It("errors with a no deployments found error", func() {
 				session := helpers.CF("cancel-deployment", appName)
 				Eventually(session).Should(Say(fmt.Sprintf("Canceling deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Eventually(session.Err).Should(Say(`Deployment not found.`))
+				Eventually(session.Err).Should(Say(`No active deployment found for app\.`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -91,7 +91,7 @@ var _ = Describe("Cancel Deployment", func() {
 
 				session := helpers.CF("cancel-deployment", appName)
 				Eventually(session).Should(Say(fmt.Sprintf("Canceling deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Eventually(session.Err).Should(Say(`Cannot cancel a DEPLOYED deployment`))
+				Eventually(session.Err).Should(Say(`No active deployment found for app\.`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

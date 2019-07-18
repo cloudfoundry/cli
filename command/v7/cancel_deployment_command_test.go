@@ -116,7 +116,7 @@ var _ = Describe("Cancel deployment command", func() {
 				Expect(executeErr).To(MatchError("get-app-error"))
 				Expect(testUI.Err).To(Say("get-app-warning"))
 
-				Expect(fakeActor.GetLatestDeploymentForAppCallCount()).To(Equal(0))
+				Expect(fakeActor.GetLatestActiveDeploymentForAppCallCount()).To(Equal(0))
 				Expect(fakeActor.CancelDeploymentCallCount()).To(Equal(0))
 			})
 		})
@@ -133,13 +133,13 @@ var _ = Describe("Cancel deployment command", func() {
 			})
 
 			It("delegates to actor.GetLatestDeployment", func() {
-				Expect(fakeActor.GetLatestDeploymentForAppCallCount()).To(Equal(1))
-				Expect(fakeActor.GetLatestDeploymentForAppArgsForCall(0)).To(Equal(appGUID))
+				Expect(fakeActor.GetLatestActiveDeploymentForAppCallCount()).To(Equal(1))
+				Expect(fakeActor.GetLatestActiveDeploymentForAppArgsForCall(0)).To(Equal(appGUID))
 			})
 
 			When("getting the latest deployment fails", func() {
 				BeforeEach(func() {
-					fakeActor.GetLatestDeploymentForAppReturns(
+					fakeActor.GetLatestActiveDeploymentForAppReturns(
 						v7action.Deployment{},
 						v7action.Warnings{"get-deployment-warning"},
 						errors.New("get-deployment-error"),
@@ -159,7 +159,7 @@ var _ = Describe("Cancel deployment command", func() {
 				var deploymentGUID string
 				BeforeEach(func() {
 					deploymentGUID = "some-deployment-guid"
-					fakeActor.GetLatestDeploymentForAppReturns(
+					fakeActor.GetLatestActiveDeploymentForAppReturns(
 						v7action.Deployment{GUID: deploymentGUID},
 						v7action.Warnings{"get-deployment-warning"},
 						nil,

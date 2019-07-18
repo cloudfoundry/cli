@@ -23,7 +23,9 @@ const (
 	SequenceIDFilter QueryKey = "sequence_ids"
 	// SpaceGUIDFilter is a query parameter for listing objects by Space GUID.
 	SpaceGUIDFilter QueryKey = "space_guids"
-	// DomainGUIDFilter is a qeury param for listing objects by domain_guid
+	// StatusValueFilter is a query parameter for listing deployments by status.value
+	StatusValueFilter QueryKey = "status_values"
+	// DomainGUIDFilter is a query param for listing objects by domain_guid
 	DomainGUIDFilter QueryKey = "domain_guids"
 	// HostsFilter is a query param for listing objects by hostname
 	HostsFilter QueryKey = "hosts"
