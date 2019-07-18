@@ -10,10 +10,6 @@ import (
 )
 
 var _ = Describe("service-brokers command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -38,11 +34,12 @@ var _ = Describe("service-brokers command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
-			session *Session
+			username string
+			session  *Session
 		)
 
 		BeforeEach(func() {
-			helpers.LoginCF()
+			username = helpers.LoginCF()
 		})
 
 		JustBeforeEach(func() {
@@ -69,7 +66,7 @@ var _ = Describe("service-brokers command", func() {
 			})
 
 			It("prints a table of service brokers", func() {
-				Eventually(session).Should(Say("Getting service brokers as admin..."))
+				Eventually(session).Should(Say("Getting service brokers as %s...", username))
 				Eventually(session).Should(Say(`name\s+url`))
 				Eventually(session).Should(Say(`%s\s+%s`, broker.Name(), broker.URL()))
 				Eventually(session).Should(Exit(0))
@@ -81,6 +78,7 @@ var _ = Describe("service-brokers command", func() {
 				BeforeEach(func() {
 					var password string
 					unprivilegedUsername, password = helpers.CreateUser()
+					helpers.LogoutCF()
 					helpers.LoginAs(unprivilegedUsername, password)
 				})
 
