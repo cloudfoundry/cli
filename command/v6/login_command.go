@@ -169,10 +169,9 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
-		switch {
-		case len(orgs) == 1:
+		if len(orgs) == 1 {
 			cmd.Config.SetOrganizationInformation(orgs[0].GUID, orgs[0].Name)
-		case len(orgs) > 1:
+		} else if len(orgs) > 1 {
 			var emptyOrg v3action.Organization
 			chosenOrg, err := cmd.promptChosenOrg(orgs)
 			if err != nil {
@@ -207,7 +206,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 			if len(spaces) == 1 {
 				cmd.targetSpace(spaces[0])
-			} else {
+			} else if len(spaces) > 1 {
 				var emptySpace v3action.Space
 				chosenSpace, err := cmd.promptChosenSpace(spaces)
 				if err != nil {

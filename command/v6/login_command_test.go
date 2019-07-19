@@ -670,7 +670,7 @@ var _ = Describe("login Command", func() {
 			})
 		})
 
-		Describe("Minimum CLI version ", func() {
+		Describe("Minimum CLI version", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("whatever.com")
 
@@ -809,6 +809,12 @@ var _ = Describe("login Command", func() {
 					})
 
 					When("no org exists", func() {
+						It("does not prompt the user to select an org", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).ToNot(Say("Select an org:"))
+							Expect(testUI.Out).ToNot(Say(`Org \(enter to skip\):`))
+						})
+
 						It("displays how to target an org and space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
@@ -1122,6 +1128,29 @@ var _ = Describe("login Command", func() {
 				})
 
 				When("-s was not passed", func() {
+					When("no space exists", func() {
+						BeforeEach(func() {
+							fakeActor.GetOrganizationSpacesReturns(
+								[]v3action.Space{},
+								v3action.Warnings{},
+								nil,
+							)
+						})
+						It("does not prompt the user to select a space", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).ToNot(Say("Select a space:"))
+							Expect(testUI.Out).ToNot(Say(`Space \(enter to skip\):`))
+						})
+
+						It("displays how to target a space", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
+							Expect(testUI.Out).To(Say("User:           some-user"))
+							Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
+						})
+					})
+
 					When("only one space is available", func() {
 						BeforeEach(func() {
 							spaces := []v3action.Space{
