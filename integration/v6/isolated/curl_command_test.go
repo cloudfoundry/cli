@@ -125,6 +125,7 @@ var _ = Describe("curl command", func() {
 				Eventually(versionSession).Should(Exit(0))
 				versionPattern := regexp.MustCompile("cf version (.+)")
 				version := versionPattern.FindStringSubmatch(string(versionSession.Out.Contents()))
+				Expect(version).ToNot(BeEmpty())
 				return regexp.QuoteMeta(version[1])
 			}
 			session := helpers.CF("curl", "/v2/info", "-v")

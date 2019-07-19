@@ -592,7 +592,7 @@ var _ = Describe("login command", func() {
 
 					re := regexp.MustCompile("1\\. (?P<SpaceName>.*)\n")
 					submatches := re.FindStringSubmatch(string(session.Out.Contents()))
-					Expect(submatches).ToNot(BeNil())
+					Expect(submatches).ToNot(BeEmpty(), "missing numbered space list")
 					expectedSpaceName := submatches[1]
 
 					targetSession := helpers.CF("target")
