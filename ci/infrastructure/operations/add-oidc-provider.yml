@@ -41,6 +41,7 @@
             - label: 'key-1'
               passphrase: 'MY-PASSPHRASE'
         uaadb:
+          address: sql-db.service.cf.internal
           databases:
           - name: uaa_oidc
             tag: uaa
@@ -60,6 +61,8 @@
                   signingKey: ((uaa-oidc-key1.private_key))
           sslCertificate: ((uaa-oidc_tls.certificate))
           sslPrivateKey: ((uaa-oidc_tls.private_key))
+          ca_certs:
+          - ((mysql_server_certificate.ca))
           clients:
             rp_oidc_admin:
               authorized-grant-types: authorization_code,client_credentials,refresh_token,user_token,password,urn:ietf:params:oauth:grant-type:saml2-bearer,implicit
