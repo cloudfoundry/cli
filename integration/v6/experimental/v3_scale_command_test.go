@@ -304,7 +304,7 @@ var _ = Describe("v3-scale command", func() {
 					It("scales the app and displays the app summary", func() {
 						buffer := NewBuffer()
 						buffer.Write([]byte("y\n"))
-						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "120M", "-m", "6M")
+						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "10M", "-m", "6M")
 						Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
 						Eventually(session).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -320,7 +320,7 @@ var _ = Describe("v3-scale command", func() {
 						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/2`))
 						Expect(instanceSummary.State).To(MatchRegexp(`crashed`))
 						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 6M`))
-						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
+						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 10M`))
 					})
 				})
 			})
