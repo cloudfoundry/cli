@@ -1250,7 +1250,13 @@ var _ = Describe("Application Actions", func() {
 
 					It("returns the error and all warnings", func() {
 						Expect(executeErr).To(MatchError(errors.New("some-error")))
-						Expect(warnings).To(ConsistOf("get-app-warning-1", "get-app-warning-2"))
+						Expect(warnings).To(ConsistOf(
+							"get-deployment-warning",
+							"get-deployment-warning",
+							"get-deployment-warning",
+							"get-app-warning-1",
+							"get-app-warning-2",
+						))
 					})
 				})
 			})

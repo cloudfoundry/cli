@@ -249,62 +249,53 @@ func (actor Actor) PollStart(appGUID string, noWait bool) (Warnings, error) {
 	return allWarnings, actionerror.StartupTimeoutError{}
 }
 
-// PollStartForRolling polls a deploying application's processes until some are started. It does
-// the same thing as PollStart, except it accounts for rolling deployments and whether
+// PollStartForRolling polls a deploying application's processes until some are started. It does the same thing as PollStart, except it accounts for rolling deployments and whether
 // they have failed or been canceled during polling.
 func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, noWait bool) (Warnings, error) {
-	var allWarnings Warnings
-	var processes []ccv3.Process
+	var (
+		deployment  ccv3.Deployment
+		processes   []ccv3.Process
+		allWarnings Warnings
+	)
 
-	timeout := time.Now().Add(actor.Config.StartupTimeout())
+	timer := time.NewTimer(0)
+	defer timer.Stop()
+	timeout := time.After(actor.Config.StartupTimeout())
 
-	for time.Now().Before(timeout) {
-		// Do we have a healthy deployment?
-		ccDeployment, warnings, err := actor.checkDeployment(deploymentGUID, noWait)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return allWarnings, err
-		}
-		if ccDeployment != nil {
-			if noWait {
-				processes = ccDeployment.NewProcesses
-			} else {
-				ccProcesses, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
-				if err != nil {
-					return Warnings(warnings), err
-				}
-				processes = ccProcesses
-			}
-			break
-		}
-		time.Sleep(actor.Config.PollingInterval())
-	}
-
-	shouldCheckDeployment := false // no need to check deployment first time through this loop
-	for time.Now().Before(timeout) {
-		if noWait {
-			if shouldCheckDeployment {
-				// Did the user cancel the deployment, or did it fail?
-				_, warnings, err := actor.checkDeployment(deploymentGUID, noWait)
+	for {
+		select {
+		case <-timeout:
+			return allWarnings, actionerror.StartupTimeoutError{}
+		case <-timer.C:
+			if !isDeployed(deployment) {
+				ccDeployment, warnings, err := actor.getDeployment(deploymentGUID)
 				allWarnings = append(allWarnings, warnings...)
 				if err != nil {
 					return allWarnings, err
 				}
-			} else {
-				shouldCheckDeployment = true
+				deployment = ccDeployment
+				processes, warnings, err = actor.getProcesses(deployment, appGUID, noWait)
+				allWarnings = append(allWarnings, warnings...)
+				if err != nil {
+					return allWarnings, err
+				}
 			}
-		}
 
-		stopPolling, warnings, err := actor.PollProcesses(processes)
-		allWarnings = append(allWarnings, warnings...)
-		if stopPolling || err != nil {
-			return allWarnings, err
-		}
+			if noWait || isDeployed(deployment) {
+				stopPolling, warnings, err := actor.PollProcesses(processes)
+				allWarnings = append(allWarnings, warnings...)
+				if stopPolling || err != nil {
+					return allWarnings, err
+				}
+			}
 
-		time.Sleep(actor.Config.PollingInterval())
+			timer.Reset(actor.Config.PollingInterval())
+		}
 	}
+}
 
-	return allWarnings, actionerror.StartupTimeoutError{}
+func isDeployed(d ccv3.Deployment) bool {
+	return d.StatusValue == constant.DeploymentStatusValueFinalized && d.StatusReason == constant.DeploymentStatusReasonDeployed
 }
 
 // PollProcesses - return true if there's no need to keep polling
@@ -366,29 +357,38 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	}
 }
 
-func (actor Actor) checkDeployment(deploymentGUID string, noWait bool) (*ccv3.Deployment, Warnings, error) {
+func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnings, error) {
 	var allWarnings Warnings
 	deployment, warnings, err := actor.CloudControllerClient.GetDeployment(deploymentGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return nil, allWarnings, err
+		return deployment, allWarnings, err
 	}
 
-	switch deployment.StatusValue {
-	case constant.DeploymentStatusValueDeploying:
-		if noWait {
-			return &deployment, allWarnings, nil
-		}
-	case constant.DeploymentStatusValueFinalized:
+	if deployment.StatusValue == constant.DeploymentStatusValueFinalized {
 		switch deployment.StatusReason {
 		case constant.DeploymentStatusReasonCanceled:
-			return nil, allWarnings, errors.New("Deployment has been canceled")
+			return deployment, allWarnings, errors.New("Deployment has been canceled")
 		case constant.DeploymentStatusReasonSuperseded:
-			return nil, allWarnings, errors.New("Deployment has been superseded")
-		case constant.DeploymentStatusReasonDeployed:
-			return &deployment, allWarnings, nil
+			return deployment, allWarnings, errors.New("Deployment has been superseded")
 		}
 	}
 
-	return nil, allWarnings, nil
+	return deployment, allWarnings, nil
+}
+
+func (actor Actor) getProcesses(deployment ccv3.Deployment, appGUID string, noWait bool) ([]ccv3.Process, Warnings, error) {
+	if noWait {
+		return deployment.NewProcesses, nil, nil
+	}
+
+	if isDeployed(deployment) {
+		processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
+		if err != nil {
+			return processes, Warnings(warnings), err
+		}
+		return processes, nil, nil
+	}
+
+	return nil, nil, nil
 }
