@@ -43,6 +43,7 @@ var _ = Describe("Routes", func() {
 			orgGUID = "org-guid"
 			spaceGUID = "space-guid"
 			app = v7action.Application{Name: "app-name", GUID: "app-guid"}
+			gt = DefaultRoute
 			fakeV7Actor.GetDefaultDomainReturns(
 				v7action.Domain{GUID: "domain-guid", Name: "domain-name"},
 				v7action.Warnings{"get-default-domain-warning"},
