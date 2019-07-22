@@ -217,14 +217,14 @@ jobs:
       trigger: true
     - get: cli-ci
   - aggregate:
-    - task: golangci-lint
+    - task: lint
       file: cli-ci/ci/cli-v7/tasks/lint.yml
       on_failure:
          put: slack-alert
          params:
            channel: '#v3-acceleration-team'
            text: |
-             golangci-lint failed :(
+             lint failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-linux
       file: cli-ci/ci/cli-v7/tasks/units-linux.yml
