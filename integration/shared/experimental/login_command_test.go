@@ -489,8 +489,8 @@ var _ = Describe("login command", func() {
 				It("targets the org and the space", func() {
 					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
 
-					Eventually(session).Should(Say(`Targeted org:\s+%s`, orgName))
-					Eventually(session).Should(Say(`\n\nTargeted space:\s+%s`, spaceName))
+					Eventually(session).Should(Say(`Targeted org\s+%s`, orgName))
+					Eventually(session).Should(Say(`\n\nTargeted space\s+%s`, spaceName))
 
 					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
 					Eventually(session).Should(Say(`Space:\s+%s`, spaceName))
@@ -542,8 +542,8 @@ var _ = Describe("login command", func() {
 					_, writeErr := stdin.Write([]byte(orgName + "\n"))
 					Expect(writeErr).ToNot(HaveOccurred())
 
-					Eventually(session).Should(Say(`Targeted org:\s+%s`, orgName))
-					Eventually(session).Should(Say(`\n\nTargeted space:\s+%s`, spaceName))
+					Eventually(session).Should(Say(`Targeted org\s+%s`, orgName))
+					Eventually(session).Should(Say(`\n\nTargeted space\s+%s`, spaceName))
 
 					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
 					Eventually(session).Should(Say(`Space:\s+%s`, spaceName))

@@ -186,7 +186,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	targetedOrg := cmd.Config.TargetedOrganization()
 
 	if targetedOrg.GUID != "" {
-		cmd.UI.DisplayTextWithFlavor("Targeted org: {{.Organization}}", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Targeted org {{.Organization}}", map[string]interface{}{
 			"Organization": cmd.Config.TargetedOrganizationName(),
 		})
 
@@ -236,7 +236,7 @@ func (cmd *LoginCommand) targetSpace(space v3action.Space) {
 	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
 
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayTextWithFlavor("Targeted space: {{.Space}}", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}", map[string]interface{}{
 		"Space": space.Name,
 	})
 }
