@@ -227,6 +227,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayNewline()
 
 	return nil
 }
@@ -237,7 +238,6 @@ func (cmd *LoginCommand) targetSpace(space v3action.Space) {
 	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}", map[string]interface{}{
 		"Space": space.Name,
 	})
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd *LoginCommand) getAPI() error {
