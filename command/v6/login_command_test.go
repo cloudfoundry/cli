@@ -1188,7 +1188,7 @@ var _ = Describe("login Command", func() {
 							Expect(testUI.Err).To(Say("some-warning-1"))
 							Expect(testUI.Err).To(Say("some-warning-2"))
 
-							Expect(testUI.Out).To(Say(`Targeted space: some-space-name`))
+							Expect(testUI.Out).To(Say(`Targeted space some-space-name`))
 							Expect(testUI.Out).To(Say(`Space:\s+some-space-name`))
 							Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE`))
 						})
