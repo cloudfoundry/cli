@@ -666,6 +666,69 @@ var _ = Describe("login command", func() {
 
 	})
 
+	Describe("Full interactive happy path", func() {
+		var (
+			orgName1   string
+			orgName2   string
+			spaceName1 string
+			spaceName2 string
+			username   string
+			password   string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			orgName1 = helpers.NewOrgName()
+			orgName2 = helpers.NewOrgName()
+			spaceName1 = helpers.NewSpaceName()
+			spaceName2 = helpers.NewSpaceName()
+
+			Eventually(helpers.CF("create-org", orgName1)).Should(Exit(0))
+			Eventually(helpers.CF("create-org", orgName2)).Should(Exit(0))
+			Eventually(helpers.CF("create-space", "-o", orgName1, spaceName1)).Should(Exit(0))
+			Eventually(helpers.CF("create-space", "-o", orgName1, spaceName2)).Should(Exit(0))
+
+			username, password = helpers.CreateUser()
+			Eventually(helpers.CF("set-org-role", username, orgName1, "OrgManager")).Should(Exit(0))
+			Eventually(helpers.CF("set-org-role", username, orgName2, "OrgManager")).Should(Exit(0))
+			Eventually(helpers.CF("set-space-role", username, orgName1, spaceName1, "SpaceManager")).Should(Exit(0))
+			Eventually(helpers.CF("set-space-role", username, orgName1, spaceName2, "SpaceManager")).Should(Exit(0))
+		})
+
+		When("there are multiple orgs and spaces available to a user", func() {
+			It("prompts for username, password, org, and space. Then logs in and targets correctly", func() {
+				buffer := NewBuffer()
+				_, err := buffer.Write([]byte(fmt.Sprintf("%s\n%s\n%s\n%s\n", username, password, orgName1, spaceName2)))
+				Expect(err).ToNot(HaveOccurred())
+
+				session := helpers.CFWithStdin(buffer, "login")
+				Eventually(session).Should(Say("Email:"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("Password:"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("Select an org:"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+				Eventually(session).Should(Say(fmt.Sprintf("Targeted org %s", orgName1)))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("Select a space:"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
+				Eventually(session).Should(Say(fmt.Sprintf("Targeted space %s", spaceName2)))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say(`Org:\s+%s`, orgName1))
+				Eventually(session).Should(Say(`Space:\s+%s`, spaceName2))
+				Eventually(session).Should(Exit(0))
+
+				targetSession := helpers.CF("target")
+				Eventually(targetSession).Should(Exit(0))
+				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName1))
+				Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName2))
+			})
+		})
+	})
+
 	Describe("User Credentials", func() {
 		It("prompts the user for email and password", func() {
 			username, password := helpers.GetCredentials()

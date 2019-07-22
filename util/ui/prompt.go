@@ -85,6 +85,7 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 		t := fmt.Sprintf("%d. %s", i+1, c)
 		ui.DisplayText(t)
 	}
+	ui.DisplayNewline()
 
 	translatedPrompt := ui.TranslateText(promptTemplate, templateValues...)
 

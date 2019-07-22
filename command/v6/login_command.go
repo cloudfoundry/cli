@@ -189,6 +189,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		cmd.UI.DisplayTextWithFlavor("Targeted org {{.Organization}}", map[string]interface{}{
 			"Organization": cmd.Config.TargetedOrganizationName(),
 		})
+		cmd.UI.DisplayNewline()
 
 		if cmd.Space != "" {
 			space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, targetedOrg.GUID)
@@ -217,8 +218,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 				}
 			}
 		}
-
-		cmd.UI.DisplayNewline()
 	}
 
 	err = cmd.checkMinCLIVersion()
@@ -235,10 +234,10 @@ func (cmd *LoginCommand) Execute(args []string) error {
 func (cmd *LoginCommand) targetSpace(space v3action.Space) {
 	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
 
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}", map[string]interface{}{
 		"Space": space.Name,
 	})
+	cmd.UI.DisplayNewline()
 }
 
 func (cmd *LoginCommand) getAPI() error {
