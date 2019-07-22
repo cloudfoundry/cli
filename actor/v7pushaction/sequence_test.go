@@ -58,10 +58,22 @@ var _ = Describe("Actor", func() {
 			})
 
 			When("no-route is not given", func() {
-
-				It("does not the map default route function", func() {
-					Expect(sequence).To(BeEmpty())
+				BeforeEach(func() {
+					plan.NoRouteFlag = true
 				})
+
+				It("unmaps the existing route from the application", func() {
+					Expect(sequence).To(matchers.MatchFuncsByName(actor.UnmapRoutesFromApplication))
+				})
+			})
+		})
+
+		When("the plan requires **no** route", func() {
+			BeforeEach(func() {
+				plan = PushPlan{}
+			})
+
+			It("returns a sequence including unmapping he routes from the app", func() {
 			})
 		})
 

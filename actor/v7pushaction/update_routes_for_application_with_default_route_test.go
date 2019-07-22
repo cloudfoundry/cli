@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("UpdateWebProcessForApplication", func() {
+var _ = Describe("UpdateRoutesForApplicationWithDefaultRoute", func() {
 	var (
 		actor       *Actor
 		fakeV7Actor *v7pushactionfakes.FakeV7Actor

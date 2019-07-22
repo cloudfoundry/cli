@@ -1,9 +1,15 @@
 package v7pushaction
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+)
 
 func ShouldUpdateApplication(plan PushPlan) bool {
 	return plan.ApplicationNeedsUpdate
+}
+
+func ShouldUnmapRoutes(plan PushPlan) bool {
+	return plan.NoRouteFlag && len(plan.ApplicationRoutes) > 0
 }
 
 func ShouldCreateAndMapRandomRoute(plan PushPlan) bool {
@@ -59,6 +65,10 @@ func (actor Actor) GetUpdateSequence(plan PushPlan) []ChangeApplicationFunc {
 
 	if ShouldUpdateApplication(plan) {
 		updateSequence = append(updateSequence, actor.UpdateApplication)
+	}
+
+	if ShouldUnmapRoutes(plan) {
+		updateSequence = append(updateSequence, actor.UnmapRoutesFromApplication)
 	}
 
 	if ShouldCreateAndMapDefaultRoute(plan) {

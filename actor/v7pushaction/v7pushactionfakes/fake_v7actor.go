@@ -218,6 +218,22 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetRouteDestinationByAppGUIDStub        func(string, string) (v7action.RouteDestination, v7action.Warnings, error)
+	getRouteDestinationByAppGUIDMutex       sync.RWMutex
+	getRouteDestinationByAppGUIDArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getRouteDestinationByAppGUIDReturns struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRouteDestinationByAppGUIDReturnsOnCall map[int]struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}
 	MapRouteStub        func(string, string) (v7action.Warnings, error)
 	mapRouteMutex       sync.RWMutex
 	mapRouteArgsForCall []struct {
@@ -403,6 +419,20 @@ type FakeV7Actor struct {
 		result2 error
 	}
 	stopApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	UnmapRouteStub        func(string, string) (v7action.Warnings, error)
+	unmapRouteMutex       sync.RWMutex
+	unmapRouteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	unmapRouteReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	unmapRouteReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -1349,6 +1379,73 @@ func (fake *FakeV7Actor) GetRouteByAttributesReturnsOnCall(i int, result1 v7acti
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUID(arg1 string, arg2 string) (v7action.RouteDestination, v7action.Warnings, error) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	ret, specificReturn := fake.getRouteDestinationByAppGUIDReturnsOnCall[len(fake.getRouteDestinationByAppGUIDArgsForCall)]
+	fake.getRouteDestinationByAppGUIDArgsForCall = append(fake.getRouteDestinationByAppGUIDArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetRouteDestinationByAppGUID", []interface{}{arg1, arg2})
+	fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	if fake.GetRouteDestinationByAppGUIDStub != nil {
+		return fake.GetRouteDestinationByAppGUIDStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRouteDestinationByAppGUIDReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDCallCount() int {
+	fake.getRouteDestinationByAppGUIDMutex.RLock()
+	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
+	return len(fake.getRouteDestinationByAppGUIDArgsForCall)
+}
+
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDCalls(stub func(string, string) (v7action.RouteDestination, v7action.Warnings, error)) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	fake.GetRouteDestinationByAppGUIDStub = stub
+}
+
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDArgsForCall(i int) (string, string) {
+	fake.getRouteDestinationByAppGUIDMutex.RLock()
+	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
+	argsForCall := fake.getRouteDestinationByAppGUIDArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturns(result1 v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	fake.GetRouteDestinationByAppGUIDStub = nil
+	fake.getRouteDestinationByAppGUIDReturns = struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturnsOnCall(i int, result1 v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
+	fake.getRouteDestinationByAppGUIDMutex.Lock()
+	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
+	fake.GetRouteDestinationByAppGUIDStub = nil
+	if fake.getRouteDestinationByAppGUIDReturnsOnCall == nil {
+		fake.getRouteDestinationByAppGUIDReturnsOnCall = make(map[int]struct {
+			result1 v7action.RouteDestination
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRouteDestinationByAppGUIDReturnsOnCall[i] = struct {
+		result1 v7action.RouteDestination
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV7Actor) MapRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.mapRouteMutex.Lock()
 	ret, specificReturn := fake.mapRouteReturnsOnCall[len(fake.mapRouteArgsForCall)]
@@ -2206,6 +2303,70 @@ func (fake *FakeV7Actor) StopApplicationReturnsOnCall(i int, result1 v7action.Wa
 	}{result1, result2}
 }
 
+func (fake *FakeV7Actor) UnmapRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.unmapRouteMutex.Lock()
+	ret, specificReturn := fake.unmapRouteReturnsOnCall[len(fake.unmapRouteArgsForCall)]
+	fake.unmapRouteArgsForCall = append(fake.unmapRouteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UnmapRoute", []interface{}{arg1, arg2})
+	fake.unmapRouteMutex.Unlock()
+	if fake.UnmapRouteStub != nil {
+		return fake.UnmapRouteStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unmapRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) UnmapRouteCallCount() int {
+	fake.unmapRouteMutex.RLock()
+	defer fake.unmapRouteMutex.RUnlock()
+	return len(fake.unmapRouteArgsForCall)
+}
+
+func (fake *FakeV7Actor) UnmapRouteCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.unmapRouteMutex.Lock()
+	defer fake.unmapRouteMutex.Unlock()
+	fake.UnmapRouteStub = stub
+}
+
+func (fake *FakeV7Actor) UnmapRouteArgsForCall(i int) (string, string) {
+	fake.unmapRouteMutex.RLock()
+	defer fake.unmapRouteMutex.RUnlock()
+	argsForCall := fake.unmapRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) UnmapRouteReturns(result1 v7action.Warnings, result2 error) {
+	fake.unmapRouteMutex.Lock()
+	defer fake.unmapRouteMutex.Unlock()
+	fake.UnmapRouteStub = nil
+	fake.unmapRouteReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) UnmapRouteReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.unmapRouteMutex.Lock()
+	defer fake.unmapRouteMutex.Unlock()
+	fake.UnmapRouteStub = nil
+	if fake.unmapRouteReturnsOnCall == nil {
+		fake.unmapRouteReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.unmapRouteReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) UpdateApplication(arg1 v7action.Application) (v7action.Application, v7action.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -2506,6 +2667,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.getDomainMutex.RUnlock()
 	fake.getRouteByAttributesMutex.RLock()
 	defer fake.getRouteByAttributesMutex.RUnlock()
+	fake.getRouteDestinationByAppGUIDMutex.RLock()
+	defer fake.getRouteDestinationByAppGUIDMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
 	fake.pollBuildMutex.RLock()
@@ -2532,6 +2695,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.stageApplicationPackageMutex.RUnlock()
 	fake.stopApplicationMutex.RLock()
 	defer fake.stopApplicationMutex.RUnlock()
+	fake.unmapRouteMutex.RLock()
+	defer fake.unmapRouteMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.updateProcessByTypeAndApplicationMutex.RLock()

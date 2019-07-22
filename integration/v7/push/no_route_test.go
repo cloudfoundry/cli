@@ -21,13 +21,26 @@ var _ = Describe("no-route", func() {
 	})
 
 	When("the --no-route flag is set", func() {
-
 		It("does not map any routes to the app", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--no-route")
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--no-start", "--no-route")
 				Consistently(session).ShouldNot(Say(`Mapping routes\.\.\.`))
 				Eventually(session).Should(Say(`name:\s+%s`, appName))
-				Eventually(session).Should(Say(`requested state:\s+started`))
+				Eventually(session).Should(Say(`requested state:\s+stopped`))
+				Eventually(session).Should(Say(`(?m)routes:\s+\n`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		It("unmaps currently mapped routes", func() {
+			helpers.WithHelloWorldApp(func(appDir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--no-start")
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--no-start", "--no-route")
+				Consistently(session).ShouldNot(Say(`Mapping routes\.\.\.`))
+				Eventually(session).Should(Say(`name:\s+%s`, appName))
+				Eventually(session).Should(Say(`requested state:\s+stopped`))
 				Eventually(session).Should(Say(`(?m)routes:\s+\n`))
 				Eventually(session).Should(Exit(0))
 			})
@@ -46,10 +59,10 @@ var _ = Describe("no-route", func() {
 						},
 					},
 				})
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName)
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--no-start")
 				Consistently(session).ShouldNot(Say(`Mapping routes\.\.\.`))
 				Eventually(session).Should(Say(`name:\s+%s`, appName))
-				Eventually(session).Should(Say(`requested state:\s+started`))
+				Eventually(session).Should(Say(`requested state:\s+stopped`))
 				Eventually(session).Should(Say(`(?m)routes:\s+\n`))
 				Eventually(session).Should(Exit(0))
 			})

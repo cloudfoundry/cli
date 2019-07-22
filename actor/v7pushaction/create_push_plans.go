@@ -7,7 +7,13 @@ import (
 // CreatePushPlans returns a set of PushPlan objects based off the inputs
 // provided. It's assumed that all flag and argument and manifest combinations
 // have been validated prior to calling this function.
-func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser ManifestParser, overrides FlagOverrides) ([]PushPlan, error) {
+func (actor Actor) CreatePushPlans(
+	appNameArg string,
+	spaceGUID string,
+	orgGUID string,
+	parser ManifestParser,
+	overrides FlagOverrides,
+) ([]PushPlan, error) {
 	var pushPlans []PushPlan
 
 	for _, manifestApplication := range getEligibleApplications(parser, appNameArg) {
