@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/clock"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command"
@@ -39,7 +40,7 @@ func (cmd *DropletsCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
 	return nil
 }

@@ -32,7 +32,7 @@ var _ = Describe("Package Actions", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		fakeSharedActor = new(v7actionfakes.FakeSharedActor)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil, nil)
 	})
 
 	Describe("GetApplicationPackages", func() {

@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . CreateAppManifestActor
@@ -44,7 +45,7 @@ func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI)
 		return err
 	}
 
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir

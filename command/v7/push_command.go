@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/clock"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
@@ -122,7 +123,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	v7actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient)
+	v7actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 	cmd.VersionActor = v7actor
 	cmd.Actor = v7pushaction.NewActor(v7actor, sharedActor)
 

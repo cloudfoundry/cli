@@ -234,19 +234,24 @@ func (actor Actor) PollStart(appGUID string, noWait bool) (Warnings, error) {
 		filteredProcesses = processes
 	}
 
-	timeout := time.Now().Add(actor.Config.StartupTimeout())
+	timer := actor.Clock.NewTimer(time.Millisecond)
+	defer timer.Stop()
+	timeout := actor.Clock.After(actor.Config.StartupTimeout())
 
-	for time.Now().Before(timeout) {
-		stopPolling, warnings, err := actor.PollProcesses(filteredProcesses)
-		allWarnings = append(allWarnings, warnings...)
-		if stopPolling || err != nil {
-			return allWarnings, err
+	for {
+		select {
+		case <-timeout:
+			return allWarnings, actionerror.StartupTimeoutError{}
+		case <-timer.C():
+			stopPolling, warnings, err := actor.PollProcesses(filteredProcesses)
+			allWarnings = append(allWarnings, warnings...)
+			if stopPolling || err != nil {
+				return allWarnings, err
+			}
+
+			timer.Reset(actor.Config.PollingInterval())
 		}
-
-		time.Sleep(actor.Config.PollingInterval())
 	}
-
-	return allWarnings, actionerror.StartupTimeoutError{}
 }
 
 // PollStartForRolling polls a deploying application's processes until some are started. It does the same thing as PollStart, except it accounts for rolling deployments and whether
@@ -258,15 +263,15 @@ func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, no
 		allWarnings Warnings
 	)
 
-	timer := time.NewTimer(0)
+	timer := actor.Clock.NewTimer(time.Millisecond)
 	defer timer.Stop()
-	timeout := time.After(actor.Config.StartupTimeout())
+	timeout := actor.Clock.After(actor.Config.StartupTimeout())
 
 	for {
 		select {
 		case <-timeout:
 			return allWarnings, actionerror.StartupTimeoutError{}
-		case <-timer.C:
+		case <-timer.C():
 			if !isDeployed(deployment) {
 				ccDeployment, warnings, err := actor.getDeployment(deploymentGUID)
 				allWarnings = append(allWarnings, warnings...)

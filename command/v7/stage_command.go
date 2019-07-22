@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . StageActor
@@ -44,7 +45,7 @@ func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	return nil

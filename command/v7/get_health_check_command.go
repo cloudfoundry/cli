@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . GetHealthCheckActor
@@ -37,7 +38,7 @@ func (cmd *GetHealthCheckCommand) Setup(config command.Config, ui command.UI) er
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
 	return nil
 }

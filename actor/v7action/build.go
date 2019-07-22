@@ -59,45 +59,51 @@ func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan 
 			return
 		}
 
-		timeout := time.Now().Add(actor.Config.StagingTimeout())
+		timer := actor.Clock.NewTimer(time.Millisecond)
+		defer timer.Stop()
+		timeout := actor.Clock.After(actor.Config.StagingTimeout())
 
-		for time.Now().Before(timeout) {
-			var warnings ccv3.Warnings
-			build, warnings, err = actor.CloudControllerClient.GetBuild(build.GUID)
-			warningsStream <- Warnings(warnings)
-			if err != nil {
-				errorStream <- err
+		for {
+			select {
+			case <-timeout:
+				errorStream <- actionerror.StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 				return
-			}
-
-			switch build.State {
-			case constant.BuildFailed:
-				errorStream <- errors.New(build.Error)
-				return
-			case constant.BuildStaging:
-				time.Sleep(actor.Config.PollingInterval())
-			default:
-
-				//TODO: uncomment after #150569020
-				// ccv3Droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
-				// warningsStream <- Warnings(warnings)
-				// if err != nil {
-				// 	errorStream <- err
-				// 	return
-				// }
-
-				ccv3Droplet := ccv3.Droplet{
-					GUID:      build.DropletGUID,
-					State:     constant.DropletState(build.State),
-					CreatedAt: build.CreatedAt,
+			case <-timer.C():
+				var warnings ccv3.Warnings
+				build, warnings, err = actor.CloudControllerClient.GetBuild(build.GUID)
+				warningsStream <- Warnings(warnings)
+				if err != nil {
+					errorStream <- err
+					return
 				}
 
-				dropletStream <- actor.convertCCToActorDroplet(ccv3Droplet)
-				return
+				switch build.State {
+				case constant.BuildFailed:
+					errorStream <- errors.New(build.Error)
+					return
+				case constant.BuildStaging:
+					timer.Reset(actor.Config.PollingInterval())
+				default:
+
+					//TODO: uncomment after #150569020
+					// ccv3Droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
+					// warningsStream <- Warnings(warnings)
+					// if err != nil {
+					// 	errorStream <- err
+					// 	return
+					// }
+
+					ccv3Droplet := ccv3.Droplet{
+						GUID:      build.DropletGUID,
+						State:     constant.DropletState(build.State),
+						CreatedAt: build.CreatedAt,
+					}
+
+					dropletStream <- actor.convertCCToActorDroplet(ccv3Droplet)
+					return
+				}
 			}
 		}
-
-		errorStream <- actionerror.StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 	}()
 
 	return dropletStream, warningsStream, errorStream
@@ -121,12 +127,12 @@ func (actor Actor) StageApplicationPackage(packageGUID string) (Build, Warnings,
 func (actor Actor) PollBuild(buildGUID string, appName string) (Droplet, Warnings, error) {
 	var allWarnings Warnings
 
-	timeout := time.After(actor.Config.StagingTimeout())
-	interval := time.NewTimer(0)
+	timeout := actor.Clock.After(actor.Config.StagingTimeout())
+	interval := actor.Clock.NewTimer(time.Millisecond)
 
 	for {
 		select {
-		case <-interval.C:
+		case <-interval.C():
 			build, warnings, err := actor.CloudControllerClient.GetBuild(buildGUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {

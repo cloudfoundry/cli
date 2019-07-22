@@ -20,7 +20,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
 	})
 
 	Describe("CreateIsolationSegment", func() {

@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
 type ResourceType string
@@ -46,7 +47,7 @@ func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 	return nil
 }
 

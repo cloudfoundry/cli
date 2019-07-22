@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . ResetSpaceIsolationSegmentActor
@@ -43,7 +44,7 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {

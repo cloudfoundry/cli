@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/clock"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -49,7 +50,7 @@ func (cmd *CreateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 	cmd.ProgressBar = v7action.NewProgressBar()
 
 	return nil

@@ -29,7 +29,7 @@ var _ = Describe("Labels", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeSharedActor = new(v7actionfakes.FakeSharedActor)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil, nil)
 	})
 
 	Context("UpdateApplicationLabelsByApplicationName", func() {

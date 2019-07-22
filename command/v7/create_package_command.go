@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . CreatePackageActor
@@ -41,7 +42,7 @@ func (cmd *CreatePackageCommand) Setup(config command.Config, ui command.UI) err
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(client, config, sharedActor, nil)
+	cmd.Actor = v7action.NewActor(client, config, sharedActor, nil, clock.NewClock())
 
 	cmd.PackageDisplayer = shared.NewPackageDisplayer(cmd.UI, cmd.Config)
 

@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . UpdateBuildpackActor
@@ -57,7 +58,7 @@ func (cmd *UpdateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 	cmd.ProgressBar = v7action.NewProgressBar()
 
 	return nil

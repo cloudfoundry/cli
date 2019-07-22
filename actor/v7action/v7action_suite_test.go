@@ -6,9 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	log "github.com/sirupsen/logrus"
@@ -25,14 +27,15 @@ var _ = BeforeEach(func() {
 	log.SetLevel(log.PanicLevel)
 })
 
-func NewTestActor() (*Actor, *v7actionfakes.FakeCloudControllerClient, *v7actionfakes.FakeConfig, *v7actionfakes.FakeSharedActor, *v7actionfakes.FakeUAAClient) {
+func NewTestActor() (*Actor, *v7actionfakes.FakeCloudControllerClient, *v7actionfakes.FakeConfig, *v7actionfakes.FakeSharedActor, *v7actionfakes.FakeUAAClient, *fakeclock.FakeClock) {
 	fakeCloudControllerClient := new(v7actionfakes.FakeCloudControllerClient)
 	fakeConfig := new(v7actionfakes.FakeConfig)
 	fakeSharedActor := new(v7actionfakes.FakeSharedActor)
 	fakeUAAClient := new(v7actionfakes.FakeUAAClient)
-	actor := NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient)
+	fakeClock := fakeclock.NewFakeClock(time.Now())
+	actor := NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, fakeClock)
 
-	return actor, fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient
+	return actor, fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, fakeClock
 }
 
 // Thanks to Svett Ralchev

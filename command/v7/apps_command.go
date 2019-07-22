@@ -10,6 +10,7 @@ import (
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . AppsActor
@@ -38,7 +39,7 @@ func (cmd *AppsCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
 	ccClientV2, uaaClientV2, err := v6shared.NewClients(config, ui, true)
 	if err != nil {

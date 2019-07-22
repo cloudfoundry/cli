@@ -26,7 +26,7 @@ var _ = Describe("Resource Matching", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
 		resources = []sharedaction.V3Resource{}
 	})
 

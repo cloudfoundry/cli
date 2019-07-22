@@ -1,6 +1,8 @@
 // Package v7action contains the business logic for the commands/v3 package
 package v7action
 
+import "code.cloudfoundry.org/clock"
+
 // SortOrder is used for sorting.
 type SortOrder string
 
@@ -18,14 +20,16 @@ type Actor struct {
 	Config                Config
 	SharedActor           SharedActor
 	UAAClient             UAAClient
+	Clock                 clock.Clock
 }
 
 // NewActor returns a new V3 actor.
-func NewActor(client CloudControllerClient, config Config, sharedActor SharedActor, uaaClient UAAClient) *Actor {
+func NewActor(client CloudControllerClient, config Config, sharedActor SharedActor, uaaClient UAAClient, clk clock.Clock) *Actor {
 	return &Actor{
 		CloudControllerClient: client,
 		Config:                config,
 		SharedActor:           sharedActor,
 		UAAClient:             uaaClient,
+		Clock:                 clk,
 	}
 }

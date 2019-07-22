@@ -24,6 +24,17 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
+  name = "code.cloudfoundry.org/clock"
+  packages = [
+    ".",
+    "fakeclock",
+  ]
+  pruneopts = "NUT"
+  revision = "02e53af36e6c978af692887ed449b74026d76fec"
+  version = "1.0.0"
+
+[[projects]]
   digest = "1:286c64923387f8c88d79d737547f3dbc70e9d7e1343e9769c84e4647aac31aaa"
   name = "code.cloudfoundry.org/diego-ssh"
   packages = [
@@ -565,6 +576,8 @@
     "code.cloudfoundry.org/bytefmt",
     "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1",
     "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper",
+    "code.cloudfoundry.org/clock",
+    "code.cloudfoundry.org/clock/fakeclock",
     "code.cloudfoundry.org/diego-ssh/server",
     "code.cloudfoundry.org/diego-ssh/server/fakes",
     "code.cloudfoundry.org/diego-ssh/test_helpers",

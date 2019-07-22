@@ -23,7 +23,7 @@ var _ = Describe("Logging Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, fakeConfig, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
 		fakeNOAAClient = new(v7actionfakes.FakeNOAAClient)
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})

@@ -15,7 +15,7 @@ var _ = Describe("Version Check Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
 	})
 
 	Describe("CloudControllerAPIVersion", func() {
