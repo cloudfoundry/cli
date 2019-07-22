@@ -265,7 +265,7 @@ jobs:
     - get: cli-ci
   - aggregate:
     - task: golangci-lint
-      file: cli-ci/ci/cli-v7/tasks/golangci-lint.yml
+      file: cli-ci/ci/cli-v7/tasks/lint.yml
       on_failure:
         put: slack-alert
         params:
