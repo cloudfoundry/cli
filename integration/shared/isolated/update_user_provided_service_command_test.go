@@ -13,7 +13,6 @@ import (
 
 var _ = Describe("update-user-provided-service command", func() {
 	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionTagsOnUserProvidedServices)
 	})
 
@@ -34,9 +33,8 @@ var _ = Describe("update-user-provided-service command", func() {
 	})
 
 	When("an api is targeted, the user is logged in, and an org and space are targeted", func() {
-		const userName = "admin"
-
 		var (
+			userName  string
 			orgName   string
 			spaceName string
 		)
@@ -45,6 +43,7 @@ var _ = Describe("update-user-provided-service command", func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
+			userName, _ = helpers.GetCredentials()
 		})
 
 		AfterEach(func() {
