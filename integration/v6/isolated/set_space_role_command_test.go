@@ -9,10 +9,6 @@ import (
 )
 
 var _ = Describe("set-space-role command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	Describe("help text and argument validation", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -92,14 +88,15 @@ var _ = Describe("set-space-role command", func() {
 		})
 	})
 
-	When("logged in as admin", func() {
+	When("logged in as a privileged user", func() {
 		var (
-			orgName   string
-			spaceName string
+			privilegedUsername string
+			orgName            string
+			spaceName          string
 		)
 
 		BeforeEach(func() {
-			helpers.LoginCF()
+			privilegedUsername = helpers.LoginCF()
 			orgName = ReadOnlyOrg
 			spaceName = ReadOnlySpace
 		})
@@ -114,7 +111,7 @@ var _ = Describe("set-space-role command", func() {
 			When("the client exists", func() {
 				It("sets the org role for the client", func() {
 					session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
-					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", clientID, orgName, spaceName))
+					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as %s...", clientID, orgName, spaceName, privilegedUsername))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -159,7 +156,7 @@ var _ = Describe("set-space-role command", func() {
 			When("the passed role is lowercase", func() {
 				It("sets the space role for the user", func() {
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "spaceauditor")
-					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -167,7 +164,7 @@ var _ = Describe("set-space-role command", func() {
 
 			It("sets the space role for the user", func() {
 				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
-				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -188,13 +185,13 @@ var _ = Describe("set-space-role command", func() {
 			When("the user already has the desired role", func() {
 				BeforeEach(func() {
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
-					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))
 					Eventually(session).Should(Exit(0))
 				})
 
 				It("is idempotent", func() {
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
-					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -221,7 +218,7 @@ var _ = Describe("set-space-role command", func() {
 		When("the user does not exist", func() {
 			It("prints an appropriate error and exits 1", func() {
 				session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
-				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user not-exists in org %s / space %s as admin...", orgName, spaceName))
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user not-exists in org %s / space %s as %s...", orgName, spaceName, privilegedUsername))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Say("Server error, status code: 404, error code: 20003, message: The user could not be found: not-exists"))
 				Eventually(session).Should(Exit(1))
