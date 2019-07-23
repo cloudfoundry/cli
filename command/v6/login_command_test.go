@@ -870,6 +870,9 @@ var _ = Describe("login Command", func() {
 						When("the user selects an org by list position", func() {
 							When("the position is valid", func() {
 								BeforeEach(func() {
+									fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+										GUID: "targeted-org-guid1"})
+									fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
 									input.Write([]byte("2\n"))
 								})
 
@@ -878,6 +881,7 @@ var _ = Describe("login Command", func() {
 									Expect(testUI.Out).To(Say("1. 1234"))
 									Expect(testUI.Out).To(Say("2. some-org-name1"))
 									Expect(testUI.Out).To(Say("3. some-org-name2"))
+									Expect(testUI.Out).To(Say("\n\n"))
 									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
 									Expect(executeErr).ToNot(HaveOccurred())
 								})
@@ -887,6 +891,10 @@ var _ = Describe("login Command", func() {
 									orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
 									Expect(orgGUID).To(Equal("some-org-guid1"))
 									Expect(orgName).To(Equal("some-org-name1"))
+								})
+
+								It("outputs targeted org", func() {
+									Expect(testUI.Out).To(Say("Targeted org targeted-org-name"))
 								})
 							})
 
@@ -1326,6 +1334,42 @@ var _ = Describe("login Command", func() {
 						})
 
 					})
+				})
+			})
+		})
+
+		Describe("Targeting Org and Space", func() {
+			When("the user selects an org and space by list positions", func() {
+				BeforeEach(func() {
+					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+						GUID: "targeted-org-guid1"})
+					fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
+
+					spaces := []v3action.Space{
+						{
+							GUID:             "some-space-guid",
+							Name:             "some-space-name",
+							OrganizationGUID: "targeted-org-guid",
+						},
+						{
+							GUID:             "some-space-guid1",
+							Name:             "some-space-name1",
+							OrganizationGUID: "targeted-org-guid1",
+						},
+					}
+
+					fakeActor.GetOrganizationSpacesReturns(
+						spaces,
+						v3action.Warnings{},
+						nil,
+					)
+
+					input.Write([]byte("2\n"))
+				})
+
+				It("outputs targeted org", func() {
+					Expect(testUI.Out).To(Say("Targeted org targeted-org-name\n\nSelect a space"),
+						"Expect an empty line between 'Targeted org' and 'Select a space' messages")
 				})
 			})
 		})
