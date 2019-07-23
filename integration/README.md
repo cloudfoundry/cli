@@ -45,13 +45,17 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/shared/global in
 - `SKIP_SSL_VALIDATION` - If true, will skip SSL Validation. Will default `--skip-ssl-validation` if not set.
 - `CF_INT_USERNAME` - The CF Administrator username. Will default to `admin` if not set.
 - `CF_INT_PASSWORD` - The CF Administrator password. Will default to `admin` if not set.
+- `CF_INT_CLIENT_ID` - The ID for the integration client credentials identity.
+- `CF_INT_CLIENT_SECRET` - The secret for the integration client credentials identity.
+- `CF_INT_CLIENT_CREDENTIALS_TEST_MODE` - If `true` all tests capable of being run under a client will authenticate with client credentials.
+- `CF_INT_CUSTOM_CLIENT_ID` - The ID for a custom client used in place of the standard `cf` client.
+- `CF_INT_CUSTOM_CLIENT_SECRET` - The secret for a custom client used in place of the standard `cf` client.
 - `CF_INT_OIDC_USERNAME` - The admin user in the OIDC identity provider. Will default to `admin_oidc` if not set.
 - `CF_INT_OIDC_PASSWORD` - The admin password in the OIDC identity provider. Will default to `admin` if not set.
 - `CF_INT_DOCKER_IMAGE` - A private docker image used for the docker authentication tests.
 - `CF_INT_DOCKER_USERNAME` - The username for the private docker registry for `CF_INT_DOCKER_IMAGE`.
 - `CF_INT_DOCKER_PASSWORD` - The password for `CF_INT_DOCKER_USERNAME`.
-- `CF_INT_CLIENT_ID` - the ID for the integration client credentials identity.
-- `CF_INT_CLIENT_SECRET` - the secret for the integration client credentials identity.
+- `CF_INT_IGNORE_API_VERSION_CHECK` - If `true`, will not skip tests that are dependent on a minimum version of the API.
 - `CF_CLI_EXPERIMENTAL` - Will enable both experimental functionality of the CF CLI and tests for that functionality. Will default to `false` if not set.
 - `KEEP_FAKE_SERVICE_BROKERS` - If `true`, will not delete any deployed reusable fake service broker apps. Useful for local development: allows for faster test suite re-runs. Will default to `false` if not set.
 
