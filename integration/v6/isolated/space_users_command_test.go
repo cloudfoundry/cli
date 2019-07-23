@@ -10,10 +10,6 @@ import (
 )
 
 var _ = Describe("space-users command", func() {
-	BeforeEach(func() {
-		helpers.SkipIfClientCredentialsTestMode()
-	})
-
 	When("the user is logged in", func() {
 		var (
 			orgName       string
