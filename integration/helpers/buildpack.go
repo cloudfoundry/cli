@@ -95,7 +95,7 @@ func DeleteBuildpackIfOnOldCCAPI(buildpackName string) {
 }
 
 type Buildpack struct {
-	Guid  string `json:"guid"`
+	GUID  string `json:"guid"`
 	Name  string `json:"name"`
 	Stack string `json:"stack"`
 }
@@ -116,5 +116,5 @@ func BuildpackGUIDByNameAndStack(buildpackName string, stackName string) string 
 	err := json.Unmarshal(bytes, &buildpacks)
 	Expect(err).ToNot(HaveOccurred())
 
-	return buildpacks.Buildpacks[0].Guid
+	return buildpacks.Buildpacks[0].GUID
 }
