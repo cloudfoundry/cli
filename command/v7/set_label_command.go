@@ -47,7 +47,8 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd SetLabelCommand) ValidateFlags() error {
-	if cmd.BuildpackStack != "" && ResourceType(cmd.RequiredArgs.ResourceType) != Buildpack {
+	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
+	if cmd.BuildpackStack != "" && ResourceType(resourceTypeString) != Buildpack {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
 				cmd.RequiredArgs.ResourceType, "--stack, -s",

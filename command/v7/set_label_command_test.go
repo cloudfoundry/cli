@@ -572,7 +572,7 @@ var _ = Describe("set-label command", func() {
 						)
 					})
 
-					It("sets the provided labels on the org", func() {
+					It("sets the provided labels on the buildpack", func() {
 						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
 						Expect(stack).To(Equal(""), "failed to pass buildpack stack")
@@ -584,6 +584,17 @@ var _ = Describe("set-label command", func() {
 
 					It("prints the flavor text in lowercase", func() {
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s`), resourceName))
+					})
+
+					When("setting the stack argument", func() {
+						BeforeEach(func() {
+							cmd.BuildpackStack = "cflinuxfs3"
+						})
+
+						It("does not display an argument combination error", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+						})
+
 					})
 				})
 			})
