@@ -216,8 +216,13 @@ var _ = Describe("labels command", func() {
 			})
 
 			When("there are multiple buildpacks with the same name", func() {
-				var newStackName = "my-stack"
+				var (
+					newStackName string
+				)
+
 				BeforeEach(func() {
+					newStackName = helpers.NewStackName()
+					helpers.CreateStack(newStackName)
 					helpers.SetupBuildpackWithStack(buildpackName, newStackName)
 					session := helpers.CF("set-label", "buildpack", buildpackName, "-s", newStackName,
 						"my-stack-some-other-key=some-other-value", "some-key=some-value")
@@ -229,6 +234,7 @@ var _ = Describe("labels command", func() {
 				AfterEach(func() {
 					session := helpers.CF("delete-buildpack", buildpackName, "-s", newStackName, "-f")
 					Eventually(session).Should(Exit(0))
+					helpers.DeleteStack(newStackName)
 				})
 				It("fails when the buildpack is ambiguous", func() {
 					session := helpers.CF("labels", "buildpack", buildpackName)
@@ -290,7 +296,7 @@ var _ = Describe("labels command", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "buildpack", "non-existent-buildpack")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), "non-existent-buildpack", username))
-					Eventually(session.Err).Should(Say("Buildpack 'non-existent-buildpack' not found"))
+					Eventually(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
