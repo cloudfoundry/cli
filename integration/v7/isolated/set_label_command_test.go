@@ -309,7 +309,7 @@ var _ = Describe("set-label command", func() {
 			When("the buildpack is unknown", func() {
 				It("displays an error", func() {
 					session := helpers.CF("set-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Buildpack 'non-existent-buildpack' not found"))
+					Eventually(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
@@ -363,7 +363,7 @@ var _ = Describe("set-label command", func() {
 			When("the buildpack exists in general but does NOT exist for the specified stack", func() {
 				It("displays an error", func() {
 					session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value", "--stack", "FAKE")
-					Eventually(session.Err).Should(Say(fmt.Sprintf("Buildpack '%s' with stack 'FAKE' not found", buildpackName)))
+					Eventually(session.Err).Should(Say(fmt.Sprintf("Buildpack %s with stack FAKE not found", buildpackName)))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
