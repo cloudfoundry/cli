@@ -325,6 +325,51 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 
+				When("the buildpack exists for multiple stacks", func() {
+					var stacks []string
+
+					BeforeEach(func() {
+						stacks = helpers.EnsureMinimumNumberOfStacks(2)
+
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath, "99")
+							Eventually(createSession).Should(Exit(0))
+						}, stacks[1])
+					})
+					AfterEach(func() {
+						buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[1])
+						deleteResourceByGUID(buildpackGUID, "buildpacks")
+					})
+
+					When("stack is not specified", func() {
+						It("displays an error", func() {
+							session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value")
+							Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("stack is specified", func() {
+						It("sets the specified labels on the correct buildpack", func() {
+							session := helpers.CF("set-label", "buildpack", buildpackName, "pci=true", "public-facing=false", "--stack", stacks[1])
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as %s...`), buildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[1])
+							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
+							Eventually(session).Should(Exit(0))
+							buildpackJSON := session.Out.Contents()
+							var buildpack commonResource
+							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+							Expect(buildpack.Metadata.Labels["pci"]).To(Equal("true"))
+							Expect(buildpack.Metadata.Labels["public-facing"]).To(Equal("false"))
+						})
+					})
+				})
+
 				When("the buildpack exists in general but does NOT exist for the specified stack", func() {
 					It("displays an error", func() {
 						session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value", "--stack", "FAKE")
