@@ -408,6 +408,124 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
+		Describe("for stacks", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				cmd.RequiredArgs = flag.LabelsArgs{
+					ResourceType: "stack",
+					ResourceName: "fake-stack",
+				}
+				fakeLabelsActor.GetStackLabelsReturns(
+					map[string]types.NullString{
+						"some-other-label": types.NewNullString("some-other-value"),
+						"some-label":       types.NewNullString("some-value"),
+					},
+					v7action.Warnings{},
+					nil)
+			})
+
+			It("doesn't error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("checks that the user is logged in", func() {
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+				Expect(checkOrg).To(BeFalse())
+				Expect(checkSpace).To(BeFalse())
+			})
+
+			It("displays a message that it is retrieving the labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for stack fake-stack as some-user...`)))
+			})
+
+			It("retrieves the labels associated with the stack", func() {
+				Expect(fakeLabelsActor.GetStackLabelsCallCount()).To(Equal(1))
+			})
+
+			It("displays the labels that are associated with the stack, alphabetically", func() {
+				Expect(testUI.Out).To(Say(`key\s+value`))
+				Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+				Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+			})
+
+			When("CAPI returns warnings", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetStackLabelsReturns(
+						map[string]types.NullString{
+							"some-other-label": types.NewNullString("some-other-value"),
+							"some-label":       types.NewNullString("some-value"),
+						},
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						nil)
+				})
+
+				It("prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+			})
+
+			When("there is an error retrieving the stack", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetStackLabelsReturns(
+						map[string]types.NullString{},
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						errors.New("boom"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+
+				It("still prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+
+				It("doesn't say ok", func() {
+					Expect(testUI.Out).ToNot(Say("OK"))
+				})
+			})
+
+			When("checking targeted stack and space fails", func() {
+				BeforeEach(func() {
+					fakeSharedActor.CheckTargetReturns(errors.New("nope"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("nope"))
+				})
+			})
+
+			When("fetching the current user's name fails", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "StaCk",
+						ResourceName: "fake-stack",
+					}
+				})
+
+				It("retrieves the labels associated with the stack", func() {
+					Expect(fakeLabelsActor.GetStackLabelsCallCount()).To(Equal(1))
+					stackName := fakeLabelsActor.GetStackLabelsArgsForCall(0)
+					Expect(stackName).To(Equal("fake-stack"))
+				})
+			})
+		})
+
 		Describe("for buildpacks", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserNameReturns("some-user", nil)
