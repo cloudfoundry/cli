@@ -152,7 +152,7 @@ var _ = Describe("unset-label command", func() {
 			When("the buildpack exists for multiple stacks", func() {
 				var buildpackGUIDs [2]string
 				BeforeEach(func() {
-					stacks = helpers.EnsureMinimumNumberOfStacks(2)
+					stacks = []string{helpers.PreferredStack(), helpers.CreateStack()}
 					for i := 0; i < 2; i++ {
 
 						helpers.BuildpackWithStack(func(buildpackPath string) {
@@ -171,6 +171,7 @@ var _ = Describe("unset-label command", func() {
 					for i := 0; i < 2; i++ {
 						deleteResourceByGUID(buildpackGUIDs[i], "buildpacks")
 					}
+					helpers.DeleteStack(stacks[1])
 				})
 
 				When("stack is not specified", func() {
