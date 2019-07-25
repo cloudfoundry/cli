@@ -1296,18 +1296,6 @@ var _ = Describe("login Command", func() {
 										input.Write([]byte("some-space-name2\n"))
 									})
 
-									It("prompts the user to select a space", func() {
-										Expect(testUI.Out).To(Say("Select a space:"))
-										Expect(testUI.Out).To(Say("1. some-space-name"))
-										Expect(testUI.Out).To(Say("2. some-space-name1"))
-										Expect(testUI.Out).To(Say("3. some-space-name2"))
-										Expect(testUI.Out).To(Say("4. 3"))
-										Expect(testUI.Out).To(Say("5. 100"))
-										Expect(testUI.Out).To(Say("\n\n"))
-										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
-										Expect(executeErr).ToNot(HaveOccurred())
-									})
-
 									It("targets that space", func() {
 										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
 										guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
