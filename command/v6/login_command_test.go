@@ -1136,203 +1136,222 @@ var _ = Describe("login Command", func() {
 				})
 
 				When("-s was not passed", func() {
-					When("no space exists", func() {
-						BeforeEach(func() {
-							fakeActor.GetOrganizationSpacesReturns(
-								[]v3action.Space{},
-								v3action.Warnings{},
-								nil,
-							)
-						})
-						It("does not prompt the user to select a space", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).ToNot(Say("Select a space:"))
-							Expect(testUI.Out).ToNot(Say(`Space \(enter to skip\):`))
-						})
+					When("fetching the spaces for an organization succeeds", func() {
 
-						It("displays how to target a space", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
+						When("no space exists", func() {
+							BeforeEach(func() {
+								fakeActor.GetOrganizationSpacesReturns(
+									[]v3action.Space{},
+									v3action.Warnings{},
+									nil,
+								)
+							})
+							It("does not prompt the user to select a space", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).ToNot(Say("Select a space:"))
+								Expect(testUI.Out).ToNot(Say(`Space \(enter to skip\):`))
+							})
 
-							Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
-							Expect(testUI.Out).To(Say("User:           some-user"))
-							Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
-						})
-					})
+							It("displays how to target a space", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
 
-					When("only one space is available", func() {
-						BeforeEach(func() {
-							spaces := []v3action.Space{
-								{
-									GUID:             "some-space-guid",
-									Name:             "some-space-name",
-									OrganizationGUID: "targeted-org-guid",
-								},
-							}
-
-							fakeActor.GetOrganizationSpacesReturns(
-								spaces,
-								v3action.Warnings{"some-warning-1", "some-warning-2"},
-								nil,
-							)
-
-							fakeConfig.TargetedSpaceReturns(configv3.Space{
-								GUID: "some-space-guid",
-								Name: "some-space-name",
+								Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
+								Expect(testUI.Out).To(Say("User:           some-user"))
+								Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
 							})
 						})
 
-						It("targets this space", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
+						When("only one space is available", func() {
+							BeforeEach(func() {
+								spaces := []v3action.Space{
+									{
+										GUID:             "some-space-guid",
+										Name:             "some-space-name",
+										OrganizationGUID: "targeted-org-guid",
+									},
+								}
 
-							Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
-							Expect(fakeActor.GetOrganizationSpacesArgsForCall(0)).To(Equal("targeted-org-guid"))
+								fakeActor.GetOrganizationSpacesReturns(
+									spaces,
+									v3action.Warnings{},
+									nil,
+								)
 
-							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
-
-							firstArg, secondArg, _ := fakeConfig.SetSpaceInformationArgsForCall(0)
-							Expect(firstArg).To(Equal("some-space-guid"))
-							Expect(secondArg).To(Equal("some-space-name"))
-
-							Expect(testUI.Err).To(Say("some-warning-1"))
-							Expect(testUI.Err).To(Say("some-warning-2"))
-
-							Expect(testUI.Out).To(Say(`Targeted space some-space-name`))
-							Expect(testUI.Out).To(Say(`Space:\s+some-space-name`))
-							Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE`))
-						})
-					})
-
-					When("more than one space is available", func() {
-						BeforeEach(func() {
-							spaces := []v3action.Space{
-								{
-									GUID:             "some-space-guid",
-									Name:             "some-space-name",
-									OrganizationGUID: "targeted-org-guid",
-								},
-								{
-									GUID:             "some-space-guid1",
-									Name:             "some-space-name1",
-									OrganizationGUID: "targeted-org-guid1",
-								},
-								{
-									GUID:             "some-space-guid2",
-									Name:             "some-space-name2",
-									OrganizationGUID: "targeted-org-guid2",
-								},
-							}
-
-							fakeActor.GetOrganizationSpacesReturns(
-								spaces,
-								v3action.Warnings{},
-								nil,
-							)
-						})
-
-						It("displays a numbered list of spaces", func() {
-							Expect(testUI.Out).To(Say("Select a space:"))
-							Expect(testUI.Out).To(Say("1. some-space-name"))
-							Expect(testUI.Out).To(Say("2. some-space-name1"))
-							Expect(testUI.Out).To(Say("3. some-space-name2"))
-							Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
-						})
-
-						When("the user selects a space by list position", func() {
-							When("the position is valid", func() {
-								BeforeEach(func() {
-									input.Write([]byte("2\n"))
-								})
-
-								It("targets that space", func() {
-									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
-									guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
-									Expect(guid).To(Equal("some-space-guid1"))
-									Expect(name).To(Equal("some-space-name1"))
-									Expect(allowSSH).To(BeTrue())
-									Expect(executeErr).NotTo(HaveOccurred())
-								})
-							})
-							When("the position is invalid", func() {
-								BeforeEach(func() {
-									input.Write([]byte("100\n"))
-								})
-
-								It("reprompts the user", func() {
-									Expect(testUI.Out).To(Say("Select a space:"))
-									Expect(testUI.Out).To(Say("1. some-space-name"))
-									Expect(testUI.Out).To(Say("2. some-space-name1"))
-									Expect(testUI.Out).To(Say("3. some-space-name2"))
-									Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
-									Expect(testUI.Out).To(Say("1. some-space-name"))
-									Expect(testUI.Out).To(Say("2. some-space-name1"))
-									Expect(testUI.Out).To(Say("3. some-space-name2"))
-									Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
-								})
-
-							})
-						})
-
-						When("the user selects a space by name", func() {
-							When("the list contains that space", func() {
-								BeforeEach(func() {
-									input.Write([]byte("some-space-name2\n"))
-								})
-
-								It("prompts the user to select a space", func() {
-									Expect(testUI.Out).To(Say("Select a space:"))
-									Expect(testUI.Out).To(Say("1. some-space-name"))
-									Expect(testUI.Out).To(Say("2. some-space-name1"))
-									Expect(testUI.Out).To(Say("3. some-space-name2"))
-									Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
-									Expect(executeErr).ToNot(HaveOccurred())
-								})
-
-								It("targets that space", func() {
-									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
-									guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
-									Expect(guid).To(Equal("some-space-guid2"))
-									Expect(name).To(Equal("some-space-name2"))
-									Expect(allowSSH).To(BeTrue())
-									Expect(executeErr).NotTo(HaveOccurred())
+								fakeConfig.TargetedSpaceReturns(configv3.Space{
+									GUID: "some-space-guid",
+									Name: "some-space-name",
 								})
 							})
 
-							When("the space is not in the list", func() {
-								BeforeEach(func() {
-									input.Write([]byte("invalid-space\n"))
-								})
+							It("targets this space", func() {
+								Expect(executeErr).NotTo(HaveOccurred())
 
-								It("returns an error", func() {
-									Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "invalid-space"}))
-								})
+								Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
+								Expect(fakeActor.GetOrganizationSpacesArgsForCall(0)).To(Equal("targeted-org-guid"))
 
-								It("does not target the space", func() {
-									Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
-								})
+								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+
+								firstArg, secondArg, _ := fakeConfig.SetSpaceInformationArgsForCall(0)
+								Expect(firstArg).To(Equal("some-space-guid"))
+								Expect(secondArg).To(Equal("some-space-name"))
+
+								Expect(testUI.Out).To(Say(`Targeted space some-space-name`))
+								Expect(testUI.Out).To(Say(`Space:\s+some-space-name`))
+								Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE`))
+							})
+						})
+
+						When("more than one space is available", func() {
+							BeforeEach(func() {
+								spaces := []v3action.Space{
+									{
+										GUID:             "some-space-guid",
+										Name:             "some-space-name",
+										OrganizationGUID: "targeted-org-guid",
+									},
+									{
+										GUID:             "some-space-guid1",
+										Name:             "some-space-name1",
+										OrganizationGUID: "targeted-org-guid1",
+									},
+									{
+										GUID:             "some-space-guid2",
+										Name:             "some-space-name2",
+										OrganizationGUID: "targeted-org-guid2",
+									},
+								}
+
+								fakeActor.GetOrganizationSpacesReturns(
+									spaces,
+									v3action.Warnings{},
+									nil,
+								)
 							})
 
-							When("the user exits the prompt early", func() {
-								var fakeUI *commandfakes.FakeUI
+							It("displays a numbered list of spaces", func() {
+								Expect(testUI.Out).To(Say("Select a space:"))
+								Expect(testUI.Out).To(Say("1. some-space-name"))
+								Expect(testUI.Out).To(Say("2. some-space-name1"))
+								Expect(testUI.Out).To(Say("3. some-space-name2"))
+								Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+							})
 
-								BeforeEach(func() {
-									fakeUI = new(commandfakes.FakeUI)
-									cmd.UI = fakeUI
-								})
-
-								When("the prompt returns with an EOF", func() {
+							When("the user selects a space by list position", func() {
+								When("the position is valid", func() {
 									BeforeEach(func() {
-										fakeUI.DisplayTextMenuReturns("", io.EOF)
+										input.Write([]byte("2\n"))
 									})
-									It("selects no space and returns no error", func() {
+
+									It("targets that space", func() {
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+										guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+										Expect(guid).To(Equal("some-space-guid1"))
+										Expect(name).To(Equal("some-space-name1"))
+										Expect(allowSSH).To(BeTrue())
+										Expect(executeErr).NotTo(HaveOccurred())
+									})
+								})
+								When("the position is invalid", func() {
+									BeforeEach(func() {
+										input.Write([]byte("100\n"))
+									})
+
+									It("reprompts the user", func() {
+										Expect(testUI.Out).To(Say("Select a space:"))
+										Expect(testUI.Out).To(Say("1. some-space-name"))
+										Expect(testUI.Out).To(Say("2. some-space-name1"))
+										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+										Expect(testUI.Out).To(Say("1. some-space-name"))
+										Expect(testUI.Out).To(Say("2. some-space-name1"))
+										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+									})
+
+								})
+							})
+
+							When("the user selects a space by name", func() {
+								When("the list contains that space", func() {
+									BeforeEach(func() {
+										input.Write([]byte("some-space-name2\n"))
+									})
+
+									It("prompts the user to select a space", func() {
+										Expect(testUI.Out).To(Say("Select a space:"))
+										Expect(testUI.Out).To(Say("1. some-space-name"))
+										Expect(testUI.Out).To(Say("2. some-space-name1"))
+										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
 										Expect(executeErr).ToNot(HaveOccurred())
+									})
+
+									It("targets that space", func() {
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+										guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+										Expect(guid).To(Equal("some-space-guid2"))
+										Expect(name).To(Equal("some-space-name2"))
+										Expect(allowSSH).To(BeTrue())
+										Expect(executeErr).NotTo(HaveOccurred())
+									})
+								})
+
+								When("the space is not in the list", func() {
+									BeforeEach(func() {
+										input.Write([]byte("invalid-space\n"))
+									})
+
+									It("returns an error", func() {
+										Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "invalid-space"}))
+									})
+
+									It("does not target the space", func() {
 										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 									})
 								})
 
+								When("the user exits the prompt early", func() {
+									var fakeUI *commandfakes.FakeUI
+
+									BeforeEach(func() {
+										fakeUI = new(commandfakes.FakeUI)
+										cmd.UI = fakeUI
+									})
+
+									When("the prompt returns with an EOF", func() {
+										BeforeEach(func() {
+											fakeUI.DisplayTextMenuReturns("", io.EOF)
+										})
+										It("selects no space and returns no error", func() {
+											Expect(executeErr).ToNot(HaveOccurred())
+											Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
+										})
+									})
+
+								})
+
 							})
 
 						})
+					})
 
+					When("fetching the spaces for an organization fails", func() {
+						BeforeEach(func() {
+							fakeActor.GetOrganizationSpacesReturns(
+								[]v3action.Space{},
+								v3action.Warnings{"some-warning-1", "some-warning-2"},
+								errors.New("fetching spaces failed"),
+							)
+						})
+
+						It("returns an error", func() {
+							Expect(executeErr).To(MatchError("fetching spaces failed"))
+						})
+
+						It("returns all warnings", func() {
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
 					})
 				})
 			})
