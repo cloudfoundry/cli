@@ -12,6 +12,9 @@ type Stack struct {
 	Name string `json:"name"`
 	// Description is the description for the stack
 	Description string `json:"description"`
+
+	// Metadata is used for custom tagging of API resources
+	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
 // GetStacks lists stacks with optional filters.

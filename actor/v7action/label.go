@@ -6,49 +6,38 @@ import (
 )
 
 func (actor *Actor) GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
-	var labels map[string]types.NullString
 	resource, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	if err != nil {
-		return labels, warnings, err
-	}
-	if resource.Metadata != nil {
-		labels = resource.Metadata.Labels
-	}
-	return labels, warnings, nil
+	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor *Actor) GetOrganizationLabels(orgName string) (map[string]types.NullString, Warnings, error) {
-	var labels map[string]types.NullString
 	resource, warnings, err := actor.GetOrganizationByName(orgName)
-	if err != nil {
-		return labels, warnings, err
-	}
-	if resource.Metadata != nil {
-		labels = resource.Metadata.Labels
-	}
-	return labels, warnings, nil
+	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, Warnings, error) {
-	var labels map[string]types.NullString
 	resource, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
-	if err != nil {
-		return labels, warnings, err
-	}
-	if resource.Metadata != nil {
-		labels = resource.Metadata.Labels
-	}
-	return labels, warnings, nil
+	return actor.getLabels(resource.Metadata, warnings, err)
+}
+
+func (actor *Actor) GetStackLabels(stackName string) (map[string]types.NullString, Warnings, error) {
+	resource, warnings, err := actor.GetStackByName(stackName)
+	return actor.getLabels(resource.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, Warnings, error) {
-	var labels map[string]types.NullString
 	resource, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+	return actor.getLabels(resource.Metadata, warnings, err)
+}
+
+func (actor *Actor) getLabels(metadata *ccv3.Metadata, warnings Warnings, err error) (map[string]types.NullString, Warnings, error) {
+	var labels map[string]types.NullString
+
 	if err != nil {
 		return labels, warnings, err
 	}
-	if resource.Metadata != nil {
-		labels = resource.Metadata.Labels
+	if metadata != nil {
+		labels = metadata.Labels
 	}
 	return labels, warnings, nil
 }
@@ -85,16 +74,15 @@ func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID strin
 	return actor.updateResourceMetadata("space", space.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
-func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
-	return append(warnings, updateWarnings...), err
-}
-
 func (actor *Actor) UpdateStackLabelsByStackName(stackName string, labels map[string]types.NullString) (Warnings, error) {
 	stack, warnings, err := actor.GetStackByName(stackName)
 	if err != nil {
 		return warnings, err
 	}
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("stack", stack.GUID, ccv3.Metadata{Labels: labels})
+	return actor.updateResourceMetadata("stack", stack.GUID, ccv3.Metadata{Labels: labels}, warnings)
+}
+
+func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
 	return append(warnings, updateWarnings...), err
 }
