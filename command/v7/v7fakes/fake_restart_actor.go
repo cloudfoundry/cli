@@ -25,20 +25,20 @@ type FakeRestartActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationSummaryByNameAndSpaceStub        func(string, string, bool) (v7action.ApplicationSummary, v7action.Warnings, error)
-	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
-	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
+	GetDetailedAppSummaryStub        func(string, string, bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
+	getDetailedAppSummaryMutex       sync.RWMutex
+	getDetailedAppSummaryArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 bool
 	}
-	getApplicationSummaryByNameAndSpaceReturns struct {
-		result1 v7action.ApplicationSummary
+	getDetailedAppSummaryReturns struct {
+		result1 v7action.DetailedApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}
-	getApplicationSummaryByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v7action.ApplicationSummary
+	getDetailedAppSummaryReturnsOnCall map[int]struct {
+		result1 v7action.DetailedApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -153,69 +153,69 @@ func (fake *FakeRestartActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v7action.ApplicationSummary, v7action.Warnings, error) {
-	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
-	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
-	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
+func (fake *FakeRestartActor) GetDetailedAppSummary(arg1 string, arg2 string, arg3 bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error) {
+	fake.getDetailedAppSummaryMutex.Lock()
+	ret, specificReturn := fake.getDetailedAppSummaryReturnsOnCall[len(fake.getDetailedAppSummaryArgsForCall)]
+	fake.getDetailedAppSummaryArgsForCall = append(fake.getDetailedAppSummaryArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
-	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3})
-	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3)
+	fake.recordInvocation("GetDetailedAppSummary", []interface{}{arg1, arg2, arg3})
+	fake.getDetailedAppSummaryMutex.Unlock()
+	if fake.GetDetailedAppSummaryStub != nil {
+		return fake.GetDetailedAppSummaryStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
+	fakeReturns := fake.getDetailedAppSummaryReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceCallCount() int {
-	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
-	return len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)
+func (fake *FakeRestartActor) GetDetailedAppSummaryCallCount() int {
+	fake.getDetailedAppSummaryMutex.RLock()
+	defer fake.getDetailedAppSummaryMutex.RUnlock()
+	return len(fake.getDetailedAppSummaryArgsForCall)
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceCalls(stub func(string, string, bool) (v7action.ApplicationSummary, v7action.Warnings, error)) {
-	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
-	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	fake.GetApplicationSummaryByNameAndSpaceStub = stub
+func (fake *FakeRestartActor) GetDetailedAppSummaryCalls(stub func(string, string, bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)) {
+	fake.getDetailedAppSummaryMutex.Lock()
+	defer fake.getDetailedAppSummaryMutex.Unlock()
+	fake.GetDetailedAppSummaryStub = stub
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool) {
-	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
-	argsForCall := fake.getApplicationSummaryByNameAndSpaceArgsForCall[i]
+func (fake *FakeRestartActor) GetDetailedAppSummaryArgsForCall(i int) (string, string, bool) {
+	fake.getDetailedAppSummaryMutex.RLock()
+	defer fake.getDetailedAppSummaryMutex.RUnlock()
+	argsForCall := fake.getDetailedAppSummaryArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
-	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	fake.GetApplicationSummaryByNameAndSpaceStub = nil
-	fake.getApplicationSummaryByNameAndSpaceReturns = struct {
-		result1 v7action.ApplicationSummary
+func (fake *FakeRestartActor) GetDetailedAppSummaryReturns(result1 v7action.DetailedApplicationSummary, result2 v7action.Warnings, result3 error) {
+	fake.getDetailedAppSummaryMutex.Lock()
+	defer fake.getDetailedAppSummaryMutex.Unlock()
+	fake.GetDetailedAppSummaryStub = nil
+	fake.getDetailedAppSummaryReturns = struct {
+		result1 v7action.DetailedApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i int, result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
-	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
-	fake.GetApplicationSummaryByNameAndSpaceStub = nil
-	if fake.getApplicationSummaryByNameAndSpaceReturnsOnCall == nil {
-		fake.getApplicationSummaryByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.ApplicationSummary
+func (fake *FakeRestartActor) GetDetailedAppSummaryReturnsOnCall(i int, result1 v7action.DetailedApplicationSummary, result2 v7action.Warnings, result3 error) {
+	fake.getDetailedAppSummaryMutex.Lock()
+	defer fake.getDetailedAppSummaryMutex.Unlock()
+	fake.GetDetailedAppSummaryStub = nil
+	if fake.getDetailedAppSummaryReturnsOnCall == nil {
+		fake.getDetailedAppSummaryReturnsOnCall = make(map[int]struct {
+			result1 v7action.DetailedApplicationSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v7action.ApplicationSummary
+	fake.getDetailedAppSummaryReturnsOnCall[i] = struct {
+		result1 v7action.DetailedApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -416,8 +416,8 @@ func (fake *FakeRestartActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
-	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
+	fake.getDetailedAppSummaryMutex.RLock()
+	defer fake.getDetailedAppSummaryMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	fake.startApplicationMutex.RLock()

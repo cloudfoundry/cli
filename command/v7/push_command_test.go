@@ -537,27 +537,29 @@ var _ = Describe("push Command", func() {
 
 											When("when getting the application summary succeeds", func() {
 												BeforeEach(func() {
-													summary := v7action.ApplicationSummary{
-														Application:      v7action.Application{},
-														CurrentDroplet:   v7action.Droplet{},
-														ProcessSummaries: v7action.ProcessSummaries{},
+													summary := v7action.DetailedApplicationSummary{
+														ApplicationSummary: v7action.ApplicationSummary{
+															Application:      v7action.Application{},
+															ProcessSummaries: v7action.ProcessSummaries{},
+														},
+														CurrentDroplet: v7action.Droplet{},
 													}
-													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
-													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
+													fakeVersionActor.GetDetailedAppSummaryReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
+													fakeVersionActor.GetDetailedAppSummaryReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
 												})
 
 												// TODO: Don't test the shared.AppSummaryDisplayer.AppDisplay method.
 												// Use DI to pass in a new AppSummaryDisplayer to the Command instead.
 												It("displays the app summary", func() {
 													Expect(executeErr).ToNot(HaveOccurred())
-													Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(2))
+													Expect(fakeVersionActor.GetDetailedAppSummaryCallCount()).To(Equal(2))
 												})
 											})
 
 											When("getting the application summary fails", func() {
 												BeforeEach(func() {
-													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(
-														v7action.ApplicationSummary{},
+													fakeVersionActor.GetDetailedAppSummaryReturns(
+														v7action.DetailedApplicationSummary{},
 														v7action.Warnings{"get-application-summary-warnings"},
 														errors.New("get-application-summary-error"),
 													)
@@ -567,7 +569,7 @@ var _ = Describe("push Command", func() {
 													Expect(testUI.Out).ToNot(Say(`requested state:`))
 												})
 
-												It("returns the error from GetApplicationSummaryByNameAndSpace", func() {
+												It("returns the error from GetDetailedAppSummary", func() {
 													Expect(executeErr).To(MatchError("get-application-summary-error"))
 												})
 
@@ -628,7 +630,7 @@ var _ = Describe("push Command", func() {
 
 												It("displays the app summary", func() {
 													Expect(executeErr).To(HaveOccurred())
-													Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+													Expect(fakeVersionActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
 												})
 											})
 										})

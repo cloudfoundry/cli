@@ -273,7 +273,7 @@ func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
 
 func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 	log.Info("getting application summary info")
-	summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(
+	summary, warnings, err := cmd.VersionActor.GetDetailedAppSummary(
 		plan.Application.Name,
 		cmd.Config.TargetedSpace().GUID,
 		true,

@@ -4,12 +4,10 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/v6/shared/sharedfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -26,7 +24,6 @@ var _ = Describe("apps Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeAppsActor
-		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
 	)
@@ -36,7 +33,6 @@ var _ = Describe("apps Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeAppsActor)
-		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -45,7 +41,6 @@ var _ = Describe("apps Command", func() {
 			UI:          testUI,
 			Config:      fakeConfig,
 			Actor:       fakeActor,
-			V2AppActor:  fakeV2Actor,
 			SharedActor: fakeSharedActor,
 		}
 
@@ -102,7 +97,7 @@ var _ = Describe("apps Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v7action.ApplicationWithProcessSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.GetAppSummariesForSpaceReturns([]v7action.ApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -120,7 +115,7 @@ var _ = Describe("apps Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v7action.ApplicationWithProcessSummary{
+			fakeActor.GetAppSummariesForSpaceReturns([]v7action.ApplicationSummary{
 				{
 					Application: v7action.Application{
 						GUID:  "app-guid",
@@ -128,10 +123,9 @@ var _ = Describe("apps Command", func() {
 						State: constant.ApplicationStarted,
 					},
 					ProcessSummaries: []v7action.ProcessSummary{{Process: v7action.Process{Type: "process-type"}}},
+					Routes:           []v7action.Route{},
 				},
-			}, v7action.Warnings{"warning-1", "warning-2"}, nil)
-
-			fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{}, v2action.Warnings{"route-warning-1", "route-warning-2"}, expectedErr)
+			}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -141,46 +135,13 @@ var _ = Describe("apps Command", func() {
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
-			Expect(testUI.Err).To(Say("route-warning-1"))
-			Expect(testUI.Err).To(Say("route-warning-2"))
 		})
 	})
 
 	When("the route actor does not return any errors", func() {
-		BeforeEach(func() {
-			fakeV2Actor.GetApplicationRoutesStub = func(appGUID string) (v2action.Routes, v2action.Warnings, error) {
-				switch appGUID {
-				case "app-guid-1":
-					return []v2action.Route{
-							{
-								Host:   "some-app-1",
-								Domain: v2action.Domain{Name: "some-other-domain"},
-							},
-							{
-								Host:   "some-app-1",
-								Domain: v2action.Domain{Name: "some-domain"},
-							},
-						},
-						v2action.Warnings{"route-warning-1", "route-warning-2"},
-						nil
-				case "app-guid-2":
-					return []v2action.Route{
-							{
-								Host:   "some-app-2",
-								Domain: v2action.Domain{Name: "some-domain"},
-							},
-						},
-						v2action.Warnings{"route-warning-3", "route-warning-4"},
-						nil
-				default:
-					panic("unknown app guid")
-				}
-			}
-		})
-
 		Context("with existing apps", func() {
 			BeforeEach(func() {
-				appSummaries := []v7action.ApplicationWithProcessSummary{
+				appSummaries := []v7action.ApplicationSummary{
 					{
 						Application: v7action.Application{
 							GUID:  "app-guid-1",
@@ -221,6 +182,18 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 						},
+						Routes: []v7action.Route{
+							{
+								Host:       "some-app-1",
+								DomainName: "some-other-domain",
+								URL:        "some-app-1.some-other-domain",
+							},
+							{
+								Host:       "some-app-1",
+								DomainName: "some-domain",
+								URL:        "some-app-1.some-domain",
+							},
+						},
 					},
 					{
 						Application: v7action.Application{
@@ -245,9 +218,16 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 						},
+						Routes: []v7action.Route{
+							{
+								Host:       "some-app-2",
+								DomainName: "some-domain",
+								URL:        "some-app-2.some-domain",
+							},
+						},
 					},
 				}
-				fakeActor.GetApplicationsWithProcessesBySpaceReturns(appSummaries, v7action.Warnings{"warning-1", "warning-2"}, nil)
+				fakeActor.GetAppSummariesForSpaceReturns(appSummaries, v7action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
 			It("prints the application summary and outputs warnings", func() {
@@ -262,26 +242,15 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
 
-				Expect(testUI.Err).To(Say("route-warning-1"))
-				Expect(testUI.Err).To(Say("route-warning-2"))
-				Expect(testUI.Err).To(Say("route-warning-3"))
-				Expect(testUI.Err).To(Say("route-warning-4"))
-
-				Expect(fakeActor.GetApplicationsWithProcessesBySpaceCallCount()).To(Equal(1))
-				spaceGUID := fakeActor.GetApplicationsWithProcessesBySpaceArgsForCall(0)
+				Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
+				spaceGUID := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
-
-				Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(2))
-				appGUID := fakeV2Actor.GetApplicationRoutesArgsForCall(0)
-				Expect(appGUID).To(Equal("app-guid-1"))
-				appGUID = fakeV2Actor.GetApplicationRoutesArgsForCall(1)
-				Expect(appGUID).To(Equal("app-guid-2"))
 			})
 		})
 
 		When("app does not have processes", func() {
 			BeforeEach(func() {
-				appSummaries := []v7action.ApplicationWithProcessSummary{
+				appSummaries := []v7action.ApplicationSummary{
 					{
 						Application: v7action.Application{
 							GUID:  "app-guid",
@@ -291,7 +260,7 @@ var _ = Describe("apps Command", func() {
 						ProcessSummaries: []v7action.ProcessSummary{},
 					},
 				}
-				fakeActor.GetApplicationsWithProcessesBySpaceReturns(appSummaries, v7action.Warnings{"warning"}, nil)
+				fakeActor.GetAppSummariesForSpaceReturns(appSummaries, v7action.Warnings{"warning"}, nil)
 			})
 
 			It("it does not request or display routes information for app", func() {
@@ -303,17 +272,15 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Out).To(Say(`some-app\s+started\s+$`))
 				Expect(testUI.Err).To(Say("warning"))
 
-				Expect(fakeActor.GetApplicationsWithProcessesBySpaceCallCount()).To(Equal(1))
-				spaceGUID := fakeActor.GetApplicationsWithProcessesBySpaceArgsForCall(0)
+				Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
+				spaceGUID := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
-
-				Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(0))
 			})
 		})
 
 		Context("with no apps", func() {
 			BeforeEach(func() {
-				fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v7action.ApplicationWithProcessSummary{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
+				fakeActor.GetAppSummariesForSpaceReturns([]v7action.ApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
 			It("displays there are no apps", func() {

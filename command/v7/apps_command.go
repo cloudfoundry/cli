@@ -4,10 +4,8 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
-	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/clock"
@@ -16,7 +14,7 @@ import (
 //go:generate counterfeiter . AppsActor
 
 type AppsActor interface {
-	GetApplicationsWithProcessesBySpace(spaceGUID string) ([]v7action.ApplicationWithProcessSummary, v7action.Warnings, error)
+	GetAppSummariesForSpace(spaceGUID string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 }
 
 type AppsCommand struct {
@@ -26,7 +24,6 @@ type AppsCommand struct {
 	UI          command.UI
 	Config      command.Config
 	Actor       AppsActor
-	V2AppActor  v6shared.V2AppActor
 	SharedActor command.SharedActor
 }
 
@@ -40,13 +37,6 @@ func (cmd *AppsCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	ccClientV2, uaaClientV2, err := v6shared.NewClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-
-	cmd.V2AppActor = v2action.NewActor(ccClientV2, uaaClientV2, config)
 
 	return nil
 }
@@ -69,7 +59,7 @@ func (cmd AppsCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	summaries, warnings, err := cmd.Actor.GetApplicationsWithProcessesBySpace(cmd.Config.TargetedSpace().GUID)
+	summaries, warnings, err := cmd.Actor.GetAppSummariesForSpace(cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -90,25 +80,24 @@ func (cmd AppsCommand) Execute(args []string) error {
 	}
 
 	for _, summary := range summaries {
-		var routesList string
-		if len(summary.ProcessSummaries) > 0 {
-			routes, warnings, err := cmd.V2AppActor.GetApplicationRoutes(summary.GUID)
-			cmd.UI.DisplayWarnings(warnings)
-			if err != nil {
-				return err
-			}
-			routesList = routes.Summary()
-		}
-
 		table = append(table, []string{
 			summary.Name,
 			cmd.UI.TranslateText(strings.ToLower(string(summary.State))),
 			summary.ProcessSummaries.String(),
-			routesList,
+			getURLs(summary.Routes),
 		})
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	return nil
+}
+
+func getURLs(routes []v7action.Route) string {
+	var routeURLs []string
+	for _, route := range routes {
+		routeURLs = append(routeURLs, route.URL)
+	}
+
+	return strings.Join(routeURLs, ", ")
 }

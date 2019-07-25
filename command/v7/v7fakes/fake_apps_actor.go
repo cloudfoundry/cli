@@ -9,18 +9,18 @@ import (
 )
 
 type FakeAppsActor struct {
-	GetApplicationsWithProcessesBySpaceStub        func(string) ([]v7action.ApplicationWithProcessSummary, v7action.Warnings, error)
-	getApplicationsWithProcessesBySpaceMutex       sync.RWMutex
-	getApplicationsWithProcessesBySpaceArgsForCall []struct {
+	GetAppSummariesForSpaceStub        func(string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
+	getAppSummariesForSpaceMutex       sync.RWMutex
+	getAppSummariesForSpaceArgsForCall []struct {
 		arg1 string
 	}
-	getApplicationsWithProcessesBySpaceReturns struct {
-		result1 []v7action.ApplicationWithProcessSummary
+	getAppSummariesForSpaceReturns struct {
+		result1 []v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}
-	getApplicationsWithProcessesBySpaceReturnsOnCall map[int]struct {
-		result1 []v7action.ApplicationWithProcessSummary
+	getAppSummariesForSpaceReturnsOnCall map[int]struct {
+		result1 []v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -28,67 +28,67 @@ type FakeAppsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpace(arg1 string) ([]v7action.ApplicationWithProcessSummary, v7action.Warnings, error) {
-	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
-	ret, specificReturn := fake.getApplicationsWithProcessesBySpaceReturnsOnCall[len(fake.getApplicationsWithProcessesBySpaceArgsForCall)]
-	fake.getApplicationsWithProcessesBySpaceArgsForCall = append(fake.getApplicationsWithProcessesBySpaceArgsForCall, struct {
+func (fake *FakeAppsActor) GetAppSummariesForSpace(arg1 string) ([]v7action.ApplicationSummary, v7action.Warnings, error) {
+	fake.getAppSummariesForSpaceMutex.Lock()
+	ret, specificReturn := fake.getAppSummariesForSpaceReturnsOnCall[len(fake.getAppSummariesForSpaceArgsForCall)]
+	fake.getAppSummariesForSpaceArgsForCall = append(fake.getAppSummariesForSpaceArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("GetApplicationsWithProcessesBySpace", []interface{}{arg1})
-	fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
-	if fake.GetApplicationsWithProcessesBySpaceStub != nil {
-		return fake.GetApplicationsWithProcessesBySpaceStub(arg1)
+	fake.recordInvocation("GetAppSummariesForSpace", []interface{}{arg1})
+	fake.getAppSummariesForSpaceMutex.Unlock()
+	if fake.GetAppSummariesForSpaceStub != nil {
+		return fake.GetAppSummariesForSpaceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationsWithProcessesBySpaceReturns
+	fakeReturns := fake.getAppSummariesForSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpaceCallCount() int {
-	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
-	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
-	return len(fake.getApplicationsWithProcessesBySpaceArgsForCall)
+func (fake *FakeAppsActor) GetAppSummariesForSpaceCallCount() int {
+	fake.getAppSummariesForSpaceMutex.RLock()
+	defer fake.getAppSummariesForSpaceMutex.RUnlock()
+	return len(fake.getAppSummariesForSpaceArgsForCall)
 }
 
-func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpaceCalls(stub func(string) ([]v7action.ApplicationWithProcessSummary, v7action.Warnings, error)) {
-	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
-	defer fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
-	fake.GetApplicationsWithProcessesBySpaceStub = stub
+func (fake *FakeAppsActor) GetAppSummariesForSpaceCalls(stub func(string) ([]v7action.ApplicationSummary, v7action.Warnings, error)) {
+	fake.getAppSummariesForSpaceMutex.Lock()
+	defer fake.getAppSummariesForSpaceMutex.Unlock()
+	fake.GetAppSummariesForSpaceStub = stub
 }
 
-func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpaceArgsForCall(i int) string {
-	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
-	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
-	argsForCall := fake.getApplicationsWithProcessesBySpaceArgsForCall[i]
+func (fake *FakeAppsActor) GetAppSummariesForSpaceArgsForCall(i int) string {
+	fake.getAppSummariesForSpaceMutex.RLock()
+	defer fake.getAppSummariesForSpaceMutex.RUnlock()
+	argsForCall := fake.getAppSummariesForSpaceArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpaceReturns(result1 []v7action.ApplicationWithProcessSummary, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
-	defer fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
-	fake.GetApplicationsWithProcessesBySpaceStub = nil
-	fake.getApplicationsWithProcessesBySpaceReturns = struct {
-		result1 []v7action.ApplicationWithProcessSummary
+func (fake *FakeAppsActor) GetAppSummariesForSpaceReturns(result1 []v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
+	fake.getAppSummariesForSpaceMutex.Lock()
+	defer fake.getAppSummariesForSpaceMutex.Unlock()
+	fake.GetAppSummariesForSpaceStub = nil
+	fake.getAppSummariesForSpaceReturns = struct {
+		result1 []v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpaceReturnsOnCall(i int, result1 []v7action.ApplicationWithProcessSummary, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
-	defer fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
-	fake.GetApplicationsWithProcessesBySpaceStub = nil
-	if fake.getApplicationsWithProcessesBySpaceReturnsOnCall == nil {
-		fake.getApplicationsWithProcessesBySpaceReturnsOnCall = make(map[int]struct {
-			result1 []v7action.ApplicationWithProcessSummary
+func (fake *FakeAppsActor) GetAppSummariesForSpaceReturnsOnCall(i int, result1 []v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
+	fake.getAppSummariesForSpaceMutex.Lock()
+	defer fake.getAppSummariesForSpaceMutex.Unlock()
+	fake.GetAppSummariesForSpaceStub = nil
+	if fake.getAppSummariesForSpaceReturnsOnCall == nil {
+		fake.getAppSummariesForSpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.ApplicationSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getApplicationsWithProcessesBySpaceReturnsOnCall[i] = struct {
-		result1 []v7action.ApplicationWithProcessSummary
+	fake.getAppSummariesForSpaceReturnsOnCall[i] = struct {
+		result1 []v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -97,8 +97,8 @@ func (fake *FakeAppsActor) GetApplicationsWithProcessesBySpaceReturnsOnCall(i in
 func (fake *FakeAppsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
-	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
+	fake.getAppSummariesForSpaceMutex.RLock()
+	defer fake.getAppSummariesForSpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -13,7 +13,7 @@ import (
 
 type AppActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.ApplicationSummary, v7action.Warnings, error)
+	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 }
 
 type AppCommand struct {
@@ -68,7 +68,7 @@ func (cmd AppCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
+	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

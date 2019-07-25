@@ -13,7 +13,7 @@ import (
 
 type StartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.ApplicationSummary, v7action.Warnings, error)
+	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 }
@@ -93,7 +93,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	}
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(
+	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		false,

@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/clock"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -65,13 +66,206 @@ var _ = Describe("Application Summary Actions", func() {
 		)
 	})
 
-	Describe("GetApplicationSummaryByNameAndSpace", func() {
+	Describe("GetAppSummariesForSpace", func() {
+		var (
+			spaceGUID string
+
+			summaries  []ApplicationSummary
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			spaceGUID = "some-space-guid"
+		})
+
+		JustBeforeEach(func() {
+			summaries, warnings, executeErr = actor.GetAppSummariesForSpace(spaceGUID)
+		})
+
+		When("getting the application is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+					},
+					ccv3.Warnings{"get-apps-warning"},
+					nil,
+				)
+
+				listedProcesses := []ccv3.Process{
+					{
+						GUID:       "some-process-guid",
+						Type:       "some-type",
+						Command:    *types.NewFilteredString("[Redacted Value]"),
+						MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+					},
+					{
+						GUID:       "some-process-web-guid",
+						Type:       "web",
+						Command:    *types.NewFilteredString("[Redacted Value]"),
+						MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+					},
+				}
+				fakeCloudControllerClient.GetApplicationProcessesReturns(
+					listedProcesses,
+					ccv3.Warnings{"get-app-processes-warning"},
+					nil,
+				)
+
+				explicitlyCalledProcess := listedProcesses[0]
+				explicitlyCalledProcess.Command = *types.NewFilteredString("some-start-command")
+				fakeCloudControllerClient.GetProcessReturnsOnCall(
+					0,
+					explicitlyCalledProcess,
+					ccv3.Warnings{"get-process-by-type-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetProcessReturnsOnCall(
+					1,
+					listedProcesses[1],
+					ccv3.Warnings{"get-process-by-type-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetProcessInstancesReturns(
+					[]ccv3.ProcessInstance{
+						{
+							State:       constant.ProcessInstanceRunning,
+							CPU:         0.01,
+							MemoryUsage: 1000000,
+							DiskUsage:   2000000,
+							MemoryQuota: 3000000,
+							DiskQuota:   4000000,
+							Index:       0,
+						},
+					},
+					ccv3.Warnings{"get-process-instances-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetApplicationRoutesReturns(
+					[]ccv3.Route{
+						{GUID: "some-route-guid"},
+						{GUID: "some-other-route-guid"},
+					},
+					ccv3.Warnings{"get-routes-warning"},
+					nil,
+				)
+			})
+
+			It("returns the summary and warnings with droplet information", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(summaries).To(Equal([]ApplicationSummary{
+					{
+						Application: Application{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+						ProcessSummaries: []ProcessSummary{
+							{
+								Process: Process{
+									GUID:       "some-process-web-guid",
+									Type:       "web",
+									Command:    *types.NewFilteredString("[Redacted Value]"),
+									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+								},
+								InstanceDetails: []ProcessInstance{
+									{
+										State:       constant.ProcessInstanceRunning,
+										CPU:         0.01,
+										MemoryUsage: 1000000,
+										DiskUsage:   2000000,
+										MemoryQuota: 3000000,
+										DiskQuota:   4000000,
+										Index:       0,
+									},
+								},
+							},
+							{
+								Process: Process{
+									GUID:       "some-process-guid",
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									Type:       "some-type",
+									Command:    *types.NewFilteredString("[Redacted Value]"),
+								},
+								InstanceDetails: []ProcessInstance{
+									{
+										State:       constant.ProcessInstanceRunning,
+										CPU:         0.01,
+										MemoryUsage: 1000000,
+										DiskUsage:   2000000,
+										MemoryQuota: 3000000,
+										DiskQuota:   4000000,
+										Index:       0,
+									},
+								},
+							},
+						},
+						Routes: []v7action.Route{
+							{GUID: "some-route-guid"},
+							{GUID: "some-other-route-guid"},
+						},
+					},
+				}))
+
+				Expect(warnings).To(ConsistOf(
+					"get-apps-warning",
+					"get-app-processes-warning",
+					"get-process-instances-warning",
+					"get-process-instances-warning",
+					"get-routes-warning",
+				))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+				))
+
+				Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
+
+				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
+			})
+		})
+
+		When("getting the application fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+					},
+					ccv3.Warnings{"get-apps-warning"},
+					errors.New("failed to get app"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("failed to get app"))
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
+			})
+		})
+	})
+
+	Describe("GetDetailedAppSummary", func() {
 		var (
 			appName              string
 			spaceGUID            string
 			withObfuscatedValues bool
 
-			summary    ApplicationSummary
+			summary    DetailedApplicationSummary
 			warnings   Warnings
 			executeErr error
 		)
@@ -82,105 +276,162 @@ var _ = Describe("Application Summary Actions", func() {
 			withObfuscatedValues = true
 		})
 
-		Context("when a route actor is not provided", func() {
-			JustBeforeEach(func() {
-				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
+		JustBeforeEach(func() {
+			summary, warnings, executeErr = actor.GetDetailedAppSummary(appName, spaceGUID, withObfuscatedValues)
+		})
+
+		When("getting the application is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name:  "some-app-name",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+					},
+					ccv3.Warnings{"get-apps-warning"},
+					nil,
+				)
 			})
 
-			When("retrieving the application is successful", func() {
+			When("getting the process information is successful", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv3.Application{
+					listedProcesses := []ccv3.Process{
+						{
+							GUID:       "some-process-guid",
+							Type:       "some-type",
+							Command:    *types.NewFilteredString("[Redacted Value]"),
+							MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+						},
+						{
+							GUID:       "some-process-web-guid",
+							Type:       "web",
+							Command:    *types.NewFilteredString("[Redacted Value]"),
+							MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+						},
+					}
+					fakeCloudControllerClient.GetApplicationProcessesReturns(
+						listedProcesses,
+						ccv3.Warnings{"get-app-processes-warning"},
+						nil,
+					)
+
+					explicitlyCalledProcess := listedProcesses[0]
+					explicitlyCalledProcess.Command = *types.NewFilteredString("some-start-command")
+					fakeCloudControllerClient.GetProcessReturnsOnCall(
+						0,
+						explicitlyCalledProcess,
+						ccv3.Warnings{"get-process-by-type-warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetProcessReturnsOnCall(
+						1,
+						listedProcesses[1],
+						ccv3.Warnings{"get-process-by-type-warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetProcessInstancesReturns(
+						[]ccv3.ProcessInstance{
 							{
-								Name:  "some-app-name",
-								GUID:  "some-app-guid",
-								State: constant.ApplicationStarted,
+								State:       constant.ProcessInstanceRunning,
+								CPU:         0.01,
+								MemoryUsage: 1000000,
+								DiskUsage:   2000000,
+								MemoryQuota: 3000000,
+								DiskQuota:   4000000,
+								Index:       0,
 							},
 						},
-						ccv3.Warnings{"some-warning"},
+						ccv3.Warnings{"get-process-instances-warning"},
 						nil,
 					)
 				})
 
-				When("retrieving the process information is successful", func() {
+				When("getting current droplet succeeds", func() {
 					BeforeEach(func() {
-						listedProcesses := []ccv3.Process{
-							{
-								GUID:       "some-process-guid",
-								Type:       "some-type",
-								Command:    *types.NewFilteredString("[Redacted Value]"),
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-							},
-							{
-								GUID:       "some-process-web-guid",
-								Type:       "web",
-								Command:    *types.NewFilteredString("[Redacted Value]"),
-								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-							},
-						}
-						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							listedProcesses,
-							ccv3.Warnings{"some-process-warning"},
-							nil,
-						)
-
-						explicitlyCalledProcess := listedProcesses[0]
-						explicitlyCalledProcess.Command = *types.NewFilteredString("some-start-command")
-						fakeCloudControllerClient.GetProcessReturnsOnCall(
-							0,
-							explicitlyCalledProcess,
-							ccv3.Warnings{"get-process-by-type-warning"},
-							nil,
-						)
-
-						fakeCloudControllerClient.GetProcessReturnsOnCall(
-							1,
-							listedProcesses[1],
-							ccv3.Warnings{"get-process-by-type-warning"},
-							nil,
-						)
-
-						fakeCloudControllerClient.GetProcessInstancesReturns(
-							[]ccv3.ProcessInstance{
-								{
-									State:       constant.ProcessInstanceRunning,
-									CPU:         0.01,
-									MemoryUsage: 1000000,
-									DiskUsage:   2000000,
-									MemoryQuota: 3000000,
-									DiskQuota:   4000000,
-									Index:       0,
+						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+							ccv3.Droplet{
+								Stack: "some-stack",
+								Buildpacks: []ccv3.DropletBuildpack{
+									{
+										Name: "some-buildpack",
+									},
 								},
+								Image: "docker/some-image",
 							},
-							ccv3.Warnings{"some-process-stats-warning"},
+							ccv3.Warnings{"get-app-droplet-warning"},
 							nil,
 						)
 					})
 
-					When("app has droplet", func() {
+					When("getting application routes succeeds", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-								ccv3.Droplet{
-									Stack: "some-stack",
-									Buildpacks: []ccv3.DropletBuildpack{
-										{
-											Name: "some-buildpack",
-										},
-									},
-									Image: "docker/some-image",
+							fakeCloudControllerClient.GetApplicationRoutesReturns(
+								[]ccv3.Route{
+									{GUID: "some-route-guid"},
+									{GUID: "some-other-route-guid"},
 								},
-								ccv3.Warnings{"some-droplet-warning"},
+								ccv3.Warnings{"get-routes-warning"},
 								nil,
 							)
 						})
 
 						It("returns the summary and warnings with droplet information", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(summary).To(Equal(ApplicationSummary{
-								Application: Application{
-									Name:  "some-app-name",
-									GUID:  "some-app-guid",
-									State: constant.ApplicationStarted,
+							Expect(summary).To(Equal(DetailedApplicationSummary{
+								ApplicationSummary: v7action.ApplicationSummary{
+									Application: Application{
+										Name:  "some-app-name",
+										GUID:  "some-app-guid",
+										State: constant.ApplicationStarted,
+									},
+									ProcessSummaries: []ProcessSummary{
+										{
+											Process: Process{
+												GUID:       "some-process-web-guid",
+												Type:       "web",
+												Command:    *types.NewFilteredString("[Redacted Value]"),
+												MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+											},
+											InstanceDetails: []ProcessInstance{
+												{
+													State:       constant.ProcessInstanceRunning,
+													CPU:         0.01,
+													MemoryUsage: 1000000,
+													DiskUsage:   2000000,
+													MemoryQuota: 3000000,
+													DiskQuota:   4000000,
+													Index:       0,
+												},
+											},
+										},
+										{
+											Process: Process{
+												GUID:       "some-process-guid",
+												MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+												Type:       "some-type",
+												Command:    *types.NewFilteredString("some-start-command"),
+											},
+											InstanceDetails: []ProcessInstance{
+												{
+													State:       constant.ProcessInstanceRunning,
+													CPU:         0.01,
+													MemoryUsage: 1000000,
+													DiskUsage:   2000000,
+													MemoryQuota: 3000000,
+													DiskQuota:   4000000,
+													Index:       0,
+												},
+											},
+										},
+									},
+									Routes: []v7action.Route{
+										{GUID: "some-route-guid"},
+										{GUID: "some-other-route-guid"},
+									},
 								},
 								CurrentDroplet: Droplet{
 									Stack: "some-stack",
@@ -191,48 +442,18 @@ var _ = Describe("Application Summary Actions", func() {
 										},
 									},
 								},
-								ProcessSummaries: []ProcessSummary{
-									{
-										Process: Process{
-											GUID:       "some-process-web-guid",
-											Type:       "web",
-											Command:    *types.NewFilteredString("[Redacted Value]"),
-											MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-										},
-										InstanceDetails: []ProcessInstance{
-											{
-												State:       constant.ProcessInstanceRunning,
-												CPU:         0.01,
-												MemoryUsage: 1000000,
-												DiskUsage:   2000000,
-												MemoryQuota: 3000000,
-												DiskQuota:   4000000,
-												Index:       0,
-											},
-										},
-									},
-									{
-										Process: Process{
-											GUID:       "some-process-guid",
-											MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-											Type:       "some-type",
-											Command:    *types.NewFilteredString("some-start-command"),
-										},
-										InstanceDetails: []ProcessInstance{
-											{
-												State:       constant.ProcessInstanceRunning,
-												CPU:         0.01,
-												MemoryUsage: 1000000,
-												DiskUsage:   2000000,
-												MemoryQuota: 3000000,
-												DiskQuota:   4000000,
-												Index:       0,
-											},
-										},
-									},
-								},
 							}))
-							Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "get-process-by-type-warning", "get-process-by-type-warning", "some-process-stats-warning", "some-process-stats-warning", "some-droplet-warning"))
+
+							Expect(warnings).To(ConsistOf(
+								"get-apps-warning",
+								"get-app-processes-warning",
+								"get-process-by-type-warning",
+								"get-process-by-type-warning",
+								"get-process-instances-warning",
+								"get-process-instances-warning",
+								"get-app-droplet-warning",
+								"get-routes-warning",
+							))
 
 							Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
@@ -253,38 +474,41 @@ var _ = Describe("Application Summary Actions", func() {
 							Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
 							Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
 						})
-
-						When("getting the current droplet returns an error", func() {
-							var expectedErr error
-
-							BeforeEach(func() {
-								expectedErr = errors.New("some error")
-								fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-									ccv3.Droplet{},
-									ccv3.Warnings{"some-droplet-warning"},
-									expectedErr,
-								)
-							})
-
-							It("returns the error", func() {
-								Expect(executeErr).To(Equal(expectedErr))
-								Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "get-process-by-type-warning", "get-process-by-type-warning", "some-process-stats-warning", "some-process-stats-warning", "some-droplet-warning"))
-							})
-						})
 					})
 
-					When("app does not have current droplet", func() {
+					When("getting application routes fails", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-								ccv3.Droplet{},
-								ccv3.Warnings{"some-droplet-warning"},
-								ccerror.DropletNotFoundError{},
-							)
+							fakeCloudControllerClient.GetApplicationRoutesReturns(nil, ccv3.Warnings{"get-routes-warnings"}, errors.New("some-error"))
 						})
 
-						It("returns the summary and warnings without droplet information", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(summary).To(Equal(ApplicationSummary{
+						It("returns the warnings and error", func() {
+							Expect(executeErr).To(MatchError("some-error"))
+							Expect(warnings).To(ConsistOf(
+								"get-apps-warning",
+								"get-app-processes-warning",
+								"get-process-by-type-warning",
+								"get-process-by-type-warning",
+								"get-process-instances-warning",
+								"get-process-instances-warning",
+								"get-routes-warnings",
+							))
+						})
+					})
+				})
+
+				When("app does not have current droplet", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+							ccv3.Droplet{},
+							ccv3.Warnings{"get-app-droplet-warning"},
+							ccerror.DropletNotFoundError{},
+						)
+					})
+
+					It("returns the summary and warnings without droplet information", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(summary).To(Equal(DetailedApplicationSummary{
+							ApplicationSummary: v7action.ApplicationSummary{
 								Application: Application{
 									Name:  "some-app-name",
 									GUID:  "some-app-guid",
@@ -330,45 +554,44 @@ var _ = Describe("Application Summary Actions", func() {
 										},
 									},
 								},
-							}))
-							Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "get-process-by-type-warning", "get-process-by-type-warning", "some-process-stats-warning", "some-process-stats-warning", "some-droplet-warning"))
-						})
-					})
+							},
+						}))
 
+						Expect(warnings).To(ConsistOf(
+							"get-apps-warning",
+							"get-app-processes-warning",
+							"get-process-by-type-warning",
+							"get-process-by-type-warning",
+							"get-process-instances-warning",
+							"get-process-instances-warning",
+							"get-app-droplet-warning",
+						))
+					})
 				})
 
-				When("getting the app process instances returns an error", func() {
+				When("getting the current droplet returns an error", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							[]ccv3.Process{
-								{
-									GUID: "some-process-guid",
-									Type: "some-type",
-								},
-							},
-							ccv3.Warnings{"some-process-warning"},
-							nil,
-						)
-
-						fakeCloudControllerClient.GetProcessReturns(
-							ccv3.Process{},
-							ccv3.Warnings{"get-process-warning"},
-							nil,
-						)
-
 						expectedErr = errors.New("some error")
-						fakeCloudControllerClient.GetProcessInstancesReturns(
-							[]ccv3.ProcessInstance{},
-							ccv3.Warnings{"some-process-stats-warning"},
+						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+							ccv3.Droplet{},
+							ccv3.Warnings{"get-droplet-warning"},
 							expectedErr,
 						)
 					})
 
 					It("returns the error", func() {
 						Expect(executeErr).To(Equal(expectedErr))
-						Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "get-process-warning", "some-process-stats-warning"))
+						Expect(warnings).To(ConsistOf(
+							"get-apps-warning",
+							"get-app-processes-warning",
+							"get-process-by-type-warning",
+							"get-process-by-type-warning",
+							"get-process-instances-warning",
+							"get-process-instances-warning",
+							"get-droplet-warning",
+						))
 					})
 				})
 			})
@@ -377,34 +600,54 @@ var _ = Describe("Application Summary Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv3.Application{
+					fakeCloudControllerClient.GetApplicationProcessesReturns(
+						[]ccv3.Process{
 							{
-								Name:  "some-app-name",
-								GUID:  "some-app-guid",
-								State: constant.ApplicationStarted,
+								GUID: "some-process-guid",
+								Type: "some-type",
 							},
 						},
-						ccv3.Warnings{"some-warning"},
+						ccv3.Warnings{"get-app-processes-warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetProcessReturns(
+						ccv3.Process{},
+						ccv3.Warnings{"get-process-warning"},
 						nil,
 					)
 
 					expectedErr = errors.New("some error")
-					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						[]ccv3.Process{{Type: constant.ProcessTypeWeb}},
-						ccv3.Warnings{"some-process-warning"},
+					fakeCloudControllerClient.GetProcessInstancesReturns(
+						[]ccv3.ProcessInstance{},
+						ccv3.Warnings{"get-process-instances-warning"},
 						expectedErr,
 					)
 				})
 
-				It("returns the error", func() {
+				It("returns the error and warnings", func() {
 					Expect(executeErr).To(Equal(expectedErr))
-					Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
+					Expect(warnings).To(ConsistOf("get-apps-warning", "get-app-processes-warning", "get-process-warning", "get-process-instances-warning"))
 				})
 			})
 		})
 
-		When("passed with a routeActor", func() {
+		When("no applications are returned", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"get-apps-warning"},
+					nil,
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: appName}))
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
+			})
+		})
+
+		When("getting the application fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
@@ -414,59 +657,14 @@ var _ = Describe("Application Summary Actions", func() {
 							State: constant.ApplicationStarted,
 						},
 					},
-					ccv3.Warnings{"some-warning"},
-					nil,
+					ccv3.Warnings{"get-apps-warning"},
+					errors.New("failed to get app"),
 				)
 			})
 
-			JustBeforeEach(func() {
-				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
-			})
-
-			When("getting the routes is successful", func() {
-				BeforeEach(func() {
-					routes := []ccv3.Route{
-						{GUID: "some-route-guid"},
-						{GUID: "some-other-route-guid"},
-					}
-
-					fakeCloudControllerClient.GetApplicationRoutesReturns(routes, ccv3.Warnings{"routes-warnings"}, nil)
-				})
-
-				It("retrieves and sets the application routes", func() {
-					Expect(warnings).To(ConsistOf("some-warning", "routes-warnings"))
-					Expect(summary.Routes).To(ConsistOf(
-						v7action.Route{GUID: "some-route-guid"},
-						v7action.Route{GUID: "some-other-route-guid"},
-					))
-
-					Expect(fakeCloudControllerClient.GetApplicationRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationRoutesArgsForCall(0)).To(Equal("some-app-guid"))
-				})
-			})
-
-			When("getting the application routes errors", func() {
-				When("a generic error is returned", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationRoutesReturns(nil, ccv3.Warnings{"routes-warnings"}, errors.New("some-error"))
-					})
-
-					It("returns warnings and the error", func() {
-						Expect(executeErr).To(MatchError("some-error"))
-						Expect(warnings).To(ConsistOf("some-warning", "routes-warnings"))
-					})
-				})
-
-				When("a ResourceNotFoundError is returned", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationRoutesReturns(nil, ccv3.Warnings{"routes-warnings"}, ccerror.ResourceNotFoundError{})
-					})
-
-					It("adds warnings and continues", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("some-warning", "routes-warnings"))
-					})
-				})
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("failed to get app"))
+				Expect(warnings).To(ConsistOf("get-apps-warning"))
 			})
 		})
 	})

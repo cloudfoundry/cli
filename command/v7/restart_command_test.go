@@ -341,7 +341,7 @@ var _ = Describe("restart Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v7action.ApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -360,10 +360,26 @@ var _ = Describe("restart Command", func() {
 				Name: "some-space",
 				GUID: "some-space-guid",
 			})
-			summary := v7action.ApplicationSummary{
-				Application: v7action.Application{
-					Name:  "some-app",
-					State: constant.ApplicationStarted,
+			summary := v7action.DetailedApplicationSummary{
+				ApplicationSummary: v7action.ApplicationSummary{
+					Application: v7action.Application{
+						Name:  "some-app",
+						State: constant.ApplicationStarted,
+					},
+					ProcessSummaries: v7action.ProcessSummaries{
+						{
+							Process: v7action.Process{
+								Type:    constant.ProcessTypeWeb,
+								Command: *types.NewFilteredString("some-command-1"),
+							},
+						},
+						{
+							Process: v7action.Process{
+								Type:    "console",
+								Command: *types.NewFilteredString("some-command-2"),
+							},
+						},
+					},
 				},
 				CurrentDroplet: v7action.Droplet{
 					Stack: "cflinuxfs2",
@@ -378,22 +394,8 @@ var _ = Describe("restart Command", func() {
 						},
 					},
 				},
-				ProcessSummaries: v7action.ProcessSummaries{
-					{
-						Process: v7action.Process{
-							Type:    constant.ProcessTypeWeb,
-							Command: *types.NewFilteredString("some-command-1"),
-						},
-					},
-					{
-						Process: v7action.Process{
-							Type:    "console",
-							Command: *types.NewFilteredString("some-command-2"),
-						},
-					},
-				},
 			}
-			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
+			fakeActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
 		It("prints the application summary and outputs warnings", func() {
@@ -407,8 +409,8 @@ var _ = Describe("restart Command", func() {
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
 
-			Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-			appName, spaceGUID, withObfuscatedValues := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+			Expect(fakeActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
+			appName, spaceGUID, withObfuscatedValues := fakeActor.GetDetailedAppSummaryArgsForCall(0)
 			Expect(appName).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
 			Expect(withObfuscatedValues).To(BeFalse())

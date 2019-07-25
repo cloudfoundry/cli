@@ -22,7 +22,7 @@ func NewAppSummaryDisplayer(ui command.UI) *AppSummaryDisplayer {
 	}
 }
 
-func (display AppSummaryDisplayer) AppDisplay(summary v7action.ApplicationSummary, displayStartCommand bool) {
+func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicationSummary, displayStartCommand bool) {
 	var isoRow []string
 	if name, exists := summary.GetIsolationSegmentName(); exists {
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), name)
@@ -92,7 +92,7 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7act
 	display.UI.DisplayInstancesTableForApp(table)
 }
 
-func (display AppSummaryDisplayer) displayProcessTable(summary v7action.ApplicationSummary, displayStartCommand bool) {
+func (display AppSummaryDisplayer) displayProcessTable(summary v7action.DetailedApplicationSummary, displayStartCommand bool) {
 	for _, process := range summary.ProcessSummaries {
 		display.UI.DisplayNewline()
 
@@ -119,7 +119,7 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Applicat
 	}
 }
 
-func (display AppSummaryDisplayer) getCreatedTime(summary v7action.ApplicationSummary) string {
+func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedApplicationSummary) string {
 	if summary.CurrentDroplet.CreatedAt != "" {
 		timestamp, err := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
 		if err != nil {

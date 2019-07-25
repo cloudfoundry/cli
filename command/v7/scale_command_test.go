@@ -143,62 +143,64 @@ var _ = Describe("scale Command", func() {
 		})
 
 		When("the application exists", func() {
-			var appSummary v7action.ApplicationSummary
+			var appSummary v7action.DetailedApplicationSummary
 
 			BeforeEach(func() {
-				appSummary = v7action.ApplicationSummary{
-					ProcessSummaries: v7action.ProcessSummaries{
-						{
-							Process: v7action.Process{
-								Type:       constant.ProcessTypeWeb,
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
-							},
-							InstanceDetails: []v7action.ProcessInstance{
-								v7action.ProcessInstance{
-									Index:       0,
-									State:       constant.ProcessInstanceRunning,
-									MemoryUsage: 1000000,
-									DiskUsage:   1000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   2000000,
-									Uptime:      time.Since(time.Unix(267321600, 0)),
+				appSummary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						ProcessSummaries: v7action.ProcessSummaries{
+							{
+								Process: v7action.Process{
+									Type:       constant.ProcessTypeWeb,
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
-								v7action.ProcessInstance{
-									Index:       1,
-									State:       constant.ProcessInstanceRunning,
-									MemoryUsage: 2000000,
-									DiskUsage:   2000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   4000000,
-									Uptime:      time.Since(time.Unix(330480000, 0)),
-								},
-								v7action.ProcessInstance{
-									Index:       2,
-									State:       constant.ProcessInstanceRunning,
-									MemoryUsage: 3000000,
-									DiskUsage:   3000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   6000000,
-									Uptime:      time.Since(time.Unix(1277164800, 0)),
+								InstanceDetails: []v7action.ProcessInstance{
+									v7action.ProcessInstance{
+										Index:       0,
+										State:       constant.ProcessInstanceRunning,
+										MemoryUsage: 1000000,
+										DiskUsage:   1000000,
+										MemoryQuota: 33554432,
+										DiskQuota:   2000000,
+										Uptime:      time.Since(time.Unix(267321600, 0)),
+									},
+									v7action.ProcessInstance{
+										Index:       1,
+										State:       constant.ProcessInstanceRunning,
+										MemoryUsage: 2000000,
+										DiskUsage:   2000000,
+										MemoryQuota: 33554432,
+										DiskQuota:   4000000,
+										Uptime:      time.Since(time.Unix(330480000, 0)),
+									},
+									v7action.ProcessInstance{
+										Index:       2,
+										State:       constant.ProcessInstanceRunning,
+										MemoryUsage: 3000000,
+										DiskUsage:   3000000,
+										MemoryQuota: 33554432,
+										DiskQuota:   6000000,
+										Uptime:      time.Since(time.Unix(1277164800, 0)),
+									},
 								},
 							},
-						},
-						{
-							Process: v7action.Process{
-								Type:       "console",
-								MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
-								DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
-							},
-							InstanceDetails: []v7action.ProcessInstance{
-								v7action.ProcessInstance{
-									Index:       0,
-									State:       constant.ProcessInstanceRunning,
-									MemoryUsage: 1000000,
-									DiskUsage:   1000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   8000000,
-									Uptime:      time.Since(time.Unix(167572800, 0)),
+							{
+								Process: v7action.Process{
+									Type:       "console",
+									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
+									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+								},
+								InstanceDetails: []v7action.ProcessInstance{
+									v7action.ProcessInstance{
+										Index:       0,
+										State:       constant.ProcessInstanceRunning,
+										MemoryUsage: 1000000,
+										DiskUsage:   1000000,
+										MemoryQuota: 33554432,
+										DiskQuota:   8000000,
+										Uptime:      time.Since(time.Unix(167572800, 0)),
+									},
 								},
 							},
 						},
@@ -213,7 +215,7 @@ var _ = Describe("scale Command", func() {
 
 			When("no flag options are provided", func() {
 				BeforeEach(func() {
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetDetailedAppSummaryReturns(
 						appSummary,
 						v7action.Warnings{"get-app-summary-warning"},
 						nil)
@@ -265,8 +267,8 @@ var _ = Describe("scale Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("get process error")
-						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
-							v7action.ApplicationSummary{},
+						fakeActor.GetDetailedAppSummaryReturns(
+							v7action.DetailedApplicationSummary{},
 							v7action.Warnings{"get-process-warning"},
 							expectedErr,
 						)
@@ -290,7 +292,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetDetailedAppSummaryReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -523,7 +525,7 @@ var _ = Describe("scale Command", func() {
 						Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 						Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
 						Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-						Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+						Expect(fakeActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
 					})
 				})
 			})
@@ -535,7 +537,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetDetailedAppSummaryReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -576,7 +578,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetDetailedAppSummaryReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -618,7 +620,7 @@ var _ = Describe("scale Command", func() {
 					appGUID = fakeActor.StartApplicationArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
 
-					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+					Expect(fakeActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
 				})
 			})
 
@@ -629,7 +631,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetDetailedAppSummaryReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -680,7 +682,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetDetailedAppSummaryReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)

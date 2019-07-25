@@ -30,7 +30,7 @@ var _ = Describe("app summary displayer", func() {
 
 	Describe("AppDisplay", func() {
 		var (
-			summary             v7action.ApplicationSummary
+			summary             v7action.DetailedApplicationSummary
 			displayStartCommand bool
 		)
 
@@ -44,65 +44,67 @@ var _ = Describe("app summary displayer", func() {
 
 				BeforeEach(func() {
 					uptime = time.Since(time.Unix(267321600, 0))
-					summary = v7action.ApplicationSummary{
-						Application: v7action.Application{
-							GUID:  "some-app-guid",
-							State: constant.ApplicationStarted,
-						},
-						ProcessSummaries: v7action.ProcessSummaries{
-							{
-								Process: v7action.Process{
-									Type:       constant.ProcessTypeWeb,
-									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
-								},
-								InstanceDetails: []v7action.ProcessInstance{
-									v7action.ProcessInstance{
-										Index:       0,
-										State:       constant.ProcessInstanceRunning,
-										MemoryUsage: 1000000,
-										DiskUsage:   1000000,
-										MemoryQuota: 33554432,
-										DiskQuota:   2000000,
-										Uptime:      uptime,
-										Details:     "Some Details 1",
-									},
-									v7action.ProcessInstance{
-										Index:       1,
-										State:       constant.ProcessInstanceRunning,
-										MemoryUsage: 2000000,
-										DiskUsage:   2000000,
-										MemoryQuota: 33554432,
-										DiskQuota:   4000000,
-										Uptime:      time.Since(time.Unix(330480000, 0)),
-										Details:     "Some Details 2",
-									},
-									v7action.ProcessInstance{
-										Index:       2,
-										State:       constant.ProcessInstanceRunning,
-										MemoryUsage: 3000000,
-										DiskUsage:   3000000,
-										MemoryQuota: 33554432,
-										DiskQuota:   6000000,
-										Uptime:      time.Since(time.Unix(1277164800, 0)),
-									},
-								},
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: v7action.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
 							},
-							{
-								Process: v7action.Process{
-									Type:       "console",
-									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
-									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									Process: v7action.Process{
+										Type:       constant.ProcessTypeWeb,
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+									},
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index:       0,
+											State:       constant.ProcessInstanceRunning,
+											MemoryUsage: 1000000,
+											DiskUsage:   1000000,
+											MemoryQuota: 33554432,
+											DiskQuota:   2000000,
+											Uptime:      uptime,
+											Details:     "Some Details 1",
+										},
+										v7action.ProcessInstance{
+											Index:       1,
+											State:       constant.ProcessInstanceRunning,
+											MemoryUsage: 2000000,
+											DiskUsage:   2000000,
+											MemoryQuota: 33554432,
+											DiskQuota:   4000000,
+											Uptime:      time.Since(time.Unix(330480000, 0)),
+											Details:     "Some Details 2",
+										},
+										v7action.ProcessInstance{
+											Index:       2,
+											State:       constant.ProcessInstanceRunning,
+											MemoryUsage: 3000000,
+											DiskUsage:   3000000,
+											MemoryQuota: 33554432,
+											DiskQuota:   6000000,
+											Uptime:      time.Since(time.Unix(1277164800, 0)),
+										},
+									},
 								},
-								InstanceDetails: []v7action.ProcessInstance{
-									v7action.ProcessInstance{
-										Index:       0,
-										State:       constant.ProcessInstanceRunning,
-										MemoryUsage: 1000000,
-										DiskUsage:   1000000,
-										MemoryQuota: 33554432,
-										DiskQuota:   8000000,
-										Uptime:      time.Since(time.Unix(167572800, 0)),
+								{
+									Process: v7action.Process{
+										Type:       "console",
+										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
+										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+									},
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index:       0,
+											State:       constant.ProcessInstanceRunning,
+											MemoryUsage: 1000000,
+											DiskUsage:   1000000,
+											MemoryQuota: 33554432,
+											DiskQuota:   8000000,
+											Uptime:      time.Since(time.Unix(167572800, 0)),
+										},
 									},
 								},
 							},
@@ -148,35 +150,37 @@ var _ = Describe("app summary displayer", func() {
 
 			When("some processes have > 0 instances and others have 0 instances", func() {
 				BeforeEach(func() {
-					summary = v7action.ApplicationSummary{
-						Application: v7action.Application{
-							GUID:  "some-app-guid",
-							State: constant.ApplicationStarted,
-						},
-						ProcessSummaries: v7action.ProcessSummaries{
-							{
-								Process: v7action.Process{
-									Type:       constant.ProcessTypeWeb,
-									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
-								},
-								InstanceDetails: []v7action.ProcessInstance{
-									v7action.ProcessInstance{
-										Index:       0,
-										State:       constant.ProcessInstanceRunning,
-										MemoryUsage: 1000000,
-										DiskUsage:   1000000,
-										MemoryQuota: 33554432,
-										DiskQuota:   2000000,
-										Uptime:      time.Since(time.Unix(267321600, 0)),
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: v7action.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									Process: v7action.Process{
+										Type:       constant.ProcessTypeWeb,
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+									},
+									InstanceDetails: []v7action.ProcessInstance{
+										v7action.ProcessInstance{
+											Index:       0,
+											State:       constant.ProcessInstanceRunning,
+											MemoryUsage: 1000000,
+											DiskUsage:   1000000,
+											MemoryQuota: 33554432,
+											DiskQuota:   2000000,
+											Uptime:      time.Since(time.Unix(267321600, 0)),
+										},
 									},
 								},
-							},
-							{
-								Process: v7action.Process{
-									Type:       "console",
-									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
-									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+								{
+									Process: v7action.Process{
+										Type:       "console",
+										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
+										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+									},
 								},
 							},
 						},
@@ -196,16 +200,16 @@ var _ = Describe("app summary displayer", func() {
 
 			When("all the instances for a process are down (but scaled to > 0 instances)", func() {
 				BeforeEach(func() {
-					summary = v7action.ApplicationSummary{
-
-						ProcessSummaries: []v7action.ProcessSummary{
-							{
-								Process: v7action.Process{
-									Type:       constant.ProcessTypeWeb,
-									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								},
-								InstanceDetails: []v7action.ProcessInstance{{State: constant.ProcessInstanceDown}},
-							},
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							ProcessSummaries: []v7action.ProcessSummary{
+								{
+									Process: v7action.Process{
+										Type:       constant.ProcessTypeWeb,
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									},
+									InstanceDetails: []v7action.ProcessInstance{{State: constant.ProcessInstanceDown}},
+								}},
 						},
 					}
 				})
@@ -218,27 +222,29 @@ var _ = Describe("app summary displayer", func() {
 
 			Describe("start command", func() {
 				BeforeEach(func() {
-					summary = v7action.ApplicationSummary{
-						Application: v7action.Application{
-							GUID:  "some-app-guid",
-							State: constant.ApplicationStarted,
-						},
-						ProcessSummaries: v7action.ProcessSummaries{
-							{
-								Process: v7action.Process{
-									Type:    constant.ProcessTypeWeb,
-									Command: *types.NewFilteredString("some-command-1"),
-								},
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: v7action.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
 							},
-							{
-								Process: v7action.Process{
-									Type:    "console",
-									Command: *types.NewFilteredString("some-command-2"),
+							ProcessSummaries: v7action.ProcessSummaries{
+								{
+									Process: v7action.Process{
+										Type:    constant.ProcessTypeWeb,
+										Command: *types.NewFilteredString("some-command-1"),
+									},
 								},
-							},
-							{
-								Process: v7action.Process{
-									Type: "random",
+								{
+									Process: v7action.Process{
+										Type:    "console",
+										Command: *types.NewFilteredString("some-command-2"),
+									},
+								},
+								{
+									Process: v7action.Process{
+										Type: "random",
+									},
 								},
 							},
 						},
@@ -276,24 +282,26 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the app has no instances", func() {
 			BeforeEach(func() {
-				summary = v7action.ApplicationSummary{
-					Application: v7action.Application{
-						GUID:  "some-app-guid",
-						State: constant.ApplicationStarted,
-					},
-					ProcessSummaries: v7action.ProcessSummaries{
-						{
-							Process: v7action.Process{
-								Type:       constant.ProcessTypeWeb,
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
-							},
+				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: v7action.Application{
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
 						},
-						{
-							Process: v7action.Process{
-								Type:       "console",
-								MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
-								DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+						ProcessSummaries: v7action.ProcessSummaries{
+							{
+								Process: v7action.Process{
+									Type:       constant.ProcessTypeWeb,
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+								},
+							},
+							{
+								Process: v7action.Process{
+									Type:       "console",
+									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
+									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+								},
 							},
 						},
 					},
@@ -319,20 +327,22 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the app is stopped", func() {
 			BeforeEach(func() {
-				summary = v7action.ApplicationSummary{
-					Application: v7action.Application{
-						GUID:  "some-app-guid",
-						State: constant.ApplicationStopped,
-					},
-					ProcessSummaries: v7action.ProcessSummaries{
-						{
-							Process: v7action.Process{
-								Type: constant.ProcessTypeWeb,
-							},
+				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: v7action.Application{
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStopped,
 						},
-						{
-							Process: v7action.Process{
-								Type: "console",
+						ProcessSummaries: v7action.ProcessSummaries{
+							{
+								Process: v7action.Process{
+									Type: constant.ProcessTypeWeb,
+								},
+							},
+							{
+								Process: v7action.Process{
+									Type: "console",
+								},
 							},
 						},
 					},
@@ -373,10 +383,12 @@ var _ = Describe("app summary displayer", func() {
 
 			When("the application summary has no isolation segment information", func() {
 				BeforeEach(func() {
-					summary = v7action.ApplicationSummary{
-						Application: v7action.Application{
-							GUID:  "some-app-guid",
-							State: constant.ApplicationStopped,
+					summary = v7action.DetailedApplicationSummary{
+						ApplicationSummary: v7action.ApplicationSummary{
+							Application: v7action.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStopped,
+							},
 						},
 					}
 				})
@@ -441,12 +453,14 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the application is a docker app", func() {
 			BeforeEach(func() {
-				summary = v7action.ApplicationSummary{
-					Application: v7action.Application{
-						GUID:          "some-guid",
-						Name:          "some-app",
-						State:         constant.ApplicationStarted,
-						LifecycleType: constant.AppLifecycleTypeDocker,
+				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: v7action.Application{
+							GUID:          "some-guid",
+							Name:          "some-app",
+							State:         constant.ApplicationStarted,
+							LifecycleType: constant.AppLifecycleTypeDocker,
+						},
 					},
 					CurrentDroplet: v7action.Droplet{
 						Image: "docker/some-image",
@@ -465,7 +479,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the application is a buildpack app", func() {
 			BeforeEach(func() {
-				summary = v7action.ApplicationSummary{
+				summary = v7action.DetailedApplicationSummary{
 					CurrentDroplet: v7action.Droplet{
 						Stack: "cflinuxfs2",
 						Buildpacks: []v7action.DropletBuildpack{

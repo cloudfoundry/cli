@@ -916,7 +916,7 @@ var _ = Describe("Application Actions", func() {
 					nil,
 				)
 				fakeConfig.StartupTimeoutReturns(time.Millisecond * 5)
-				fakeConfig.PollingIntervalReturns(time.Millisecond * 8) // should run once
+				fakeConfig.PollingIntervalReturns(time.Millisecond * 30) // should run once
 			})
 
 			When("--no-wait is not specified", func() {
