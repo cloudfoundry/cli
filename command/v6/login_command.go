@@ -513,13 +513,9 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 			return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
 		} else if err == io.EOF {
 			return v3action.Organization{}, nil
+		} else {
+			return v3action.Organization{}, err
 		}
-
-		return v3action.Organization{}, err
-	}
-
-	if chosenOrgName == "" {
-		return v3action.Organization{}, nil
 	}
 
 	for _, org := range orgs {
@@ -528,7 +524,7 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 		}
 	}
 
-	return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: chosenOrgName}
+	return v3action.Organization{}, nil
 }
 
 func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Space, error) {
@@ -543,8 +539,9 @@ func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Sp
 			return v3action.Space{}, translatableerror.SpaceNotFoundError{Name: invalidChoice.Choice}
 		} else if err == io.EOF {
 			return v3action.Space{}, nil
+		} else {
+			return v3action.Space{}, err
 		}
-		return v3action.Space{}, nil
 	}
 
 	for _, space := range spaces {
@@ -552,7 +549,7 @@ func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Sp
 			return space, nil
 		}
 	}
-	return v3action.Space{}, translatableerror.SpaceNotFoundError{Name: chosenSpaceName}
+	return v3action.Space{}, nil
 }
 
 func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string) (string, error) {
@@ -575,10 +572,23 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 		cmd.UI.DisplayNewline()
 		defaultChoice := "enter to skip"
 		choice, err = cmd.UI.DisplayOptionalTextPrompt(defaultChoice, prompt)
-		if choice == defaultChoice {
+
+		switch {
+		case choice == defaultChoice:
 			return "", nil
+		case !contains(choices, choice):
+			return "", ui.InvalidChoiceError{Choice: choice}
 		}
 	}
 
 	return choice, err
+}
+
+func contains(s []string, v string) bool {
+	for _, x := range s {
+		if x == v {
+			return true
+		}
+	}
+	return false
 }
