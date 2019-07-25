@@ -544,7 +544,7 @@ func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Sp
 		} else if err == io.EOF {
 			return v3action.Space{}, nil
 		}
-		return v3action.Space{}, translatableerror.SpaceNotFoundError{Name: chosenSpaceName}
+		return v3action.Space{}, nil
 	}
 
 	for _, space := range spaces {
@@ -552,7 +552,7 @@ func (cmd *LoginCommand) promptChosenSpace(spaces []v3action.Space) (v3action.Sp
 			return space, nil
 		}
 	}
-	return v3action.Space{}, nil
+	return v3action.Space{}, translatableerror.SpaceNotFoundError{Name: chosenSpaceName}
 }
 
 func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string) (string, error) {

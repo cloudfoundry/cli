@@ -1137,7 +1137,6 @@ var _ = Describe("login Command", func() {
 
 				When("-s was not passed", func() {
 					When("fetching the spaces for an organization succeeds", func() {
-
 						When("no space exists", func() {
 							BeforeEach(func() {
 								fakeActor.GetOrganizationSpacesReturns(
@@ -1330,6 +1329,75 @@ var _ = Describe("login Command", func() {
 
 								})
 
+							})
+
+						})
+
+						When("more than 50 spaces exist", func() {
+							BeforeEach(func() {
+								spaces := make([]v3action.Space, 51)
+								for i := range spaces {
+									spaces[i].Name = fmt.Sprintf("space-%d", i+1)
+									spaces[i].GUID = fmt.Sprintf("space-guid-%d", i+1)
+								}
+
+								fakeActor.GetOrganizationSpacesReturns(
+									spaces,
+									v3action.Warnings{},
+									nil,
+								)
+							})
+
+							When("the user selects an space by name", func() {
+								When("the list contains that space", func() {
+									BeforeEach(func() {
+										input.Write([]byte("space-37\n"))
+									})
+
+									It("prompts the user to select an space", func() {
+										Expect(testUI.Out).To(Say("There are too many options to display; please type in the name."))
+										Expect(testUI.Out).To(Say("\n\n"))
+										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+										Expect(executeErr).ToNot(HaveOccurred())
+									})
+
+									It("targets that space", func() {
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+										spaceGUID, spaceName, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+										Expect(spaceGUID).To(Equal("space-guid-37"))
+										Expect(spaceName).To(Equal("space-37"))
+										Expect(allowSSH).To(BeTrue())
+									})
+								})
+
+								When("the name is a valid list position, but it does not match a space name", func() {
+									BeforeEach(func() {
+										input.Write([]byte("31\n"))
+									})
+
+									It("returns an error", func() {
+										Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "31"}))
+									})
+
+									It("does not target the space", func() {
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
+									})
+
+								})
+
+								When("the space is not in the list", func() {
+									BeforeEach(func() {
+										input.Write([]byte("invalid-space\n"))
+									})
+
+									It("returns an error", func() {
+										Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "invalid-space"}))
+									})
+
+									It("does not target the space", func() {
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
+									})
+								})
 							})
 
 						})
