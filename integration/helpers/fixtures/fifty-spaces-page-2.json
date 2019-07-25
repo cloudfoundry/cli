@@ -1,0 +1,43 @@
+{
+    "pagination": {
+        "first": {
+            "href": "%[1]s/v3/spaces?organization_guids=4305313e-d34e-4015-9a57-5550235cd6b0&page=1&per_page=50"
+        },
+        "last": {
+            "href": "%[1]s/v3/spaces?organization_guids=4305313e-d34e-4015-9a57-5550235cd6b0&page=2&per_page=50"
+        },
+        "next": null,
+        "previous": {
+            "href": "%[1]s/v3/spaces?organization_guids=4305313e-d34e-4015-9a57-5550235cd6b0&page=1&per_page=50"
+        },
+        "total_pages": 2,
+        "total_results": 51
+    },
+    "resources": [
+        {
+            "created_at": "2019-07-24T20:53:34Z",
+            "guid": "a7451481-fd87-4661-88ee-76807a780974",
+            "links": {
+                "organization": {
+                    "href": "%[1]s/v3/organizations/4305313e-d34e-4015-9a57-5550235cd6b0"
+                },
+                "self": {
+                    "href": "%[1]s/v3/spaces/a7451481-fd87-4661-88ee-76807a780974"
+                }
+            },
+            "metadata": {
+                "annotations": {},
+                "labels": {}
+            },
+            "name": "test-space-51",
+            "relationships": {
+                "organization": {
+                    "data": {
+                        "guid": "4305313e-d34e-4015-9a57-5550235cd6b0"
+                    }
+                }
+            },
+            "updated_at": "2019-07-24T20:53:34Z"
+        }
+    ]
+}

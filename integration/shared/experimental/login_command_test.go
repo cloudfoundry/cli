@@ -665,6 +665,30 @@ var _ = Describe("login command", func() {
 					})
 				})
 
+				When("there are more than 50 spaces", func() {
+					var server *ghttp.Server
+					BeforeEach(func() {
+						server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+						helpers.AddLoginRoutes(server)
+						helpers.AddFiftyOneSpaces(server)
+					})
+
+					It("displays a message and prompt the user for the space name", func() {
+						input := NewBuffer()
+						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "test-space-1")))
+						Expect(wErr).ToNot(HaveOccurred())
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
+
+						Eventually(session).Should(Say("Select a space:"))
+						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
+						Eventually(session).Should(Say("Targeted space test-space-1"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 		})
 
