@@ -1218,6 +1218,16 @@ var _ = Describe("login Command", func() {
 										Name:             "some-space-name2",
 										OrganizationGUID: "targeted-org-guid2",
 									},
+									{
+										GUID:             "some-space-guid3",
+										Name:             "3",
+										OrganizationGUID: "targeted-org-guid3",
+									},
+									{
+										GUID:             "some-space-guid3",
+										Name:             "100",
+										OrganizationGUID: "targeted-org-guid3",
+									},
 								}
 
 								fakeActor.GetOrganizationSpacesReturns(
@@ -1232,6 +1242,9 @@ var _ = Describe("login Command", func() {
 								Expect(testUI.Out).To(Say("1. some-space-name"))
 								Expect(testUI.Out).To(Say("2. some-space-name1"))
 								Expect(testUI.Out).To(Say("3. some-space-name2"))
+								Expect(testUI.Out).To(Say("4. 3"))
+								Expect(testUI.Out).To(Say("5. 100"))
+								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
 							})
 
@@ -1250,9 +1263,10 @@ var _ = Describe("login Command", func() {
 										Expect(executeErr).NotTo(HaveOccurred())
 									})
 								})
+
 								When("the position is invalid", func() {
 									BeforeEach(func() {
-										input.Write([]byte("100\n"))
+										input.Write([]byte("-1\n"))
 									})
 
 									It("reprompts the user", func() {
@@ -1260,13 +1274,19 @@ var _ = Describe("login Command", func() {
 										Expect(testUI.Out).To(Say("1. some-space-name"))
 										Expect(testUI.Out).To(Say("2. some-space-name1"))
 										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say("4. 3"))
+										Expect(testUI.Out).To(Say("5. 100"))
+										Expect(testUI.Out).To(Say("\n\n"))
 										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+										Expect(testUI.Out).To(Say("Select a space:"))
 										Expect(testUI.Out).To(Say("1. some-space-name"))
 										Expect(testUI.Out).To(Say("2. some-space-name1"))
 										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say("4. 3"))
+										Expect(testUI.Out).To(Say("5. 100"))
+										Expect(testUI.Out).To(Say("\n\n"))
 										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
 									})
-
 								})
 							})
 
@@ -1281,6 +1301,9 @@ var _ = Describe("login Command", func() {
 										Expect(testUI.Out).To(Say("1. some-space-name"))
 										Expect(testUI.Out).To(Say("2. some-space-name1"))
 										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say("4. 3"))
+										Expect(testUI.Out).To(Say("5. 100"))
+										Expect(testUI.Out).To(Say("\n\n"))
 										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
 										Expect(executeErr).ToNot(HaveOccurred())
 									})
@@ -1331,6 +1354,46 @@ var _ = Describe("login Command", func() {
 
 							})
 
+							When("the user enters text which is both a space name and a digit", func() {
+								When("the entry is a valid position", func() {
+									BeforeEach(func() {
+										input.Write([]byte("3\n"))
+									})
+
+									It("targets the space at the index specified", func() {
+										Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+										guid, name, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+										Expect(guid).To(Equal("some-space-guid2"))
+										Expect(name).To(Equal("some-space-name2"))
+										Expect(allowSSH).To(BeTrue())
+										Expect(executeErr).NotTo(HaveOccurred())
+									})
+								})
+
+								When("the entry is an invalid position", func() {
+									BeforeEach(func() {
+										input.Write([]byte("100\n"))
+									})
+
+									It("reprompts the user", func() {
+										Expect(testUI.Out).To(Say("Select a space:"))
+										Expect(testUI.Out).To(Say("1. some-space-name"))
+										Expect(testUI.Out).To(Say("2. some-space-name1"))
+										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say("4. 3"))
+										Expect(testUI.Out).To(Say("5. 100"))
+										Expect(testUI.Out).To(Say("\n\n"))
+										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+										Expect(testUI.Out).To(Say("1. some-space-name"))
+										Expect(testUI.Out).To(Say("2. some-space-name1"))
+										Expect(testUI.Out).To(Say("3. some-space-name2"))
+										Expect(testUI.Out).To(Say("4. 3"))
+										Expect(testUI.Out).To(Say("5. 100"))
+										Expect(testUI.Out).To(Say("\n\n"))
+										Expect(testUI.Out).To(Say(`Space \(enter to skip\):`))
+									})
+								})
+							})
 						})
 
 						When("more than 50 spaces exist", func() {
