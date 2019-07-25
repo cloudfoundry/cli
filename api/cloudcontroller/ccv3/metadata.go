@@ -20,7 +20,7 @@ type ResourceMetadata struct {
 }
 
 func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata Metadata) (ResourceMetadata, Warnings, error) {
-	metadataBtyes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
+	metadataBytes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
 	if err != nil {
 		return ResourceMetadata{}, nil, err
 	}
@@ -31,25 +31,25 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 	case "app":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchApplicationRequest,
-			Body:        bytes.NewReader(metadataBtyes),
+			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"app_guid": resourceGUID},
 		})
 	case "buildpack":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchBuildpackRequest,
-			Body:        bytes.NewReader(metadataBtyes),
+			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"buildpack_guid": resourceGUID},
 		})
 	case "org":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchOrganizationRequest,
-			Body:        bytes.NewReader(metadataBtyes),
+			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"organization_guid": resourceGUID},
 		})
 	case "space":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchSpaceRequest,
-			Body:        bytes.NewReader(metadataBtyes),
+			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"space_guid": resourceGUID},
 		})
 	default:
