@@ -562,7 +562,9 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 		for {
 			cmd.UI.DisplayText(text)
 			choice, err = cmd.UI.DisplayTextMenu(choices, prompt)
-			if err != ui.ErrInvalidIndex {
+			if err == ui.ErrInvalidIndex {
+				continue
+			} else {
 				break
 			}
 		}
