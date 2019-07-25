@@ -572,6 +572,7 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 	} else {
 		cmd.UI.DisplayText(text)
 		cmd.UI.DisplayText("There are too many options to display; please type in the name.")
+		cmd.UI.DisplayNewline()
 		defaultChoice := "enter to skip"
 		choice, err = cmd.UI.DisplayOptionalTextPrompt(defaultChoice, prompt)
 		if choice == defaultChoice {

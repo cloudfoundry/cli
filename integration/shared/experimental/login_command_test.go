@@ -294,8 +294,12 @@ var _ = Describe("login command", func() {
 
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 
+						Eventually(session).Should(Say("Select an org:"))
 						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
-						Eventually(session).Should(Say("Org:\\s+org20"))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+						Eventually(session).Should(Say("Targeted org org20"))
+
 						Eventually(session).Should(Exit(0))
 					})
 				})
