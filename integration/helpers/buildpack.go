@@ -115,6 +115,14 @@ func BuildpackGUIDByNameAndStack(buildpackName string, stackName string) string 
 	buildpacks := BuildpackList{}
 	err := json.Unmarshal(bytes, &buildpacks)
 	Expect(err).ToNot(HaveOccurred())
-
-	return buildpacks.Buildpacks[0].GUID
+	Expect(len(buildpacks.Buildpacks)).To(BeNumerically(">", 0))
+	if stackName != "" {
+		return buildpacks.Buildpacks[0].GUID
+	}
+	for _, buildpack := range buildpacks.Buildpacks {
+		if buildpack.Stack == "" {
+			return buildpack.GUID
+		}
+	}
+	return ""
 }
