@@ -481,13 +481,28 @@ var _ = Describe("set-label command", func() {
 
 							Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 
-							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as some-user...`), resourceName))
+							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
 							Expect(testUI.Out).To(Say("OK"))
 						})
 
 						It("prints all warnings", func() {
 							Expect(testUI.Err).To(Say("some-warning-1"))
 							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
+
+						When("no stack is provided", func() {
+							BeforeEach(func() {
+								cmd.BuildpackStack = ""
+							})
+
+							It("displays a message that includes the stack name", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as some-user...`), resourceName))
+
+								Expect(testUI.Out).To(Say("OK"))
+							})
 						})
 					})
 				})

@@ -138,10 +138,15 @@ func (cmd SetLabelCommand) executeBuildpack(username string, labels map[string]t
 	}
 
 	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+	if cmd.BuildpackStack != "" {
+		preFlavoringText = fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
+	}
+
 	cmd.UI.DisplayTextWithFlavor(
 		preFlavoringText,
 		map[string]interface{}{
 			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"StackName":    cmd.BuildpackStack,
 			"User":         username,
 		},
 	)
