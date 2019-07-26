@@ -186,6 +186,44 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("DeferText", func() {
+		It("defers the template with map values substituted in to ui.Out with a newline", func() {
+			ui.DeferText(
+				"template with {{.SomeMapValue}}",
+				map[string]interface{}{
+					"SomeMapValue": "map-value",
+				})
+			Expect(out).NotTo(Say("template with map-value\n"))
+			ui.FlushDeferred()
+			Expect(out).To(Say("template with map-value\n"))
+		})
+
+		When("the locale is not set to english", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Out = out
+			})
+
+			It("defers the translated template with map values substituted in to ui.Out", func() {
+				ui.DeferText(
+					"\nTIP: Use '{{.Command}}' to target new org",
+					map[string]interface{}{
+						"Command": "foo",
+					})
+				Expect(out).NotTo(Say("\nASTUCE : utilisez 'foo' pour cibler une nouvelle organisation"))
+				ui.FlushDeferred()
+				Expect(out).To(Say("\nASTUCE : utilisez 'foo' pour cibler une nouvelle organisation"))
+				ui.FlushDeferred()
+				Expect(out).NotTo(Say("\nASTUCE : utilisez 'foo' pour cibler une nouvelle organisation"))
+			})
+		})
+	})
+
 	Describe("DisplayTextWithBold", func() {
 		It("displays the template to ui.Out", func() {
 			ui.DisplayTextWithBold("some-template")

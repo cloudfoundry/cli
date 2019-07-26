@@ -69,11 +69,44 @@ var _ = Describe("delete Command", func() {
 	When("the -r flag is provided", func() {
 		BeforeEach(func() {
 			cmd.DeleteMappedRoutes = true
-			cmd.Force = true
+			cmd.Force = false
+			_, err := input.Write([]byte("y\n"))
+			Expect(err).ToNot(HaveOccurred())
+
+			fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, nil)
 		})
 
-		It("prints a warning", func() {
-			Expect(testUI.Err).To(Say("-r flag not implemented - the mapped routes will not be deleted"))
+		It("asks for a special prompt about deleting associated routes", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(testUI.Err).To(Say("some-warning"))
+			Expect(testUI.Out).To(Say(`Deleting the app and associated routes will make apps with this route, in any org, unreachable\.`))
+			Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(testUI.Out).NotTo(Say("App some-app does not exist"))
+		})
+
+		It("deletes application and mapped routes", func() {
+			actualName, actualSpace, deleteMappedRoutes := fakeActor.DeleteApplicationByNameAndSpaceArgsForCall(0)
+			Expect(actualName).To(Equal(app))
+			Expect(actualSpace).To(Equal(fakeConfig.TargetedSpace().GUID))
+			Expect(deleteMappedRoutes).To(BeTrue())
+		})
+
+		When("the route is mapped to a different app", func() {
+			BeforeEach(func() {
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, actionerror.RouteBoundToMultipleAppsError{})
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(actionerror.RouteBoundToMultipleAppsError{}))
+			})
+
+			It("defers showing a tip", func() {
+				Expect(testUI.Out).NotTo(Say("TIP"))
+				testUI.FlushDeferred()
+				Expect(testUI.Out).To(Say(`TIP: Run 'cf delete some-app to delete the app and 'cf delete-route' to delete the route\.`))
+			})
 		})
 	})
 
@@ -119,9 +152,10 @@ var _ = Describe("delete Command", func() {
 			})
 
 			It("delegates to the Actor", func() {
-				actualName, actualSpace := fakeActor.DeleteApplicationByNameAndSpaceArgsForCall(0)
+				actualName, actualSpace, deleteMappedRoutes := fakeActor.DeleteApplicationByNameAndSpaceArgsForCall(0)
 				Expect(actualName).To(Equal(app))
 				Expect(actualSpace).To(Equal(fakeConfig.TargetedSpace().GUID))
+				Expect(deleteMappedRoutes).To(BeFalse())
 			})
 
 			It("deletes the app", func() {

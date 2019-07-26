@@ -92,6 +92,8 @@ type UI struct {
 	TerminalWidth int
 
 	TimezoneLocation *time.Location
+
+	deferred []string
 }
 
 // NewUI will return a UI object where Out is set to STDOUT, In is set to
@@ -142,6 +144,14 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 		fileLock:         &sync.Mutex{},
 		TimezoneLocation: time.UTC,
 	}
+}
+
+// DeferText translates the template, substitutes in templateValues, and
+// Enqueues the output to be presented later via FlushDeferred. Only the first
+// map in templateValues is used.
+func (ui *UI) DeferText(template string, templateValues ...map[string]interface{}) {
+	s := fmt.Sprintf("%s\n", ui.TranslateText(template, templateValues...))
+	ui.deferred = append(ui.deferred, s)
 }
 
 func (ui *UI) DisplayDeprecationWarning() {
@@ -252,6 +262,18 @@ func (ui *UI) DisplayWarnings(warnings []string) {
 	if len(warnings) > 0 {
 		fmt.Fprintln(ui.Err)
 	}
+}
+
+// FlushDeferred diplays text previously deferred (using DeferText) to the UI's
+// `Out`.
+func (ui *UI) FlushDeferred() {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	for _, s := range ui.deferred {
+		fmt.Fprint(ui.Out, s)
+	}
+	ui.deferred = []string{}
 }
 
 // GetErr returns the error writer.

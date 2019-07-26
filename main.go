@@ -24,6 +24,7 @@ type UI interface {
 	DisplayError(err error)
 	DisplayWarning(template string, templateValues ...map[string]interface{})
 	DisplayText(template string, templateValues ...map[string]interface{})
+	FlushDeferred()
 }
 
 type DisplayUsage interface {
@@ -173,6 +174,7 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer commandUI.FlushDeferred()
 
 	err = preventExtraArgs(args)
 	if err != nil {
@@ -223,6 +225,7 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 		if err != nil {
 			return handleError(err, commandUI)
 		}
+
 		return handleError(extendedCmd.Execute(args), commandUI)
 	}
 

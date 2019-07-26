@@ -14,13 +14,13 @@ import (
 
 type DeleteActor interface {
 	CloudControllerAPIVersion() string
-	DeleteApplicationByNameAndSpace(name string, spaceGUID string) (v7action.Warnings, error)
+	DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (v7action.Warnings, error)
 }
 
 type DeleteCommand struct {
 	RequiredArgs       flag.AppName `positional-args:"yes"`
 	Force              bool         `short:"f" description:"Force deletion without confirmation"`
-	DeleteMappedRoutes bool         `short:"r" description:"Also delete any mapped routes [Not currently functional]"`
+	DeleteMappedRoutes bool         `short:"r" description:"Also delete any mapped routes"`
 	usage              interface{}  `usage:"CF_NAME delete APP_NAME [-r] [-f]"`
 	relatedCommands    interface{}  `related_commands:"apps, scale, stop"`
 
@@ -45,10 +45,6 @@ func (cmd *DeleteCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd DeleteCommand) Execute(args []string) error {
-	if cmd.DeleteMappedRoutes {
-		cmd.UI.DisplayWarning("-r flag not implemented - the mapped routes will not be deleted. Use `delete-orphaned-routes` instead.")
-	}
-
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -60,7 +56,13 @@ func (cmd DeleteCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Force {
-		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the app {{.AppName}}?", map[string]interface{}{
+		prompt := "Really delete the app {{.AppName}}?"
+		if cmd.DeleteMappedRoutes {
+			prompt = "Really delete the app {{.AppName}} and associated routes?"
+			cmd.UI.DisplayText("Deleting the app and associated routes will make apps with this route, in any org, unreachable.")
+		}
+
+		response, promptErr := cmd.UI.DisplayBoolPrompt(false, prompt, map[string]interface{}{
 			"AppName": cmd.RequiredArgs.AppName,
 		})
 
@@ -81,7 +83,11 @@ func (cmd DeleteCommand) Execute(args []string) error {
 		"Username":  currentUser.Name,
 	})
 
-	warnings, err := cmd.Actor.DeleteApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.DeleteApplicationByNameAndSpace(
+		cmd.RequiredArgs.AppName,
+		cmd.Config.TargetedSpace().GUID,
+		cmd.DeleteMappedRoutes,
+	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
@@ -89,6 +95,14 @@ func (cmd DeleteCommand) Execute(args []string) error {
 			cmd.UI.DisplayTextWithFlavor("App {{.AppName}} does not exist", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
+		case actionerror.RouteBoundToMultipleAppsError:
+			cmd.UI.DeferText(
+				"TIP: Run 'cf delete {{.AppName}} to delete the app and 'cf delete-route' to delete the route.",
+				map[string]interface{}{
+					"AppName": cmd.RequiredArgs.AppName,
+				},
+			)
+			return err
 		default:
 			return err
 		}

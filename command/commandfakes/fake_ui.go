@@ -11,6 +11,12 @@ import (
 )
 
 type FakeUI struct {
+	DeferTextStub        func(string, ...map[string]interface{})
+	deferTextMutex       sync.RWMutex
+	deferTextArgsForCall []struct {
+		arg1 string
+		arg2 []map[string]interface{}
+	}
 	DisplayBoolPromptStub        func(bool, string, ...map[string]interface{}) (bool, error)
 	displayBoolPromptMutex       sync.RWMutex
 	displayBoolPromptArgsForCall []struct {
@@ -273,6 +279,38 @@ type FakeUI struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeUI) DeferText(arg1 string, arg2 ...map[string]interface{}) {
+	fake.deferTextMutex.Lock()
+	fake.deferTextArgsForCall = append(fake.deferTextArgsForCall, struct {
+		arg1 string
+		arg2 []map[string]interface{}
+	}{arg1, arg2})
+	fake.recordInvocation("DeferText", []interface{}{arg1, arg2})
+	fake.deferTextMutex.Unlock()
+	if fake.DeferTextStub != nil {
+		fake.DeferTextStub(arg1, arg2...)
+	}
+}
+
+func (fake *FakeUI) DeferTextCallCount() int {
+	fake.deferTextMutex.RLock()
+	defer fake.deferTextMutex.RUnlock()
+	return len(fake.deferTextArgsForCall)
+}
+
+func (fake *FakeUI) DeferTextCalls(stub func(string, ...map[string]interface{})) {
+	fake.deferTextMutex.Lock()
+	defer fake.deferTextMutex.Unlock()
+	fake.DeferTextStub = stub
+}
+
+func (fake *FakeUI) DeferTextArgsForCall(i int) (string, []map[string]interface{}) {
+	fake.deferTextMutex.RLock()
+	defer fake.deferTextMutex.RUnlock()
+	argsForCall := fake.deferTextArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeUI) DisplayBoolPrompt(arg1 bool, arg2 string, arg3 ...map[string]interface{}) (bool, error) {
@@ -1653,6 +1691,8 @@ func (fake *FakeUI) WriterReturnsOnCall(i int, result1 io.Writer) {
 func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.deferTextMutex.RLock()
+	defer fake.deferTextMutex.RUnlock()
 	fake.displayBoolPromptMutex.RLock()
 	defer fake.displayBoolPromptMutex.RUnlock()
 	fake.displayChangesForPushMutex.RLock()

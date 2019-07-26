@@ -29,13 +29,42 @@ func (app Application) Stopped() bool {
 	return app.State == constant.ApplicationStopped
 }
 
-func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
+func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
 	var allWarnings Warnings
 
 	app, getAppWarnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
 	allWarnings = append(allWarnings, getAppWarnings...)
 	if err != nil {
 		return allWarnings, err
+	}
+
+	var routes []Route
+	if deleteRoutes {
+		var getRoutesWarnings Warnings
+		routes, getRoutesWarnings, err = actor.GetApplicationRoutes(app.GUID)
+		allWarnings = append(allWarnings, getRoutesWarnings...)
+		if err != nil {
+			return allWarnings, err
+		}
+
+		var destinations []RouteDestination
+		var getDestinationsWarnings Warnings
+		for _, route := range routes {
+			destinations, getDestinationsWarnings, err = actor.GetRouteDestinations(route.GUID)
+			allWarnings = append(allWarnings, getDestinationsWarnings...)
+			if err != nil {
+				return allWarnings, err
+			}
+
+			if len(destinations) > 1 {
+				for _, destination := range destinations {
+					guid := destination.App.GUID
+					if guid != app.GUID {
+						return allWarnings, actionerror.RouteBoundToMultipleAppsError{AppName: app.Name, RouteURL: route.URL}
+					}
+				}
+			}
+		}
 	}
 
 	jobURL, deleteAppWarnings, err := actor.CloudControllerClient.DeleteApplication(app.GUID)
@@ -46,6 +75,29 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string
 
 	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
 	allWarnings = append(allWarnings, pollWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if deleteRoutes {
+		for _, route := range routes {
+			jobURL, deleteRouteWarnings, err := actor.CloudControllerClient.DeleteRoute(route.GUID)
+			allWarnings = append(allWarnings, deleteRouteWarnings...)
+			if err != nil {
+				if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+					continue
+				}
+				return allWarnings, err
+			}
+
+			pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+			allWarnings = append(allWarnings, pollWarnings...)
+			if err != nil {
+				return allWarnings, err
+			}
+		}
+	}
+
 	return allWarnings, err
 }
 

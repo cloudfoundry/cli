@@ -19,11 +19,12 @@ type FakeDeleteActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	DeleteApplicationByNameAndSpaceStub        func(string, string) (v7action.Warnings, error)
+	DeleteApplicationByNameAndSpaceStub        func(string, string, bool) (v7action.Warnings, error)
 	deleteApplicationByNameAndSpaceMutex       sync.RWMutex
 	deleteApplicationByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 bool
 	}
 	deleteApplicationByNameAndSpaceReturns struct {
 		result1 v7action.Warnings
@@ -89,17 +90,18 @@ func (fake *FakeDeleteActor) CloudControllerAPIVersionReturnsOnCall(i int, resul
 	}{result1}
 }
 
-func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v7action.Warnings, error) {
 	fake.deleteApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.deleteApplicationByNameAndSpaceReturnsOnCall[len(fake.deleteApplicationByNameAndSpaceArgsForCall)]
 	fake.deleteApplicationByNameAndSpaceArgsForCall = append(fake.deleteApplicationByNameAndSpaceArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("DeleteApplicationByNameAndSpace", []interface{}{arg1, arg2})
+		arg3 bool
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("DeleteApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.deleteApplicationByNameAndSpaceMutex.Unlock()
 	if fake.DeleteApplicationByNameAndSpaceStub != nil {
-		return fake.DeleteApplicationByNameAndSpaceStub(arg1, arg2)
+		return fake.DeleteApplicationByNameAndSpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -114,17 +116,17 @@ func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpaceCallCount() int {
 	return len(fake.deleteApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpaceCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpaceCalls(stub func(string, string, bool) (v7action.Warnings, error)) {
 	fake.deleteApplicationByNameAndSpaceMutex.Lock()
 	defer fake.deleteApplicationByNameAndSpaceMutex.Unlock()
 	fake.DeleteApplicationByNameAndSpaceStub = stub
 }
 
-func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
+func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpaceArgsForCall(i int) (string, string, bool) {
 	fake.deleteApplicationByNameAndSpaceMutex.RLock()
 	defer fake.deleteApplicationByNameAndSpaceMutex.RUnlock()
 	argsForCall := fake.deleteApplicationByNameAndSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeDeleteActor) DeleteApplicationByNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {

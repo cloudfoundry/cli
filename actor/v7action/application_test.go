@@ -34,12 +34,15 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("DeleteApplicationByNameAndSpace", func() {
 		var (
-			warnings   Warnings
-			executeErr error
+			warnings           Warnings
+			executeErr         error
+			deleteMappedRoutes bool
+			appName            string
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.DeleteApplicationByNameAndSpace("some-app", "some-space-guid")
+			appName = "some-app"
+			warnings, executeErr = actor.DeleteApplicationByNameAndSpace(appName, "some-space-guid", deleteMappedRoutes)
 		})
 
 		When("looking up the app guid fails", func() {
@@ -94,6 +97,139 @@ var _ = Describe("Application Actions", func() {
 						Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-app-warning", "some-poll-warning"))
 						Expect(executeErr).ToNot(HaveOccurred())
 					})
+				})
+			})
+		})
+
+		When("attempting to delete mapped routes", func() {
+			BeforeEach(func() {
+				deleteMappedRoutes = true
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "abc123"}}, nil, nil)
+			})
+
+			When("getting the routes fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationRoutesReturns(nil, ccv3.Warnings{"get-routes-warning"}, errors.New("get-routes-error"))
+				})
+
+				It("returns the warnings and an error", func() {
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).To(MatchError("get-routes-error"))
+				})
+			})
+
+			When("getting the routes succeeds", func() {
+				When("there are no routes", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv3.Route{}, nil, nil)
+					})
+
+					It("does not delete any routes", func() {
+						Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(0))
+					})
+				})
+
+				When("there are routes", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv3.Route{{GUID: "route-1-guid"}, {GUID: "route-2-guid", URL: "route-2.example.com"}}, nil, nil)
+					})
+
+					When("getting route destinations fails", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetRouteDestinationsReturnsOnCall(0, nil, ccv3.Warnings{"get-route-destinations-warning"}, errors.New("get-route-destinations-error"))
+						})
+
+						It("returns all warnings and an error", func() {
+							Expect(warnings).To(ConsistOf("get-route-destinations-warning"))
+							Expect(executeErr).To(MatchError("get-route-destinations-error"))
+						})
+					})
+
+					When("getting route destinations succeeds", func() {
+						It("deletes the routes", func() {
+							Expect(fakeCloudControllerClient.GetApplicationRoutesCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetApplicationRoutesArgsForCall(0)).To(Equal("abc123"))
+							Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(2))
+							guids := []string{fakeCloudControllerClient.DeleteRouteArgsForCall(0), fakeCloudControllerClient.DeleteRouteArgsForCall(1)}
+							Expect(guids).To(ConsistOf("route-1-guid", "route-2-guid"))
+						})
+
+						When("the route has already been deleted", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.DeleteRouteReturnsOnCall(0,
+									"",
+									ccv3.Warnings{"delete-route-1-warning"},
+									ccerror.ResourceNotFoundError{},
+								)
+								fakeCloudControllerClient.DeleteRouteReturnsOnCall(1,
+									"poll-job-url",
+									ccv3.Warnings{"delete-route-2-warning"},
+									nil,
+								)
+								fakeCloudControllerClient.PollJobReturnsOnCall(1, ccv3.Warnings{"poll-job-warning"}, nil)
+							})
+
+							It("does **not** fail", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(warnings).To(ConsistOf("delete-route-1-warning", "delete-route-2-warning", "poll-job-warning"))
+								Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(2))
+								Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(2))
+								Expect(fakeCloudControllerClient.PollJobArgsForCall(1)).To(BeEquivalentTo("poll-job-url"))
+							})
+						})
+
+						When("app to delete has a route bound to another app", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetRouteDestinationsReturnsOnCall(1,
+									[]ccv3.RouteDestination{
+										{App: ccv3.RouteDestinationApp{GUID: "abc123"}},
+										{App: ccv3.RouteDestinationApp{GUID: "different-app-guid"}},
+									},
+									ccv3.Warnings{"get-destination-warning"},
+									nil)
+							})
+							It("refuses the entire operation", func() {
+								Expect(executeErr).To(MatchError(actionerror.RouteBoundToMultipleAppsError{AppName: "some-app", RouteURL: "route-2.example.com"}))
+								Expect(warnings).To(ConsistOf("get-destination-warning"))
+								Expect(fakeCloudControllerClient.GetRouteDestinationsCallCount()).To(Equal(2))
+								Expect(fakeCloudControllerClient.DeleteApplicationCallCount()).To(Equal(0))
+								Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(0))
+							})
+						})
+
+						When("deleting the route fails", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.DeleteRouteReturnsOnCall(0,
+									"poll-job-url",
+									ccv3.Warnings{"delete-route-1-warning"},
+									nil,
+								)
+								fakeCloudControllerClient.DeleteRouteReturnsOnCall(1,
+									"",
+									ccv3.Warnings{"delete-route-2-warning"},
+									errors.New("delete-route-2-error"),
+								)
+								fakeCloudControllerClient.PollJobReturnsOnCall(1, ccv3.Warnings{"poll-job-warning"}, nil)
+							})
+
+							It("returns the error", func() {
+								Expect(executeErr).To(MatchError("delete-route-2-error"))
+								Expect(warnings).To(ConsistOf("delete-route-1-warning", "delete-route-2-warning", "poll-job-warning"))
+							})
+						})
+
+					})
+
+					When("the polling job fails", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"poll-job-warning"}, errors.New("poll-job-error"))
+						})
+
+						It("returns the error", func() {
+							Expect(executeErr).To(MatchError("poll-job-error"))
+						})
+					})
+
 				})
 			})
 		})

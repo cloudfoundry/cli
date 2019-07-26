@@ -12,7 +12,8 @@ import (
 // the mapping exists.
 func MapRouteToApplication(app string, domain string, host string, path string) {
 	Eventually(CF("map-route", app, domain, "--hostname", host, "--path", path)).Should(Exit(0))
-	Eventually(CF("routes")).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+%s\\s+/%s\\s+%s", host, domain, path, app))))
+	Eventually(CF("routes")).Should(And(Exit(0), Say(
+		fmt.Sprintf("%s\\s+%s\\s+/?%s\\s+.*%s.*", host, domain, path, app))))
 }
 
 // UnmapRouteFromApplication unmaps a route from an app using 'cf unmap-route' and asserts that

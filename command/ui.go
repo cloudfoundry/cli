@@ -10,6 +10,7 @@ import (
 // UI is the interface to STDOUT, STDERR, and STDIN.
 //go:generate counterfeiter . UI
 type UI interface {
+	DeferText(template string, data ...map[string]interface{})
 	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayChangesForPush(changeSet []ui.Change) error
 	DisplayDeprecationWarning()
@@ -27,8 +28,8 @@ type UI interface {
 	DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTableWithHeader(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
-	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error)
+	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTextWithBold(text string, keys ...map[string]interface{})
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
