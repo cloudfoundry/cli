@@ -580,6 +580,11 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--random-route",
 			},
 		}
+	case len(cmd.Buildpacks) > 0 && cmd.ManifestParser.Apps()[0].Docker != nil:
+		return translatableerror.ArgumentManifestMismatchError{
+			Arg:              "--buildpack, -b",
+			ManifestProperty: "docker",
+		}
 	}
 
 	return nil

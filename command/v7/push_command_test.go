@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"errors"
 	"time"
 
@@ -1156,6 +1157,24 @@ var _ = Describe("push Command", func() {
 				Args: []string{
 					"--no-route", "--random-route",
 				},
+			}),
+		Entry("when docker is set in the manifest and -b flag is passd",
+			func() {
+				cmd.Buildpacks = []string{"some_buildpack"}
+				fakeManifestParser.AppsReturns([]manifestparser.Application{
+					{
+						ApplicationModel: manifestparser.ApplicationModel{
+							Name: "some-app",
+							Docker: &manifestparser.Docker{
+								Image: "nginx:latest",
+							},
+						},
+					},
+				})
+			},
+			translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--buildpack, -b",
+				ManifestProperty: "docker",
 			}),
 	)
 })
