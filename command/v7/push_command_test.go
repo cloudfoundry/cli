@@ -1,9 +1,10 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/util/manifestparser"
 	"errors"
 	"time"
+
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "github.com/onsi/gomega/gstruct"
 

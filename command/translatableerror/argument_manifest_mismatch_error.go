@@ -15,7 +15,7 @@ func (ArgumentManifestMismatchError) Error() string {
 
 func (e ArgumentManifestMismatchError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"Arg": e.Arg,
+		"Arg":      e.Arg,
 		"Property": e.ManifestProperty,
 	})
 }
