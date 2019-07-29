@@ -435,13 +435,33 @@ var _ = Describe("labels command", func() {
 				Expect(checkSpace).To(BeFalse())
 			})
 
-			It("displays a message that it is retrieving the labels", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for buildpack my-buildpack as some-user...`)))
+			Describe("the getting-labels message", func() {
+				When("the buildpack stack is not specified", func() {
+					BeforeEach(func() {
+						cmd.BuildpackStack = ""
+					})
+
+					It("displays a message that it is retrieving the labels", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for buildpack my-buildpack as some-user...`)))
+					})
+				})
+
+				When("the buildpack stack is specified", func() {
+					BeforeEach(func() {
+						cmd.BuildpackStack = "omelette"
+					})
+
+					It("displays a message that it is retrieving the labels", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for buildpack my-buildpack with stack omelette as some-user...`)))
+					})
+				})
 			})
 
-			It("retrieves the labels associated with the buidpack", func() {
+			It("retrieves the labels associated with the buildpack", func() {
 				Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
 			})
 
@@ -516,7 +536,7 @@ var _ = Describe("labels command", func() {
 						ResourceType: "Buildpack",
 						ResourceName: "fake-buildpack",
 					}
-					cmd.StackName = "another-great-stack"
+					cmd.BuildpackStack = "another-great-stack"
 				})
 
 				It("retrieves the labels associated with the buildpack", func() {

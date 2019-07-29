@@ -84,11 +84,11 @@ func DeleteStack(name string) {
 	Eventually(session).Should(Exit(0))
 }
 
-// EnsureMinimumNumberOfStacks ensures there are at least 2 stacks in the foundation by creating new ones if there
-// are fewer than 2
+// EnsureMinimumNumberOfStacks ensures there are at least <num> stacks in the foundation by creating new ones if there
+// are fewer than the specified number
 func EnsureMinimumNumberOfStacks(num int) []string {
 	var stacks []string
-	for stacks = FetchStacks(); len(stacks) < 2; {
+	for stacks = FetchStacks(); len(stacks) < num; {
 		stacks = append(stacks, CreateStack())
 	}
 	return stacks

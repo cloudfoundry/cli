@@ -360,7 +360,6 @@ var _ = Describe("set-label command", func() {
 						Expect(buildpack.Metadata.Labels["owner"]).To(Equal("beth"))
 					})
 				})
-
 			})
 
 			When("the buildpack exists for multiple stacks", func() {

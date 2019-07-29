@@ -34,13 +34,13 @@ type LabelsActor interface {
 }
 
 type LabelsCommand struct {
-	RequiredArgs flag.LabelsArgs `positional-args:"yes"`
-	StackName    string          `long:"stack" short:"s" description:"required when more than one buildpack has the same name"`
-	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n\nSEE ALSO:\n   set-label, unset-label"`
-	UI           command.UI
-	Config       command.Config
-	SharedActor  command.SharedActor
-	Actor        LabelsActor
+	RequiredArgs   flag.LabelsArgs `positional-args:"yes"`
+	BuildpackStack string          `long:"stack" short:"s" description:"required when more than one buildpack has the same name"`
+	usage          interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n\nSEE ALSO:\n   set-label, unset-label"`
+	UI             command.UI
+	Config         command.Config
+	SharedActor    command.SharedActor
+	Actor          LabelsActor
 }
 
 func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
@@ -144,14 +144,25 @@ func (cmd LabelsCommand) fetchBuildpackLabels(username string) (map[string]types
 		return nil, nil, err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Getting labels for buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
-		"BuildpackName": cmd.RequiredArgs.ResourceName,
-		"Username":      username,
-	})
+	var template string
+	if cmd.BuildpackStack != "" {
+		template = "Getting labels for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+	} else {
+		template = "Getting labels for %s {{.ResourceName}} as {{.User}}..."
+	}
+	preFlavoringText := fmt.Sprintf(template, cmd.RequiredArgs.ResourceType)
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"StackName":    cmd.BuildpackStack,
+			"User":         username,
+		},
+	)
 
 	cmd.UI.DisplayNewline()
 
-	return cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.StackName)
+	return cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack)
 }
 
 func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {

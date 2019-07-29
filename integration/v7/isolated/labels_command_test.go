@@ -243,14 +243,14 @@ var _ = Describe("labels command", func() {
 				})
 				It("lists the labels for both buildpacks", func() {
 					session := helpers.CF("labels", "buildpack", buildpackName, "-s", newStackName)
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s with stack %s as %s...\n\n"), buildpackName, newStackName, username))
 					Eventually(session).Should(Say(`key\s+value`))
 					Eventually(session).Should(Say(`my-stack-some-other-key\s+some-other-value`))
 					Eventually(session).Should(Say(`some-key\s+some-value`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("labels", "buildpack", buildpackName, "--stack", "cflinuxfs3")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s with stack cflinuxfs3 as %s...\n\n"), buildpackName, username))
 					Eventually(session).Should(Say(`key\s+value`))
 					Eventually(session).Should(Say(`cfl1\s+var1`))
 					Eventually(session).Should(Say(`cfl2\s+var2`))

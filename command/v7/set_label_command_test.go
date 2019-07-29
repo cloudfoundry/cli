@@ -489,29 +489,62 @@ var _ = Describe("set-label command", func() {
 					})
 
 					When("updating the buildpack labels succeeds", func() {
-						It("sets the provided labels on the buildpack", func() {
-							Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-							name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-							Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-							Expect(stack).To(Equal("globinski"), "failed to pass stack name")
-							Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
-								"FOO": types.NewNullString("BAR"),
-								"ENV": types.NewNullString("FAKE"),
-							}))
+						When("the buildpack stack is specified", func() {
+							It("sets the provided labels on the buildpack", func() {
+								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+								Expect(stack).To(Equal("globinski"), "failed to pass stack name")
+								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+									"FOO": types.NewNullString("BAR"),
+									"ENV": types.NewNullString("FAKE"),
+								}))
+							})
+
+							It("displays a message", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
+								Expect(testUI.Out).To(Say("OK"))
+							})
+
+							It("prints all warnings", func() {
+								Expect(testUI.Err).To(Say("some-warning-1"))
+								Expect(testUI.Err).To(Say("some-warning-2"))
+							})
 						})
 
-						It("displays a message", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
+						When("the buildpack stack is not specified", func() {
+							BeforeEach(func() {
+								cmd.BuildpackStack = ""
+							})
 
-							Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+							It("sets the provided labels on the buildpack", func() {
+								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+								Expect(stack).To(Equal(""), "got a non-empty stack name")
+								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+									"FOO": types.NewNullString("BAR"),
+									"ENV": types.NewNullString("FAKE"),
+								}))
+							})
 
-							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
-							Expect(testUI.Out).To(Say("OK"))
-						})
+							It("displays a message", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
 
-						It("prints all warnings", func() {
-							Expect(testUI.Err).To(Say("some-warning-1"))
-							Expect(testUI.Err).To(Say("some-warning-2"))
+								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as some-user...`), resourceName))
+								Expect(testUI.Out).To(Say("OK"))
+							})
+
+							It("prints all warnings", func() {
+								Expect(testUI.Err).To(Say("some-warning-1"))
+								Expect(testUI.Err).To(Say("some-warning-2"))
+							})
 						})
 
 						When("no stack is provided", func() {
