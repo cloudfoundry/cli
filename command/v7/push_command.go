@@ -509,6 +509,7 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--path, -p",
 			},
 		}
+
 	case cmd.DockerImage.Path != "" && cmd.Stack != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -516,6 +517,7 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--docker-image, -o",
 			},
 		}
+
 	case cmd.NoManifest && cmd.PathToManifest != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -523,6 +525,7 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--manifest, -f",
 			},
 		}
+
 	case cmd.NoManifest && len(cmd.PathsToVarsFiles) > 0:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -530,6 +533,7 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--vars-file",
 			},
 		}
+
 	case cmd.NoManifest && len(cmd.Vars) > 0:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -537,11 +541,13 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--vars",
 			},
 		}
+
 	case cmd.HealthCheckType.Type == constant.HTTP && cmd.HealthCheckHTTPEndpoint == "":
 		return translatableerror.RequiredFlagsError{
 			Arg1: "--endpoint",
 			Arg2: "--health-check-type=http, -u=http",
 		}
+
 	case 0 < len(cmd.HealthCheckHTTPEndpoint) && cmd.HealthCheckType.Type != constant.HTTP:
 		return translatableerror.RequiredFlagsError{
 			Arg1: "--health-check-type=http, -u=http",
@@ -573,6 +579,7 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--no-wait",
 			},
 		}
+
 	case cmd.NoRoute && cmd.RandomRoute:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
@@ -580,10 +587,30 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--random-route",
 			},
 		}
-	case len(cmd.Buildpacks) > 0 && cmd.ManifestParser.Apps()[0].Docker != nil:
-		return translatableerror.ArgumentManifestMismatchError{
-			Arg:              "--buildpack, -b",
-			ManifestProperty: "docker",
+
+	}
+
+	if len(cmd.ManifestParser.Apps()) == 1 {
+		app := cmd.ManifestParser.Apps()[0]
+
+		switch {
+		case len(cmd.Buildpacks) > 0 && app.Docker != nil:
+			return translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--buildpack, -b",
+				ManifestProperty: "docker",
+			}
+
+		case len(cmd.AppPath) > 0 && app.Docker != nil:
+			return translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--path, -p",
+				ManifestProperty: "docker",
+			}
+
+		case len(cmd.DockerImage.Path) > 0 && app.Path != "":
+			return translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--docker-image, -o",
+				ManifestProperty: "path",
+			}
 		}
 	}
 

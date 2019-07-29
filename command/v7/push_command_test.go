@@ -248,6 +248,32 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
+				When("no apps are defined in the manifest", func() {
+					BeforeEach(func() {
+						fakeManifestParser.AppsReturns([]manifestparser.Application{})
+					})
+
+					When("passing in a path", func() {
+						BeforeEach(func() {
+							cmd.AppPath = "not-empty"
+						})
+
+						It("does not fail when parsing flags", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+						})
+					})
+
+					When("passing in buildpacks", func() {
+						BeforeEach(func() {
+							cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
+						})
+
+						It("does not fail when parsing flags", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+						})
+					})
+				})
+
 				When("no manifest flag", func() {
 					BeforeEach(func() {
 						cmd.NoManifest = true
@@ -1176,6 +1202,40 @@ var _ = Describe("push Command", func() {
 			translatableerror.ArgumentManifestMismatchError{
 				Arg:              "--buildpack, -b",
 				ManifestProperty: "docker",
+			}),
+		Entry("when docker is set in the manifest and -p flag is passd",
+			func() {
+				cmd.AppPath = "path_to_some_app"
+				fakeManifestParser.AppsReturns([]manifestparser.Application{
+					{
+						ApplicationModel: manifestparser.ApplicationModel{
+							Name: "some-app",
+							Docker: &manifestparser.Docker{
+								Image: "nginx:latest",
+							},
+						},
+					},
+				})
+			},
+			translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--path, -p",
+				ManifestProperty: "docker",
+			}),
+		Entry("when path is set in the manifest and -o flag is passd",
+			func() {
+				cmd.DockerImage.Path = "nginx:latest"
+				fakeManifestParser.AppsReturns([]manifestparser.Application{
+					{
+						ApplicationModel: manifestparser.ApplicationModel{
+							Name: "some-app",
+							Path: "path_to_some_app",
+						},
+					},
+				})
+			},
+			translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--docker-image, -o",
+				ManifestProperty: "path",
 			}),
 	)
 })
