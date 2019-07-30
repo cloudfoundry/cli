@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -62,6 +63,11 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		warnings v7action.Warnings
 	)
 	username, err := cmd.Config.CurrentUserName()
+	if err != nil {
+		return err
+	}
+
+	err = cmd.validateFlags()
 	if err != nil {
 		return err
 	}
@@ -197,4 +203,16 @@ func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+}
+
+func (cmd LabelsCommand) validateFlags() error {
+	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
+	if cmd.StackName != "" && ResourceType(resourceTypeString) != Buildpack {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--stack, -s",
+			},
+		}
+	}
+	return nil
 }
