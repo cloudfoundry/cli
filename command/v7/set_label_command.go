@@ -46,17 +46,6 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd SetLabelCommand) ValidateFlags() error {
-	if cmd.BuildpackStack != "" && ResourceType(cmd.RequiredArgs.ResourceType) != Buildpack {
-		return translatableerror.ArgumentCombinationError{
-			Args: []string{
-				cmd.RequiredArgs.ResourceType, "--stack, -s",
-			},
-		}
-	}
-	return nil
-}
-
 func (cmd SetLabelCommand) Execute(args []string) error {
 
 	labels := make(map[string]types.NullString)
@@ -73,13 +62,12 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.ValidateFlags()
+	err = cmd.validateFlags()
 	if err != nil {
 		return err
 	}
 
-	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
-	switch ResourceType(resourceTypeString) {
+	switch cmd.canonicalResourceTypeForName() {
 	case App:
 		err = cmd.executeApp(username, labels)
 	case Buildpack:
@@ -207,5 +195,20 @@ func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types
 		return err
 	}
 
+	return nil
+}
+
+func (cmd SetLabelCommand) canonicalResourceTypeForName() ResourceType {
+	return ResourceType(strings.ToLower(cmd.RequiredArgs.ResourceType))
+}
+
+func (cmd SetLabelCommand) validateFlags() error {
+	if cmd.BuildpackStack != "" && cmd.canonicalResourceTypeForName() != Buildpack {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--stack, -s",
+			},
+		}
+	}
 	return nil
 }

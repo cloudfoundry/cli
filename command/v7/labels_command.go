@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -65,8 +66,12 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		return err
 	}
 
-	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
-	switch ResourceType(resourceTypeString) {
+	err = cmd.validateFlags()
+	if err != nil {
+		return err
+	}
+
+	switch cmd.canonicalResourceTypeForName() {
 	case App:
 		labels, warnings, err = cmd.fetchAppLabels(username)
 	case Org:
@@ -165,6 +170,10 @@ func (cmd LabelsCommand) fetchBuildpackLabels(username string) (map[string]types
 	return cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack)
 }
 
+func (cmd LabelsCommand) canonicalResourceTypeForName() ResourceType {
+	return ResourceType(strings.ToLower(cmd.RequiredArgs.ResourceType))
+}
+
 func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
@@ -189,4 +198,15 @@ func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+}
+
+func (cmd LabelsCommand) validateFlags() error {
+	if cmd.BuildpackStack != "" && cmd.canonicalResourceTypeForName() != Buildpack {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--stack, -s",
+			},
+		}
+	}
+	return nil
 }

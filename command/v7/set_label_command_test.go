@@ -32,7 +32,7 @@ var _ = Describe("set-label command", func() {
 		executeErr error
 	)
 
-	checkBuildpackArgFunc := func() {
+	verifyStackArgNotAllowed := func() {
 		BeforeEach(func() {
 			cmd.BuildpackStack = "cflinuxfs3"
 		})
@@ -44,7 +44,6 @@ var _ = Describe("set-label command", func() {
 
 			Expect(executeErr).To(MatchError(argumentCombinationError))
 		})
-
 	}
 
 	When("setting labels on apps", func() {
@@ -237,7 +236,7 @@ var _ = Describe("set-label command", func() {
 		})
 
 		When("when the --stack flag is specified", func() {
-			checkBuildpackArgFunc()
+			verifyStackArgNotAllowed()
 		})
 	})
 
@@ -425,7 +424,7 @@ var _ = Describe("set-label command", func() {
 		})
 
 		When("when the --stack flag is specified", func() {
-			checkBuildpackArgFunc()
+			verifyStackArgNotAllowed()
 		})
 	})
 
@@ -779,7 +778,7 @@ var _ = Describe("set-label command", func() {
 				})
 
 				When("when the --stack flag is specified", func() {
-					checkBuildpackArgFunc()
+					verifyStackArgNotAllowed()
 				})
 
 				When("the resource type argument is not lowercase", func() {

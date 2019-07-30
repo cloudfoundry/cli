@@ -4,9 +4,12 @@ import (
 	"errors"
 	"regexp"
 
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/types"
@@ -44,6 +47,20 @@ var _ = Describe("labels command", func() {
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
+
+	verifyStackArgNotAllowed := func() {
+		BeforeEach(func() {
+			cmd.BuildpackStack = "cflinuxfs3"
+		})
+
+		It("displays an argument combination error", func() {
+			argumentCombinationError := translatableerror.ArgumentCombinationError{
+				Args: []string{strings.ToLower(cmd.RequiredArgs.ResourceType), "--stack, -s"},
+			}
+
+			Expect(executeErr).To(MatchError(argumentCombinationError))
+		})
+	}
 
 	Describe("listing labels", func() {
 		Describe("for apps", func() {
@@ -168,6 +185,10 @@ var _ = Describe("labels command", func() {
 					Expect(executeErr).To(MatchError("boom"))
 				})
 			})
+
+			When("when the --stack flag is specified", func() {
+				verifyStackArgNotAllowed()
+			})
 		})
 
 		Describe("for orgs", func() {
@@ -285,6 +306,10 @@ var _ = Describe("labels command", func() {
 					orgName := fakeLabelsActor.GetOrganizationLabelsArgsForCall(0)
 					Expect(orgName).To(Equal("fake-org"))
 				})
+			})
+
+			When("when the --stack flag is specified", func() {
+				verifyStackArgNotAllowed()
 			})
 		})
 
@@ -405,6 +430,10 @@ var _ = Describe("labels command", func() {
 					Expect(spaceName).To(Equal("fake-space"))
 					Expect(orgGUID).To(Equal("some-org-guid"))
 				})
+			})
+
+			When("when the --stack flag is specified", func() {
+				verifyStackArgNotAllowed()
 			})
 		})
 
@@ -540,6 +569,7 @@ var _ = Describe("labels command", func() {
 				})
 
 				It("retrieves the labels associated with the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
 					buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
 					Expect(buildpackName).To(Equal("fake-buildpack"))
