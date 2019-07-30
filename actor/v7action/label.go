@@ -42,15 +42,19 @@ func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string
 }
 
 func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
-	app, appWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
-		return appWarnings, err
+		return warnings, err
 	}
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("app", app.GUID, ccv3.Metadata{Labels: labels})
+	return actor.updateResourceMetadata("app", app.GUID, ccv3.Metadata{Labels: labels}, warnings)
+}
+
+func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStack(buildpackName string, stack string, labels map[string]types.NullString) (Warnings, error) {
+	buildpack, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, stack)
 	if err != nil {
-		return append(appWarnings, updateWarnings...), err
+		return warnings, err
 	}
-	return append(appWarnings, updateWarnings...), err
+	return actor.updateResourceMetadata("buildpack", buildpack.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, labels map[string]types.NullString) (Warnings, error) {
@@ -58,11 +62,7 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 	if err != nil {
 		return warnings, err
 	}
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("org", org.GUID, ccv3.Metadata{Labels: labels})
-	if err != nil {
-		return append(warnings, updateWarnings...), err
-	}
-	return append(warnings, updateWarnings...), err
+	return actor.updateResourceMetadata("org", org.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID string, labels map[string]types.NullString) (Warnings, error) {
@@ -70,9 +70,10 @@ func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID strin
 	if err != nil {
 		return warnings, err
 	}
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata("space", space.GUID, ccv3.Metadata{Labels: labels})
-	if err != nil {
-		return append(warnings, updateWarnings...), err
-	}
+	return actor.updateResourceMetadata("space", space.GUID, ccv3.Metadata{Labels: labels}, warnings)
+}
+
+func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
 	return append(warnings, updateWarnings...), err
 }

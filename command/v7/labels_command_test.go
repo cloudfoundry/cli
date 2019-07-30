@@ -46,7 +46,6 @@ var _ = Describe("labels command", func() {
 	})
 
 	Describe("listing labels", func() {
-
 		Describe("for apps", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserNameReturns("some-user", nil)
@@ -87,6 +86,22 @@ var _ = Describe("labels command", func() {
 				appName, spaceGUID := fakeLabelsActor.GetApplicationLabelsArgsForCall(0)
 				Expect(appName).To(Equal("dora"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "ApP",
+						ResourceName: "dora",
+					}
+				})
+
+				It("retrieves the labels associated with the application", func() {
+					Expect(fakeLabelsActor.GetApplicationLabelsCallCount()).To(Equal(1))
+					appName, spaceGUID := fakeLabelsActor.GetApplicationLabelsArgsForCall(0)
+					Expect(appName).To(Equal("dora"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
 			})
 
 			It("displays the labels that are associated with the application, alphabetically", func() {
@@ -256,12 +271,27 @@ var _ = Describe("labels command", func() {
 					Expect(executeErr).To(MatchError("boom"))
 				})
 			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "OrG",
+						ResourceName: "fake-org",
+					}
+				})
+
+				It("retrieves the labels associated with the org", func() {
+					Expect(fakeLabelsActor.GetOrganizationLabelsCallCount()).To(Equal(1))
+					orgName := fakeLabelsActor.GetOrganizationLabelsArgsForCall(0)
+					Expect(orgName).To(Equal("fake-org"))
+				})
+			})
 		})
 
 		Describe("for spaces", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserNameReturns("some-user", nil)
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "space",
 					ResourceName: "fake-space",
@@ -358,6 +388,22 @@ var _ = Describe("labels command", func() {
 
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "SpAcE",
+						ResourceName: "fake-space",
+					}
+				})
+
+				It("retrieves the labels associated with the space", func() {
+					Expect(fakeLabelsActor.GetSpaceLabelsCallCount()).To(Equal(1))
+					spaceName, orgGUID := fakeLabelsActor.GetSpaceLabelsArgsForCall(0)
+					Expect(spaceName).To(Equal("fake-space"))
+					Expect(orgGUID).To(Equal("some-org-guid"))
 				})
 			})
 		})

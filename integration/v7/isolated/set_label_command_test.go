@@ -36,6 +36,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+cf set-label space business_space public-facing=false owner=jane_doe`))
 				Eventually(session).Should(Say("RESOURCES:"))
 				Eventually(session).Should(Say(`\s+app`))
+				Eventually(session).Should(Say(`\s+buildpack`))
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say("SEE ALSO:"))
@@ -48,10 +49,12 @@ var _ = Describe("set-label command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
-			orgName   string
-			spaceName string
-			appName   string
-			username  string
+			orgName            string
+			spaceName          string
+			appName            string
+			username           string
+			stackNameBase      string
+			testWithStackCount int
 		)
 
 		type commonResource struct {
@@ -65,6 +68,7 @@ var _ = Describe("set-label command", func() {
 			helpers.LoginCF()
 			orgName = helpers.NewOrgName()
 			helpers.CreateOrg(orgName)
+			stackNameBase = helpers.NewStackName()
 		})
 
 		When("assigning label to app", func() {
@@ -260,6 +264,228 @@ var _ = Describe("set-label command", func() {
 					Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
 					Expect(len(org.Metadata.Labels)).To(Equal(1))
 					Expect(org.Metadata.Labels["owner"]).To(Equal("beth"))
+				})
+			})
+		})
+
+		When("assigning label to buildpack", func() {
+			var (
+				buildpackName string
+			)
+
+			BeforeEach(func() {
+				buildpackName = helpers.NewBuildpackName()
+			})
+
+			When("the buildpack exists for at most one stack", func() {
+				var (
+					currentStack string
+				)
+
+				BeforeEach(func() {
+					currentStack = helpers.PreferredStack()
+					helpers.BuildpackWithStack(func(buildpackPath string) {
+						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "98")
+						Eventually(session).Should(Exit(0))
+					}, currentStack)
+				})
+				AfterEach(func() {
+					helpers.CF("delete-buildpack", buildpackName, "-f", "-s", currentStack)
+				})
+
+				It("sets the specified labels on the buildpack", func() {
+					session := helpers.CF("set-label", "buildpack", buildpackName, "pci=true", "public-facing=false")
+					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as %s...`), buildpackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, currentStack)
+					session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
+					Eventually(session).Should(Exit(0))
+					buildpackJSON := session.Out.Contents()
+					var buildpack commonResource
+					Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+					Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+					Expect(buildpack.Metadata.Labels["pci"]).To(Equal("true"))
+					Expect(buildpack.Metadata.Labels["public-facing"]).To(Equal("false"))
+				})
+
+				When("the buildpack is unknown", func() {
+					It("displays an error", func() {
+						session := helpers.CF("set-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
+						Eventually(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("the buildpack exists in general but does NOT exist for the specified stack", func() {
+					It("displays an error", func() {
+						session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value", "--stack", "FAKE")
+						Eventually(session.Err).Should(Say(fmt.Sprintf("Buildpack %s with stack FAKE not found", buildpackName)))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("the label has an empty key and an invalid value", func() {
+					It("displays an error", func() {
+						session := helpers.CF("set-label", "buildpack", buildpackName, "=test", "sha2=108&eb90d734")
+						Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("the label does not include a '=' to separate the key and value", func() {
+					It("displays an error", func() {
+						session := helpers.CF("set-label", "buildpack", buildpackName, "test-label")
+						Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("more than one value is provided for the same key", func() {
+					It("uses the last value", func() {
+						session := helpers.CF("set-label", "buildpack", buildpackName, "owner=sue", "owner=beth")
+						Eventually(session).Should(Exit(0))
+						buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, currentStack)
+						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
+						Eventually(session).Should(Exit(0))
+						buildpackJSON := session.Out.Contents()
+						var buildpack commonResource
+						Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+						Expect(len(buildpack.Metadata.Labels)).To(Equal(1))
+						Expect(buildpack.Metadata.Labels["owner"]).To(Equal("beth"))
+					})
+				})
+
+			})
+
+			When("the buildpack exists for multiple stacks", func() {
+				var (
+					stacks         [3]string
+					buildpackGUIDs [3]string
+				)
+
+				BeforeEach(func() {
+					stacks[0] = helpers.PreferredStack()
+					testWithStackCount += 1
+					stacks[1] = helpers.CreateStack(fmt.Sprintf("%s-%d", stackNameBase, testWithStackCount))
+
+					for i := 0; i < 2; i++ {
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath,
+								fmt.Sprintf("%d", 95+i))
+							Eventually(createSession).Should(Exit(0))
+							buildpackGUIDs[i] = helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[i])
+						}, stacks[i])
+					}
+					helpers.CF("curl", "/v3/buildpacks?names="+buildpackName)
+				})
+				AfterEach(func() {
+					helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[0])
+					helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[1])
+					helpers.DeleteStack(stacks[1])
+				})
+
+				When("all buildpacks are stack-scoped", func() {
+					When("no stack is specified", func() {
+						It("displays an error", func() {
+							session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value")
+							Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("a non-existent stack is specified", func() {
+						It("displays an error", func() {
+							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
+							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
+							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Buildpack %s with stack %s not found", buildpackName, bogusStackName))))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("an existing stack is specified", func() {
+						It("updates the correct buildpack", func() {
+							session := helpers.CF("set-label", "buildpack", buildpackName, "peach=5", "quince=6", "--stack", stacks[0])
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[0], username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[0]))
+							Eventually(session).Should(Exit(0))
+							buildpackJSON := session.Out.Contents()
+							var buildpack commonResource
+							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+							Expect(buildpack.Metadata.Labels["peach"]).To(Equal("5"))
+							Expect(buildpack.Metadata.Labels["quince"]).To(Equal("6"))
+						})
+					})
+				})
+
+				When("one of the buildpacks is not stack-scoped", func() {
+					BeforeEach(func() {
+						helpers.BuildpackWithoutStack(func(buildpackPath string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath, "97")
+							Eventually(createSession).Should(Exit(0))
+							buildpackGUIDs[2] = helpers.BuildpackGUIDByNameAndStack(buildpackName, "")
+						})
+					})
+					AfterEach(func() {
+						helpers.CF("delete-buildpack", buildpackName, "-f")
+					})
+
+					When("no stack is specified", func() {
+						It("updates the unscoped buildpack", func() {
+							session := helpers.CF("set-label", "buildpack", buildpackName, "mango=1", "figs=2")
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as %s...`), buildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[2]))
+							Eventually(session).Should(Exit(0))
+							buildpackJSON := session.Out.Contents()
+							var buildpack commonResource
+							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+							Expect(buildpack.Metadata.Labels["mango"]).To(Equal("1"))
+							Expect(buildpack.Metadata.Labels["figs"]).To(Equal("2"))
+						})
+					})
+
+					When("an existing stack is specified", func() {
+						It("updates the correct buildpack", func() {
+							session := helpers.CF("set-label", "buildpack", buildpackName, "tangelo=3", "lemon=4", "--stack", stacks[1])
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[1], username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]))
+							Eventually(session).Should(Exit(0))
+							buildpackJSON := session.Out.Contents()
+							var buildpack commonResource
+							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+							Expect(buildpack.Metadata.Labels["tangelo"]).To(Equal("3"))
+							Expect(buildpack.Metadata.Labels["lemon"]).To(Equal("4"))
+						})
+					})
+
+					When("a non-existent stack is specified", func() {
+						It("displays an error", func() {
+							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
+							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
+							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Buildpack %s with stack %s not found", buildpackName, bogusStackName))))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
 				})
 			})
 		})

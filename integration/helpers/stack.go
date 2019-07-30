@@ -52,9 +52,12 @@ func PreferredStack() string {
 
 // CreateStack creates a new stack with the user provided name. If a name is not provided, a random name is used
 func CreateStack(names ...string) string {
-	name := NewStackName()
+	var name string
+
 	if len(names) > 0 {
 		name = names[0]
+	} else {
+		name = NewStackName()
 	}
 
 	requestBody := fmt.Sprintf(
