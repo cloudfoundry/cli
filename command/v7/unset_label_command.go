@@ -20,6 +20,7 @@ type UnsetLabelActor interface {
 	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type UnsetLabelCommand struct {
@@ -70,6 +71,8 @@ func (cmd UnsetLabelCommand) Execute(args []string) error {
 		err = cmd.executeOrg(user.Name, labels)
 	case Space:
 		err = cmd.executeSpace(user.Name, labels)
+	case Stack:
+		err = cmd.executeStack(user.Name, labels)
 	default:
 		err = errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.RequiredArgs.ResourceType}))
 	}
@@ -151,6 +154,24 @@ func (cmd UnsetLabelCommand) executeSpace(username string, labels map[string]typ
 	})
 
 	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID, labels)
+
+	cmd.UI.DisplayWarnings(warnings)
+
+	return err
+}
+
+func (cmd UnsetLabelCommand) executeStack(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for stack {{.ResourceName}} as {{.User}}...", map[string]interface{}{
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"User":         username,
+	})
+
+	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 

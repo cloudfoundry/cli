@@ -45,6 +45,7 @@ var _ = Describe("unset-label command", func() {
 			spaceName string
 			appName   string
 			username  string
+			stackName string
 		)
 
 		type commonResource struct {
@@ -274,5 +275,37 @@ var _ = Describe("unset-label command", func() {
 				Expect(space.Metadata.Labels["pci"]).To(Equal("true"))
 			})
 		})
+
+		When("unsetting labels from a stack", func() {
+			var stackGUID string
+
+			BeforeEach(func() {
+				stackName, stackGUID = helpers.CreateStackWithGUID()
+				session := helpers.CF("set-label", "stack", stackName, "pci=true", "public-facing=false")
+				Eventually(session).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				deleteResourceByGUID(stackGUID, "stacks")
+			})
+
+			It("unsets the specified labels on the stack", func() {
+				session := helpers.CF("unset-label", "stack", stackName, "public-facing")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for stack %s as %s...`), stackName, username))
+				Consistently(session).ShouldNot(Say("\n\nOK"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("curl", fmt.Sprintf("/v3/stacks/%s", stackGUID))
+				Eventually(session).Should(Exit(0))
+				stackJSON := session.Out.Contents()
+
+				var stack commonResource
+				Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
+				Expect(len(stack.Metadata.Labels)).To(Equal(1))
+				Expect(stack.Metadata.Labels["pci"]).To(Equal("true"))
+			})
+		})
+
 	})
 })
