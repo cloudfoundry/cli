@@ -85,15 +85,15 @@ var _ = Describe("login Command", func() {
 
 			When("user provides the api endpoint using the -a flag", func() {
 				BeforeEach(func() {
-					cmd.APIEndpoint = "api.boshlite.com"
+					cmd.APIEndpoint = "api.example.com"
 				})
 
 				It("target the provided api endpoint", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("API endpoint: api.boshlite.com\n\n"))
+					Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
 					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
-					Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
+					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
 				})
 			})
 
@@ -112,26 +112,33 @@ var _ = Describe("login Command", func() {
 
 				When("the user enters something at the prompt", func() {
 					BeforeEach(func() {
-						input.Write([]byte("api.boshlite.com\n"))
 						cmd.APIEndpoint = ""
+						input.Write([]byte("api.example.com\n"))
+						fakeConfig.TargetReturnsOnCall(0, "")
+						fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
 					})
 
 					It("targets the API that the user inputted", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
+
 						Expect(testUI.Out).To(Say("API endpoint:"))
-						Expect(testUI.Out).To(Say("api.boshlite.com\n"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API version: 3\.4\.5\)`))
+						Expect(testUI.Out).To(Say("api.example.com\n"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
 
 						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 						actualSettings := fakeActor.SetTargetArgsForCall(0)
-						Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
+						Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+
+						Expect(fakeConfig.TargetCallCount()).To(Equal(2))
 					})
 				})
 
 				When("the user inputs an empty API", func() {
 					BeforeEach(func() {
 						cmd.APIEndpoint = ""
-						input.Write([]byte("\n\napi.boshlite.com\n"))
+						input.Write([]byte("\n\napi.example.com\n"))
+						fakeConfig.TargetReturnsOnCall(0, "")
+						fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
 					})
 
 					It("reprompts for the API", func() {
@@ -139,24 +146,27 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Out).To(Say("API endpoint:"))
 						Expect(testUI.Out).To(Say("API endpoint:"))
 						Expect(testUI.Out).To(Say("API endpoint:"))
-						Expect(testUI.Out).To(Say("api.boshlite.com\n"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API version: 3\.4\.5\)`))
+						Expect(testUI.Out).To(Say("api.example.com\n"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
+						Expect(fakeConfig.TargetCallCount()).To(Equal(2))
 					})
 				})
 			})
 
 			When("the endpoint has trailing slashes", func() {
 				BeforeEach(func() {
-					cmd.APIEndpoint = "api.boshlite.com////"
+					cmd.APIEndpoint = "api.example.com////"
+					fakeConfig.TargetReturns("https://api.example.com///")
 				})
 
 				It("strips the backslashes before using the endpoint", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
-					Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
+					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
 
-					Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API version: 3\.4\.5\)`))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
+					Expect(fakeConfig.TargetCallCount()).To(Equal(1))
 				})
 			})
 		})
@@ -740,6 +750,7 @@ var _ = Describe("login Command", func() {
 							v3action.Warnings{"some-warning-1", "some-warning-2"},
 							nil)
 						fakeConfig.TargetedOrganizationNameReturns("some-org")
+						fakeConfig.TargetReturns("https://example.com")
 					})
 
 					It("prints all warnings", func() {
@@ -755,7 +766,7 @@ var _ = Describe("login Command", func() {
 					})
 
 					It("reports to the user that the org is targeted", func() {
-						Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
 						Expect(testUI.Out).To(Say("User:           some-user"))
 						Expect(testUI.Out).To(Say("Org:            some-org"))
 					})
@@ -806,6 +817,7 @@ var _ = Describe("login Command", func() {
 				When("fetching the organizations succeeds", func() {
 					BeforeEach(func() {
 						fakeConfig.CurrentUserNameReturns("some-user", nil)
+						fakeConfig.TargetReturns("https://example.com")
 					})
 
 					When("no org exists", func() {
@@ -818,8 +830,8 @@ var _ = Describe("login Command", func() {
 						It("displays how to target an org and space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
-							Expect(testUI.Out).To(Say("User:           some-user"))
+							Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
+							Expect(testUI.Out).To(Say(`User:\s+some-user`))
 							Expect(testUI.Out).To(Say("No org or space targeted, use '%s target -o ORG -s SPACE'", binaryName))
 						})
 					})
@@ -1144,6 +1156,7 @@ var _ = Describe("login Command", func() {
 									v3action.Warnings{},
 									nil,
 								)
+								fakeConfig.TargetReturns("https://example.com")
 							})
 							It("does not prompt the user to select a space", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
@@ -1153,9 +1166,8 @@ var _ = Describe("login Command", func() {
 
 							It("displays how to target a space", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-
-								Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
-								Expect(testUI.Out).To(Say("User:           some-user"))
+								Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
+								Expect(testUI.Out).To(Say(`User:\s+some-user`))
 								Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
 							})
 						})

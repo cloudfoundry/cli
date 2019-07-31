@@ -448,7 +448,7 @@ func (cmd *LoginCommand) showStatus() {
 			cmd.UI.TranslateText("API endpoint:"),
 			cmd.UI.TranslateText("{{.APIEndpoint}} (API version: {{.APIVersion}})",
 				map[string]interface{}{
-					"APIEndpoint": strings.TrimRight(cmd.APIEndpoint, "/"),
+					"APIEndpoint": strings.TrimRight(cmd.Config.Target(), "/"),
 					"APIVersion":  cmd.Config.APIVersion(),
 				}),
 		},

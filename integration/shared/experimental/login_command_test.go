@@ -3,6 +3,7 @@ package experimental
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"time"
 
@@ -169,6 +170,43 @@ var _ = Describe("login command", func() {
 					})
 				})
 			})
+		})
+	})
+
+	Describe("https", func() {
+
+		When("no scheme is included in the API endpoint", func() {
+			var (
+				hostname  string
+				serverURL *url.URL
+				err       error
+				session *Session
+			)
+
+			BeforeEach(func() {
+				serverURL, err = url.Parse(helpers.GetAPI())
+				Expect(err).NotTo(HaveOccurred())
+
+				hostname = serverURL.Hostname()
+
+				username, password := helpers.GetCredentials()
+				if skipSSLValidation {
+					session = helpers.CF("login", "-u", username, "-p", password, "-a", hostname, "--skip-ssl-validation")
+				} else {
+					session = helpers.CF("login", "-u", username, "-p", password, "-a", hostname)
+				}
+			})
+
+			It("displays the API endpoint you are about to target as https", func() {
+				Eventually(session).Should(Say("API endpoint: %s", hostname))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("displays the API endpoint you have targeted as https", func() {
+				Eventually(session).Should(Say(`API endpoint:\s+https://%s\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`, hostname))
+				Eventually(session).Should(Exit(0))
+			})
+
 		})
 	})
 
