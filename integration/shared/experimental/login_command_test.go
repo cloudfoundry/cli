@@ -180,7 +180,7 @@ var _ = Describe("login command", func() {
 				hostname  string
 				serverURL *url.URL
 				err       error
-				session *Session
+				session   *Session
 			)
 
 			BeforeEach(func() {
