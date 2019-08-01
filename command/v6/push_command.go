@@ -235,6 +235,8 @@ func (cmd PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings,
 		return pushaction.CommandLineSettings{}, err
 	}
 
+	cmd.warnOnAnyDeprecatedRouteFlags()
+
 	dockerPassword := cmd.Config.DockerPassword()
 	if dockerPassword != "" {
 		cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
@@ -272,6 +274,25 @@ func (cmd PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings,
 
 	log.Debugln("Command Line Settings:", config)
 	return config, nil
+}
+
+func (cmd PushCommand) warnOnAnyDeprecatedRouteFlags() {
+	var deprecatedFlag string
+	if cmd.NoHostname {
+		deprecatedFlag = "--no-hostname"
+	} else if cmd.Domain != "" {
+		deprecatedFlag = "-d"
+	} else if cmd.Hostname != "" {
+		deprecatedFlag = "--hostname"
+	} else if cmd.RoutePath.Path != "" {
+		deprecatedFlag = "--route-path"
+	}
+	if len(deprecatedFlag) > 0 {
+		cmd.UI.DisplayWarning("Deprecation warning: Use of the '{{.Flag}}' flag is deprecated in favor of the 'routes' property in the manifest. Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.",
+			map[string]interface{}{
+				"Flag": deprecatedFlag,
+			})
+	}
 }
 
 func (cmd PushCommand) findAndReadManifestWithFlavorText(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
