@@ -21,6 +21,29 @@ type Space struct {
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
+func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
+	spaceBytes, err := json.Marshal(space)
+	if err != nil {
+		return Space{}, nil, err
+	}
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostSpaceRequest,
+		Body:        bytes.NewReader(spaceBytes),
+	})
+
+	if err != nil {
+		return Space{}, nil, err
+	}
+
+	var responseSpace Space
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseSpace,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseSpace, response.Warnings, err
+}
+
 // GetSpaces lists spaces with optional filters.
 func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

@@ -2,10 +2,34 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type Space ccv3.Space
+
+func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, error) {
+	allWarnings := Warnings{}
+
+	space, apiWarnings, err := actor.CloudControllerClient.CreateSpace(ccv3.Space{
+		Name: spaceName,
+		Relationships: ccv3.Relationships{
+			constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: orgGUID},
+		},
+	})
+
+	actorWarnings := Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
+
+	if _, ok := err.(ccerror.NameNotUniqueInOrgError); ok {
+		return Space{}, allWarnings, actionerror.SpaceAlreadyExistsError{Space: spaceName}
+	}
+	return Space{
+		GUID: space.GUID,
+		Name: spaceName,
+	}, allWarnings, err
+}
 
 // ResetSpaceIsolationSegment disassociates a space from an isolation segment.
 //

@@ -63,7 +63,7 @@ func (config *Config) DockerPassword() string {
 }
 
 // Experimental returns whether or not to run experimental CLI commands. This
-// is based off of:
+// is based on the following:
 //   1. The $CF_CLI_EXPERIMENTAL environment variable if set
 //   2. Defaults to false
 func (config *Config) Experimental() bool {

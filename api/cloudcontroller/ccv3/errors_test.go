@@ -255,6 +255,25 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
+					When("the name isn't unique to organization", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "Name must be unique per organization",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns a NameNotUniqueInOrgError", func() {
+							Expect(makeError).To(MatchError(ccerror.NameNotUniqueInOrgError{}))
+						})
+					})
+
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `

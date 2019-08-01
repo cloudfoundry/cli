@@ -21,6 +21,100 @@ var _ = Describe("Spaces", func() {
 		client, _ = NewTestClient()
 	})
 
+	Describe("CreateSpace", func() {
+		var (
+			space         Space
+			spaceToCreate Space
+			warnings      Warnings
+			executeErr    error
+		)
+
+		JustBeforeEach(func() {
+			spaceToCreate = Space{Name: "some-space", Relationships: Relationships{constant.RelationshipTypeOrganization: Relationship{GUID: "some-org-guid"}}}
+			space, warnings, executeErr = client.CreateSpace(spaceToCreate)
+		})
+
+		When("spaces exist", func() {
+			BeforeEach(func() {
+				response := `{
+      "name": "some-space",
+      "guid": "some-space-guid"
+    }`
+
+				expectedBody := `{
+"name": "some-space",
+"relationships": {
+      "organization": {
+      "data": { "guid": "some-org-guid" }
+    }
+  }
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/spaces"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the given space and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(space).To(Equal(Space{
+					GUID: "some-space-guid",
+					Name: "some-space",
+				}))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+		{
+      "code": 10010,
+      "detail": "Isolation segment not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/spaces"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+	})
+
 	Describe("GetSpaces", func() {
 		var (
 			query Query

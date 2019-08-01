@@ -255,6 +255,21 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	CreateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
+	createSpaceMutex       sync.RWMutex
+	createSpaceArgsForCall []struct {
+		arg1 ccv3.Space
+	}
+	createSpaceReturns struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteApplicationStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteApplicationMutex       sync.RWMutex
 	deleteApplicationArgsForCall []struct {
@@ -2478,6 +2493,72 @@ func (fake *FakeCloudControllerClient) CreateServiceBrokerReturnsOnCall(i int, r
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) CreateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
+	fake.createSpaceMutex.Lock()
+	ret, specificReturn := fake.createSpaceReturnsOnCall[len(fake.createSpaceArgsForCall)]
+	fake.createSpaceArgsForCall = append(fake.createSpaceArgsForCall, struct {
+		arg1 ccv3.Space
+	}{arg1})
+	fake.recordInvocation("CreateSpace", []interface{}{arg1})
+	fake.createSpaceMutex.Unlock()
+	if fake.CreateSpaceStub != nil {
+		return fake.CreateSpaceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceCallCount() int {
+	fake.createSpaceMutex.RLock()
+	defer fake.createSpaceMutex.RUnlock()
+	return len(fake.createSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceCalls(stub func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)) {
+	fake.createSpaceMutex.Lock()
+	defer fake.createSpaceMutex.Unlock()
+	fake.CreateSpaceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceArgsForCall(i int) ccv3.Space {
+	fake.createSpaceMutex.RLock()
+	defer fake.createSpaceMutex.RUnlock()
+	argsForCall := fake.createSpaceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceReturns(result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+	fake.createSpaceMutex.Lock()
+	defer fake.createSpaceMutex.Unlock()
+	fake.CreateSpaceStub = nil
+	fake.createSpaceReturns = struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceReturnsOnCall(i int, result1 ccv3.Space, result2 ccv3.Warnings, result3 error) {
+	fake.createSpaceMutex.Lock()
+	defer fake.createSpaceMutex.Unlock()
+	fake.CreateSpaceStub = nil
+	if fake.createSpaceReturnsOnCall == nil {
+		fake.createSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Space
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteApplication(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
@@ -7487,6 +7568,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
+	fake.createSpaceMutex.RLock()
+	defer fake.createSpaceMutex.RUnlock()
 	fake.deleteApplicationMutex.RLock()
 	defer fake.deleteApplicationMutex.RUnlock()
 	fake.deleteApplicationProcessInstanceMutex.RLock()

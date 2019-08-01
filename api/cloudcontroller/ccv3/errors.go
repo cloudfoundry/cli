@@ -132,6 +132,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 		"name must be unique in space"):
 		return ccerror.NameNotUniqueInSpaceError{}
 	case strings.Contains(errorString,
+		"Name must be unique per organization"):
+		return ccerror.NameNotUniqueInOrgError{}
+	case strings.Contains(errorString,
 		"Route already exists"):
 		return ccerror.RouteNotUniqueError{UnprocessableEntityError: err}
 	case strings.Contains(errorString,

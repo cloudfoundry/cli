@@ -43,7 +43,7 @@ var _ = Describe("help command", func() {
 			Eventually(session).Should(Say(`  domains\s+map-route`))
 
 			Eventually(session).Should(Say("Space management:"))
-			Eventually(session).Should(Say(`  spaces\s+create-space\s+set-space-role`))
+			Eventually(session).Should(Say(`  spaces\s+create-space,csp\s+set-space-role`))
 
 			Eventually(session).Should(Say("Org management:"))
 			Eventually(session).Should(Say(`  orgs,o\s+set-org-role`))

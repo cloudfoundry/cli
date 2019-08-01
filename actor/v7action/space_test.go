@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,6 +22,60 @@ var _ = Describe("Space", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig := new(v7actionfakes.FakeConfig)
 		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil)
+	})
+
+	Describe("CreateSpace", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			_, warnings, executeErr = actor.CreateSpace("space-name", "org-guid")
+		})
+
+		When("the API layer calls are successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateSpaceReturns(
+					ccv3.Space{GUID: "space-guid", Name: "space-name"},
+					ccv3.Warnings{"create-warning-1", "create-warning-2"},
+					nil)
+			})
+		})
+
+		When("the cc client returns an NameNotUniqueInOrgError", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateSpaceReturns(
+					ccv3.Space{},
+					ccv3.Warnings{"create-space-warning"},
+					ccerror.NameNotUniqueInOrgError{},
+				)
+			})
+
+			It("returns the SpaceAlreadyExistsError and warnings", func() {
+				Expect(executeErr).To(MatchError(actionerror.SpaceAlreadyExistsError{
+					Space: "space-name",
+				}))
+				Expect(warnings).To(ConsistOf("create-space-warning"))
+			})
+		})
+
+		When("the cc client returns a different error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateSpaceReturns(
+					ccv3.Space{},
+					ccv3.Warnings{"warning"},
+					errors.New("api-error"),
+				)
+			})
+
+			It("it returns an error and prints warnings", func() {
+				Expect(warnings).To(ConsistOf("warning"))
+				Expect(executeErr).To(MatchError("api-error"))
+
+				Expect(fakeCloudControllerClient.CreateSpaceCallCount()).To(Equal(1))
+			})
+		})
 	})
 
 	Describe("ResetSpaceIsolationSegment", func() {
