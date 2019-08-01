@@ -21,8 +21,6 @@ var (
 	// Suite Level
 	apiURL            string
 	skipSSLValidation bool
-	ReadOnlyOrg       string
-	ReadOnlySpace     string
 
 	// Per Test Level
 	homeDir string
@@ -67,17 +65,15 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Enable Experimental Flag
 	helpers.TurnOnExperimental()
 
-	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
 })
 
 var _ = SynchronizedAfterSuite(func() {
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
-	homeDir = helpers.SetHomeDir()
+	suiteHomeDir := helpers.SetHomeDir()
 	helpers.SetAPI()
 	helpers.LoginCF()
-	helpers.QuickDeleteOrg(ReadOnlyOrg)
-	helpers.DestroyHomeDir(homeDir)
+	helpers.DestroyHomeDir(suiteHomeDir)
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
 }, func() {
 	outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
