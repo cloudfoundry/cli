@@ -210,6 +210,109 @@ var _ = Describe("login command", func() {
 		})
 	})
 
+	Describe("SSL Validation", func() {
+		When("no scheme is included in the API endpoint", func() {
+			var (
+				hostname  string
+				serverURL *url.URL
+				err       error
+			)
+
+			BeforeEach(func() {
+				serverURL, err = url.Parse(helpers.GetAPI())
+				Expect(err).NotTo(HaveOccurred())
+
+				hostname = serverURL.Hostname()
+			})
+
+			It("defaults to https", func() {
+				username, password := helpers.GetCredentials()
+				var session *Session
+				if skipSSLValidation {
+					session = helpers.CF("login", "-u", username, "-p", password, "-a", hostname, "--skip-ssl-validation")
+				} else {
+					session = helpers.CF("login", "-u", username, "-p", password, "-a", hostname)
+				}
+
+				Eventually(session).Should(Say("API endpoint: %s", hostname))
+				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the API endpoint's scheme is http", func() {
+			var httpURL string
+
+			BeforeEach(func() {
+				apiURL, err := url.Parse(helpers.GetAPI())
+				Expect(err).NotTo(HaveOccurred())
+				apiURL.Scheme = "http"
+
+				httpURL = apiURL.String()
+			})
+
+			It("shows a warning to the user", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", httpURL, "--skip-ssl-validation")
+
+				Eventually(session).Should(Say("API endpoint: %s", httpURL))
+				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		// This test is redundant:
+		// If SKIP_SSL_VALIDATION is disabled
+		// then the test suite would have already logged in
+		// with a valid cert by the time this test gets run
+		FWhen("the OS provides a valid SSL Certificate (Unix: SSL_CERT_FILE or SSL_CERT_DIR Environment variables) (Windows: Import-Certificate call)", func() {
+			BeforeEach(func() {
+				if skipSSLValidation {
+					Skip("SKIP_SSL_VALIDATION is enabled")
+				}
+			})
+
+			It("trusts the cert and allows the users to log in", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", helpers.GetAPI())
+				Eventually(session).Should(Say("API endpoint: %s", apiURL))
+				Eventually(session).Should(Exit())
+
+				session = helpers.CF("api")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say("api endpoint:   %s", apiURL))
+			})
+		})
+
+		When("the SSL Certificate is invalid", func() {
+			var (
+				server    *ghttp.Server
+				serverURL *url.URL
+				err       error
+			)
+
+			BeforeEach(func() {
+				cliVersion := "1.0.0"
+				server = helpers.StartServerWithMinimumCLIVersion(cliVersion)
+				serverURL, err = url.Parse(server.URL())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("displays a helpful error message and exits 1", func() {
+				session := helpers.CF("login", "-a", serverURL.String())
+				Eventually(session).Should(Say("API endpoint: %s", serverURL))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("Invalid SSL Cert for %s:%s", serverURL.Hostname(), serverURL.Port()))
+				Eventually(session).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+
 	Describe("SSO", func() {
 		When("--sso-passcode is provided", func() {
 			Context("and --sso is also passed", func() {
