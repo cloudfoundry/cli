@@ -288,7 +288,7 @@ func (cmd PushCommand) warnOnAnyDeprecatedRouteFlags() {
 		deprecatedFlag = "--route-path"
 	}
 	if len(deprecatedFlag) > 0 {
-		cmd.UI.DisplayWarning("Deprecation warning: Use of the '{{.Flag}}' flag is deprecated in favor of the 'routes' property in the manifest. Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.",
+		cmd.UI.DisplayWarning("Deprecation warning: Use of the '{{.Flag}}' command-line flag option is deprecated in favor of the 'routes' property in the manifest. Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html#routes for usage information. The '{{.Flag}}' command-line flag option will be removed in the future.",
 			map[string]interface{}{
 				"Flag": deprecatedFlag,
 			})

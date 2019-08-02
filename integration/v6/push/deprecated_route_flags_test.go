@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("deprecated route command-line flags", func() {
 
-	const deprecationTemplate = "Deprecation warning: Use of the '%s' flag is deprecated in favor of the 'routes' property in the manifest. Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future."
+	const deprecationTemplate = "Deprecation warning: Use of the '%[1]s' command-line flag option is deprecated in favor of the 'routes' property in the manifest. Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html#routes for usage information. The '%[1]s' command-line flag option will be removed in the future."
 
 	var (
 		appName       string
