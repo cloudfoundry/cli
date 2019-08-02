@@ -10,7 +10,7 @@ type ArgumentManifestMismatchError struct {
 func (ArgumentManifestMismatchError) DisplayUsage() {}
 
 func (ArgumentManifestMismatchError) Error() string {
-	return "Incorrect Usage: The argument {{.Arg}} cannot be used with the manifest property {{.Property}}"
+	return "Incorrect Usage: The flag option {{.Arg}} cannot be used with the manifest property {{.Property}}"
 }
 
 func (e ArgumentManifestMismatchError) Translate(translate func(string, ...interface{}) string) string {
