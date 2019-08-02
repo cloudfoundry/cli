@@ -298,6 +298,10 @@ var _ = Describe("login command", func() {
 			})
 		})
 
+		// This test is redundant:
+		// If SKIP_SSL_VALIDATION is disabled
+		// then the test suite would have already logged in
+		// with a valid cert by the time this test gets run
 		When("the OS provides a valid SSL Certificate (Unix: SSL_CERT_FILE or SSL_CERT_DIR Environment variables) (Windows: Import-Certificate call)", func() {
 			BeforeEach(func() {
 				if skipSSLValidation {
