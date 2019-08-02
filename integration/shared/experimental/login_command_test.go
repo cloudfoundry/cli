@@ -325,7 +325,11 @@ var _ = Describe("login command", func() {
 						helpers.AddEmptyPaginatedResponse(server, "/v3/spaces?organization_guids=f6653aac-938e-4469-9a66-56a02796412b")
 					})
 
-					It("displays a message and prompt the user for the org name", func() {
+					AfterEach(func() {
+						server.Close()
+					})
+
+					It("displays a message and prompts the user for the org name", func() {
 						input := NewBuffer()
 						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "org20"))) // "org20" is one of the orgs in the test fixture
 						Expect(wErr).ToNot(HaveOccurred())
@@ -711,7 +715,11 @@ var _ = Describe("login command", func() {
 						helpers.AddFiftyOneSpaces(server)
 					})
 
-					It("displays a message and prompt the user for the space name", func() {
+					AfterEach(func() {
+						server.Close()
+					})
+
+					It("displays a message and prompts the user for the space name", func() {
 						input := NewBuffer()
 						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "test-space-1")))
 						Expect(wErr).ToNot(HaveOccurred())
