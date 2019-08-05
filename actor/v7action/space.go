@@ -82,10 +82,10 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 
 // GetOrganizationSpaces returns a list of spaces in the specified org
 func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
-	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
-		Key:    ccv3.OrganizationGUIDFilter,
-		Values: []string{orgGUID},
-	})
+	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+	)
 	if err != nil {
 		return []Space{}, Warnings(warnings), err
 	}

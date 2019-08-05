@@ -314,10 +314,8 @@ var _ = Describe("Space", func() {
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
 					[]ccv3.Query{
-						{
-							Key:    ccv3.OrganizationGUIDFilter,
-							Values: []string{"some-org-guid"},
-						},
+						{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+						{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
 					}))
 			})
 		})
