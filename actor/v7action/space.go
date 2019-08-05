@@ -97,3 +97,30 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, err
 
 	return spaces, Warnings(warnings), nil
 }
+
+func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	org, actorWarnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, actorWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobURL, deleteWarnings, err := actor.CloudControllerClient.DeleteSpace(space.GUID)
+	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	ccWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, Warnings(ccWarnings)...)
+
+	return allWarnings, err
+}

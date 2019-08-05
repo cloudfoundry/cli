@@ -401,6 +401,21 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	DeleteSpaceStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteSpaceMutex       sync.RWMutex
+	deleteSpaceArgsForCall []struct {
+		arg1 string
+	}
+	deleteSpaceReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	EntitleIsolationSegmentToOrganizationsStub        func(string, []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	entitleIsolationSegmentToOrganizationsMutex       sync.RWMutex
 	entitleIsolationSegmentToOrganizationsArgsForCall []struct {
@@ -3145,6 +3160,72 @@ func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedS
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpace(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteSpaceMutex.Lock()
+	ret, specificReturn := fake.deleteSpaceReturnsOnCall[len(fake.deleteSpaceArgsForCall)]
+	fake.deleteSpaceArgsForCall = append(fake.deleteSpaceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteSpace", []interface{}{arg1})
+	fake.deleteSpaceMutex.Unlock()
+	if fake.DeleteSpaceStub != nil {
+		return fake.DeleteSpaceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceCallCount() int {
+	fake.deleteSpaceMutex.RLock()
+	defer fake.deleteSpaceMutex.RUnlock()
+	return len(fake.deleteSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteSpaceMutex.Lock()
+	defer fake.deleteSpaceMutex.Unlock()
+	fake.DeleteSpaceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceArgsForCall(i int) string {
+	fake.deleteSpaceMutex.RLock()
+	defer fake.deleteSpaceMutex.RUnlock()
+	argsForCall := fake.deleteSpaceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteSpaceMutex.Lock()
+	defer fake.deleteSpaceMutex.Unlock()
+	fake.DeleteSpaceStub = nil
+	fake.deleteSpaceReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteSpaceMutex.Lock()
+	defer fake.deleteSpaceMutex.Unlock()
+	fake.DeleteSpaceStub = nil
+	if fake.deleteSpaceReturnsOnCall == nil {
+		fake.deleteSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) EntitleIsolationSegmentToOrganizations(arg1 string, arg2 []string) (ccv3.RelationshipList, ccv3.Warnings, error) {
@@ -7588,6 +7669,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteRouteMutex.RUnlock()
 	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
 	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
+	fake.deleteSpaceMutex.RLock()
+	defer fake.deleteSpaceMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
 	fake.getApplicationDropletCurrentMutex.RLock()

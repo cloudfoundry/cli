@@ -326,4 +326,58 @@ var _ = Describe("Spaces", func() {
 		})
 
 	})
+
+	Describe("DeleteSpace", func() {
+		var (
+			jobURL     JobURL
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteSpace("space-guid")
+		})
+
+		When("no errors are encountered", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/spaces/space-guid"),
+						RespondWith(http.StatusAccepted, nil, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}, "Location": []string{"job-url"}}),
+					))
+			})
+
+			It("deletes the Space and returns all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+				Expect(jobURL).To(Equal(JobURL("job-url")))
+			})
+		})
+
+		When("an error is encountered", func() {
+			BeforeEach(func() {
+				response := `{
+   "errors": [
+      {
+         "detail": "Space not found",
+         "title": "CF-ResourceNotFound",
+         "code": 10010
+      }
+   ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/spaces/space-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("returns an error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
+					Message: "Space not found",
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+			})
+		})
+	})
 })

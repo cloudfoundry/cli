@@ -44,6 +44,20 @@ func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
 	return responseSpace, response.Warnings, err
 }
 
+func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteSpaceRequest,
+		URIParams:   map[string]string{"space_guid": spaceGUID},
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
 // GetSpaces lists spaces with optional filters.
 func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
