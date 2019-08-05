@@ -103,6 +103,16 @@ func createTargetedOrgAndSpace() (string, string) {
 	return org, space
 }
 
+func createTargetedOrgAndSpaceV7(username string) (string, string) {
+	org := helpers.NewOrgName()
+	space := helpers.NewSpaceName()
+	helpers.CreateOrgAndSpace(org, space)
+	helpers.TargetOrgAndSpace(org, space)
+	helpers.SetSpaceRole(username, org, space, "SpaceDeveloper")
+	helpers.SetSpaceRole(username, org, space, "SpaceManager")
+	return org, space
+}
+
 func confirmTestPluginOutput(command string, output ...string) {
 	session := helpers.CF(command)
 	for _, val := range output {
