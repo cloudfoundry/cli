@@ -206,10 +206,6 @@ var _ = Describe("push Command", func() {
 				})
 			})
 
-			It("displays the experimental warning", func() {
-				Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-			})
-
 			When("invalid flags are passed", func() {
 				BeforeEach(func() {
 					cmd.DockerUsername = "some-docker-username"
