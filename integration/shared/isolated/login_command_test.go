@@ -247,7 +247,7 @@ var _ = Describe("login command", func() {
 		})
 	})
 
-	Describe("SSL Validation", func() {
+	Describe("https", func() {
 		When("no scheme is included in the API endpoint", func() {
 			var (
 				hostname  string

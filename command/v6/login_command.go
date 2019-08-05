@@ -275,6 +275,9 @@ func (cmd *LoginCommand) retargetAPI() error {
 	if err != nil {
 		return err
 	}
+	if strings.HasPrefix(endpoint.String(), "http:") {
+		cmd.UI.DisplayWarning("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
+	}
 
 	return cmd.reloadActor()
 }
