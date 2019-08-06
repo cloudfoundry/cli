@@ -74,7 +74,7 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 		}
 
 		if !deleteSpace {
-			cmd.UI.DisplayTextWithFlavor("{{.TargetSpace}} has not been deleted.",
+			cmd.UI.DisplayTextWithFlavor("'{{.TargetSpace}}' has not been deleted.",
 				map[string]interface{}{
 					"TargetSpace": cmd.RequiredArgs.Space,
 				})

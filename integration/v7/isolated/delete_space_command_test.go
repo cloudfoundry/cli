@@ -120,7 +120,7 @@ var _ = Describe("delete-space command", func() {
 				It("does not delete the space", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
 					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
-					Eventually(session).Should(Say("%s has not been deleted.", spaceName))
+					Eventually(session).Should(Say("'%s' has not been deleted.", spaceName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 				})
@@ -135,7 +135,7 @@ var _ = Describe("delete-space command", func() {
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
 					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
-					Eventually(session).Should(Say("%s has not been deleted.", spaceName))
+					Eventually(session).Should(Say("'%s' has not been deleted.", spaceName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 				})

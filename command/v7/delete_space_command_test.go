@@ -212,7 +212,7 @@ var _ = Describe("delete-space Command", func() {
 						It("cancels the delete", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Delete cancelled"))
+							Expect(testUI.Out).To(Say("'%s' has not been deleted.", "some-space"))
 							Expect(fakeActor.DeleteSpaceByNameAndOrganizationNameCallCount()).To(Equal(0))
 						})
 					})
@@ -226,7 +226,7 @@ var _ = Describe("delete-space Command", func() {
 						It("cancels the delete", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Delete cancelled"))
+							Expect(testUI.Out).To(Say("'%s' has not been deleted.", "some-space"))
 							Expect(fakeActor.DeleteSpaceByNameAndOrganizationNameCallCount()).To(Equal(0))
 						})
 					})
