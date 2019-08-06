@@ -144,4 +144,108 @@ var _ = Describe("Organization Actions", func() {
 			Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org-name"}))
 		})
 	})
+
+	Describe("DeleteOrganization", func() {
+		var (
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			warnings, err = actor.DeleteOrganization("some-org")
+		})
+
+		When("the org is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{},
+					ccv3.Warnings{
+						"warning-1",
+						"warning-2",
+					},
+					nil,
+				)
+			})
+
+			It("returns an OrganizationNotFoundError", func() {
+				Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		When("the org is found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{{Name: "some-org", GUID: "some-org-guid"}},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			When("the delete returns an error", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("some delete space error")
+					fakeCloudControllerClient.DeleteOrganizationReturns(
+						ccv3.JobURL(""),
+						ccv3.Warnings{"warning-5", "warning-6"},
+						expectedErr,
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(err).To(Equal(expectedErr))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-5", "warning-6"))
+				})
+			})
+
+			When("the delete returns a job", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteOrganizationReturns(
+						ccv3.JobURL("some-url"),
+						ccv3.Warnings{"warning-5", "warning-6"},
+						nil,
+					)
+				})
+
+				When("polling errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("Never expected, by anyone")
+						fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"warning-7", "warning-8"}, expectedErr)
+					})
+
+					It("returns the error", func() {
+						Expect(err).To(Equal(expectedErr))
+						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-5", "warning-6", "warning-7", "warning-8"))
+					})
+				})
+
+				When("the job is successful", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"warning-7", "warning-8"}, nil)
+					})
+
+					It("returns warnings and no error", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-5", "warning-6", "warning-7", "warning-8"))
+
+						Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv3.Query{{
+							Key:    ccv3.NameFilter,
+							Values: []string{"some-org"},
+						}}))
+
+						Expect(fakeCloudControllerClient.DeleteOrganizationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.DeleteOrganizationArgsForCall(0)).To(Equal("some-org-guid"))
+
+						Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv3.JobURL("some-url")))
+					})
+				})
+			})
+		})
+	})
 })

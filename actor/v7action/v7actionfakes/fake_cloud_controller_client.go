@@ -357,6 +357,21 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	DeleteOrganizationStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteOrganizationMutex       sync.RWMutex
+	deleteOrganizationArgsForCall []struct {
+		arg1 string
+	}
+	deleteOrganizationReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteOrganizationReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteOrphanedRoutesStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteOrphanedRoutesMutex       sync.RWMutex
 	deleteOrphanedRoutesArgsForCall []struct {
@@ -2964,6 +2979,72 @@ func (fake *FakeCloudControllerClient) DeleteIsolationSegmentOrganizationReturns
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganization(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteOrganizationMutex.Lock()
+	ret, specificReturn := fake.deleteOrganizationReturnsOnCall[len(fake.deleteOrganizationArgsForCall)]
+	fake.deleteOrganizationArgsForCall = append(fake.deleteOrganizationArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteOrganization", []interface{}{arg1})
+	fake.deleteOrganizationMutex.Unlock()
+	if fake.DeleteOrganizationStub != nil {
+		return fake.DeleteOrganizationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteOrganizationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationCallCount() int {
+	fake.deleteOrganizationMutex.RLock()
+	defer fake.deleteOrganizationMutex.RUnlock()
+	return len(fake.deleteOrganizationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteOrganizationMutex.Lock()
+	defer fake.deleteOrganizationMutex.Unlock()
+	fake.DeleteOrganizationStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationArgsForCall(i int) string {
+	fake.deleteOrganizationMutex.RLock()
+	defer fake.deleteOrganizationMutex.RUnlock()
+	argsForCall := fake.deleteOrganizationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteOrganizationMutex.Lock()
+	defer fake.deleteOrganizationMutex.Unlock()
+	fake.DeleteOrganizationStub = nil
+	fake.deleteOrganizationReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteOrganizationMutex.Lock()
+	defer fake.deleteOrganizationMutex.Unlock()
+	fake.DeleteOrganizationStub = nil
+	if fake.deleteOrganizationReturnsOnCall == nil {
+		fake.deleteOrganizationReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteOrganizationReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteOrphanedRoutes(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
@@ -7663,6 +7744,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.deleteIsolationSegmentOrganizationMutex.RLock()
 	defer fake.deleteIsolationSegmentOrganizationMutex.RUnlock()
+	fake.deleteOrganizationMutex.RLock()
+	defer fake.deleteOrganizationMutex.RUnlock()
 	fake.deleteOrphanedRoutesMutex.RLock()
 	defer fake.deleteOrphanedRoutesMutex.RUnlock()
 	fake.deleteRouteMutex.RLock()

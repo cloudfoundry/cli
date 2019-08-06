@@ -16,6 +16,7 @@ const (
 	DeleteIsolationSegmentRelationshipOrganizationRequest       = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                               = "DeleteIsolationSegment"
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
+	DeleteOrganizationRequest                                   = "DeleteOrganization"
 	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
@@ -153,6 +154,7 @@ var APIRoutes = []Route{
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid/relationships/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRelationshipOrganizationRequest},
 	{Resource: OrgsResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationsRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/", Method: http.MethodPatch, Name: PatchOrganizationRequest},
+	{Resource: OrgsResource, Path: "/:organization_guid/", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/domains", Method: http.MethodGet, Name: GetOrganizationDomainsRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/domains/default", Method: http.MethodGet, Name: GetDefaultDomainRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationRelationshipDefaultIsolationSegmentRequest},

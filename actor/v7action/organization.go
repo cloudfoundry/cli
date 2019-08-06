@@ -48,6 +48,27 @@ func (actor Actor) UpdateOrganization(org Organization) (Organization, Warnings,
 	return actor.convertCCToActorOrganization(updatedOrg), Warnings(warnings), nil
 }
 
+func (actor Actor) DeleteOrganization(name string) (Warnings, error) {
+	var allWarnings Warnings
+
+	org, warnings, err := actor.GetOrganizationByName(name)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobURL, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(org.GUID)
+	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	ccWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, Warnings(ccWarnings)...)
+
+	return allWarnings, err
+}
+
 func (actor Actor) convertCCToActorOrganization(org ccv3.Organization) Organization {
 	return Organization{
 		GUID:     org.GUID,

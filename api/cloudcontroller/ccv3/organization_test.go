@@ -402,8 +402,60 @@ var _ = Describe("Organizations", func() {
 						"k2": types.NewNullString("v2"),
 					}))
 			})
+		})
+	})
 
+	Describe("DeleteOrganization", func() {
+		var (
+			jobURL     JobURL
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteOrganization("org-guid")
 		})
 
+		When("no errors are encountered", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/organizations/org-guid"),
+						RespondWith(http.StatusAccepted, nil, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}, "Location": []string{"job-url"}}),
+					))
+			})
+
+			It("deletes the Org and returns all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+				Expect(jobURL).To(Equal(JobURL("job-url")))
+			})
+		})
+
+		When("an error is encountered", func() {
+			BeforeEach(func() {
+				response := `{
+   "errors": [
+      {
+         "detail": "Organization not found",
+         "title": "CF-ResourceNotFound",
+         "code": 10010
+      }
+   ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/organizations/org-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("returns an error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
+					Message: "Organization not found",
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+			})
+		})
 	})
 })

@@ -65,7 +65,7 @@ type commandList struct {
 	Delete                             v7.DeleteCommand                             `command:"delete" alias:"d" description:"Delete an app"`
 	DeleteBuildpack                    v7.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
 	DeleteIsolationSegment             v6.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
-	DeleteOrg                          v6.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
+	DeleteOrg                          v7.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
 	DeleteOrphanedRoutes               v7.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app or service instance)"`
 	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" description:"Delete a private domain"`
 	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`

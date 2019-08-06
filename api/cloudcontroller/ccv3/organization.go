@@ -20,6 +20,21 @@ type Organization struct {
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
+func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteOrganizationRequest,
+		URIParams:   map[string]string{"organization_guid": orgGUID},
+	})
+
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
 func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDefaultDomainRequest,
