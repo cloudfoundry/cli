@@ -76,7 +76,7 @@ func CreateSpace(space string) {
 
 // SetUserAsSpaceDeveloper sets the user as a space developer with `cf set-user-role`.
 func SetSpaceRole(username, org, space, role string) {
-	Eventually(CF("set-space-role", username, org, space, role)).Should(Exit(0))
+	Eventually(CF("set-space-role", username, org, space, role, "--client")).Should(Exit(0))
 }
 
 // GetOrgGUID gets the GUID of an org with the given name.
