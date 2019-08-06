@@ -9,6 +9,7 @@ SET PATH=%CD%;%PATH%
 SET /p DOMAIN=<%CD%\bosh-lock\name
 SET /p CF_INT_PASSWORD=<%CD%\cf-credentials\cf-password
 SET CF_INT_API=https://api.%DOMAIN%
+SET SKIP_SSL_VALIDATION=false
 
 pushd %CD%\cf-cli-binaries
 	7z e cf-cli-binaries.tgz
