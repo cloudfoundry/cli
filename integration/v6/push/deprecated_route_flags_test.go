@@ -16,6 +16,8 @@ var _ = Describe("deprecated route command-line flags", func() {
 		appName       string
 		host          string
 		privateDomain string
+		localArgs     []string
+		session       *Session
 	)
 
 	BeforeEach(func() {
@@ -26,54 +28,54 @@ var _ = Describe("deprecated route command-line flags", func() {
 		domain := helpers.NewDomain(organization, privateDomain)
 		domain.Create()
 	})
+	JustBeforeEach(func() {
+		helpers.WithHelloWorldApp(func(dir string) {
+			allArgs := []string{PushCommandName, appName, "--no-start"}
+			allArgs = append(allArgs, localArgs...)
+			session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, allArgs...)
+			Eventually(session).Should(Exit(0))
+		})
+	})
 
 	When("no deprecated flags are provided", func() {
 		It("does not output a deprecation warning", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
-				Eventually(session).Should(Exit(0))
-				Expect(string(session.Err.Contents())).ToNot(ContainSubstring("deprecated"))
-			})
+			Expect(string(session.Err.Contents())).ToNot(ContainSubstring("deprecated"))
 		})
 	})
 
 	When("the -d (domains) flag is provided", func() {
+		BeforeEach(func() {
+			localArgs = []string{"-d", privateDomain}
+		})
 		It("outputs a deprecation warning", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "-d", privateDomain)
-				Eventually(session.Err).Should(Say(deprecationTemplate, "-d"))
-				Eventually(session).Should(Exit(0))
-			})
+			Eventually(session.Err).Should(Say(deprecationTemplate, "-d"))
 		})
 	})
 
 	When("the --hostname flag is provided", func() {
+		BeforeEach(func() {
+			localArgs = []string{"--hostname", host}
+		})
 		It("outputs a deprecation warning", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--hostname", host)
-				Eventually(session.Err).Should(Say(deprecationTemplate, "--hostname"))
-				Eventually(session).Should(Exit(0))
-			})
+			Eventually(session.Err).Should(Say(deprecationTemplate, "--hostname"))
 		})
 	})
 
 	When("the --no-hostname flag is provided", func() {
+		BeforeEach(func() {
+			localArgs = []string{"--no-hostname", "-d", privateDomain}
+		})
 		It("outputs a deprecation warning", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--no-hostname", "-d", privateDomain)
-				Eventually(session.Err).Should(Say(deprecationTemplate, "--no-hostname"))
-				Eventually(session).Should(Exit(0))
-			})
+			Eventually(session.Err).Should(Say(deprecationTemplate, "--no-hostname"))
 		})
 	})
 
 	When("the --route-path flag is provided", func() {
+		BeforeEach(func() {
+			localArgs = []string{"--route-path", "some-path"}
+		})
 		It("outputs a deprecation warning", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--route-path", "some-path")
-				Eventually(session.Err).Should(Say(deprecationTemplate, "--route-path"))
-				Eventually(session).Should(Exit(0))
-			})
+			Eventually(session.Err).Should(Say(deprecationTemplate, "--route-path"))
 		})
 	})
 
