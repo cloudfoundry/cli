@@ -102,6 +102,7 @@ var _ = Describe("delete-space command", func() {
 				It("deletes the space", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
+					Eventually(session).Should(Say(`This action impacts all resources scoped to this space, including apps, service instances, and space-scoped service brokers.`))
 					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
 					Eventually(session).Should(Say("Deleting space %s in org %s as %s...", spaceName, orgName, username))
 					Eventually(session).Should(Say("OK"))
@@ -119,7 +120,7 @@ var _ = Describe("delete-space command", func() {
 				It("does not delete the space", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
 					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
-					Eventually(session).Should(Say("Delete cancelled"))
+					Eventually(session).Should(Say("%s has not been deleted.", spaceName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 				})
@@ -134,7 +135,7 @@ var _ = Describe("delete-space command", func() {
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
 					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
-					Eventually(session).Should(Say("Delete cancelled"))
+					Eventually(session).Should(Say("%s has not been deleted.", spaceName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 				})

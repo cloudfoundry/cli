@@ -66,7 +66,7 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Force {
-		promptMessage := "Really delete the space {{.SpaceName}}?"
+		promptMessage := "This action impacts all resources scoped to this space, including apps, service instances, and space-scoped service brokers.\nReally delete the space {{.SpaceName}}?"
 		deleteSpace, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{"SpaceName": cmd.RequiredArgs.Space})
 
 		if promptErr != nil {
@@ -74,7 +74,10 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 		}
 
 		if !deleteSpace {
-			cmd.UI.DisplayText("Delete cancelled")
+			cmd.UI.DisplayTextWithFlavor("{{.TargetSpace}} has not been deleted.",
+				map[string]interface{}{
+					"TargetSpace": cmd.RequiredArgs.Space,
+				})
 			return nil
 		}
 	}
