@@ -8,6 +8,8 @@ SET PATH=%GOPATH%\bin;%PATH%
 SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
+SET SKIP_SSL_VALIDATION=false
+
 go get -v -u github.com/onsi/ginkgo/ginkgo
 
 cd %GOPATH%\src\code.cloudfoundry.org\cli
