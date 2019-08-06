@@ -124,7 +124,7 @@ type commandList struct {
 	RenameOrg                          v6.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
 	RenameService                      v6.RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`
 	RenameServiceBroker                v6.RenameServiceBrokerCommand                `command:"rename-service-broker" description:"Rename a service broker"`
-	RenameSpace                        v6.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
+	RenameSpace                        v7.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
 	RepoPlugins                        plugin.RepoPluginsCommand                    `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
 	ResetOrgDefaultIsolationSegment    v6.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v6.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`

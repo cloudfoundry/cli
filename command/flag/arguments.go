@@ -68,6 +68,11 @@ type Space struct {
 	Space string `positional-arg-name:"SPACE" required:"true" description:"The space"`
 }
 
+type RenameSpace struct {
+	OldSpaceName string `positional-arg-name:"SPACE" required:"true" description:"The new space name"`
+	NewSpaceName string `positional-arg-name:"NEW_SPACE_NAME" required:"true" description:"The new space name"`
+}
+
 type SpaceQuota struct {
 	SpaceQuota string `positional-arg-name:"SPACE_QUOTA_NAME" required:"true" description:"The space quota"`
 }

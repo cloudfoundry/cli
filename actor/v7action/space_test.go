@@ -480,4 +480,95 @@ var _ = Describe("Space", func() {
 			})
 		})
 	})
+
+	Describe("RenameSpaceByNameAndOrganizationGUID", func() {
+		var (
+			oldSpaceName string
+			newSpaceName string
+			orgGUID      string
+
+			space      Space
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			space, warnings, executeErr = actor.RenameSpaceByNameAndOrganizationGUID(
+				oldSpaceName,
+				newSpaceName,
+				orgGUID,
+			)
+		})
+
+		It("delegate to the actor to get the space", func() {
+			// assert on the underlying client call because we dont have a fake actor
+			Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+		})
+
+		When("getting the space fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					nil,
+					ccv3.Warnings{"get-space-warning"},
+					errors.New("get-space-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("get-space-error"))
+				Expect(warnings).To(ConsistOf("get-space-warning"))
+			})
+		})
+
+		When("getting the space succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]ccv3.Space{{Name: oldSpaceName, GUID: "space-guid"}},
+					ccv3.Warnings{"get-space-warning"},
+					nil,
+				)
+			})
+
+			It("delegates to the client to update the space", func() {
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateSpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateSpaceArgsForCall(0)).To(Equal(ccv3.Space{
+					GUID: "space-guid",
+					Name: newSpaceName,
+				}))
+			})
+
+			When("updating the space fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSpaceReturns(
+						ccv3.Space{},
+						ccv3.Warnings{"update-space-warning"},
+						errors.New("update-space-error"),
+					)
+				})
+
+				It("returns an error and all warnings", func() {
+					Expect(executeErr).To(MatchError("update-space-error"))
+					Expect(warnings).To(ConsistOf("get-space-warning", "update-space-warning"))
+				})
+
+			})
+
+			When("updating the space succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSpaceReturns(
+						ccv3.Space{Name: newSpaceName, GUID: "space-guid"},
+						ccv3.Warnings{"update-space-warning"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-space-warning", "update-space-warning"))
+					Expect(space).To(Equal(Space{Name: newSpaceName, GUID: "space-guid"}))
+				})
+			})
+		})
+	})
 })

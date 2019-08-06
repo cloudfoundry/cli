@@ -124,3 +124,18 @@ func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgNam
 
 	return allWarnings, err
 }
+
+func (actor Actor) RenameSpaceByNameAndOrganizationGUID(oldSpaceName, newSpaceName, orgGUID string) (Space, Warnings, error) {
+	var allWarnings Warnings
+
+	space, getWarnings, err := actor.GetSpaceByNameAndOrganization(oldSpaceName, orgGUID)
+	allWarnings = append(allWarnings, getWarnings...)
+	if err != nil {
+		return Space{}, allWarnings, err
+	}
+
+	ccSpace, updateWarnings, err := actor.CloudControllerClient.UpdateSpace(ccv3.Space{GUID: space.GUID, Name: newSpaceName})
+	allWarnings = append(allWarnings, Warnings(updateWarnings)...)
+
+	return Space(ccSpace), allWarnings, err
+}
