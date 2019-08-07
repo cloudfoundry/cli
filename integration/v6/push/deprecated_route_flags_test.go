@@ -129,7 +129,7 @@ Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attribute
 				localArgs = []string{"-d", privateDomain}
 			})
 			It("outputs a deprecation warning", func() {
-				Expect(session.Err).Should(Say("howdy"+deprecationTemplate, "-d"))
+				Expect(session.Err).Should(Say(deprecationTemplate, "-d"))
 			})
 		})
 
