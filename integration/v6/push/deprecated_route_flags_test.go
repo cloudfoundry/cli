@@ -45,8 +45,11 @@ Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attribute
 		})
 
 		When("no deprecated flags are provided", func() {
+			BeforeEach(func() {
+				localArgs = []string{}
+			})
 			It("does not output a deprecation warning", func() {
-				Expect(string(session.Err.Contents())).ToNot(ContainSubstring("deprecated"))
+				Expect(string(session.Err.Contents())).ToNot(ContainSubstring("command-line flag option is deprecated in favor of the 'routes' property in the manifest"))
 			})
 		})
 
@@ -120,8 +123,13 @@ Please see https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attribute
 			Expect(session.Err).Should(Say(legacyManifestDeprecationTemplate))
 		})
 
-		It("does not output a deprecation warning", func() {
-			Expect(session.Err).Should(Not(Say(deprecationTemplate)))
+		When("no deprecated flags are provided", func() {
+			BeforeEach(func() {
+				localArgs = []string{}
+			})
+			It("does not output a deprecation warning", func() {
+				Expect(string(session.Err.Contents())).ToNot(ContainSubstring("command-line flag option is deprecated in favor of the 'routes' property in the manifest"))
+			})
 		})
 
 		When("the -d (domains) flag is provided", func() {
