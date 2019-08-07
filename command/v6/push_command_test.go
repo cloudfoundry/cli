@@ -587,6 +587,35 @@ var _ = Describe("push Command", func() {
 									})
 								})
 							})
+
+							Context("via a legacy manifest.yml in the current directory", func() {
+								var expectedErr manifest.GlobalFieldsError
+
+								BeforeEach(func() {
+									err := os.Chdir(tmpDir)
+									Expect(err).ToNot(HaveOccurred())
+
+									providedPath = filepath.Join(tmpDir, "manifest.yml")
+									err = ioutil.WriteFile(providedPath, []byte("some manifest file"), 0666)
+									Expect(err).ToNot(HaveOccurred())
+									expectedErr = manifest.GlobalFieldsError{Fields: []string{"host"}}
+
+									fakeActor.ReadManifestReturns(nil, nil, expectedErr)
+								})
+
+								It("throws a legacy main error", func() {
+									Expect(executeErr).To(MatchError(expectedErr))
+
+									Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(providedPath))
+
+									Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(0))
+
+									translatedErr := translatableerror.ConvertToTranslatableError(executeErr)
+									_, ok := translatedErr.(translatableerror.TriggerLegacyPushError)
+									Expect(ok).To(BeTrue())
+								})
+							})
 						})
 
 						When("an app name and manifest are provided", func() {
