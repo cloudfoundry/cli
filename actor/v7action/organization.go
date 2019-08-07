@@ -16,6 +16,16 @@ type Organization struct {
 	Metadata *Metadata
 }
 
+// GetOrganizationByGUID returns the organization with the given guid.
+func (actor Actor) GetOrganizationByGUID(orgGUID string) (Organization, Warnings, error) {
+	ccOrg, warnings, err := actor.CloudControllerClient.GetOrganization(orgGUID)
+	if err != nil {
+		return Organization{}, Warnings(warnings), err
+	}
+
+	return actor.convertCCToActorOrganization(ccOrg), Warnings(warnings), err
+}
+
 // GetOrganizationByName returns the organization with the given name.
 func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, error) {
 	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(

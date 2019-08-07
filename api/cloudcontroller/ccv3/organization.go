@@ -82,6 +82,29 @@ func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID stri
 	return fullOrgsList, warnings, err
 }
 
+// GetOrganization gets an organization by the given guid.
+func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetOrganizationRequest,
+		URIParams:   map[string]string{"organization_guid": orgGUID},
+	})
+
+	if err != nil {
+		return Organization{}, nil, err
+	}
+
+	var responseOrg Organization
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseOrg,
+	}
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return Organization{}, response.Warnings, err
+	}
+
+	return responseOrg, response.Warnings, nil
+}
+
 // GetOrganizations lists organizations with optional filters.
 func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

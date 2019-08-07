@@ -66,6 +66,11 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
+// NewServiceInstanceName provides a random name prefixed with INT-SI
+func NewServiceInstanceName() string {
+	return PrefixedRandomName("INT-SI")
+}
+
 // NewServiceBrokerName provides a random name prefixed with INTEGRATION-SERVICE-BROKER
 func NewServiceBrokerName() string {
 	return PrefixedRandomName("INTEGRATION-SERVICE-BROKER")

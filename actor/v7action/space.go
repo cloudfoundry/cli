@@ -1,6 +1,9 @@
 package v7action
 
 import (
+	"fmt"
+	"sort"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -8,6 +11,15 @@ import (
 )
 
 type Space ccv3.Space
+
+type SpaceSummary struct {
+	Space
+	Name                 string
+	OrgName              string
+	AppNames             []string
+	ServiceInstanceNames []string
+	IsolationSegmentName string
+}
 
 func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, error) {
 	allWarnings := Warnings{}
@@ -78,6 +90,96 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 	}
 
 	return Space(ccv3Spaces[0]), Warnings(warnings), nil
+}
+
+func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUID string) (SpaceSummary, Warnings, error) {
+	var allWarnings Warnings
+
+	org, warnings, err := actor.GetOrganizationByGUID(orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	apps, warnings, err := actor.GetApplicationsBySpace(space.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	appNames := make([]string, len(apps))
+	for i, app := range apps {
+		appNames[i] = app.Name
+	}
+	sort.Strings(appNames)
+
+	serviceInstances, ccv3Warnings, err := actor.CloudControllerClient.GetServiceInstances(
+		ccv3.Query{
+			Key:    ccv3.SpaceGUIDFilter,
+			Values: []string{space.GUID},
+		})
+	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	serviceInstanceNames := make([]string, len(serviceInstances))
+	for i, instance := range serviceInstances {
+		serviceInstanceNames[i] = instance.Name
+	}
+	sort.Strings(serviceInstanceNames)
+
+	isoSegRelationship, ccv3Warnings, err := actor.CloudControllerClient.GetSpaceIsolationSegment(space.GUID)
+	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	isoSegName := ""
+	isoSegGUID := isoSegRelationship.GUID
+	isDefaultIsoSeg := false
+
+	if isoSegGUID == "" {
+		defaultIsoSeg, ccv3Warnings, err := actor.CloudControllerClient.GetOrganizationDefaultIsolationSegment(org.GUID)
+		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
+		if err != nil {
+			return SpaceSummary{}, allWarnings, err
+		}
+		isoSegGUID = defaultIsoSeg.GUID
+		if isoSegGUID != "" {
+			isDefaultIsoSeg = true
+		}
+	}
+
+	if isoSegGUID != "" {
+		isoSeg, ccv3warnings, err := actor.CloudControllerClient.GetIsolationSegment(isoSegGUID)
+		allWarnings = append(allWarnings, Warnings(ccv3warnings)...)
+		if err != nil {
+			return SpaceSummary{}, allWarnings, err
+		}
+		if isDefaultIsoSeg {
+			isoSegName = fmt.Sprintf("%s (org default)", isoSeg.Name)
+		} else {
+			isoSegName = isoSeg.Name
+		}
+	}
+
+	spaceSummary := SpaceSummary{
+		OrgName:              org.Name,
+		Name:                 space.Name,
+		Space:                space,
+		AppNames:             appNames,
+		ServiceInstanceNames: serviceInstanceNames,
+		IsolationSegmentName: isoSegName,
+	}
+
+	return spaceSummary, allWarnings, nil
 }
 
 // GetOrganizationSpaces returns a list of spaces in the specified org

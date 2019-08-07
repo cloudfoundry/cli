@@ -571,4 +571,316 @@ var _ = Describe("Space", func() {
 			})
 		})
 	})
+
+	Describe("GetSpaceSummaryByNameAndOrganization", func() {
+		var (
+			spaceSummary SpaceSummary
+			warnings     Warnings
+			err          error
+		)
+
+		JustBeforeEach(func() {
+			spaceSummary, warnings, err = actor.GetSpaceSummaryByNameAndOrganization("space-name", "org-guid")
+		})
+
+		When("getting the organization succeeds", func() {
+			var org ccv3.Organization
+
+			BeforeEach(func() {
+				org = ccv3.Organization{
+					GUID: "some-org-guid",
+					Name: "some-org-name",
+				}
+
+				w := ccv3.Warnings{"get-org-warning"}
+				fakeCloudControllerClient.GetOrganizationReturns(org, w, nil)
+			})
+
+			When("getting the space succeeds", func() {
+				var ccv3Spaces []ccv3.Space
+
+				BeforeEach(func() {
+					ccv3Spaces = []ccv3.Space{
+						{
+							GUID: "some-space-guid",
+							Name: "some-space-name",
+						},
+					}
+
+					w := ccv3.Warnings{"get-space-warning"}
+					fakeCloudControllerClient.GetSpacesReturns(ccv3Spaces, w, nil)
+				})
+
+				When("getting the space applications succeeds", func() {
+					var apps []ccv3.Application
+
+					BeforeEach(func() {
+						apps = []ccv3.Application{
+							{
+								Name: "some-app-name-B",
+								GUID: "some-app-guid-B",
+							},
+							{
+								Name: "some-app-name-A",
+								GUID: "some-app-guid-A",
+							},
+						}
+
+						w := ccv3.Warnings{"get-apps-warning"}
+						fakeCloudControllerClient.GetApplicationsReturns(apps, w, nil)
+					})
+
+					When("getting the service instances succeeds", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetServiceInstancesReturns(
+								[]ccv3.ServiceInstance{{Name: "instance-1"}, {Name: "instance-2"}},
+								ccv3.Warnings{"get-services-warning"},
+								nil,
+							)
+						})
+
+						It("returns a populated space summary with app names sorted alphabetically", func() {
+							expectedSpaceSummary := SpaceSummary{
+								Name:    ccv3Spaces[0].Name,
+								OrgName: org.Name,
+								Space: Space{
+									Name: ccv3Spaces[0].Name,
+									GUID: ccv3Spaces[0].GUID,
+								},
+								AppNames:             []string{"some-app-name-A", "some-app-name-B"},
+								ServiceInstanceNames: []string{"instance-1", "instance-2"},
+							}
+
+							Expect(err).ToNot(HaveOccurred())
+							Expect(spaceSummary).To(Equal(expectedSpaceSummary))
+						})
+
+						It("propagates all warnings", func() {
+							Expect(warnings).To(ConsistOf("get-apps-warning", "get-services-warning", "get-space-warning", "get-org-warning"))
+						})
+					})
+
+					When("getting the service instances fails", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetServiceInstancesReturns(
+								[]ccv3.ServiceInstance{},
+								ccv3.Warnings{"get-services-warning"},
+								errors.New("get-services-error"),
+							)
+						})
+
+						It("returns warnings and error", func() {
+							Expect(err).To(MatchError("get-services-error"))
+							Expect(warnings).To(ConsistOf("get-apps-warning", "get-services-warning", "get-space-warning", "get-org-warning"))
+						})
+					})
+
+					When("getting the space isolation segment returns no isolation segment relationship", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(
+								ccv3.Relationship{},
+								ccv3.Warnings{"get-space-iso-seg-warning"},
+								nil,
+							)
+						})
+
+						When("getting the org default isolation segment returns an isolation segment relationship", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
+									ccv3.Relationship{GUID: "org-default-iso-seg-guid"},
+									ccv3.Warnings{"get-org-default-iso-seg-warning"},
+									nil,
+								)
+								fakeCloudControllerClient.GetIsolationSegmentReturns(
+									ccv3.IsolationSegment{GUID: "org-default-iso-seg-guid", Name: "org-default-iso-seg-name"},
+									ccv3.Warnings{"get-iso-seg-warning"},
+									nil,
+								)
+							})
+
+							It("returns a populated space summary with app names sorted alphabetically", func() {
+								expectedSpaceSummary := SpaceSummary{
+									Name:    ccv3Spaces[0].Name,
+									OrgName: org.Name,
+									Space: Space{
+										Name: ccv3Spaces[0].Name,
+										GUID: ccv3Spaces[0].GUID,
+									},
+									AppNames:             []string{"some-app-name-A", "some-app-name-B"},
+									ServiceInstanceNames: []string{},
+									IsolationSegmentName: "org-default-iso-seg-name (org default)",
+								}
+
+								Expect(err).ToNot(HaveOccurred())
+								Expect(spaceSummary).To(Equal(expectedSpaceSummary))
+							})
+
+							It("propagates all warnings", func() {
+								Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning", "get-org-default-iso-seg-warning", "get-iso-seg-warning"))
+							})
+						})
+
+						When("getting the org default isolation segment returns no isolation segment relationship", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
+									ccv3.Relationship{},
+									ccv3.Warnings{"get-org-default-iso-seg-warning"},
+									nil,
+								)
+							})
+
+							It("does not try to get the isolation segment", func() {
+								Expect(fakeCloudControllerClient.GetIsolationSegmentCallCount()).To(Equal(0))
+							})
+
+							It("returns a populated space summary with app names sorted alphabetically", func() {
+								expectedSpaceSummary := SpaceSummary{
+									Name:    ccv3Spaces[0].Name,
+									OrgName: org.Name,
+									Space: Space{
+										Name: ccv3Spaces[0].Name,
+										GUID: ccv3Spaces[0].GUID,
+									},
+									AppNames:             []string{"some-app-name-A", "some-app-name-B"},
+									ServiceInstanceNames: []string{},
+								}
+
+								Expect(err).ToNot(HaveOccurred())
+								Expect(spaceSummary).To(Equal(expectedSpaceSummary))
+							})
+
+							It("propagates all warnings", func() {
+								Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning", "get-org-default-iso-seg-warning"))
+							})
+						})
+
+						When("getting the org default isolation segment fails", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
+									ccv3.Relationship{},
+									ccv3.Warnings{"get-org-default-iso-seg-warning"},
+									errors.New("get-org-default-iso-seg-error"),
+								)
+							})
+
+							It("returns all warnings and error", func() {
+								Expect(err).To(MatchError("get-org-default-iso-seg-error"))
+								Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning", "get-org-default-iso-seg-warning"))
+							})
+						})
+					})
+
+					When("getting the space isolation segment returns an isolation segment relationship", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(
+								ccv3.Relationship{GUID: "some-iso-seg-guid"},
+								ccv3.Warnings{"get-space-iso-seg-warning"},
+								nil,
+							)
+						})
+
+						When("getting the isolation segment succeeds", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetIsolationSegmentReturns(
+									ccv3.IsolationSegment{GUID: "some-iso-seg-guid", Name: "some-iso-seg-name"},
+									ccv3.Warnings{"get-iso-seg-warning"},
+									nil,
+								)
+							})
+
+							It("returns a populated space summary with app names sorted alphabetically", func() {
+								expectedSpaceSummary := SpaceSummary{
+									Name:    ccv3Spaces[0].Name,
+									OrgName: org.Name,
+									Space: Space{
+										Name: ccv3Spaces[0].Name,
+										GUID: ccv3Spaces[0].GUID,
+									},
+									AppNames:             []string{"some-app-name-A", "some-app-name-B"},
+									ServiceInstanceNames: []string{},
+									IsolationSegmentName: "some-iso-seg-name",
+								}
+
+								Expect(err).ToNot(HaveOccurred())
+								Expect(spaceSummary).To(Equal(expectedSpaceSummary))
+							})
+
+							It("propagates all warnings", func() {
+								Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning", "get-iso-seg-warning"))
+							})
+						})
+
+						When("getting the isolation segment fails", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetIsolationSegmentReturns(
+									ccv3.IsolationSegment{},
+									ccv3.Warnings{"get-iso-seg-warning"},
+									errors.New("get-iso-seg-error"),
+								)
+							})
+
+							It("returns all warnings and the error", func() {
+								Expect(err).To(MatchError("get-iso-seg-error"))
+								Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning", "get-iso-seg-warning"))
+							})
+						})
+					})
+
+					When("getting the space isolation segment fails", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(
+								ccv3.Relationship{},
+								ccv3.Warnings{"get-space-iso-seg-warning"},
+								errors.New("get-space-iso-seg-error"),
+							)
+						})
+
+						It("returns all warnings and the error", func() {
+							Expect(err).To(MatchError("get-space-iso-seg-error"))
+							Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning"))
+						})
+					})
+				})
+
+				When("getting the space applications fails", func() {
+					BeforeEach(func() {
+						e := errors.New("get-apps-error")
+						w := ccv3.Warnings{"get-apps-warning"}
+						fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, w, e)
+					})
+
+					It("returns all warnings and an error", func() {
+						Expect(err).To(MatchError("get-apps-error"))
+						Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning"))
+					})
+				})
+			})
+
+			When("getting the space fails", func() {
+				BeforeEach(func() {
+					e := errors.New("get-space-error")
+					w := ccv3.Warnings{"get-space-warning"}
+					fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{}, w, e)
+				})
+
+				It("returns all warnings and an error", func() {
+					Expect(err).To(MatchError("get-space-error"))
+					Expect(warnings).To(ConsistOf("get-space-warning", "get-org-warning"))
+				})
+			})
+		})
+
+		When("getting the organization fails", func() {
+			BeforeEach(func() {
+				e := errors.New("get-org-error")
+				w := ccv3.Warnings{"get-org-warning"}
+				fakeCloudControllerClient.GetOrganizationReturns(ccv3.Organization{}, w, e)
+			})
+
+			It("returns warnings and an error", func() {
+				Expect(err).To(MatchError("get-org-error"))
+				Expect(warnings).To(ConsistOf("get-org-warning"))
+			})
+		})
+	})
 })
