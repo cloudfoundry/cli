@@ -440,6 +440,7 @@ var _ = Describe("Package", func() {
 			client, _ = NewTestClient()
 
 			inputPackage = Package{
+				GUID: "package-guid",
 				Links: map[string]APILink{
 					"upload": {
 						HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
@@ -470,7 +471,7 @@ var _ = Describe("Package", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
 						func(writer http.ResponseWriter, req *http.Request) {
 							verifyHeaderAndBody(writer, req)
 						},
@@ -581,7 +582,7 @@ var _ = Describe("Package", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
 						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -613,7 +614,7 @@ var _ = Describe("Package", func() {
 				fakeReader.ReadReturns(0, expectedErr)
 
 				server.AppendHandlers(
-					VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+					VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
 				)
 			})
 
@@ -629,7 +630,7 @@ var _ = Describe("Package", func() {
 					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
 						defer GinkgoRecover() // Since this will be running in a thread
 
-						if strings.HasSuffix(request.URL.String(), "/v3/my-special-endpoint/some-pkg-guid/upload") {
+						if strings.HasSuffix(request.URL.String(), "/v3/packages/package-guid/upload") {
 							_, err := ioutil.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(request.Body.Close()).ToNot(HaveOccurred())
@@ -659,7 +660,7 @@ var _ = Describe("Package", func() {
 					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
 						defer GinkgoRecover() // Since this will be running in a thread
 
-						if strings.HasSuffix(request.URL.String(), "/v3/my-special-endpoint/some-pkg-guid/upload") {
+						if strings.HasSuffix(request.URL.String(), "/v3/packages/package-guid/upload") {
 							defer request.Body.Close()
 							readBytes, err := ioutil.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
@@ -676,13 +677,6 @@ var _ = Describe("Package", func() {
 			It("returns the http error", func() {
 				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
 				Expect(err).To(MatchError(expectedErr))
-			})
-		})
-
-		When("the input package does not have an upload link", func() {
-			It("returns an UploadLinkNotFoundError", func() {
-				_, _, err := client.UploadBitsPackage(Package{GUID: "some-pkg-guid"}, nil, nil, 0)
-				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
 			})
 		})
 	})

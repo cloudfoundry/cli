@@ -193,20 +193,15 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 // Note: In order to determine if package creation is successful, poll the
 // Package's state field for more information.
 func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
-	link, ok := pkg.Links["upload"]
-	if !ok {
-		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
-	}
-
 	if matchedResources == nil {
 		return Package{}, nil, ccerror.NilObjectError{Object: "matchedResources"}
 	}
 
 	if newResources == nil {
-		return client.uploadExistingResourcesOnly(link, matchedResources)
+		return client.uploadExistingResourcesOnly(pkg.GUID, matchedResources)
 	}
 
-	return client.uploadNewAndExistingResources(link, matchedResources, newResources, newResourcesLength)
+	return client.uploadNewAndExistingResources(pkg.GUID, matchedResources, newResources, newResourcesLength)
 }
 
 // UploadPackage uploads a file to a given package's Upload resource. Note:
@@ -387,7 +382,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 	return pkg, response.Warnings, firstError
 }
 
-func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, matchedResources []Resource) (Package, Warnings, error) {
+func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedResources []Resource) (Package, Warnings, error) {
 	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
 		return Package{}, nil, err
@@ -406,9 +401,9 @@ func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, matchedRes
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    uploadLink.HREF,
-		Method: uploadLink.Method,
-		Body:   bytes.NewReader(body.Bytes()),
+		RequestName: internal.PostPackageBitsRequest,
+		URIParams:   internal.Params{"package_guid": packageGUID},
+		Body:        bytes.NewReader(body.Bytes()),
 	})
 	if err != nil {
 		return Package{}, nil, err
@@ -425,7 +420,7 @@ func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, matchedRes
 	return pkg, response.Warnings, err
 }
 
-func (client *Client) uploadNewAndExistingResources(uploadLink APILink, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
 	contentLength, err := client.calculateAppBitsRequestSize(matchedResources, newResourcesLength)
 	if err != nil {
 		return Package{}, nil, err
@@ -433,12 +428,10 @@ func (client *Client) uploadNewAndExistingResources(uploadLink APILink, matchedR
 
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(matchedResources, newResources, newResourcesLength)
 
-	// This request uses URL/Method instead of an internal RequestName to support
-	// the possibility of external bit services.
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    uploadLink.HREF,
-		Method: uploadLink.Method,
-		Body:   body,
+		RequestName: internal.PostPackageBitsRequest,
+		URIParams:   internal.Params{"package_guid": packageGUID},
+		Body:        body,
 	})
 	if err != nil {
 		return Package{}, nil, err
