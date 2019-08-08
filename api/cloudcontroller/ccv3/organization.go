@@ -20,6 +20,37 @@ type Organization struct {
 	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
+// CreateOrganization creates an organization with the given name.
+func (client *Client) CreateOrganization(orgName string) (Organization, Warnings, error) {
+	org := Organization{Name: orgName}
+	orgBytes, err := json.Marshal(org)
+	if err != nil {
+		return Organization{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostOrganizationRequest,
+		Body:        bytes.NewReader(orgBytes),
+	})
+
+	if err != nil {
+		return Organization{}, nil, err
+	}
+
+	var responseOrg Organization
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseOrg,
+	}
+	err = client.connection.Make(request, &response)
+
+	if err != nil {
+		return Organization{}, response.Warnings, err
+	}
+
+	return responseOrg, response.Warnings, err
+}
+
+// DeleteOrganization deletes the organization with the given GUID.
 func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteOrganizationRequest,
@@ -35,6 +66,7 @@ func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, erro
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
+// GetDefaultDomain gets the default domain for the organization with the given GUID.
 func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDefaultDomainRequest,
@@ -131,6 +163,7 @@ func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings
 	return fullOrgsList, warnings, err
 }
 
+// UpdateOrganization updates an organization with the given properties.
 func (client *Client) UpdateOrganization(org Organization) (Organization, Warnings, error) {
 	orgGUID := org.GUID
 	org.GUID = ""

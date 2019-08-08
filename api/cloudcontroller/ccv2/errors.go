@@ -113,7 +113,7 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 	case "CF-ServiceKeyNameTaken":
 		return ccerror.ServiceKeyTakenError{Message: errorResponse.Description}
 	case "CF-OrganizationNameTaken":
-		return ccerror.OrganizationNameTakenError{Message: errorResponse.Description}
+		return ccerror.OrganizationNameTakenError{}
 	case "CF-SpaceNameTaken":
 		return ccerror.SpaceNameTakenError{Message: errorResponse.Description}
 	case "CF-ServiceInstanceNameTaken":

@@ -3,6 +3,7 @@ package ccv3
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -126,6 +127,7 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	//idea to make route already exist error flexible for all relevant error cases
 	errorString := errorResponse.Detail
 	err := ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
+	orgNameTakenRegexp := regexp.MustCompile(`Organization '.*' already exists\.`)
 	// boolean switch case with partial/regex string matchers
 	switch {
 	case strings.Contains(errorString,
@@ -140,6 +142,8 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"Buildpack must be an existing admin buildpack or a valid git URI"):
 		return ccerror.InvalidBuildpackError{}
+	case orgNameTakenRegexp.MatchString(errorString):
+		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
 	default:
 		return err
 	}

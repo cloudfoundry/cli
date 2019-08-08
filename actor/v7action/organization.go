@@ -42,6 +42,16 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 	return actor.convertCCToActorOrganization(orgs[0]), Warnings(warnings), nil
 }
 
+// CreateOrganization creates a new organization with the given name
+func (actor Actor) CreateOrganization(orgName string) (Organization, Warnings, error) {
+	allWarnings := Warnings{}
+
+	organization, apiWarnings, err := actor.CloudControllerClient.CreateOrganization(orgName)
+	allWarnings = append(allWarnings, apiWarnings...)
+
+	return actor.convertCCToActorOrganization(organization), allWarnings, err
+}
+
 // UpdateOrganization updates the name and/or labels of an organization
 func (actor Actor) UpdateOrganization(org Organization) (Organization, Warnings, error) {
 	ccOrg := ccv3.Organization{

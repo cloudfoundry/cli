@@ -193,6 +193,49 @@ var _ = Describe("Organization Actions", func() {
 		})
 	})
 
+	Describe("CreateOrganization", func() {
+		var (
+			org      Organization
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			org, warnings, err = actor.CreateOrganization("some-org-name")
+		})
+
+		When("the org is created successfully", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateOrganizationReturns(
+					ccv3.Organization{Name: "some-org-name", GUID: "some-org-guid"},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the org resource", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(org).To(Equal(Organization{Name: "some-org-name", GUID: "some-org-guid"}))
+			})
+		})
+
+		When("the request fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateOrganizationReturns(
+					ccv3.Organization{},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					errors.New("create-org-failed"),
+				)
+			})
+
+			It("returns warnings and the client error", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(err).To(MatchError("create-org-failed"))
+			})
+		})
+	})
+
 	Describe("DeleteOrganization", func() {
 		var (
 			warnings Warnings

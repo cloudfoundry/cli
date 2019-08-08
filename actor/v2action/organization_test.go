@@ -347,7 +347,7 @@ var _ = Describe("Org Actions", func() {
 						fakeCloudControllerClient.CreateOrganizationReturns(
 							ccv2.Organization{},
 							ccv2.Warnings{"warning-1", "warning-2"},
-							ccerror.OrganizationNameTakenError{Message: "name is taken"},
+							ccerror.OrganizationNameTakenError{},
 						)
 					})
 

@@ -202,9 +202,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 
 						It("returns a OrganizationNameTakenError", func() {
-							Expect(executeErr).To(MatchError(ccerror.OrganizationNameTakenError{
-								Message: "The organization name is taken: potato",
-							}))
+							Expect(executeErr).To(MatchError(ccerror.OrganizationNameTakenError{}))
 						})
 					})
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
@@ -417,6 +418,133 @@ var _ = Describe("Organizations", func() {
 		})
 	})
 
+	Describe("CreateOrganization", func() {
+		var (
+			createdOrg Organization
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			createdOrg, warnings, executeErr = client.CreateOrganization("some-org-name")
+		})
+
+		When("the organization is created successfully", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-org-guid",
+					"name": "some-org-name"
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-org-name",
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/organizations"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created org", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(createdOrg).To(Equal(ccv3.Organization{
+					GUID: "some-org-guid",
+					Name: "some-org-name",
+				}))
+			})
+		})
+
+		When("an organization with the same name already exists", func() {
+			BeforeEach(func() {
+				response := `{
+					 "errors": [
+							{
+								 "detail": "Organization 'some-org-name' already exists.",
+								 "title": "CF-UnprocessableEntity",
+								 "code": 10008
+							}
+					 ]
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-org-name",
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/organizations"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusUnprocessableEntity, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns a meaningful organization-name-taken error", func() {
+				Expect(executeErr).To(MatchError(ccerror.OrganizationNameTakenError{
+					UnprocessableEntityError: ccerror.UnprocessableEntityError{
+						Message: "Organization 'some-org-name' already exists.",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("creating the org fails", func() {
+			BeforeEach(func() {
+				response := `{
+					 "errors": [
+							{
+								 "detail": "Fail",
+								 "title": "CF-SomeError",
+								 "code": 10002
+							},
+							{
+								 "detail": "Something went terribly wrong",
+								 "title": "CF-UnknownError",
+								 "code": 10001
+							}
+					 ]
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-org-name",
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/organizations"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10002,
+							Detail: "Fail",
+							Title:  "CF-SomeError",
+						},
+						{
+							Code:   10001,
+							Detail: "Something went terribly wrong",
+							Title:  "CF-UnknownError",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("UpdateOrganization", func() {
 		var (
 			orgToUpdate Organization
@@ -432,8 +560,8 @@ var _ = Describe("Organizations", func() {
 		When("the organization is updated successfully", func() {
 			BeforeEach(func() {
 				response := `{
-					"guid": "some-app-guid",
-					"name": "some-app-name",
+					"guid": "some-org-guid",
+					"name": "some-org-name",
 					"metadata": {
 						"labels": {
 							"k1":"v1",
@@ -474,7 +602,6 @@ var _ = Describe("Organizations", func() {
 
 			It("should include the labels in the JSON", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(server.ReceivedRequests()).To(HaveLen(3))
 				Expect(len(warnings)).To(Equal(0))
 				Expect(updatedOrg.Metadata.Labels).To(BeEquivalentTo(
 					map[string]types.NullString{
