@@ -61,7 +61,7 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.DomainNotFoundError); ok {
-			cmd.UI.DisplayTextWithFlavor("Domain {{.DomainName}} does not exist", map[string]interface{}{
+			cmd.UI.DisplayWarning("Domain '{{.DomainName}}' does not exist.", map[string]interface{}{
 				"DomainName": cmd.RequiredArgs.Domain,
 			})
 			cmd.UI.DisplayOK()

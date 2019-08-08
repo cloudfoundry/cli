@@ -140,7 +140,7 @@ var _ = Describe("delete-org Command", func() {
 								Expect(testUI.Err).To(Say("warning-1"))
 								Expect(testUI.Err).To(Say("warning-2"))
 
-								Expect(testUI.Out).To(Say("Org some-org does not exist."))
+								Expect(testUI.Err).To(Say(`Org 'some-org' does not exist\.`))
 								Expect(testUI.Out).To(Say("OK"))
 							})
 						})

@@ -83,7 +83,7 @@ var _ = Describe("delete Command", func() {
 			Expect(testUI.Out).To(Say(`Deleting the app and associated routes will make apps with this route, in any org, unreachable\.`))
 			Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 			Expect(testUI.Out).To(Say("OK"))
-			Expect(testUI.Out).NotTo(Say("App some-app does not exist"))
+			Expect(testUI.Out).NotTo(Say(`App 'some-app' does not exist\.`))
 		})
 
 		It("deletes application and mapped routes", func() {
@@ -105,7 +105,7 @@ var _ = Describe("delete Command", func() {
 			It("defers showing a tip", func() {
 				Expect(testUI.Out).NotTo(Say("TIP"))
 				testUI.FlushDeferred()
-				Expect(testUI.Out).To(Say(`TIP: Run 'cf delete some-app to delete the app and 'cf delete-route' to delete the route\.`))
+				Expect(testUI.Out).To(Say(`\n\nTIP: Run 'cf delete some-app' to delete the app and 'cf delete-route' to delete the route\.`))
 			})
 		})
 	})
@@ -164,7 +164,7 @@ var _ = Describe("delete Command", func() {
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).NotTo(Say("App some-app does not exist"))
+				Expect(testUI.Out).NotTo(Say(`App 'some-app' does not exist\.`))
 			})
 		})
 
@@ -177,7 +177,7 @@ var _ = Describe("delete Command", func() {
 			It("cancels the delete", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Delete cancelled"))
+				Expect(testUI.Out).To(Say(`App 'some-app' has not been deleted\.`))
 				Expect(fakeActor.DeleteApplicationByNameAndSpaceCallCount()).To(Equal(0))
 			})
 		})
@@ -191,7 +191,7 @@ var _ = Describe("delete Command", func() {
 			It("cancels the delete", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Delete cancelled"))
+				Expect(testUI.Out).To(Say(`App 'some-app' has not been deleted\.`))
 				Expect(fakeActor.DeleteApplicationByNameAndSpaceCallCount()).To(Equal(0))
 			})
 		})
@@ -244,7 +244,7 @@ var _ = Describe("delete Command", func() {
 
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
-				Expect(testUI.Out).To(Say("App some-app does not exist"))
+				Expect(testUI.Err).To(Say(`App 'some-app' does not exist\.`))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
@@ -260,7 +260,7 @@ var _ = Describe("delete Command", func() {
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).NotTo(Say("App some-app does not exist"))
+				Expect(testUI.Err).NotTo(Say(`App 'some-app' does not exist\.`))
 			})
 		})
 	})

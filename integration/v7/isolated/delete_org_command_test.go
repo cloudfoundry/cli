@@ -57,7 +57,7 @@ var _ = Describe("delete-org command", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("delete-org", "-f", "please-do-not-exist-in-real-life")
 			Eventually(session).Should(Say("Deleting org please-do-not-exist-in-real-life as %s...", username))
-			Eventually(session).Should(Say("Org please-do-not-exist-in-real-life does not exist."))
+			Eventually(session.Err).Should(Say(`Org 'please-do-not-exist-in-real-life' does not exist\.`))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 		})

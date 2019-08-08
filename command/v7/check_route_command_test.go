@@ -122,7 +122,7 @@ var _ = Describe("check-route Command", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(testUI.Out).To(Say("Checking for route..."))
-				Expect(testUI.Out).To(Say("Route some-domain.com does exist."))
+				Expect(testUI.Out).To(Say(`Route 'some-domain.com' does exist\.`))
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
@@ -146,7 +146,7 @@ var _ = Describe("check-route Command", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(testUI.Out).To(Say("Checking for route..."))
-				Expect(testUI.Out).To(Say("Route some-domain.com does not exist."))
+				Expect(testUI.Out).To(Say(`Route 'some-domain\.com' does not exist\.`))
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
@@ -173,7 +173,7 @@ var _ = Describe("check-route Command", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(testUI.Out).To(Say("Checking for route..."))
-				Expect(testUI.Out).To(Say("Route some-host.some-domain.com/some-path does exist."))
+				Expect(testUI.Out).To(Say(`Route 'some-host\.some-domain\.com/some-path' does exist\.`))
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))

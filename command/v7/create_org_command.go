@@ -18,7 +18,7 @@ type CreateOrgActor interface {
 
 type CreateOrgCommand struct {
 	RequiredArgs    flag.Organization `positional-args:"yes"`
-	usage           interface{}       `usage:"CF_NAME create-org ORG [-o ORG]"`
+	usage           interface{}       `usage:"CF_NAME create-org ORG"`
 	relatedCommands interface{}       `related_commands:"create-space, orgs, quotas, set-org-role"`
 
 	UI          command.UI

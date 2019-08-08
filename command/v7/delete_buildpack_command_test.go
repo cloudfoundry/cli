@@ -147,7 +147,7 @@ var _ = Describe("delete-buildpack Command", func() {
 
 			It("prints warnings and helpful error message (that includes the stack name)", func() {
 				Expect(testUI.Err).To(Say("a-warning"))
-				Expect(testUI.Err).To(Say("Buildpack the-buildpack with stack stack! not found."))
+				Expect(testUI.Err).To(Say(`Buildpack 'the-buildpack' with stack 'stack!' not found\.`))
 			})
 		})
 
@@ -159,7 +159,7 @@ var _ = Describe("delete-buildpack Command", func() {
 
 			It("prints warnings and helpful error message", func() {
 				Expect(testUI.Err).To(Say("a-warning"))
-				Expect(testUI.Err).To(Say("Buildpack the-buildpack does not exist."))
+				Expect(testUI.Err).To(Say(`Buildpack 'the-buildpack' does not exist\.`))
 			})
 		})
 	})

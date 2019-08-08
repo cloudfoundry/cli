@@ -97,7 +97,7 @@ var _ = Describe("check-route command", func() {
 				It("tells the user the route exists and exits without failing", func() {
 					session := helpers.CF("check-route", domainName, "--hostname", hostname)
 					Eventually(session).Should(Say(`Checking for route\.\.\.`))
-					Eventually(session).Should(Say(`Route %s\.%s does exist\.`, hostname, domainName))
+					Eventually(session).Should(Say(`Route '%s\.%s' does exist\.`, hostname, domainName))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
 				})
@@ -119,7 +119,7 @@ var _ = Describe("check-route command", func() {
 					It("checks the route", func() {
 						session := helpers.CF("check-route", domainName)
 						Eventually(session).Should(Say(`Checking for route\.\.\.`))
-						Eventually(session).Should(Say(`Route %s does not exist\.`, domainName))
+						Eventually(session).Should(Say(`Route '%s' does not exist\.`, domainName))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -129,7 +129,7 @@ var _ = Describe("check-route command", func() {
 						hostname := "tiramisu"
 						session := helpers.CF("check-route", domainName, "-n", hostname)
 						Eventually(session).Should(Say(`Checking for route\.\.\.`))
-						Eventually(session).Should(Say(`Route %s\.%s does not exist\.`, hostname, domainName))
+						Eventually(session).Should(Say(`Route '%s\.%s' does not exist\.`, hostname, domainName))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -140,7 +140,7 @@ var _ = Describe("check-route command", func() {
 						pathString := "/recipes"
 						session := helpers.CF("check-route", domainName, "-n", hostname, "--path", pathString)
 						Eventually(session).Should(Say(`Checking for route\.\.\.`))
-						Eventually(session).Should(Say(`Route %s\.%s%s does not exist\.`, hostname, domainName, pathString))
+						Eventually(session).Should(Say(`Route '%s\.%s%s' does not exist\.`, hostname, domainName, pathString))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -151,7 +151,7 @@ var _ = Describe("check-route command", func() {
 						pathString := "more-recipes"
 						session := helpers.CF("check-route", domainName, "-n", hostname, "--path", pathString)
 						Eventually(session).Should(Say(`Checking for route\.\.\.`))
-						Eventually(session).Should(Say(`Route %s\.%s\/%s does not exist\.`, hostname, domainName, pathString))
+						Eventually(session).Should(Say(`Route '%s\.%s\/%s' does not exist\.`, hostname, domainName, pathString))
 						Eventually(session).Should(Exit(0))
 					})
 				})

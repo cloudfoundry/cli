@@ -90,22 +90,17 @@ var _ = Describe("delete-private-domain Command", func() {
 		})
 	})
 
-	When("the user attempts to delete-private-domain a shared domain", func() {
-
-	})
-
 	When("the domain does not exist", func() {
 		BeforeEach(func() {
 			fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, actionerror.DomainNotFoundError{Name: "domain.com"})
 		})
 
 		It("displays OK and returns with success", func() {
-			Expect(testUI.Out).To(Say("Domain some-domain.com does not exist"))
-			Expect(testUI.Out).To(Say("OK"))
 			Expect(testUI.Err).To(Say("get-domain-warnings"))
+			Expect(testUI.Err).To(Say(`Domain 'some-domain.com' does not exist\.`))
+			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).ToNot(HaveOccurred())
 		})
-
 	})
 
 	When("the getting the domain errors", func() {
@@ -144,7 +139,7 @@ var _ = Describe("delete-private-domain Command", func() {
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting private domain some-domain.com as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).NotTo(Say("Domain some-domain does not exist"))
+				Expect(testUI.Err).NotTo(Say(`Domain 'some-domain.com' does not exist\.`))
 			})
 		})
 
@@ -227,7 +222,7 @@ var _ = Describe("delete-private-domain Command", func() {
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting private domain some-domain.com as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).NotTo(Say("Domain some-domain.com does not exist"))
+				Expect(testUI.Err).NotTo(Say(`Domain 'some-domain.com' does not exist\.`))
 			})
 		})
 	})

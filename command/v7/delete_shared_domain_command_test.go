@@ -214,7 +214,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting domain some-domain.com as steve\.\.\.`))
-				Expect(testUI.Out).To(Say("Domain some-domain.com does not exist"))
+				Expect(testUI.Err).To(Say(`Domain 'some-domain\.com' does not exist\.`))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
@@ -230,7 +230,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say(`Deleting domain some-domain.com as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).NotTo(Say("Domain some-domain.com does not exist"))
+				Expect(testUI.Err).NotTo(Say(`Domain 'some-domain\.com' does not exist\.`))
 			})
 		})
 	})

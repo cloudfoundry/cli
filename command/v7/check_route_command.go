@@ -68,9 +68,9 @@ func (cmd CheckRouteCommand) Execute(args []string) error {
 	}
 
 	if matches {
-		cmd.UI.DisplayText("Route {{.FQDN}} does exist.", formatParams)
+		cmd.UI.DisplayText("Route '{{.FQDN}}' does exist.", formatParams)
 	} else {
-		cmd.UI.DisplayText("Route {{.FQDN}} does not exist.", formatParams)
+		cmd.UI.DisplayText("Route '{{.FQDN}}' does not exist.", formatParams)
 	}
 
 	cmd.UI.DisplayOK()

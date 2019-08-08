@@ -71,7 +71,9 @@ func (cmd DeleteCommand) Execute(args []string) error {
 		}
 
 		if !response {
-			cmd.UI.DisplayText("Delete cancelled")
+			cmd.UI.DisplayText("App '{{.AppName}}' has not been deleted.", map[string]interface{}{
+				"AppName": cmd.RequiredArgs.AppName,
+			})
 			return nil
 		}
 	}
@@ -92,12 +94,12 @@ func (cmd DeleteCommand) Execute(args []string) error {
 	if err != nil {
 		switch err.(type) {
 		case actionerror.ApplicationNotFoundError:
-			cmd.UI.DisplayTextWithFlavor("App {{.AppName}} does not exist", map[string]interface{}{
+			cmd.UI.DisplayWarning("App '{{.AppName}}' does not exist.", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
 		case actionerror.RouteBoundToMultipleAppsError:
 			cmd.UI.DeferText(
-				"TIP: Run 'cf delete {{.AppName}} to delete the app and 'cf delete-route' to delete the route.",
+				"\nTIP: Run 'cf delete {{.AppName}}' to delete the app and 'cf delete-route' to delete the route.",
 				map[string]interface{}{
 					"AppName": cmd.RequiredArgs.AppName,
 				},
