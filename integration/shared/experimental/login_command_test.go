@@ -273,6 +273,35 @@ var _ = Describe("login command", func() {
 				Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Exit(1))
 			})
+
+			When("the server accepts logins", func() {
+				BeforeEach(func() {
+					fakeTokenResponse := map[string]string{
+						"access_token": "",
+						"token_type":   "bearer",
+					}
+					server.RouteToHandler(http.MethodPost, "/oauth/token",
+						ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+					server.RouteToHandler(http.MethodGet, "/v3/organizations",
+						ghttp.RespondWith(http.StatusOK, `{
+                                                        "total_results": 0,
+                                                        "total_pages": 1,
+                                                        "resources": []}`))
+				})
+
+				It("doesn't complain about an invalid cert when we specify --skip-ssl-validation", func() {
+					session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
+					//session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say("API endpoint:\\s+" + server.URL()))
+					Expect(session).Should(Say(`Authenticating\.\.\.`))
+					Expect(session).Should(Say(`OK`))
+					Expect(session).Should(Say(`API endpoint:\s+` + server.URL() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+
+					Expect(string(session.Err.Contents())).Should(Not(ContainSubstring("Invalid SSL Cert for %s", server.URL())))
+				})
+
+			})
 		})
 	})
 
