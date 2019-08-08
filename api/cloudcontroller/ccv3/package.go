@@ -207,20 +207,15 @@ func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource
 // UploadPackage uploads a file to a given package's Upload resource. Note:
 // fileToUpload is read entirely into memory prior to sending data to CC.
 func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
-	link, ok := pkg.Links["upload"]
-	if !ok {
-		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
-	}
-
 	body, contentType, err := client.createUploadStream(fileToUpload, "bits")
 	if err != nil {
 		return Package{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    link.HREF,
-		Method: link.Method,
-		Body:   body,
+		RequestName: internal.PostPackageBitsRequest,
+		URIParams:   internal.Params{"package_guid": pkg.GUID},
+		Body:        body,
 	})
 	if err != nil {
 		return Package{}, nil, err

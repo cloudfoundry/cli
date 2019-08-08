@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -441,12 +440,6 @@ var _ = Describe("Package", func() {
 
 			inputPackage = Package{
 				GUID: "package-guid",
-				Links: map[string]APILink{
-					"upload": {
-						HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
-						Method: http.MethodPost,
-					},
-				},
 			}
 		})
 
@@ -703,12 +696,7 @@ var _ = Describe("Package", func() {
 
 				inputPackage = Package{
 					State: constant.PackageAwaitingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{
-							HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
-							Method: http.MethodPost,
-						},
-					},
+					GUID:  "package-guid",
 				}
 
 				tempFile, err = ioutil.TempFile("", "package-upload")
@@ -751,7 +739,7 @@ var _ = Describe("Package", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
 						verifyHeaderAndBody,
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
@@ -779,17 +767,6 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		When("the package does not have an upload link", func() {
-			BeforeEach(func() {
-				inputPackage = Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload}
-				fileToUpload = "/path/to/foo"
-			})
-
-			It("returns an UploadLinkNotFoundError", func() {
-				Expect(executeErr).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
-			})
-		})
-
 		When("cc returns back an error or warnings", func() {
 			var tempFile *os.File
 
@@ -797,13 +774,8 @@ var _ = Describe("Package", func() {
 				var err error
 
 				inputPackage = Package{
+					GUID:  "package-guid",
 					State: constant.PackageAwaitingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{
-							HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
-							Method: http.MethodPost,
-						},
-					},
 				}
 
 				tempFile, err = ioutil.TempFile("", "package-upload")
@@ -834,7 +806,7 @@ var _ = Describe("Package", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
