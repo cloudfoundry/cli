@@ -195,7 +195,7 @@ var _ = Describe("plugin API", func() {
 	Describe("GetSpaceUsers", func() {
 		It("returns the space users", func() {
 			username, _ := helpers.GetCredentials()
-			org, space := createTargetedOrgAndSpaceV7(username)
+			org, space := createTargetedOrgAndSpace()
 			session := helpers.CF("GetSpaceUsers", org, space)
 			Eventually(session).Should(Say(username))
 			Eventually(session).Should(Exit(0))

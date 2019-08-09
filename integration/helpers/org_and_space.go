@@ -74,7 +74,12 @@ func CreateSpace(space string) {
 	Eventually(CF("create-space", space)).Should(Exit(0))
 }
 
-// SetUserAsSpaceDeveloper sets the user as a space developer with `cf set-user-role`.
+// SetUserAsOrgDeveloper sets the user as a org developer with `cf set-org-role`.
+func SetOrgRole(username, org, role string) {
+	Eventually(CF("set-org-role", username, org, role, "--client")).Should(Exit(0))
+}
+
+// SetUserAsSpaceDeveloper sets the user as a space developer with `cf set-space-role`.
 func SetSpaceRole(username, org, space, role string) {
 	Eventually(CF("set-space-role", username, org, space, role, "--client")).Should(Exit(0))
 }

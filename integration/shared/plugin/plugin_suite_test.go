@@ -98,16 +98,10 @@ func uninstallTestPlugin() {
 func createTargetedOrgAndSpace() (string, string) {
 	org := helpers.NewOrgName()
 	space := helpers.NewSpaceName()
+	username, _ := helpers.GetCredentials()
 	helpers.CreateOrgAndSpace(org, space)
 	helpers.TargetOrgAndSpace(org, space)
-	return org, space
-}
-
-func createTargetedOrgAndSpaceV7(username string) (string, string) {
-	org := helpers.NewOrgName()
-	space := helpers.NewSpaceName()
-	helpers.CreateOrgAndSpace(org, space)
-	helpers.TargetOrgAndSpace(org, space)
+	helpers.SetOrgRole(username, org, "OrgManager")
 	helpers.SetSpaceRole(username, org, space, "SpaceDeveloper")
 	helpers.SetSpaceRole(username, org, space, "SpaceManager")
 	return org, space
