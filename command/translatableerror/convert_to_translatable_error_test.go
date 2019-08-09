@@ -361,7 +361,7 @@ var _ = Describe("ConvertToTranslatableError", func() {
 
 		Entry("ccerror.UnverifiedServerError -> InvalidSSLCertError",
 			ccerror.UnverifiedServerError{URL: "some-url"},
-			InvalidSSLCertError{URL: "some-url"}),
+			InvalidSSLCertError{URL: "some-url", SuggestedCommand: "api"}),
 
 		Entry("ccerror.UnprocessableEntityError with droplet message -> RunTaskError",
 			ccerror.UnprocessableEntityError{Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app."},
