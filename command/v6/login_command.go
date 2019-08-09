@@ -131,6 +131,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 	err = cmd.retargetAPI()
 	if err != nil {
+		te := translatableerror.ConvertToTranslatableError(err)
+		if ise, ok := te.(translatableerror.InvalidSSLCertError); ok {
+			ise.SuggestedCommand = "login"
+			return ise
+		}
 		return err
 	}
 
