@@ -63,7 +63,9 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 		}
 
 		if !deleteOrg {
-			cmd.UI.DisplayText("Delete cancelled")
+			cmd.UI.DisplayText("Organization '{{.OrgName}}' has not been deleted.", map[string]interface{}{
+				"OrgName": cmd.RequiredArgs.Organization,
+			})
 			return nil
 		}
 	}

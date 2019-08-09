@@ -180,7 +180,7 @@ var _ = Describe("delete-org Command", func() {
 						It("does not delete the org", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Delete cancelled"))
+							Expect(testUI.Out).To(Say(`Organization 'some-org' has not been deleted\.`))
 
 							Expect(fakeActor.DeleteOrganizationCallCount()).To(Equal(0))
 						})
@@ -195,7 +195,7 @@ var _ = Describe("delete-org Command", func() {
 						It("does not delete the org", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Delete cancelled"))
+							Expect(testUI.Out).To(Say(`Organization 'some-org' has not been deleted\.`))
 
 							Expect(fakeActor.DeleteOrganizationCallCount()).To(Equal(0))
 						})

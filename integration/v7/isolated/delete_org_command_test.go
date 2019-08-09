@@ -110,7 +110,7 @@ var _ = Describe("delete-org command", func() {
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
 					Eventually(session).Should(Say(`Really delete the org %s, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\?`, orgName))
-					Eventually(session).Should(Say("Delete cancelled"))
+					Eventually(session).Should(Say(`Organization '%s' has not been deleted\.`, orgName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
 				})
@@ -125,7 +125,7 @@ var _ = Describe("delete-org command", func() {
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
 					Eventually(session).Should(Say(`Really delete the org %s, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\?`, orgName))
-					Eventually(session).Should(Say("Delete cancelled"))
+					Eventually(session).Should(Say(`Organization '%s' has not been deleted\.`, orgName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
 				})
