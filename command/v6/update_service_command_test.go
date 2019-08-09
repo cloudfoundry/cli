@@ -146,9 +146,14 @@ var _ = Describe("update-service Command", func() {
 
 			When("checking the target succeeds", func() {
 				When("getting the service instance succeeds", func() {
+					var (
+						serviceInstance v2action.ServiceInstance
+					)
+
 					BeforeEach(func() {
+						serviceInstance = v2action.ServiceInstance{GUID: instanceGUID, ServicePlanGUID: planGUID}
 						fakeActor.GetServiceInstanceByNameAndSpaceReturns(
-							v2action.ServiceInstance{GUID: instanceGUID, ServicePlanGUID: planGUID},
+							serviceInstance,
 							v2action.Warnings{"warning"},
 							nil)
 					})
@@ -190,9 +195,8 @@ var _ = Describe("update-service Command", func() {
 						It("sends an upgrade request", func() {
 							Expect(fakeActor.UpgradeServiceInstanceCallCount()).To(Equal(1), "upgrade should be requested")
 
-							serviceInstanceGUID, servicePlanGUID := fakeActor.UpgradeServiceInstanceArgsForCall(0)
-							Expect(serviceInstanceGUID).To(Equal(instanceGUID))
-							Expect(servicePlanGUID).To(Equal(planGUID))
+							actualServiceInstance := fakeActor.UpgradeServiceInstanceArgsForCall(0)
+							Expect(actualServiceInstance).To(Equal(serviceInstance))
 						})
 
 						When("the update request succeeds", func() {

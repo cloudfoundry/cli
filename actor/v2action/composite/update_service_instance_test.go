@@ -41,8 +41,12 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 			servicePlanGUID     = "service-plan-guid"
 		)
 
+		var (
+			serviceInstance = v2action.ServiceInstance{GUID: serviceInstanceGUID, ServicePlanGUID: servicePlanGUID}
+		)
+
 		JustBeforeEach(func() {
-			warnings, err = composite.UpgradeServiceInstance(serviceInstanceGUID, servicePlanGUID)
+			warnings, err = composite.UpgradeServiceInstance(serviceInstance)
 		})
 
 		When("the plan exists", func() {
