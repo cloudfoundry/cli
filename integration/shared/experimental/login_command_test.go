@@ -270,8 +270,7 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Say("API endpoint: %s", server.URL()))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", server.URL()))
-				// TODO: TIP needs to reflect the correct command
-				// Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
+				Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

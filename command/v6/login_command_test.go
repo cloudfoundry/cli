@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -88,12 +89,21 @@ var _ = Describe("login Command", func() {
 					cmd.APIEndpoint = "api.example.com"
 				})
 
-				It("target the provided api endpoint", func() {
+				It("targets the provided api endpoint", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
 					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
 					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+				})
+
+				When("targeting the API fails", func() {
+					BeforeEach(func() {
+						fakeActor.SetTargetReturns(nil, errors.New("some error"))
+					})
+					It("errors", func() {
+						Expect(executeErr).To(MatchError("some error"))
+					})
 				})
 			})
 
@@ -167,6 +177,32 @@ var _ = Describe("login Command", func() {
 
 					Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
 					Expect(fakeConfig.TargetCallCount()).To(Equal(1))
+				})
+			})
+
+			When("the endpoint is well-formed", func() {
+				BeforeEach(func() {
+					cmd.APIEndpoint = "api.example.com"
+				})
+
+				When("targeting the API fails due to an invalid certificate", func() {
+					BeforeEach(func() {
+						fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
+					})
+					It("returns an error mentioning the login command", func() {
+						Expect(executeErr).To(MatchError(
+							translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
+					})
+				})
+
+				When("reloading the actor fails due to an invalid certificate", func() {
+					BeforeEach(func() {
+						fakeActorMaker.NewActorReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
+					})
+					It("returns an error mentioning the login command", func() {
+						Expect(executeErr).To(MatchError(
+							translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
+					})
 				})
 			})
 		})

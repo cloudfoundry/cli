@@ -171,7 +171,7 @@ func ConvertToTranslatableError(err error) error {
 	case ccerror.SSLValidationHostnameError:
 		return SSLCertError(e)
 	case ccerror.UnverifiedServerError:
-		return InvalidSSLCertError(e)
+		return InvalidSSLCertError{URL: e.URL, SuggestedCommand: "api"}
 
 	// Specific CC Errors
 	case ccerror.V2JobFailedError:
