@@ -35,11 +35,10 @@ type FakeUpdateServiceActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	UpgradeServiceInstanceStub        func(string, string) (v2action.Warnings, error)
+	UpgradeServiceInstanceStub        func(v2action.ServiceInstance) (v2action.Warnings, error)
 	upgradeServiceInstanceMutex       sync.RWMutex
 	upgradeServiceInstanceArgsForCall []struct {
-		arg1 string
-		arg2 string
+		arg1 v2action.ServiceInstance
 	}
 	upgradeServiceInstanceReturns struct {
 		result1 v2action.Warnings
@@ -172,17 +171,16 @@ func (fake *FakeUpdateServiceActor) GetServiceInstanceByNameAndSpaceReturnsOnCal
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUpdateServiceActor) UpgradeServiceInstance(arg1 string, arg2 string) (v2action.Warnings, error) {
+func (fake *FakeUpdateServiceActor) UpgradeServiceInstance(arg1 v2action.ServiceInstance) (v2action.Warnings, error) {
 	fake.upgradeServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.upgradeServiceInstanceReturnsOnCall[len(fake.upgradeServiceInstanceArgsForCall)]
 	fake.upgradeServiceInstanceArgsForCall = append(fake.upgradeServiceInstanceArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("UpgradeServiceInstance", []interface{}{arg1, arg2})
+		arg1 v2action.ServiceInstance
+	}{arg1})
+	fake.recordInvocation("UpgradeServiceInstance", []interface{}{arg1})
 	fake.upgradeServiceInstanceMutex.Unlock()
 	if fake.UpgradeServiceInstanceStub != nil {
-		return fake.UpgradeServiceInstanceStub(arg1, arg2)
+		return fake.UpgradeServiceInstanceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -197,17 +195,17 @@ func (fake *FakeUpdateServiceActor) UpgradeServiceInstanceCallCount() int {
 	return len(fake.upgradeServiceInstanceArgsForCall)
 }
 
-func (fake *FakeUpdateServiceActor) UpgradeServiceInstanceCalls(stub func(string, string) (v2action.Warnings, error)) {
+func (fake *FakeUpdateServiceActor) UpgradeServiceInstanceCalls(stub func(v2action.ServiceInstance) (v2action.Warnings, error)) {
 	fake.upgradeServiceInstanceMutex.Lock()
 	defer fake.upgradeServiceInstanceMutex.Unlock()
 	fake.UpgradeServiceInstanceStub = stub
 }
 
-func (fake *FakeUpdateServiceActor) UpgradeServiceInstanceArgsForCall(i int) (string, string) {
+func (fake *FakeUpdateServiceActor) UpgradeServiceInstanceArgsForCall(i int) v2action.ServiceInstance {
 	fake.upgradeServiceInstanceMutex.RLock()
 	defer fake.upgradeServiceInstanceMutex.RUnlock()
 	argsForCall := fake.upgradeServiceInstanceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *FakeUpdateServiceActor) UpgradeServiceInstanceReturns(result1 v2action.Warnings, result2 error) {

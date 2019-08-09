@@ -16,7 +16,7 @@ import (
 type UpdateServiceActor interface {
 	CloudControllerAPIVersion() string
 	GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
-	UpgradeServiceInstance(serviceInstanceGUID, servicePlanGUID string) (v2action.Warnings, error)
+	UpgradeServiceInstance(serviceInstance v2action.ServiceInstance) (v2action.Warnings, error)
 }
 
 type textData map[string]interface{}
@@ -112,7 +112,7 @@ func (cmd *UpdateServiceCommand) promptForUpgrade() (bool, error) {
 }
 
 func (cmd *UpdateServiceCommand) performUpgrade(instance v2action.ServiceInstance) error {
-	warnings, err := cmd.Actor.UpgradeServiceInstance(instance.GUID, instance.ServicePlanGUID)
+	warnings, err := cmd.Actor.UpgradeServiceInstance(instance)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

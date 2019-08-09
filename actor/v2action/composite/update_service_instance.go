@@ -36,13 +36,14 @@ type UpdateServiceInstanceCompositeActor struct {
 }
 
 // UpgradeServiceInstance requests update on the service instance with the `maintenance_info` available on the plan
-func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInstanceGUID, servicePlanGUID string) (v2action.Warnings, error) {
-	servicePlan, warnings, err := c.GetServicePlanActor.GetServicePlan(servicePlanGUID)
+func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInstance v2action.ServiceInstance) (v2action.Warnings, error) {
+	servicePlan, warnings, err := c.GetServicePlanActor.GetServicePlan(serviceInstance.ServicePlanGUID)
 	if err != nil {
 		return warnings, err
 	}
+
 	updateWarnings, err := c.UpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfo(
-		serviceInstanceGUID,
+		serviceInstance.GUID,
 		v2action.MaintenanceInfo(servicePlan.MaintenanceInfo),
 	)
 	return append(warnings, updateWarnings...), err
