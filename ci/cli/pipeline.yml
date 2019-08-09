@@ -247,6 +247,7 @@ groups:
   - integration-linux-client-creds
   - integration-windows
   - integration-legacy
+  - integration-legacy-client-creds
   - cats
   - integration-experimental
   - create-installers
@@ -546,6 +547,48 @@ jobs:
       params:
         <<: *integration_params
         NODES: 12
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: |
+            Legacy integration failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+  ensure:
+    put: legacy-gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: integration-legacy-client-creds
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: vars-store
+    - put: bosh-lock
+      resource: legacy-gcp-bosh-pool
+      timeout: 2h
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      params:
+        <<: *integration_params
+        NODES: 12
+        CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
+        CF_INT_CLIENT_ID: potato-face
+        CF_INT_CLIENT_SECRET: ((client-secret))
       on_failure:
         put: slack-alert
         params:
