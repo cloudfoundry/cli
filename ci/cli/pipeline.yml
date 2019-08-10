@@ -526,7 +526,7 @@ jobs:
 - name: integration-legacy
   serial: true
   plan:
-  - aggregate:
+  - aggregate: &integration-legacy-aggregate
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -565,19 +565,7 @@ jobs:
 - name: integration-legacy-client-creds
   serial: true
   plan:
-  - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lock
-      resource: legacy-gcp-bosh-pool
-      timeout: 2h
-      params:
-        acquire: true
+  - aggregate: *integration-legacy-aggregate
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
