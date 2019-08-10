@@ -35,6 +35,11 @@
 verify_signatures: false
 
 # PostCommit:
+#   CustomScript:
+#     enabled: true
+#     required_executable: grep
+#     command: ['grep -E "^\[\#[0-9]{9}\]" .git/COMMIT_EDITMSG']
+
 #   GitGuilt: disabled
 #   GitLfs: disabled
 #   IndexTags: disabled
