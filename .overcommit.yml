@@ -100,8 +100,10 @@ PreCommit:
 #   Flay: disabled
 #   Foodcritic: disabled
 #   ForbiddenBranches: disabled
-#   GoLint: disabled
-#   GoVet: disabled
+  GoLint:
+    enabled: true
+  GoVet:
+    enabled: true
 #   Hadolint: disabled
 #   HardTabs: disabled
 #   Hlint: disabled
