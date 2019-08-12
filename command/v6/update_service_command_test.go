@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
+
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -151,7 +153,11 @@ var _ = Describe("update-service Command", func() {
 					)
 
 					BeforeEach(func() {
-						serviceInstance = v2action.ServiceInstance{GUID: instanceGUID, ServicePlanGUID: planGUID}
+						serviceInstance = v2action.ServiceInstance{
+							Name:            serviceInstanceName,
+							GUID:            instanceGUID,
+							ServicePlanGUID: planGUID,
+						}
 						fakeActor.GetServiceInstanceByNameAndSpaceReturns(
 							serviceInstance,
 							v2action.Warnings{"warning"},
@@ -216,6 +222,26 @@ var _ = Describe("update-service Command", func() {
 
 							It("says that the update has failed", func() {
 								Expect(executeErr).To(MatchError("bad things happened"))
+							})
+						})
+
+						When("the update request fails with upgrade not available error", func() {
+							BeforeEach(func() {
+								fakeActor.UpgradeServiceInstanceReturns(
+									v2action.Warnings{},
+									actionerror.ServiceUpgradeNotAvailableError{},
+								)
+							})
+
+							It("says that the update has failed", func() {
+								expectedErr := translatableerror.TipDecoratorError{
+									BaseError: actionerror.ServiceUpgradeNotAvailableError{},
+									Tip:       "To find out if upgrade is available run `cf service {{.ServiceName}}`.",
+									TipKeys: map[string]interface{}{
+										"ServiceName": serviceInstanceName,
+									},
+								}
+								Expect(executeErr).To(MatchError(expectedErr))
 							})
 						})
 

@@ -3,6 +3,7 @@ package composite_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	. "code.cloudfoundry.org/cli/actor/v2action/composite"
 	"code.cloudfoundry.org/cli/actor/v2action/composite/compositefakes"
@@ -36,13 +37,17 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 	})
 
 	Describe("UpgradeServiceInstance", func() {
-		const (
-			serviceInstanceGUID = "service-instance-guid"
-			servicePlanGUID     = "service-plan-guid"
-		)
-
 		var (
-			serviceInstance = v2action.ServiceInstance{GUID: serviceInstanceGUID, ServicePlanGUID: servicePlanGUID}
+			serviceInstanceGUID    = "service-instance-guid"
+			servicePlanGUID        = "service-plan-guid"
+			currentMaintenanceInfo = ccv2.MaintenanceInfo{
+				Version: "1.1.2-def",
+			}
+			serviceInstance = v2action.ServiceInstance{
+				GUID:            serviceInstanceGUID,
+				ServicePlanGUID: servicePlanGUID,
+				MaintenanceInfo: currentMaintenanceInfo,
+			}
 		)
 
 		JustBeforeEach(func() {
@@ -52,44 +57,71 @@ var _ = Describe("UpdateServiceInstanceCompositeActor", func() {
 		When("the plan exists", func() {
 			var maintenanceInfo v2action.MaintenanceInfo
 
-			BeforeEach(func() {
-				maintenanceInfo = v2action.MaintenanceInfo{
-					Version: "1.2.3-abc",
-				}
-				servicePlan := v2action.ServicePlan{
-					MaintenanceInfo: ccv2.MaintenanceInfo(maintenanceInfo),
-				}
-				fakeGetServicePlanActor.GetServicePlanReturns(servicePlan, v2action.Warnings{"plan-lookup-warning"}, nil)
-				fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoReturns(v2action.Warnings{"update-service-instance-warning"}, nil)
-			})
-
-			It("updates the service instance with the latest maintenanceInfo on the plan", func() {
-				Expect(err).To(BeNil())
-				Expect(fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoCallCount()).To(Equal(1))
-				guid, minfo := fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoArgsForCall(0)
-				Expect(guid).To(Equal(serviceInstanceGUID))
-				Expect(minfo).To(Equal(maintenanceInfo))
-
-				Expect(fakeGetServicePlanActor.GetServicePlanCallCount()).To(Equal(1))
-				planGUID := fakeGetServicePlanActor.GetServicePlanArgsForCall(0)
-				Expect(planGUID).To(Equal(servicePlanGUID))
-			})
-
-			It("returns all warnings", func() {
-				Expect(warnings).To(ConsistOf("plan-lookup-warning", "update-service-instance-warning"))
-			})
-
-			When("updating the service instance fails", func() {
+			When("the plan has a newer maintenance info", func() {
 				BeforeEach(func() {
-					fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoReturns(
-						v2action.Warnings{"update-service-instance-warning"},
-						errors.New("something really bad happened"),
-					)
+					maintenanceInfo = v2action.MaintenanceInfo{
+						Version: "1.2.3-abc",
+					}
+					servicePlan := v2action.ServicePlan{
+						MaintenanceInfo: ccv2.MaintenanceInfo(maintenanceInfo),
+					}
+					fakeGetServicePlanActor.GetServicePlanReturns(servicePlan, v2action.Warnings{"plan-lookup-warning"}, nil)
+					fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoReturns(v2action.Warnings{"update-service-instance-warning"}, nil)
 				})
 
-				It("returns the error and warnings", func() {
-					Expect(err).To(MatchError("something really bad happened"))
+				It("updates the service instance with the latest maintenanceInfo on the plan", func() {
+					Expect(err).To(BeNil())
+					Expect(fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoCallCount()).To(Equal(1))
+					guid, minfo := fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoArgsForCall(0)
+					Expect(guid).To(Equal(serviceInstanceGUID))
+					Expect(minfo).To(Equal(maintenanceInfo))
+
+					Expect(fakeGetServicePlanActor.GetServicePlanCallCount()).To(Equal(1))
+					planGUID := fakeGetServicePlanActor.GetServicePlanArgsForCall(0)
+					Expect(planGUID).To(Equal(servicePlanGUID))
+				})
+
+				It("returns all warnings", func() {
 					Expect(warnings).To(ConsistOf("plan-lookup-warning", "update-service-instance-warning"))
+				})
+
+				When("updating the service instance fails", func() {
+					BeforeEach(func() {
+						fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoReturns(
+							v2action.Warnings{"update-service-instance-warning"},
+							errors.New("something really bad happened"),
+						)
+					})
+
+					It("returns the error and warnings", func() {
+						Expect(err).To(MatchError("something really bad happened"))
+						Expect(warnings).To(ConsistOf("plan-lookup-warning", "update-service-instance-warning"))
+					})
+				})
+			})
+
+			When("the plan has the same maintenance info", func() {
+				BeforeEach(func() {
+					maintenanceInfo = v2action.MaintenanceInfo{
+						Version: currentMaintenanceInfo.Version,
+					}
+					servicePlan := v2action.ServicePlan{
+						MaintenanceInfo: ccv2.MaintenanceInfo(maintenanceInfo),
+					}
+					fakeGetServicePlanActor.GetServicePlanReturns(servicePlan, v2action.Warnings{"plan-lookup-warning"}, nil)
+				})
+
+				It("returns an error informing that no upgrade is available", func() {
+					expectedErr := actionerror.ServiceUpgradeNotAvailableError{}
+					Expect(err).To(MatchError(expectedErr))
+				})
+
+				It("does not attempt to call UpdateServiceInstanceMaintenanceInfo", func() {
+					Expect(fakeUpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfoCallCount()).To(Equal(0))
+				})
+
+				It("returns all warnings", func() {
+					Expect(warnings).To(ConsistOf("plan-lookup-warning"))
 				})
 			})
 		})
