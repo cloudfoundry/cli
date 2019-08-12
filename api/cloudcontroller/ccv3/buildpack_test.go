@@ -59,7 +59,6 @@ var _ = Describe("Buildpacks", func() {
 							"position": 1,
 							"enabled": true,
 							"locked": false,
-							"unlocked": false,
 							"metadata": {
 								"labels": {}
 							}
