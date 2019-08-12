@@ -24,7 +24,6 @@ var _ = Describe("routes Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeRoutesActor
 		executeErr      error
-		orglevel        bool
 		args            []string
 		binaryName      string
 	)
@@ -40,16 +39,17 @@ var _ = Describe("routes Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-	})
 
-	JustBeforeEach(func() {
 		cmd = RoutesCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			Orglevel:    orglevel,
+			Orglevel:    false,
 		}
+	})
+
+	JustBeforeEach(func() {
 		executeErr = cmd.Execute(args)
 	})
 
@@ -86,264 +86,127 @@ var _ = Describe("routes Command", func() {
 	Context("When the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+				GUID: "some-org-guid",
+				Name: "some-org",
+			})
+
+			fakeConfig.TargetedSpaceReturns(configv3.Space{
+				GUID: "some-space-guid",
+				Name: "some-space",
+			})
 		})
 
-		When("Orglevel is not passed", func() {
+		When("getting routes succeeds", func() {
+			var (
+				routes []v7action.Route
+			)
+
 			BeforeEach(func() {
-				orglevel = false
-			})
-			When("GetRoutesBySpace returns an error", func() {
-				var expectedErr error
+				routes = []v7action.Route{
+					{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"},
+					{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
+					{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"},
+				}
 
-				BeforeEach(func() {
-					warnings := v7action.Warnings{"warning-1", "warning-2"}
-					expectedErr = errors.New("some-error")
-					fakeActor.GetRoutesBySpaceReturns(nil, warnings, expectedErr)
-				})
-
-				It("prints that error with warnings", func() {
-					Expect(executeErr).To(Equal(expectedErr))
-
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-					Expect(testUI.Out).ToNot(Say(tableHeaders))
-				})
+				fakeActor.GetRoutesBySpaceReturns(
+					routes,
+					v7action.Warnings{"actor-warning-1"},
+					nil,
+				)
 			})
 
-			When("GetRoutesBySpace returns some routes", func() {
+			It("delegates to the actor for summaries", func() {
+				Expect(fakeActor.GetRouteSummariesCallCount()).To(Equal(1))
+
+				Expect(fakeActor.GetRouteSummariesArgsForCall(0)).To(Equal(routes))
+			})
+
+			When("getting route summaries succeeds", func() {
 				var (
-					routes       []v7action.Route
-					apps         []v7action.Application
-					destinations []v7action.RouteDestination
+					routeSummaries []v7action.RouteSummary
 				)
 
 				BeforeEach(func() {
-					routes = []v7action.Route{
-						{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"},
-						{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
-						{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"},
-					}
-					apps = []v7action.Application{
-						{Name: "app1", GUID: "app-guid-1"},
-						{Name: "app2", GUID: "app-guid-2"},
-					}
-					destinations = []v7action.RouteDestination{
-						{GUID: "dst-guid-1", App: v7action.RouteDestinationApp{GUID: "app-guid-1"}},
-						{GUID: "dst-guid-2", App: v7action.RouteDestinationApp{GUID: "app-guid-2"}},
+					routeSummaries = []v7action.RouteSummary{
+						{Route: v7action.Route{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"}},
+						{Route: v7action.Route{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"}},
+						{Route: v7action.Route{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"}, AppNames: []string{"app1", "app2"}},
 					}
 
-					fakeActor.GetRoutesBySpaceReturns(
-						routes,
-						v7action.Warnings{"actor-warning-1"},
+					fakeActor.GetRouteSummariesReturns(
+						routeSummaries,
+						v7action.Warnings{"actor-warning-2"},
 						nil,
 					)
-
-					fakeActor.GetApplicationsByGUIDsReturns(
-						apps,
-						v7action.Warnings{"actor-warning-2", "actor-warning-3"},
-						nil,
-					)
-
-					fakeActor.GetRouteDestinationsReturns(
-						[]v7action.RouteDestination{},
-						v7action.Warnings{"actor-warning-4"},
-						nil,
-					)
-
-					fakeActor.GetRouteDestinationsReturnsOnCall(0,
-						destinations,
-						v7action.Warnings{"actor-warning-4"},
-						nil,
-					)
-
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-						Name: "some-org",
-					})
-
-					fakeConfig.TargetedSpaceReturns(configv3.Space{
-						GUID: "some-space-guid",
-						Name: "some-space",
-					})
 				})
 
-				It("asks the RoutesActor for a list of routes", func() {
-					Expect(fakeActor.GetRoutesBySpaceCallCount()).To(Equal(1))
-				})
+				It("prints routes in a table", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
 
-				It("prints warnings", func() {
 					Expect(testUI.Err).To(Say("actor-warning-1"))
 					Expect(testUI.Err).To(Say("actor-warning-2"))
-					Expect(testUI.Err).To(Say("actor-warning-3"))
-				})
 
-				It("prints the list of routes in alphabetical order", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say(tableHeaders))
 					Expect(testUI.Out).To(Say(`space-1\s+domain1\s+`))
 					Expect(testUI.Out).To(Say(`space-2\s+host-3\s+domain2\s+\/path\/2`))
 					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1, app2`))
 				})
-
-				It("prints the flavor text", func() {
-					Expect(testUI.Out).To(Say("Getting routes for org some-org / space some-space as banana...\n\n"))
-				})
 			})
 
-			When("GetRoutesBySpace returns no routes", func() {
-				var routes []v7action.Route
-
+			When("getting route summaries fails", func() {
 				BeforeEach(func() {
-					routes = []v7action.Route{}
-
-					fakeActor.GetRoutesBySpaceReturns(
-						routes,
-						v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
+					fakeActor.GetRouteSummariesReturns(
 						nil,
+						v7action.Warnings{"actor-warning-2", "actor-warning-3"},
+						errors.New("summaries-error"),
 					)
-
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-						Name: "some-org",
-					})
-					fakeConfig.TargetedSpaceReturns(configv3.Space{
-						GUID: "some-space-guid",
-						Name: "some-space",
-					})
 				})
 
-				It("asks the RoutesActor for a list of routes", func() {
-					Expect(fakeActor.GetRoutesBySpaceCallCount()).To(Equal(1))
-				})
+				It("prints warnings and returns error", func() {
+					Expect(executeErr).To(MatchError("summaries-error"))
 
-				It("prints warnings", func() {
 					Expect(testUI.Err).To(Say("actor-warning-1"))
 					Expect(testUI.Err).To(Say("actor-warning-2"))
 					Expect(testUI.Err).To(Say("actor-warning-3"))
-				})
-
-				It("does not print table headers", func() {
-					Expect(testUI.Out).NotTo(Say(tableHeaders))
-				})
-
-				It("prints a message indicating that no routes were found", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Out).To(Say("No routes found."))
-				})
-
-				It("prints the flavor text", func() {
-					Expect(testUI.Out).To(Say("Getting routes for org some-org / space some-space as banana...\n\n"))
 				})
 			})
 		})
 
-		When("Orglevel is passed", func() {
+		When("getting space routes fails", func() {
+			var expectedErr error
+
 			BeforeEach(func() {
-				orglevel = true
+				warnings := v7action.Warnings{"warning-1", "warning-2"}
+				expectedErr = errors.New("some-error")
+				fakeActor.GetRoutesBySpaceReturns(nil, warnings, expectedErr)
 			})
 
-			When("GetRoutesByOrg returns an error", func() {
-				var expectedErr error
+			It("prints warnings and returns error", func() {
+				Expect(executeErr).To(Equal(expectedErr))
 
-				BeforeEach(func() {
-					warnings := v7action.Warnings{"warning-1", "warning-2"}
-					expectedErr = errors.New("some-error")
-					fakeActor.GetRoutesByOrgReturns(nil, warnings, expectedErr)
-				})
+				Expect(testUI.Err).To(Say("warning-1"))
+				Expect(testUI.Err).To(Say("warning-2"))
+				Expect(testUI.Out).ToNot(Say(tableHeaders))
+			})
+		})
 
-				It("prints that error with warnings", func() {
-					Expect(executeErr).To(Equal(expectedErr))
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-					Expect(testUI.Out).ToNot(Say(tableHeaders))
-				})
+		When("--org-level is passed and getting org routes fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				cmd.Orglevel = true
+				warnings := v7action.Warnings{"warning-1", "warning-2"}
+				expectedErr = errors.New("some-error")
+				fakeActor.GetRoutesByOrgReturns(nil, warnings, expectedErr)
 			})
 
-			When("GetRoutesByOrg returns some routes", func() {
-				var routes []v7action.Route
+			It("prints warnings and returns error", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
 
-				BeforeEach(func() {
-					routes = []v7action.Route{
-						{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
-						{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-2", Path: "/path/2"},
-						{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-3"},
-					}
-
-					fakeActor.GetRoutesByOrgReturns(
-						routes,
-						v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
-						nil,
-					)
-
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-						Name: "some-org",
-					})
-				})
-
-				It("asks the RoutesActor for a list of routes", func() {
-					Expect(fakeActor.GetRoutesByOrgCallCount()).To(Equal(1))
-				})
-
-				It("prints warnings", func() {
-					Expect(testUI.Err).To(Say("actor-warning-1"))
-					Expect(testUI.Err).To(Say("actor-warning-2"))
-					Expect(testUI.Err).To(Say("actor-warning-3"))
-				})
-
-				It("prints the list of routes", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Out).To(Say(tableHeaders))
-					Expect(testUI.Out).To(Say(`space-1\s+domain1`))
-					Expect(testUI.Out).To(Say(`space-2\s+host-2\s+domain2\s+\/path\/2`))
-					Expect(testUI.Out).To(Say(`space-3\s+host-3\s+domain3`))
-				})
-
-				It("prints the flavor text", func() {
-					Expect(testUI.Out).To(Say("Getting routes for org some-org as banana...\n\n"))
-				})
-			})
-
-			When("GetRoutesByOrg returns no routes", func() {
-				var routes []v7action.Route
-
-				BeforeEach(func() {
-					routes = []v7action.Route{}
-
-					fakeActor.GetRoutesByOrgReturns(
-						routes,
-						v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
-						nil,
-					)
-
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-						Name: "some-org",
-					})
-				})
-
-				It("asks the RoutesActor for a list of routes", func() {
-					Expect(fakeActor.GetRoutesByOrgCallCount()).To(Equal(1))
-				})
-
-				It("prints warnings", func() {
-					Expect(testUI.Err).To(Say("actor-warning-1"))
-					Expect(testUI.Err).To(Say("actor-warning-2"))
-					Expect(testUI.Err).To(Say("actor-warning-3"))
-				})
-
-				It("does not print table headers", func() {
-					Expect(testUI.Out).NotTo(Say(tableHeaders))
-				})
-
-				It("prints a message indicating that no routes were found", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Out).To(Say("No routes found."))
-				})
-
-				It("prints the flavor text", func() {
-					Expect(testUI.Out).To(Say("Getting routes for org some-org as banana...\n\n"))
-				})
+				Expect(testUI.Err).To(Say("warning-1"))
+				Expect(testUI.Err).To(Say("warning-2"))
+				Expect(testUI.Out).ToNot(Say(tableHeaders))
 			})
 		})
 	})

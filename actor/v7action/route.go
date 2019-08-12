@@ -1,12 +1,14 @@
 package v7action
 
 import (
+	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 type RouteDestination struct {
@@ -25,6 +27,11 @@ type Route struct {
 	DomainName string
 	SpaceName  string
 	URL        string
+}
+
+type RouteSummary struct {
+	Route
+	AppNames []string
 }
 
 func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (Route, Warnings, error) {
@@ -126,6 +133,65 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 	}
 
 	return actor.createActionRoutes(routes, allWarnings)
+}
+
+func (actor Actor) GetRouteSummaries(routes []Route) ([]RouteSummary, Warnings, error) {
+	var allWarnings Warnings
+	var routeSummaries []RouteSummary
+
+	destinationAppGUIDsByRouteGUID := make(map[string][]string)
+	destinationAppGUIDs := make(map[string]bool)
+	var uniqueAppGUIDs []string
+
+	for _, route := range routes {
+		destinations, warnings, err := actor.GetRouteDestinations(route.GUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
+
+		for _, destination := range destinations {
+			appGUID := destination.App.GUID
+
+			if _, ok := destinationAppGUIDs[appGUID]; !ok {
+				destinationAppGUIDs[appGUID] = true
+				uniqueAppGUIDs = append(uniqueAppGUIDs, appGUID)
+			}
+
+			destinationAppGUIDsByRouteGUID[route.GUID] = append(destinationAppGUIDsByRouteGUID[route.GUID], appGUID)
+		}
+	}
+
+	apps, warnings, err := actor.GetApplicationsByGUIDs(uniqueAppGUIDs)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	appNamesByGUID := make(map[string]string)
+	for _, app := range apps {
+		appNamesByGUID[app.GUID] = app.Name
+	}
+
+	for _, route := range routes {
+		var appNames []string
+
+		appGUIDs := destinationAppGUIDsByRouteGUID[route.GUID]
+		for _, appGUID := range appGUIDs {
+			appNames = append(appNames, appNamesByGUID[appGUID])
+		}
+
+		routeSummaries = append(routeSummaries, RouteSummary{
+			Route:    route,
+			AppNames: appNames,
+		})
+	}
+
+	sort.Slice(routeSummaries, func(i, j int) bool {
+		return sorting.LessIgnoreCase(routeSummaries[i].SpaceName, routeSummaries[j].SpaceName)
+	})
+
+	return routeSummaries, allWarnings, nil
 }
 
 func (actor Actor) DeleteOrphanedRoutes(spaceGUID string) (Warnings, error) {

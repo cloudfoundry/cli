@@ -9,33 +9,18 @@ import (
 )
 
 type FakeRoutesActor struct {
-	GetApplicationsByGUIDsStub        func([]string) ([]v7action.Application, v7action.Warnings, error)
-	getApplicationsByGUIDsMutex       sync.RWMutex
-	getApplicationsByGUIDsArgsForCall []struct {
-		arg1 []string
+	GetRouteSummariesStub        func([]v7action.Route) ([]v7action.RouteSummary, v7action.Warnings, error)
+	getRouteSummariesMutex       sync.RWMutex
+	getRouteSummariesArgsForCall []struct {
+		arg1 []v7action.Route
 	}
-	getApplicationsByGUIDsReturns struct {
-		result1 []v7action.Application
+	getRouteSummariesReturns struct {
+		result1 []v7action.RouteSummary
 		result2 v7action.Warnings
 		result3 error
 	}
-	getApplicationsByGUIDsReturnsOnCall map[int]struct {
-		result1 []v7action.Application
-		result2 v7action.Warnings
-		result3 error
-	}
-	GetRouteDestinationsStub        func(string) ([]v7action.RouteDestination, v7action.Warnings, error)
-	getRouteDestinationsMutex       sync.RWMutex
-	getRouteDestinationsArgsForCall []struct {
-		arg1 string
-	}
-	getRouteDestinationsReturns struct {
-		result1 []v7action.RouteDestination
-		result2 v7action.Warnings
-		result3 error
-	}
-	getRouteDestinationsReturnsOnCall map[int]struct {
-		result1 []v7action.RouteDestination
+	getRouteSummariesReturnsOnCall map[int]struct {
+		result1 []v7action.RouteSummary
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -73,138 +58,72 @@ type FakeRoutesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRoutesActor) GetApplicationsByGUIDs(arg1 []string) ([]v7action.Application, v7action.Warnings, error) {
-	var arg1Copy []string
+func (fake *FakeRoutesActor) GetRouteSummaries(arg1 []v7action.Route) ([]v7action.RouteSummary, v7action.Warnings, error) {
+	var arg1Copy []v7action.Route
 	if arg1 != nil {
-		arg1Copy = make([]string, len(arg1))
+		arg1Copy = make([]v7action.Route, len(arg1))
 		copy(arg1Copy, arg1)
 	}
-	fake.getApplicationsByGUIDsMutex.Lock()
-	ret, specificReturn := fake.getApplicationsByGUIDsReturnsOnCall[len(fake.getApplicationsByGUIDsArgsForCall)]
-	fake.getApplicationsByGUIDsArgsForCall = append(fake.getApplicationsByGUIDsArgsForCall, struct {
-		arg1 []string
+	fake.getRouteSummariesMutex.Lock()
+	ret, specificReturn := fake.getRouteSummariesReturnsOnCall[len(fake.getRouteSummariesArgsForCall)]
+	fake.getRouteSummariesArgsForCall = append(fake.getRouteSummariesArgsForCall, struct {
+		arg1 []v7action.Route
 	}{arg1Copy})
-	fake.recordInvocation("GetApplicationsByGUIDs", []interface{}{arg1Copy})
-	fake.getApplicationsByGUIDsMutex.Unlock()
-	if fake.GetApplicationsByGUIDsStub != nil {
-		return fake.GetApplicationsByGUIDsStub(arg1)
+	fake.recordInvocation("GetRouteSummaries", []interface{}{arg1Copy})
+	fake.getRouteSummariesMutex.Unlock()
+	if fake.GetRouteSummariesStub != nil {
+		return fake.GetRouteSummariesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationsByGUIDsReturns
+	fakeReturns := fake.getRouteSummariesReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeRoutesActor) GetApplicationsByGUIDsCallCount() int {
-	fake.getApplicationsByGUIDsMutex.RLock()
-	defer fake.getApplicationsByGUIDsMutex.RUnlock()
-	return len(fake.getApplicationsByGUIDsArgsForCall)
+func (fake *FakeRoutesActor) GetRouteSummariesCallCount() int {
+	fake.getRouteSummariesMutex.RLock()
+	defer fake.getRouteSummariesMutex.RUnlock()
+	return len(fake.getRouteSummariesArgsForCall)
 }
 
-func (fake *FakeRoutesActor) GetApplicationsByGUIDsCalls(stub func([]string) ([]v7action.Application, v7action.Warnings, error)) {
-	fake.getApplicationsByGUIDsMutex.Lock()
-	defer fake.getApplicationsByGUIDsMutex.Unlock()
-	fake.GetApplicationsByGUIDsStub = stub
+func (fake *FakeRoutesActor) GetRouteSummariesCalls(stub func([]v7action.Route) ([]v7action.RouteSummary, v7action.Warnings, error)) {
+	fake.getRouteSummariesMutex.Lock()
+	defer fake.getRouteSummariesMutex.Unlock()
+	fake.GetRouteSummariesStub = stub
 }
 
-func (fake *FakeRoutesActor) GetApplicationsByGUIDsArgsForCall(i int) []string {
-	fake.getApplicationsByGUIDsMutex.RLock()
-	defer fake.getApplicationsByGUIDsMutex.RUnlock()
-	argsForCall := fake.getApplicationsByGUIDsArgsForCall[i]
+func (fake *FakeRoutesActor) GetRouteSummariesArgsForCall(i int) []v7action.Route {
+	fake.getRouteSummariesMutex.RLock()
+	defer fake.getRouteSummariesMutex.RUnlock()
+	argsForCall := fake.getRouteSummariesArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeRoutesActor) GetApplicationsByGUIDsReturns(result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationsByGUIDsMutex.Lock()
-	defer fake.getApplicationsByGUIDsMutex.Unlock()
-	fake.GetApplicationsByGUIDsStub = nil
-	fake.getApplicationsByGUIDsReturns = struct {
-		result1 []v7action.Application
+func (fake *FakeRoutesActor) GetRouteSummariesReturns(result1 []v7action.RouteSummary, result2 v7action.Warnings, result3 error) {
+	fake.getRouteSummariesMutex.Lock()
+	defer fake.getRouteSummariesMutex.Unlock()
+	fake.GetRouteSummariesStub = nil
+	fake.getRouteSummariesReturns = struct {
+		result1 []v7action.RouteSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRoutesActor) GetApplicationsByGUIDsReturnsOnCall(i int, result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationsByGUIDsMutex.Lock()
-	defer fake.getApplicationsByGUIDsMutex.Unlock()
-	fake.GetApplicationsByGUIDsStub = nil
-	if fake.getApplicationsByGUIDsReturnsOnCall == nil {
-		fake.getApplicationsByGUIDsReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Application
+func (fake *FakeRoutesActor) GetRouteSummariesReturnsOnCall(i int, result1 []v7action.RouteSummary, result2 v7action.Warnings, result3 error) {
+	fake.getRouteSummariesMutex.Lock()
+	defer fake.getRouteSummariesMutex.Unlock()
+	fake.GetRouteSummariesStub = nil
+	if fake.getRouteSummariesReturnsOnCall == nil {
+		fake.getRouteSummariesReturnsOnCall = make(map[int]struct {
+			result1 []v7action.RouteSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getApplicationsByGUIDsReturnsOnCall[i] = struct {
-		result1 []v7action.Application
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeRoutesActor) GetRouteDestinations(arg1 string) ([]v7action.RouteDestination, v7action.Warnings, error) {
-	fake.getRouteDestinationsMutex.Lock()
-	ret, specificReturn := fake.getRouteDestinationsReturnsOnCall[len(fake.getRouteDestinationsArgsForCall)]
-	fake.getRouteDestinationsArgsForCall = append(fake.getRouteDestinationsArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetRouteDestinations", []interface{}{arg1})
-	fake.getRouteDestinationsMutex.Unlock()
-	if fake.GetRouteDestinationsStub != nil {
-		return fake.GetRouteDestinationsStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.getRouteDestinationsReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeRoutesActor) GetRouteDestinationsCallCount() int {
-	fake.getRouteDestinationsMutex.RLock()
-	defer fake.getRouteDestinationsMutex.RUnlock()
-	return len(fake.getRouteDestinationsArgsForCall)
-}
-
-func (fake *FakeRoutesActor) GetRouteDestinationsCalls(stub func(string) ([]v7action.RouteDestination, v7action.Warnings, error)) {
-	fake.getRouteDestinationsMutex.Lock()
-	defer fake.getRouteDestinationsMutex.Unlock()
-	fake.GetRouteDestinationsStub = stub
-}
-
-func (fake *FakeRoutesActor) GetRouteDestinationsArgsForCall(i int) string {
-	fake.getRouteDestinationsMutex.RLock()
-	defer fake.getRouteDestinationsMutex.RUnlock()
-	argsForCall := fake.getRouteDestinationsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRoutesActor) GetRouteDestinationsReturns(result1 []v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
-	fake.getRouteDestinationsMutex.Lock()
-	defer fake.getRouteDestinationsMutex.Unlock()
-	fake.GetRouteDestinationsStub = nil
-	fake.getRouteDestinationsReturns = struct {
-		result1 []v7action.RouteDestination
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeRoutesActor) GetRouteDestinationsReturnsOnCall(i int, result1 []v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
-	fake.getRouteDestinationsMutex.Lock()
-	defer fake.getRouteDestinationsMutex.Unlock()
-	fake.GetRouteDestinationsStub = nil
-	if fake.getRouteDestinationsReturnsOnCall == nil {
-		fake.getRouteDestinationsReturnsOnCall = make(map[int]struct {
-			result1 []v7action.RouteDestination
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.getRouteDestinationsReturnsOnCall[i] = struct {
-		result1 []v7action.RouteDestination
+	fake.getRouteSummariesReturnsOnCall[i] = struct {
+		result1 []v7action.RouteSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -345,10 +264,8 @@ func (fake *FakeRoutesActor) GetRoutesBySpaceReturnsOnCall(i int, result1 []v7ac
 func (fake *FakeRoutesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationsByGUIDsMutex.RLock()
-	defer fake.getApplicationsByGUIDsMutex.RUnlock()
-	fake.getRouteDestinationsMutex.RLock()
-	defer fake.getRouteDestinationsMutex.RUnlock()
+	fake.getRouteSummariesMutex.RLock()
+	defer fake.getRouteSummariesMutex.RUnlock()
 	fake.getRoutesByOrgMutex.RLock()
 	defer fake.getRoutesByOrgMutex.RUnlock()
 	fake.getRoutesBySpaceMutex.RLock()

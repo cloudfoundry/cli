@@ -363,6 +363,137 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("GetRouteSummaries", func() {
+		var (
+			routes         []Route
+			routeSummaries []RouteSummary
+			warnings       Warnings
+			executeErr     error
+		)
+
+		BeforeEach(func() {
+			routes = []Route{
+				{GUID: "route-guid-1"},
+				{GUID: "route-guid-2"},
+				{GUID: "route-guid-3"},
+			}
+
+			fakeCloudControllerClient.GetRouteDestinationsReturnsOnCall(0,
+				[]ccv3.RouteDestination{
+					{
+						App: ccv3.RouteDestinationApp{GUID: "app-guid-1"},
+					},
+				},
+				ccv3.Warnings{"get-destinations-warning-1"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetRouteDestinationsReturnsOnCall(1,
+				[]ccv3.RouteDestination{
+					{
+						App: ccv3.RouteDestinationApp{GUID: "app-guid-1"},
+					},
+					{
+						App: ccv3.RouteDestinationApp{GUID: "app-guid-2"},
+					},
+				},
+				ccv3.Warnings{"get-destinations-warning-2"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetRouteDestinationsReturnsOnCall(2,
+				nil,
+				ccv3.Warnings{"get-destinations-warning-3"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetApplicationsReturns(
+				[]ccv3.Application{
+					{
+						GUID: "app-guid-1",
+						Name: "app-name-1",
+					},
+					{
+						GUID: "app-guid-2",
+						Name: "app-name-2",
+					},
+				},
+				ccv3.Warnings{"get-apps-warning"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			routeSummaries, warnings, executeErr = actor.GetRouteSummaries(routes)
+		})
+
+		When("the API layer calls are successful", func() {
+			It("returns the routes and warnings", func() {
+				Expect(routeSummaries).To(Equal([]RouteSummary{
+					{
+						Route:    Route{GUID: "route-guid-1"},
+						AppNames: []string{"app-name-1"},
+					},
+					{
+						Route:    Route{GUID: "route-guid-2"},
+						AppNames: []string{"app-name-1", "app-name-2"},
+					},
+					{
+						Route:    Route{GUID: "route-guid-3"},
+						AppNames: nil,
+					},
+				}))
+				Expect(warnings).To(ConsistOf("get-destinations-warning-1", "get-destinations-warning-2", "get-destinations-warning-3", "get-apps-warning"))
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetRouteDestinationsCallCount()).To(Equal(3))
+				Expect(fakeCloudControllerClient.GetRouteDestinationsArgsForCall(0)).To(Equal("route-guid-1"))
+				Expect(fakeCloudControllerClient.GetRouteDestinationsArgsForCall(1)).To(Equal("route-guid-2"))
+				Expect(fakeCloudControllerClient.GetRouteDestinationsArgsForCall(2)).To(Equal("route-guid-3"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+				Expect(query).To(ConsistOf(
+					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"app-guid-1", "app-guid-2"}},
+				))
+			})
+		})
+
+		When("getting route destinations fails for one route", func() {
+			var err = errors.New("failed to get route destinations")
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteDestinationsReturnsOnCall(1,
+					nil,
+					ccv3.Warnings{"get-destinations-warning-2"},
+					err,
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(executeErr).To(Equal(err))
+				Expect(warnings).To(ConsistOf("get-destinations-warning-1", "get-destinations-warning-2"))
+			})
+		})
+
+		When("getting apps fails", func() {
+			var err = errors.New("failed to get apps")
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					nil,
+					ccv3.Warnings{"get-apps-warning"},
+					err,
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(executeErr).To(Equal(err))
+				Expect(warnings).To(ConsistOf("get-destinations-warning-1", "get-destinations-warning-2", "get-destinations-warning-3", "get-apps-warning"))
+			})
+		})
+	})
+
 	Describe("GetRouteDestinations", func() {
 		var (
 			routeGUID    string
