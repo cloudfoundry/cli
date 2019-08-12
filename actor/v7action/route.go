@@ -1,6 +1,8 @@
 package v7action
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -95,16 +97,20 @@ func (actor Actor) GetRouteDestinationByAppGUID(routeGUID string, appGUID string
 func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error) {
 	allWarnings := Warnings{}
 
-	routes, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
-		Key:    ccv3.SpaceGUIDFilter,
-		Values: []string{spaceGUID},
-	})
+	routes, warnings, err := actor.CloudControllerClient.GetRoutes(
+		ccv3.Query{
+			Key:    ccv3.SpaceGUIDFilter,
+			Values: []string{spaceGUID},
+		},
+	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
-	return actor.createActionRoutes(routes, spaceGUID, allWarnings)
+	ret, actor_warnings, err := actor.createActionRoutes(routes, allWarnings)
+
+	return ret, actor_warnings, err
 }
 
 func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
@@ -119,59 +125,7 @@ func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 		return nil, allWarnings, err
 	}
 
-	spaceGUIDsSet := map[string]struct{}{}
-	domainGUIDsSet := map[string]struct{}{}
-	spacesQuery := ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{}}
-	domainsQuery := ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{}}
-
-	for _, route := range routes {
-		if _, ok := spaceGUIDsSet[route.SpaceGUID]; !ok {
-			spacesQuery.Values = append(spacesQuery.Values, route.SpaceGUID)
-			spaceGUIDsSet[route.SpaceGUID] = struct{}{}
-		}
-
-		if _, ok := domainGUIDsSet[route.DomainGUID]; !ok {
-			domainsQuery.Values = append(domainsQuery.Values, route.DomainGUID)
-			domainGUIDsSet[route.DomainGUID] = struct{}{}
-		}
-	}
-
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(spacesQuery)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	domains, warnings, err := actor.CloudControllerClient.GetDomains(domainsQuery)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	spacesByGUID := map[string]ccv3.Space{}
-	for _, space := range spaces {
-		spacesByGUID[space.GUID] = space
-	}
-
-	domainsByGUID := map[string]ccv3.Domain{}
-	for _, domain := range domains {
-		domainsByGUID[domain.GUID] = domain
-	}
-
-	actorRoutes := []Route{}
-	for _, route := range routes {
-		actorRoutes = append(actorRoutes, Route{
-			GUID:       route.GUID,
-			Host:       route.Host,
-			Path:       route.Path,
-			SpaceGUID:  route.SpaceGUID,
-			DomainGUID: route.DomainGUID,
-			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
-			DomainName: domainsByGUID[route.DomainGUID].Name,
-		})
-	}
-
-	return actorRoutes, allWarnings, nil
+	return actor.createActionRoutes(routes, allWarnings)
 }
 
 func (actor Actor) DeleteOrphanedRoutes(spaceGUID string) (Warnings, error) {
@@ -287,46 +241,29 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]Route, Warnings, erro
 		return nil, allWarnings, err
 	}
 
-	return actor.createActionRoutes(routes, routes[0].SpaceGUID, allWarnings)
+	return actor.createActionRoutes(routes, allWarnings)
 }
 
-func (actor Actor) createActionRoutes(routes []ccv3.Route, spaceGUID string, allWarnings Warnings) ([]Route, Warnings, error) {
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: []string{spaceGUID},
-	})
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return nil, allWarnings, err
-	}
+func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings) ([]Route, Warnings, error) {
+	spaceGUIDsSet := map[string]struct{}{}
+	spacesQuery := ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{}}
 
-	domainGUIDsSet := map[string]struct{}{}
-	domainGUIDs := []string{}
 	for _, route := range routes {
-		if _, ok := domainGUIDsSet[route.DomainGUID]; ok {
-			continue
+		if _, ok := spaceGUIDsSet[route.SpaceGUID]; !ok {
+			spacesQuery.Values = append(spacesQuery.Values, route.SpaceGUID)
+			spaceGUIDsSet[route.SpaceGUID] = struct{}{}
 		}
-		domainGUIDsSet[route.DomainGUID] = struct{}{}
-		domainGUIDs = append(domainGUIDs, route.DomainGUID)
 	}
 
-	domains, warnings, err := actor.CloudControllerClient.GetDomains(ccv3.Query{
-		Key:    ccv3.GUIDFilter,
-		Values: domainGUIDs,
-	})
-
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(spacesQuery)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
+
 	spacesByGUID := map[string]ccv3.Space{}
 	for _, space := range spaces {
 		spacesByGUID[space.GUID] = space
-	}
-
-	domainsByGUID := map[string]ccv3.Domain{}
-	for _, domain := range domains {
-		domainsByGUID[domain.GUID] = domain
 	}
 
 	actorRoutes := []Route{}
@@ -335,13 +272,18 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, spaceGUID string, all
 			GUID:       route.GUID,
 			Host:       route.Host,
 			Path:       route.Path,
-			URL:        route.URL,
 			SpaceGUID:  route.SpaceGUID,
 			DomainGUID: route.DomainGUID,
+			URL:        route.URL,
 			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
-			DomainName: domainsByGUID[route.DomainGUID].Name,
+			DomainName: getDomainName(route.URL, route.Host, route.Path),
 		})
 	}
 
-	return actorRoutes, allWarnings, err
+	return actorRoutes, allWarnings, nil
+}
+
+func getDomainName(fullURL, host, path string) string {
+	domainWithoutHost := strings.TrimLeft(fullURL, host+".")
+	return strings.TrimRight(domainWithoutHost, path)
 }

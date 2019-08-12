@@ -169,9 +169,9 @@ var _ = Describe("Route Actions", func() {
 
 			fakeCloudControllerClient.GetRoutesReturns(
 				[]ccv3.Route{
-					{GUID: "route1-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", Host: "hostname"},
-					{GUID: "route2-guid", SpaceGUID: "space-guid", DomainGUID: "domain2-guid", Path: "/my-path"},
-					{GUID: "route3-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid"},
+					{GUID: "route1-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", Host: "hostname", URL: "hostname.domain1-name"},
+					{GUID: "route2-guid", SpaceGUID: "space-guid", DomainGUID: "domain2-guid", Path: "/my-path", URL: "domain2-name/my-path"},
+					{GUID: "route3-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", URL: "domain1-name"},
 				},
 				ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
 				nil,
@@ -185,11 +185,11 @@ var _ = Describe("Route Actions", func() {
 		When("the API layer calls are successful", func() {
 			It("returns the routes and warnings", func() {
 				Expect(routes).To(Equal([]Route{
-					{GUID: "route1-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", Host: "hostname", DomainName: "domain1-name", SpaceName: "space-name"},
-					{GUID: "route2-guid", SpaceGUID: "space-guid", DomainGUID: "domain2-guid", Path: "/my-path", DomainName: "domain2-name", SpaceName: "space-name"},
-					{GUID: "route3-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", DomainName: "domain1-name", SpaceName: "space-name"},
+					{GUID: "route1-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", Host: "hostname", DomainName: "domain1-name", SpaceName: "space-name", URL: "hostname.domain1-name"},
+					{GUID: "route2-guid", SpaceGUID: "space-guid", DomainGUID: "domain2-guid", Path: "/my-path", DomainName: "domain2-name", SpaceName: "space-name", URL: "domain2-name/my-path"},
+					{GUID: "route3-guid", SpaceGUID: "space-guid", DomainGUID: "domain1-guid", DomainName: "domain1-name", SpaceName: "space-name", URL: "domain1-name"},
 				}))
-				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-domains-warning", "get-spaces-warning"))
+				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-spaces-warning"))
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
@@ -203,12 +203,6 @@ var _ = Describe("Route Actions", func() {
 				Expect(query).To(HaveLen(1))
 				Expect(query[0].Key).To(Equal(ccv3.SpaceGUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("space-guid"))
-
-				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
-				query = fakeCloudControllerClient.GetDomainsArgsForCall(0)
-				Expect(query).To(HaveLen(1))
-				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
-				Expect(query[0].Values).To(ConsistOf("domain1-guid", "domain2-guid"))
 			})
 		})
 
@@ -245,22 +239,6 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		When("getting domains fails", func() {
-			var err = errors.New("failed to get domains")
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetDomainsReturns(
-					nil,
-					ccv3.Warnings{"get-domains-warning"},
-					err,
-				)
-			})
-
-			It("returns the error and any warnings", func() {
-				Expect(executeErr).To(Equal(err))
-				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-spaces-warning", "get-domains-warning"))
-			})
-		})
 	})
 
 	Describe("GetRoutesByOrg", func() {
@@ -291,9 +269,9 @@ var _ = Describe("Route Actions", func() {
 
 			fakeCloudControllerClient.GetRoutesReturns(
 				[]ccv3.Route{
-					{GUID: "route1-guid", SpaceGUID: "space1-guid", DomainGUID: "domain1-guid", Host: "hostname"},
-					{GUID: "route2-guid", SpaceGUID: "space2-guid", DomainGUID: "domain2-guid", Path: "/my-path"},
-					{GUID: "route3-guid", SpaceGUID: "space1-guid", DomainGUID: "domain1-guid"},
+					{GUID: "route1-guid", SpaceGUID: "space1-guid", URL: "hostname.domain1-name", DomainGUID: "domain1-guid", Host: "hostname"},
+					{GUID: "route2-guid", SpaceGUID: "space2-guid", URL: "domain2-name/my-path", DomainGUID: "domain2-guid", Path: "/my-path"},
+					{GUID: "route3-guid", SpaceGUID: "space1-guid", URL: "domain1-name", DomainGUID: "domain1-guid"},
 				},
 				ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
 				nil,
@@ -314,6 +292,7 @@ var _ = Describe("Route Actions", func() {
 						Host:       "hostname",
 						DomainName: "domain1-name",
 						SpaceName:  "space1-name",
+						URL:        "hostname.domain1-name",
 					},
 					{
 						GUID:       "route2-guid",
@@ -322,6 +301,7 @@ var _ = Describe("Route Actions", func() {
 						Path:       "/my-path",
 						DomainName: "domain2-name",
 						SpaceName:  "space2-name",
+						URL:        "domain2-name/my-path",
 					},
 					{
 						GUID:       "route3-guid",
@@ -329,9 +309,10 @@ var _ = Describe("Route Actions", func() {
 						DomainGUID: "domain1-guid",
 						DomainName: "domain1-name",
 						SpaceName:  "space1-name",
+						URL:        "domain1-name",
 					},
 				}))
-				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-domains-warning", "get-spaces-warning"))
+				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-spaces-warning"))
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
@@ -345,12 +326,6 @@ var _ = Describe("Route Actions", func() {
 				Expect(query).To(HaveLen(1))
 				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("space1-guid", "space2-guid"))
-
-				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
-				query = fakeCloudControllerClient.GetDomainsArgsForCall(0)
-				Expect(query).To(HaveLen(1))
-				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
-				Expect(query[0].Values).To(ConsistOf("domain1-guid", "domain2-guid"))
 			})
 		})
 
@@ -384,23 +359,6 @@ var _ = Describe("Route Actions", func() {
 			It("returns the error and any warnings", func() {
 				Expect(executeErr).To(Equal(err))
 				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-spaces-warning"))
-			})
-		})
-
-		When("getting domains fails", func() {
-			var err = errors.New("failed to get domains")
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetDomainsReturns(
-					nil,
-					ccv3.Warnings{"get-domains-warning"},
-					err,
-				)
-			})
-
-			It("returns the error and any warnings", func() {
-				Expect(executeErr).To(Equal(err))
-				Expect(warnings).To(ConsistOf("get-route-warning-1", "get-route-warning-2", "get-spaces-warning", "get-domains-warning"))
 			})
 		})
 	})
@@ -1021,16 +979,6 @@ var _ = Describe("Route Actions", func() {
 					ccv3.Warnings{"get-spaces-warning"},
 					nil,
 				)
-				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
-						{
-							GUID: "routes-domain-guid",
-							Name: "domain-name",
-						},
-					},
-					ccv3.Warnings{"get-domains-warning"},
-					nil,
-				)
 				fakeCloudControllerClient.GetApplicationRoutesReturns(
 					[]ccv3.Route{
 						{
@@ -1047,7 +995,7 @@ var _ = Describe("Route Actions", func() {
 
 			It("returns the warnings and routes", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("get-spaces-warning", "get-domains-warning", "get-application-routes-warning"))
+				Expect(warnings).To(ConsistOf("get-spaces-warning", "get-application-routes-warning"))
 
 				Expect(fakeCloudControllerClient.GetApplicationRoutesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationRoutesArgsForCall(0)).To(Equal(appGUID))
@@ -1059,7 +1007,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "routes-space-guid",
 						DomainGUID: "routes-domain-guid",
 						SpaceName:  "space-name",
-						DomainName: "domain-name",
+						DomainName: "some-url.sh",
 					},
 				))
 			})
@@ -1098,27 +1046,6 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					queries := fakeCloudControllerClient.GetSpacesArgsForCall(0)
 					Expect(queries).To(ConsistOf(ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"routes-space-guid"}}))
-				})
-			})
-
-			When("getting domains fails", func() {
-				var err = errors.New("failed to get domains")
-
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetDomainsReturns(
-						nil,
-						ccv3.Warnings{"get-domains-warning"},
-						err,
-					)
-				})
-
-				It("returns the error and any warnings", func() {
-					Expect(executeErr).To(Equal(err))
-					Expect(warnings).To(ConsistOf("get-application-routes-warning", "get-spaces-warning", "get-domains-warning"))
-
-					Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
-					queries := fakeCloudControllerClient.GetDomainsArgsForCall(0)
-					Expect(queries).To(ConsistOf(ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"routes-domain-guid"}}))
 				})
 			})
 		})
