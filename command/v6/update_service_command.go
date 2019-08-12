@@ -117,19 +117,23 @@ func (cmd *UpdateServiceCommand) performUpgrade(instance v2action.ServiceInstanc
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if castedErr, ok := err.(actionerror.ServiceUpgradeNotAvailableError); ok {
-			return translatableerror.TipDecoratorError{
-				BaseError: castedErr,
-				Tip:       "To find out if upgrade is available run `cf service {{.ServiceName}}`.",
-				TipKeys: map[string]interface{}{
-					"ServiceName": instance.Name,
-				},
-			}
+			return decorateUpgradeNotAvailableErrorWithTip(castedErr, instance)
 		}
 		return err
 	}
 
 	cmd.UI.DisplayOK()
 	return nil
+}
+
+func decorateUpgradeNotAvailableErrorWithTip(castedErr actionerror.ServiceUpgradeNotAvailableError, instance v2action.ServiceInstance) error {
+	return translatableerror.TipDecoratorError{
+		BaseError: castedErr,
+		Tip:       "To find out if upgrade is available run `cf service {{.ServiceName}}`.",
+		TipKeys: map[string]interface{}{
+			"ServiceName": instance.Name,
+		},
+	}
 }
 
 func (cmd *UpdateServiceCommand) validateArgumentCombination() error {
