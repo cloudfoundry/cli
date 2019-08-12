@@ -1,6 +1,7 @@
 package composite
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 )
 
@@ -42,10 +43,15 @@ func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInsta
 		return warnings, err
 	}
 
+	if upgradeIsAvailable(serviceInstance, servicePlan) {
+		return warnings, actionerror.ServiceUpgradeNotAvailableError{}
+	}
+
 	updateWarnings, err := c.UpdateServiceInstanceMaintenanceInfoActor.UpdateServiceInstanceMaintenanceInfo(
 		serviceInstance.GUID,
 		v2action.MaintenanceInfo(servicePlan.MaintenanceInfo),
 	)
+
 	return append(warnings, updateWarnings...), err
 }
 
@@ -57,4 +63,8 @@ func (c UpdateServiceInstanceCompositeActor) GetServiceInstanceByNameAndSpace(na
 // CloudControllerAPIVersion returns the CloudController API version
 func (c UpdateServiceInstanceCompositeActor) CloudControllerAPIVersion() string {
 	return c.GetAPIVersionActor.CloudControllerAPIVersion()
+}
+
+func upgradeIsAvailable(serviceInstance v2action.ServiceInstance, servicePlan v2action.ServicePlan) bool {
+	return serviceInstance.MaintenanceInfo.Version == servicePlan.MaintenanceInfo.Version
 }

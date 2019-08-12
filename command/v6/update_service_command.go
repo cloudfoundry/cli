@@ -1,6 +1,7 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/composite"
@@ -115,6 +116,15 @@ func (cmd *UpdateServiceCommand) performUpgrade(instance v2action.ServiceInstanc
 	warnings, err := cmd.Actor.UpgradeServiceInstance(instance)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
+		if castedErr, ok := err.(actionerror.ServiceUpgradeNotAvailableError); ok {
+			return translatableerror.TipDecoratorError{
+				BaseError: castedErr,
+				Tip:       "To find out if upgrade is available run `cf service {{.ServiceName}}`.",
+				TipKeys: map[string]interface{}{
+					"ServiceName": instance.Name,
+				},
+			}
+		}
 		return err
 	}
 
