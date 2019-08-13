@@ -186,18 +186,38 @@ var _ = Describe("update-service command", func() {
 							Expect(err).ToNot(HaveOccurred())
 						})
 
-						It("updates the service", func() {
-							session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
+						When("upgrade is available", func() {
+							BeforeEach(func() {
+								broker.Services[0].Plans[0].MaintenanceInfo.Version = "9.1.2"
+								broker.Update()
+							})
 
-							By("displaying an informative message")
-							Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
-							Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
-							Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
-							Eventually(session).Should(Exit(0))
+							It("updates the service", func() {
+								session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
 
-							By("requesting an upgrade from the platform")
-							session = helpers.CF("service", serviceInstanceName)
-							Eventually(session).Should(Say("status:\\s+update succeeded"))
+								By("displaying an informative message")
+								Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
+								Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+								Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+								Eventually(session).Should(Exit(0))
+
+								By("requesting an upgrade from the platform")
+								session = helpers.CF("service", serviceInstanceName)
+								Eventually(session).Should(Say("status:\\s+update succeeded"))
+							})
+						})
+
+						When("no upgrade is available", func() {
+							It("does not update the service and outputs informative message", func() {
+								session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
+
+								Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
+								Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+								Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+								Eventually(session.Err).Should(Say("No upgrade is available."))
+								Eventually(session.Err).Should(Say("TIP: To find out if upgrade is available run `cf service %s`.", serviceInstanceName))
+								Eventually(session).Should(Exit(1))
+							})
 						})
 					})
 				})
