@@ -755,3 +755,5 @@ jobs:
     params:
       load_base: baseimage
       build: cli-ci-package-dockerfile/ci/cli-package
+
+# vi: includeexpr=substitute(v\:fname,'^cli-ci/','',''):
