@@ -27,6 +27,7 @@ var _ = Describe("update-service Command", func() {
 		spaceGUID           = "space-guid"
 		instanceGUID        = "instance-guid"
 		planGUID            = "plan-guid"
+		username            = "cf-user"
 	)
 
 	var (
@@ -40,6 +41,8 @@ var _ = Describe("update-service Command", func() {
 		extraArgs       []string
 
 		space = configv3.Space{Name: "space-a", GUID: spaceGUID}
+
+		sayUpdatingServiceInstanceByCurrentUser = Say("Updating service instance %s as %s...", serviceInstanceName, username)
 	)
 
 	BeforeEach(func() {
@@ -50,6 +53,7 @@ var _ = Describe("update-service Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		fakeConfig.TargetedSpaceReturns(space)
+		fakeConfig.CurrentUserNameReturns(username, nil)
 
 		extraArgs = []string{}
 
@@ -187,6 +191,10 @@ var _ = Describe("update-service Command", func() {
 							Expect(fakeActor.UpgradeServiceInstanceCallCount()).To(Equal(0))
 						})
 
+						It("does not mention that it is updating a service", func() {
+							Expect(testUI.Out).ToNot(sayUpdatingServiceInstanceByCurrentUser)
+						})
+
 						It("cancels the update", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
 							Expect(testUI.Out).To(Say("Update cancelled"))
@@ -196,6 +204,10 @@ var _ = Describe("update-service Command", func() {
 					When("user goes ahead with the upgrade", func() {
 						BeforeEach(func() {
 							input.Write([]byte("y\n"))
+						})
+
+						It("mentions which service instance was updated by which user", func() {
+							Expect(testUI.Out).To(sayUpdatingServiceInstanceByCurrentUser)
 						})
 
 						It("sends an upgrade request", func() {
@@ -278,6 +290,23 @@ var _ = Describe("update-service Command", func() {
 					When("user does not answer", func() {
 						It("fails", func() {
 							Expect(executeErr).To(MatchError("EOF"))
+						})
+					})
+
+					When("--force is provided", func() {
+						BeforeEach(func() {
+							cmd.ForceUpgrade = true
+						})
+
+						It("mentions which service instance was updated by which user", func() {
+							Expect(testUI.Out).To(sayUpdatingServiceInstanceByCurrentUser)
+						})
+
+						It("sends an upgrade request", func() {
+							Expect(fakeActor.UpgradeServiceInstanceCallCount()).To(Equal(1), "upgrade should be requested")
+
+							actualServiceInstance := fakeActor.UpgradeServiceInstanceArgsForCall(0)
+							Expect(actualServiceInstance).To(Equal(serviceInstance))
 						})
 					})
 				})
