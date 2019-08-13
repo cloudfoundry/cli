@@ -82,11 +82,11 @@ func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 		switch err.(type) {
 		case actionerror.BuildpackNotFoundError:
 			if cmd.Stack == "" {
-				cmd.UI.DisplayWarning("Buildpack '{{.BuildpackName}}' does not exist.", map[string]interface{}{
+				cmd.UI.DisplayWarningV7("Buildpack '{{.BuildpackName}}' does not exist.", map[string]interface{}{
 					"BuildpackName": cmd.RequiredArgs.Buildpack,
 				})
 			} else {
-				cmd.UI.DisplayWarning("Buildpack '{{.BuildpackName}}' with stack '{{.Stack}}' not found.", map[string]interface{}{
+				cmd.UI.DisplayWarningV7("Buildpack '{{.BuildpackName}}' with stack '{{.Stack}}' not found.", map[string]interface{}{
 					"BuildpackName": cmd.RequiredArgs.Buildpack,
 					"Stack":         cmd.Stack,
 				})

@@ -94,7 +94,7 @@ func (cmd DeleteCommand) Execute(args []string) error {
 	if err != nil {
 		switch err.(type) {
 		case actionerror.ApplicationNotFoundError:
-			cmd.UI.DisplayWarning("App '{{.AppName}}' does not exist.", map[string]interface{}{
+			cmd.UI.DisplayWarningV7("App '{{.AppName}}' does not exist.", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
 		case actionerror.RouteBoundToMultipleAppsError:

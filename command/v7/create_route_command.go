@@ -75,7 +75,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteAlreadyExistsError); ok {
-			cmd.UI.DisplayText(err.Error())
+			cmd.UI.DisplayWarningV7(err.Error())
 			cmd.UI.DisplayOK()
 			return nil
 		}

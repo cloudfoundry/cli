@@ -190,8 +190,8 @@ var _ = Describe("create-route Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
+				Expect(testUI.Err).To(Say("api error for a route that already exists"))
 				Expect(testUI.Out).To(Say(`Creating route %s for org %s / space %s as the-user\.\.\.`, domainName, orgName, spaceName))
-				Expect(testUI.Out).To(Say("api error for a route that already exists"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})

@@ -99,7 +99,7 @@ var _ = Describe("create-route command", func() {
 				It("warns the user that it has already been created and runs to completion without failing", func() {
 					session := helpers.CF("create-route", domainName, "--hostname", hostname)
 					Eventually(session).Should(Say(`Creating route %s\.%s for org %s / space %s as %s\.\.\.`, hostname, domainName, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`Route already exists with host '%s' for domain '%s'\.`, hostname, domainName))
+					Eventually(session.Err).Should(Say(`Route already exists with host '%s' for domain '%s'\.`, hostname, domainName))
 					Eventually(session).Should(Say(`OK`))
 					Eventually(session).Should(Exit(0))
 				})

@@ -254,6 +254,13 @@ func (ui *UI) DisplayWarning(template string, templateValues ...map[string]inter
 	fmt.Fprintf(ui.Err, "%s\n\n", ui.TranslateText(template, templateValues...))
 }
 
+// DisplayWarningV7 translates the warning, substitutes in templateValues, and
+// outputs to ui.Err. Only the first map in templateValues is used.
+// This command has one fewer newline than DisplayWarning. Use it before an OK message in V7.
+func (ui *UI) DisplayWarningV7(template string, templateValues ...map[string]interface{}) {
+	fmt.Fprintf(ui.Err, "%s\n", ui.TranslateText(template, templateValues...))
+}
+
 // DisplayWarnings translates the warnings and outputs to ui.Err.
 func (ui *UI) DisplayWarnings(warnings []string) {
 	for _, warning := range warnings {

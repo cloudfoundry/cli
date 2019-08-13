@@ -188,6 +188,12 @@ type FakeUI struct {
 		arg1 string
 		arg2 []map[string]interface{}
 	}
+	DisplayWarningV7Stub        func(string, ...map[string]interface{})
+	displayWarningV7Mutex       sync.RWMutex
+	displayWarningV7ArgsForCall []struct {
+		arg1 string
+		arg2 []map[string]interface{}
+	}
 	DisplayWarningsStub        func([]string)
 	displayWarningsMutex       sync.RWMutex
 	displayWarningsArgsForCall []struct {
@@ -1206,6 +1212,38 @@ func (fake *FakeUI) DisplayWarningArgsForCall(i int) (string, []map[string]inter
 	return argsForCall.arg1, argsForCall.arg2
 }
 
+func (fake *FakeUI) DisplayWarningV7(arg1 string, arg2 ...map[string]interface{}) {
+	fake.displayWarningV7Mutex.Lock()
+	fake.displayWarningV7ArgsForCall = append(fake.displayWarningV7ArgsForCall, struct {
+		arg1 string
+		arg2 []map[string]interface{}
+	}{arg1, arg2})
+	fake.recordInvocation("DisplayWarningV7", []interface{}{arg1, arg2})
+	fake.displayWarningV7Mutex.Unlock()
+	if fake.DisplayWarningV7Stub != nil {
+		fake.DisplayWarningV7Stub(arg1, arg2...)
+	}
+}
+
+func (fake *FakeUI) DisplayWarningV7CallCount() int {
+	fake.displayWarningV7Mutex.RLock()
+	defer fake.displayWarningV7Mutex.RUnlock()
+	return len(fake.displayWarningV7ArgsForCall)
+}
+
+func (fake *FakeUI) DisplayWarningV7Calls(stub func(string, ...map[string]interface{})) {
+	fake.displayWarningV7Mutex.Lock()
+	defer fake.displayWarningV7Mutex.Unlock()
+	fake.DisplayWarningV7Stub = stub
+}
+
+func (fake *FakeUI) DisplayWarningV7ArgsForCall(i int) (string, []map[string]interface{}) {
+	fake.displayWarningV7Mutex.RLock()
+	defer fake.displayWarningV7Mutex.RUnlock()
+	argsForCall := fake.displayWarningV7ArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
 func (fake *FakeUI) DisplayWarnings(arg1 []string) {
 	var arg1Copy []string
 	if arg1 != nil {
@@ -1737,6 +1775,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayTextWithFlavorMutex.RUnlock()
 	fake.displayWarningMutex.RLock()
 	defer fake.displayWarningMutex.RUnlock()
+	fake.displayWarningV7Mutex.RLock()
+	defer fake.displayWarningV7Mutex.RUnlock()
 	fake.displayWarningsMutex.RLock()
 	defer fake.displayWarningsMutex.RUnlock()
 	fake.getErrMutex.RLock()

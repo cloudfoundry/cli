@@ -34,6 +34,7 @@ type UI interface {
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
 	DisplayWarnings(warnings []string)
+	DisplayWarningV7(formattedString string, keys ...map[string]interface{})
 	GetErr() io.Writer
 	GetIn() io.Reader
 	GetOut() io.Writer

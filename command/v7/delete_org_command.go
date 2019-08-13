@@ -80,7 +80,7 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 	if err != nil {
 		switch err.(type) {
 		case actionerror.OrganizationNotFoundError:
-			cmd.UI.DisplayWarning("Org '{{.OrgName}}' does not exist.", map[string]interface{}{
+			cmd.UI.DisplayWarningV7("Org '{{.OrgName}}' does not exist.", map[string]interface{}{
 				"OrgName": cmd.RequiredArgs.Organization,
 			})
 		default:
