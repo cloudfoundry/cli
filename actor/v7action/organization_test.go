@@ -23,6 +23,86 @@ var _ = Describe("Organization Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
 	})
 
+	Describe("GetOrganizations", func() {
+		var (
+			ccv3Organizations []ccv3.Organization
+			organizations     []Organization
+
+			organization1Name string
+			organization1GUID string
+
+			organization2Name string
+			organization2GUID string
+
+			organization3Name string
+			organization3GUID string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			ccv3Organizations = []ccv3.Organization{
+				{Name: organization1Name, GUID: organization1GUID},
+				{Name: organization2Name, GUID: organization2GUID},
+				{Name: organization3Name, GUID: organization3GUID},
+			}
+		})
+
+		JustBeforeEach(func() {
+			organizations, warnings, executeErr = actor.GetOrganizations()
+		})
+
+		When("the API layer call is successful", func() {
+			expectedQuery := []ccv3.Query{
+				{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+			}
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					ccv3Organizations,
+					ccv3.Warnings{"some-organizations-warning"},
+					nil,
+				)
+			})
+
+			It("returns back the domains and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(actualQuery).To(Equal(expectedQuery))
+
+				Expect(organizations).To(ConsistOf(
+					Organization{Name: organization1Name, GUID: organization1GUID},
+					Organization{Name: organization2Name, GUID: organization2GUID},
+					Organization{Name: organization3Name, GUID: organization3GUID},
+				))
+				Expect(warnings).To(ConsistOf("some-organizations-warning"))
+
+			})
+		})
+
+		When("when the API layer call returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{},
+					ccv3.Warnings{"some-organizations-warning"},
+					errors.New("some-organizations-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("some-organizations-error"))
+				Expect(warnings).To(ConsistOf("some-organizations-warning"))
+				Expect(organizations).To(ConsistOf([]Organization{}))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+			})
+
+		})
+	})
+
 	Describe("GetOrganizationByGUID", func() {
 		When("the org exists", func() {
 			BeforeEach(func() {

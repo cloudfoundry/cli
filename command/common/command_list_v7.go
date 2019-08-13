@@ -108,7 +108,7 @@ type commandList struct {
 	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
 	Org                                v6.OrgCommand                                `command:"org" description:"Show org info"`
 	OrgUsers                           v6.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
-	Orgs                               v6.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
+	Orgs                               v7.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
 	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`
 	Passwd                             v6.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
 	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`

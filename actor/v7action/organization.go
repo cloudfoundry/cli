@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
-// Organization represents a V3 actor organization.
+// Organization represents a V7 actor organization.
 type Organization struct {
 	// GUID is the unique organization identifier.
 	GUID string
@@ -14,6 +14,22 @@ type Organization struct {
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata
+}
+
+func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
+	ccOrgs, warnings, err := actor.CloudControllerClient.GetOrganizations(
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+	)
+	if err != nil {
+		return []Organization{}, Warnings(warnings), err
+	}
+
+	orgs := make([]Organization, len(ccOrgs))
+	for i, ccOrg := range ccOrgs {
+		orgs[i] = actor.convertCCToActorOrganization(ccOrg)
+	}
+
+	return orgs, Warnings(warnings), nil
 }
 
 // GetOrganizationByGUID returns the organization with the given guid.
