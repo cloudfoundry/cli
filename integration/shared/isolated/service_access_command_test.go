@@ -145,7 +145,7 @@ var _ = Describe("service-access command", func() {
 				BeforeEach(func() {
 					helpers.SetupCF(orgName, spaceName)
 
-					otherBroker = fakeservicebroker.New().WithNameSuffix("other")
+					otherBroker = fakeservicebroker.NewAlternate()
 					otherBroker.Services[0].Plans[1].Name = helpers.GenerateLowerName(helpers.NewPlanName, otherBroker.Services[0].Plans[0].Name)
 					otherBroker.Register()
 

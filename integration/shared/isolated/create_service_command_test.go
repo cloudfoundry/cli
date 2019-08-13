@@ -330,7 +330,7 @@ var _ = Describe("create-service command", func() {
 					broker1 = fakeservicebroker.New().Register()
 					service = broker1.ServiceName()
 					servicePlan = broker1.ServicePlanName()
-					broker2 = fakeservicebroker.New().WithNameSuffix("other")
+					broker2 = fakeservicebroker.NewAlternate()
 					broker2.Services[0].Name = service
 					broker2.Services[0].Plans[0].Name = servicePlan
 					broker2.Register()
