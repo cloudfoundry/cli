@@ -124,14 +124,16 @@ func New() *FakeServiceBroker {
 	}
 }
 
-func (f *FakeServiceBroker) WithName(name string) *FakeServiceBroker {
-	f.name = name
-	f.reusable = false
+// NewAlternate returns a reusable broker with another name. Can be used in conjunction with New() if you need two brokers in the same test.
+func NewAlternate() *FakeServiceBroker {
+	f := New()
+	f.name = generateReusableBrokerName("other-")
 	return f
 }
 
-func (f *FakeServiceBroker) WithNameSuffix(suffix string) *FakeServiceBroker {
-	f.name = generateReusableBrokerName(suffix + "-")
+func (f *FakeServiceBroker) WithName(name string) *FakeServiceBroker {
+	f.name = name
+	f.reusable = false
 	return f
 }
 
@@ -207,7 +209,7 @@ func Cleanup() {
 		helpers.TargetOrgAndSpace(itsOrg, itsSpace)
 
 		broker := New()
-		otherBroker := New().WithNameSuffix("other")
+		otherBroker := NewAlternate()
 
 		if os.Getenv("KEEP_FAKE_SERVICE_BROKERS") != "true" {
 			broker.stopReusing()

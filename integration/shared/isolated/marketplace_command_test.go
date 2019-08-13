@@ -65,7 +65,7 @@ var _ = Describe("marketplace command", func() {
 
 						broker1 = fakeservicebroker.New().Register()
 						enableServiceAccess(broker1)
-						broker2 = fakeservicebroker.New().WithNameSuffix("other").Register()
+						broker2 = fakeservicebroker.NewAlternate().Register()
 						enableServiceAccess(broker2)
 
 						helpers.LogoutCF()
@@ -136,7 +136,7 @@ var _ = Describe("marketplace command", func() {
 						helpers.CreateOrgAndSpace(org2, space2)
 						helpers.TargetOrgAndSpace(org2, space2)
 
-						broker2 = fakeservicebroker.New().WithNameSuffix("other").Register()
+						broker2 = fakeservicebroker.NewAlternate().Register()
 						enableServiceAccess(broker2)
 					})
 

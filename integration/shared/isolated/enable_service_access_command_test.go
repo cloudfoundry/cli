@@ -215,7 +215,7 @@ var _ = Describe("enable service access command", func() {
 			When("two services with the same name are registered", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
-					secondBroker = fakeservicebroker.New().WithNameSuffix("other")
+					secondBroker = fakeservicebroker.NewAlternate()
 					secondBroker.Services[0].Name = service
 					secondBroker.Services[0].Plans[0].Name = servicePlan
 					secondBroker.Register()

@@ -243,7 +243,7 @@ var _ = Describe("disable service access command", func() {
 
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
-					secondBroker = fakeservicebroker.New().WithNameSuffix("other")
+					secondBroker = fakeservicebroker.NewAlternate()
 					secondBroker.Services[0].Name = broker.ServiceName()
 					secondBroker.Register()
 					Eventually(helpers.CF("enable-service-access", broker.ServiceName(), "-b", broker.Name())).Should(Exit(0))
@@ -288,7 +288,7 @@ var _ = Describe("disable service access command", func() {
 				helpers.SetupCF(orgName, spaceName)
 
 				broker1 = fakeservicebroker.New().Register()
-				broker2 = fakeservicebroker.New().WithNameSuffix("other")
+				broker2 = fakeservicebroker.NewAlternate()
 				broker2.Services[0].Name = broker1.ServiceName()
 				broker2.Services[0].Plans[0].Name = broker1.ServicePlanName()
 				broker2.Register()
