@@ -350,6 +350,6 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 }
 
 func getDomainName(fullURL, host, path string) string {
-	domainWithoutHost := strings.TrimLeft(fullURL, host+".")
-	return strings.TrimRight(domainWithoutHost, path)
+	domainWithoutHost := strings.TrimPrefix(fullURL, host+".")
+	return strings.TrimSuffix(domainWithoutHost, path)
 }
