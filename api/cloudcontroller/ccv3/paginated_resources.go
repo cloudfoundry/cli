@@ -16,8 +16,15 @@ func NewPaginatedResources(exampleResource interface{}) *PaginatedResources {
 // PaginatedResources represents a page of resources returned by the Cloud
 // Controller.
 type PaginatedResources struct {
+	// PageNumber is the number of this page, among a set of paginated responses.
+	// Does not come from API response.
+	PageNumber int
 	// Pagination represents information about the paginated resource.
 	Pagination struct {
+		// TotalResults is the total number of results across all pages.
+		TotalResults int `json:"total_results"`
+		// TotalPages is the total number of pages.
+		TotalPages int `json:"total_pages"`
 		// Next represents a link to the next page.
 		Next struct {
 			// HREF is the HREF of the next page.

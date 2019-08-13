@@ -8,6 +8,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Application represents a Cloud Controller V3 Application.
@@ -154,16 +156,17 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 
 // GetApplications lists applications with optional queries.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+
+	log.Debugf("request: %v", query)
+	request := requestOptions{
 		RequestName: internal.GetApplicationsRequest,
 		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
 	}
 
+	log.Debugf("request: %v", request)
+
 	var fullAppsList []Application
-	warnings, err := client.paginate(request, Application{}, func(item interface{}) error {
+	warnings, err := client.paginate2(request, Application{}, func(item interface{}) error {
 		if app, ok := item.(Application); ok {
 			fullAppsList = append(fullAppsList, app)
 		} else {
