@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'json'
+require 'timeout'
 
 describe ServiceBroker do
   before do
@@ -292,7 +293,7 @@ describe ServiceBroker do
             Timeout::timeout(1) do
               send(action)
             end
-          end.to raise_error(TimeoutError)
+          end.to raise_error(Timeout::Error)
         end
 
         it 'can be customized on a per-plan basis' do
@@ -418,13 +419,13 @@ describe ServiceBroker do
           Timeout::timeout(1) do
             get '/v2/service_instances/fake-guid/last_operation'
           end
-        end.to raise_error(TimeoutError)
+        end.to raise_error(Timeout::Error)
 
         expect do
           Timeout::timeout(0.5) do
             get '/v2/service_instances/fake-guid/last_operation'
           end
-        end.to raise_error(TimeoutError)
+        end.to raise_error(Timeout::Error)
       end
 
       it 'honors max_fetch_service_instance_request' do
