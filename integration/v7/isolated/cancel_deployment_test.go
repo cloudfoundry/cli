@@ -86,7 +86,7 @@ var _ = Describe("Cancel Deployment", func() {
 		Context("when the API errors", func() {
 			It("exits 1 and displays an error", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=rolling")).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=rolling", "--no-wait")).Should(Exit(0))
 				})
 
 				session := helpers.CF("cancel-deployment", appName)
