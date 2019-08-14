@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 	"regexp"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -30,6 +31,20 @@ var _ = Describe("set-label command", func() {
 
 		executeErr error
 	)
+
+	verifyStackArgNotAllowed := func() {
+		BeforeEach(func() {
+			cmd.BuildpackStack = "cflinuxfs3"
+		})
+
+		It("displays an argument combination error", func() {
+			argumentCombinationError := translatableerror.ArgumentCombinationError{
+				Args: []string{strings.ToLower(cmd.RequiredArgs.ResourceType), "--stack, -s"},
+			}
+
+			Expect(executeErr).To(MatchError(argumentCombinationError))
+		})
+	}
 
 	When("setting labels on apps", func() {
 
@@ -219,6 +234,10 @@ var _ = Describe("set-label command", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
 		})
+
+		When("when the --stack flag is specified", func() {
+			verifyStackArgNotAllowed()
+		})
 	})
 
 	When("setting labels on orgs", func() {
@@ -403,6 +422,10 @@ var _ = Describe("set-label command", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
 		})
+
+		When("when the --stack flag is specified", func() {
+			verifyStackArgNotAllowed()
+		})
 	})
 
 	When("setting labels on buildpacks", func() {
@@ -465,29 +488,62 @@ var _ = Describe("set-label command", func() {
 					})
 
 					When("updating the buildpack labels succeeds", func() {
-						It("sets the provided labels on the buildpack", func() {
-							Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-							name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-							Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-							Expect(stack).To(Equal("globinski"), "failed to pass stack name")
-							Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
-								"FOO": types.NewNullString("BAR"),
-								"ENV": types.NewNullString("FAKE"),
-							}))
+						When("the buildpack stack is specified", func() {
+							It("sets the provided labels on the buildpack", func() {
+								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+								Expect(stack).To(Equal("globinski"), "failed to pass stack name")
+								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+									"FOO": types.NewNullString("BAR"),
+									"ENV": types.NewNullString("FAKE"),
+								}))
+							})
+
+							It("displays a message", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
+								Expect(testUI.Out).To(Say("OK"))
+							})
+
+							It("prints all warnings", func() {
+								Expect(testUI.Err).To(Say("some-warning-1"))
+								Expect(testUI.Err).To(Say("some-warning-2"))
+							})
 						})
 
-						It("displays a message", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
+						When("the buildpack stack is not specified", func() {
+							BeforeEach(func() {
+								cmd.BuildpackStack = ""
+							})
 
-							Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+							It("sets the provided labels on the buildpack", func() {
+								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+								Expect(stack).To(Equal(""), "got a non-empty stack name")
+								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+									"FOO": types.NewNullString("BAR"),
+									"ENV": types.NewNullString("FAKE"),
+								}))
+							})
 
-							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
-							Expect(testUI.Out).To(Say("OK"))
-						})
+							It("displays a message", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
 
-						It("prints all warnings", func() {
-							Expect(testUI.Err).To(Say("some-warning-1"))
-							Expect(testUI.Err).To(Say("some-warning-2"))
+								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as some-user...`), resourceName))
+								Expect(testUI.Out).To(Say("OK"))
+							})
+
+							It("prints all warnings", func() {
+								Expect(testUI.Err).To(Say("some-warning-1"))
+								Expect(testUI.Err).To(Say("some-warning-2"))
+							})
 						})
 
 						When("no stack is provided", func() {
@@ -590,6 +646,18 @@ var _ = Describe("set-label command", func() {
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
+		})
+
+		When("setting the stack argument", func() {
+
+			BeforeEach(func() {
+				cmd.BuildpackStack = "cflinuxfs3"
+			})
+
+			It("does not display an argument combination error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
 		})
 	})
 
@@ -710,18 +778,7 @@ var _ = Describe("set-label command", func() {
 				})
 
 				When("when the --stack flag is specified", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs = flag.SetLabelArgs{
-							ResourceType: "space",
-							ResourceName: resourceName,
-							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
-						}
-						cmd.BuildpackStack = "im-a-stack"
-					})
-
-					It("complains about the --stack flag being present", func() {
-						Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{Args: []string{"space", "--stack, -s"}}))
-					})
+					verifyStackArgNotAllowed()
 				})
 
 				When("the resource type argument is not lowercase", func() {

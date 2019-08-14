@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -30,15 +31,17 @@ type LabelsActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
+	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 }
 
 type LabelsCommand struct {
-	RequiredArgs flag.LabelsArgs `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   space\n   org\n\nSEE ALSO:\n   set-label, unset-label"`
-	UI           command.UI
-	Config       command.Config
-	SharedActor  command.SharedActor
-	Actor        LabelsActor
+	RequiredArgs   flag.LabelsArgs `positional-args:"yes"`
+	BuildpackStack string          `long:"stack" short:"s" description:"required when more than one buildpack has the same name"`
+	usage          interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n\nSEE ALSO:\n   set-label, unset-label"`
+	UI             command.UI
+	Config         command.Config
+	SharedActor    command.SharedActor
+	Actor          LabelsActor
 }
 
 func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
@@ -63,14 +66,20 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		return err
 	}
 
-	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
-	switch ResourceType(resourceTypeString) {
+	err = cmd.validateFlags()
+	if err != nil {
+		return err
+	}
+
+	switch cmd.canonicalResourceTypeForName() {
 	case App:
 		labels, warnings, err = cmd.fetchAppLabels(username)
 	case Org:
 		labels, warnings, err = cmd.fetchOrgLabels(username)
 	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
+	case Buildpack:
+		labels, warnings, err = cmd.fetchBuildpackLabels(username)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
@@ -134,6 +143,37 @@ func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.Nul
 	return cmd.Actor.GetSpaceLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID)
 }
 
+func (cmd LabelsCommand) fetchBuildpackLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var template string
+	if cmd.BuildpackStack != "" {
+		template = "Getting labels for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+	} else {
+		template = "Getting labels for %s {{.ResourceName}} as {{.User}}..."
+	}
+	preFlavoringText := fmt.Sprintf(template, cmd.RequiredArgs.ResourceType)
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"StackName":    cmd.BuildpackStack,
+			"User":         username,
+		},
+	)
+
+	cmd.UI.DisplayNewline()
+
+	return cmd.Actor.GetBuildpackLabels(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack)
+}
+
+func (cmd LabelsCommand) canonicalResourceTypeForName() ResourceType {
+	return ResourceType(strings.ToLower(cmd.RequiredArgs.ResourceType))
+}
+
 func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
@@ -158,4 +198,15 @@ func (cmd LabelsCommand) printLabels(labels map[string]types.NullString) {
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
+}
+
+func (cmd LabelsCommand) validateFlags() error {
+	if cmd.BuildpackStack != "" && cmd.canonicalResourceTypeForName() != Buildpack {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--stack, -s",
+			},
+		}
+	}
+	return nil
 }

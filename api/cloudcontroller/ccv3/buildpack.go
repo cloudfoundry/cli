@@ -34,16 +34,19 @@ type Buildpack struct {
 	State string
 	// Links are links to related resources.
 	Links APILinks
+	// Metadata is used for custom tagging of API resources
+	Metadata *Metadata
 }
 
 // MarshalJSON converts a Package into a Cloud Controller Package.
 func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 	ccBuildpack := struct {
-		Name     string `json:"name,omitempty"`
-		Stack    string `json:"stack,omitempty"`
-		Position *int   `json:"position,omitempty"`
-		Enabled  *bool  `json:"enabled,omitempty"`
-		Locked   *bool  `json:"locked,omitempty"`
+		Name     string    `json:"name,omitempty"`
+		Stack    string    `json:"stack,omitempty"`
+		Position *int      `json:"position,omitempty"`
+		Enabled  *bool     `json:"enabled,omitempty"`
+		Locked   *bool     `json:"locked,omitempty"`
+		Metadata *Metadata `json:"metadata,omitempty"`
 	}{
 		Name:  buildpack.Name,
 		Stack: buildpack.Stack,
@@ -73,6 +76,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 		Enabled  types.NullBool `json:"enabled"`
 		Locked   types.NullBool `json:"locked"`
 		Position types.NullInt  `json:"position"`
+		Metadata *Metadata      `json:"metadata"`
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccBuildpack)
@@ -89,6 +93,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	buildpack.Stack = ccBuildpack.Stack
 	buildpack.State = ccBuildpack.State
 	buildpack.Links = ccBuildpack.Links
+	buildpack.Metadata = ccBuildpack.Metadata
 
 	return nil
 }

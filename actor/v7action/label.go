@@ -41,6 +41,18 @@ func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string
 	return labels, warnings, nil
 }
 
+func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, Warnings, error) {
+	var labels map[string]types.NullString
+	resource, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+	if err != nil {
+		return labels, warnings, err
+	}
+	if resource.Metadata != nil {
+		labels = resource.Metadata.Labels
+	}
+	return labels, warnings, nil
+}
+
 func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
 	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
