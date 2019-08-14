@@ -183,6 +183,13 @@ func (actor Actor) DeleteIsolationSegmentOrganizationByName(isolationSegmentName
 	return allWarnings, err
 }
 
+// GetOrganizationDefaultIsolationSegment gets a default isolation segment on
+// an organization.
+func (actor Actor) GetOrganizationDefaultIsolationSegment(orgGUID string) (string, Warnings, error) {
+	defaultIsoSegRelationship, apiWarnings, err := actor.CloudControllerClient.GetOrganizationDefaultIsolationSegment(orgGUID)
+	return defaultIsoSegRelationship.GUID, Warnings(apiWarnings), err
+}
+
 // SetOrganizationDefaultIsolationSegment sets a default isolation segment on
 // an organization.
 func (actor Actor) SetOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {

@@ -106,7 +106,7 @@ type commandList struct {
 	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
 	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
-	Org                                v6.OrgCommand                                `command:"org" description:"Show org info"`
+	Org                                v7.OrgCommand                                `command:"org" description:"Show org info"`
 	OrgUsers                           v6.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Orgs                               v7.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
 	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`

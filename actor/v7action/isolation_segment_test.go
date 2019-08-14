@@ -687,6 +687,47 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 	})
 
+	Describe("GetOrganizationDefaultIsolationSegment", func() {
+		When("fetching the resource is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Relationship{GUID: "iso-seg-guid"},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns all warnings", func() {
+				defaultIsoSegGUID, warnings, err := actor.GetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentCallCount()).To(Equal(1))
+				orgGUID := fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentArgsForCall(0)
+				Expect(orgGUID).To(Equal("some-org-guid"))
+				Expect(defaultIsoSegGUID).To(Equal("iso-seg-guid"))
+			})
+		})
+
+		When("fetching the resourece fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Relationship{},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					errors.New("some-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := actor.GetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).To(MatchError("some-error"))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
 	Describe("SetOrganizationDefaultIsolationSegment", func() {
 		When("the assignment is successful", func() {
 			BeforeEach(func() {
