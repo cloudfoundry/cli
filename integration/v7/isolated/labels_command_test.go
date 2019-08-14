@@ -90,10 +90,10 @@ var _ = Describe("labels command", func() {
 			When("there are no labels set on the application", func() {
 				It("indicates that there are no labels", func() {
 					session := helpers.CF("labels", "app", appName)
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app %s in org %s / space %s as %s...\n\n"), appName, orgName, spaceName, username))
-					Expect(session).ToNot(Say(`key\s+value`))
-					Eventually(session).Should(Say("No labels found."))
 					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for app %s in org %s / space %s as %s...\n\n"), appName, orgName, spaceName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Expect(session).Should(Say("No labels found."))
 				})
 			})
 
@@ -127,10 +127,10 @@ var _ = Describe("labels command", func() {
 			When("there are no labels set on the organization", func() {
 				It("indicates that there are no labels", func() {
 					session := helpers.CF("labels", "org", orgName)
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for org %s as %s...\n\n"), orgName, username))
-					Expect(session).ToNot(Say(`key\s+value`))
-					Eventually(session).Should(Say("No labels found."))
 					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for org %s as %s...\n\n"), orgName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Expect(session).Should(Say("No labels found."))
 				})
 			})
 
@@ -172,10 +172,10 @@ var _ = Describe("labels command", func() {
 			When("there are no labels set on the space", func() {
 				It("indicates that there are no labels", func() {
 					session := helpers.CF("labels", "space", spaceName)
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), spaceName, orgName, username))
-					Expect(session).ToNot(Say(`key\s+value`))
-					Eventually(session).Should(Say("No labels found."))
 					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), spaceName, orgName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Expect(session).Should(Say("No labels found."))
 				})
 			})
 
@@ -216,10 +216,10 @@ var _ = Describe("labels command", func() {
 
 					It("indicates that there are no labels", func() {
 						session := helpers.CF("labels", "buildpack", buildpackName)
-						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
-						Expect(session).ToNot(Say(`key\s+value`))
-						Eventually(session).Should(Say("No labels found."))
 						Eventually(session).Should(Exit(0))
+						Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for buildpack %s as %s...\n\n"), buildpackName, username))
+						Expect(session).ToNot(Say(`key\s+value`))
+						Expect(session).Should(Say("No labels found."))
 					})
 
 					When("there are labels on the buildpack", func() {
