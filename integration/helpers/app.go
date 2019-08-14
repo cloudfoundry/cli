@@ -162,6 +162,20 @@ func WithBananaPantsApp(f func(dir string)) {
 	f(dir)
 }
 
+func WithEmptyFilesApp(f func(dir string)) {
+	dir := TempDirAbsolutePath("", "simple-app")
+	defer os.RemoveAll(dir)
+
+	tempfile := filepath.Join(dir, "index.html")
+	err := ioutil.WriteFile(tempfile, nil, 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	f(dir)
+}
+
 // AppGUID returns the GUID for an app in the currently targeted space.
 func AppGUID(appName string) string {
 	session := CF("app", appName, "--guid")

@@ -27,13 +27,34 @@ func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStrea
 
 func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream chan<- *PushEvent, progressBar ProgressBar) (v7action.Package, Warnings, error) {
 	log.WithField("Path", pushPlan.BitsPath).Info("creating archive")
-	var allWarnings Warnings
 
-	eventStream <- &PushEvent{Plan: pushPlan, Event: ResourceMatching}
-	matchedResources, unmatchedResources, warnings, err := actor.MatchResources(pushPlan.AllResources)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return v7action.Package{}, allWarnings, err
+	var (
+		allWarnings        Warnings
+		matchedResources   []sharedaction.V3Resource
+		unmatchedResources []sharedaction.V3Resource
+	)
+
+	// check if all source files are empty
+	shouldResourceMatch := false
+	for _, resource := range pushPlan.AllResources {
+		if resource.SizeInBytes != 0 {
+			shouldResourceMatch = true
+		}
+	}
+
+	if shouldResourceMatch {
+		eventStream <- &PushEvent{Plan: pushPlan, Event: ResourceMatching}
+		var warnings Warnings
+		var err error
+
+		matchedResources, unmatchedResources, warnings, err = actor.MatchResources(pushPlan.AllResources)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return v7action.Package{}, allWarnings, err
+		}
+	} else {
+		matchedResources = []sharedaction.V3Resource{}
+		unmatchedResources = pushPlan.AllResources
 	}
 
 	eventStream <- &PushEvent{Plan: pushPlan, Event: CreatingPackage}
@@ -92,6 +113,7 @@ func (actor Actor) CreateAndUploadApplicationBits(pushPlan PushPlan, eventStream
 			return v7action.Package{}, allWarnings, err
 		}
 	}
+
 	return pkg, allWarnings, nil
 }
 

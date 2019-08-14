@@ -64,4 +64,14 @@ var _ = Describe("resource matching", func() {
 			Eventually(session).Should(Exit(0))
 		})
 	})
+
+	When("the app has only empty files", func() {
+		It("skips resource matching", func() {
+			helpers.WithEmptyFilesApp(func(dir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+				Eventually(session).Should(Say(`\s+name:\s+%s`, appName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
 })
