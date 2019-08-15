@@ -70,7 +70,7 @@ var _ = Describe("login command", func() {
 
 	Describe("Invalid Command Usage", func() {
 		When("a random flag is passed in", func() {
-			It("should exit 1 and display an unknown flag error message", func() {
+			It("exits 1 and displays an unknown flag error message", func() {
 				session := helpers.CF("login", "--test")
 				Eventually(session).Should(Exit(1))
 
