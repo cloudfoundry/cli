@@ -655,7 +655,7 @@ var _ = Describe("login command", func() {
 			orgName = helpers.NewOrgName()
 			session := helpers.CF("create-org", orgName)
 			Eventually(session).Should(Exit(0))
-			username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+			username, password = helpers.CreateUser()
 		})
 
 		When("only one space is available to the user", func() {
