@@ -276,7 +276,6 @@ var _ = Describe("set-label command", func() {
 		When("assigning label to buildpack", func() {
 			var (
 				buildpackName string
-				stacks        []string
 			)
 
 			BeforeEach(func() {

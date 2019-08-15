@@ -964,7 +964,7 @@ var _ = Describe("set-label command", func() {
 				})
 
 				When("when the --stack flag is specified", func() {
-					checkBuildpackArgFunc()
+					verifyStackArgNotAllowed()
 				})
 
 				When("the resource type argument is not lowercase", func() {
