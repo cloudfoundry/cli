@@ -873,7 +873,7 @@ var _ = Describe("set-label command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		It("checks that the user is logged in and targeted to an org", func() {
+		It("checks that the user is logged in but not necessarily targeted to an org", func() {
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(checkOrg).To(BeFalse())
