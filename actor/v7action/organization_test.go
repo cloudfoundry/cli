@@ -419,4 +419,93 @@ var _ = Describe("Organization Actions", func() {
 			})
 		})
 	})
+
+	Describe("RenameOrganization", func() {
+		var (
+			oldOrgName = "old-and-stale-org-name"
+			newOrgName = "fresh-and-new-org-name"
+
+			org        Organization
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			org, warnings, executeErr = actor.RenameOrganization(
+				oldOrgName,
+				newOrgName,
+			)
+		})
+
+		It("delegate to the actor to get the org", func() {
+			// assert on the underlying client call because we dont have a fake actor
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+		})
+
+		When("getting the org fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					nil,
+					ccv3.Warnings{"get-org-warning"},
+					errors.New("get-org-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("get-org-error"))
+				Expect(warnings).To(ConsistOf("get-org-warning"))
+			})
+		})
+
+		When("getting the org succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{{Name: oldOrgName, GUID: "org-guid"}},
+					ccv3.Warnings{"get-org-warning"},
+					nil,
+				)
+			})
+
+			It("delegates to the client to update the org", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateOrganizationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateOrganizationArgsForCall(0)).To(Equal(ccv3.Organization{
+					GUID: "org-guid",
+					Name: newOrgName,
+				}))
+			})
+
+			When("updating the org fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateOrganizationReturns(
+						ccv3.Organization{},
+						ccv3.Warnings{"update-org-warning"},
+						errors.New("update-org-error"),
+					)
+				})
+
+				It("returns an error and all warnings", func() {
+					Expect(executeErr).To(MatchError("update-org-error"))
+					Expect(warnings).To(ConsistOf("get-org-warning", "update-org-warning"))
+				})
+
+			})
+
+			When("updating the org succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateOrganizationReturns(
+						ccv3.Organization{Name: newOrgName, GUID: "org-guid"},
+						ccv3.Warnings{"update-org-warning"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-org-warning", "update-org-warning"))
+					Expect(org).To(Equal(Organization{Name: newOrgName, GUID: "org-guid"}))
+				})
+			})
+		})
+	})
 })

@@ -121,7 +121,7 @@ type commandList struct {
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	Rename                             v6.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RenameBuildpack                    v6.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
-	RenameOrg                          v6.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
+	RenameOrg                          v7.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
 	RenameService                      v6.RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`
 	RenameServiceBroker                v6.RenameServiceBrokerCommand                `command:"rename-service-broker" description:"Rename a service broker"`
 	RenameSpace                        v7.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
