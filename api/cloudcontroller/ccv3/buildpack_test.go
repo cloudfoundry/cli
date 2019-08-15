@@ -62,10 +62,6 @@ var _ = Describe("Buildpacks", func() {
 							"metadata": {
 								"labels": {}
 							}
-							"locked": false,
-							"metadata": {
-								"labels": {}
-							}
 						},
 						{
 							"guid": "guid2",

@@ -55,7 +55,7 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 	case "stack":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchStackRequest,
-			Body:        bytes.NewReader(metadataBtyes),
+			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"stack_guid": resourceGUID},
 		})
 	default:

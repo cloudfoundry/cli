@@ -686,7 +686,7 @@ var _ = Describe("labels command", func() {
 						ResourceType: "Buildpack",
 						ResourceName: "fake-buildpack",
 					}
-					cmd.StackName = "another-great-stack"
+					cmd.BuildpackStack = "another-great-stack"
 				})
 
 				It("retrieves the labels associated with the buildpack", func() {
