@@ -26,6 +26,59 @@ var _ = Describe("login command", func() {
 		helpers.TurnOffExperimentalLogin()
 	})
 
+	Describe("Help Text", func() {
+		When("--help flag is set", func() {
+			It("displays the command usage", func() {
+				session := helpers.CF("login", "--help")
+				Eventually(session).Should(Exit(0))
+
+				Expect(session).Should(Say("NAME:\n"))
+				Expect(session).Should(Say("login - Log user in"))
+
+				Expect(session).Should(Say("USAGE:\n"))
+				Expect(session).Should(Say(`cf login \[-a API_URL\] \[-u USERNAME\] \[-p PASSWORD\] \[-o ORG\] \[-s SPACE\] \[--sso | --sso-passcode PASSCODE\]`))
+
+				Expect(session).Should(Say("WARNING:\n"))
+				Expect(session).Should(Say("Providing your password as a command line option is highly discouraged\n"))
+				Expect(session).Should(Say("Your password may be visible to others and may be recorded in your shell history\n"))
+
+				Expect(session).Should(Say("EXAMPLES:\n"))
+				Expect(session).Should(Say(regexp.QuoteMeta("cf login (omit username and password to login interactively -- cf will prompt for both)")))
+				Expect(session).Should(Say(regexp.QuoteMeta("cf login -u name@example.com -p pa55woRD (specify username and password as arguments)")))
+				Expect(session).Should(Say(regexp.QuoteMeta("cf login -u name@example.com -p \"my password\" (use quotes for passwords with a space)")))
+				Expect(session).Should(Say(regexp.QuoteMeta("cf login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)")))
+				Expect(session).Should(Say(regexp.QuoteMeta("cf login --sso (cf will provide a url to obtain a one-time passcode to login)")))
+
+				Expect(session).Should(Say("ALIAS:\n"))
+				Expect(session).Should(Say("l"))
+
+				Expect(session).Should(Say("OPTIONS:\n"))
+				Expect(session).Should(Say(`-a\s+API endpoint \(e.g. https://api\.example\.com\)`))
+				Expect(session).Should(Say(`-o\s+Org`))
+				Expect(session).Should(Say(`-p\s+Password`))
+				Expect(session).Should(Say(`-s\s+Space`))
+				Expect(session).Should(Say(`--skip-ssl-validation\s+Skip verification of the API endpoint\. Not recommended\!`))
+				Expect(session).Should(Say(`--sso\s+Prompt for a one-time passcode to login`))
+				Expect(session).Should(Say(`--sso-passcode\s+One-time passcode`))
+				Expect(session).Should(Say(`-u\s+Username`))
+
+				Expect(session).Should(Say("SEE ALSO:\n"))
+				Expect(session).Should(Say("api, auth, target"))
+			})
+		})
+	})
+
+	Describe("Invalid Command Usage", func() {
+		When("a random flag is passed in", func() {
+			It("should exit 1 and display an unknown flag error message", func() {
+				session := helpers.CF("login", "--test")
+				Eventually(session).Should(Exit(1))
+
+				Expect(session.Err).Should(Say("Incorrect Usage: unknown flag `test'"))
+			})
+		})
+	})
+
 	Describe("Minimum Version Check", func() {
 		When("the CLI version is lower than the minimum supported version by the CC", func() {
 			var server *ghttp.Server
@@ -1151,6 +1204,7 @@ var _ = Describe("login command", func() {
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-p", password, "-u", username)
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 					Eventually(session).Should(Exit(1))
