@@ -7,9 +7,9 @@ type BuildpackNotFoundError struct {
 
 func (e BuildpackNotFoundError) Error() string {
 	if len(e.StackName) == 0 {
-		return "Buildpack '{{.BuildpackName}}' not found"
+		return "Buildpack {{.BuildpackName}} not found"
 	}
-	return "Buildpack '{{.BuildpackName}}' with stack '{{.StackName}}' not found"
+	return "Buildpack {{.BuildpackName}} with stack {{.StackName}} not found"
 }
 
 func (e BuildpackNotFoundError) Translate(translate func(string, ...interface{}) string) string {

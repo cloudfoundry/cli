@@ -353,7 +353,7 @@ var _ = Describe("set-label command", func() {
 					When("stack is specified", func() {
 						It("sets the specified labels on the correct buildpack", func() {
 							session := helpers.CF("set-label", "buildpack", buildpackName, "pci=true", "public-facing=false", "--stack", stacks[1])
-							Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s as %s...`), buildpackName, username))
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[1], username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
