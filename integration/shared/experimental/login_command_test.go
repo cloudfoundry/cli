@@ -84,7 +84,7 @@ var _ = Describe("login command", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
-				server = helpers.StartServerWithAPIVersions("2.99.9", "3.36.0")
+				server = helpers.StartMockServerWithAPIVersions("2.99.9", "3.36.0")
 
 				fakeTokenResponse := map[string]string{
 					"access_token":  helpers.BuildTokenString(time.Now()),
@@ -117,7 +117,7 @@ var _ = Describe("login command", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
-				server = helpers.StartServerWithMinimumCLIVersion("9000.0.0")
+				server = helpers.StartMockServerWithMinimumCLIVersion("9000.0.0")
 
 				fakeTokenResponse := map[string]string{
 					"access_token": "",
@@ -345,7 +345,7 @@ var _ = Describe("login command", func() {
 
 			BeforeEach(func() {
 				cliVersion := "1.0.0"
-				server = helpers.StartServerWithMinimumCLIVersion(cliVersion)
+				server = helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
 			})
 
 			AfterEach(func() {
@@ -500,7 +500,7 @@ var _ = Describe("login command", func() {
 					var server *ghttp.Server
 
 					BeforeEach(func() {
-						server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+						server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
 						helpers.AddLoginRoutes(server)
 						helpers.AddFiftyOneOrgs(server)
 						// handle request for spaces under "org20"
@@ -892,7 +892,7 @@ var _ = Describe("login command", func() {
 				When("there are more than 50 spaces", func() {
 					var server *ghttp.Server
 					BeforeEach(func() {
-						server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+						server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
 						helpers.AddLoginRoutes(server)
 						helpers.AddFiftyOneSpaces(server)
 					})
@@ -1115,7 +1115,7 @@ var _ = Describe("login command", func() {
 				BeforeEach(func() {
 					password = "some-password"
 					mfaCode = "123456"
-					server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+					server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
 					helpers.AddMfa(server, password, mfaCode)
 				})
 

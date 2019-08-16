@@ -16,24 +16,24 @@ const (
 	DefaultV3Version string = "3.66.0"
 )
 
-// StartAndTargetServerWithAPIVersions starts and targets a server with the given V2 and V3
+// StartAndTargetMockServerWithAPIVersions starts and targets a server with the given V2 and V3
 // API versions.
-func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Server {
-	server := StartServerWithAPIVersions(v2Version, v3Version)
+func StartAndTargetMockServerWithAPIVersions(v2Version string, v3Version string) *Server {
+	server := StartMockServerWithAPIVersions(v2Version, v3Version)
 	Eventually(CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
 
 	return server
 }
 
-// StartServerWithMinimumCLIVersion starts a server with the default V2 and V3
+// StartMockServerWithMinimumCLIVersion starts a server with the default V2 and V3
 // API versions and the given minimum CLI version.
-func StartServerWithMinimumCLIVersion(minCLIVersion string) *Server {
+func StartMockServerWithMinimumCLIVersion(minCLIVersion string) *Server {
 	return startServerWithVersions(DefaultV2Version, DefaultV3Version, &minCLIVersion)
 }
 
-// StartServerWithAPIVersions starts a server with the given V2 and V3
+// StartMockServerWithAPIVersions starts a server with the given V2 and V3
 // API versions
-func StartServerWithAPIVersions(v2Version string, v3Version string) *Server {
+func StartMockServerWithAPIVersions(v2Version string, v3Version string) *Server {
 	return startServerWithVersions(v2Version, v3Version, nil)
 }
 

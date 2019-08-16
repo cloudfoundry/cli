@@ -137,7 +137,7 @@ var _ = Describe("api command", func() {
 
 			BeforeEach(func() {
 				cliVersion := "1.0.0"
-				server = helpers.StartServerWithMinimumCLIVersion(cliVersion)
+				server = helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
 				apiURL = server.URL()
 			})
 

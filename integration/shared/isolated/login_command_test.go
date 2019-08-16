@@ -79,7 +79,7 @@ var _ = Describe("login command", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
-				server = helpers.StartServerWithAPIVersions("2.99.9", "3.34.9")
+				server = helpers.StartMockServerWithAPIVersions("2.99.9", "3.34.9")
 
 				fakeTokenResponse := map[string]string{
 					"access_token":  helpers.BuildTokenString(time.Now()),
@@ -110,7 +110,7 @@ var _ = Describe("login command", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
-				server = helpers.StartServerWithMinimumCLIVersion("9000.0.0")
+				server = helpers.StartMockServerWithMinimumCLIVersion("9000.0.0")
 
 				helpers.AddLoginRoutes(server)
 				server.RouteToHandler(http.MethodGet, "/v2/organizations",
@@ -326,7 +326,7 @@ var _ = Describe("login command", func() {
 
 			BeforeEach(func() {
 				cliVersion := "1.0.0"
-				server = helpers.StartServerWithMinimumCLIVersion(cliVersion)
+				server = helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
 				serverURL, err = url.Parse(server.URL())
 				Expect(err).NotTo(HaveOccurred())
 			})

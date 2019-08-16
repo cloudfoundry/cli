@@ -59,7 +59,7 @@ var _ = Describe("v3-zdt-restart command", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinSupportedV3ClientVersion)
+				server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinSupportedV3ClientVersion)
 			})
 
 			AfterEach(func() {
