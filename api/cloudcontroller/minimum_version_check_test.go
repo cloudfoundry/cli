@@ -1,6 +1,8 @@
 package cloudcontroller_test
 
 import (
+	"time"
+
 	. "code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
@@ -35,6 +37,14 @@ var _ = Describe("Minimum Version Check", func() {
 				err := MinimumAPIVersionCheck("2.0.0", "")
 				Expect(err).ToNot(HaveOccurred())
 			})
+		})
+	})
+
+	Describe("Minimum version numbers", func() {
+		It("are up to date", func() {
+			expirationDate, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(time.Now().Before(expirationDate)).To(BeTrue(), "Check https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version and update versions if necessary")
 		})
 	})
 })
