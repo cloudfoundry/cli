@@ -80,6 +80,39 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("Minimum Version Check", func() {
+		When("the v2 API version is less than the minimum supported version", func() {
+			var server *ghttp.Server
+
+			BeforeEach(func() {
+				server = helpers.StartServerWithAPIVersions("2.99.9", "3.36.0")
+
+				fakeTokenResponse := map[string]string{
+					"access_token":  helpers.BuildTokenString(time.Now()),
+					"token_type":    "bearer",
+					"refresh_token": "refresh-token",
+				}
+				server.RouteToHandler(http.MethodPost, "/oauth/token",
+					ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+				server.RouteToHandler(http.MethodGet, "/v3/organizations",
+					ghttp.RespondWith(http.StatusOK, `{
+					 "total_results": 0,
+					 "total_pages": 1,
+					 "resources": []}`))
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("displays the warning and exits successfully", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+
+				Eventually(session.Err).Should(Say("Your API version is no longer supported. Upgrade to a newer version of the API. Please refer to https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		When("the CLI version is lower than the minimum supported version by the CC", func() {
 			var server *ghttp.Server
 
@@ -104,7 +137,8 @@ var _ = Describe("login command", func() {
 			})
 
 			It("displays the warning and exits successfully", func() {
-				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
 				Eventually(session.Err).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\. You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
 				Eventually(session).Should(Exit(0))
 			})
