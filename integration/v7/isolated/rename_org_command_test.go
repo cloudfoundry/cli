@@ -70,14 +70,9 @@ var _ = Describe("rename-org command", func() {
 	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
-			helpers.CreateOrg(orgName)
 		})
 
 		When("org does not exist", func() {
-			AfterEach(func() {
-				helpers.QuickDeleteOrg(orgName)
-			})
-
 			It("tells the user that the org does not exist, prints help text, and exits 1", func() {
 				session := helpers.CF("rename-org", "not-an-org", orgNameNew)
 
@@ -87,6 +82,10 @@ var _ = Describe("rename-org command", func() {
 		})
 
 		When("the org does exist", func() {
+			BeforeEach(func() {
+				helpers.CreateOrg(orgName)
+			})
+
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgNameNew)
 			})
@@ -101,6 +100,25 @@ var _ = Describe("rename-org command", func() {
 				session = helpers.CF("org", orgNameNew)
 				Eventually(session).Should(Say(`name:\s+%s`, orgNameNew))
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("the new name is already taken", func() {
+				BeforeEach(func() {
+					helpers.CreateOrg(orgNameNew)
+				})
+
+				AfterEach(func() {
+					helpers.QuickDeleteOrg(orgNameNew)
+				})
+
+				It("fails to rename the org", func() {
+					session := helpers.CF("rename-org", orgName, orgNameNew)
+					userName, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Renaming org %s to %s as %s...", orgName, orgNameNew, userName))
+					Eventually(session.Err).Should(Say(`Organization name '%s' is already taken\.`, orgNameNew))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})
