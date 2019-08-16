@@ -54,11 +54,11 @@ jobs:
 - name: units
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-pr
       trigger: true
     - get: cli-master
-  - aggregate:
+  - in_parallel:
     - put: cli-pr
       params:
         path: cli-pr
@@ -77,7 +77,7 @@ jobs:
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-pr
       trigger: true
       version: every
@@ -105,7 +105,7 @@ jobs:
 - name: integration-linux # TODO: clean this up
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-pr
       trigger: true
       passed: [claim-bosh-lite]

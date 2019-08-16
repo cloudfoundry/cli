@@ -261,11 +261,11 @@ jobs:
 - name: units
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       trigger: true
     - get: cli-ci
-  - aggregate:
+  - in_parallel:
     - task: lint
       file: cli-ci/ci/cli-v7/tasks/lint.yml
       on_failure:
@@ -307,7 +307,7 @@ jobs:
 - name: build-binaries
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       trigger: true
       passed: [units]
@@ -349,7 +349,7 @@ jobs:
 - name: integration-linux
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -392,7 +392,7 @@ jobs:
 - name: integration-linux-client-creds
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -431,7 +431,7 @@ jobs:
 - name: integration-windows
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -472,7 +472,7 @@ jobs:
 - name: integration-windows-client-creds
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -514,7 +514,7 @@ jobs:
 - name: integration-experimental
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -569,7 +569,7 @@ jobs:
 - name: integration-legacy
   serial: true
   plan:
-  - aggregate: &integration-legacy-aggregate
+  - in_parallel: &integration-legacy-aggregate
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -608,7 +608,7 @@ jobs:
 - name: integration-legacy-client-creds
   serial: true
   plan:
-  - aggregate: *integration-legacy-aggregate
+  - in_parallel: *integration-legacy-aggregate
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -636,7 +636,7 @@ jobs:
 - name: create-installers
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [integration-linux, integration-linux-client-creds, integration-windows, integration-experimental, integration-legacy]
     - get: cf-cli-binaries
@@ -650,7 +650,7 @@ jobs:
        params:
          channel: '#cli-dev-internal'
          text: "extracting the binaries in installer creation failed :("
-  - aggregate:
+  - in_parallel:
     - task: unix
       file: cli-ci/ci/cli/tasks/create-installers.yml
       on_failure:
@@ -673,7 +673,7 @@ jobs:
        params:
          channel: '#cli-dev-internal'
          text: "extracting the binaries in installer creation failed :("
-  - aggregate:
+  - in_parallel:
     - put: edge-linux-binary-32
       params:
         file: archives/cf-cli_edge_linux_i686.tgz
@@ -718,7 +718,7 @@ jobs:
 - name: cats
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [integration-linux, integration-linux-client-creds, integration-windows, integration-experimental, integration-legacy]
     - get: cf-acceptance-tests
@@ -772,7 +772,7 @@ jobs:
 - name: create-cli-base-image
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-ci-base-dockerfile
       trigger: true
     - get: golang
@@ -786,7 +786,7 @@ jobs:
 - name: create-cli-package-image
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-ci-package-dockerfile
       trigger: true
     - get: baseimage

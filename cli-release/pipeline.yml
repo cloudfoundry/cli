@@ -219,7 +219,7 @@ jobs:
 - name: create-and-sign-installers-v6
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-ci
     - get: cli
       resource: cli-v6
@@ -251,7 +251,7 @@ jobs:
   - task: copy-certificates
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
 
-  - aggregate:
+  - in_parallel:
     - task: repackage-binaries-and-installers
       file: cli-ci/ci/cli-release/tasks/repackage-binaries-and-installers.yml
       params:
@@ -299,7 +299,7 @@ jobs:
 - name: create-and-sign-installers-v7
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli-ci
     - get: cli
       resource: cli-v7
@@ -331,7 +331,7 @@ jobs:
   - task: copy-certificates
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
 
-  - aggregate:
+  - in_parallel:
     - task: repackage-binaries-and-installers
       file: cli-ci/ci/cli-release/tasks/repackage-binaries-and-installers.yml
       params:
@@ -379,7 +379,7 @@ jobs:
 - name: update-claw-v6
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       resource: cli-v6
       trigger: true
@@ -388,7 +388,7 @@ jobs:
     - get: edge-linux-binary-64
       resource: edge-linux-binary-64-v6
       passed: [create-and-sign-installers-v6]
-  - aggregate:
+  - in_parallel:
     - task: claw.run.pivotal.io
       file: cli-ci/ci/cli-release/tasks/update-claw.yml
       params:
@@ -409,7 +409,7 @@ jobs:
 - name: update-debian-repo-v6
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       resource: cli-v6
       trigger: true
@@ -433,7 +433,7 @@ jobs:
 - name: update-homebrew-v6
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       resource: cli-v6
       trigger: true
@@ -449,7 +449,7 @@ jobs:
 - name: update-rpm-repo-v6
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       resource: cli-v6
       trigger: true

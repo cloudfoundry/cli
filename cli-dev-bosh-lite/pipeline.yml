@@ -112,7 +112,7 @@ resources:
 jobs:
   - name: create-bosh-lite
     plan:
-      - aggregate:
+      - in_parallel:
         - get: capi-ci
         - get: bosh-deployment
         - get: cf-deployment
@@ -186,11 +186,11 @@ jobs:
                 params:
                   remove: fake-placeholder-env/
             on_failure:
-              aggregate:
+              in_parallel:
                 - task: delete-bosh-lite
                   file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
         on_failure:
-          aggregate:
+          in_parallel:
             - put: terraform
               params:
                 action: destroy
@@ -222,7 +222,7 @@ jobs:
 
   - name: delete-bosh-lite
     plan:
-      - aggregate:
+      - in_parallel:
         - get: destroy-bosh-lite-trigger
           version: every
           trigger: true
@@ -276,7 +276,7 @@ jobs:
   - name: check-pool-size
     build_logs_to_retain: 100
     plan:
-      - aggregate:
+      - in_parallel:
         - get: capi-ci
         - get: pool-repo
         - get: 5m
