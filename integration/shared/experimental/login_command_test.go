@@ -108,7 +108,7 @@ var _ = Describe("login command", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
 
-				Eventually(session.Err).Should(Say("Your API version is no longer supported. Upgrade to a newer version of the API. Please refer to https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version"))
+				Eventually(session.Err).Should(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

@@ -2,6 +2,7 @@ package command_test
 
 import (
 	"fmt"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/command"
@@ -140,8 +141,10 @@ var _ = Describe("version checks", func() {
 		When("checking the cloud controller minimum version warning", func() {
 			When("checking for outdated API version", func() {
 				When("the API version is older than the minimum supported API version", func() {
+					var min semver.Version
 					BeforeEach(func() {
-						min, err := semver.Make(ccversion.MinSupportedV2ClientVersion)
+						var err error
+						min, err = semver.Make(ccversion.MinSupportedV2ClientVersion)
 						Expect(err).ToNot(HaveOccurred())
 						apiVersion = fmt.Sprintf("%d.%d.%d", min.Major, min.Minor-1, min.Patch)
 					})
@@ -149,7 +152,10 @@ var _ = Describe("version checks", func() {
 					It("outputs a warning telling the user to upgrade their CF version", func() {
 						err := WarnIfAPIVersionBelowSupportedMinimum(apiVersion, testUI)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(testUI.Err).To(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
+						warning := regexp.QuoteMeta("Your CF API version (%s) is no longer supported. " +
+							"Upgrade to a newer version of the API (minimum version %s). Please refer to " +
+							"https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version")
+						Expect(testUI.Err).To(Say(warning, apiVersion, min))
 					})
 				})
 
@@ -163,7 +169,7 @@ var _ = Describe("version checks", func() {
 					It("continues silently", func() {
 						err := WarnIfAPIVersionBelowSupportedMinimum(apiVersion, testUI)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(testUI.Err).NotTo(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
+						Expect(testUI.Err).NotTo(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 					})
 				})
 			})

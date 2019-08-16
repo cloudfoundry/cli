@@ -214,8 +214,7 @@ api version:    100.200.300`,
 
 			It("outputs a warning", func() {
 				Expect(err).ToNot(HaveOccurred())
-
-				Expect(testUI.Err).To(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
+				Expect(testUI.Err).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 			})
 		})
 

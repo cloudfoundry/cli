@@ -92,8 +92,7 @@ var _ = Describe("New Clients", func() {
 
 			It("outputs a warning", func() {
 				NewClients(fakeConfig, testUI, true)
-
-				Expect(testUI.Err).To(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
+				Expect(testUI.Err).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 			})
 		})
 

@@ -41,7 +41,13 @@ func WarnIfAPIVersionBelowSupportedMinimum(apiVersion string, ui UI) error {
 	}
 
 	if isOutdated {
-		ui.DisplayWarning("Your API version is no longer supported. Upgrade to a newer version of the API. Please refer to https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version")
+		ui.DisplayWarning("Your CF API version ({{.APIVersion}}) is no longer supported. "+
+			"Upgrade to a newer version of the API (minimum version {{.MinSupportedVersion}}). Please refer to "+
+			"https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version",
+			map[string]interface{}{
+				"APIVersion":          apiVersion,
+				"MinSupportedVersion": ccversion.MinSupportedV2ClientVersion,
+			})
 	}
 
 	return nil
