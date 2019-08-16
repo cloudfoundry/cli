@@ -35,25 +35,22 @@
     ]
   },
   "linters": {
-    "disable-all": true,
-    "enable": [
-      "deadcode",
-      "depguard",
-      "errcheck",
-      "gochecknoinits",
-      "goconst",
-      "gocritic",
-      "goimports",
-      "gosimple",
-      "govet",
-      "ineffassign",
-      "interfacer",
-      "staticcheck",
-      "structcheck",
-      "typecheck",
-      "unconvert",
-      "unused",
-      "varcheck"
+    "enable-all": true,
+    "disable": [
+      "dupl",
+      "gochecknoglobals",
+      "gocyclo",
+      "gofmt",
+      "golint",
+      "gosec",
+      "lll",
+      "maligned",
+      "misspell",
+      "nakedret",
+      "prealloc",
+      "scopelint",
+      "stylecheck",
+      "unparam"
     ]
   },
   "linters-settings": {
