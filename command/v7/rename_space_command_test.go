@@ -94,7 +94,7 @@ var _ = Describe("rename-space Command", func() {
 				)
 			})
 
-			It("deletes the space in the targeted org", func() {
+			It("renames the space in the targeted org", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("warning-1"))
@@ -112,7 +112,7 @@ var _ = Describe("rename-space Command", func() {
 					fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: "old-space-guid", Name: "old-space-name"})
 				})
 
-				It("deletes the space and untargets the org", func() {
+				It("targets the renamed space", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Err).To(Say("warning-1"))

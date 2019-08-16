@@ -65,7 +65,6 @@ var _ = Describe("rename-org Command", func() {
 				Expect(executeErr).To(MatchError(returnedErr))
 			})
 		})
-
 		When("when the command succeeds", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)

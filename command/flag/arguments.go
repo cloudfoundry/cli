@@ -69,7 +69,7 @@ type Space struct {
 }
 
 type RenameSpace struct {
-	OldSpaceName string `positional-arg-name:"SPACE" required:"true" description:"The new space name"`
+	OldSpaceName string `positional-arg-name:"SPACE" required:"true" description:"The old space name"`
 	NewSpaceName string `positional-arg-name:"NEW_SPACE_NAME" required:"true" description:"The new space name"`
 }
 
@@ -199,7 +199,7 @@ type AppRenameArgs struct {
 
 type RenameOrgArgs struct {
 	OldOrgName string `positional-arg-name:"ORG" required:"true" description:"The old organization name"`
-	NewOrgName string `positional-arg-name:"NEW_ORG" required:"true" description:"The new organization name"`
+	NewOrgName string `positional-arg-name:"NEW_ORG_NAME" required:"true" description:"The new organization name"`
 }
 
 type RenameSpaceArgs struct {
