@@ -328,7 +328,7 @@ var _ = Describe("set-label command", func() {
 					var stacks []string
 
 					BeforeEach(func() {
-						stacks = helpers.EnsureMinimumNumberOfStacks(2)
+						stacks = []string{helpers.PreferredStack(), helpers.CreateStack()}
 
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath, "99")
@@ -336,8 +336,8 @@ var _ = Describe("set-label command", func() {
 						}, stacks[1])
 					})
 					AfterEach(func() {
-						buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[1])
-						deleteResourceByGUID(buildpackGUID, "buildpacks")
+						helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[1])
+						helpers.DeleteStack(stacks[1])
 					})
 
 					When("stack is not specified", func() {
