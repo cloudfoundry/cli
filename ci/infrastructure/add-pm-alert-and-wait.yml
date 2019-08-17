@@ -5,7 +5,7 @@
   value:
     name: alert-pm
     plan:
-    - aggregate:
+    - in_parallel:
       - get: cf-deployment
         trigger: true
     - put: slack-alert
@@ -33,7 +33,7 @@
 
 # Make deploy trigger after the 10 minute wait
 - type: replace
-  path: /jobs/name=deploy/plan/0/aggregate/get=cf-deployment/passed?
+  path: /jobs/name=deploy/plan/0/in_parallel/get=cf-deployment/passed?
   value: [alert-pm]
 
 # Add slack notification resource
