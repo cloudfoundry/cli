@@ -349,7 +349,7 @@ jobs:
 - name: integration-linux
   serial: true
   plan:
-  - in_parallel:
+  - in_parallel: &integration_resources
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -392,19 +392,7 @@ jobs:
 - name: integration-linux-client-creds
   serial: true
   plan:
-  - in_parallel:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lock
-      resource: gcp-bosh-pool
-      timeout: 2h
-      params:
-        acquire: true
+  - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -431,19 +419,7 @@ jobs:
 - name: integration-windows
   serial: true
   plan:
-  - in_parallel:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lock
-      resource: gcp-bosh-pool
-      timeout: 2h
-      params:
-        acquire: true
+  - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -472,19 +448,7 @@ jobs:
 - name: integration-windows-client-creds
   serial: true
   plan:
-  - in_parallel:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lock
-      resource: gcp-bosh-pool
-      timeout: 2h
-      params:
-        acquire: true
+  - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -514,19 +478,7 @@ jobs:
 - name: integration-experimental
   serial: true
   plan:
-  - in_parallel:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lock
-      resource: gcp-bosh-pool
-      timeout: 2h
-      params:
-        acquire: true
+  - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -569,7 +521,7 @@ jobs:
 - name: integration-legacy
   serial: true
   plan:
-  - in_parallel: &integration-legacy-aggregate
+  - in_parallel: &integration_legacy_resources
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -608,7 +560,7 @@ jobs:
 - name: integration-legacy-client-creds
   serial: true
   plan:
-  - in_parallel: *integration-legacy-aggregate
+  - in_parallel: *integration_legacy_resources
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
