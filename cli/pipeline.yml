@@ -274,7 +274,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            lint failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-linux
       file: cli-ci/ci/cli/tasks/units-linux.yml
@@ -283,7 +283,7 @@ jobs:
          params:
            channel: '#cli-dev-internal'
            text: |
-             Linux unit tests failed :(
+             $BUILD_JOB_NAME failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
@@ -292,7 +292,7 @@ jobs:
          params:
            channel: '#cli-dev-internal'
            text: |
-             OS X unit tests failed :(
+             $BUILD_JOB_NAME failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-windows
       tags: ["cli-windows"]
@@ -302,7 +302,7 @@ jobs:
          params:
            channel: '#cli-dev-internal'
            text: |
-             Windows unit tests failed :(
+             $BUILD_JOB_NAME failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
 
 - name: build-binaries
@@ -321,7 +321,7 @@ jobs:
       params:
         channel: '#cli-dev-internal'
         text: |
-          i18n generation failed :(
+          $BUILD_JOB_NAME failed :(
           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   - task: build
     file: cli-ci/ci/cli/tasks/build-binaries.yml
@@ -330,7 +330,7 @@ jobs:
       params:
         channel: '#cli-dev-internal'
         text: |
-          build binaries failed :(
+          $BUILD_JOB_NAME failed :(
           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   - task: build-osx
     file: cli-ci/ci/cli/tasks/build-osx-binary.yml
@@ -339,7 +339,7 @@ jobs:
       params:
         channel: '#cli-dev-internal'
         text: |
-          build OS X binaries failed :(
+          $BUILD_JOB_NAME failed :(
           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
@@ -373,7 +373,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Linux integration failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -404,7 +404,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Linux client-creds integration failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -436,7 +436,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Windows integration failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -466,7 +466,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Windows integration failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -495,7 +495,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Windows integration-experimental failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -509,7 +509,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Linux integration-experimental failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -539,7 +539,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Windows client-creds integration-experimental failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -554,7 +554,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Linux client-creds integration-experimental failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -593,7 +593,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Legacy integration failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -621,7 +621,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            Legacy integration failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
@@ -759,7 +759,7 @@ jobs:
         params:
           channel: '#cli-dev-internal'
           text: |
-            CATs Linux failed :(
+            $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   ensure:
     put: gcp-bosh-pool
