@@ -9,6 +9,7 @@ resource_types:
 resources:
 - name: cli
   type: git
+  icon: console
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
@@ -47,6 +48,7 @@ resources:
 
 - name: cf-cli-binaries
   type: s3
+  icon: folder
   source:
     bucket: ((staging-bucket-name))
     access_key_id: ((cli-team-aws-s3-access-key-id))
@@ -228,6 +230,7 @@ resources:
 
 - name: slack-alert
   type: slack-notification
+  icon: slack
   source:
     url: ((slack-webhook-url))
 
