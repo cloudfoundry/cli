@@ -21,5 +21,7 @@ go get -v -u github.com/onsi/ginkgo/ginkgo
 
 SET RUN_ID=(openssl rand -hex 16)
 
+echo "CF_INT_CLIENT_CREDENTIALS_TEST_MODE: $CF_INT_CLIENT_CREDENTIALS_TEST_MODE"
+
 cd %GOPATH%\src\code.cloudfoundry.org\cli
 ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/experimental ./integration/v6/experimental
