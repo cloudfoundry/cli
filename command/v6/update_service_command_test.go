@@ -172,10 +172,6 @@ var _ = Describe("update-service Command", func() {
 						Expect(testUI.Err).To(Say("warning"))
 					})
 
-					It("mentions that the command is experimental", func() {
-						Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice\\."))
-					})
-
 					It("prompts the user about the upgrade", func() {
 						Expect(testUI.Out).To(Say("You are about to update %s\\.", serviceInstanceName))
 						Expect(testUI.Out).To(Say("Warning: This operation may be long running and will block further operations on the service until complete\\."))
