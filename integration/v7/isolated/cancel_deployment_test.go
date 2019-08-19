@@ -83,20 +83,6 @@ var _ = Describe("Cancel Deployment", func() {
 			})
 		})
 
-		Context("when the API errors", func() {
-			It("exits 1 and displays an error", func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "--strategy=rolling", "--no-wait")).Should(Exit(0))
-				})
-
-				session := helpers.CF("cancel-deployment", appName)
-				Eventually(session).Should(Say(fmt.Sprintf("Canceling deployment for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Eventually(session.Err).Should(Say(`No active deployment found for app\.`))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		Context("when the cancel is successful", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
