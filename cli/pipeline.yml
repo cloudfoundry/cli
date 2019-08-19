@@ -279,25 +279,25 @@ jobs:
     - task: units-linux
       file: cli-ci/ci/cli/tasks/units-linux.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-dev-internal'
-           text: *slack_notification_text
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: *slack_notification_text
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-dev-internal'
-           text: *slack_notification_text
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: *slack_notification_text
     - task: units-windows
       tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/units-windows.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-dev-internal'
-           text: *slack_notification_text
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: *slack_notification_text
 
 - name: build-binaries
   serial: true
@@ -628,33 +628,33 @@ jobs:
   - task: extract-binaries
     file: cli-ci/ci/cli/tasks/extract-binaries.yml
     on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-dev-internal'
-         text: "extracting the binaries in installer creation failed :("
+      put: slack-alert
+      params:
+        channel: '#cli-dev-internal'
+        text: "extracting the binaries in installer creation failed :("
   - in_parallel:
     - task: unix
       file: cli-ci/ci/cli/tasks/create-installers.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-dev-internal'
-           text: "create unix installers failed :("
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: "create unix installers failed :("
     - task: windows
       tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/create-installers-windows.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-dev-internal'
-           text: "create windows installer failed :("
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: "create windows installer failed :("
   - task: package-binaries
     file: cli-ci/ci/cli/tasks/package-binaries.yml
     on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-dev-internal'
-         text: "extracting the binaries in installer creation failed :("
+      put: slack-alert
+      params:
+        channel: '#cli-dev-internal'
+        text: "extracting the binaries in installer creation failed :("
   - in_parallel:
     - put: edge-linux-binary-32
       params:
