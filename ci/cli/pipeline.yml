@@ -273,7 +273,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
+          text: &slack_notification_text |
             $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-linux
@@ -282,18 +282,14 @@ jobs:
          put: slack-alert
          params:
            channel: '#cli-dev-internal'
-           text: |
-             $BUILD_JOB_NAME failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+           text: *slack_notification_text
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
       on_failure:
          put: slack-alert
          params:
            channel: '#cli-dev-internal'
-           text: |
-             $BUILD_JOB_NAME failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+           text: *slack_notification_text
     - task: units-windows
       tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/units-windows.yml
@@ -301,9 +297,7 @@ jobs:
          put: slack-alert
          params:
            channel: '#cli-dev-internal'
-           text: |
-             $BUILD_JOB_NAME failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+           text: *slack_notification_text
 
 - name: build-binaries
   serial: true
@@ -320,27 +314,21 @@ jobs:
       put: slack-alert
       params:
         channel: '#cli-dev-internal'
-        text: |
-          $BUILD_JOB_NAME failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+        text: *slack_notification_text
   - task: build
     file: cli-ci/ci/cli/tasks/build-binaries.yml
     on_failure:
       put: slack-alert
       params:
         channel: '#cli-dev-internal'
-        text: |
-          $BUILD_JOB_NAME failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+        text: *slack_notification_text
   - task: build-osx
     file: cli-ci/ci/cli/tasks/build-osx-binary.yml
     on_failure:
       put: slack-alert
       params:
         channel: '#cli-dev-internal'
-        text: |
-          $BUILD_JOB_NAME failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+        text: *slack_notification_text
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -372,9 +360,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -403,9 +389,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -435,9 +419,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -465,9 +447,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -494,9 +474,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -508,9 +486,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -538,9 +514,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -553,9 +527,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -592,9 +564,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -620,9 +590,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -758,9 +726,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-dev-internal'
-          text: |
-            $BUILD_JOB_NAME failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+          text: *slack_notification_text
   ensure:
     put: gcp-bosh-pool
     params:
