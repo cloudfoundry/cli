@@ -249,8 +249,9 @@ groups:
   - integration-windows-client-creds
   - integration-legacy
   - integration-legacy-client-creds
-  - cats
   - integration-experimental
+  - integration-experimental-client-creds
+  - cats
   - create-installers
 - name: images
   jobs:
@@ -501,6 +502,8 @@ jobs:
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
+      params:
+        <<: *integration_params
       on_failure:
         put: slack-alert
         params:
@@ -511,8 +514,51 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: integration-experimental-client-creds
+  serial: true
+  plan:
+  - in_parallel: *integration_resources
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration-windows
+      tags: ["cli-windows"]
+      file: cli-ci/ci/cli/tasks/integration-experimental-windows.yml
       params:
         <<: *integration_params
+        CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
+      input_mapping:
+        cf-credentials: cleanup-integration-outputs
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: |
+            Windows client-creds integration-experimental failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration-linux
+      file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
+      params:
+        <<: *integration_params
+        CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: |
+            Linux client-creds integration-experimental failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
   ensure:
     put: gcp-bosh-pool
     params:
