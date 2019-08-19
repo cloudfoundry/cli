@@ -9,6 +9,11 @@ groups:
   - delete-infrastructure
 
 resources:
+- name: capi-ci
+  type: git
+  source:
+    branch: master
+    uri: git@github.com:cloudfoundry/capi-ci.git
 - name: cf-deployment-concourse-tasks
   type: git
   source:
@@ -56,6 +61,17 @@ jobs:
       params:
         claim: ((stack-name)).cli.fun
     - get: cli-ci
+  # TODO: remove certs from bbl state
+  # TODO: persist bbl state
+  - task: disable-resurrection
+    file: capi-ci/ci/bbl-tasks/update-resurrection.yml
+    params:
+      ENVIRONMENT: ((stack-name))
+      ON_OR_OFF: off
+  - task: delete-certs
+    file: capi-ci/ci/bbl-tasks/delete-certs.yml
+    params:
+      ENVIRONMENT: ripley
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
@@ -108,14 +124,18 @@ jobs:
       CLEAN_ALL: true
   ensure:
     aggregate:
-      - put: state
-        params:
-          repository: updated-bbl-state
-          rebase: true
-      - put: gcp-bosh-pool
-        params:
-          release: gcp-bosh-pool
-
+    - task: enable-resurrection
+      file: capi-ci/ci/bbl-tasks/update-resurrection.yml
+      params:
+        ENVIRONMENT: ((stack-name))
+        ON_OR_OFF: on
+    - put: state
+      params:
+        repository: updated-bbl-state
+        rebase: true
+    - put: gcp-bosh-pool
+      params:
+        release: gcp-bosh-pool
 - name: delete-cf
   serial_groups: [((stack-name))]
   build_logs_to_retain: 100

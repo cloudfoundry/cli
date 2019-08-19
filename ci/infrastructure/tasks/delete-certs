@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -e
+
+workspace_dir="$( pwd )"
+updated_cli_private="${workspace_dir}/updated-cli-private"
+output_path="${updated_cli_private}/ci/infrastructure/${ENVIRONMENT}"
+delete_var_store_script="${workspace_dir}/cli/ci/infrastructure/tasks/delete-var-store-certs.rb"
+
+function delete_bbl_certs() {
+  ${delete_var_store_script} ${output_path}/vars/director-vars-store.yml
+  ${delete_var_store_script} ${output_path}/vars/jumpbox-vars-store.yml
+}
+
+function delete_cf_certs() {
+  eval "$(bbl print-env)"
+  # from the cf-deployment manifest, find all the certs by name,
+  # then delete them from credhub one by one
+  yq '.variables | .[] | select(.type=="certificate") | .name' <(bosh -dcf manifest) \
+     |  xargs -n1 -I{} sh -c \
+        "echo about to delete {} from credhub && credhub delete -n /bosh-${ENVIRONMENT}/cf/{}" \
+     || true # best effort for reentrancy - we always want to bbl up even if this fails
+}
+
+function commit_capi_ci_private() {
+  if [[ -n $(git status --porcelain) ]]; then
+    git config user.name "CI Bot"
+    git config user.email "cf-capi-eng@pivotal.io"
+
+    git add "${updated_cli_private}/${ENVIRONMENT}"
+    git commit -m "Initial commit for '${ENVIRONMENT}'"
+  fi
+}
+
+cp -rf cli-private/. ${updated_cli_private}
+
+mkdir -p "${updated_cli_private}/${ENVIRONMENT}"
+pushd "${updated_cli_private}/${ENVIRONMENT}"
+  if [[ "$DELETE_CF_CERTS" == "true" ]] ; then
+    delete_cf_certs
+  fi
+  delete_bbl_certs
+
+  commit_capi_ci_private
+popd

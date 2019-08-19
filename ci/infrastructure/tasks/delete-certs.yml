@@ -1,0 +1,22 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/capi
+    tag: bbl
+
+inputs:
+- name: cli
+- name: cli-private
+
+outputs:
+- name: updated-cli-private
+
+run:
+  path: cli/ci/infrastructure/tasks/delete-certs
+
+params:
+  ENVIRONMENT:
+  DELETE_CF_CERTS: false
