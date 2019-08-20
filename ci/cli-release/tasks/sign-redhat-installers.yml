@@ -56,5 +56,5 @@ run:
     ./sign-rpm edge-redhat-installer-32/cf${SUFFIX}-cli-installer_edge_i686.rpm
     ./sign-rpm edge-redhat-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.rpm
 
-    mv edge-redhat-installer-32/cf${SUFFIX}-cli-installer_edge_i686.rpm signed-redhat-installer/cf-cli-installer_${VERSION}_i686.rpm
-    mv edge-redhat-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.rpm signed-redhat-installer/cf-cli-installer_${VERSION}_x86-64.rpm
+    mv edge-redhat-installer-32/cf${SUFFIX}-cli-installer_edge_i686.rpm signed-redhat-installer/cf${SUFFIX}-cli-installer_${VERSION}_i686.rpm
+    mv edge-redhat-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.rpm signed-redhat-installer/cf${SUFFIX}-cli-installer_${VERSION}_x86-64.rpm

@@ -53,10 +53,10 @@ run:
       -t http://timestamp.comodoca.com/authenticode \
       -h sha256 \
       -in cf_installer.exe \
-      -out signed-64/cf_installer.exe
+      -out signed-64/cf${VERSION_SUFFIX}_installer.exe
     rm -f cf_installer.exe
 
-    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_winx64.zip LICENSE NOTICE signed-64/cf_installer.exe
+    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_winx64.zip LICENSE NOTICE signed-64/cf${VERSION_SUFFIX}_installer.exe
 
     unzip winstallers/cf-cli-installer_win32.zip
 
@@ -67,6 +67,6 @@ run:
       -t http://timestamp.comodoca.com/authenticode \
       -h sha256 \
       -in cf_installer.exe \
-      -out signed-32/cf_installer.exe
+      -out signed-32/cf${VERSION_SUFFIX}_installer.exe
 
-    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_win32.zip LICENSE NOTICE signed-32/cf_installer.exe
+    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_win32.zip LICENSE NOTICE signed-32/cf${VERSION_SUFFIX}_installer.exe

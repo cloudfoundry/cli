@@ -35,9 +35,9 @@ run:
       SUFFIX=""
     fi
 
-    mv edge-linux-binary-32/cf${SUFFIX}-cli_edge_linux_i686.tgz repackaged-binaries-and-installers/cf-cli_${VERSION}_linux_i686.tgz
-    mv edge-linux-binary-64/cf${SUFFIX}-cli_edge_linux_x86-64.tgz repackaged-binaries-and-installers/cf-cli_${VERSION}_linux_x86-64.tgz
-    mv edge-osx-binary-64/cf${SUFFIX}-cli_edge_osx.tgz repackaged-binaries-and-installers/cf-cli_${VERSION}_osx.tgz
+    mv edge-linux-binary-32/cf${SUFFIX}-cli_edge_linux_i686.tgz repackaged-binaries-and-installers/cf${SUFFIX}-cli_${VERSION}_linux_i686.tgz
+    mv edge-linux-binary-64/cf${SUFFIX}-cli_edge_linux_x86-64.tgz repackaged-binaries-and-installers/cf${SUFFIX}-cli_${VERSION}_linux_x86-64.tgz
+    mv edge-osx-binary-64/cf${SUFFIX}-cli_edge_osx.tgz repackaged-binaries-and-installers/cf${SUFFIX}-cli_${VERSION}_osx.tgz
 
-    mv edge-deb-installer-32/cf${SUFFIX}-cli-installer_edge_i686.deb repackaged-binaries-and-installers/cf-cli-installer_${VERSION}_i686.deb
-    mv edge-deb-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.deb repackaged-binaries-and-installers/cf-cli-installer_${VERSION}_x86-64.deb
+    mv edge-deb-installer-32/cf${SUFFIX}-cli-installer_edge_i686.deb repackaged-binaries-and-installers/cf${SUFFIX}-cli-installer_${VERSION}_i686.deb
+    mv edge-deb-installer-64/cf${SUFFIX}-cli-installer_edge_x86-64.deb repackaged-binaries-and-installers/cf${SUFFIX}-cli-installer_${VERSION}_x86-64.deb
