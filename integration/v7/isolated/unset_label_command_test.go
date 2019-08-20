@@ -209,6 +209,15 @@ var _ = Describe("unset-label command", func() {
 						Expect(len(buildpack.Metadata.Labels)).To(Equal(1))
 						Expect(buildpack.Metadata.Labels["public-facing0"]).To(Equal("false"))
 
+						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]))
+						Eventually(session).Should(Exit(0))
+						buildpackJSON = session.Out.Contents()
+						buildpack = commonResource{}
+						Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+						Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+						Expect(buildpack.Metadata.Labels["pci1"]).To(Equal("true"))
+						Expect(buildpack.Metadata.Labels["public-facing1"]).To(Equal("false"))
+
 						session = helpers.CF("unset-label", "buildpack", buildpackName, "pci1", "--stack", stacks[1])
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[1], username))
 						Eventually(session).Should(Say("OK"))
