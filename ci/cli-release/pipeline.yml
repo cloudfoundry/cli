@@ -406,6 +406,36 @@ jobs:
         CF_ORGANIZATION: ((oss-organization))
         CF_SPACE: ((oss-space))
 
+- name: update-claw-v7
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      resource: cli-v7
+      trigger: true
+      passed: [create-and-sign-installers-v7]
+    - get: cli-ci
+    - get: edge-linux-binary-64
+      resource: edge-linux-binary-64-v7
+      passed: [create-and-sign-installers-v7]
+  - aggregate:
+    - task: claw.run.pivotal.io
+      file: cli-ci/ci/cli-release/tasks/update-claw-v7.yml
+      params:
+        CF_API: ((cf-api))
+        CF_USERNAME: ((cli-pws-client-id))
+        CF_PASSWORD: ((cli-pws-client-secret))
+        CF_ORGANIZATION: ((pivotal-organization))
+        CF_SPACE: ((pivotal-space))
+    - task: packages.cloudfoundry.org
+      file: cli-ci/ci/cli-release/tasks/update-claw-v7.yml
+      params:
+        CF_API: ((cf-api))
+        CF_USERNAME: ((cli-pws-client-id))
+        CF_PASSWORD: ((cli-pws-client-secret))
+        CF_ORGANIZATION: ((oss-organization))
+        CF_SPACE: ((oss-space))
+
 - name: update-debian-repo-v6
   serial: true
   plan:
@@ -423,6 +453,30 @@ jobs:
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
   - task: publish-debian
     file: cli-ci/ci/cli-release/tasks/publish-debian.yml
+    params:
+      AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
+      AWS_BUCKET_NAME: cf-cli-debian-repo
+      AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
+      GPG_KEY_LOCATION: ((gpg-key-location))
+      KEY_ID_LOCATION: ((gpg-key-id-location))
+
+- name: update-debian-repo-v7
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      resource: cli-v7
+      trigger: true
+      passed: [update-claw-v7]
+    - get: cli-ci
+  - task: obtain-certificates
+    file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
+    params:
+      CERT_PATH: ((osx-certificate-store))
+  - task: copy-certificates
+    file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
+  - task: publish-debian
+    file: cli-ci/ci/cli-release/tasks/publish-debian-v7.yml
     params:
       AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
       AWS_BUCKET_NAME: cf-cli-debian-repo
