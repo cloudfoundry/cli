@@ -100,7 +100,7 @@ run:
         cp $root/extracted-binaries/cf7-cli_linux_i686 cf7
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-        cp ../completion/cf7 cf.bash
+        cp ../completion/cf7 cf7.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
@@ -114,7 +114,7 @@ run:
         cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf7
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-        cp ../completion/cf7 cf.bash
+        cp ../completion/cf7 cf7.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
