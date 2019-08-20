@@ -35,8 +35,8 @@ run:
     VERSION=$(cat cli/BUILD_VERSION_V7)
 
     mkdir installers
-    curl -L "https://cli.run.pivotal.io/stable?release=debian32&version=${VERSION}&source=github-rel" > installers/cf-cli-installer_${VERSION}_i686.deb
-    curl -L "https://cli.run.pivotal.io/stable?release=debian64&version=${VERSION}&source=github-rel" > installers/cf-cli-installer_${VERSION}_x86-64.deb
+    curl -L "https://cli.run.pivotal.io/stable?release=debian32&version=${VERSION}&source=github-rel" > installers/cf7-cli-installer_${VERSION}_i686.deb
+    curl -L "https://cli.run.pivotal.io/stable?release=debian64&version=${VERSION}&source=github-rel" > installers/cf7-cli-installer_${VERSION}_x86-64.deb
 
     cat >> $GNUPGHOME/gpg.conf <<EOF
     personal-digest-preferences SHA256
