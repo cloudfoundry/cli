@@ -500,7 +500,7 @@ jobs:
     params:
       repository: update-brew-formula-output/homebrew-tap
 
-- name: update-rpm-repo-v6
+- name: update-rpm-repo
   serial: true
   plan:
   - in_parallel:
@@ -508,6 +508,10 @@ jobs:
       resource: cli-v6
       trigger: true
       passed: [update-claw-v6]
+    - get: cli-v7
+      resource: cli-v7
+      trigger: true
+      passed: [update-claw-v7]
     - get: cli-ci
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml

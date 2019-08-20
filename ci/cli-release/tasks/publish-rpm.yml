@@ -42,6 +42,12 @@ run:
       s3://cf-cli-releases \
       .
 
+    aws s3 sync \
+      --exclude "*" \
+      --include "releases/*/*installer*.rpm" \
+      s3://v7-cf-cli-releases \
+      .
+
     createrepo -s sha .
     # ./sign-repodata
 
