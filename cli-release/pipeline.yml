@@ -500,7 +500,7 @@ jobs:
     params:
       repository: update-brew-formula-output/homebrew-tap
 
-- name: update-rpm-repo
+- name: update-rpm-repo-v6
   serial: true
   plan:
   - in_parallel:
@@ -508,6 +508,24 @@ jobs:
       resource: cli-v6
       trigger: true
       passed: [update-claw-v6]
+    - get: cli-ci
+  - task: obtain-certificates
+    file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
+    params:
+      CERT_PATH: ((osx-certificate-store))
+  - task: copy-certificates
+    file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
+  - task: publish-rpm
+    file: cli-ci/ci/cli-release/tasks/publish-rpm.yml
+    params:
+      AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
+      AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
+      GPG_KEY_LOCATION: ((gpg-key-location))
+
+- name: update-rpm-repo-v7
+  serial: true
+  plan:
+  - in_parallel:
     - get: cli-v7
       resource: cli-v7
       trigger: true
