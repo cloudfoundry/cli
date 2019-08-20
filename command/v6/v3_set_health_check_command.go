@@ -33,7 +33,7 @@ func (cmd *V3SetHealthCheckCommand) Setup(config command.Config, ui command.UI) 
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, _, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

@@ -53,7 +53,7 @@ func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.SharedActor = sharedActor
 	cmd.SSHActor = sharedActor
 
-	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

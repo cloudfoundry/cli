@@ -34,7 +34,7 @@ var _ = Describe("New V3 Based Clients", func() {
 
 	When("the api endpoint is not set", func() {
 		It("returns the NoAPISetError", func() {
-			_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
+			_, _, err := NewV3BasedClients(fakeConfig, testUI, true)
 			Expect(err).To(MatchError(translatableerror.NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -60,7 +60,7 @@ var _ = Describe("New V3 Based Clients", func() {
 			})
 
 			It("returns a command api request error", func() {
-				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true)
 				Expect(err).To(MatchError(ContainSubstring("dial")))
 			})
 		})
@@ -76,7 +76,7 @@ var _ = Describe("New V3 Based Clients", func() {
 			})
 
 			It("returns a command api not found error", func() {
-				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true)
 				Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
 			})
 		})
@@ -92,7 +92,7 @@ var _ = Describe("New V3 Based Clients", func() {
 			})
 
 			It("returns a V3UnexpectedResponseError", func() {
-				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true)
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusTeapot}))
 			})
 		})
@@ -108,14 +108,14 @@ var _ = Describe("New V3 Based Clients", func() {
 		})
 
 		It("passes the value to the target", func() {
-			_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
+			_, _, err := NewV3BasedClients(fakeConfig, testUI, true)
 			Expect(err.Error()).To(MatchRegexp("timeout"))
 		})
 	})
 
 	When("not targetting", func() {
 		It("does not target and returns no UAA client", func() {
-			ccClient, uaaClient, err := NewV3BasedClients(fakeConfig, testUI, false, "")
+			ccClient, uaaClient, err := NewV3BasedClients(fakeConfig, testUI, false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ccClient).ToNot(BeNil())
 			Expect(uaaClient).To(BeNil())

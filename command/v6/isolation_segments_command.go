@@ -32,7 +32,7 @@ func (cmd *IsolationSegmentsCommand) Setup(config command.Config, ui command.UI)
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	client, _, err := shared.NewV3BasedClients(config, ui, true, "")
+	client, _, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

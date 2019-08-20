@@ -30,7 +30,7 @@ func (cmd *V3CancelZdtPushCommand) Setup(config command.Config, ui command.UI) e
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

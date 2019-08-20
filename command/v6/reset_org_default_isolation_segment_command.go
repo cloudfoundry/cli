@@ -38,7 +38,7 @@ func (cmd *ResetOrgDefaultIsolationSegmentCommand) Setup(config command.Config, 
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, _, err := shared.NewV3BasedClients(config, ui, true, "")
+	client, _, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

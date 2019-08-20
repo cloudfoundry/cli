@@ -11,7 +11,7 @@ import (
 
 // NewV3BasedClients creates a new V3 Cloud Controller client and UAA client using the
 // passed in config.
-func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool, minVersionV3 string) (*ccv3.Client, *uaa.Client, error) {
+func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Client, *uaa.Client, error) {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -52,16 +52,6 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool, minV
 	})
 	if err != nil {
 		return nil, nil, err
-	}
-
-	if minVersionV3 != "" {
-		err = command.MinimumCCAPIVersionCheck(ccClient.CloudControllerAPIVersion(), minVersionV3)
-		if err != nil {
-			if _, ok := err.(translatableerror.MinimumCFAPIVersionNotMetError); ok {
-				return nil, nil, translatableerror.V3V2SwitchError{}
-			}
-			return nil, nil, err
-		}
 	}
 
 	if ccClient.UAA() == "" {
