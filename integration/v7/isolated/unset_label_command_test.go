@@ -154,7 +154,6 @@ var _ = Describe("unset-label command", func() {
 				BeforeEach(func() {
 					stacks = helpers.EnsureMinimumNumberOfStacks(2)
 					for i := 0; i < 2; i++ {
-
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath, fmt.Sprintf("%d", 98+i))
 							Eventually(createSession).Should(Exit(0))
