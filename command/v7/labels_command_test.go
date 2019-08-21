@@ -48,20 +48,6 @@ var _ = Describe("labels command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	verifyStackArgNotAllowed := func() {
-		BeforeEach(func() {
-			cmd.BuildpackStack = "cflinuxfs3"
-		})
-
-		It("displays an argument combination error", func() {
-			argumentCombinationError := translatableerror.ArgumentCombinationError{
-				Args: []string{strings.ToLower(cmd.RequiredArgs.ResourceType), "--stack, -s"},
-			}
-
-			Expect(executeErr).To(MatchError(argumentCombinationError))
-		})
-	}
-
 	Describe("listing labels", func() {
 		Describe("for apps", func() {
 			BeforeEach(func() {
@@ -170,8 +156,20 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			When("when the --stack flag is specified", func() {
-				verifyStackArgNotAllowed()
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "aPp",
+						ResourceName: "dora",
+					}
+				})
+
+				It("retrieves the labels associated with the app", func() {
+					Expect(fakeLabelsActor.GetApplicationLabelsCallCount()).To(Equal(1))
+					appName, spaceGUID := fakeLabelsActor.GetApplicationLabelsArgsForCall(0)
+					Expect(appName).To(Equal("dora"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
 			})
 		})
 
@@ -290,10 +288,6 @@ var _ = Describe("labels command", func() {
 					orgName := fakeLabelsActor.GetOrganizationLabelsArgsForCall(0)
 					Expect(orgName).To(Equal("fake-org"))
 				})
-			})
-
-			When("when the --stack flag is specified", func() {
-				verifyStackArgNotAllowed()
 			})
 		})
 
@@ -415,10 +409,6 @@ var _ = Describe("labels command", func() {
 					Expect(orgGUID).To(Equal("some-org-guid"))
 				})
 			})
-
-			When("when the --stack flag is specified", func() {
-				verifyStackArgNotAllowed()
-			})
 		})
 
 		Describe("for stacks", func() {
@@ -520,6 +510,21 @@ var _ = Describe("labels command", func() {
 
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "sTack",
+						ResourceName: "fake-stack",
+					}
+				})
+
+				It("retrieves the labels associated with the stack", func() {
+					Expect(fakeLabelsActor.GetStackLabelsCallCount()).To(Equal(1))
+					stackName := fakeLabelsActor.GetStackLabelsArgsForCall(0)
+					Expect(stackName).To(Equal("fake-stack"))
 				})
 			})
 		})
@@ -645,29 +650,29 @@ var _ = Describe("labels command", func() {
 					Expect(executeErr).To(MatchError("boom"))
 				})
 			})
-		})
-	})
 
-	Describe("mixed case resource names", func() {
-		When("showing labels", func() {
-			It("succeeds", func() {
-				names := []string{"ApP", "BuIlDpAcK", "sPaCe", "StAcK", "oRg"}
-				for _, name := range names {
-					resourceName := "oshkosh"
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
 					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: name,
-						ResourceName: resourceName,
+						ResourceType: "buildPack",
+						ResourceName: "fake-buildpack",
 					}
-					executeErr := cmd.Execute(nil)
-					Expect(executeErr).ToNot(HaveOccurred())
-				}
+					cmd.BuildpackStack = "fake-stack"
+				})
+
+				It("retrieves the labels associated with the buildpack", func() {
+					Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
+					buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
+					Expect(buildpackName).To(Equal("fake-buildpack"))
+					Expect(stackName).To(Equal("fake-stack"))
+				})
 			})
 		})
 	})
 
 	Describe("disallowed --stack option", func() {
 		When("specifying --stack", func() {
-			It("complains", func() {
+			It("errors with a disallowed resource type", func() {
 				names := []string{"app", "space", "stack", "org"}
 				for _, name := range names {
 					cmd.RequiredArgs = flag.LabelsArgs{
@@ -683,7 +688,7 @@ var _ = Describe("labels command", func() {
 				}
 			})
 
-			It("retrieves the labels associated with the buildpack", func() {
+			It("retrieves the labels when resource type is buildpack", func() {
 				cmd.RequiredArgs = flag.LabelsArgs{
 					ResourceType: "buildpack",
 					ResourceName: "oshkosh",
