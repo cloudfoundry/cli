@@ -37,7 +37,7 @@ type LabelsActor interface {
 
 type LabelsCommand struct {
 	RequiredArgs   flag.LabelsArgs `positional-args:"yes"`
-	BuildpackStack string          `long:"stack" short:"s" description:"required when more than one buildpack has the same name"`
+	BuildpackStack string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	usage          interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n\nSEE ALSO:\n   set-label, unset-label"`
 	UI             command.UI
 	Config         command.Config

@@ -38,6 +38,8 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
 		})
 	})
 
