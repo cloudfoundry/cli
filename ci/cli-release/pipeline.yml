@@ -500,6 +500,22 @@ jobs:
     params:
       repository: update-brew-formula-output/homebrew-tap
 
+- name: update-homebrew-v7
+  serial: true
+  plan:
+  - in_parallel:
+    - get: cli
+      resource: cli-v7
+      trigger: true
+      passed: [update-claw-v7]
+    - get: cli-ci
+    - get: homebrew-tap
+  - task: update-brew-formula
+    file: cli-ci/ci/cli-release/tasks/update-brew-formula-v7.yml
+  - put: homebrew-tap
+    params:
+      repository: update-brew-formula-output/homebrew-tap
+
 - name: update-rpm-repo-v6
   serial: true
   plan:
