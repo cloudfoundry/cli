@@ -155,7 +155,7 @@ var _ = Describe("labels command", func() {
 					Expect(executeErr).To(MatchError("boom"))
 				})
 			})
-      
+
 			When("the resource type argument is not lowercase", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs = flag.LabelsArgs{

@@ -294,7 +294,7 @@ var _ = Describe("unset-label command", func() {
 								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
 								Expect(testUI.Out).To(Say("OK"))
 							})
-              
+
 							It("prints all warnings", func() {
 								Expect(testUI.Err).To(Say("some-warning-1"))
 								Expect(testUI.Err).To(Say("some-warning-2"))
