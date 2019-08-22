@@ -294,7 +294,7 @@ var _ = Describe("unset-label command", func() {
 								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
 								Expect(testUI.Out).To(Say("OK"))
 							})
-
+              
 							It("prints all warnings", func() {
 								Expect(testUI.Err).To(Say("some-warning-1"))
 								Expect(testUI.Err).To(Say("some-warning-2"))
@@ -380,6 +380,17 @@ var _ = Describe("unset-label command", func() {
 							})
 						})
 					})
+				})
+			})
+
+			When("fetching the current user's name fails", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("could not get user"))
 				})
 			})
 		})

@@ -64,7 +64,7 @@ func (c CheckerMakerFunc) NewVersionChecker(config command.Config, ui command.UI
 }
 
 var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (LoginActor, error) {
-	client, uaa, err := shared.NewV3BasedClients(config, ui, targetCF, "")
+	client, uaa, err := shared.NewV3BasedClients(config, ui, targetCF)
 	if err != nil {
 		return nil, err
 	}

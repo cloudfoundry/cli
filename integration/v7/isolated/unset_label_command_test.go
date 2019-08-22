@@ -39,6 +39,8 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, labels`))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -154,9 +156,8 @@ var _ = Describe("unset-label command", func() {
 			When("the buildpack exists for multiple stacks", func() {
 				var buildpackGUIDs [2]string
 				BeforeEach(func() {
-					stacks = helpers.EnsureMinimumNumberOfStacks(2)
+					stacks = []string{helpers.PreferredStack(), helpers.CreateStack()}
 					for i := 0; i < 2; i++ {
-
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							createSession := helpers.CF("create-buildpack", buildpackName, buildpackPath, fmt.Sprintf("%d", 98+i))
 							Eventually(createSession).Should(Exit(0))
@@ -173,6 +174,7 @@ var _ = Describe("unset-label command", func() {
 					for i := 0; i < 2; i++ {
 						deleteResourceByGUID(buildpackGUIDs[i], "buildpacks")
 					}
+					helpers.DeleteStack(stacks[1])
 				})
 
 				When("stack is not specified", func() {
@@ -210,6 +212,15 @@ var _ = Describe("unset-label command", func() {
 						Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
 						Expect(len(buildpack.Metadata.Labels)).To(Equal(1))
 						Expect(buildpack.Metadata.Labels["public-facing0"]).To(Equal("false"))
+
+						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]))
+						Eventually(session).Should(Exit(0))
+						buildpackJSON = session.Out.Contents()
+						buildpack = commonResource{}
+						Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
+						Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
+						Expect(buildpack.Metadata.Labels["pci1"]).To(Equal("true"))
+						Expect(buildpack.Metadata.Labels["public-facing1"]).To(Equal("false"))
 
 						session = helpers.CF("unset-label", "buildpack", buildpackName, "pci1", "--stack", stacks[1])
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[1], username))

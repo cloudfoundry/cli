@@ -36,7 +36,7 @@ func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) e
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, uaa, err := shared.NewV3BasedClients(config, ui, true, "")
+	client, uaa, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

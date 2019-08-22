@@ -42,6 +42,8 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say(`\s+unset-label, labels`))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
 
 				Eventually(session).Should(Exit(0))
 			})

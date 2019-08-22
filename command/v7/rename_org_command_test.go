@@ -3,7 +3,6 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -15,13 +14,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("rename-space Command", func() {
+var _ = Describe("rename-org Command", func() {
 	var (
-		cmd             RenameSpaceCommand
+		cmd             RenameOrgCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeRenameSpaceActor
+		fakeActor       *v7fakes.FakeRenameOrganizationActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -32,17 +31,17 @@ var _ = Describe("rename-space Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeRenameSpaceActor)
+		fakeActor = new(v7fakes.FakeRenameOrganizationActor)
 
-		cmd = RenameSpaceCommand{
+		cmd = RenameOrgCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 		}
 
-		cmd.RequiredArgs.OldSpaceName = "old-space-name"
-		cmd.RequiredArgs.NewSpaceName = "new-space-name"
+		cmd.RequiredArgs.OldOrgName = "old-org-name"
+		cmd.RequiredArgs.NewOrgName = "new-org-name"
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -51,22 +50,6 @@ var _ = Describe("rename-space Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	When("checking target errors", func() {
-		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
-		})
-
-		It("returns the NotLoggedInError", func() {
-			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
-
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkTargetedOrg).To(BeTrue())
-			Expect(checkTargetedSpace).To(BeFalse())
-		})
-
 	})
 
 	When("checking target succeeds", func() {
@@ -82,46 +65,43 @@ var _ = Describe("rename-space Command", func() {
 				Expect(executeErr).To(MatchError(returnedErr))
 			})
 		})
-
 		When("when the command succeeds", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-targeted-org", GUID: "org-guid"})
-				fakeActor.RenameSpaceByNameAndOrganizationGUIDReturns(
-					v7action.Space{GUID: "old-space-guid", Name: "new-space-name"},
+				fakeActor.RenameOrganizationReturns(
+					v7action.Organization{GUID: "old-org-guid", Name: "new-org-name"},
 					v7action.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
 			})
 
-			It("renames the space in the targeted org", func() {
+			It("renames the org", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
 
-				Expect(fakeActor.RenameSpaceByNameAndOrganizationGUIDCallCount()).To(Equal(1))
-				oldSpaceName, newSpaceName, orgArg := fakeActor.RenameSpaceByNameAndOrganizationGUIDArgsForCall(0)
-				Expect(oldSpaceName).To(Equal("old-space-name"))
-				Expect(newSpaceName).To(Equal("new-space-name"))
-				Expect(orgArg).To(Equal("org-guid"))
+				Expect(fakeActor.RenameOrganizationCallCount()).To(Equal(1))
+				oldOrgName, newOrgName := fakeActor.RenameOrganizationArgsForCall(0)
+				Expect(oldOrgName).To(Equal("old-org-name"))
+				Expect(newOrgName).To(Equal("new-org-name"))
 			})
 
-			When("renaming a targeted space", func() {
+			When("renaming a targeted org", func() {
 				BeforeEach(func() {
-					fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: "old-space-guid", Name: "old-space-name"})
+					fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "old-org-guid", Name: "old-org-name"})
 				})
 
-				It("targets the renamed space", func() {
+				It("renames the org and records it in the config file", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 
-					Expect(fakeConfig.V7SetSpaceInformationCallCount()).To(Equal(1))
-					newSpaceGUID, newSpaceName := fakeConfig.V7SetSpaceInformationArgsForCall(0)
-					Expect(newSpaceGUID).To(Equal("old-space-guid"))
-					Expect(newSpaceName).To(Equal("new-space-name"))
+					Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+					newOrgGUID, newOrgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+					Expect(newOrgGUID).To(Equal("old-org-guid"))
+					Expect(newOrgName).To(Equal("new-org-name"))
 				})
 			})
 		})

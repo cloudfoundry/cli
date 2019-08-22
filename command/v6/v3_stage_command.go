@@ -36,7 +36,7 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

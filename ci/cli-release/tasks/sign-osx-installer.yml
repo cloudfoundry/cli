@@ -42,4 +42,4 @@ run:
       --sign "$CERT_COMMON_NAME" \
       --keychain temp-keychain \
       edge-osx-installer-64/cf${SUFFIX}-cli-installer_edge_osx.pkg \
-      signed-osx-installer/cf-cli-installer_${VERSION}_osx.pkg
+      signed-osx-installer/cf${SUFFIX}-cli-installer_${VERSION}_osx.pkg

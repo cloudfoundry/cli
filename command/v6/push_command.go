@@ -95,7 +95,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClientV3, _, err := sharedV3.NewV3BasedClients(config, ui, true, "")
+	ccClientV3, _, err := sharedV3.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

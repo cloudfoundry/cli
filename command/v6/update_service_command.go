@@ -29,8 +29,8 @@ type UpdateServiceCommand struct {
 	Tags             string               `short:"t" description:"User provided tags"`
 	usage            interface{}          `usage:"CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS] [--upgrade]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n   CF_NAME update-service SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file:\n   CF_NAME update-service SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }\n\n   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.\n\nEXAMPLES:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list, of, tags\"\n   CF_NAME update-service mydb --upgrade\n   CF_NAME update-service mydb --upgrade --force"`
 	relatedCommands  interface{}          `related_commands:"rename-service, services, update-user-provided-service"`
-	Upgrade          bool                 `short:"u" long:"upgrade" description:"Upgrade the service instance to the latest version of the service plan available. This flag is in EXPERIMENTAL stage and may change without notice. It cannot be combined with flags: -c, -p, -t."`
-	ForceUpgrade     bool                 `short:"f" long:"force" description:"Force the upgrade to the latest available version of the service plan. This flag is in EXPERIMENTAL stage and may change without notice. It can only be used with: -u, --upgrade."`
+	Upgrade          bool                 `short:"u" long:"upgrade" description:"Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t."`
+	ForceUpgrade     bool                 `short:"f" long:"force" description:"Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade."`
 
 	UI          command.UI
 	Actor       UpdateServiceActor
@@ -109,7 +109,6 @@ func (cmd *UpdateServiceCommand) promptForUpgrade() (bool, error) {
 
 	var serviceName = textData{"ServiceName": cmd.RequiredArgs.ServiceInstance}
 
-	cmd.UI.DisplayText("This command is in EXPERIMENTAL stage and may change without notice.")
 	cmd.UI.DisplayTextWithFlavor("You are about to update {{.ServiceName}}.", serviceName)
 	cmd.UI.DisplayText("Warning: This operation may be long running and will block further operations on the service until complete.")
 

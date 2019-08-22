@@ -1,0 +1,47 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
+
+inputs:
+- name: cli
+- name: certificates
+
+params:
+  GPG_KEY_LOCATION:
+  KEY_ID_LOCATION:
+  AWS_SECRET_ACCESS_KEY:
+  AWS_ACCESS_KEY_ID:
+  AWS_BUCKET_NAME:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    mkdir gpg-dir
+    export GNUPGHOME=$PWD/gpg-dir
+    chmod 700 $GNUPGHOME
+    trap "rm -rf $GNUPGHOME" 0
+
+    gpg --import certificates/$GPG_KEY_LOCATION
+
+    export DEBIAN_FRONTEND=noninteractive
+
+    VERSION=$(cat cli/BUILD_VERSION_V7)
+
+    mkdir installers
+    curl -L "https://cli.run.pivotal.io/stable?release=debian32&version=${VERSION}&source=github-rel" > installers/cf7-cli-installer_${VERSION}_i686.deb
+    curl -L "https://cli.run.pivotal.io/stable?release=debian64&version=${VERSION}&source=github-rel" > installers/cf7-cli-installer_${VERSION}_x86-64.deb
+
+    cat >> $GNUPGHOME/gpg.conf <<EOF
+    personal-digest-preferences SHA256
+    cert-digest-algo SHA256
+    default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
+    EOF
+
+    deb-s3 upload installers/*.deb --preserve-versions --sign=$(cat ${KEY_ID_LOCATION}) --bucket=${AWS_BUCKET_NAME}

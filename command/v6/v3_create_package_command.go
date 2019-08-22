@@ -36,7 +36,7 @@ func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) e
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	client, _, err := shared.NewV3BasedClients(config, ui, true, "")
+	client, _, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

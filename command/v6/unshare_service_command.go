@@ -40,7 +40,7 @@ func (cmd *UnshareServiceCommand) Setup(config command.Config, ui command.UI) er
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClientV3, uaaClientV3, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClientV3, uaaClientV3, err := shared.NewV3BasedClients(config, ui, true)
 	if err != nil {
 		return err
 	}

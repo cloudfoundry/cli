@@ -68,8 +68,8 @@ func (actor Actor) CreateOrganization(orgName string) (Organization, Warnings, e
 	return actor.convertCCToActorOrganization(organization), allWarnings, err
 }
 
-// UpdateOrganization updates the name and/or labels of an organization
-func (actor Actor) UpdateOrganization(org Organization) (Organization, Warnings, error) {
+// updateOrganization updates the name and/or labels of an organization
+func (actor Actor) updateOrganization(org Organization) (Organization, Warnings, error) {
 	ccOrg := ccv3.Organization{
 		GUID:     org.GUID,
 		Name:     org.Name,
@@ -82,6 +82,24 @@ func (actor Actor) UpdateOrganization(org Organization) (Organization, Warnings,
 	}
 
 	return actor.convertCCToActorOrganization(updatedOrg), Warnings(warnings), nil
+}
+
+func (actor Actor) RenameOrganization(oldOrgName, newOrgName string) (Organization, Warnings, error) {
+	var allWarnings Warnings
+
+	org, warnings, err := actor.GetOrganizationByName(oldOrgName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Organization{}, allWarnings, err
+	}
+
+	org.Name = newOrgName
+	org, warnings, err = actor.updateOrganization(org)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Organization{}, allWarnings, err
+	}
+	return org, allWarnings, nil
 }
 
 func (actor Actor) DeleteOrganization(name string) (Warnings, error) {
