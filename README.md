@@ -24,20 +24,25 @@
 
 ***Cloud Foundry CLI*** is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
 Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf help`);
-Further documentation is at the [docs page for the
-CLI](https://docs.cloudfoundry.org/cf-cli).
 
-**Important Note**: CF CLI supports as far back as CF Release v284/CF Deployment v1.7.0 (CAPI Release: 1.46.0 (APIs 2.100.0 and 3.35.0). See our [wiki](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version) for more information. If you are on an older version of CF Release, we recommend you upgrade to a supported version. 
+Currently, there are two versions of the cf CLI in development: 
+- the supported v6 cf CLI. See [here](https://docs.cloudfoundry.org/cf-cli) for more information. 
+- v7 beta cf CLI which is currently in development and will be in beta mode until it is completely backed by the [v3 API](http://v3-apidocs.cloudfoundry.org/version/3.75.0/index.html). See [here](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information. 
+
+
+**Important Note**: The v6 CF CLI supports as far back as CF Release v284/CF Deployment v1.7.0 (CAPI Release: 1.46.0 (APIs 2.100.0 and 3.35.0). See our [wiki](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version) for more information. If you are on an older version of CF Release, we recommend you upgrade to a supported version. 
+
+**Important Note**: The v7 CF CLI beta under rapid development and as such is tested only against CC API v3 Release Candidate.
 
 If you have any questions, ask away on the #cli channel in [our Slack
 community](https://slack.cloudfoundry.org/) and the
 [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
 mailing list, or [open a GitHub issue](https://github.com/cloudfoundry/cli/issues/new).  You can follow our development progress
-on [Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938).
+on [Core CF CLI Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938) or [v3/v7 CLI VAT Pivotal Tracker](https://www.pivotaltracker.com/n/projects/2196383).
 
 ## Getting Started
 
-Download and install the cf CLI from the [Downloads Section](#downloads).
+Download and install the cf CLI from the [Downloads Section](#downloads) for either the [v6 cf CLI](https://github.com/cloudfoundry/cli/blob/master/README.md#downloading-the-v6-cli) or the [v7 beta cf CLI](https://github.com/cloudfoundry/cli/blob/master/README.md#downloading-the-v7-cli). 
 
 Once installed, you can log in and push an app.
 
@@ -47,7 +52,9 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 
 ## Downloads
 
-### Installing using a package manager
+### Downloading the V6 CLI
+
+#### Installing using a package manager
 
 **Mac OS X** and **Linux** using [Homebrew](https://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
 
@@ -76,7 +83,7 @@ sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundr
 sudo yum install cf-cli
 ```
 
-### Installers and compressed binaries
+#### Installers and compressed binaries
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
@@ -99,9 +106,77 @@ sudo curl -o /usr/share/bash-completion/completions/cf https://raw.githubusercon
 cf --version
 ```
 
-#### Edge binaries
+##### Edge binaries
 Edge binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are 'pushed' and passed through the CI.
 Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.org/edge?arch=macosx64&source=github), [Windows 64 bit](https://packages.cloudfoundry.org/edge?arch=windows64&source=github) and [Linux 64 bit](https://packages.cloudfoundry.org/edge?arch=linux64&source=github).
+
+---------------------------------------
+
+
+### Downloading the V7 beta CLI
+
+**Important Note**: The v7 CF CLI beta under rapid development and as such is tested only against CC API v3 Release Candidate. Use at your own risk. See [releases](https://github.com/cloudfoundry/cli/releases) for more information. 
+
+#### Compatibility
+The V7 CLI is developed and tested against CAPI release candidates. See the [releases](https://github.com/cloudfoundry/cli/releases) page for the minimum CAPI RC version required for each V7 beta version.
+
+#### Installing using a package manager
+
+**Mac OS X** and **Linux** using [Homebrew](https://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
+
+```sh
+brew install cloudfoundry/tap/cf7-cli
+```
+
+**Note:** `cf7` tab completion requires `bash-completion` to be installed properly in order to work.
+
+**Debian** and **Ubuntu** based Linux distributions:
+
+```sh
+# ...first add the Cloud Foundry Foundation public key and package repository to your system
+wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+# ...then, update your local package index, then finally install the cf CLI
+sudo apt-get update
+sudo apt-get install cf7-cli
+```
+
+**Enterprise Linux** and **Fedora** systems (RHEL6/CentOS6 and up):
+```sh
+# ...first configure the Cloud Foundry Foundation package repository
+sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+# ...then, install the cf CLI (which will also download and add the public key to your system)
+sudo yum install cf7-cli
+```
+
+#### Installers and compressed binaries
+
+| | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
+| :---------------: | :---------------: |:---------------:| :------------:|
+| Installers | [pkg](https://packages.cloudfoundry.org/stable?release=macosx64&version=v7&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64&version=v7&source=github) | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&version=v7&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github) |
+| Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=v7&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64-exe&version=v7&source=github) | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github) |
+
+Release notes, and 32 bit releases can be found [here](https://github.com/cloudfoundry/cli/releases).
+
+**Download examples** with curl for Mac OS X and Linux binaries
+```sh
+# ...download & extract Mac OS X binary
+curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=v7&source=github" | tar -zx
+# ...or Linux 64-bit binary
+curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github" | tar -zx
+# ...move it to /usr/local/bin or a location you know is in your $PATH
+mv cf7 /usr/local/bin
+# ...copy tab completion file on Ubuntu (takes affect after re-opening your shell)
+sudo curl -o /usr/share/bash-completion/completions/cf7 https://raw.githubusercontent.com/cloudfoundry/cli/master/ci/installers/completion/cf7
+# ...and to confirm your cf CLI version
+cf7 --version
+```
+
+##### Edge binaries
+Edge binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are 'pushed' and passed through the CI.
+Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.org/edge?arch=macosx64&version=v7&source=github), [Windows 64 bit](https://packages.cloudfoundry.org/edge?arch=windows64&version=v7&source=github) and [Linux 64 bit](https://packages.cloudfoundry.org/edge?arch=linux64&version=v7&source=github).
+
+
 
 ## Known Issues
 
@@ -138,4 +213,5 @@ as long they vendor the plugins directory.
 Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
 If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
+
 
