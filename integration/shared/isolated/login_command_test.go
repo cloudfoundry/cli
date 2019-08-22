@@ -66,10 +66,19 @@ var _ = Describe("login command", func() {
 	Describe("Invalid Command Usage", func() {
 		When("a random flag is passed in", func() {
 			It("should exit 1 and display an unknown flag error message", func() {
-				session := helpers.CF("login", "--test")
+				session := helpers.CF("login", "--i-am-an-unknown-flag")
 				Eventually(session).Should(Exit(1))
 
-				Expect(session.Err).Should(Say("Incorrect Usage: unknown flag `test'"))
+				Expect(session.Err).Should(Say("Incorrect Usage: unknown flag `i-am-an-unknown-flag'"))
+			})
+		})
+
+		When("an extra argument is passed in", func() {
+			It("should exit 1 and display an unexpected argument error message", func() {
+				session := helpers.CF("login",  "-a", "api.missing-fish.lite.cli.fun", "--skip-ssl-validation", "i-am-an-extra-argument")
+				Eventually(session).Should(Exit(1))
+
+				Expect(session.Err).Should(Say(`Incorrect Usage: unexpected argument "i-am-an-extra-argument"`))
 			})
 		})
 	})
