@@ -104,28 +104,42 @@ var _ = Describe("v3-create-package command", func() {
 		})
 
 		When("the app exists", func() {
+
+			var lifecycle string
+
 			BeforeEach(func() {
-				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
+				lifecycle = "buildpack"
 			})
 
-			It("creates the package", func() {
-				session := helpers.CF("v3-create-package", appName)
-				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Exit(0))
+			JustBeforeEach(func() {
+				Eventually(helpers.CF("v3-create-app", appName, "--app-type", lifecycle)).Should(Exit(0))
 			})
 
-			When("the --docker-image flag is provided", func() {
-				When("the docker-image exists", func() {
-					It("creates the package", func() {
-						session := helpers.CF("v3-create-package", appName, "--docker-image", PublicDockerImage)
-						userName, _ := helpers.GetCredentials()
-						Eventually(session).Should(Say("Creating docker package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
+			When("it has a buildpack lifecycle", func() {
+				It("creates the package", func() {
+					session := helpers.CF("v3-create-package", appName)
+					userName, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("it has a docker lifecycle", func() {
+				BeforeEach(func() {
+					lifecycle = "docker"
+				})
+				When("the --docker-image flag is provided", func() {
+					When("the docker-image exists", func() {
+						It("creates the package", func() {
+							session := helpers.CF("v3-create-package", appName, "--docker-image", PublicDockerImage)
+							userName, _ := helpers.GetCredentials()
+							Eventually(session).Should(Say("Creating docker package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 			})
