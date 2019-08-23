@@ -75,7 +75,7 @@ var _ = Describe("login command", func() {
 
 		When("an extra argument is passed in", func() {
 			It("should exit 1 and display an unexpected argument error message", func() {
-				session := helpers.CF("login",  "-a", "api.missing-fish.lite.cli.fun", "--skip-ssl-validation", "i-am-an-extra-argument")
+				session := helpers.CF("login", "-a", "api.missing-fish.lite.cli.fun", "--skip-ssl-validation", "i-am-an-extra-argument")
 				Eventually(session).Should(Exit(1))
 
 				Expect(session.Err).Should(Say(`Incorrect Usage: unexpected argument "i-am-an-extra-argument"`))
