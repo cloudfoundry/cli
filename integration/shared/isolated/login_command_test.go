@@ -32,7 +32,7 @@ var _ = Describe("login command", func() {
 				Expect(session).Should(Say("login - Log user in"))
 
 				Expect(session).Should(Say("USAGE:\n"))
-				Expect(session).Should(Say(`cf login \[-a API_URL\] \[-u USERNAME\] \[-p PASSWORD\] \[-o ORG\] \[-s SPACE\] \[--sso | --sso-passcode PASSCODE\]`))
+				Expect(session).Should(Say(`cf login \[-a API_URL\] \[-u USERNAME\] \[-p PASSWORD\] \[-o ORG\] \[-s SPACE\] \[--sso | --sso-passcode PASSCODE\] \[--origin ORIGIN\]`))
 
 				Expect(session).Should(Say("WARNING:\n"))
 				Expect(session).Should(Say("Providing your password as a command line option is highly discouraged\n"))
@@ -44,6 +44,7 @@ var _ = Describe("login command", func() {
 				Expect(session).Should(Say(regexp.QuoteMeta("cf login -u name@example.com -p \"my password\" (use quotes for passwords with a space)")))
 				Expect(session).Should(Say(regexp.QuoteMeta("cf login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)")))
 				Expect(session).Should(Say(regexp.QuoteMeta("cf login --sso (cf will provide a url to obtain a one-time passcode to login)")))
+				Expect(session).Should(Say(regexp.QuoteMeta("cf login --origin ldap")))
 
 				Expect(session).Should(Say("ALIAS:\n"))
 				Expect(session).Should(Say("l"))
@@ -1349,6 +1350,42 @@ var _ = Describe("login command", func() {
 			It("re-authenticates using the custom client", func() {
 				session := helpers.CF("orgs")
 				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Describe("Setting the identity provider to be used", func() {
+		When("the user provides the --origin flag", func() {
+			It("logs in successfully", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "--origin", "uaa")
+				Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+				Eventually(session).Should(Say(`Authenticating\.\.\.`))
+				Eventually(session).Should(Say(`OK`))
+				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+				Eventually(session).Should(Say("User:\\s+" + username))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the user provides the --origin flag and --sso flag", func() {
+			It("rejects the command", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "--sso", "--origin", "uaa")
+
+				Eventually(session.Err).Should(Say(`Incorrect Usage: The following arguments cannot be used together: --sso, --origin`))
+
+				Eventually(session).Should(Exit(1))
+			})
+		})
+		When("the user provides the --origin flag and --sso-passcode flag", func() {
+			It("rejects the command", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "--sso-passcode", "some-passcode", "--origin", "uaa")
+
+				Eventually(session.Err).Should(Say(`Incorrect Usage: The following arguments cannot be used together: --sso-passcode, --origin`))
+
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

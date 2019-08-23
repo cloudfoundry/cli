@@ -92,7 +92,8 @@ type LoginCommand struct {
 	SSO               bool        `long:"sso" description:"Prompt for a one-time passcode to login"`
 	SSOPasscode       string      `long:"sso-passcode" description:"One-time passcode"`
 	Username          string      `short:"u" description:"Username"`
-	usage             interface{} `usage:"CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--sso | --sso-passcode PASSCODE]\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\nEXAMPLES:\n   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)\n   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time passcode to login)"`
+	Origin            string      `long:"origin" description:"Indicates the identity provider to be used for login"`
+	usage             interface{} `usage:"CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--sso | --sso-passcode PASSCODE] [--origin ORIGIN]\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\nEXAMPLES:\n   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)\n   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time passcode to login)\n   CF_NAME login --origin ldap"`
 	relatedCommands   interface{} `related_commands:"api, auth, target"`
 
 	UI           command.UI
@@ -117,6 +118,19 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *LoginCommand) Execute(args []string) error {
+	if cmd.Origin != "" {
+		if cmd.SSO {
+			return translatableerror.ArgumentCombinationError{
+				Args: []string{"--sso", "--origin"},
+			}
+		}
+		if cmd.SSOPasscode != "" {
+			return translatableerror.ArgumentCombinationError{
+				Args: []string{"--sso-passcode", "--origin"},
+			}
+		}
+	}
+
 	endpoint, err := cmd.determineAPIEndpoint()
 	if err != nil {
 		return err
@@ -337,7 +351,7 @@ func (cmd *LoginCommand) authenticate() error {
 
 		cmd.UI.DisplayText("Authenticating...")
 
-		err = cmd.Actor.Authenticate(promptedCredentials, "", constant.GrantTypePassword)
+		err = cmd.Actor.Authenticate(promptedCredentials, cmd.Origin, constant.GrantTypePassword)
 
 		if err != nil {
 			cmd.UI.DisplayWarning(translatableerror.ConvertToTranslatableError(err).Error())
