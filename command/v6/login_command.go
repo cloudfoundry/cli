@@ -129,7 +129,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayNewline()
 
-	err = cmd.retargetAPI()
+	err = cmd.targetAPI()
 	if err != nil {
 		te := translatableerror.ConvertToTranslatableError(err)
 		if ise, ok := te.(translatableerror.InvalidSSLCertError); ok {
@@ -262,25 +262,27 @@ func (cmd *LoginCommand) getAPI() error {
 		}
 		cmd.APIEndpoint = apiEndpoint
 	}
-	return nil
-}
 
-func (cmd *LoginCommand) retargetAPI() error {
 	strippedEndpoint := strings.TrimRight(cmd.APIEndpoint, "/")
 	endpoint, _ := url.Parse(strippedEndpoint)
 	if endpoint.Scheme == "" {
 		endpoint.Scheme = "https"
 	}
+	cmd.APIEndpoint = endpoint.String()
 
+	return nil
+}
+
+func (cmd *LoginCommand) targetAPI() error {
 	settings := v3action.TargetSettings{
-		URL:               endpoint.String(),
+		URL:               cmd.APIEndpoint,
 		SkipSSLValidation: cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation,
 	}
 	_, err := cmd.Actor.SetTarget(settings)
 	if err != nil {
 		return err
 	}
-	if strings.HasPrefix(endpoint.String(), "http:") {
+	if strings.HasPrefix(cmd.APIEndpoint, "http:") {
 		cmd.UI.DisplayWarning("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
 	}
 
