@@ -28,7 +28,6 @@ func WarnIfCLIVersionBelowAPIDefinedMinimum(config Config, apiVersion string, ui
 				"MinCLIVersion": minVer,
 				"BinaryVersion": currentVer,
 			})
-		ui.DisplayNewline()
 	}
 
 	return nil
