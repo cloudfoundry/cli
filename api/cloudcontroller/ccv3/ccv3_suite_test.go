@@ -143,6 +143,9 @@ func SetupV3Response() {
 			},
             "routes": {
                 "href": "SERVER_URL/v3/routes"
+            },
+            "users": {
+                "href": "SERVER_URL/v3/users"
             }
 		}
 	}`, "SERVER_URL", serverURL, -1)

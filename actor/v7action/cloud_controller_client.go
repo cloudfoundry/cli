@@ -29,6 +29,7 @@ type CloudControllerClient interface {
 	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
 	CreateServiceBroker(name, username, password, url, spaceGUID string) (ccv3.Warnings, error)
 	CreateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
+	CreateUser(userGUID string) (ccv3.User, ccv3.Warnings, error)
 	DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
 	DeleteBuildpack(buildpackGUID string) (ccv3.JobURL, ccv3.Warnings, error)

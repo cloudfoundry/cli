@@ -97,6 +97,7 @@ const (
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PostSpaceRequest                                            = "PostSpace"
+	PostUserRequest                                             = "PostUser"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
 	UnmapRouteRequest                                           = "UnmapRoute"
@@ -195,4 +196,5 @@ var APIRoutes = []Route{
 	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: StacksResource, Path: "/:stack_guid", Method: http.MethodPatch, Name: PatchStackRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
+	{Resource: UsersResource, Path: "/", Method: http.MethodPost, Name: PostUserRequest},
 }

@@ -59,7 +59,7 @@ type commandList struct {
 	CreateSharedDomain                 v7.CreateSharedDomainCommand                 `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`
 	CreateSpace                        v7.CreateSpaceCommand                        `command:"create-space" alias:"csp" description:"Create a space"`
 	CreateSpaceQuota                   v6.CreateSpaceQuotaCommand                   `command:"create-space-quota" description:"Define a new space resource quota"`
-	CreateUser                         v6.CreateUserCommand                         `command:"create-user" description:"Create a new user"`
+	CreateUser                         v7.CreateUserCommand                         `command:"create-user" description:"Create a new user"`
 	CreateUserProvidedService          v6.CreateUserProvidedServiceCommand          `command:"create-user-provided-service" alias:"cups" description:"Make a user-provided service instance available to CF apps"`
 	Curl                               v6.CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
 	Delete                             v7.DeleteCommand                             `command:"delete" alias:"d" description:"Delete an app"`

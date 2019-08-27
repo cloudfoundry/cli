@@ -285,6 +285,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateUserStub        func(string) (ccv3.User, ccv3.Warnings, error)
+	createUserMutex       sync.RWMutex
+	createUserArgsForCall []struct {
+		arg1 string
+	}
+	createUserReturns struct {
+		result1 ccv3.User
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createUserReturnsOnCall map[int]struct {
+		result1 ccv3.User
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteApplicationStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteApplicationMutex       sync.RWMutex
 	deleteApplicationArgsForCall []struct {
@@ -2682,6 +2697,72 @@ func (fake *FakeCloudControllerClient) CreateSpaceReturnsOnCall(i int, result1 c
 	}
 	fake.createSpaceReturnsOnCall[i] = struct {
 		result1 ccv3.Space
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateUser(arg1 string) (ccv3.User, ccv3.Warnings, error) {
+	fake.createUserMutex.Lock()
+	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
+	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("CreateUser", []interface{}{arg1})
+	fake.createUserMutex.Unlock()
+	if fake.CreateUserStub != nil {
+		return fake.CreateUserStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createUserReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateUserCallCount() int {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	return len(fake.createUserArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateUserCalls(stub func(string) (ccv3.User, ccv3.Warnings, error)) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateUserArgsForCall(i int) string {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	argsForCall := fake.createUserArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateUserReturns(result1 ccv3.User, result2 ccv3.Warnings, result3 error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = nil
+	fake.createUserReturns = struct {
+		result1 ccv3.User
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateUserReturnsOnCall(i int, result1 ccv3.User, result2 ccv3.Warnings, result3 error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = nil
+	if fake.createUserReturnsOnCall == nil {
+		fake.createUserReturnsOnCall = make(map[int]struct {
+			result1 ccv3.User
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createUserReturnsOnCall[i] = struct {
+		result1 ccv3.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -7896,6 +7977,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createServiceBrokerMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
 	fake.deleteApplicationMutex.RLock()
 	defer fake.deleteApplicationMutex.RUnlock()
 	fake.deleteApplicationProcessInstanceMutex.RLock()
