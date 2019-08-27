@@ -587,8 +587,9 @@ var _ = Describe("login Command", func() {
 		})
 
 		Describe("SSO Passcode", func() {
+			fakeAPI := "whatever.com"
 			BeforeEach(func() {
-				fakeConfig.TargetReturns("whatever.com")
+				fakeConfig.TargetReturns(fakeAPI)
 
 				input.Write([]byte("some-passcode\n"))
 				fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
@@ -614,7 +615,7 @@ var _ = Describe("login Command", func() {
 
 				It("authenticates with the inputted code", func() {
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
 					Expect(testUI.Out).To(Say(`User:\s+potatoface`))
 
 					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
@@ -669,7 +670,7 @@ var _ = Describe("login Command", func() {
 				It("displays a summary with user information", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
 					Expect(testUI.Out).To(Say(`User:\s+potatoface`))
 				})
 
@@ -697,7 +698,7 @@ var _ = Describe("login Command", func() {
 					})
 
 					It("does not include user information in the summary", func() {
-						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
 						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, cmd.Config.BinaryName()))
 					})
 				})
@@ -717,8 +718,10 @@ var _ = Describe("login Command", func() {
 		})
 
 		Describe("Minimum CLI version", func() {
+			var fakeAPI string
 			BeforeEach(func() {
-				fakeConfig.TargetReturns("whatever.com")
+				fakeAPI = "whatever.com"
+				fakeConfig.TargetReturns(fakeAPI)
 
 				fakeChecker.MinCLIVersionReturns("9000.0.0")
 			})
@@ -752,7 +755,7 @@ var _ = Describe("login Command", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 						Expect(testUI.Out).To(Say(`Authenticating...`))
 						Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
 						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, binaryName))
 					})
 				})
