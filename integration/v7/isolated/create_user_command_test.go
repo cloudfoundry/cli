@@ -174,7 +174,7 @@ var _ = Describe("create-user command", func() {
 					session := helpers.CF("create-user", newUser, newPassword)
 					Eventually(session.Err).Should(Say("User '%s' already exists.", newUser))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).ShouldNot(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
+					Consistently(session).ShouldNot(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 					Eventually(session).Should(Exit(0))
 				})
 			})

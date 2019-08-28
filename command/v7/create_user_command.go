@@ -78,7 +78,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(uaa.ConflictError); ok {
-			cmd.UI.DisplayWarning("User '{{.User}}' already exists.", map[string]interface{}{
+			cmd.UI.DisplayWarningV7("User '{{.User}}' already exists.", map[string]interface{}{
 				"User": cmd.Args.Username,
 			})
 			cmd.UI.DisplayOK()
