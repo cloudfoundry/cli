@@ -751,10 +751,11 @@ var _ = Describe("login Command", func() {
 						testUI.Err = outAndErr
 					})
 
-					It("displays the warning after all prompts but before the summary ", func() {
+					It("displays the warning after the API targeting but before the summary ", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(testUI.Out).To(Say(`Authenticating...`))
+						Expect(testUI.Out).To(Say(`API endpoint: `))
 						Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
+						Expect(testUI.Out).To(Say(`Authenticating...`))
 						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
 						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, binaryName))
 					})

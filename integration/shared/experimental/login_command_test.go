@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os/exec"
 	"regexp"
 	"time"
 
@@ -104,12 +105,23 @@ var _ = Describe("login command", func() {
 				server.Close()
 			})
 
-			It("displays the warning and exits successfully", func() {
+			It("displays the warning to stderr and exits successfully", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
 
 				Eventually(session.Err).Should(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 				Eventually(session).Should(Exit(0))
+			})
+
+			It("displays the warning before authenticating", func() {
+				username, password := helpers.GetCredentials()
+				cmd := exec.Command("cf", "login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+				stdErrAndStdOut, err := cmd.CombinedOutput()
+				Expect(err).ToNot(HaveOccurred())
+
+				output := BufferWithBytes(stdErrAndStdOut)
+				Expect(output).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
+				Expect(output).To(Say("Authenticating..."), "Expected Min API version warning before 'Authenticating...' message.")
 			})
 		})
 
@@ -136,11 +148,23 @@ var _ = Describe("login command", func() {
 				server.Close()
 			})
 
-			It("displays the warning and exits successfully", func() {
+			It("displays the warning to stderr and exits successfully", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+
 				Eventually(session.Err).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\. You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
 				Eventually(session).Should(Exit(0))
+			})
+
+			It("displays the warning before authenticating", func() {
+				username, password := helpers.GetCredentials()
+				cmd := exec.Command("cf", "login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+				stdErrAndStdOut, err := cmd.CombinedOutput()
+				Expect(err).ToNot(HaveOccurred())
+
+				output := BufferWithBytes(stdErrAndStdOut)
+				Expect(output).To(Say(`Cloud Foundry API version .+ requires CLI version .+\. You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
+				Expect(output).To(Say("Authenticating..."), "Expected Min CLI version warning before 'Authenticating...' message.")
 			})
 		})
 	})

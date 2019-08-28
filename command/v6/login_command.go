@@ -139,6 +139,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return err
 	}
 
+	err = cmd.checkMinCLIVersion()
+	if err != nil {
+		return err
+	}
+
 	defer cmd.showStatus()
 
 	if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
@@ -225,11 +230,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		}
 	}
 
-	err = cmd.checkMinCLIVersion()
-	if err != nil {
-		return err
-	}
-
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayNewline()
@@ -286,7 +286,7 @@ func (cmd *LoginCommand) targetAPI() error {
 		cmd.UI.DisplayWarning("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
 	}
 
-	return cmd.reloadActor()
+	return cmd.reloadActorAndChecker()
 }
 
 func (cmd *LoginCommand) authenticate() error {
@@ -400,12 +400,6 @@ func (cmd *LoginCommand) authenticateSSO() error {
 }
 
 func (cmd *LoginCommand) checkMinCLIVersion() error {
-	newChecker, err := cmd.CheckerMaker.NewVersionChecker(cmd.Config, cmd.UI, true)
-	if err != nil {
-		return err
-	}
-
-	cmd.Checker = newChecker
 	cmd.Config.SetMinCLIVersion(cmd.Checker.MinCLIVersion())
 	return command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Checker.CloudControllerAPIVersion(), cmd.UI)
 }
@@ -441,13 +435,20 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 	return credentialsCopy, nil
 }
 
-func (cmd *LoginCommand) reloadActor() error {
+func (cmd *LoginCommand) reloadActorAndChecker() error {
 	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true)
 	if err != nil {
 		return err
 	}
 
 	cmd.Actor = newActor
+
+	newChecker, err := cmd.CheckerMaker.NewVersionChecker(cmd.Config, cmd.UI, true)
+	if err != nil {
+		return err
+	}
+
+	cmd.Checker = newChecker
 
 	return nil
 }
