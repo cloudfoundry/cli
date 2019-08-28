@@ -22,6 +22,8 @@ var _ = Describe("ssh command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+
 		appName = helpers.PrefixedRandomName("app")
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()

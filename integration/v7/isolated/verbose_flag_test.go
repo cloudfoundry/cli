@@ -17,6 +17,10 @@ import (
 )
 
 var _ = Describe("Verbose", func() {
+	BeforeEach(func() {
+		helpers.SkipIfClientCredentialsTestMode()
+	})
+
 	DescribeTable("displays verbose output to terminal",
 		func(env string, configTrace string, flag bool) {
 			tmpDir, err := ioutil.TempDir("", "")
