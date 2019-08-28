@@ -9,6 +9,7 @@ resource_types:
 resources:
 - name: cli
   type: git
+  icon: console
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
@@ -56,6 +57,7 @@ resources:
 
 - name: cf-cli-binaries
   type: s3
+  icon: folder
   source:
     bucket: ((staging-bucket-name))
     access_key_id: ((cli-team-aws-s3-access-key-id))
@@ -180,6 +182,7 @@ resources:
 
 - name: slack-alert
   type: slack-notification
+  icon: slack
   source:
     url: ((vat-slack-webhook-url))
 
@@ -212,53 +215,47 @@ jobs:
 - name: units
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       trigger: true
     - get: cli-ci
-  - aggregate:
+  - in_parallel:
     - task: lint
       file: cli-ci/ci/cli-v7/tasks/lint.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#v3-acceleration-team'
-           text: |
-             lint failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: &slack_notification_text |
+            $BUILD_JOB_NAME failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-linux
       file: cli-ci/ci/cli-v7/tasks/units-linux.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#v3-acceleration-team'
-           text: |
-             Linux unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: *slack_notification_text
     - task: units-osx
       file: cli-ci/ci/cli-v7/tasks/units-osx.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#v3-acceleration-team'
-           text: |
-             OS X unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: *slack_notification_text
     - task: units-windows
       tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/units-windows.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#v3-acceleration-team'
-           text: |
-             Windows unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: *slack_notification_text
 
 - name: build-binaries
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       trigger: true
       passed: [units]
@@ -270,28 +267,22 @@ jobs:
       put: slack-alert
       params:
         channel: '#v3-acceleration-team'
-        text: |
-          i18n generation failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - aggregate:
+        text: *slack_notification_text
+  - in_parallel:
     - task: build
       file: cli-ci/ci/cli-v7/tasks/build-binaries.yml
       on_failure:
         put: slack-alert
         params:
           channel: '#v3-acceleration-team'
-          text: |
-            build binaries failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          text: *slack_notification_text
     - task: build-osx
       file: cli-ci/ci/cli-v7/tasks/build-osx-binary.yml
       on_failure:
         put: slack-alert
         params:
           channel: '#v3-acceleration-team'
-          text: |
-            build OS X binaries failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          text: *slack_notification_text
   - task: combine-binaries
     file: cli-ci/ci/cli-v7/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -301,7 +292,7 @@ jobs:
 - name: integration-linux
   serial: true
   plan:
-  - aggregate:
+  - in_parallel: &integration_resources
     - get: cli
       passed: [build-binaries]
     - get: cf-cli-binaries
@@ -323,9 +314,7 @@ jobs:
         put: slack-alert
         params:
           channel: '#v3-acceleration-team'
-          text: |
-            :dr-seuss2: Linux integration failed :throwing-in-the-towel:
-            :dancing-penguin: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
@@ -341,22 +330,35 @@ jobs:
     params:
       release: bosh-lock
 
+- name: integration-linux-client-creds
+  serial: true
+  plan:
+  - in_parallel: *integration_resources
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli-v7/tasks/integration-linux.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: *slack_notification_text
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      params:
+        <<: *integration_params
+        CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
 - name: integration-windows
   serial: true
   plan:
-  - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: cli-integration
-    - get: vars-store
-    - put: bosh-lock
-      resource: gcp-bosh-pool
-      params:
-        acquire: true
+  - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
@@ -371,9 +373,35 @@ jobs:
         put: slack-alert
         params:
           channel: '#v3-acceleration-team'
-          text: |
-            :dr-seuss2: Windows integration failed :throwing-in-the-towel:
-            :win95: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          text: *slack_notification_text
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: integration-windows-client-creds
+  serial: true
+  plan:
+  - in_parallel: *integration_resources
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: integration
+      tags: [vat-windows]
+      file: cli-ci/ci/cli-v7/tasks/integration-windows.yml
+      params:
+        <<: *integration_params
+        CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
+      input_mapping:
+        cf-credentials: cleanup-integration-outputs
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: *slack_notification_text
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
@@ -385,52 +413,60 @@ jobs:
 - name: create-installers
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
-      passed: [integration-linux, integration-windows]
+      passed:
+      - integration-linux
+      - integration-linux-client-creds
+      - integration-windows
+      - integration-windows-client-creds
     - get: cf-cli-binaries
-      passed: [integration-linux, integration-windows]
+      passed:
+      - integration-linux
+      - integration-linux-client-creds
+      - integration-windows
+      - integration-windows-client-creds
       trigger: true
     - get: cli-ci
   - task: extract-binaries
     file: cli-ci/ci/cli-v7/tasks/extract-binaries.yml
     on_failure:
-       put: slack-alert
-       params:
-         channel: '#v3-acceleration-team'
-         text: |
-           extracting the binaries in installer creation failed :bart:
-           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - aggregate:
+      put: slack-alert
+      params:
+        channel: '#v3-acceleration-team'
+        text: |
+          extracting the binaries in installer creation failed :bart:
+          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - in_parallel:
     - task: unix
       file: cli-ci/ci/cli-v7/tasks/create-installers.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#v3-acceleration-team'
-           text: |
-             :ubuntu: create unix installers failed :redhat:
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: |
+            :ubuntu: create unix installers failed :redhat:
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: windows
       tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/create-installers-windows.yml
       on_failure:
-         put: slack-alert
-         params:
-           channel: '#v3-acceleration-team'
-           text: |
-             create windows installer failed :winc:
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: |
+            create windows installer failed :winc:
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - task: package-binaries
     file: cli-ci/ci/cli-v7/tasks/package-binaries.yml
     on_failure:
-       put: slack-alert
-       params:
-         channel: '#v3-acceleration-team'
-         text: |
-           extracting the binaries in installer creation failed :package:
-           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - aggregate:
+      put: slack-alert
+      params:
+        channel: '#v3-acceleration-team'
+        text: |
+          extracting the binaries in installer creation failed :package:
+          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - in_parallel:
     - put: edge-linux-binary-32
       params:
         file: archives/cf7-cli_edge_linux_i686.tgz
@@ -471,7 +507,7 @@ jobs:
 - name: create-beta-release
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [create-installers]
     - get: cli-ci
@@ -504,7 +540,7 @@ jobs:
 - name: publish-beta-release
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       trigger: true
       passed: [create-beta-release]
@@ -512,7 +548,7 @@ jobs:
     - get: cli-wiki
     - get: edge-linux-binary-64
       passed: [create-beta-release]
-  - aggregate:
+  - in_parallel:
     - task: claw.run.pivotal.io
       file: cli-ci/ci/cli-v7/tasks/update-claw.yml
       params:
@@ -540,7 +576,7 @@ jobs:
 - name: update-cf7-homebrew
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       trigger: true
       passed: [publish-beta-release]
@@ -555,7 +591,7 @@ jobs:
 - name: bump-cli-v7-version
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       passed: [create-beta-release]
       trigger: true
@@ -578,13 +614,13 @@ jobs:
 - name: create-release-marker
   serial: true
   plan:
-    - aggregate:
-      - get: bump-v7-version
-        passed: [bump-cli-v7-version]
-        trigger: true
-      - get: cli-ci
-    - task: create-release-marker
-      file: cli-ci/ci/cli-v7/tasks/create-release-marker.yml
-      params:
-        TRACKER_API_KEY: ((cf-cli-public-tracker-token))
-        TRACKER_PROJECT_ID: ((vat-public-tracker-project-id))
+  - in_parallel:
+    - get: bump-v7-version
+      passed: [bump-cli-v7-version]
+      trigger: true
+    - get: cli-ci
+  - task: create-release-marker
+    file: cli-ci/ci/cli-v7/tasks/create-release-marker.yml
+    params:
+      TRACKER_API_KEY: ((cf-cli-public-tracker-token))
+      TRACKER_PROJECT_ID: ((vat-public-tracker-project-id))
