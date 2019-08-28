@@ -26,10 +26,12 @@ var _ = Describe("create-user Command", func() {
 		fakeActor       *v7fakes.FakeCreateUserActor
 		binaryName      string
 		executeErr      error
+		input           *Buffer
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		input = NewBuffer()
+		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeCreateUserActor)
@@ -111,6 +113,32 @@ var _ = Describe("create-user Command", func() {
 					Expect(username).To(Equal("some-user"))
 					Expect(password).To(Equal(""))
 					Expect(origin).To(Equal("some-origin"))
+
+					Expect(testUI.Out).To(Say("Creating user some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'."))
+					Expect(testUI.Err).To(Say("warning"))
+				})
+			})
+
+			When("password-prompt flag is set", func() {
+				BeforeEach(func() {
+					cmd.PasswordPrompt = true
+					_, err := input.Write([]byte("some-password\n"))
+					Expect(err).ToNot(HaveOccurred())
+					fakeActor.CreateUserReturns(
+						v7action.User{GUID: "new-user-cc-guid"},
+						v7action.Warnings{"warning"},
+						nil)
+				})
+
+				It("prompts for a password", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).To(Say("Password:"))
+
+					Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
+					_, password, _ := fakeActor.CreateUserArgsForCall(0)
+					Expect(password).To(Equal("some-password"))
 
 					Expect(testUI.Out).To(Say("Creating user some-user..."))
 					Expect(testUI.Out).To(Say("OK"))

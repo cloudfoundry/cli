@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -18,13 +20,15 @@ var _ = Describe("create-user command", func() {
 				Eventually(session).Should(Say("create-user - Create a new user"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf create-user USERNAME PASSWORD"))
-				Eventually(session).Should(Say("cf create-user USERNAME [--origin ORIGIN]"))
+				Eventually(session).Should(Say("cf create-user USERNAME --origin ORIGIN"))
+				Eventually(session).Should(Say("cf create-user USERNAME --password-prompt"))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("   cf create-user j.smith@example.com S3cr3t                  # internal user"))
 				Eventually(session).Should(Say("   cf create-user j.smith@example.com --origin ldap           # LDAP user"))
 				Eventually(session).Should(Say("   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--origin      Origin for mapping a user account to a user in an external identity provider"))
+				Eventually(session).Should(Say(`--origin\s+Origin for mapping a user account to a user in an external identity provider`))
+				Eventually(session).Should(Say(`--password-prompt\s+Prompt interactively for password`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("passwd, set-org-role, set-space-role"))
 				Eventually(session).Should(Exit(0))
@@ -144,6 +148,21 @@ var _ = Describe("create-user command", func() {
 						Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--origin'"))
 						Eventually(session).Should(Exit(1))
 					})
+				})
+			})
+
+			When("the user passes in a password-prompt flag", func() {
+				It("prompts the user for their password", func() {
+					newUser := helpers.NewUsername()
+					buffer := NewBuffer()
+					_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", "some-password")))
+					Expect(err).ToNot(HaveOccurred())
+					session := helpers.CFWithStdin(buffer, "create-user", newUser, "--password-prompt")
+					Eventually(session).Should(Say("Password: "))
+					Eventually(session).Should(Say("Creating user %s...", newUser))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
