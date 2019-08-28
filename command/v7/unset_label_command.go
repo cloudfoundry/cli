@@ -25,13 +25,14 @@ type UnsetLabelActor interface {
 }
 
 type UnsetLabelCommand struct {
-	RequiredArgs   flag.UnsetLabelArgs `positional-args:"yes"`
-	BuildpackStack string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage          interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n   cf unset-label org business pci public-facing\n   cf unset-label buildpack go_buildpack go -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n   stack\n\nSEE ALSO:\n   set-label, labels"`
-	UI             command.UI
-	Config         command.Config
-	SharedActor    command.SharedActor
-	Actor          UnsetLabelActor
+	RequiredArgs    flag.UnsetLabelArgs `positional-args:"yes"`
+	BuildpackStack  string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	usage           interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n   cf unset-label org business pci public-facing\n   cf unset-label buildpack go_buildpack go -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   org\n   space\n   stack"`
+	relatedCommands interface{}         `related_commands:"labels, set-label"`
+	UI              command.UI
+	Config          command.Config
+	SharedActor     command.SharedActor
+	Actor           UnsetLabelActor
 }
 
 func (cmd *UnsetLabelCommand) Setup(config command.Config, ui command.UI) error {
