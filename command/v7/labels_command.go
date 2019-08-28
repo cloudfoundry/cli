@@ -74,11 +74,6 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.validateFlags()
-	if err != nil {
-		return err
-	}
-
 	switch cmd.canonicalResourceTypeForName() {
 	case App:
 		labels, warnings, err = cmd.fetchAppLabels(username)
@@ -100,7 +95,6 @@ func (cmd LabelsCommand) Execute(args []string) error {
 
 	cmd.printLabels(labels)
 	return nil
-
 }
 
 func (cmd LabelsCommand) fetchAppLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {

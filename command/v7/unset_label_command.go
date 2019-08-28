@@ -14,16 +14,6 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . UnsetLabelActor
-
-type UnsetLabelActor interface {
-	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
-	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
-	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
-	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
-	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
-}
-
 type UnsetLabelCommand struct {
 	RequiredArgs    flag.UnsetLabelArgs `positional-args:"yes"`
 	BuildpackStack  string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
@@ -32,7 +22,7 @@ type UnsetLabelCommand struct {
 	UI              command.UI
 	Config          command.Config
 	SharedActor     command.SharedActor
-	Actor           UnsetLabelActor
+	Actor           SetLabelActor
 }
 
 func (cmd *UnsetLabelCommand) Setup(config command.Config, ui command.UI) error {

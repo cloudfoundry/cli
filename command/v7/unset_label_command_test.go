@@ -26,14 +26,14 @@ var _ = Describe("unset-label command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		testUI          *ui.UI
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeUnsetLabelActor
+		fakeActor       *v7fakes.FakeSetLabelActor
 		executeErr      error
 	)
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeUnsetLabelActor)
+		fakeActor = new(v7fakes.FakeSetLabelActor)
 		cmd = UnsetLabelCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
@@ -176,7 +176,7 @@ var _ = Describe("unset-label command", func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
-			fakeActor = new(v7fakes.FakeUnsetLabelActor)
+			fakeActor = new(v7fakes.FakeSetLabelActor)
 			resourceName = "some-buildpack"
 			cmd = UnsetLabelCommand{
 				Actor:       fakeActor,

@@ -116,11 +116,8 @@ func (cmd SetLabelCommand) executeApp(username string, labels map[string]types.N
 		labels)
 
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (cmd SetLabelCommand) executeBuildpack(username string, labels map[string]types.NullString) error {
@@ -195,11 +192,8 @@ func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types
 		labels)
 
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (cmd SetLabelCommand) executeStack(username string, labels map[string]types.NullString) error {
