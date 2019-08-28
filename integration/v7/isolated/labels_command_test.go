@@ -30,11 +30,14 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+cf labels RESOURCE RESOURCE_NAME`))
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf labels app dora`))
+			Eventually(session).Should(Say(`\s+cf labels org business`))
+			Eventually(session).Should(Say(`\s+cf labels buildpack go_buildpack --stack cflinuxfs3`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+space`))
+			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
@@ -58,21 +61,19 @@ var _ = Describe("labels command", func() {
 			buildpackName = helpers.NewBuildpackName()
 			stackName = helpers.NewStackName()
 			username, _ = helpers.GetCredentials()
-			helpers.LoginCF()
-			helpers.CreateOrg(orgName)
 		})
 
 		Describe("app labels", func() {
 			BeforeEach(func() {
-				helpers.TargetOrg(orgName)
 				spaceName = helpers.NewSpaceName()
 				appName = helpers.PrefixedRandomName("app")
-				helpers.CreateSpace(spaceName)
-				helpers.TargetOrgAndSpace(orgName, spaceName)
 				helpers.SetupCF(orgName, spaceName)
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 				})
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			When("there are labels set on the application", func() {
@@ -113,6 +114,10 @@ var _ = Describe("labels command", func() {
 		})
 
 		Describe("buildpack labels", func() {
+			BeforeEach(func() {
+				helpers.LoginCF()
+			})
+
 			When("there is exactly one buildpack with a given name", func() {
 				When("the buildpack is not bound to a stack", func() {
 					BeforeEach(func() {
@@ -305,6 +310,12 @@ var _ = Describe("labels command", func() {
 		})
 
 		Describe("org labels", func() {
+			BeforeEach(func() {
+				helpers.SetupCFWithOrgOnly(orgName)
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
 
 			When("there are labels set on the organization", func() {
 				BeforeEach(func() {
@@ -344,6 +355,7 @@ var _ = Describe("labels command", func() {
 
 		Describe("stack labels", func() {
 			BeforeEach(func() {
+				helpers.LoginCF()
 				helpers.CreateStack(stackName)
 			})
 			AfterEach(func() {
@@ -389,11 +401,11 @@ var _ = Describe("labels command", func() {
 
 		Describe("space labels", func() {
 			BeforeEach(func() {
-				helpers.TargetOrg(orgName)
 				spaceName = helpers.NewSpaceName()
-				helpers.CreateSpace(spaceName)
-				helpers.TargetOrgAndSpace(orgName, spaceName)
 				helpers.SetupCF(orgName, spaceName)
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			When("there are labels set on the space", func() {

@@ -157,6 +157,13 @@ func SetupCF(org string, space string) {
 	TargetOrgAndSpace(org, space)
 }
 
+// SetupCFWithOrgOnly logs in to the CLI with LoginCF, creates the given org, and targets it.
+func SetupCFWithOrgOnly(org string) {
+	LoginCF()
+	CreateOrg(org)
+	TargetOrg(org)
+}
+
 // SetupCFWithGeneratedOrgAndSpaceNames logs in to the CLI with LoginCF, creates the org and
 // space with generated names, and targets that org and space. Returns the generated org so
 // that it can be deleted easily in cleanup step of the test.

@@ -31,6 +31,8 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say(`\s+cf unset-label RESOURCE RESOURCE_NAME KEY`))
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf unset-label app dora ci_signature_sha2`))
+			Eventually(session).Should(Say(`\s+cf unset-label org business pci public-facing`))
+			Eventually(session).Should(Say(`\s+cf unset-label buildpack go_buildpack go -s cflinuxfs3`))
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))
@@ -64,7 +66,6 @@ var _ = Describe("unset-label command", func() {
 			username, _ = helpers.GetCredentials()
 			helpers.LoginCF()
 			orgName = helpers.NewOrgName()
-			helpers.CreateOrg(orgName)
 		})
 
 		When("unsetting labels from an app", func() {
@@ -79,6 +80,9 @@ var _ = Describe("unset-label command", func() {
 
 				session := helpers.CF("set-label", "app", appName, "some-key=some-value", "some-other-key=some-other-value", "some-third-key=other")
 				Eventually(session).Should(Exit(0))
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("unsets the specified labels on the app", func() {
@@ -107,6 +111,7 @@ var _ = Describe("unset-label command", func() {
 				stacks        []string
 			)
 			BeforeEach(func() {
+				helpers.LoginCF()
 				buildpackName = helpers.NewBuildpackName()
 			})
 
@@ -241,8 +246,12 @@ var _ = Describe("unset-label command", func() {
 
 		When("unsetting labels from an org", func() {
 			BeforeEach(func() {
+				helpers.SetupCFWithOrgOnly(orgName)
 				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
 				Eventually(session).Should(Exit(0))
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("unsets the specified labels on the org", func() {
@@ -271,6 +280,9 @@ var _ = Describe("unset-label command", func() {
 				session := helpers.CF("set-label", "space", spaceName, "pci=true", "public-facing=false")
 				Eventually(session).Should(Exit(0))
 			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
 
 			It("unsets the specified labels on the space", func() {
 				session := helpers.CF("unset-label", "space", spaceName, "public-facing")
@@ -295,6 +307,7 @@ var _ = Describe("unset-label command", func() {
 			var stackGUID string
 
 			BeforeEach(func() {
+				helpers.LoginCF()
 				stackName, stackGUID = helpers.CreateStackWithGUID()
 				session := helpers.CF("set-label", "stack", stackName, "pci=true", "public-facing=false")
 				Eventually(session).Should(Exit(0))

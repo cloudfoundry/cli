@@ -68,14 +68,8 @@ var _ = Describe("set-label command", func() {
 
 		BeforeEach(func() {
 			username, _ = helpers.GetCredentials()
-			helpers.LoginCF()
 			orgName = helpers.NewOrgName()
-			helpers.CreateOrg(orgName)
 			stackNameBase = helpers.NewStackName()
-		})
-		AfterEach(func() {
-			session := helpers.CF("delete-org", "-f", orgName)
-			Eventually(session).Should(Exit(0))
 		})
 
 		When("assigning label to app", func() {
@@ -87,6 +81,9 @@ var _ = Describe("set-label command", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 				})
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("sets the specified labels on the app", func() {
@@ -151,8 +148,10 @@ var _ = Describe("set-label command", func() {
 		When("assigning label to space", func() {
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
-
 				helpers.SetupCF(orgName, spaceName)
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("sets the specified labels on the space", func() {
@@ -215,6 +214,12 @@ var _ = Describe("set-label command", func() {
 		})
 
 		When("assigning label to org", func() {
+			BeforeEach(func() {
+				helpers.SetupCFWithOrgOnly(orgName)
+			})
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
 			It("sets the specified labels on the org", func() {
 				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for org %s as %s...`), orgName, username))
@@ -281,6 +286,7 @@ var _ = Describe("set-label command", func() {
 			)
 
 			BeforeEach(func() {
+				helpers.LoginCF()
 				buildpackName = helpers.NewBuildpackName()
 			})
 
@@ -548,6 +554,7 @@ var _ = Describe("set-label command", func() {
 			)
 
 			BeforeEach(func() {
+				helpers.LoginCF()
 				stackName, stackGUID = helpers.CreateStackWithGUID()
 			})
 			AfterEach(func() {
