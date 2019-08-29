@@ -110,6 +110,7 @@ var _ = Describe("create-shared-domain command", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			username, password = helpers.CreateUser()
+			helpers.LogoutCF()
 			helpers.LoginAs(username, password)
 		})
 
