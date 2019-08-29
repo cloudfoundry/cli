@@ -605,6 +605,8 @@ jobs:
     passed:
     - integration-linux
     - integration-windows
+    - integration-linux-client-creds
+    - integration-windows-client-creds
     trigger: true
   - put: cf-cli-tracker
     params:
