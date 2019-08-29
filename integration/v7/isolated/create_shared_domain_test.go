@@ -47,13 +47,19 @@ var _ = Describe("create-shared-domain command", func() {
 		domainName = helpers.NewDomainName()
 	})
 
-	When("user is logged in as admin", func() {
+	When("user is logged in", func() {
+		var userName string
+
+		BeforeEach(func() {
+			userName, _ = helpers.GetCredentials()
+		})
+
 		When("No optional flags are specified", func() {
 			When("domain name is valid", func() {
 				It("should create the shared domain", func() {
 					session := helpers.CF("create-shared-domain", domainName)
 
-					Eventually(session).Should(Say("Creating shared domain %s as admin...", domainName))
+					Eventually(session).Should(Say("Creating shared domain %s as %s...", domainName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("TIP: Domain '%s' is shared with all orgs. Run 'cf domains' to view available domains.", domainName))
 					Eventually(session).Should(Exit(0))
@@ -72,7 +78,7 @@ var _ = Describe("create-shared-domain command", func() {
 				It("should fail and return an error", func() {
 					session := helpers.CF("create-shared-domain", domainName)
 
-					Eventually(session).Should(Say("Creating shared domain %s as admin...", regexp.QuoteMeta(domainName)))
+					Eventually(session).Should(Say("Creating shared domain %s as %s...", regexp.QuoteMeta(domainName), userName))
 					Eventually(session.Err).Should(Say("RFC 1035"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -84,7 +90,7 @@ var _ = Describe("create-shared-domain command", func() {
 			It("creates a domain with internal flag", func() {
 				session := helpers.CF("create-shared-domain", domainName, "--internal")
 
-				Eventually(session).Should(Say("Creating shared domain %s as admin...", domainName))
+				Eventually(session).Should(Say("Creating shared domain %s as %s...", domainName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
@@ -95,7 +101,7 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 	})
 
-	When("user is not logged in as admin", func() {
+	When("user is logged in as another user", func() {
 		var (
 			username string
 			password string

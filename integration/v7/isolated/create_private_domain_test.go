@@ -60,12 +60,18 @@ var _ = Describe("create-private-domain command", func() {
 	})
 
 	When("user is logged in", func() {
+		var userName string
+
+		BeforeEach(func() {
+			userName, _ = helpers.GetCredentials()
+		})
+
 		When("org exists", func() {
 			When("domain name is valid", func() {
 				It("should create the private domain", func() {
 					session := helpers.CF("create-private-domain", orgName, domainName)
 
-					Eventually(session).Should(Say("Creating private domain %s for org %s as admin...", domainName, orgName))
+					Eventually(session).Should(Say("Creating private domain %s for org %s as %s...", domainName, orgName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("TIP: Domain '%s' is a private domain. Run 'cf share-private-domain' to share this domain with a different org.", domainName))
 					Eventually(session).Should(Exit(0))
@@ -85,7 +91,7 @@ var _ = Describe("create-private-domain command", func() {
 					It("should fail and return an error", func() {
 						session := helpers.CF("create-private-domain", orgName, domainName)
 
-						Eventually(session).Should(Say("Creating private domain %s for org %s as admin...", regexp.QuoteMeta(domainName), orgName))
+						Eventually(session).Should(Say("Creating private domain %s for org %s as %s...", regexp.QuoteMeta(domainName), orgName, userName))
 						Eventually(session.Err).Should(Say("RFC 1035"))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))

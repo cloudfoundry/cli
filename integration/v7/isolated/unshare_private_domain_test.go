@@ -54,9 +54,15 @@ var _ = Describe("unshare-private-domain command", func() {
 	})
 
 	Describe("When the environment is set up correctly", func() {
+		var userName string
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			userName, _ = helpers.GetCredentials()
+		})
+
 		When("the user says yes", func() {
 			BeforeEach(func() {
-				helpers.LoginCF()
 				owningOrgName = helpers.CreateAndTargetOrg()
 				helpers.CreateOrg(sharedToOrgName)
 				domain := helpers.NewDomain(owningOrgName, domainName)
@@ -71,7 +77,7 @@ var _ = Describe("unshare-private-domain command", func() {
 				session := helpers.CFWithStdin(buffer, "unshare-private-domain", sharedToOrgName, domainName)
 				Eventually(session).Should(Say(`Warning: org %s will no longer be able to access private domain %s`, sharedToOrgName, domainName))
 				Eventually(session).Should(Say(`Really unshare private domain %s\? \[yN\]`, domainName))
-				Eventually(session).Should(Say("Unsharing domain %s from org %s as admin...", domainName, sharedToOrgName))
+				Eventually(session).Should(Say("Unsharing domain %s from org %s as %s...", domainName, sharedToOrgName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
@@ -82,9 +88,9 @@ var _ = Describe("unshare-private-domain command", func() {
 			})
 
 		})
+
 		When("the user says no", func() {
 			BeforeEach(func() {
-				helpers.LoginCF()
 				owningOrgName = helpers.CreateAndTargetOrg()
 				helpers.CreateOrg(sharedToOrgName)
 				domain := helpers.NewDomain(owningOrgName, domainName)
@@ -97,7 +103,7 @@ var _ = Describe("unshare-private-domain command", func() {
 				_, err := buffer.Write([]byte("n\n"))
 				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(buffer, "unshare-private-domain", sharedToOrgName, domainName)
-				Consistently(session).ShouldNot(Say("Unsharing domain %s from org %s as admin...", domainName, sharedToOrgName))
+				Consistently(session).ShouldNot(Say("Unsharing domain %s from org %s as %s...", domainName, sharedToOrgName, userName))
 				Consistently(session).ShouldNot(Say("OK"))
 				Eventually(session).Should(Say(`Warning: org %s will no longer be able to access private domain %s`, sharedToOrgName, domainName))
 				Eventually(session).Should(Say(`Really unshare private domain %s\? \[yN\]`, domainName))
@@ -109,7 +115,6 @@ var _ = Describe("unshare-private-domain command", func() {
 				Eventually(session).Should(Say("%s", domainName))
 				Eventually(session).Should(Exit(0))
 			})
-
 		})
 	})
 })

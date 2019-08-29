@@ -39,6 +39,7 @@ var _ = Describe("share-private-domain command", func() {
 		orgName           string
 		spaceName         string
 		domainName        string
+		userName          string
 	)
 
 	BeforeEach(func() {
@@ -50,6 +51,7 @@ var _ = Describe("share-private-domain command", func() {
 
 	When("user is logged in", func() {
 		BeforeEach(func() {
+			userName, _ = helpers.GetCredentials()
 			helpers.SetupCF(orgName, spaceName)
 			helpers.CreateOrg(sharedWithOrgName)
 			domain := helpers.NewDomain(orgName, domainName)
@@ -59,7 +61,7 @@ var _ = Describe("share-private-domain command", func() {
 		It("should create the shared domain", func() {
 			session := helpers.CF("share-private-domain", sharedWithOrgName, domainName)
 
-			Eventually(session).Should(Say("Sharing domain %s with org %s as admin...", domainName, sharedWithOrgName))
+			Eventually(session).Should(Say("Sharing domain %s with org %s as %s...", domainName, sharedWithOrgName, userName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 

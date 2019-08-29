@@ -12,7 +12,6 @@ import (
 
 var _ = Describe("domains command", func() {
 	Describe("help", func() {
-
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
 			Eventually(session).Should(Exit(0))
@@ -59,7 +58,13 @@ var _ = Describe("domains command", func() {
 		})
 	})
 
-	When("logged in as admin", func() {
+	When("logged in", func() {
+		var userName string
+
+		BeforeEach(func() {
+			userName, _ = helpers.GetCredentials()
+		})
+
 		When("no org is targeted", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
@@ -96,7 +101,7 @@ var _ = Describe("domains command", func() {
 				It("displays the shared domains and denotes that they are shared", func() {
 					session := helpers.CF("domains")
 
-					Eventually(session).Should(Say(`Getting domains in org %s as admin\.\.\.`, orgName))
+					Eventually(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
 					Eventually(session).Should(Say(`name\s+availability\s+internal`))
 					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
 					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
@@ -116,7 +121,7 @@ var _ = Describe("domains command", func() {
 					It("displays the internal flag on the shared domain", func() {
 						session := helpers.CF("domains")
 
-						Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
+						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
 						Eventually(session).Should(Say(`name\s+availability\s+internal`))
 						Eventually(session).Should(Say(`%s\s+shared\s+true`, internalDomainName))
 						Eventually(session).Should(Exit(0))
@@ -138,7 +143,7 @@ var _ = Describe("domains command", func() {
 				It("displays the private domains", func() {
 					session := helpers.CF("domains")
 
-					Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
+					Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
 					Eventually(session).Should(Say(`name\s+availability\s+internal`))
 					Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain1.Name))
 					Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
@@ -163,7 +168,7 @@ var _ = Describe("domains command", func() {
 					It("should not display the private domains of other orgs", func() {
 						session := helpers.CF("domains")
 
-						Eventually(session).Should(Say(`Getting domains in org %s as admin`, newOrgName))
+						Eventually(session).Should(Say(`Getting domains in org %s as %s`, newOrgName, userName))
 						Eventually(session).Should(Say(`name\s+availability\s+internal`))
 
 						Consistently(session).ShouldNot(Say(`%s`, privateDomain1.Name))
@@ -177,17 +182,17 @@ var _ = Describe("domains command", func() {
 				})
 
 				When("logged in as a user that cannot see private domains", func() {
-					var username string
+					var userName string
 
 					BeforeEach(func() {
-						username = helpers.SwitchToOrgRole(orgName, "BillingManager")
+						userName = helpers.SwitchToOrgRole(orgName, "BillingManager")
 						helpers.TargetOrg(orgName)
 					})
 
 					It("only prints the shared domains", func() {
 						session := helpers.CF("domains")
 
-						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, username))
+						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
 						Eventually(session).Should(Say(`name\s+availability\s+internal`))
 						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
 						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
