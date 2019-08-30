@@ -122,14 +122,14 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	}
 	cmd.UI.DisplayWarning("Using experimental login command, some behavior may be different")
 
-	err := cmd.getAPI()
+	endpoint, err := cmd.determineAPIEndpoint()
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayNewline()
 
-	err = cmd.targetAPI()
+	err = cmd.targetAPI(endpoint)
 	if err != nil {
 		te := translatableerror.ConvertToTranslatableError(err)
 		if ise, ok := te.(translatableerror.InvalidSSLCertError); ok {
@@ -245,44 +245,45 @@ func (cmd *LoginCommand) targetSpace(space v3action.Space) {
 	})
 }
 
-func (cmd *LoginCommand) getAPI() error {
+func (cmd *LoginCommand) determineAPIEndpoint() (string, error) {
+	var endpoint string
+
 	if cmd.APIEndpoint != "" {
-		cmd.UI.DisplayTextWithFlavor("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
-			"APIEndpoint": cmd.APIEndpoint,
-		})
+		endpoint = cmd.APIEndpoint
 	} else if cmd.Config.Target() != "" {
-		cmd.APIEndpoint = cmd.Config.Target()
+		endpoint = cmd.Config.Target()
+	}
+
+	if len(endpoint) > 0 {
 		cmd.UI.DisplayTextWithFlavor("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
-			"APIEndpoint": cmd.APIEndpoint,
+			"APIEndpoint": endpoint,
 		})
 	} else {
-		apiEndpoint, err := cmd.UI.DisplayTextPrompt("API endpoint")
+		var err error
+		endpoint, err = cmd.UI.DisplayTextPrompt("API endpoint")
 		if err != nil {
-			return err
+			return "", err
 		}
-		cmd.APIEndpoint = apiEndpoint
 	}
 
-	strippedEndpoint := strings.TrimRight(cmd.APIEndpoint, "/")
-	endpoint, _ := url.Parse(strippedEndpoint)
-	if endpoint.Scheme == "" {
-		endpoint.Scheme = "https"
+	strippedEndpoint := strings.TrimRight(endpoint, "/")
+	u, _ := url.Parse(strippedEndpoint)
+	if u.Scheme == "" {
+		u.Scheme = "https"
 	}
-	cmd.APIEndpoint = endpoint.String()
-
-	return nil
+	return u.String(), nil
 }
 
-func (cmd *LoginCommand) targetAPI() error {
+func (cmd *LoginCommand) targetAPI(endpoint string) error {
 	settings := v3action.TargetSettings{
-		URL:               cmd.APIEndpoint,
+		URL:               endpoint,
 		SkipSSLValidation: cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation,
 	}
 	_, err := cmd.Actor.SetTarget(settings)
 	if err != nil {
 		return err
 	}
-	if strings.HasPrefix(cmd.APIEndpoint, "http:") {
+	if strings.HasPrefix(endpoint, "http:") {
 		cmd.UI.DisplayWarning("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
 	}
 
