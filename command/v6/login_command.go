@@ -283,7 +283,8 @@ func (cmd *LoginCommand) determineAPIEndpoint() (v3action.TargetSettings, error)
 }
 
 func (cmd *LoginCommand) targetAPI(settings v3action.TargetSettings) error {
-	_, err := cmd.Actor.SetTarget(settings)
+	warnings, err := cmd.Actor.SetTarget(settings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

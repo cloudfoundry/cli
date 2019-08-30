@@ -50,6 +50,8 @@ var _ = Describe("login Command", func() {
 		binaryName = "some-executable"
 		fakeConfig.BinaryNameReturns(binaryName)
 
+		fakeConfig.UAAOAuthClientReturns("cf")
+
 		cmd = LoginCommand{
 			UI:           testUI,
 			Actor:        fakeActor,
@@ -86,6 +88,7 @@ var _ = Describe("login Command", func() {
 
 			When("user provides the api endpoint using the -a flag", func() {
 				BeforeEach(func() {
+					fakeActor.SetTargetReturns(v3action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 					cmd.APIEndpoint = "api.example.com"
 				})
 
@@ -97,12 +100,25 @@ var _ = Describe("login Command", func() {
 					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
 				})
 
+				It("prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+
 				When("targeting the API fails", func() {
 					BeforeEach(func() {
-						fakeActor.SetTargetReturns(nil, errors.New("some error"))
+						fakeActor.SetTargetReturns(
+							v3action.Warnings{"some-warning-1", "some-warning-2"},
+							errors.New("some error"))
 					})
+
 					It("errors", func() {
 						Expect(executeErr).To(MatchError("some error"))
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
 				})
 			})
