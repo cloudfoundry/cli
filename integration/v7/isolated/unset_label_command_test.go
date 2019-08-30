@@ -28,7 +28,7 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say(`\s+unset-label - Unset a label \(key-value pairs\) for an API resource`))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`\s+cf unset-label RESOURCE RESOURCE_NAME KEY`))
+			Eventually(session).Should(Say(`\s+cf unset-label RESOURCE RESOURCE_NAME KEY...`))
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf unset-label app dora ci_signature_sha2`))
 			Eventually(session).Should(Say(`\s+cf unset-label org business pci public-facing`))

@@ -33,7 +33,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say(`\s+cf set-label app dora env=production`))
 				Eventually(session).Should(Say(`\s+cf set-label org business pci=true public-facing=false`))
-				Eventually(session).Should(Say(`\s+cf set-label space business_space public-facing=false owner=jane_doe`))
+				Eventually(session).Should(Say(`\s+cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3`))
 				Eventually(session).Should(Say("RESOURCES:"))
 				Eventually(session).Should(Say(`\s+app`))
 				Eventually(session).Should(Say(`\s+buildpack`))
