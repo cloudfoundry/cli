@@ -385,6 +385,23 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 
+			When("targeted with --skip-ssl-validation", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
+				})
+
+				When("logging in without --skip-ssl-validation", func() {
+					It("displays a helpful error message and exits 1", func() {
+						session := helpers.CF("login", "-a", server.URL())
+						Eventually(session).Should(Say("API endpoint: %s", server.URL()))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", server.URL()))
+						Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
 			When("the server accepts logins", func() {
 				BeforeEach(func() {
 					fakeTokenResponse := map[string]string{

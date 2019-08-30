@@ -245,13 +245,18 @@ func (cmd *LoginCommand) targetSpace(space v3action.Space) {
 	})
 }
 
-func (cmd *LoginCommand) determineAPIEndpoint() (string, error) {
-	var endpoint string
+func (cmd *LoginCommand) determineAPIEndpoint() (v3action.TargetSettings, error) {
+	var (
+		endpoint          string
+		skipSSLValidation bool
+	)
 
 	if cmd.APIEndpoint != "" {
 		endpoint = cmd.APIEndpoint
+		skipSSLValidation = cmd.SkipSSLValidation
 	} else if cmd.Config.Target() != "" {
 		endpoint = cmd.Config.Target()
+		skipSSLValidation = cmd.Config.SkipSSLValidation()
 	}
 
 	if len(endpoint) > 0 {
@@ -262,7 +267,7 @@ func (cmd *LoginCommand) determineAPIEndpoint() (string, error) {
 		var err error
 		endpoint, err = cmd.UI.DisplayTextPrompt("API endpoint")
 		if err != nil {
-			return "", err
+			return v3action.TargetSettings{}, err
 		}
 	}
 
@@ -271,19 +276,18 @@ func (cmd *LoginCommand) determineAPIEndpoint() (string, error) {
 	if u.Scheme == "" {
 		u.Scheme = "https"
 	}
-	return u.String(), nil
+	return v3action.TargetSettings{
+		URL:               u.String(),
+		SkipSSLValidation: skipSSLValidation,
+	}, nil
 }
 
-func (cmd *LoginCommand) targetAPI(endpoint string) error {
-	settings := v3action.TargetSettings{
-		URL:               endpoint,
-		SkipSSLValidation: cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation,
-	}
+func (cmd *LoginCommand) targetAPI(settings v3action.TargetSettings) error {
 	_, err := cmd.Actor.SetTarget(settings)
 	if err != nil {
 		return err
 	}
-	if strings.HasPrefix(endpoint, "http:") {
+	if strings.HasPrefix(settings.URL, "http:") {
 		cmd.UI.DisplayWarning("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
 	}
 
