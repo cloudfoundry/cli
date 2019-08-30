@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:</string>
+      <key>HOME</key>
+      <string>/Users/pivotal</string>
+    </dict>
+    <key>Label</key>
+    <string>com.pivotal.ConcourseWorker</string>
+    <key>Program</key>
+    <string>/Users/pivotal/bin/concourse_worker</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>LaunchOnlyOnce</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/concourse-worker.stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/concourse-worker.stderr.log</string>
+    <key>InitGroups</key>
+    <true/>
+  </dict>
+</plist>

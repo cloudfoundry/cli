@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -exv
+
+echo "Starting Concourse Worker $(/bin/date) as $(/usr/bin/whoami)"
+
+if [[ $(/usr/bin/whoami) != "root" ]]; then
+  echo "sudo /Users/pivotal/bin/concourse_worker"
+  exit 1
+fi
+
+concourse_tsa="ci.cli.fun"
+concourse_port="2222"
+concourse_team="main"
+concourse_pub_key="/tmp/tsa_id_rsa.pub"
+concourse_pvt_key="/users/pivotal/bin/keys/worker_id_rsa"
+
+/usr/bin/ssh-keyscan -p "$concourse_port" "$concourse_tsa" | awk '{print $2 " " $3}' > "$concourse_pub_key"
+
+test -s "$concourse_pub_key" || exit 1
+
+/users/pivotal/bin/concourse_darwin_amd64 worker \
+  --work-dir "/users/pivotal/concourse" \
+  --team "$concourse_team" \
+  --tsa-host "$concourse_tsa":"$concourse_port" \
+  --tsa-public-key "$concourse_pub_key" \
+  --tsa-worker-private-key "$concourse_pvt_key"
