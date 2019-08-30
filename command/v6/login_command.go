@@ -256,7 +256,7 @@ func (cmd *LoginCommand) determineAPIEndpoint() (v3action.TargetSettings, error)
 		skipSSLValidation = cmd.SkipSSLValidation
 	} else if cmd.Config.Target() != "" {
 		endpoint = cmd.Config.Target()
-		skipSSLValidation = cmd.Config.SkipSSLValidation()
+		skipSSLValidation = cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation
 	}
 
 	if len(endpoint) > 0 {

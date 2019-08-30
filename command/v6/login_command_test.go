@@ -118,6 +118,23 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.fake\.com \(API version: 3\.4\.5\)`))
 						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 					})
+
+					When("the config has SkipSSLValidation false and the --skip-ssl-validation flag is passed", func() {
+						BeforeEach(func() {
+							fakeConfig.SkipSSLValidationReturns(false)
+							cmd.SkipSSLValidation = true
+						})
+
+						It("sets the target with SkipSSLValidation is true", func() {
+							Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+							targetSettings := fakeActor.SetTargetArgsForCall(0)
+							Expect(targetSettings.SkipSSLValidation).To(BeTrue())
+						})
+
+						It("does not error", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+						})
+					})
 				})
 
 				When("the user enters something at the prompt", func() {
