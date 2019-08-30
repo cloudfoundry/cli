@@ -57,8 +57,7 @@
   revision = "4d0c80011a0f37da1711c184028bc40137cd45af"
 
 [[projects]]
-  branch = "master"
-  digest = "1:412001a3e6d850b82d4109e8bbbf1795a78d2f7616d36beacd67d0b1e32ebaa0"
+  digest = "1:780bb0855702098edd8451eec35ac12c47d3e08dc57a2b1bbde7044dbcf92a86"
   name = "code.cloudfoundry.org/lager"
   packages = [
     ".",
@@ -66,7 +65,8 @@
     "lagertest",
   ]
   pruneopts = "NUT"
-  revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
+  revision = "b152b7147a2a0154109a5194fcc7f4a933283abb"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "master"
@@ -198,15 +198,15 @@
   version = "v0.2.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4189ee6a3844f555124d9d2656fe7af02fca961c2a9bad9074789df13a0c62e0"
+  digest = "1:4ddc17aeaa82cb18c5f0a25d7c253a10682f518f4b2558a82869506eec223d76"
   name = "github.com/docker/distribution"
   packages = [
     "digestset",
     "reference",
   ]
   pruneopts = "NUT"
-  revision = "e5b5e44386f7964a1f010a2b8b7687d073215bbb"
+  revision = "2461543d988979529609e8cb6fca9ca190dc48da"
+  version = "v2.7.1"
 
 [[projects]]
   branch = "master"
@@ -225,8 +225,7 @@
   revision = "5df930a27be2502f99b292b7cc09ebad4d0891f4"
 
 [[projects]]
-  branch = "master"
-  digest = "1:0a0ef0f4f66e63db86dc2f865bdede9c9902976e86ecf02173ed559b765f99d2"
+  digest = "1:a3d6554400182effbda952d37d18a8212caccb51363612baee27d4f5a13139d6"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
@@ -234,7 +233,8 @@
     "protoc-gen-gogo/descriptor",
   ]
   pruneopts = "NUT"
-  revision = "616a82ed12d78d24d4839363e8f3c5d3f20627cf"
+  revision = "ba06b47c162d49f2af050fb4c75bcbc86a159d5c"
+  version = "v1.2.1"
 
 [[projects]]
   branch = "master"
@@ -245,12 +245,12 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
-  branch = "master"
   digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
   name = "github.com/google/go-querystring"
   packages = ["query"]
   pruneopts = "NUT"
-  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+  revision = "44c6ddd0a2342c386950e880b658017258da92fc"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"

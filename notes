@@ -1,0 +1,33 @@
+code.cloudfoundry.org/bytefmt no tagged versions
+code.cloudfoundry.org/cfnetworking-cli-api no tagged versions
+code.cloudfoundry.org/diego-ssh no recent tagged versions
+code.cloudfoundry.org/gofileutils no tagged versions
+code.cloudfoundry.org/lager UPDATED to v2.0.0
+code.cloudfoundry.org/ykk no tagged versions
+github.com/cloudfoundry/cli-plugin-repo N/A BUT this is our repo???
+github.com/cloudfoundry/noaa No recent tagged versions
+github.com/cloudfoundry/sonde-go no tagged versions
+github.com/cppforlife/go-patch MISSING from .toml TODO
+github.com/docker/distribution UPDATED to v2.7.1
+github.com/fatih/color (1.7.0 but is has problems upgrading)
+github.com/gogo/protobuf UPDATED to 1.2.1
+github.com/golang/protobuf MISSING from .toml TODO
+github.com/google/go-querystring UPDATED tp 1.0.0
+github.com/jessevdk/go-flags
+github.com/lunixbochs/vtclean
+github.com/mattn/go-colorable
+github.com/mattn/go-runewidth
+github.com/moby/moby
+github.com/nu7hatch/gouuid
+github.com/onsi/ginkgo
+github.com/onsi/gomega
+github.com/sabhiram/go-gitignore
+github.com/sajari/fuzzy
+github.com/tedsuo/rata
+github.com/vito/go-interact
+golang.org/x/crypto
+golang.org/x/net
+golang.org/x/text
+gopkg.in/fsnotify.v1
+
+

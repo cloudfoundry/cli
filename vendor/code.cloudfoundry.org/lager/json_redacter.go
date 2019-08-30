@@ -5,7 +5,6 @@ import (
 	"regexp"
 )
 
-
 const awsAccessKeyIDPattern = `AKIA[A-Z0-9]{16}`
 const awsSecretAccessKeyPattern = `KEY["']?\s*(?::|=>|=)\s*["']?[A-Z0-9/\+=]{40}["']?`
 const cryptMD5Pattern = `\$1\$[A-Z0-9./]{1,16}\$[A-Z0-9./]{22}`
@@ -14,26 +13,26 @@ const cryptSHA512Pattern = `\$6\$[A-Z0-9./]{1,16}\$[A-Z0-9./]{86}`
 const privateKeyHeaderPattern = `-----BEGIN(.*)PRIVATE KEY-----`
 
 type JSONRedacter struct {
-	keyMatchers []*regexp.Regexp
+	keyMatchers   []*regexp.Regexp
 	valueMatchers []*regexp.Regexp
 }
 
 func NewJSONRedacter(keyPatterns []string, valuePatterns []string) (*JSONRedacter, error) {
 	if keyPatterns == nil {
-		keyPatterns = []string{"[Pp]wd","[Pp]ass"}
+		keyPatterns = []string{"[Pp]wd", "[Pp]ass"}
 	}
 	if valuePatterns == nil {
 		valuePatterns = []string{awsAccessKeyIDPattern, awsSecretAccessKeyPattern, cryptMD5Pattern, cryptSHA256Pattern, cryptSHA512Pattern, privateKeyHeaderPattern}
 	}
 	ret := &JSONRedacter{}
-	for _ ,v := range keyPatterns {
+	for _, v := range keyPatterns {
 		r, err := regexp.Compile(v)
 		if err != nil {
 			return nil, err
 		}
 		ret.keyMatchers = append(ret.keyMatchers, r)
 	}
-	for _ ,v := range valuePatterns {
+	for _, v := range valuePatterns {
 		r, err := regexp.Compile(v)
 		if err != nil {
 			return nil, err
@@ -99,7 +98,7 @@ func (r JSONRedacter) redactObject(data *map[string]interface{}) {
 	}
 }
 
-func handleError (err error) []byte {
+func handleError(err error) []byte {
 	var content []byte
 	if _, ok := err.(*json.UnsupportedTypeError); ok {
 		data := map[string]interface{}{"lager serialisation error": err.Error()}

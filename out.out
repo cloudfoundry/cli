@@ -1,0 +1,55 @@
+PROJECT                                     CONSTRAINT         VERSION        REVISION  LATEST      PKGS USED
+code.cloudfoundry.org/bytefmt               branch master      branch master  f4415fa   854d396     1   
+code.cloudfoundry.org/cfnetworking-cli-api  branch master      branch master  4b04f26   4b04f26     5   
+code.cloudfoundry.org/clock                 1.0.0              1.0.0          02e53af   1.0.0       2   
+code.cloudfoundry.org/diego-ssh             18cdb35                           18cdb35               6   
+code.cloudfoundry.org/gofileutils           branch master      branch master  4d0c800   4d0c800     1   
+code.cloudfoundry.org/lager                 branch master      branch master  0bfa98e   54c4f25     3   
+code.cloudfoundry.org/ykk                   branch master      branch master  e4df4ce   e4df4ce     1   
+github.com/Azure/go-ansiterm                branch master      branch master  d6e3b33   d6e3b33     2   
+github.com/SermoDigital/jose                ^1.1.0             1.1            f6df55f   1.1         4   
+github.com/blang/semver                     ^3.5.1             v3.5.1         2ee8785   v3.6.1      1   
+github.com/bmatcuk/doublestar               v1.0.9             v1.0.9         b360822   v1.0.9      1   
+github.com/bmizerany/pat                    branch master      branch master  6226ea5   6226ea5     1   
+github.com/charlievieth/fs                  branch master      branch master  7dc3736   7dc3736     1   
+github.com/cloudfoundry/bosh-cli            ^5.5.1             v5.5.1         7850ac9   v5.5.1      1   
+github.com/cloudfoundry/bosh-utils          branch master      branch master  c6a922e   2bd955a     3   
+github.com/cloudfoundry/cli-plugin-repo     branch master      branch master  e3bb94a   b933e8f     1   
+github.com/cloudfoundry/noaa                branch master      branch master  5ce4936   5ce4936     4   
+github.com/cloudfoundry/sonde-go            branch master      branch master  b337332   b337332     1   
+github.com/cppforlife/go-patch              branch master      branch master  250da0e   90228d4     1   
+github.com/cyphar/filepath-securejoin       v0.2.1             v0.2.1         06bda83   v0.2.1      1   
+github.com/docker/distribution              branch master      branch master  e5b5e44   1fb7fff     2   
+github.com/docker/docker                    branch master      branch master  9de84a7   1cfc306     1   
+github.com/fatih/color                      branch master      branch master  5df930a   3f9d52f     1   
+github.com/gogo/protobuf                    branch master      branch master  616a82e   4c00d2f     3   
+github.com/golang/protobuf                  branch master      branch master  1e59b77   822fe56     1   
+github.com/google/go-querystring            branch master      branch master  53e6ce1   c8c88db     1   
+github.com/gorilla/websocket                branch master      branch master  b89020e   c3e18be     1   
+github.com/hpcloud/tail                     v1.0.0             v1.0.0         a30252c   v1.0.0      5   
+github.com/jessevdk/go-flags                branch master      branch master  c0795c8   c0795c8     1   
+github.com/kr/pty                           ^1.0.1             v1.0.1         95d05c1   v1.1.8      1   
+github.com/lunixbochs/vtclean               branch master      branch master  88cfb0c   88cfb0c     1   
+github.com/mailru/easyjson                  branch master      branch master  8b799c4   b2ccc51     4   
+github.com/mattn/go-colorable               branch master      branch master  efa5899   388941e     1   
+github.com/mattn/go-isatty                  v0.0.3             v0.0.3         0360b2a   v0.0.3      1   
+github.com/mattn/go-runewidth               branch master      branch master  703b5e6   703b5e6     1   
+github.com/moby/moby                        branch master      branch master  9de84a7   1cfc306     1   
+github.com/nu7hatch/gouuid                  branch master      branch master  179d4d0   179d4d0     1   
+github.com/onsi/ginkgo                      branch master      branch master  0d4f080   974566c     19  
+github.com/onsi/gomega                      branch master      branch master  efe19c3   bdebf9e     17  
+github.com/opencontainers/go-digest         v1.0.0-rc1         v1.0.0-rc1     279bed9   v1.0.0-rc1  1   
+github.com/pkg/errors                       v0.8.0             v0.8.0         645ef00   v0.8.0      1   
+github.com/sabhiram/go-gitignore            branch master      branch master  362f984   d310757     1   
+github.com/sajari/fuzzy                     branch master      branch master  243c923   243c923     1   
+github.com/sirupsen/logrus                  ^1.0.3             v1.0.5         c155da1   v1.4.2      1   
+github.com/tedsuo/rata                      branch master      branch master  07d2007   07d2007     1   
+github.com/vito/go-interact                 branch master      branch master  fa338ed   4f1a3a4     2   
+golang.org/x/crypto                         branch master      branch master  5c40567   9756ffd     8   
+golang.org/x/net                            branch master      branch master  15845e8   ba9fcec     6   
+golang.org/x/sys                            branch master      branch master  b05ddf5   1e83adb     3   
+golang.org/x/text                           branch master      branch master  fe223c5   3d0f797     19  
+gopkg.in/cheggaaa/pb.v1                     ^1.0.18            v1.0.27        1cc5bbe   v1.0.28     1   
+gopkg.in/fsnotify.v1                        v1.4.7 (override)  v1.4.7         c282820   v1.4.7      1   
+gopkg.in/tomb.v1                            branch v1          branch v1      dd63297   dd63297     1   
+gopkg.in/yaml.v2                            ^2.2.1             v2.2.2         51d6538   v2.2.2      1   

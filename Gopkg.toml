@@ -44,7 +44,7 @@ required = ["github.com/gorilla/websocket"]
   name = "code.cloudfoundry.org/gofileutils"
 
 [[constraint]]
-  branch = "master"
+  version = 'v2.0.0'
   name = "code.cloudfoundry.org/lager"
 
 [[constraint]]
@@ -72,7 +72,7 @@ required = ["github.com/gorilla/websocket"]
   name = "github.com/cloudfoundry/sonde-go"
 
 [[constraint]]
-  branch = "master"
+  version = "v2.7.1"
   name = "github.com/docker/distribution"
 
 [[constraint]]
@@ -80,11 +80,11 @@ required = ["github.com/gorilla/websocket"]
   name = "github.com/fatih/color"
 
 [[constraint]]
-  branch = "master"
+  version = "1.2.1"
   name = "github.com/gogo/protobuf"
 
 [[constraint]]
-  branch = "master"
+  version = "1.0.0"
   name = "github.com/google/go-querystring"
 
 [[constraint]]
