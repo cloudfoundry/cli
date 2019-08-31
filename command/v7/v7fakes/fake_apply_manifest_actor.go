@@ -9,12 +9,11 @@ import (
 )
 
 type FakeApplyManifestActor struct {
-	SetSpaceManifestStub        func(string, []byte, bool) (v7action.Warnings, error)
+	SetSpaceManifestStub        func(string, []byte) (v7action.Warnings, error)
 	setSpaceManifestMutex       sync.RWMutex
 	setSpaceManifestArgsForCall []struct {
 		arg1 string
 		arg2 []byte
-		arg3 bool
 	}
 	setSpaceManifestReturns struct {
 		result1 v7action.Warnings
@@ -28,7 +27,7 @@ type FakeApplyManifestActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeApplyManifestActor) SetSpaceManifest(arg1 string, arg2 []byte, arg3 bool) (v7action.Warnings, error) {
+func (fake *FakeApplyManifestActor) SetSpaceManifest(arg1 string, arg2 []byte) (v7action.Warnings, error) {
 	var arg2Copy []byte
 	if arg2 != nil {
 		arg2Copy = make([]byte, len(arg2))
@@ -39,12 +38,11 @@ func (fake *FakeApplyManifestActor) SetSpaceManifest(arg1 string, arg2 []byte, a
 	fake.setSpaceManifestArgsForCall = append(fake.setSpaceManifestArgsForCall, struct {
 		arg1 string
 		arg2 []byte
-		arg3 bool
-	}{arg1, arg2Copy, arg3})
-	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy, arg3})
+	}{arg1, arg2Copy})
+	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy})
 	fake.setSpaceManifestMutex.Unlock()
 	if fake.SetSpaceManifestStub != nil {
-		return fake.SetSpaceManifestStub(arg1, arg2, arg3)
+		return fake.SetSpaceManifestStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -59,17 +57,17 @@ func (fake *FakeApplyManifestActor) SetSpaceManifestCallCount() int {
 	return len(fake.setSpaceManifestArgsForCall)
 }
 
-func (fake *FakeApplyManifestActor) SetSpaceManifestCalls(stub func(string, []byte, bool) (v7action.Warnings, error)) {
+func (fake *FakeApplyManifestActor) SetSpaceManifestCalls(stub func(string, []byte) (v7action.Warnings, error)) {
 	fake.setSpaceManifestMutex.Lock()
 	defer fake.setSpaceManifestMutex.Unlock()
 	fake.SetSpaceManifestStub = stub
 }
 
-func (fake *FakeApplyManifestActor) SetSpaceManifestArgsForCall(i int) (string, []byte, bool) {
+func (fake *FakeApplyManifestActor) SetSpaceManifestArgsForCall(i int) (string, []byte) {
 	fake.setSpaceManifestMutex.RLock()
 	defer fake.setSpaceManifestMutex.RUnlock()
 	argsForCall := fake.setSpaceManifestArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeApplyManifestActor) SetSpaceManifestReturns(result1 v7action.Warnings, result2 error) {

@@ -18,6 +18,7 @@ type Actor struct {
 
 	PreparePushPlanSequence   []UpdatePushPlanFunc
 	ChangeApplicationSequence func(plan PushPlan) []ChangeApplicationFunc
+	TransformManifestSequence []HandleFlagOverrideFunc
 	RandomWordGenerator       RandomWordGenerator
 
 	startWithProtocol *regexp.Regexp
@@ -38,23 +39,43 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 		urlValidator:        regexp.MustCompile(URLRegexp),
 	}
 
+	actor.TransformManifestSequence = []HandleFlagOverrideFunc{
+		// app name override must come first, so it can trim the manifest
+		// from multiple apps down to just one
+		HandleAppNameOverride,
+
+		HandleInstancesOverride,
+		HandleStartCommandOverride,
+		HandleHealthCheckTypeOverride,
+		HandleHealthCheckEndpointOverride,
+		HandleHealthCheckTimeoutOverride,
+		HandleMemoryOverride,
+		HandleDiskOverride,
+		HandleNoRouteOverride,
+		HandleRandomRouteOverride,
+
+		// this must come after all routing related transforms
+		HandleDefaultRouteOverride,
+
+		HandleDockerImageOverride,
+		HandleDockerUsernameOverride,
+		HandleStackOverride,
+		HandleBuildpacksOverride,
+		HandleStrategyOverride,
+		HandleAppPathOverride,
+		HandleDropletPathOverride,
+	}
+
 	actor.PreparePushPlanSequence = []UpdatePushPlanFunc{
-		SetupApplicationForPushPlan,
-		SetupDockerImageCredentialsForPushPlan,
-		SetupBitsPathForPushPlan,
 		SetupDropletPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
 		SetupDeploymentStrategyForPushPlan,
 		SetupNoStartForPushPlan,
 		SetupNoWaitForPushPlan,
-		SetupSkipRouteCreationForPushPlan,
-		SetupScaleWebProcessForPushPlan,
-		SetupUpdateWebProcessForPushPlan,
 	}
 
 	actor.ChangeApplicationSequence = func(plan PushPlan) []ChangeApplicationFunc {
 		var sequence []ChangeApplicationFunc
-		sequence = append(sequence, actor.GetUpdateSequence(plan)...)
 		sequence = append(sequence, actor.GetPrepareApplicationSourceSequence(plan)...)
 		sequence = append(sequence, actor.GetRuntimeSequence(plan)...)
 		return sequence

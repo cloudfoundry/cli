@@ -47,8 +47,7 @@ var _ = Describe("--droplet flag", func() {
 		When("the app does not exist", func() {
 			It("creates the app with the given droplet", func() {
 				session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
-				Eventually(session).Should(Say(`Creating app %s\.\.\.`, appName))
-				Eventually(session).Should(Say(`Getting app info\.\.\.`))
+				Eventually(session).Should(Say(`Pushing app %s`, appName))
 				Eventually(session).Should(Say(`Uploading droplet bits\.\.\.`))
 				Eventually(session).Should(Say(`Waiting for app %s to start\.\.\.`, appName))
 				Eventually(session).Should(Say(`requested state:\s+started`))
@@ -63,8 +62,7 @@ var _ = Describe("--droplet flag", func() {
 		When("the app already exists", func() {
 			It("updates the app with the given droplet", func() {
 				session := helpers.CF(PushCommandName, originalApp, "--droplet", dropletPath)
-				Eventually(session).Should(Say(`Updating app %s\.\.\.`, originalApp))
-				Eventually(session).Should(Say(`Getting app info\.\.\.`))
+				Eventually(session).Should(Say(`Pushing app %s`, originalApp))
 				Eventually(session).Should(Say(`Uploading droplet bits\.\.\.`))
 				Eventually(session).Should(Say(`Waiting for app %s to start\.\.\.`, originalApp))
 				Eventually(session).Should(Say(`requested state:\s+started`))
@@ -101,7 +99,7 @@ var _ = Describe("--droplet flag", func() {
 				preUploadDropletGUID := routeResponse.GUID
 
 				session := helpers.CF(PushCommandName, originalApp, "--droplet", dropletPath, "--no-start")
-				Eventually(session).Should(Say(`Updating app %s\.\.\.`, originalApp))
+				Eventually(session).Should(Say(`Pushing app %s`, originalApp))
 				Eventually(session).Should(Say(`Uploading droplet bits\.\.\.`))
 				Eventually(session).Should(Say(`requested state:\s+stopped`))
 				Eventually(session).Should(Exit(0))

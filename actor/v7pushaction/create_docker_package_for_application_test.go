@@ -41,7 +41,6 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 				Password: "some-docker-password",
 				Username: "some-docker-username",
 			},
-			DockerImageCredentialsNeedsUpdate: true,
 		}
 	})
 

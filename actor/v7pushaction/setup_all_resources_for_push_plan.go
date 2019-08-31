@@ -6,10 +6,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func (actor Actor) SetupAllResourcesForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+func (actor Actor) SetupAllResourcesForPushPlan(pushPlan PushPlan, overrides FlagOverrides) (PushPlan, error) {
 	if pushPlan.DropletPath != "" {
 		return pushPlan, nil
 	}

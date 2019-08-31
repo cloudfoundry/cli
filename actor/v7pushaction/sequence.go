@@ -4,36 +4,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
-func ShouldUpdateApplication(plan PushPlan) bool {
-	return plan.ApplicationNeedsUpdate
-}
-
-func ShouldUnmapRoutes(plan PushPlan) bool {
-	return plan.NoRouteFlag && len(plan.ApplicationRoutes) > 0
-}
-
-func ShouldCreateAndMapRandomRoute(plan PushPlan) bool {
-	return !plan.SkipRouteCreation && plan.RandomRoute && len(plan.ApplicationRoutes) == 0
-}
-
-func ShouldCreateAndMapDefaultRoute(plan PushPlan) bool {
-	return !plan.SkipRouteCreation && !plan.RandomRoute && len(plan.ApplicationRoutes) == 0
-}
-
-func ShouldScaleWebProcess(plan PushPlan) bool {
-	return plan.ScaleWebProcessNeedsUpdate
-}
-
-func ShouldUpdateWebProcess(plan PushPlan) bool {
-	return plan.UpdateWebProcessNeedsUpdate
-}
-
 func ShouldCreateBitsPackage(plan PushPlan) bool {
-	return plan.DropletPath == "" && !plan.DockerImageCredentialsNeedsUpdate
+	return plan.DropletPath == "" && plan.DockerImageCredentials.Path == ""
 }
 
 func ShouldCreateDockerPackage(plan PushPlan) bool {
-	return plan.DropletPath == "" && plan.DockerImageCredentialsNeedsUpdate
+	return plan.DropletPath == "" && plan.DockerImageCredentials.Path != ""
 }
 
 func ShouldCreateDroplet(plan PushPlan) bool {
@@ -58,35 +34,6 @@ func ShouldSetDroplet(plan PushPlan) bool {
 
 func ShouldRestart(plan PushPlan) bool {
 	return !plan.NoStart
-}
-
-func (actor Actor) GetUpdateSequence(plan PushPlan) []ChangeApplicationFunc {
-	var updateSequence []ChangeApplicationFunc
-
-	if ShouldUpdateApplication(plan) {
-		updateSequence = append(updateSequence, actor.UpdateApplication)
-	}
-
-	if ShouldUnmapRoutes(plan) {
-		updateSequence = append(updateSequence, actor.UnmapRoutesFromApplication)
-	}
-
-	if ShouldCreateAndMapDefaultRoute(plan) {
-		updateSequence = append(updateSequence, actor.UpdateRoutesForApplicationWithDefaultRoute)
-	}
-
-	if ShouldCreateAndMapRandomRoute(plan) {
-		updateSequence = append(updateSequence, actor.UpdateRoutesForApplicationWithRandomRoute)
-	}
-	if ShouldScaleWebProcess(plan) {
-		updateSequence = append(updateSequence, actor.ScaleWebProcessForApplication)
-	}
-
-	if ShouldUpdateWebProcess(plan) {
-		updateSequence = append(updateSequence, actor.UpdateWebProcessForApplication)
-	}
-
-	return updateSequence
 }
 
 func (actor Actor) GetPrepareApplicationSourceSequence(plan PushPlan) []ChangeApplicationFunc {

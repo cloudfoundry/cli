@@ -164,10 +164,9 @@ var _ = Describe("apply-manifest Command", func() {
 						Expect(appName).To(Equal(""))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
-						spaceGUIDArg, actualBytes, actualNoRoute := fakeActor.SetSpaceManifestArgsForCall(0)
+						spaceGUIDArg, actualBytes := fakeActor.SetSpaceManifestArgsForCall(0)
 						Expect(actualBytes).To(Equal([]byte("manifesto")))
 						Expect(spaceGUIDArg).To(Equal("some-space-guid"))
-						Expect(actualNoRoute).To(BeFalse())
 					})
 				})
 

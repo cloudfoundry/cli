@@ -75,6 +75,20 @@ type FakeV7ActorForPush struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	SetSpaceManifestStub        func(string, []byte) (v7action.Warnings, error)
+	setSpaceManifestMutex       sync.RWMutex
+	setSpaceManifestArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	setSpaceManifestReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	setSpaceManifestReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -349,6 +363,75 @@ func (fake *FakeV7ActorForPush) RestartApplicationReturnsOnCall(i int, result1 v
 	}{result1, result2}
 }
 
+func (fake *FakeV7ActorForPush) SetSpaceManifest(arg1 string, arg2 []byte) (v7action.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.setSpaceManifestMutex.Lock()
+	ret, specificReturn := fake.setSpaceManifestReturnsOnCall[len(fake.setSpaceManifestArgsForCall)]
+	fake.setSpaceManifestArgsForCall = append(fake.setSpaceManifestArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy})
+	fake.setSpaceManifestMutex.Unlock()
+	if fake.SetSpaceManifestStub != nil {
+		return fake.SetSpaceManifestStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.setSpaceManifestReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7ActorForPush) SetSpaceManifestCallCount() int {
+	fake.setSpaceManifestMutex.RLock()
+	defer fake.setSpaceManifestMutex.RUnlock()
+	return len(fake.setSpaceManifestArgsForCall)
+}
+
+func (fake *FakeV7ActorForPush) SetSpaceManifestCalls(stub func(string, []byte) (v7action.Warnings, error)) {
+	fake.setSpaceManifestMutex.Lock()
+	defer fake.setSpaceManifestMutex.Unlock()
+	fake.SetSpaceManifestStub = stub
+}
+
+func (fake *FakeV7ActorForPush) SetSpaceManifestArgsForCall(i int) (string, []byte) {
+	fake.setSpaceManifestMutex.RLock()
+	defer fake.setSpaceManifestMutex.RUnlock()
+	argsForCall := fake.setSpaceManifestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7ActorForPush) SetSpaceManifestReturns(result1 v7action.Warnings, result2 error) {
+	fake.setSpaceManifestMutex.Lock()
+	defer fake.setSpaceManifestMutex.Unlock()
+	fake.SetSpaceManifestStub = nil
+	fake.setSpaceManifestReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7ActorForPush) SetSpaceManifestReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.setSpaceManifestMutex.Lock()
+	defer fake.setSpaceManifestMutex.Unlock()
+	fake.SetSpaceManifestStub = nil
+	if fake.setSpaceManifestReturnsOnCall == nil {
+		fake.setSpaceManifestReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.setSpaceManifestReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7ActorForPush) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -360,6 +443,8 @@ func (fake *FakeV7ActorForPush) Invocations() map[string][][]interface{} {
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.restartApplicationMutex.RLock()
 	defer fake.restartApplicationMutex.RUnlock()
+	fake.setSpaceManifestMutex.RLock()
+	defer fake.setSpaceManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

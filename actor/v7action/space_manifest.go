@@ -1,22 +1,15 @@
 package v7action
 
 import (
-	"strconv"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
-func (actor Actor) SetSpaceManifest(spaceGUID string, rawManifest []byte, noRoute bool) (Warnings, error) {
+func (actor Actor) SetSpaceManifest(spaceGUID string, rawManifest []byte) (Warnings, error) {
 	var allWarnings Warnings
 	jobURL, applyManifestWarnings, err := actor.CloudControllerClient.UpdateSpaceApplyManifest(
 		spaceGUID,
 		rawManifest,
-		ccv3.Query{
-			Key:    ccv3.NoRouteFilter,
-			Values: []string{strconv.FormatBool(noRoute)},
-		},
 	)
 	allWarnings = append(allWarnings, applyManifestWarnings...)
 	if err != nil {

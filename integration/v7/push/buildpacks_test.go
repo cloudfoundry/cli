@@ -74,7 +74,7 @@ var _ = Describe("buildpacks", func() {
 			It("errors and does not push the app", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "-b", "wut")
-					Eventually(session.Err).Should(Say(`Buildpack "wut" must be an existing admin buildpack or a valid git URI`))
+					Eventually(session.Err).Should(Say(`For application '%s': Specified unknown buildpack name: "wut"`, appName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})

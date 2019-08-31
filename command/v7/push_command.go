@@ -4,11 +4,11 @@ import (
 	"os"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/clock"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -19,8 +19,8 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
+	"code.cloudfoundry.org/cli/util/pushmanifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
@@ -37,11 +37,8 @@ type ProgressBar interface {
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
-	CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser v7pushaction.ManifestParser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
-	// Prepare the space by creating needed apps/applying the manifest
-	PrepareSpace(pushPlans []v7pushaction.PushPlan, parser v7pushaction.ManifestParser) ([]string, <-chan *v7pushaction.PushEvent)
-	// UpdateApplicationSettings figures out the state of the world.
-	UpdateApplicationSettings(pushPlans []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
+	HandleFlagOverrides(baseManifest pushmanifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error)
+	CreatePushPlans(spaceGUID string, orgGUID string, manifest pushmanifestparser.Manifest, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
 }
@@ -50,17 +47,16 @@ type PushActor interface {
 
 type V7ActorForPush interface {
 	AppActor
+	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
-//go:generate counterfeiter . ManifestParser
+//go:generate counterfeiter . PushManifestParser
 
-type ManifestParser interface {
-	v7pushaction.ManifestParser
-	ContainsMultipleApps() bool
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error
-	ContainsPrivateDockerImages() bool
+type PushManifestParser interface {
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (pushmanifestparser.Manifest, error)
+	MarshalManifest(manifest pushmanifestparser.Manifest) ([]byte, error)
 }
 
 //go:generate counterfeiter . ManifestLocator
@@ -73,7 +69,7 @@ type PushCommand struct {
 	OptionalArgs            flag.OptionalAppName                `positional-args:"yes"`
 	HealthCheckTimeout      flag.PositiveInteger                `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	Buildpacks              []string                            `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
-	Disk                    flag.Megabytes                      `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	Disk                    string                              `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	DockerImage             flag.DockerImage                    `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername          string                              `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	DropletPath             flag.PathWithExistenceCheck         `long:"droplet" description:"Path to a tgz file with a pre-staged app"`
@@ -81,13 +77,13 @@ type PushCommand struct {
 	HealthCheckType         flag.HealthCheckType                `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
-	Memory                  flag.Megabytes                      `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Memory                  string                              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoManifest              bool                                `long:"no-manifest" description:""`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
 	NoWait                  bool                                `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
 	AppPath                 flag.PathWithExistenceCheck         `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
-	RandomRoute             bool                                `long:"random-route" description:"Create a random route for this app"`
+	RandomRoute             bool                                `long:"random-route" description:"Create a random route for this app (except when no-route is specified in the manifest)"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                        `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	Strategy                flag.DeploymentStrategy             `long:"strategy" description:"Deployment strategy, either rolling or null."`
@@ -107,7 +103,7 @@ type PushCommand struct {
 	ProgressBar     ProgressBar
 	PWD             string
 	ManifestLocator ManifestLocator
-	ManifestParser  ManifestParser
+	ManifestParser  PushManifestParser
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -132,8 +128,8 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
 
-	cmd.ManifestLocator = manifestparser.NewLocator()
-	cmd.ManifestParser = manifestparser.NewParser()
+	cmd.ManifestLocator = pushmanifestparser.NewLocator()
+	cmd.ManifestParser = pushmanifestparser.ManifestParser{}
 
 	return err
 }
@@ -144,13 +140,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	if !cmd.NoManifest {
-		if err = cmd.ReadManifest(); err != nil {
-			return err
-		}
-	}
-
-	err = cmd.ValidateFlags()
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
@@ -160,53 +150,61 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.ValidateAllowedFlagsForMultipleApps(cmd.ManifestParser.ContainsMultipleApps())
+	err = cmd.ValidateFlags()
 	if err != nil {
 		return err
 	}
 
-	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername, cmd.ManifestParser.ContainsPrivateDockerImages())
+	baseManifest, err := cmd.GetBaseManifest(flagOverrides)
 	if err != nil {
 		return err
 	}
 
-	pushPlans, err := cmd.Actor.CreatePushPlans(
-		cmd.OptionalArgs.AppName,
+	transformedManifest, err := cmd.Actor.HandleFlagOverrides(baseManifest, flagOverrides)
+	if err != nil {
+		return err
+	}
+
+	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername, transformedManifest.ContainsPrivateDockerImages())
+	if err != nil {
+		return err
+	}
+
+	transformedRawManifest, err := cmd.ManifestParser.MarshalManifest(transformedManifest)
+	if err != nil {
+		return err
+	}
+
+	cmd.announcePushing(transformedManifest.AppNames(), user)
+
+	if transformedManifest.PathToManifest != "" {
+		cmd.UI.DisplayText("Applying manifest file {{.Path}}...", map[string]interface{}{
+			"Path": transformedManifest.PathToManifest,
+		})
+	}
+
+	v7ActionWarnings, err := cmd.VersionActor.SetSpaceManifest(
+		cmd.Config.TargetedSpace().GUID,
+		transformedRawManifest,
+	)
+
+	cmd.UI.DisplayWarnings(v7ActionWarnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayText("Manifest applied")
+
+	pushPlans, warnings, err := cmd.Actor.CreatePushPlans(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
-		cmd.ManifestParser,
+		transformedManifest,
 		flagOverrides,
 	)
-	if err != nil {
-		return err
-	}
-
-	appNames, eventStream := cmd.Actor.PrepareSpace(pushPlans, cmd.ManifestParser)
-	err = cmd.eventStreamHandler(eventStream)
-
-	if err != nil {
-		return err
-	}
-
-	if len(appNames) == 0 {
-		return translatableerror.AppNameOrManifestRequiredError{}
-	}
-
-	user, err := cmd.Config.CurrentUser()
-	if err != nil {
-		return err
-	}
-
-	cmd.announcePushing(appNames, user)
-
-	cmd.UI.DisplayText("Getting app info...")
-	log.Info("generating the app plan")
-
-	pushPlans, warnings, err := cmd.Actor.UpdateApplicationSettings(pushPlans)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
+
 	log.WithField("number of plans", len(pushPlans)).Debug("completed generating plan")
 
 	for _, plan := range pushPlans {
@@ -228,260 +226,92 @@ func (cmd PushCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd PushCommand) shouldDisplaySummary(err error) bool {
-	if err == nil {
-		return true
+func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error) {
+	defaultManifest := pushmanifestparser.Manifest{
+		Applications: []pushmanifestparser.Application{
+			{Name: flagOverrides.AppName},
+		},
 	}
-	_, ok := err.(actionerror.AllInstancesCrashedError)
-	return ok
-}
-
-func (cmd PushCommand) mapErr(appName string, err error) error {
-	switch err.(type) {
-	case actionerror.AllInstancesCrashedError:
-		return translatableerror.ApplicationUnableToStartError{
-			AppName:    appName,
-			BinaryName: cmd.Config.BinaryName(),
-		}
-	case actionerror.StartupTimeoutError:
-		return translatableerror.StartupTimeoutError{
-			AppName:    appName,
-			BinaryName: cmd.Config.BinaryName(),
-		}
+	if cmd.NoManifest {
+		return defaultManifest, nil
 	}
-	return err
-}
 
-func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
-	tokens := map[string]interface{}{
-		"AppName":   strings.Join(appNames, ", "),
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-	}
-	singular := "Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
-	plural := "Pushing apps {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
-
-	if len(appNames) == 1 {
-		cmd.UI.DisplayTextWithFlavor(singular, tokens)
-	} else {
-		cmd.UI.DisplayTextWithFlavor(plural, tokens)
-	}
-}
-
-func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
-	log.Info("getting application summary info")
-	summary, warnings, err := cmd.VersionActor.GetDetailedAppSummary(
-		plan.Application.Name,
-		cmd.Config.TargetedSpace().GUID,
-		true,
-	)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-	cmd.UI.DisplayNewline()
-	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-	appSummaryDisplayer.AppDisplay(summary, true)
-	return nil
-}
-
-func (cmd PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushEvent) error {
-	for event := range eventStream {
-		cmd.UI.DisplayWarnings(event.Warnings)
-		if event.Err != nil {
-			return event.Err
-		}
-		_, err := cmd.processEvent(event.Event, event.Plan.Application.Name)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (bool, error) {
-	switch event {
-	case v7pushaction.SkippingApplicationCreation:
-		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
-			"AppName": appName,
-		})
-	case v7pushaction.CreatingApplication:
-		cmd.UI.DisplayTextWithFlavor("Creating app {{.AppName}}...", map[string]interface{}{
-			"AppName": appName,
-		})
-	case v7pushaction.CreatingAndMappingRoutes:
-		cmd.UI.DisplayText("Mapping routes...")
-	case v7pushaction.CreatingArchive:
-		cmd.UI.DisplayText("Packaging files to upload...")
-	case v7pushaction.UploadingApplicationWithArchive:
-		cmd.UI.DisplayText("Uploading files...")
-		log.Debug("starting progress bar")
-		cmd.ProgressBar.Ready()
-	case v7pushaction.UploadingApplication:
-		cmd.UI.DisplayText("All files found in remote cache; nothing to upload.")
-		cmd.UI.DisplayText("Waiting for API to complete processing files...")
-	case v7pushaction.RetryUpload:
-		cmd.UI.DisplayText("Retrying upload due to an error...")
-	case v7pushaction.UploadWithArchiveComplete:
-		cmd.ProgressBar.Complete()
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Waiting for API to complete processing files...")
-	case v7pushaction.UploadingDroplet:
-		cmd.UI.DisplayText("Uploading droplet bits...")
-		cmd.ProgressBar.Ready()
-	case v7pushaction.UploadDropletComplete:
-		cmd.ProgressBar.Complete()
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Waiting for API to complete processing files...")
-	case v7pushaction.StoppingApplication:
-		cmd.UI.DisplayText("Stopping Application...")
-	case v7pushaction.StoppingApplicationComplete:
-		cmd.UI.DisplayText("Application Stopped")
-	case v7pushaction.ApplyManifest:
-		cmd.UI.DisplayText("Applying manifest...")
-	case v7pushaction.ApplyManifestComplete:
-		cmd.UI.DisplayText("Manifest applied")
-	case v7pushaction.StartingStaging:
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Staging app and tracing logs...")
-		logStream, errStream, warnings, err := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return false, err
-		}
-		go cmd.getLogs(logStream, errStream)
-	case v7pushaction.StagingComplete:
-		cmd.NOAAClient.Close()
-	case v7pushaction.RestartingApplication:
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayTextWithFlavor(
-			"Waiting for app {{.AppName}} to start...",
-			map[string]interface{}{
-				"AppName": appName,
-			},
-		)
-	case v7pushaction.StartingDeployment:
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayTextWithFlavor(
-			"Starting deployment for app {{.AppName}}...",
-			map[string]interface{}{
-				"AppName": appName,
-			},
-		)
-	case v7pushaction.WaitingForDeployment:
-		cmd.UI.DisplayText("Waiting for app to deploy...")
-	case v7pushaction.Complete:
-		return true, nil
-	default:
-		log.WithField("event", event).Debug("ignoring event")
-	}
-	return false, nil
-}
-
-func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream <-chan error) {
-	for {
-		select {
-		case logMessage, open := <-logStream:
-			if !open {
-				return
-			}
-			if logMessage.Staging() {
-				cmd.UI.DisplayLogMessage(logMessage, false)
-			}
-		case err, open := <-errStream:
-			if !open {
-				return
-			}
-			_, ok := err.(actionerror.NOAATimeoutError)
-			if ok {
-				cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
-			}
-			cmd.UI.DisplayWarning(err.Error())
-		}
-	}
-}
-
-func (cmd PushCommand) ReadManifest() error {
 	log.Info("reading manifest if exists")
-	pathsToVarsFiles := []string{}
-	for _, varfilepath := range cmd.PathsToVarsFiles {
-		pathsToVarsFiles = append(pathsToVarsFiles, string(varfilepath))
-	}
+	var pathsToVarsFiles []string
+	pathsToVarsFiles = append(pathsToVarsFiles, flagOverrides.PathsToVarsFiles...)
 
 	readPath := cmd.PWD
-	if len(cmd.PathToManifest) != 0 {
-		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		readPath = string(cmd.PathToManifest)
+	if flagOverrides.ManifestPath != "" {
+		log.WithField("manifestPath", flagOverrides.ManifestPath).Debug("reading '-f' provided manifest")
+		readPath = flagOverrides.ManifestPath
 	}
 
 	pathToManifest, exists, err := cmd.ManifestLocator.Path(readPath)
 	if err != nil {
-		return err
+		return pushmanifestparser.Manifest{}, err
 	}
 
-	if exists {
-		log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-		err = cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars, cmd.OptionalArgs.AppName)
-		if err != nil {
-			log.Errorln("reading manifest:", err)
-			return err
-		}
-
-		cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
+	if !exists {
+		return defaultManifest, nil
 	}
 
-	return nil
+	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
+	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, flagOverrides.Vars)
+	if err != nil {
+		log.Errorln("reading manifest:", err)
+		return pushmanifestparser.Manifest{}, err
+	}
+
+	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
+
+	return manifest, nil
+}
+
+func (cmd PushCommand) GetDockerPassword(dockerUsername string, containsPrivateDockerImages bool) (string, error) {
+	if dockerUsername == "" && !containsPrivateDockerImages { // no need for a password without a username
+		return "", nil
+	}
+
+	if cmd.Config.DockerPassword() == "" {
+		cmd.UI.DisplayText("Environment variable CF_DOCKER_PASSWORD not set.")
+		return cmd.UI.DisplayPasswordPrompt("Docker password")
+	}
+
+	cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
+	return cmd.Config.DockerPassword(), nil
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
+	var pathsToVarsFiles []string
+	for _, varFilePath := range cmd.PathsToVarsFiles {
+		pathsToVarsFiles = append(pathsToVarsFiles, string(varFilePath))
+	}
+
 	return v7pushaction.FlagOverrides{
+		AppName:             cmd.OptionalArgs.AppName,
 		Buildpacks:          cmd.Buildpacks,
 		Stack:               cmd.Stack,
-		Disk:                cmd.Disk.NullUint64,
+		Disk:                cmd.Disk,
 		DropletPath:         string(cmd.DropletPath),
 		DockerImage:         cmd.DockerImage.Path,
 		DockerUsername:      cmd.DockerUsername,
 		HealthCheckEndpoint: cmd.HealthCheckHTTPEndpoint,
 		HealthCheckType:     cmd.HealthCheckType.Type,
-		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value, Instances: cmd.Instances.NullInt,
-		Memory:          cmd.Memory.NullUint64,
-		NoStart:         cmd.NoStart,
-		NoWait:          cmd.NoWait,
-		ProvidedAppPath: string(cmd.AppPath),
-		NoRoute:         cmd.NoRoute,
-		RandomRoute:     cmd.RandomRoute,
-		StartCommand:    cmd.StartCommand.FilteredString,
-		Strategy:        cmd.Strategy.Name,
+		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value,
+		Instances:           cmd.Instances.NullInt,
+		Memory:              cmd.Memory,
+		NoStart:             cmd.NoStart,
+		NoWait:              cmd.NoWait,
+		ProvidedAppPath:     string(cmd.AppPath),
+		NoRoute:             cmd.NoRoute,
+		RandomRoute:         cmd.RandomRoute,
+		StartCommand:        cmd.StartCommand.FilteredString,
+		Strategy:            cmd.Strategy.Name,
+		ManifestPath:        string(cmd.PathToManifest),
+		PathsToVarsFiles:    pathsToVarsFiles,
+		Vars:                cmd.Vars,
+		NoManifest:          cmd.NoManifest,
 	}, nil
-}
-
-func (cmd PushCommand) ValidateAllowedFlagsForMultipleApps(containsMultipleApps bool) error {
-	if cmd.OptionalArgs.AppName != "" {
-		return nil
-	}
-
-	allowedFlagsMultipleApps := !(len(cmd.Buildpacks) > 0 ||
-		cmd.Disk.IsSet ||
-		cmd.DockerImage.Path != "" ||
-		cmd.DockerUsername != "" ||
-		cmd.DropletPath != "" ||
-		cmd.HealthCheckType.Type != "" ||
-		cmd.HealthCheckHTTPEndpoint != "" ||
-		cmd.HealthCheckTimeout.Value > 0 ||
-		cmd.Instances.IsSet ||
-		cmd.Stack != "" ||
-		cmd.Memory.IsSet ||
-		cmd.AppPath != "" ||
-		cmd.NoRoute ||
-		cmd.StartCommand.IsSet ||
-		cmd.Strategy.Name != "")
-
-	if containsMultipleApps && !allowedFlagsMultipleApps {
-		return translatableerror.CommandLineArgsWithMultipleAppsError{}
-	}
-
-	return nil
 }
 
 func (cmd PushCommand) ValidateFlags() error {
@@ -585,32 +415,181 @@ func (cmd PushCommand) ValidateFlags() error {
 				"--random-route",
 			},
 		}
-
-	}
-
-	if len(cmd.ManifestParser.Apps()) == 1 {
-		app := cmd.ManifestParser.Apps()[0]
-
-		switch {
-		case len(cmd.Buildpacks) > 0 && app.Docker != nil:
-			return translatableerror.ArgumentManifestMismatchError{
-				Arg:              "--buildpack, -b",
-				ManifestProperty: "docker",
-			}
-
-		case len(cmd.AppPath) > 0 && app.Docker != nil:
-			return translatableerror.ArgumentManifestMismatchError{
-				Arg:              "--path, -p",
-				ManifestProperty: "docker",
-			}
-
-		case len(cmd.DockerImage.Path) > 0 && app.Path != "":
-			return translatableerror.ArgumentManifestMismatchError{
-				Arg:              "--docker-image, -o",
-				ManifestProperty: "path",
-			}
-		}
+	case !cmd.validBuildpacks():
+		return translatableerror.InvalidBuildpacksError{}
 	}
 
 	return nil
+}
+
+func (cmd PushCommand) validBuildpacks() bool {
+	for _, buildpack := range cmd.Buildpacks {
+		if (buildpack == "null" || buildpack == "default") && len(cmd.Buildpacks) > 1 {
+			return false
+		}
+	}
+	return true
+}
+
+func (cmd PushCommand) shouldDisplaySummary(err error) bool {
+	if err == nil {
+		return true
+	}
+	_, ok := err.(actionerror.AllInstancesCrashedError)
+	return ok
+}
+
+func (cmd PushCommand) mapErr(appName string, err error) error {
+	switch err.(type) {
+	case actionerror.AllInstancesCrashedError:
+		return translatableerror.ApplicationUnableToStartError{
+			AppName:    appName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	case actionerror.StartupTimeoutError:
+		return translatableerror.StartupTimeoutError{
+			AppName:    appName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	}
+	return err
+}
+
+func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
+	tokens := map[string]interface{}{
+		"AppName":   strings.Join(appNames, ", "),
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  user.Name,
+	}
+	singular := "Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+	plural := "Pushing apps {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+
+	if len(appNames) == 1 {
+		cmd.UI.DisplayTextWithFlavor(singular, tokens)
+	} else {
+		cmd.UI.DisplayTextWithFlavor(plural, tokens)
+	}
+}
+
+func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
+	log.Info("getting application summary info")
+	summary, warnings, err := cmd.VersionActor.GetDetailedAppSummary(
+		plan.Application.Name,
+		cmd.Config.TargetedSpace().GUID,
+		true,
+	)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayNewline()
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
+	appSummaryDisplayer.AppDisplay(summary, true)
+	return nil
+}
+
+func (cmd PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushEvent) error {
+	for event := range eventStream {
+		cmd.UI.DisplayWarnings(event.Warnings)
+		if event.Err != nil {
+			return event.Err
+		}
+		err := cmd.processEvent(event.Event, event.Plan.Application.Name)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) error {
+	switch event {
+	case v7pushaction.CreatingArchive:
+		cmd.UI.DisplayText("Packaging files to upload...")
+	case v7pushaction.UploadingApplicationWithArchive:
+		cmd.UI.DisplayText("Uploading files...")
+		log.Debug("starting progress bar")
+		cmd.ProgressBar.Ready()
+	case v7pushaction.UploadingApplication:
+		cmd.UI.DisplayText("All files found in remote cache; nothing to upload.")
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case v7pushaction.RetryUpload:
+		cmd.UI.DisplayText("Retrying upload due to an error...")
+	case v7pushaction.UploadWithArchiveComplete:
+		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case v7pushaction.UploadingDroplet:
+		cmd.UI.DisplayText("Uploading droplet bits...")
+		cmd.ProgressBar.Ready()
+	case v7pushaction.UploadDropletComplete:
+		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case v7pushaction.StoppingApplication:
+		cmd.UI.DisplayText("Stopping Application...")
+	case v7pushaction.StoppingApplicationComplete:
+		cmd.UI.DisplayText("Application Stopped")
+	case v7pushaction.ApplyManifest:
+		cmd.UI.DisplayText("Applying manifest...")
+	case v7pushaction.ApplyManifestComplete:
+		cmd.UI.DisplayText("Manifest applied")
+	case v7pushaction.StartingStaging:
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Staging app and tracing logs...")
+		logStream, errStream, warnings, err := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+		go cmd.getLogs(logStream, errStream)
+	case v7pushaction.StagingComplete:
+		cmd.NOAAClient.Close()
+	case v7pushaction.RestartingApplication:
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayTextWithFlavor(
+			"Waiting for app {{.AppName}} to start...",
+			map[string]interface{}{
+				"AppName": appName,
+			},
+		)
+	case v7pushaction.StartingDeployment:
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayTextWithFlavor(
+			"Starting deployment for app {{.AppName}}...",
+			map[string]interface{}{
+				"AppName": appName,
+			},
+		)
+	case v7pushaction.WaitingForDeployment:
+		cmd.UI.DisplayText("Waiting for app to deploy...")
+	default:
+		log.WithField("event", event).Debug("ignoring event")
+	}
+
+	return nil
+}
+
+func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream <-chan error) {
+	for {
+		select {
+		case logMessage, open := <-logStream:
+			if !open {
+				return
+			}
+			if logMessage.Staging() {
+				cmd.UI.DisplayLogMessage(logMessage, false)
+			}
+		case err, open := <-errStream:
+			if !open {
+				return
+			}
+			_, ok := err.(actionerror.NOAATimeoutError)
+			if ok {
+				cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
+			}
+			cmd.UI.DisplayWarning(err.Error())
+		}
+	}
 }
