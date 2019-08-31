@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/util/pushmanifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -11,7 +11,7 @@ var _ = Describe("SetupBitsPathForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
 		overrides   FlagOverrides
-		manifestApp manifestparser.Application
+		manifestApp pushmanifestparser.Application
 
 		expectedPushPlan PushPlan
 		executeError     error
@@ -20,7 +20,7 @@ var _ = Describe("SetupBitsPathForPushPlan", func() {
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
 		overrides = FlagOverrides{}
-		manifestApp = manifestparser.Application{}
+		manifestApp = pushmanifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {

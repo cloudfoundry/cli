@@ -50,7 +50,6 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 			Application: v7action.Application{
 				GUID: "some-app-guid",
 			},
-			DockerImageCredentialsNeedsUpdate: false,
 		}
 	})
 

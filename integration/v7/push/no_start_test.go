@@ -22,7 +22,6 @@ var _ = Describe("push with --no-start", func() {
 		It("pushes the app without starting it", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
-				Eventually(session).Should(Say(`Getting app info\.\.\.`))
 				Eventually(session).Should(Say(`Uploading files\.\.\.`))
 				Eventually(session).Should(Say("100.00%"))
 				Eventually(session).Should(Say(`Waiting for API to complete processing files\.\.\.`))
@@ -53,7 +52,6 @@ var _ = Describe("push with --no-start", func() {
 			It("stops the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
-					Eventually(session).Should(Say(`Getting app info\.\.\.`))
 					Eventually(session).Should(Say(`Uploading files\.\.\.`))
 					Eventually(session).Should(Say("100.00%"))
 					Eventually(session).Should(Say(`Waiting for API to complete processing files\.\.\.`))
@@ -82,7 +80,6 @@ var _ = Describe("push with --no-start", func() {
 			It("the app remains stopped", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
-					Eventually(session).Should(Say(`Getting app info\.\.\.`))
 					Eventually(session).Should(Say(`Uploading files\.\.\.`))
 					Eventually(session).Should(Say("100.00%"))
 					Eventually(session).Should(Say(`Waiting for API to complete processing files\.\.\.`))

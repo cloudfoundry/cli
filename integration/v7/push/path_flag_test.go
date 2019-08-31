@@ -3,7 +3,7 @@ package push
 import (
 	"io/ioutil"
 	"os"
-	"regexp"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -37,8 +37,9 @@ var _ = When("the -p flag is provided", func() {
 			var emptyDir string
 
 			BeforeEach(func() {
-				var err error
-				emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
+				sympath, err := ioutil.TempDir("", "integration-push-path-empty")
+				Expect(err).ToNot(HaveOccurred())
+				emptyDir, err = filepath.EvalSymlinks(sympath)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -48,7 +49,7 @@ var _ = When("the -p flag is provided", func() {
 
 			It("returns an error", func() {
 				session := helpers.CF(PushCommandName, appName, "-p", emptyDir)
-				Eventually(session.Err).Should(Say("No app files found in '%s'", regexp.QuoteMeta(emptyDir)))
+				Eventually(session.Err).Should(helpers.SayPath("No app files found in '%s'", emptyDir))
 				Eventually(session).Should(Exit(1))
 			})
 		})

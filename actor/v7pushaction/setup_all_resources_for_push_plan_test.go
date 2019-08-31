@@ -7,7 +7,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
@@ -21,9 +20,8 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 		actor           *Actor
 		fakeSharedActor *v7pushactionfakes.FakeSharedActor
 
-		pushPlan    PushPlan
-		overrides   FlagOverrides
-		manifestApp manifestparser.Application
+		pushPlan  PushPlan
+		overrides FlagOverrides
 
 		expectedPushPlan PushPlan
 		executeErr       error
@@ -34,11 +32,10 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 
 		pushPlan = PushPlan{}
 		overrides = FlagOverrides{}
-		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = actor.SetupAllResourcesForPushPlan(pushPlan, overrides, manifestApp)
+		expectedPushPlan, executeErr = actor.SetupAllResourcesForPushPlan(pushPlan, overrides)
 	})
 
 	When("the plan has a droplet path", func() {

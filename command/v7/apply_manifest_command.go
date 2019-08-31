@@ -11,11 +11,19 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/clock"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 //go:generate counterfeiter . ApplyManifestActor
 type ApplyManifestActor interface {
-	SetSpaceManifest(spaceGUID string, rawManifest []byte, noRoute bool) (v7action.Warnings, error)
+	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
+}
+
+//go:generate counterfeiter . ManifestParser
+
+type ManifestParser interface {
+	FullRawManifest() []byte
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error
 }
 
 type ApplyManifestCommand struct {
@@ -93,7 +101,7 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, cmd.Parser.FullRawManifest(), false)
+	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, cmd.Parser.FullRawManifest())
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

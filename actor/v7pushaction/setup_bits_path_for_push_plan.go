@@ -3,11 +3,11 @@ package v7pushaction
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/util/pushmanifestparser"
 	log "github.com/sirupsen/logrus"
 )
 
-func SetupBitsPathForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+func SetupBitsPathForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp pushmanifestparser.Application) (PushPlan, error) {
 	log.Info("determine bits path")
 	switch {
 	case overrides.ProvidedAppPath != "":

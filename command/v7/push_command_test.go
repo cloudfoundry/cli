@@ -4,9 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/util/manifestparser"
-
-	. "github.com/onsi/gomega/gstruct"
+	"code.cloudfoundry.org/cli/util/pushmanifestparser"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -98,7 +96,7 @@ var _ = Describe("push Command", func() {
 		spaceName          string
 		orgName            string
 		pwd                string
-		fakeManifestParser *v7fakes.FakeManifestParser
+		fakeManifestParser *v7fakes.FakePushManifestParser
 	)
 
 	BeforeEach(func() {
@@ -118,7 +116,7 @@ var _ = Describe("push Command", func() {
 		orgName = "some-org"
 		pwd = "/push/cmd/test"
 		fakeManifestLocator = new(v7fakes.FakeManifestLocator)
-		fakeManifestParser = new(v7fakes.FakeManifestParser)
+		fakeManifestParser = new(v7fakes.FakePushManifestParser)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -144,19 +142,6 @@ var _ = Describe("push Command", func() {
 		})
 
 		BeforeEach(func() {
-			events := FillInEvents([]Step{
-				{
-					Warnings: v7pushaction.Warnings{"some-warning-1"},
-					Event:    v7pushaction.ApplyManifest,
-				},
-				{
-					Warnings: v7pushaction.Warnings{"some-warning-2"},
-					Event:    v7pushaction.ApplyManifestComplete,
-				},
-			})
-
-			fakeActor.PrepareSpaceReturns([]string{appName1, appName2}, events)
-
 			fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
 				return FillInEvents([]Step{})
 			}
@@ -216,157 +201,189 @@ var _ = Describe("push Command", func() {
 				})
 			})
 
-			Describe("reading manifest", func() {
-				BeforeEach(func() {
-					fakeManifestLocator.PathReturns("", true, nil)
+			When("the flags are all valid", func() {
+				It("delegating to the GetBaseManifest", func() {
+					// This tells us GetBaseManifest is being called because we dont have a fake
+					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
 				})
 
-				When("Reading the manifest fails", func() {
+				When("getting the base manifest fails", func() {
 					BeforeEach(func() {
-						fakeManifestParser.InterpolateAndParseReturns(errors.New("oh no"))
+						fakeManifestLocator.PathReturns("", false, errors.New("locate-error"))
 					})
+
 					It("returns the error", func() {
-						Expect(executeErr).To(MatchError("oh no"))
+						Expect(executeErr).To(MatchError(errors.New("locate-error")))
 					})
 				})
 
-				When("Reading the manifest succeeds", func() {
-					It("interpolates the manifest", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					})
-
-					When("the manifest contains private docker images", func() {
-						It("returns docker password", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(fakeManifestParser.ContainsPrivateDockerImagesCallCount()).To(Equal(1))
-						})
-					})
-				})
-
-				When("no apps are defined in the manifest", func() {
+				When("getting the base manifest succeeds", func() {
 					BeforeEach(func() {
-						fakeManifestParser.AppsReturns([]manifestparser.Application{})
-					})
-
-					When("passing in a path", func() {
-						BeforeEach(func() {
-							cmd.AppPath = "not-empty"
-						})
-
-						It("does not fail when parsing flags", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-						})
-					})
-
-					When("passing in buildpacks", func() {
-						BeforeEach(func() {
-							cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
-						})
-
-						It("does not fail when parsing flags", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-						})
-					})
-				})
-
-				When("no manifest flag", func() {
-					BeforeEach(func() {
-						cmd.NoManifest = true
-					})
-
-					It("does not read the manifest", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
-					})
-				})
-
-				When("multi app manifest + flag overrides", func() {
-					BeforeEach(func() {
-						fakeManifestParser.ContainsMultipleAppsReturns(true)
-						cmd.NoRoute = true
-					})
-
-					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
-					})
-				})
-			})
-
-			Describe("delegating to Actor.CreatePushPlans", func() {
-				BeforeEach(func() {
-					cmd.OptionalArgs.AppName = appName1
-				})
-
-				It("delegates the correct values", func() {
-					Expect(fakeActor.CreatePushPlansCallCount()).To(Equal(1))
-					actualAppName, actualSpaceGUID, actualOrgGUID, _, _ := fakeActor.CreatePushPlansArgsForCall(0)
-
-					Expect(actualAppName).To(Equal(appName1))
-					Expect(actualSpaceGUID).To(Equal("some-space-guid"))
-					Expect(actualOrgGUID).To(Equal("some-org-guid"))
-				})
-
-				When("Creating the pushPlans errors", func() {
-					BeforeEach(func() {
-						fakeActor.CreatePushPlansReturns(nil, errors.New("panic"))
-					})
-
-					It("passes up the error", func() {
-						Expect(executeErr).To(MatchError(errors.New("panic")))
-						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(0))
-					})
-				})
-
-				When("creating push plans succeeds", func() {
-					BeforeEach(func() {
-						fakeActor.CreatePushPlansReturns(
-							[]v7pushaction.PushPlan{
-								{Application: v7action.Application{Name: appName1}, SpaceGUID: "some-space-guid"},
-								{Application: v7action.Application{Name: appName2}, SpaceGUID: "some-space-guid"},
-							}, nil,
+						// essentially fakes GetBaseManifest
+						fakeManifestLocator.PathReturns("", true, nil)
+						fakeManifestParser.InterpolateAndParseReturns(
+							pushmanifestparser.Manifest{
+								Applications: []pushmanifestparser.Application{
+									{
+										Name: "some-app-name",
+									},
+								},
+							},
+							nil,
 						)
 					})
 
-					Describe("delegating to Actor.PrepareSpace", func() {
-						It("delegates to PrepareSpace", func() {
-							actualPushPlans, actualParser := fakeActor.PrepareSpaceArgsForCall(0)
-							Expect(actualPushPlans).To(ConsistOf(
-								v7pushaction.PushPlan{Application: v7action.Application{Name: appName1}, SpaceGUID: "some-space-guid"},
-								v7pushaction.PushPlan{Application: v7action.Application{Name: appName2}, SpaceGUID: "some-space-guid"},
-							))
-							Expect(actualParser).To(Equal(fakeManifestParser))
+					It("delegates to the flag override handler", func() {
+						Expect(fakeActor.HandleFlagOverridesCallCount()).To(Equal(1))
+						actualManifest, actualFlagOverrides := fakeActor.HandleFlagOverridesArgsForCall(0)
+						Expect(actualManifest).To(Equal(
+							pushmanifestparser.Manifest{
+								Applications: []pushmanifestparser.Application{
+									{Name: "some-app-name"},
+								},
+							},
+						))
+						Expect(actualFlagOverrides).To(Equal(v7pushaction.FlagOverrides{}))
+					})
+
+					When("handling the flag overrides fails", func() {
+						BeforeEach(func() {
+							fakeActor.HandleFlagOverridesReturns(pushmanifestparser.Manifest{}, errors.New("override-handler-error"))
 						})
 
-						When("Actor.PrepareSpace has no errors", func() {
-							Describe("delegating to Actor.UpdateApplicationSettings", func() {
-								When("there are no flag overrides", func() {
-									BeforeEach(func() {
-										fakeActor.UpdateApplicationSettingsReturns(
-											[]v7pushaction.PushPlan{
-												{Application: v7action.Application{Name: appName1}},
-												{Application: v7action.Application{Name: appName2}},
+						It("returns the error", func() {
+							Expect(executeErr).To(MatchError("override-handler-error"))
+						})
+					})
+
+					When("handling the flag overrides succeeds", func() {
+						BeforeEach(func() {
+							fakeActor.HandleFlagOverridesReturns(
+								pushmanifestparser.Manifest{
+									Applications: []pushmanifestparser.Application{
+										{Name: "some-app-name"},
+									},
+								},
+								nil,
+							)
+						})
+
+						When("the docker password is needed", func() {
+							// TODO remove this in favor of a fake manifest
+							BeforeEach(func() {
+								fakeActor.HandleFlagOverridesReturns(
+									pushmanifestparser.Manifest{
+										Applications: []pushmanifestparser.Application{
+											{
+												Name:   "some-app-name",
+												Docker: &pushmanifestparser.Docker{Username: "username", Image: "image"},
 											},
-											v7pushaction.Warnings{"conceptualize-warning-1"}, nil)
+										},
+									},
+									nil,
+								)
+							})
+
+							It("delegates to the GetDockerPassword", func() {
+								Expect(fakeConfig.DockerPasswordCallCount()).To(Equal(1))
+							})
+						})
+
+						It("delegates to the manifest parser", func() {
+							Expect(fakeManifestParser.MarshalManifestCallCount()).To(Equal(1))
+							Expect(fakeManifestParser.MarshalManifestArgsForCall(0)).To(Equal(
+								pushmanifestparser.Manifest{
+									Applications: []pushmanifestparser.Application{
+										{Name: "some-app-name"},
+									},
+								},
+							))
+						})
+
+						When("marshalling the manifest fails", func() {
+							BeforeEach(func() {
+								fakeManifestParser.MarshalManifestReturns([]byte{}, errors.New("marshal error"))
+							})
+
+							It("returns the error", func() {
+								Expect(executeErr).To(MatchError("marshal error"))
+							})
+						})
+
+						When("marsahlling the manifest succeeds", func() {
+							BeforeEach(func() {
+								fakeManifestParser.MarshalManifestReturns([]byte("our-manifest"), nil)
+							})
+
+							It("delegates to the version actor", func() {
+								Expect(fakeVersionActor.SetSpaceManifestCallCount()).To(Equal(1))
+								actualSpaceGUID, actualManifestBytes := fakeVersionActor.SetSpaceManifestArgsForCall(0)
+								Expect(actualSpaceGUID).To(Equal("some-space-guid"))
+								Expect(actualManifestBytes).To(Equal([]byte("our-manifest")))
+							})
+
+							When("applying the manifest fails", func() {
+								BeforeEach(func() {
+									fakeVersionActor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, errors.New("apply-manifest-error"))
+								})
+
+								It("returns an error and prints warnings", func() {
+									Expect(executeErr).To(MatchError("apply-manifest-error"))
+									Expect(testUI.Err).To(Say("apply-manifest-warnings"))
+								})
+
+							})
+
+							When("applying the manifest succeeds", func() {
+								BeforeEach(func() {
+									fakeVersionActor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, nil)
+								})
+
+								It("delegates to the push actor", func() {
+									Expect(fakeActor.CreatePushPlansCallCount()).To(Equal(1))
+									spaceGUID, orgGUID, manifest, overrides := fakeActor.CreatePushPlansArgsForCall(0)
+									Expect(spaceGUID).To(Equal("some-space-guid"))
+									Expect(orgGUID).To(Equal("some-org-guid"))
+									Expect(manifest).To(Equal(
+										pushmanifestparser.Manifest{
+											Applications: []pushmanifestparser.Application{
+												{Name: "some-app-name"},
+											},
+										},
+									))
+									Expect(overrides).To(Equal(v7pushaction.FlagOverrides{}))
+								})
+
+								When("creating the push plans fails", func() {
+									BeforeEach(func() {
+										fakeActor.CreatePushPlansReturns(
+											nil,
+											v7action.Warnings{"create-push-plans-warnings"},
+											errors.New("create-push-plans-error"),
+										)
 									})
 
-									It("generates a push plan with the specified app path", func() {
-										Expect(executeErr).ToNot(HaveOccurred())
-										Expect(testUI.Out).To(Say(
-											"Pushing apps %s, %s to org some-org / space some-space as some-user",
-											appName1,
-											appName2,
-										))
-										Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
-										Expect(testUI.Err).To(Say("conceptualize-warning-1"))
+									It("returns errors and warnings", func() {
+										Expect(executeErr).To(MatchError("create-push-plans-error"))
+										Expect(testUI.Err).To(Say("create-push-plans-warnings"))
+									})
 
-										Expect(fakeActor.UpdateApplicationSettingsCallCount()).To(Equal(1))
-										actualPushPlans := fakeActor.UpdateApplicationSettingsArgsForCall(0)
-										Expect(actualPushPlans).To(ConsistOf(
-											v7pushaction.PushPlan{Application: v7action.Application{Name: appName1}, SpaceGUID: "some-space-guid"},
-											v7pushaction.PushPlan{Application: v7action.Application{Name: appName2}, SpaceGUID: "some-space-guid"},
-										))
+								})
+
+								When("creating the push plans succeeds", func() {
+									BeforeEach(func() {
+										fakeActor.CreatePushPlansReturns(
+											[]v7pushaction.PushPlan{
+												v7pushaction.PushPlan{Application: v7action.Application{Name: "first-app", GUID: "potato"}},
+												v7pushaction.PushPlan{Application: v7action.Application{Name: "second-app", GUID: "potato"}},
+											},
+											v7action.Warnings{"create-push-plans-warnings"},
+											nil,
+										)
+									})
+
+									It("it displays the warnings from create push plans", func() {
+										Expect(testUI.Err).To(Say("create-push-plans-warnings"))
 									})
 
 									Describe("delegating to Actor.Actualize", func() {
@@ -383,25 +400,6 @@ var _ = Describe("push Command", func() {
 												BeforeEach(func() {
 													fakeActor.ActualizeStub = func(pushPlan v7pushaction.PushPlan, _ v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
 														return FillInEvents([]Step{
-															{
-																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
-																Event:    v7pushaction.SkippingApplicationCreation,
-																Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
-															},
-															{
-																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
-																Event:    v7pushaction.CreatingApplication,
-																Warnings: v7pushaction.Warnings{"app creation warnings"},
-															},
-															{
-																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
-																Event: v7pushaction.CreatingAndMappingRoutes,
-															},
-															{
-																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
-																Event:    v7pushaction.CreatedRoutes,
-																Warnings: v7pushaction.Warnings{"routes warnings"},
-															},
 															{
 																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event: v7pushaction.CreatingArchive,
@@ -442,15 +440,6 @@ var _ = Describe("push Command", func() {
 													Expect(fakeProgressBar.ReadyCallCount()).Should(Equal(2))
 													Expect(fakeProgressBar.CompleteCallCount()).Should(Equal(2))
 
-													Expect(testUI.Out).To(Say("Updating app first-app..."))
-													Expect(testUI.Err).To(Say("skipping app creation warnings"))
-
-													Expect(testUI.Out).To(Say("Creating app first-app..."))
-													Expect(testUI.Err).To(Say("app creation warnings"))
-
-													Expect(testUI.Out).To(Say("Mapping routes..."))
-													Expect(testUI.Err).To(Say("routes warnings"))
-
 													Expect(testUI.Out).To(Say("Packaging files to upload..."))
 
 													Expect(testUI.Out).To(Say("Uploading files..."))
@@ -462,15 +451,6 @@ var _ = Describe("push Command", func() {
 													Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
 
 													Expect(testUI.Out).To(Say("Waiting for app first-app to start..."))
-
-													Expect(testUI.Out).To(Say("Updating app second-app..."))
-													Expect(testUI.Err).To(Say("skipping app creation warnings"))
-
-													Expect(testUI.Out).To(Say("Creating app second-app..."))
-													Expect(testUI.Err).To(Say("app creation warnings"))
-
-													Expect(testUI.Out).To(Say("Mapping routes..."))
-													Expect(testUI.Err).To(Say("routes warnings"))
 
 													Expect(testUI.Out).To(Say("Packaging files to upload..."))
 
@@ -660,60 +640,6 @@ var _ = Describe("push Command", func() {
 										})
 									})
 								})
-
-								When("flag overrides are specified", func() {
-									BeforeEach(func() {
-										cmd.AppPath = "some/app/path"
-									})
-
-									It("generates a push plan with the specified flag overrides", func() {
-										Expect(fakeActor.CreatePushPlansCallCount()).To(Equal(1))
-										_, _, _, _, overrides := fakeActor.CreatePushPlansArgsForCall(0)
-										Expect(overrides).To(MatchFields(IgnoreExtras, Fields{
-											"ProvidedAppPath": Equal("some/app/path"),
-										}))
-									})
-								})
-
-								When("conceptualize returns an error", func() {
-									var expectedErr error
-
-									BeforeEach(func() {
-										expectedErr = errors.New("some-error")
-										fakeActor.UpdateApplicationSettingsReturns(nil, v7pushaction.Warnings{"some-warning-1"}, expectedErr)
-									})
-
-									It("generates a push plan with the specified app path", func() {
-										Expect(executeErr).To(MatchError(expectedErr))
-										Expect(testUI.Err).To(Say("some-warning-1"))
-									})
-								})
-							})
-						})
-
-						When("Actor.PrepareSpace has an error", func() {
-							BeforeEach(func() {
-								events := FillInEvents([]Step{
-									{
-										Warnings: v7pushaction.Warnings{"prepare-space-warning-1"},
-										Error:    errors.New("prepare-space-error-1"),
-									},
-								})
-
-								fakeActor.PrepareSpaceReturns([]string{appName1, appName2}, events)
-							})
-
-							It("returns the error", func() {
-								Expect(executeErr).To(MatchError(errors.New("prepare-space-error-1")))
-								Expect(testUI.Err).To(Say("prepare-space-warning-1"))
-							})
-
-							It("does not delegate to UpdateApplicationSettings", func() {
-								Expect(fakeActor.UpdateApplicationSettingsCallCount()).To(Equal(0))
-							})
-
-							It("does not delegate to Actualize", func() {
-								Expect(fakeActor.ActualizeCallCount()).To(Equal(0))
 							})
 						})
 					})
@@ -722,122 +648,306 @@ var _ = Describe("push Command", func() {
 		})
 	})
 
-	Describe("ValidateAllowedFlagsForMultipleApps", func() {
-		When("manifest contains a single app", func() {
-			DescribeTable("returns nil when",
-				func(setup func()) {
-					setup()
-					Expect(cmd.ValidateAllowedFlagsForMultipleApps(false)).ToNot(HaveOccurred())
-				},
-				Entry("buildpacks is specified",
-					func() {
-						cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
-					}),
-				Entry("disk is specified",
-					func() {
-						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
-					}),
-				Entry("droplet is specified",
-					func() {
-						cmd.DropletPath = "some-droplet.tgz"
-					}),
-			)
+	Describe("GetDockerPassword", func() {
+		var (
+			cmd        PushCommand
+			fakeConfig *commandfakes.FakeConfig
+			testUI     *ui.UI
+
+			dockerUsername        string
+			containsPrivateDocker bool
+
+			executeErr     error
+			dockerPassword string
+
+			input *Buffer
+		)
+
+		BeforeEach(func() {
+			input = NewBuffer()
+			testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
+			fakeConfig = new(commandfakes.FakeConfig)
+
+			cmd = PushCommand{
+				Config: fakeConfig,
+				UI:     testUI,
+			}
 		})
 
-		When("manifest contains multiple apps", func() {
-			DescribeTable("throws an error when",
-				func(setup func()) {
-					setup()
-					Expect(cmd.ValidateAllowedFlagsForMultipleApps(true)).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
-				},
+		Describe("Get", func() {
+			JustBeforeEach(func() {
+				dockerPassword, executeErr = cmd.GetDockerPassword(dockerUsername, containsPrivateDocker)
+			})
 
-				Entry("buildpacks is specified",
-					func() {
-						cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
-					}),
-				Entry("disk is specified",
-					func() {
-						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
-					}),
-				Entry("droplet is specified",
-					func() {
-						cmd.DropletPath = "some-droplet.tgz"
-					}),
-				Entry("docker image is specified",
-					func() {
-						cmd.DockerImage = flag.DockerImage{Path: "some-docker"}
-					}),
-				Entry("docker username is specified",
-					func() {
-						fakeConfig.DockerPasswordReturns("some-password")
-						cmd.DockerUsername = "docker-username"
-					}),
-				Entry("health check type is specified",
-					func() {
-						cmd.HealthCheckType = flag.HealthCheckType{Type: constant.HTTP}
-					}),
-				Entry("health check HTTP endpoint is specified",
-					func() {
-						cmd.HealthCheckHTTPEndpoint = "some-endpoint"
-					}),
-				Entry("health check timeout is specified",
-					func() {
-						cmd.HealthCheckTimeout = flag.PositiveInteger{Value: 5}
-					}),
-				Entry("instances is specified",
-					func() {
-						cmd.Instances = flag.Instances{NullInt: types.NullInt{IsSet: true}}
-					}),
-				Entry("stack is specified",
-					func() {
-						cmd.Stack = "some-stack"
-					}),
-				Entry("memory is specified",
-					func() {
-						cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
-					}),
-				Entry("provided app path is specified",
-					func() {
-						cmd.AppPath = "some-app-path"
-					}),
-				Entry("skip route creation is specified",
-					func() {
-						cmd.NoRoute = true
-					}),
-				Entry("start command is specified",
-					func() {
-						cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true}}
-					}),
-				Entry("strategy is specified",
-					func() {
-						cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
-					}),
-			)
+			When("docker image is private", func() {
+				When("there is a manifest", func() {
+					BeforeEach(func() {
+						dockerUsername = ""
+						containsPrivateDocker = true
+					})
 
-			DescribeTable("is nil when",
-				func(setup func()) {
-					setup()
-					Expect(cmd.ValidateAllowedFlagsForMultipleApps(true)).ToNot(HaveOccurred())
-				},
-				Entry("no flags are specified", func() {}),
-				Entry("path is specified",
-					func() {
-						cmd.PathToManifest = flag.ManifestPathWithExistenceCheck("/some/path")
-					}),
-				Entry("no-start is specified",
-					func() {
-						cmd.NoStart = true
-					}),
-				Entry("single app name is specified, even with disallowed flags",
-					func() {
-						cmd.OptionalArgs.AppName = "some-app-name"
+					When("a password is provided via environment variable", func() {
+						BeforeEach(func() {
+							fakeConfig.DockerPasswordReturns("some-docker-password")
+						})
 
-						cmd.Stack = "some-stack"
-						cmd.NoRoute = true
-						cmd.DockerImage = flag.DockerImage{Path: "some-docker"}
-						cmd.Instances = flag.Instances{NullInt: types.NullInt{IsSet: true}}
+						It("takes the password from the environment", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+							Expect(testUI.Out).ToNot(Say("Docker password"))
+
+							Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
+							Expect(dockerPassword).To(Equal("some-docker-password"))
+						})
+					})
+
+					When("no password is provided", func() {
+						BeforeEach(func() {
+							_, err := input.Write([]byte("some-docker-password\n"))
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						It("prompts for a password", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+							Expect(testUI.Out).To(Say("Docker password"))
+
+							Expect(dockerPassword).To(Equal("some-docker-password"))
+						})
+					})
+				})
+
+				When("there is no manifest", func() {
+					BeforeEach(func() {
+						dockerUsername = "some-docker-username"
+						containsPrivateDocker = false
+					})
+
+					When("a password is provided via environment variable", func() {
+						BeforeEach(func() {
+							fakeConfig.DockerPasswordReturns("some-docker-password")
+						})
+
+						It("takes the password from the environment", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+							Expect(testUI.Out).ToNot(Say("Docker password"))
+
+							Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
+							Expect(dockerPassword).To(Equal("some-docker-password"))
+						})
+					})
+
+					When("no password is provided", func() {
+						BeforeEach(func() {
+							_, err := input.Write([]byte("some-docker-password\n"))
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						It("prompts for a password", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+							Expect(testUI.Out).To(Say("Docker password"))
+
+							Expect(dockerPassword).To(Equal("some-docker-password"))
+						})
+					})
+				})
+			})
+			When("docker image is public", func() {
+				BeforeEach(func() {
+					dockerUsername = ""
+					containsPrivateDocker = false
+				})
+
+				It("does not prompt for a password", func() {
+					Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+					Expect(testUI.Out).ToNot(Say("Docker password"))
+					Expect(testUI.Out).ToNot(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+				})
+
+				It("returns an empty password", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(dockerPassword).To(Equal(""))
+				})
+			})
+		})
+	})
+
+	Describe("GetBaseManifest", func() {
+		var (
+			somePath      string
+			flagOverrides v7pushaction.FlagOverrides
+			manifest      pushmanifestparser.Manifest
+			executeErr    error
+		)
+
+		JustBeforeEach(func() {
+			manifest, executeErr = cmd.GetBaseManifest(flagOverrides)
+		})
+
+		When("no flags are specified", func() {
+			BeforeEach(func() {
+				cmd.PWD = somePath
+			})
+
+			When("a manifest exists in the current dir", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+					fakeManifestParser.InterpolateAndParseReturns(
+						pushmanifestparser.Manifest{
+							Applications: []pushmanifestparser.Application{
+								{Name: "new-app"},
+							},
+						},
+						nil,
+					)
+				})
+
+				It("uses the manifest in the current directory", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(manifest).To(Equal(
+						pushmanifestparser.Manifest{
+							Applications: []pushmanifestparser.Application{
+								{Name: "new-app"},
+							},
+						}),
+					)
+
+					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
+					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.PWD))
+
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+					Expect(actualManifestPath).To(Equal("/manifest/path"))
+				})
+			})
+
+			When("there is not a manifest in the current dir", func() {
+				BeforeEach(func() {
+					flagOverrides.AppName = "new-app"
+					fakeManifestLocator.PathReturns("", false, nil)
+				})
+
+				It("ignores the file not found error", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+				})
+
+				It("returns a default empty manifest", func() {
+					Expect(manifest).To(Equal(
+						pushmanifestparser.Manifest{
+							Applications: []pushmanifestparser.Application{
+								{Name: "new-app"},
+							},
+						}),
+					)
+				})
+			})
+
+			When("when there is an error locating the manifest in the current directory", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("", false, errors.New("err-location"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("err-location"))
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+				})
+			})
+
+			When("parsing the manifest fails", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+					fakeManifestParser.InterpolateAndParseReturns(
+						pushmanifestparser.Manifest{},
+						errors.New("bad yaml"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("bad yaml"))
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				})
+			})
+		})
+
+		When("The -f flag is specified", func() {
+			BeforeEach(func() {
+				somePath = "some-path"
+				flagOverrides.ManifestPath = somePath
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+				fakeManifestParser.InterpolateAndParseReturns(
+					pushmanifestparser.Manifest{
+						Applications: []pushmanifestparser.Application{
+							{Name: "new-app"},
+						},
+					},
+					nil,
+				)
+			})
+
+			It("parses the specified manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
+				Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(somePath))
+
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(actualManifestPath).To(Equal("/manifest/path"))
+				Expect(manifest).To(Equal(
+					pushmanifestparser.Manifest{
+						Applications: []pushmanifestparser.Application{
+							{Name: "new-app"},
+						},
 					}),
-			)
+				)
+			})
+		})
+
+		When("--vars-files are specified", func() {
+			var varsFiles []string
+
+			BeforeEach(func() {
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+				varsFiles = []string{"path1", "path2"}
+				flagOverrides.PathsToVarsFiles = append(flagOverrides.PathsToVarsFiles, varsFiles...)
+			})
+
+			It("passes vars files to the manifest parser", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				_, actualVarsFiles, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(actualVarsFiles).To(Equal(varsFiles))
+			})
+		})
+
+		When("The --var flag is provided", func() {
+			var vars []template.VarKV
+
+			BeforeEach(func() {
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+				vars = []template.VarKV{
+					{Name: "put-var-here", Value: "turtle"},
+				}
+				flagOverrides.Vars = vars
+			})
+
+			It("passes vars files to the manifest parser", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				_, _, actualVars := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(actualVars).To(Equal(vars))
+			})
 		})
 	})
 
@@ -853,8 +963,8 @@ var _ = Describe("push Command", func() {
 			cmd.HealthCheckType = flag.HealthCheckType{Type: constant.Port}
 			cmd.HealthCheckHTTPEndpoint = "/health-check-http-endpoint"
 			cmd.HealthCheckTimeout = flag.PositiveInteger{Value: 7}
-			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
-			cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
+			cmd.Memory = "64M"
+			cmd.Disk = "256M"
 			cmd.DropletPath = flag.PathWithExistenceCheck("some-droplet.tgz")
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
@@ -863,6 +973,9 @@ var _ = Describe("push Command", func() {
 			cmd.NoWait = true
 			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
 			cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 10, IsSet: true}}
+			cmd.PathToManifest = "/manifest/path"
+			cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{"/vars1", "/vars2"}
+			cmd.Vars = []template.VarKV{{Name: "key", Value: "val"}}
 		})
 
 		JustBeforeEach(func() {
@@ -878,8 +991,8 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.HealthCheckType).To(Equal(constant.Port))
 			Expect(overrides.HealthCheckEndpoint).To(Equal("/health-check-http-endpoint"))
 			Expect(overrides.HealthCheckTimeout).To(BeEquivalentTo(7))
-			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
-			Expect(overrides.Disk).To(Equal(types.NullUint64{Value: 1024, IsSet: true}))
+			Expect(overrides.Memory).To(Equal("64M"))
+			Expect(overrides.Disk).To(Equal("256M"))
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 			Expect(overrides.NoRoute).To(BeTrue())
 			Expect(overrides.NoStart).To(BeTrue())
@@ -887,6 +1000,9 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.RandomRoute).To(BeFalse())
 			Expect(overrides.Strategy).To(Equal(constant.DeploymentStrategyRolling))
 			Expect(overrides.Instances).To(Equal(types.NullInt{Value: 10, IsSet: true}))
+			Expect(overrides.ManifestPath).To(Equal("/manifest/path"))
+			Expect(overrides.PathsToVarsFiles).To(Equal([]string{"/vars1", "/vars2"}))
+			Expect(overrides.Vars).To(Equal([]template.VarKV{{Name: "key", Value: "val"}}))
 		})
 
 		When("a docker image is provided", func() {
@@ -897,143 +1013,6 @@ var _ = Describe("push Command", func() {
 			It("sets docker image on the flag overrides", func() {
 				Expect(overridesErr).ToNot(HaveOccurred())
 				Expect(overrides.DockerImage).To(Equal("some-docker-image"))
-			})
-		})
-	})
-
-	Describe("ReadManifest", func() {
-		var (
-			somePath   string
-			executeErr error
-		)
-
-		BeforeEach(func() {
-			somePath = "/some/path"
-		})
-
-		JustBeforeEach(func() {
-			executeErr = cmd.ReadManifest()
-		})
-
-		When("No path is provided", func() {
-			BeforeEach(func() {
-				cmd.PWD = somePath
-			})
-
-			When("a manifest exists in the current dir", func() {
-				BeforeEach(func() {
-					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-				})
-
-				It("uses the manifest in the current directory", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
-					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.PWD))
-
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					actualManifestPath, _, _, appName := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-					Expect(actualManifestPath).To(Equal("/manifest/path"))
-					Expect(appName).To(Equal(""))
-				})
-			})
-
-			When("there is not a manifest in the current dir", func() {
-				BeforeEach(func() {
-					fakeManifestLocator.PathReturns("", false, nil)
-				})
-
-				It("ignores the file not found error", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
-				})
-			})
-
-			When("when there is an error locating the manifest in the current directory", func() {
-				BeforeEach(func() {
-					fakeManifestLocator.PathReturns("", false, errors.New("err-location"))
-				})
-
-				It("ignores the file not found error", func() {
-					Expect(executeErr).To(MatchError("err-location"))
-
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
-				})
-			})
-		})
-
-		When("The -f flag is specified", func() {
-			BeforeEach(func() {
-				cmd.PathToManifest = flag.ManifestPathWithExistenceCheck(somePath)
-				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-			})
-
-			It("reads the manifest and passes through to PrepareSpace", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
-				Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(somePath))
-
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				actualManifestPath, _, _, appName := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-				Expect(actualManifestPath).To(Equal("/manifest/path"))
-				Expect(appName).To(Equal(""))
-			})
-		})
-
-		When("--vars-files are specified", func() {
-			var varsFiles []string
-
-			BeforeEach(func() {
-				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-				varsFiles = []string{"path1", "path2"}
-				for _, path := range varsFiles {
-					cmd.PathsToVarsFiles = append(cmd.PathsToVarsFiles, flag.PathWithExistenceCheck(path))
-				}
-			})
-
-			It("passes vars files to the manifest parser", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, actualVarsFiles, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-				Expect(actualVarsFiles).To(Equal(varsFiles))
-			})
-		})
-
-		When("The --var flag is provided", func() {
-			var vars []template.VarKV
-
-			BeforeEach(func() {
-				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-				vars = []template.VarKV{
-					{Name: "put-var-here", Value: "turtle"},
-				}
-				cmd.Vars = vars
-			})
-
-			It("passes vars files to the manifest parser", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, _, actualVars, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-				Expect(actualVars).To(Equal(vars))
-			})
-		})
-
-		When("an app name is provided", func() {
-			BeforeEach(func() {
-				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
-				cmd.OptionalArgs.AppName = "some-app-name"
-			})
-
-			It("passes vars files to the manifest parser", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-				_, _, _, appName := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-				Expect(appName).To(Equal("some-app-name"))
 			})
 		})
 	})
@@ -1181,57 +1160,17 @@ var _ = Describe("push Command", func() {
 					"--no-route", "--random-route",
 				},
 			}),
-		Entry("when docker is set in the manifest and -b flag is passd",
+
+		Entry("default is combined with non default buildpacks",
 			func() {
-				cmd.Buildpacks = []string{"some_buildpack"}
-				fakeManifestParser.AppsReturns([]manifestparser.Application{
-					{
-						ApplicationModel: manifestparser.ApplicationModel{
-							Name: "some-app",
-							Docker: &manifestparser.Docker{
-								Image: "nginx:latest",
-							},
-						},
-					},
-				})
+				cmd.Buildpacks = []string{"some-docker-username", "default"}
 			},
-			translatableerror.ArgumentManifestMismatchError{
-				Arg:              "--buildpack, -b",
-				ManifestProperty: "docker",
-			}),
-		Entry("when docker is set in the manifest and -p flag is passd",
+			translatableerror.InvalidBuildpacksError{}),
+
+		Entry("default is combined with non default buildpacks",
 			func() {
-				cmd.AppPath = "path_to_some_app"
-				fakeManifestParser.AppsReturns([]manifestparser.Application{
-					{
-						ApplicationModel: manifestparser.ApplicationModel{
-							Name: "some-app",
-							Docker: &manifestparser.Docker{
-								Image: "nginx:latest",
-							},
-						},
-					},
-				})
+				cmd.Buildpacks = []string{"some-docker-username", "null"}
 			},
-			translatableerror.ArgumentManifestMismatchError{
-				Arg:              "--path, -p",
-				ManifestProperty: "docker",
-			}),
-		Entry("when path is set in the manifest and -o flag is passd",
-			func() {
-				cmd.DockerImage.Path = "nginx:latest"
-				fakeManifestParser.AppsReturns([]manifestparser.Application{
-					{
-						ApplicationModel: manifestparser.ApplicationModel{
-							Name: "some-app",
-							Path: "path_to_some_app",
-						},
-					},
-				})
-			},
-			translatableerror.ArgumentManifestMismatchError{
-				Arg:              "--docker-image, -o",
-				ManifestProperty: "path",
-			}),
+			translatableerror.InvalidBuildpacksError{}),
 	)
 })

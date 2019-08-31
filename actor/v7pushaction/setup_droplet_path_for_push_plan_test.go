@@ -1,8 +1,6 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/util/manifestparser"
-
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
 	. "github.com/onsi/ginkgo"
@@ -11,9 +9,8 @@ import (
 
 var _ = Describe("SetupDropletPathForPushPlan", func() {
 	var (
-		pushPlan    PushPlan
-		overrides   FlagOverrides
-		manifestApp manifestparser.Application
+		pushPlan  PushPlan
+		overrides FlagOverrides
 
 		expectedPushPlan PushPlan
 		executeErr       error
@@ -22,11 +19,10 @@ var _ = Describe("SetupDropletPathForPushPlan", func() {
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
 		overrides = FlagOverrides{}
-		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupDropletPathForPushPlan(pushPlan, overrides, manifestApp)
+		expectedPushPlan, executeErr = SetupDropletPathForPushPlan(pushPlan, overrides)
 	})
 
 	When("flag overrides specifies droplet path", func() {

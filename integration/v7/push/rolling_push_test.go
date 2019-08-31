@@ -34,9 +34,7 @@ var _ = Describe("push with --strategy rolling", func() {
 					PushCommandName, appName, "--strategy", "rolling",
 				)
 
-				Eventually(session).Should(Say(`Updating app %s\.\.\.`, appName))
 				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
-				Eventually(session).Should(Say(`Getting app info\.\.\.`))
 				Eventually(session).Should(Say(`Packaging files to upload\.\.\.`))
 				Eventually(session).Should(Say(`Uploading files\.\.\.`))
 				Eventually(session).Should(Say(`100.00%`))
@@ -70,9 +68,7 @@ var _ = Describe("push with --strategy rolling", func() {
 					PushCommandName, appName, "--strategy", "rolling",
 				)
 
-				Eventually(session).Should(Say(`Updating app %s\.\.\.`, appName))
 				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
-				Eventually(session).Should(Say(`Getting app info\.\.\.`))
 				Eventually(session).Should(Say(`Packaging files to upload\.\.\.`))
 				Eventually(session).Should(Say(`Uploading files\.\.\.`))
 				Eventually(session).Should(Say(`100.00%`))
@@ -104,9 +100,7 @@ var _ = Describe("push with --strategy rolling", func() {
 					WorkingDirectory: appDir,
 					EnvVars:          map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
 				}, PushCommandName, appName, "--strategy", "rolling")
-				Eventually(session).Should(Say(`Updating app %s\.\.\.`, appName))
 				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
-				Eventually(session).Should(Say(`Getting app info\.\.\.`))
 				Eventually(session).Should(Say(`Packaging files to upload\.\.\.`))
 				Eventually(session).Should(Say(`Uploading files\.\.\.`))
 				Eventually(session).Should(Say(`100.00%`))

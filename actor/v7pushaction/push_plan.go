@@ -7,33 +7,20 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 type PushPlan struct {
 	SpaceGUID string
 	OrgGUID   string
 
-	Application            v7action.Application
-	ApplicationRoutes      []v7action.Route
-	ApplicationNeedsUpdate bool
+	Application v7action.Application
 
-	NoStart           bool
-	NoWait            bool
-	NoRouteFlag       bool
-	RandomRoute       bool
-	SkipRouteCreation bool
-	Strategy          constant.DeploymentStrategy
+	NoStart  bool
+	NoWait   bool
+	Strategy constant.DeploymentStrategy
 
-	DockerImageCredentials            v7action.DockerImageCredentials
-	DockerImageCredentialsNeedsUpdate bool
-
-	ScaleWebProcess            v7action.Process
-	ScaleWebProcessNeedsUpdate bool
-
-	UpdateWebProcess            v7action.Process
-	UpdateWebProcessNeedsUpdate bool
-
-	Manifest []byte
+	DockerImageCredentials v7action.DockerImageCredentials
 
 	Archive      bool
 	BitsPath     string
@@ -45,9 +32,10 @@ type PushPlan struct {
 }
 
 type FlagOverrides struct {
+	AppName             string
 	Buildpacks          []string
 	Stack               string
-	Disk                types.NullUint64
+	Disk                string
 	DropletPath         string
 	DockerImage         string
 	DockerPassword      string
@@ -56,7 +44,7 @@ type FlagOverrides struct {
 	HealthCheckTimeout  int64
 	HealthCheckType     constant.HealthCheckType
 	Instances           types.NullInt
-	Memory              types.NullUint64
+	Memory              string
 	NoStart             bool
 	NoWait              bool
 	ProvidedAppPath     string
@@ -64,6 +52,10 @@ type FlagOverrides struct {
 	RandomRoute         bool
 	StartCommand        types.FilteredString
 	Strategy            constant.DeploymentStrategy
+	ManifestPath        string
+	PathsToVarsFiles    []string
+	Vars                []template.VarKV
+	NoManifest          bool
 }
 
 func (state PushPlan) String() string {

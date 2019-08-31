@@ -2,7 +2,6 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,9 +11,8 @@ import (
 
 var _ = Describe("SetupDeploymentStrategyForPushPlan", func() {
 	var (
-		pushPlan    PushPlan
-		overrides   FlagOverrides
-		manifestApp manifestparser.Application
+		pushPlan  PushPlan
+		overrides FlagOverrides
 
 		expectedPushPlan PushPlan
 		executeErr       error
@@ -23,11 +21,10 @@ var _ = Describe("SetupDeploymentStrategyForPushPlan", func() {
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
 		overrides = FlagOverrides{}
-		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupDeploymentStrategyForPushPlan(pushPlan, overrides, manifestApp)
+		expectedPushPlan, executeErr = SetupDeploymentStrategyForPushPlan(pushPlan, overrides)
 	})
 
 	When("flag overrides specifies strategy", func() {
