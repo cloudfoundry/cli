@@ -14,11 +14,10 @@ import (
 
 var _ = Describe("Config", func() {
 	var (
-		oldLang              string
-		oldLCAll             string
-		oldCfExperimental    string
-		oldExperimentalLogin string
-		homeDir              string
+		oldLang           string
+		oldLCAll          string
+		oldCfExperimental string
+		homeDir           string
 	)
 
 	BeforeEach(func() {
@@ -30,18 +29,15 @@ var _ = Describe("Config", func() {
 		// we save and unset this variable in case it's present
 		// since we want to load a default config
 		oldCfExperimental = os.Getenv("CF_CLI_EXPERIMENTAL")
-		oldExperimentalLogin = os.Getenv("CF_EXPERIMENTAL_LOGIN")
 		Expect(os.Unsetenv("LANG")).ToNot(HaveOccurred())
 		Expect(os.Unsetenv("LC_ALL")).ToNot(HaveOccurred())
 		Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).To(Succeed())
-		Expect(os.Unsetenv("CF_EXPERIMENTAL_LOGIN")).To(Succeed())
 	})
 
 	AfterEach(func() {
 		os.Setenv("LANG", oldLang)
 		os.Setenv("LC_ALL", oldLCAll)
 		os.Setenv("CF_CLI_EXPERIMENTAL", oldCfExperimental)
-		os.Setenv("CF_EXPERIMENTAL_LOGIN", oldExperimentalLogin)
 		teardown(homeDir)
 	})
 
@@ -196,21 +192,6 @@ var _ = Describe("Config", func() {
 
 			It("stores the first set of flag overrides on the config", func() {
 				Expect(config.Flags).To(Equal(FlagOverride{Verbose: true}))
-			})
-		})
-
-		When("CF_EXPERIMENTAL_LOGIN is set to true", func() {
-			BeforeEach(func() {
-				Expect(os.Setenv("CF_EXPERIMENTAL_LOGIN", "true")).To(Succeed())
-			})
-
-			AfterEach(func() {
-				Expect(os.Unsetenv("CF_EXPERIMENTAL_LOGIN")).To(Succeed())
-			})
-
-			It("stores that value", func() {
-				Expect(loadErr).ToNot(HaveOccurred())
-				Expect(config.ExperimentalLogin()).To(BeTrue())
 			})
 		})
 	})

@@ -27,16 +27,6 @@ func TurnOffExperimental() {
 	Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).To(Succeed())
 }
 
-// TurnOnExperimentalLogin sets CF_EXPERIMENTAL_LOGIN to 'true'.
-func TurnOnExperimentalLogin() {
-	Expect(os.Setenv("CF_EXPERIMENTAL_LOGIN", "true")).To(Succeed())
-}
-
-// TurnOffExperimentalLogin unsets CF_EXPERIMENTAL_LOGIN.
-func TurnOffExperimentalLogin() {
-	Expect(os.Unsetenv("CF_EXPERIMENTAL_LOGIN")).To(Succeed())
-}
-
 // SetHomeDir sets CF_HOME and CF_PLUGIN_HOME to a temp directory and outputs
 // the created directory through GinkgoWriter.
 func SetHomeDir() string {

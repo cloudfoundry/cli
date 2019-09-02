@@ -145,16 +145,6 @@ type FakeConfig struct {
 	experimentalReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	ExperimentalLoginStub        func() bool
-	experimentalLoginMutex       sync.RWMutex
-	experimentalLoginArgsForCall []struct {
-	}
-	experimentalLoginReturns struct {
-		result1 bool
-	}
-	experimentalLoginReturnsOnCall map[int]struct {
-		result1 bool
-	}
 	GetPluginStub        func(string) (configv3.Plugin, bool)
 	getPluginMutex       sync.RWMutex
 	getPluginArgsForCall []struct {
@@ -1231,58 +1221,6 @@ func (fake *FakeConfig) ExperimentalReturnsOnCall(i int, result1 bool) {
 		})
 	}
 	fake.experimentalReturnsOnCall[i] = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeConfig) ExperimentalLogin() bool {
-	fake.experimentalLoginMutex.Lock()
-	ret, specificReturn := fake.experimentalLoginReturnsOnCall[len(fake.experimentalLoginArgsForCall)]
-	fake.experimentalLoginArgsForCall = append(fake.experimentalLoginArgsForCall, struct {
-	}{})
-	fake.recordInvocation("ExperimentalLogin", []interface{}{})
-	fake.experimentalLoginMutex.Unlock()
-	if fake.ExperimentalLoginStub != nil {
-		return fake.ExperimentalLoginStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.experimentalLoginReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeConfig) ExperimentalLoginCallCount() int {
-	fake.experimentalLoginMutex.RLock()
-	defer fake.experimentalLoginMutex.RUnlock()
-	return len(fake.experimentalLoginArgsForCall)
-}
-
-func (fake *FakeConfig) ExperimentalLoginCalls(stub func() bool) {
-	fake.experimentalLoginMutex.Lock()
-	defer fake.experimentalLoginMutex.Unlock()
-	fake.ExperimentalLoginStub = stub
-}
-
-func (fake *FakeConfig) ExperimentalLoginReturns(result1 bool) {
-	fake.experimentalLoginMutex.Lock()
-	defer fake.experimentalLoginMutex.Unlock()
-	fake.ExperimentalLoginStub = nil
-	fake.experimentalLoginReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeConfig) ExperimentalLoginReturnsOnCall(i int, result1 bool) {
-	fake.experimentalLoginMutex.Lock()
-	defer fake.experimentalLoginMutex.Unlock()
-	fake.ExperimentalLoginStub = nil
-	if fake.experimentalLoginReturnsOnCall == nil {
-		fake.experimentalLoginReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.experimentalLoginReturnsOnCall[i] = struct {
 		result1 bool
 	}{result1}
 }
@@ -3305,8 +3243,6 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.dockerPasswordMutex.RUnlock()
 	fake.experimentalMutex.RLock()
 	defer fake.experimentalMutex.RUnlock()
-	fake.experimentalLoginMutex.RLock()
-	defer fake.experimentalLoginMutex.RUnlock()
 	fake.getPluginMutex.RLock()
 	defer fake.getPluginMutex.RUnlock()
 	fake.getPluginCaseInsensitiveMutex.RLock()

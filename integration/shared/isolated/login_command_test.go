@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os/exec"
 	"regexp"
 	"time"
 
@@ -65,7 +66,7 @@ var _ = Describe("login command", func() {
 
 	Describe("Invalid Command Usage", func() {
 		When("a random flag is passed in", func() {
-			It("should exit 1 and display an unknown flag error message", func() {
+			It("exits 1 and displays an unknown flag error message", func() {
 				session := helpers.CF("login", "--test")
 				Eventually(session).Should(Exit(1))
 
@@ -75,11 +76,11 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("Minimum Version Check", func() {
-		When("the api version is less than the minimum supported version", func() {
+		When("the v2 API version is less than the minimum supported version", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
-				server = helpers.StartMockServerWithAPIVersions("2.99.9", "3.34.9")
+				server = helpers.StartMockServerWithAPIVersions("2.99.9", "3.36.0")
 
 				fakeTokenResponse := map[string]string{
 					"access_token":  helpers.BuildTokenString(time.Now()),
@@ -88,7 +89,7 @@ var _ = Describe("login command", func() {
 				}
 				server.RouteToHandler(http.MethodPost, "/oauth/token",
 					ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
-				server.RouteToHandler(http.MethodGet, "/v2/organizations",
+				server.RouteToHandler(http.MethodGet, "/v3/organizations",
 					ghttp.RespondWith(http.StatusOK, `{
 					 "total_results": 0,
 					 "total_pages": 1,
@@ -99,10 +100,23 @@ var _ = Describe("login command", func() {
 				server.Close()
 			})
 
-			It("displays the warning and exits successfully", func() {
-				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
-				Eventually(session).Should(Say("Your API version is no longer supported. Upgrade to a newer version of the API."))
+			It("displays the warning to stderr and exits successfully", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+
+				Eventually(session.Err).Should(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 				Eventually(session).Should(Exit(0))
+			})
+
+			It("displays the warning before authenticating", func() {
+				username, password := helpers.GetCredentials()
+				cmd := exec.Command("cf", "login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+				stdErrAndStdOut, err := cmd.CombinedOutput()
+				Expect(err).ToNot(HaveOccurred())
+
+				output := BufferWithBytes(stdErrAndStdOut)
+				Expect(output).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
+				Expect(output).To(Say("Authenticating..."), "Expected Min API version warning before 'Authenticating...' message.")
 			})
 		})
 
@@ -112,8 +126,13 @@ var _ = Describe("login command", func() {
 			BeforeEach(func() {
 				server = helpers.StartMockServerWithMinimumCLIVersion("9000.0.0")
 
-				helpers.AddLoginRoutes(server)
-				server.RouteToHandler(http.MethodGet, "/v2/organizations",
+				fakeTokenResponse := map[string]string{
+					"access_token": "",
+					"token_type":   "bearer",
+				}
+				server.RouteToHandler(http.MethodPost, "/oauth/token",
+					ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+				server.RouteToHandler(http.MethodGet, "/v3/organizations",
 					ghttp.RespondWith(http.StatusOK, `{
 					 "total_results": 0,
 					 "total_pages": 1,
@@ -124,16 +143,28 @@ var _ = Describe("login command", func() {
 				server.Close()
 			})
 
-			It("displays the warning and exits successfully", func() {
-				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
-				Eventually(session.Out).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\.  You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
+			It("displays the warning to stderr and exits successfully", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+
+				Eventually(session.Err).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\. You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
 				Eventually(session).Should(Exit(0))
+			})
+
+			It("displays the warning before authenticating", func() {
+				username, password := helpers.GetCredentials()
+				cmd := exec.Command("cf", "login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+				stdErrAndStdOut, err := cmd.CombinedOutput()
+				Expect(err).ToNot(HaveOccurred())
+
+				output := BufferWithBytes(stdErrAndStdOut)
+				Expect(output).To(Say(`Cloud Foundry API version .+ requires CLI version .+\. You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
+				Expect(output).To(Say("Authenticating..."), "Expected Min CLI version warning before 'Authenticating...' message.")
 			})
 		})
 	})
 
 	Describe("API Endpoint", func() {
-
 		When("the API endpoint is not set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
@@ -145,7 +176,7 @@ var _ = Describe("login command", func() {
 					_, err := input.Write([]byte("\n"))
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CFWithStdin(input, "login")
-					Eventually(session).Should(Say("API endpoint>"))
+					Eventually(session).Should(Say("API endpoint:"))
 					session.Interrupt()
 					Eventually(session).Should(Exit())
 				})
@@ -156,10 +187,10 @@ var _ = Describe("login command", func() {
 						_, err := input.Write([]byte("does.not.exist\n"))
 						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(input, "login")
-						Eventually(session).Should(Say("API endpoint>"))
+						Eventually(session).Should(Say("API endpoint:"))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Error performing request: "))
-						Eventually(session).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session.Err).Should(Say("Request error: "))
+						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -174,8 +205,9 @@ var _ = Describe("login command", func() {
 						session = helpers.CF("login", "-a", apiURL)
 					}
 					Eventually(session).Should(Say("API endpoint: %s", apiURL))
-					Consistently(session).ShouldNot(Say("API endpoint>"))
-					session.Interrupt()
+					// TODO https://www.pivotaltracker.com/story/show/166938709/comments/204492216
+					//Consistently(session).ShouldNot(Say("API endpoint:"))
+					//session.Interrupt()
 					Eventually(session).Should(Exit())
 
 					session = helpers.CF("api")
@@ -194,8 +226,8 @@ var _ = Describe("login command", func() {
 
 						Eventually(session).Should(Say("API endpoint: does.not.exist"))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Error performing request: "))
-						Eventually(session).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session.Err).Should(Say("Request error: "))
+						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -208,7 +240,7 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("api")
-						Eventually(session).Should(Say("api endpoint:\\s+%s///\n", apiURL))
+						Eventually(session).Should(Say("api endpoint:\\s+%s\n", apiURL))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -225,7 +257,7 @@ var _ = Describe("login command", func() {
 
 			When("the user provides a new API endpoint with the -a flag", func() {
 				When("the provided API endpoint is unreachable", func() {
-					It("displays an error and unsets the API endpoint", func() {
+					It("displays an error and does not change the API endpoint", func() {
 						var session *Session
 						if skipSSLValidation {
 							session = helpers.CF("login", "-a", "does.not.exist", "--skip-ssl-validation")
@@ -234,13 +266,13 @@ var _ = Describe("login command", func() {
 						}
 						Eventually(session).Should(Say("API endpoint: does.not.exist"))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Error performing request: "))
-						Eventually(session).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
+						Eventually(session.Err).Should(Say("Request error: "))
+						Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 						Eventually(session).Should(Exit(1))
 
 						apiSession := helpers.CF("api")
 						Eventually(apiSession).Should(Exit(0))
-						Expect(apiSession).Should(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
+						Eventually(apiSession).Should(Say("api endpoint:   %s", apiURL))
 					})
 				})
 			})
@@ -248,11 +280,13 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("https", func() {
+
 		When("no scheme is included in the API endpoint", func() {
 			var (
 				hostname  string
 				serverURL *url.URL
 				err       error
+				session   *Session
 			)
 
 			BeforeEach(func() {
@@ -260,21 +294,25 @@ var _ = Describe("login command", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				hostname = serverURL.Hostname()
-			})
 
-			It("defaults to https", func() {
 				username, password := helpers.GetCredentials()
-				var session *Session
 				if skipSSLValidation {
 					session = helpers.CF("login", "-u", username, "-p", password, "-a", hostname, "--skip-ssl-validation")
 				} else {
 					session = helpers.CF("login", "-u", username, "-p", password, "-a", hostname)
 				}
+			})
 
+			It("displays the API endpoint you are about to target as https", func() {
 				Eventually(session).Should(Say("API endpoint: %s", hostname))
-				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
 				Eventually(session).Should(Exit(0))
 			})
+
+			It("displays the API endpoint you have targeted as https", func() {
+				Eventually(session).Should(Say(`API endpoint:\s+https://%s\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`, hostname))
+				Eventually(session).Should(Exit(0))
+			})
+
 		})
 
 		When("the API endpoint's scheme is http", func() {
@@ -293,11 +331,15 @@ var _ = Describe("login command", func() {
 				session := helpers.CF("login", "-u", username, "-p", password, "-a", httpURL, "--skip-ssl-validation")
 
 				Eventually(session).Should(Say("API endpoint: %s", httpURL))
-				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+				Eventually(session.Err).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
+		// This test is redundant:
+		// If SKIP_SSL_VALIDATION is disabled
+		// then the test suite would have already logged in
+		// with a valid cert by the time this test gets run
 		When("the OS provides a valid SSL Certificate (Unix: SSL_CERT_FILE or SSL_CERT_DIR Environment variables) (Windows: Import-Certificate call)", func() {
 			BeforeEach(func() {
 				if skipSSLValidation {
@@ -318,17 +360,11 @@ var _ = Describe("login command", func() {
 		})
 
 		When("the SSL Certificate is invalid", func() {
-			var (
-				server    *ghttp.Server
-				serverURL *url.URL
-				err       error
-			)
+			var server *ghttp.Server
 
 			BeforeEach(func() {
 				cliVersion := "1.0.0"
 				server = helpers.StartMockServerWithMinimumCLIVersion(cliVersion)
-				serverURL, err = url.Parse(server.URL())
-				Expect(err).NotTo(HaveOccurred())
 			})
 
 			AfterEach(func() {
@@ -336,11 +372,11 @@ var _ = Describe("login command", func() {
 			})
 
 			It("displays a helpful error message and exits 1", func() {
-				session := helpers.CF("login", "-a", serverURL.String())
-				Eventually(session).Should(Say("API endpoint: %s", serverURL))
+				session := helpers.CF("login", "-a", server.URL())
+				Eventually(session).Should(Say("API endpoint: %s", server.URL()))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("Invalid SSL Cert for %s:%s", serverURL.Hostname(), serverURL.Port()))
-				Eventually(session).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
+				Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", server.URL()))
+				Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Exit(1))
 			})
 
@@ -354,13 +390,41 @@ var _ = Describe("login command", func() {
 						session := helpers.CF("login", "-a", server.URL())
 						Eventually(session).Should(Say("API endpoint: %s", server.URL()))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Invalid SSL Cert for %s:%s", serverURL.Hostname(), serverURL.Port()))
-						Eventually(session).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
+						Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", server.URL()))
+						Eventually(session.Err).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
 						Eventually(session).Should(Exit(1))
 					})
 				})
 			})
 
+			When("the server accepts logins", func() {
+				BeforeEach(func() {
+					fakeTokenResponse := map[string]string{
+						"access_token": "",
+						"token_type":   "bearer",
+					}
+					server.RouteToHandler(http.MethodPost, "/oauth/token",
+						ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+					server.RouteToHandler(http.MethodGet, "/v3/organizations",
+						ghttp.RespondWith(http.StatusOK, `{
+                                                        "total_results": 0,
+                                                        "total_pages": 1,
+                                                        "resources": []}`))
+				})
+
+				It("doesn't complain about an invalid cert when we specify --skip-ssl-validation", func() {
+					session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
+					//session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say("API endpoint:\\s+" + server.URL()))
+					Expect(session).Should(Say(`Authenticating\.\.\.`))
+					Expect(session).Should(Say(`OK`))
+					Expect(session).Should(Say(`API endpoint:\s+` + server.URL() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+
+					Expect(string(session.Err.Contents())).Should(Not(ContainSubstring("Invalid SSL Cert for %s", server.URL())))
+				})
+
+			})
 		})
 	})
 
@@ -369,27 +433,30 @@ var _ = Describe("login command", func() {
 			Context("and --sso is also passed", func() {
 				It("fails with a useful error message", func() {
 					session := helpers.CF("login", "--sso-passcode", "some-passcode", "--sso")
-					Eventually(session).Should(Say("Incorrect usage: --sso-passcode flag cannot be used with --sso"))
+					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --sso-passcode, --sso"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
 
 			Context("and the provided passcode is incorrect", func() {
 				It("prompts twice, displays an error and fails", func() {
-					session := helpers.CF("login", "--sso-passcode", "some-passcode")
+					input := NewBuffer()
+					_, err := input.Write([]byte("bad-passcode-again\nbad-passcode-strikes-back\n"))
+					Expect(err).ToNot(HaveOccurred())
+					session := helpers.CFWithStdin(input, "login", "--sso-passcode", "some-passcode")
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session.Err).Should(Say(`Invalid passcode`))
 
 					// Leaving out expectation of prompt text, since it comes from UAA (and doesn't show up on Windows)
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session.Err).Should(Say(`Invalid passcode`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session.Err).Should(Say(`Invalid passcode`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
 					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session.Err).Should(Say(`Unable to authenticate`))
 					Eventually(session).Should(Say(`FAILED`))
-					Eventually(session).Should(Say(`Unable to authenticate`))
 
 					Eventually(session).Should(Exit(1))
 				})
@@ -400,6 +467,30 @@ var _ = Describe("login command", func() {
 					session := helpers.CF("login", "--sso-passcode")
 					Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--sso-passcode'"))
 					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		When("a user authenticates with valid client credentials", func() {
+			BeforeEach(func() {
+				clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("a different user logs in with valid sso passcode", func() {
+				It("should fail log in and display an error informing the user they need to log out", func() {
+					session := helpers.CF("login", "--sso-passcode", "my-fancy-sso")
+
+					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					Eventually(session.Err).Should(Say(`Service account currently logged in\. Use 'cf logout' to log out service account and try again\.`))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+
+					//And I am still logged in
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
 				})
 			})
 		})
@@ -429,6 +520,14 @@ var _ = Describe("login command", func() {
 				Eventually(targetSession).Should(Exit(0))
 				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
 			})
+
+			It("uses v3 endpoints", func() {
+				session := helpers.CF("login", "-v", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+				Eventually(session).Should(Exit(0))
+
+				Eventually(session).Should(Say(`GET /v3/organizations.*HTTP/`))
+				Eventually(session).Should(Say(`GET /v3/spaces.*HTTP/`))
+			})
 		})
 
 		When("the -o flag is not passed", func() {
@@ -441,9 +540,41 @@ var _ = Describe("login command", func() {
 					Eventually(setOrgRoleSession).Should(Exit(0))
 				})
 
+				When("there are more than 50 orgs", func() {
+					var server *ghttp.Server
+
+					BeforeEach(func() {
+						server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+						helpers.AddLoginRoutes(server)
+						helpers.AddFiftyOneOrgs(server)
+						// handle request for spaces under "org20"
+						helpers.AddEmptyPaginatedResponse(server, "/v3/spaces?organization_guids=f6653aac-938e-4469-9a66-56a02796412b")
+					})
+
+					AfterEach(func() {
+						server.Close()
+					})
+
+					It("displays a message and prompts the user for the org name", func() {
+						input := NewBuffer()
+						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "org20"))) // "org20" is one of the orgs in the test fixture
+						Expect(wErr).ToNot(HaveOccurred())
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
+
+						Eventually(session).Should(Say("Select an org:"))
+						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+						Eventually(session).Should(Say("Targeted org org20"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				When("user selects an organization by using numbered list", func() {
 					// required
-					It("prompts the user for org and target the selected org", func() {
+					It("prompts the user for org and targets the selected org", func() {
 						input := NewBuffer()
 						_, err := input.Write([]byte("1\n"))
 						Expect(err).ToNot(HaveOccurred())
@@ -476,8 +607,9 @@ var _ = Describe("login command", func() {
 
 							session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
 
-							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
-							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
+							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org:")))
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
 
 							session.Interrupt()
 							Eventually(session).Should(Exit())
@@ -520,8 +652,8 @@ var _ = Describe("login command", func() {
 						} else {
 							session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
 						}
-
-						Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
+						Eventually(session).Should(Say(`Org \(enter to skip\):`))
+						Consistently(session).ShouldNot(Say(`Org \(enter to skip\):`))
 						Eventually(session).Should(Exit(0))
 
 						targetSession := helpers.CF("target")
@@ -540,7 +672,7 @@ var _ = Describe("login command", func() {
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Organization %s not found", orgName))
+						Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 
 						targetSession := helpers.CF("target")
 						Eventually(targetSession).Should(Exit(0))
@@ -577,7 +709,7 @@ var _ = Describe("login command", func() {
 
 					Eventually(session).Should(Exit(1))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("Organization %s not found", orgName))
+					Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
@@ -601,7 +733,7 @@ var _ = Describe("login command", func() {
 			orgName = helpers.NewOrgName()
 			session := helpers.CF("create-org", orgName)
 			Eventually(session).Should(Exit(0))
-			username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+			username, password = helpers.CreateUser()
 		})
 
 		When("only one space is available to the user", func() {
@@ -644,9 +776,7 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
 					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
 				})
-
 			})
-
 		})
 
 		When("multiple spaces are available to the user", func() {
@@ -670,8 +800,19 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the -s flag is passed", func() {
+				BeforeEach(func() {
+					orgName2 := helpers.NewOrgName()
+					session := helpers.CF("create-org", orgName2)
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("set-org-role", username, orgName2, "OrgManager")
+					Eventually(session).Should(Exit(0))
+				})
+
 				It("targets the org and the space", func() {
-					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+					stdin := NewBuffer()
+					session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+					_, writeErr := stdin.Write([]byte(orgName + "\n"))
+					Expect(writeErr).ToNot(HaveOccurred())
 
 					Eventually(session).Should(Say(`Targeted org\s+%s`, orgName))
 					Eventually(session).Should(Say(`\n\nTargeted space\s+%s`, spaceName))
@@ -695,10 +836,13 @@ var _ = Describe("login command", func() {
 					})
 
 					It("the command fails and displays an error message. It targets the org but not the space.", func() {
-						session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+						stdin := NewBuffer()
+						session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+						_, writeErr := stdin.Write([]byte(orgName + "\n"))
+						Expect(writeErr).ToNot(HaveOccurred())
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Space %s not found", spaceName))
+						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
 
 						targetSession := helpers.CF("target")
 						Eventually(targetSession).Should(Exit(0))
@@ -706,7 +850,6 @@ var _ = Describe("login command", func() {
 						Eventually(targetSession).ShouldNot(Say(`space:\s+%s`, spaceName))
 						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
 					})
-
 				})
 			})
 
@@ -735,8 +878,8 @@ var _ = Describe("login command", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Select a space (or press enter to skip):")))
-					Eventually(session).Should(Say(regexp.QuoteMeta("Select a space (or press enter to skip):")))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Space (enter to skip):")))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Space (enter to skip):")))
 					session.Interrupt()
 					Eventually(session).Should(Exit())
 				})
@@ -756,7 +899,7 @@ var _ = Describe("login command", func() {
 
 				It("allows the user to skip picking a space", func() {
 					input := NewBuffer()
-					_, err := input.Write([]byte(" \n"))
+					_, err := input.Write([]byte("\n"))
 					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
@@ -780,7 +923,7 @@ var _ = Describe("login command", func() {
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Space %s not found", spaceName))
+						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
 
 						targetSession := helpers.CF("target")
 						Eventually(targetSession).Should(Exit(0))
@@ -789,22 +932,160 @@ var _ = Describe("login command", func() {
 						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
 					})
 				})
+
+				When("there are more than 50 spaces", func() {
+					var server *ghttp.Server
+					BeforeEach(func() {
+						server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+						helpers.AddLoginRoutes(server)
+						helpers.AddFiftyOneSpaces(server)
+					})
+
+					AfterEach(func() {
+						server.Close()
+					})
+
+					It("displays a message and prompts the user for the space name", func() {
+						input := NewBuffer()
+						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "test-space-1")))
+						Expect(wErr).ToNot(HaveOccurred())
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
+
+						Eventually(session).Should(Say("Select a space:"))
+						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
+						Eventually(session).Should(Say("Targeted space test-space-1"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+		})
+
+	})
+
+	Describe("Full interactive happy path", func() {
+		var (
+			orgName1   string
+			orgName2   string
+			spaceName1 string
+			spaceName2 string
+			username   string
+			password   string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			orgName1 = helpers.NewOrgName()
+			orgName2 = helpers.NewOrgName()
+			spaceName1 = helpers.NewSpaceName()
+			spaceName2 = helpers.NewSpaceName()
+
+			Eventually(helpers.CF("create-org", orgName1)).Should(Exit(0))
+			Eventually(helpers.CF("create-org", orgName2)).Should(Exit(0))
+			Eventually(helpers.CF("create-space", "-o", orgName1, spaceName1)).Should(Exit(0))
+			Eventually(helpers.CF("create-space", "-o", orgName1, spaceName2)).Should(Exit(0))
+
+			username, password = helpers.CreateUser()
+			Eventually(helpers.CF("set-org-role", username, orgName1, "OrgManager")).Should(Exit(0))
+			Eventually(helpers.CF("set-org-role", username, orgName2, "OrgManager")).Should(Exit(0))
+			Eventually(helpers.CF("set-space-role", username, orgName1, spaceName1, "SpaceManager")).Should(Exit(0))
+			Eventually(helpers.CF("set-space-role", username, orgName1, spaceName2, "SpaceManager")).Should(Exit(0))
+		})
+
+		When("there are multiple orgs and spaces available to a user", func() {
+			It("prompts for username, password, org, and space. Then logs in and targets correctly", func() {
+				buffer := NewBuffer()
+				_, err := buffer.Write([]byte(fmt.Sprintf("%s\n%s\n%s\n%s\n", username, password, orgName1, spaceName2)))
+				Expect(err).ToNot(HaveOccurred())
+
+				session := helpers.CFWithStdin(buffer, "login")
+				Eventually(session).Should(Say("Email:"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("Password:"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("Select an org:"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+				Eventually(session).Should(Say(fmt.Sprintf("Targeted org %s", orgName1)))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("Select a space:"))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
+				Eventually(session).Should(Say(fmt.Sprintf("Targeted space %s", spaceName2)))
+				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say(`Org:\s+%s`, orgName1))
+				Eventually(session).Should(Say(`Space:\s+%s`, spaceName2))
+				Eventually(session).Should(Exit(0))
+
+				targetSession := helpers.CF("target")
+				Eventually(targetSession).Should(Exit(0))
+				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName1))
+				Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName2))
 			})
 		})
 	})
 
 	Describe("User Credentials", func() {
+		It("prompts the user for email and password", func() {
+			username, password := helpers.GetCredentials()
+			buffer := NewBuffer()
+			_, err := buffer.Write([]byte(fmt.Sprintf("%s\n%s\n", username, password)))
+			Expect(err).ToNot(HaveOccurred())
+			session := helpers.CFWithStdin(buffer, "login")
+			Eventually(session).Should(Say("Email:"))
+			Eventually(session).Should(Say("\n\n"))
+			Eventually(session).Should(Say("Password:"))
+			Eventually(session).Should(Say("\n\n"))
+			Eventually(session).Should(Exit(0))
+		})
+
+		When("the user's account has been locked due to too many failed attempts", func() {
+			var username string
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+				username, _ = helpers.CreateUser()
+				helpers.LogoutCF()
+			})
+
+			It("displays a helpful error and does not reprompt", func() {
+				input := NewBuffer()
+				_, err := input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				Expect(err).ToNot(HaveOccurred())
+				session := helpers.CFWithStdin(input, "login", "-u", username)
+				Eventually(session).Should(Exit(1))
+
+				input = NewBuffer()
+				_, err = input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				Expect(err).ToNot(HaveOccurred())
+				session = helpers.CFWithStdin(input, "login", "-u", username)
+				Eventually(session).Should(Exit(1))
+
+				input = NewBuffer()
+				_, err = input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				Expect(err).NotTo(HaveOccurred())
+				session = helpers.CFWithStdin(input, "login", "-u", username)
+				Eventually(session).Should(Say(`Password`))
+				Eventually(session.Err).Should(Say(`Your account has been locked because of too many failed attempts to login\.`))
+				Consistently(session).ShouldNot(Say(`Password`))
+				Eventually(session.Err).Should(Say(`Unable to authenticate.`))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		When("the -u flag is provided", func() {
 			It("prompts the user for their password", func() {
-
-				helpers.SkipIfWindows()
-
 				username, password := helpers.GetCredentials()
 				buffer := NewBuffer()
 				_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", password)))
 				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(buffer, "login", "-u", username)
-				Eventually(session).Should(Say("Password> "))
+				Eventually(session).Should(Say("Password: "))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -816,10 +1097,126 @@ var _ = Describe("login command", func() {
 				_, err := input.Write([]byte(username + "\n"))
 				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(input, "login", "-p", password)
-				Eventually(session).Should(Say("Email> "))
+				Eventually(session).Should(Say("Email: "))
 				Eventually(session).Should(Exit(0))
 			})
+
+			When("the password flag is given incorrectly", func() {
+				It("Prompts the user two more times before exiting with an error", func() {
+					username, _ := helpers.GetCredentials()
+					input := NewBuffer()
+					_, err := input.Write([]byte(username + "\n" + "bad-password\n" + "bad-password\n"))
+					Expect(err).ToNot(HaveOccurred())
+					session := helpers.CFWithStdin(input, "login", "-p", "bad-password")
+					Eventually(session).Should(Say("Email: "))
+					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
+					Eventually(session).Should(Say("Password: "))
+					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
+					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Unable to authenticate."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
+
+		When("multiple interactive prompts are used", func() {
+			var (
+				orgName  string
+				orgName2 string
+				username string
+				password string
+			)
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+				orgName = helpers.NewOrgName()
+				session := helpers.CF("create-org", orgName)
+				Eventually(session).Should(Exit(0))
+				username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+
+				orgName2 = helpers.NewOrgName()
+				Eventually(helpers.CF("create-org", orgName2)).Should(Exit(0))
+				setOrgRoleSession := helpers.CF("set-org-role", username, orgName2, "OrgManager")
+				Eventually(setOrgRoleSession).Should(Exit(0))
+			})
+
+			It("should accept each value", func() {
+				input := NewBuffer()
+				_, err := input.Write([]byte(username + "\n" + password + "\n" + orgName + "\n"))
+				Expect(err).ToNot(HaveOccurred())
+				session := helpers.CFWithStdin(input, "login")
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("MFA is enabled", func() {
+				var (
+					password string
+					mfaCode  string
+					server   *ghttp.Server
+				)
+
+				BeforeEach(func() {
+					password = "some-password"
+					mfaCode = "123456"
+					server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+					helpers.AddMfa(server, password, mfaCode)
+				})
+
+				AfterEach(func() {
+					server.Close()
+				})
+
+				When("correct MFA code and credentials are provided", func() {
+					BeforeEach(func() {
+						fakeTokenResponse := map[string]string{
+							"access_token": "",
+							"token_type":   "bearer",
+						}
+						server.RouteToHandler(http.MethodPost, "/oauth/token",
+							ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+						server.RouteToHandler(http.MethodGet, "/v3/organizations",
+							ghttp.RespondWith(http.StatusOK, `{
+							 "total_results": 0,
+							 "total_pages": 1,
+							 "resources": []}`))
+					})
+
+					It("logs in the user", func() {
+						input := NewBuffer()
+						_, err := input.Write([]byte(username + "\n" + password + "\n" + mfaCode + "\n"))
+						Expect(err).ToNot(HaveOccurred())
+						session := helpers.CFWithStdin(input, "login")
+						Eventually(session).Should(Say("Email: "))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say("Password:"))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("incorrect MFA code and credentials are provided", func() {
+					It("fails", func() {
+						input := NewBuffer()
+						wrongMfaCode := mfaCode + "foo"
+						_, err := input.Write([]byte(username + "\n" + password + "\n" + wrongMfaCode + "\n" + password + "\n" + wrongMfaCode + "\n"))
+						Expect(err).ToNot(HaveOccurred())
+						session := helpers.CFWithStdin(input, "login")
+						Eventually(session).Should(Say("Password: "))
+						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
+						Eventually(session).Should(Say("Password: "))
+						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
+						Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Unable to authenticate."))
+
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+		})
+
 		When("the user provides the -p and -u flags", func() {
 			Context("and the credentials are correct", func() {
 				It("logs in successfully", func() {
@@ -836,29 +1233,23 @@ var _ = Describe("login command", func() {
 
 			Context("and the credentials are incorrect", func() {
 				It("prompts twice, displays an error and fails", func() {
-
-					helpers.SkipIfWindows()
-
-					// Note: This test gets the desired behavior but accidentally. The legacy code does not support multiple tty inputs.
-					// For this test, when reading on the second and subsequent times, it gets a tty error but still will return
-					// a presumably blank entry to the CLI. This has the desired effect of multiple incorrect entries.
-					// We believe the assertions to still be valid.
-					username, password := helpers.GetCredentials()
-					badPassword := password + "_wrong"
-					session := helpers.CF("login", "-p", badPassword, "-u", username)
+					input := NewBuffer()
+					_, err := input.Write([]byte("garbage\ngarbage\n"))
+					Expect(err).ToNot(HaveOccurred())
+					session := helpers.CFWithStdin(input, "login", "-p", "nope", "-u", "faker")
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`Password>`))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Password:`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`Password>`))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Password:`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
 					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session.Err).Should(Say(`Unable to authenticate.`))
 					Eventually(session).Should(Say(`FAILED`))
-					Eventually(session).Should(Say(`Unable to authenticate`))
 
 					Eventually(session).Should(Exit(1))
 				})
@@ -887,15 +1278,13 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				It("prints an error and fails", func() {
+				It("should fail log in and display an error informing the user they need to log out", func() {
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-p", password, "-u", username)
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
-					// The following message is a bit strange in the output. Consider removing?
-					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+					Eventually(session.Err).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -940,6 +1329,14 @@ var _ = Describe("login command", func() {
 
 			Expect(iatIsSet).To(BeTrue())
 			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
+		})
+
+		It("warns the user that this configuration is deprecated", func() {
+			deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
+
+			session := helpers.CF("login", "-u", username, "-p", password)
+			Eventually(session.Err).Should(Say(deprecationMessage))
+			Eventually(session).Should(Exit(0))
 		})
 
 		When("the token has expired", func() {

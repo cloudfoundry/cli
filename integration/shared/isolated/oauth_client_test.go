@@ -76,7 +76,7 @@ var _ = Describe("custom oauth client id", func() {
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-u", username, "-p", password)
 					Eventually(session).Should(Exit(1))
-					Expect(session).To(Say(
+					Expect(session.Err).To(Say(
 						"Credentials were rejected, please try again."))
 				})
 			})

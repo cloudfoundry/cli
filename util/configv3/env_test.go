@@ -83,17 +83,6 @@ var _ = Describe("Config", func() {
 		Entry("uses default value of false if an invalid environment value is set", "something-invalid", false),
 	)
 
-	DescribeTable("ExperimentalLogin",
-		func(envVal string, expected bool) {
-			config.ENV.ExperimentalLogin = envVal
-			Expect(config.ExperimentalLogin()).To(Equal(expected))
-		},
-
-		Entry("uses default value of false if environment value is not set", "", false),
-		Entry("uses environment value if a valid environment value is set", "true", true),
-		Entry("uses default value of false if an invalid environment value is set", "something-invalid", false),
-	)
-
 	DescribeTable("LogLevel",
 		func(envVal string, expectedLevel int) {
 			config := Config{ENV: EnvOverride{CFLogLevel: envVal}}

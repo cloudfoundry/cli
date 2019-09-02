@@ -117,11 +117,6 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *LoginCommand) Execute(args []string) error {
-	if !cmd.Config.ExperimentalLogin() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-	cmd.UI.DisplayWarning("Using experimental login command, some behavior may be different")
-
 	endpoint, err := cmd.determineAPIEndpoint()
 	if err != nil {
 		return err

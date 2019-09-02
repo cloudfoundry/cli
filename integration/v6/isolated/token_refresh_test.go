@@ -38,7 +38,6 @@ var _ = Describe("Token Refreshing", func() {
 
 			When("logging in with un-rewritten cf login", func() {
 				BeforeEach(func() {
-					helpers.TurnOffExperimentalLogin()
 					u, p := helpers.GetCredentials()
 					session := helpers.CF("login", "-u", u, "-p", p)
 					Eventually(session).Should(Exit(0))
@@ -52,16 +51,10 @@ var _ = Describe("Token Refreshing", func() {
 
 			When("logging in with rewritten cf login", func() {
 				BeforeEach(func() {
-					helpers.TurnOnExperimentalLogin()
 					u, p := helpers.GetCredentials()
 					session := helpers.CF("login", "-u", u, "-p", p)
 					Eventually(session).Should(Exit(0))
 				})
-
-				AfterEach(func() {
-					helpers.TurnOffExperimentalLogin()
-				})
-
 				It("persists an empty string as the grant type in config.json", func() {
 					c := helpers.GetConfig()
 					Expect(c.UAAGrantType()).To(Equal(""))
