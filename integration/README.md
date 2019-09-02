@@ -42,7 +42,7 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/shared/global in
 ### Customizations (based on environment variables)
 
 - `CF_INT_API` - Sets the CF API URL these tests will be using. Will default to `api.bosh-lite.com` if not set.
-- `SKIP_SSL_VALIDATION` - If true, will skip SSL Validation. Will default `--skip-ssl-validation` if not set.
+- `SKIP_SSL_VALIDATION` - If true, will skip SSL Validation. Will default to `--skip-ssl-validation` if not set.
 - `CF_INT_USERNAME` - The CF Administrator username. Will default to `admin` if not set.
 - `CF_INT_PASSWORD` - The CF Administrator password. Will default to `admin` if not set.
 - `CF_INT_CLIENT_ID` - The ID for the integration client credentials identity.
