@@ -525,6 +525,14 @@ var _ = Describe("login command", func() {
 				Eventually(targetSession).Should(Exit(0))
 				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
 			})
+
+			It("uses v3 endpoints", func() {
+				session := helpers.CF("login", "-v", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+				Eventually(session).Should(Exit(0))
+
+				Eventually(session).Should(Say(`GET /v3/organizations.*HTTP/`))
+				Eventually(session).Should(Say(`GET /v3/spaces.*HTTP/`))
+			})
 		})
 
 		When("the -o flag is not passed", func() {
