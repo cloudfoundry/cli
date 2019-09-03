@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <installer-gui-script minSpecVersion="2">
-    <pkg-ref id="com.cloudfoundry.cli">
+    <pkg-ref id="com.cloudfoundry.cf7-cli">
         <bundle-version>
             <bundle CFBundleShortVersionString="VERSION" CFBundleVersion="1510" SourceVersion="1510000000000000" BuildVersion="1" id="com.cloudfoundry.cf7-cli" path="Cloud Foundry V7 CLI.app"/>
         </bundle-version>
@@ -19,7 +19,7 @@
         </line>
     </choices-outline>
     <choice id="default" title="Cloud Foundry V7 CLI"/>
-    <choice id="com.cloudfoundry.cli" title="Cloud Foundry V7 CLI" visible="false">
+    <choice id="com.cloudfoundry.cf7-cli" title="Cloud Foundry V7 CLI" visible="false">
         <pkg-ref id="com.cloudfoundry.cf7-cli"/>
     </choice>
     <pkg-ref id="com.cloudfoundry.cf7-cli" version="VERSION" installKBytes="SIZE" onConclusion="none">#com.cloudfoundry.cf7-cli.pkg</pkg-ref>
