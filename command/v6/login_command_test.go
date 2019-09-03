@@ -318,29 +318,30 @@ var _ = Describe("login Command", func() {
 							cmd.Username = "potatoface"
 						})
 
-							It("uses the provided value and does not prompt for the username", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
+						It("uses the provided value and does not prompt for the username", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).NotTo(Say("Username:"))
+							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+							credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+							Expect(credentials["username"]).To(Equal("potatoface"))
+						})
+
+						When("the --origin flag is set", func() {
+							BeforeEach(func() {
+								cmd.Origin = "picklebike"
+							})
+							It("authenticates with it", func() {
+								Expect(executeErr).NotTo(HaveOccurred())
 								Expect(testUI.Out).NotTo(Say("Username:"))
 								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-								credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+								credentials, origin, _ := fakeActor.AuthenticateArgsForCall(0)
 								Expect(credentials["username"]).To(Equal("potatoface"))
+								Expect(origin).To(Equal("picklebike"))
 							})
 
-					When("the --origin flag is set", func() {
-								BeforeEach(func() {
-									cmd.Origin = "picklebike"
-								})
-								It("authenticates with it", func() {
-									Expect(executeErr).NotTo(HaveOccurred())
-									Expect(testUI.Out).NotTo(Say("Username:"))
-									Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-									credentials, origin, _ := fakeActor.AuthenticateArgsForCall(0)
-									Expect(credentials["username"]).To(Equal("potatoface"))
-									Expect(origin).To(Equal("picklebike"))
-								})
-
-							})
-						})})
+						})
+					})
+				})
 
 				When("one of the prompts has password key and is password type", func() {
 					BeforeEach(func() {
