@@ -53,7 +53,7 @@ var _ = Describe("create-service-broker command", func() {
 		It("displays an informative error that the user must be logged in", func() {
 			session := helpers.CF("create-service-broker", brokerName, "user", "pass", "http://example.com")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 			Eventually(session).Should(Exit(1))
 		})
 	})

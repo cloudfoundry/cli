@@ -92,7 +92,7 @@ var _ = Describe("v3-ssh command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("v3-ssh", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

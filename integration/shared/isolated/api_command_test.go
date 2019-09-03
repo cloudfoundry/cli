@@ -206,7 +206,7 @@ var _ = Describe("api command", func() {
 				Eventually(session).Should(Say("Setting api endpoint to %s...", server.URL()))
 				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -240,7 +240,7 @@ var _ = Describe("api command", func() {
 			Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
 			Consistently(session).ShouldNot(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 			Eventually(session).Should(Say("OK"))
-			Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 			Eventually(session).Should(Exit(0))
 		})
 

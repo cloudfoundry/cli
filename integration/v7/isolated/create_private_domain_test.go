@@ -124,7 +124,7 @@ var _ = Describe("create-private-domain command", func() {
 		It("displays an error message and fails", func() {
 			session := helpers.CF("domains")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 			Eventually(session).Should(Exit(1))
 		})
 	})

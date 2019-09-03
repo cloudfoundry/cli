@@ -79,7 +79,7 @@ var _ = Describe("target command", func() {
 					helpers.LogoutCF()
 					cmd := append([]string{"target"}, args...)
 					session := helpers.CF(cmd...)
-					Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				},

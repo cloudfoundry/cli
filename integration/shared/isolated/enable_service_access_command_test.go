@@ -75,7 +75,7 @@ var _ = Describe("enable service access command", func() {
 		It("displays FAILED, an informative error message, and exits 1", func() {
 			session := helpers.CF("enable-service-access", "does-not-matter")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 			Eventually(session).Should(Exit(1))
 		})
 	})

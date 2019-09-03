@@ -216,7 +216,7 @@ var _ = Describe("set-org-role command", func() {
 		It("reports that the user is not logged in", func() {
 			session := helpers.CF("set-org-role", "some-user", "some-org", "BillingManager")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 			Eventually(session).Should(Exit(1))
 		})
 	})

@@ -65,7 +65,7 @@ func CheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, target
 	LogoutCF()
 	session := CF(command...)
 	Eventually(session).Should(Say("FAILED"))
-	Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+	Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' or 'cf login --sso' to log in\\."))
 	Eventually(session).Should(Exit(1))
 
 	By("errors if cli not targeted")
@@ -103,7 +103,7 @@ func UnrefactoredCheckEnvironmentTargetedCorrectly(targetedOrganizationRequired 
 	LogoutCF()
 	session := CF(command...)
 	Eventually(session).Should(Say("FAILED"))
-	Eventually(session).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+	Eventually(session).Should(Say("Not logged in\\. Use 'cf login' or 'cf login --sso' to log in\\."))
 	Eventually(session).Should(Exit(1))
 
 	By("errors if cli not targeted")

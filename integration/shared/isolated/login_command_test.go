@@ -455,7 +455,7 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session.Err).Should(Say(`Invalid passcode`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
-					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session).Should(Say(`Not logged in. Use 'cf login' or 'cf login --sso' to log in.`))
 					Eventually(session.Err).Should(Say(`Unable to authenticate`))
 					Eventually(session).Should(Say(`FAILED`))
 
@@ -1113,7 +1113,7 @@ var _ = Describe("login command", func() {
 					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
 					Eventually(session).Should(Say("Password: "))
 					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
-					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Unable to authenticate."))
 					Eventually(session).Should(Exit(1))
@@ -1208,7 +1208,7 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
 						Eventually(session).Should(Say("Password: "))
 						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
-						Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+						Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Unable to authenticate."))
 
@@ -1248,7 +1248,7 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
-					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session).Should(Say(`Not logged in. Use 'cf login' or 'cf login --sso' to log in.`))
 					Eventually(session.Err).Should(Say(`Unable to authenticate.`))
 					Eventually(session).Should(Say(`FAILED`))
 
@@ -1262,11 +1262,11 @@ var _ = Describe("login command", func() {
 
 					It("logs them out", func() {
 						session := helpers.CF("login", "-p", "nope", "-u", "faker")
-						Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+						Eventually(session).Should(Say(`Not logged in. Use 'cf login' or 'cf login --sso' to log in.`))
 						Eventually(session).Should(Exit())
 
 						orgsSession := helpers.CF("orgs")
-						Eventually(orgsSession.Err).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+						Eventually(orgsSession.Err).Should(Say(`Not logged in. Use 'cf login' or 'cf login --sso' to log in.`))
 						Eventually(orgsSession).Should(Exit())
 					})
 				})

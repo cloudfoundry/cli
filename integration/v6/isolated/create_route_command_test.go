@@ -120,7 +120,7 @@ var _ = Describe("create-route command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("create-route", "some-space", "some-domain")
 				Eventually(session).Should(Say(`FAILED`))
-				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
+				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' or 'cf login --sso' to log in\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
