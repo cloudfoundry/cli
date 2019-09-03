@@ -472,7 +472,7 @@ func (cmd *LoginCommand) showStatus() {
 	user, err := cmd.Config.CurrentUserName()
 	if user == "" || err != nil {
 		cmd.UI.DisplayKeyValueTable("", tableContent, 3)
-		cmd.displayNotLoggedIn()
+		command.DisplayNotLoggedInText(cmd.Config.BinaryName(), cmd.UI)
 		return
 	}
 	tableContent = append(tableContent, []string{cmd.UI.TranslateText("User:"), user})
@@ -496,16 +496,6 @@ func (cmd *LoginCommand) showStatus() {
 	}
 
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
-}
-
-func (cmd *LoginCommand) displayNotLoggedIn() {
-	cmd.UI.DisplayText(
-		"Not logged in. Use '{{.CFLoginCommand}}' or '{{.CFLoginCommandSSO}}' to log in.",
-		map[string]interface{}{
-			"CFLoginCommand":    fmt.Sprintf("%s login", cmd.Config.BinaryName()),
-			"CFLoginCommandSSO": fmt.Sprintf("%s login --sso", cmd.Config.BinaryName()),
-		},
-	)
 }
 
 func (cmd *LoginCommand) displayNotTargetted() {
