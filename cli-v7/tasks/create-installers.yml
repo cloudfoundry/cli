@@ -126,7 +126,7 @@ run:
     (
       SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_osx | cut -f 1)"
 
-      pushd cli-ci/ci/installers/osx
+      pushd cli-ci/ci/installers/osx_v7
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
         mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf7-cli
@@ -140,8 +140,8 @@ run:
         popd
         ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
         mkbom -i bom_list Bom
-        mv Bom Payload com.cloudfoundry.cli.pkg
-        xar -c --compression none -f cf7-cli-installer_osx.pkg com.cloudfoundry.cli.pkg Distribution
+        mv Bom Payload com.cloudfoundry.cf7-cli.pkg
+        xar -c --compression none -f cf7-cli-installer_osx.pkg com.cloudfoundry.cf7-cli.pkg Distribution
         mv cf7-cli-installer_osx.pkg $root/packaged/cf7-cli-installer_osx.pkg
       popd
     )
