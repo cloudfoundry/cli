@@ -75,7 +75,7 @@ var _ = Describe("share-private-domain command", func() {
 		It("should report failure and exit with non-zero exit code", func() {
 			session := helpers.CF("share-private-domain", orgName, domainName)
 
-			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
 		})

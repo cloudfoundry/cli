@@ -96,7 +96,7 @@ var _ = Describe("purge-service-offering command", func() {
 				session := helpers.CF("purge-service-offering", "service-name")
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
+				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' or 'cf login --sso' to log in\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

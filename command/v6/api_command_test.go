@@ -187,7 +187,7 @@ api version:    100.200.300`,
 			It("outputs a 'not logged in' message", func() {
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Not logged in. Use 'faceman login' to log in."))
+				Expect(testUI.Out).To(Say("Not logged in. Use 'faceman login' or 'faceman login --sso' to log in."))
 			})
 		})
 
@@ -201,7 +201,7 @@ api version:    100.200.300`,
 			It("does not output a 'not logged in' message", func() {
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).ToNot(Say("Not logged in. Use 'faceman login' to log in."))
+				Expect(testUI.Out).ToNot(Say("Not logged in. Use 'faceman login' or 'faceman login --sso' to log in."))
 			})
 		})
 

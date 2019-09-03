@@ -500,9 +500,10 @@ func (cmd *LoginCommand) showStatus() {
 
 func (cmd *LoginCommand) displayNotLoggedIn() {
 	cmd.UI.DisplayText(
-		"Not logged in. Use '{{.CFLoginCommand}}' to log in.",
+		"Not logged in. Use '{{.CFLoginCommand}}' or '{{.CFLoginCommandSSO}}' to log in.",
 		map[string]interface{}{
-			"CFLoginCommand": fmt.Sprintf("%s login", cmd.Config.BinaryName()),
+			"CFLoginCommand":    fmt.Sprintf("%s login", cmd.Config.BinaryName()),
+			"CFLoginCommandSSO": fmt.Sprintf("%s login --sso", cmd.Config.BinaryName()),
 		},
 	)
 }

@@ -47,7 +47,7 @@ var _ = Describe("feature-flags command", func() {
 		It("displays an error and exits 1", func() {
 			session := helpers.CF("feature-flags")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
+			Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' or 'cf login --sso' to log in\.`))
 			Eventually(session).Should(Exit(1))
 		})
 	})

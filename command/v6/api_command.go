@@ -74,8 +74,9 @@ func (cmd *APICommand) Execute(args []string) error {
 
 	user, err := cmd.Config.CurrentUser()
 	if user.Name == "" {
-		cmd.UI.DisplayText("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{
-			"CFLoginCommand": fmt.Sprintf("%s login", cmd.Config.BinaryName()),
+		cmd.UI.DisplayText("Not logged in. Use '{{.CFLoginCommand}}' or '{{.CFLoginCommandSSO}}' to log in.", map[string]interface{}{
+			"CFLoginCommand":    fmt.Sprintf("%s login", cmd.Config.BinaryName()),
+			"CFLoginCommandSSO": fmt.Sprintf("%s login --sso", cmd.Config.BinaryName()),
 		})
 	}
 	return err

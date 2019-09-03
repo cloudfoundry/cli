@@ -161,7 +161,7 @@ var _ = Describe("auth command", func() {
 
 				// Verify that the user is not logged-in
 				targetSession1 := helpers.CF("target")
-				Eventually(targetSession1.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
+				Eventually(targetSession1.Err).Should(Say(`Not logged in\. Use 'cf login' or 'cf login --sso' to log in\.`))
 				Eventually(targetSession1).Should(Say("FAILED"))
 				Eventually(targetSession1).Should(Exit(1))
 
@@ -206,7 +206,7 @@ var _ = Describe("auth command", func() {
 
 				// Verify that the user is not logged-in
 				targetSession1 := helpers.CF("target")
-				Eventually(targetSession1.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
+				Eventually(targetSession1.Err).Should(Say(`Not logged in\. Use 'cf login' or 'cf login --sso' to log in\.`))
 				Eventually(targetSession1).Should(Say("FAILED"))
 				Eventually(targetSession1).Should(Exit(1))
 

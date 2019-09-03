@@ -19,7 +19,8 @@ import (
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf(T("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{"CFLoginCommand": CommandColor(cf.Name + " " + "login")}))
+	return fmt.Sprintf(T("Not logged in. Use '{{.CFLoginCommand}}' or '{{.CFLoginCommandSSO}}' to log in.", map[string]interface{}{"CFLoginCommand": CommandColor(cf.Name + " " + "login"),
+		"CFLoginCommandSSO": CommandColor(cf.Name + " " + "login --sso")}))
 }
 
 //go:generate counterfeiter . UI

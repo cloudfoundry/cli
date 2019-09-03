@@ -47,7 +47,7 @@ var _ = Describe("unshare-private-domain command", func() {
 			It("lets the user know", func() {
 				session := helpers.CF("unshare-private-domain", sharedToOrgName, domainName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
