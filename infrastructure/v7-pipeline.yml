@@ -24,12 +24,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v7.*
-- name: ops-files
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v7.*
+    tag_filter: v*
 - name: state
   type: git
   source:
@@ -66,7 +61,6 @@ jobs:
     - put: gcp-bosh-pool
       params:
         claim: ((stack-name)).cli.fun
-    - get: ops-files
     - get: cli-ci
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
@@ -85,7 +79,7 @@ jobs:
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
@@ -96,21 +90,21 @@ jobs:
   - task: copy-ops-files
     file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
     input_mapping:
-      input1: ops-files
+      input1: cf-deployment
       input2: cli-ci
     params:
       COPY_PATHS: "input2/ci/infrastructure/operations/use-latest-capi.yml input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml input2/ci/infrastructure/operations/add-uaa-client-credentials.yml input2/ci/infrastructure/operations/add-dummy-windows-stack.yml input2/ci/infrastructure/operations/reduce-async-service-polling.yml input2/ci/infrastructure/operations/add-oidc-provider.yml input2/ci/infrastructure/operations/adjust-user-retry-attempts.yml input2/ci/infrastructure/operations/enable-v3-deployments-endpoint.yml input2/ci/infrastructure/operations/enable-mysql-audit-logging.yml"
   - task: upload-edge-capi
     file: cli-ci/ci/infrastructure/tasks/upload-edge-capi.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
       release-tarball: edge-capi-release
     params:
       BBL_STATE_DIR: "ci/infrastructure/((stack-name))"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
       vars-files: vars_path
       ops-files: combine_inputs_output
     params:
@@ -121,7 +115,7 @@ jobs:
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
       CLEAN_ALL: true
