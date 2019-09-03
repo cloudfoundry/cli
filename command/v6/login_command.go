@@ -118,17 +118,9 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *LoginCommand) Execute(args []string) error {
-	if cmd.Origin != "" {
-		if cmd.SSO {
-			return translatableerror.ArgumentCombinationError{
-				Args: []string{"--sso", "--origin"},
-			}
-		}
-		if cmd.SSOPasscode != "" {
-			return translatableerror.ArgumentCombinationError{
-				Args: []string{"--sso-passcode", "--origin"},
-			}
-		}
+	err := cmd.validateFlags()
+	if err != nil {
+		return err
 	}
 
 	endpoint, err := cmd.determineAPIEndpoint()
@@ -163,9 +155,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 	var authErr error
 	if cmd.SSO || cmd.SSOPasscode != "" {
-		if cmd.SSO && cmd.SSOPasscode != "" {
-			return translatableerror.ArgumentCombinationError{Args: []string{"--sso-passcode", "--sso"}}
-		}
 		authErr = cmd.authenticateSSO()
 	} else {
 		authErr = cmd.authenticate()
@@ -610,6 +599,27 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 	}
 
 	return choice, err
+}
+
+func (cmd *LoginCommand) validateFlags() error {
+	if cmd.Origin != "" {
+		if cmd.SSO {
+			return translatableerror.ArgumentCombinationError{
+				Args: []string{"--sso", "--origin"},
+			}
+		}
+		if cmd.SSOPasscode != "" {
+			return translatableerror.ArgumentCombinationError{
+				Args: []string{"--sso-passcode", "--origin"},
+			}
+		}
+	}
+	if cmd.SSO && cmd.SSOPasscode != "" {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--sso-passcode", "--sso"},
+		}
+	}
+	return nil
 }
 
 func contains(s []string, v string) bool {
