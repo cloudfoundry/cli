@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="2">
+    <pkg-ref id="com.cloudfoundry.cli">
+        <bundle-version>
+            <bundle CFBundleShortVersionString="VERSION" CFBundleVersion="1510" SourceVersion="1510000000000000" BuildVersion="1" id="com.cloudfoundry.cf7-cli" path="Cloud Foundry V7 CLI.app"/>
+        </bundle-version>
+    </pkg-ref>
+    <title>Cloud Foundry V7 CLI</title>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64"/>
+    <license file="LICENSE" mime-type="text/plain"/>
+    <volume-check>
+        <allowed-os-versions>
+            <os-version min="10.7"/>
+        </allowed-os-versions>
+    </volume-check>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.cloudfoundry.cf7-cli"/>
+        </line>
+    </choices-outline>
+    <choice id="default" title="Cloud Foundry V7 CLI"/>
+    <choice id="com.cloudfoundry.cli" title="Cloud Foundry V7 CLI" visible="false">
+        <pkg-ref id="com.cloudfoundry.cf7-cli"/>
+    </choice>
+    <pkg-ref id="com.cloudfoundry.cf7-cli" version="VERSION" installKBytes="SIZE" onConclusion="none">#com.cloudfoundry.cf7-cli.pkg</pkg-ref>
+</installer-gui-script>
