@@ -221,23 +221,6 @@ var _ = Describe("login Command", func() {
 					Expect(executeErr).To(MatchError(
 						translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
 				})
-
-				Context("ordering of output", func() {
-					BeforeEach(func() {
-						outAndErr := NewBuffer()
-						testUI.Out = outAndErr
-						testUI.Err = outAndErr
-					})
-
-					It("displays the warning after the API targeting but before the summary ", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(testUI.Out).To(Say(`API endpoint: `))
-						Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
-						Expect(testUI.Out).To(Say(`Authenticating...`))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
-						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, binaryName, binaryName))
-					})
-				})
 			})
 		})
 	})
@@ -282,7 +265,7 @@ var _ = Describe("login Command", func() {
 					Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
 					Expect(testUI.Out).To(Say(`Authenticating...`))
 					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
-					Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, binaryName))
+					Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, binaryName, binaryName))
 				})
 			})
 		})
@@ -619,10 +602,6 @@ var _ = Describe("login Command", func() {
 							fakeActor.AuthenticateReturns(errors.New("something died"))
 							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
 						})
-						It("displays a status summary", func() {
-							Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-							Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, cmd.Config.BinaryName(), cmd.Config.BinaryName()))
-						})
 
 						It("prints the error message three times", func() {
 							Expect(testUI.Out).To(Say("Your Password:"))
@@ -642,7 +621,7 @@ var _ = Describe("login Command", func() {
 
 						It("displays a status summary", func() {
 							Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-							Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, cmd.Config.BinaryName()))
+							Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, cmd.Config.BinaryName(), cmd.Config.BinaryName()))
 						})
 
 					})
@@ -799,7 +778,7 @@ var _ = Describe("login Command", func() {
 
 				It("does not include user information in the summary", func() {
 					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
-					Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, cmd.Config.BinaryName()))
+					Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, cmd.Config.BinaryName(), cmd.Config.BinaryName()))
 				})
 			})
 		})
@@ -863,11 +842,6 @@ var _ = Describe("login Command", func() {
 					Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
 					Expect(testUI.Out).To(Say("User:           some-user"))
 					Expect(testUI.Out).To(Say("Org:            some-org"))
-				})
-
-				It("does not include user information in the summary", func() {
-					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
-					Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, cmd.Config.BinaryName(), cmd.Config.BinaryName()))
 				})
 			})
 
