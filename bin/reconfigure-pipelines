@@ -76,7 +76,9 @@ configure_pipeline cli $pipelines_path/cli/pipeline.yml
 
 configure_infrastructure_pipeline inf-beque beque-pipeline baked-potato
 configure_infrastructure_pipeline inf-hardknox hardknox-pipeline baked-potato
+configure_infrastructure_pipeline inf-kinkhao kinkhao-pipeline baked-potato
 configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline baked-potato
+configure_infrastructure_pipeline inf-starbelly starbelly-pipeline baked-potato
 configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
 
 # Arsicault has additional configuration to alert the PM before it rolls.
