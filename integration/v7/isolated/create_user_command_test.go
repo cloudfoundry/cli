@@ -20,7 +20,7 @@ var _ = Describe("create-user command", func() {
 				Eventually(session).Should(Say("create-user - Create a new user"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf create-user USERNAME PASSWORD"))
-				Eventually(session).Should(Say("cf create-user USERNAME --origin ORIGIN"))
+				Eventually(session).Should(Say(`cf create-user USERNAME \[--origin ORIGIN\]`))
 				Eventually(session).Should(Say("cf create-user USERNAME --password-prompt"))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("   cf create-user j.smith@example.com S3cr3t                  # internal user"))

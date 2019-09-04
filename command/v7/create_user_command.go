@@ -24,7 +24,7 @@ type CreateUserCommand struct {
 	Args            flag.CreateUser `positional-args:"yes"`
 	Origin          string          `long:"origin" description:"Origin for mapping a user account to a user in an external identity provider"`
 	PasswordPrompt  bool            `long:"password-prompt" description:"Prompt interactively for password"`
-	usage           interface{}     `usage:"CF_NAME create-user USERNAME PASSWORD\n   CF_NAME create-user USERNAME --origin ORIGIN\n   CF_NAME create-user USERNAME --password-prompt\n\nEXAMPLES:\n   cf create-user j.smith@example.com S3cr3t                  # internal user\n   cf create-user j.smith@example.com --origin ldap           # LDAP user\n   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user"`
+	usage           interface{}     `usage:"CF_NAME create-user USERNAME PASSWORD\n   CF_NAME create-user USERNAME [--origin ORIGIN]\n   CF_NAME create-user USERNAME --password-prompt\n\nEXAMPLES:\n   cf create-user j.smith@example.com S3cr3t                  # internal user\n   cf create-user j.smith@example.com --origin ldap           # LDAP user\n   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user"`
 	relatedCommands interface{}     `related_commands:"passwd, set-org-role, set-space-role"`
 
 	UI          command.UI
