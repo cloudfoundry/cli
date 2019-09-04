@@ -1156,11 +1156,11 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns the timeout error", func() {
-						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-
 						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
 						Expect(warnings).To(ConsistOf("get-deployment-warning", "poll-process-warning"))
+
+						Expect(fakeCloudControllerClient.GetDeploymentCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
 
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
