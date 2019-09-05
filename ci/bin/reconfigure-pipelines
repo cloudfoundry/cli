@@ -90,5 +90,6 @@ configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-po
 # Lola (legacy pipeline) uses a different base pipeline configuration than the other infrastructures.
 lola_pipeline=$pipelines_path/infrastructure/lola-pipeline.yml
 configure_infrastructure_pipeline inf-lola lola-pipeline kloesse $lola_pipeline
+configure_infrastructure_pipeline inf-chipotle chipotle-pipeline kloesse $lola_pipeline
 
 configure_bosh_lite_pool_pipeline bosh-lites
