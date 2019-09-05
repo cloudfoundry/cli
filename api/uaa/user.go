@@ -3,7 +3,9 @@ package uaa
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"code.cloudfoundry.org/cli/api/uaa/internal"
 )
@@ -35,6 +37,10 @@ type email struct {
 // newUserResponse represents the HTTP JSON response.
 type newUserResponse struct {
 	ID string `json:"id"`
+}
+
+type paginatedUsersResponse struct {
+	Resources []newUserResponse `json:"resources"`
 }
 
 // CreateUser creates a new UAA user account with the provided password.
@@ -82,4 +88,47 @@ func (client *Client) CreateUser(user string, password string, origin string) (U
 	}
 
 	return User(userResponse), nil
+}
+
+// GetUsers gets a list of users from UAA with the given username and (if provided) origin.
+// NOTE: that this is a paginated response and we are only currently returning the first page
+// of users. This will mean, if no origin is passed and there are more than 100 users with
+// the given username, only the first 100 will be returned. For our current purposes, this is
+// more than enough, but it would be a problem if we ever need to get all users with a username.
+func (client Client) GetUsers(userName, origin string) ([]User, error) {
+	filter := fmt.Sprintf(`userName eq "%s"`, userName)
+
+	if origin != "" {
+		filter = fmt.Sprintf(`%s and origin eq "%s"`, filter, origin)
+	}
+
+	request, err := client.newRequest(requestOptions{
+		RequestName: internal.GetUsersRequest,
+		Header: http.Header{
+			"Content-Type": {"application/json"},
+		},
+		Query: url.Values{
+			"filter": {filter},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var usersResponse paginatedUsersResponse
+	response := Response{
+		Result: &usersResponse,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []User
+	for _, user := range usersResponse.Resources {
+		users = append(users, User(user))
+	}
+
+	return users, nil
 }
