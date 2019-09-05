@@ -149,9 +149,10 @@ sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundr
 sudo yum install cf7-cli
 ```
 
-**IMPORTANT NOTE**: Due to a [bug](https://github.com/cloudfoundry/cli/issues/1774) with v7.0.0-beta.24 with both the Mac and Windows Installers, we are removing the links to the v7 beta for these two Operating Systems. We hope to release 7.0.0-beta.25 with the fix soon.
 
 #### Installers and compressed binaries
+
+**IMPORTANT NOTE**: Due to a [bug](https://github.com/cloudfoundry/cli/issues/1774) with v7.0.0-beta.24 with both the Mac and Windows Installers, we are removing the links to the v7 beta for these two Operating Systems. We hope to release 7.0.0-beta.25 with the fix soon.
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
