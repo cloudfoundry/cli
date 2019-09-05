@@ -834,7 +834,7 @@ var _ = Describe("SSH", func() {
 
 			It("sends keep alive messages at the expected interval", func() {
 				times := <-timesCh
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(300*time.Millisecond), 100*time.Millisecond))
+				Expect(times[2]).To(BeTemporally("~", times[0].Add(300*time.Millisecond), 200*time.Millisecond))
 			})
 		})
 	})
