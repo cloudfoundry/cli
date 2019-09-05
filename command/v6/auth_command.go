@@ -1,8 +1,8 @@
 package v6
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
