@@ -149,13 +149,13 @@ sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundr
 sudo yum install cf7-cli
 ```
 
-**IMPORTANT NOTE**: There is a [bug](https://github.com/cloudfoundry/cli/issues/1774) with [v7.0.0-beta.24](https://github.com/cloudfoundry/cli/releases/tag/v7.0.0-beta.24) if you are using the Mac Installer: if you have a `cf` installed, the cf7 installer will  uninstall cf v6 cli, and vice versa. 
+**IMPORTANT NOTE**: Due to a [bug](https://github.com/cloudfoundry/cli/issues/1774) with [v7.0.0-beta.24] with both the Mac and Windows Installers, we are removing the links to the v7 beta for these two Operating Systems. We hope to release 7.0.0-beta.25 with the fix soon.
 
 #### Installers and compressed binaries
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
-| Installers | [pkg](https://packages.cloudfoundry.org/stable?release=macosx64&version=v7&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64&version=v7&source=github) | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&version=v7&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github) |
+| Installers |  |  | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&version=v7&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github) |
 | Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=v7&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64-exe&version=v7&source=github) | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github) |
 
 Release notes, and 32 bit releases can be found [here](https://github.com/cloudfoundry/cli/releases).
