@@ -152,17 +152,43 @@ var _ = Describe("create-user command", func() {
 			})
 
 			When("the user passes in a password-prompt flag", func() {
-				It("prompts the user for their password", func() {
-					newUser := helpers.NewUsername()
-					buffer := NewBuffer()
-					_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", "some-password")))
-					Expect(err).ToNot(HaveOccurred())
-					session := helpers.CFWithStdin(buffer, "create-user", newUser, "--password-prompt")
-					Eventually(session).Should(Say("Password: "))
-					Eventually(session).Should(Say("Creating user %s...", newUser))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
-					Eventually(session).Should(Exit(0))
+				When("the user already exists", func() {
+					var (
+						newUser     string
+						newPassword string
+						session     *Session
+					)
+
+					BeforeEach(func() {
+						newUser = helpers.NewUsername()
+						newPassword = helpers.NewPassword()
+						session = helpers.CF("create-user", newUser, newPassword)
+						Eventually(session).Should(Exit(0))
+					})
+
+					It("does not prompt the user for their password", func() {
+						session = helpers.CF("create-user", newUser, "--password-prompt")
+						Consistently(session).Should(Not(Say("Password: ")))
+						Consistently(session).ShouldNot(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
+						Eventually(session).Should(Say("Creating user %s...", newUser))
+						Eventually(session.Err).Should(Say("User '%s' already exists.", newUser))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+				When("the user does not exist yet", func() {
+					It("prompts the user for their password", func() {
+						newUser := helpers.NewUsername()
+						buffer := NewBuffer()
+						_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", "some-password")))
+						Expect(err).ToNot(HaveOccurred())
+						session := helpers.CFWithStdin(buffer, "create-user", newUser, "--password-prompt")
+						Eventually(session).Should(Say("Password: "))
+						Eventually(session).Should(Say("Creating user %s...", newUser))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 
@@ -191,14 +217,14 @@ var _ = Describe("create-user command", func() {
 
 				It("fails with the user already exists message", func() {
 					session := helpers.CF("create-user", newUser, newPassword)
+					Consistently(session).ShouldNot(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 					Eventually(session.Err).Should(Say("User '%s' already exists.", newUser))
 					Eventually(session).Should(Say("OK"))
-					Consistently(session).ShouldNot(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			When("the user does not already exist", func() {
+			When("the user does not exist yet", func() {
 				It("creates the new user", func() {
 					newUser := helpers.NewUsername()
 					newPassword := helpers.NewPassword()

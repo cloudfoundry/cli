@@ -1,11 +1,10 @@
 package uaa
 
 import (
+	"code.cloudfoundry.org/cli/api/uaa/internal"
 	"io"
 	"net/http"
 	"net/url"
-
-	"code.cloudfoundry.org/cli/api/uaa/internal"
 )
 
 // RequestOptions contains all the options to create an HTTP Request.

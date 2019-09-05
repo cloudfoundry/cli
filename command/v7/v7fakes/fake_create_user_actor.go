@@ -26,6 +26,20 @@ type FakeCreateUserActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetUserStub        func(string, string) (v7action.User, error)
+	getUserMutex       sync.RWMutex
+	getUserArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getUserReturns struct {
+		result1 v7action.User
+		result2 error
+	}
+	getUserReturnsOnCall map[int]struct {
+		result1 v7action.User
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -98,11 +112,77 @@ func (fake *FakeCreateUserActor) CreateUserReturnsOnCall(i int, result1 v7action
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCreateUserActor) GetUser(arg1 string, arg2 string) (v7action.User, error) {
+	fake.getUserMutex.Lock()
+	ret, specificReturn := fake.getUserReturnsOnCall[len(fake.getUserArgsForCall)]
+	fake.getUserArgsForCall = append(fake.getUserArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetUser", []interface{}{arg1, arg2})
+	fake.getUserMutex.Unlock()
+	if fake.GetUserStub != nil {
+		return fake.GetUserStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getUserReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateUserActor) GetUserCallCount() int {
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
+	return len(fake.getUserArgsForCall)
+}
+
+func (fake *FakeCreateUserActor) GetUserCalls(stub func(string, string) (v7action.User, error)) {
+	fake.getUserMutex.Lock()
+	defer fake.getUserMutex.Unlock()
+	fake.GetUserStub = stub
+}
+
+func (fake *FakeCreateUserActor) GetUserArgsForCall(i int) (string, string) {
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
+	argsForCall := fake.getUserArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCreateUserActor) GetUserReturns(result1 v7action.User, result2 error) {
+	fake.getUserMutex.Lock()
+	defer fake.getUserMutex.Unlock()
+	fake.GetUserStub = nil
+	fake.getUserReturns = struct {
+		result1 v7action.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateUserActor) GetUserReturnsOnCall(i int, result1 v7action.User, result2 error) {
+	fake.getUserMutex.Lock()
+	defer fake.getUserMutex.Unlock()
+	fake.GetUserStub = nil
+	if fake.getUserReturnsOnCall == nil {
+		fake.getUserReturnsOnCall = make(map[int]struct {
+			result1 v7action.User
+			result2 error
+		})
+	}
+	fake.getUserReturnsOnCall[i] = struct {
+		result1 v7action.User
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCreateUserActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.createUserMutex.RLock()
 	defer fake.createUserMutex.RUnlock()
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -18,6 +18,7 @@ import (
 
 type CreateUserActor interface {
 	CreateUser(username string, password string, origin string) (v7action.User, v7action.Warnings, error)
+	GetUser(username, origin string) (v7action.User, error)
 }
 
 type CreateUserCommand struct {
@@ -48,9 +49,6 @@ func (cmd *CreateUserCommand) Setup(config command.Config, ui command.UI) error 
 }
 
 func (cmd *CreateUserCommand) Execute(args []string) error {
-	// cmd.Args.Password is intentionally set to a pointer such that we can check
-	// if it is passed (otherwise we can't differentiate between the default
-	// empty string and a passed in empty string.
 	var password string
 	var err error
 
@@ -60,23 +58,41 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 		}
 	}
 
-	if cmd.Args.Password != nil {
-		password = *cmd.Args.Password
-	} else {
-		password = ""
-		if cmd.PasswordPrompt {
-			password, err = cmd.UI.DisplayPasswordPrompt("Password")
-			if err != nil {
-				return err
-			}
-		}
-	}
-
+	//	Is the admin logged in?
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
 
+	//	Does the new user already exist?
+	_, err = cmd.Actor.GetUser(cmd.Args.Username, cmd.Origin)
+	if err == nil {
+		// User already exists
+		cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{
+			"TargetUser": cmd.Args.Username,
+		})
+
+		cmd.UI.DisplayWarningV7("User '{{.User}}' already exists.", map[string]interface{}{
+			"User": cmd.Args.Username,
+		})
+
+		cmd.UI.DisplayOK()
+		return nil
+	}
+
+	//	Get the password
+	if cmd.Args.Password != nil {
+		password = *cmd.Args.Password
+	}
+
+	if cmd.PasswordPrompt {
+		password, err = cmd.UI.DisplayPasswordPrompt("Password")
+		if err != nil {
+			return err
+		}
+	}
+
+	//	Create the user!
 	cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{
 		"TargetUser": cmd.Args.Username,
 	})

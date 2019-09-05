@@ -100,4 +100,110 @@ var _ = Describe("User", func() {
 			})
 		})
 	})
+
+	Describe("GetUsers", func() {
+		var (
+			userName string
+			origin   string
+			users    []User
+			err      error
+		)
+
+		BeforeEach(func() {
+			userName = ""
+			origin = ""
+			users = []User{}
+			err = nil
+		})
+
+		JustBeforeEach(func() {
+			users, err = client.GetUsers(userName, origin)
+		})
+
+		When("no errors occur", func() {
+			When("getting the users by username", func() {
+				BeforeEach(func() {
+					userName = "existing-user"
+					origin = ""
+
+					response := `{
+						"resources": [
+							{ "ID": "existing-user-id" }
+						]
+					}`
+
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/Users", "filter=userName+eq+%22existing-user%22"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, response),
+						))
+				})
+
+				It("gets users by username", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(users).To(Equal([]User{
+						{ID: "existing-user-id"},
+					}))
+				})
+			})
+
+			When("getting the user by username and origin", func() {
+				BeforeEach(func() {
+					userName = "existing-user"
+					origin = "ldap"
+
+					response := `{
+						"resources": [
+							{ "ID": "existing-user-id" }
+						]
+					}`
+
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/Users", "filter=userName+eq+%22existing-user%22+and+origin+eq+%22ldap%22"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, response),
+						))
+				})
+
+				It("gets user by username and origin", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(users).To(Equal([]User{
+						{ID: "existing-user-id"},
+					}))
+				})
+			})
+		})
+
+		When("an error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				userName = "existing-user"
+				origin = "ldap"
+
+				response = `{
+					"error_description": "Invalid filter expression"
+				}`
+
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodGet, "/Users", "filter=userName+eq+%22existing-user%22+and+origin+eq+%22ldap%22"),
+						VerifyHeaderKV("Content-Type", "application/json"),
+						RespondWith(http.StatusBadRequest, response),
+					))
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError(RawHTTPStatusError{
+					StatusCode:  400,
+					RawResponse: []byte(response),
+				}))
+			})
+		})
+	})
 })

@@ -103,11 +103,18 @@ var _ = Describe("create-user Command", func() {
 						v7action.Warnings{"warning"},
 						nil)
 					cmd.Origin = "some-origin"
+					fakeActor.GetUserReturns(
+						v7action.User{},
+						actionerror.UAAUserNotFoundError{})
 				})
 
 				It("creates the user and displays all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.GetUserCallCount()).To(Equal(1))
 
+					username, origin := fakeActor.GetUserArgsForCall(0)
+					Expect(username).To(Equal("some-user"))
+					Expect(origin).To(Equal("some-origin"))
 					Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
 					username, password, origin := fakeActor.CreateUserArgsForCall(0)
 					Expect(username).To(Equal("some-user"))
@@ -126,50 +133,53 @@ var _ = Describe("create-user Command", func() {
 					cmd.PasswordPrompt = true
 					_, err := input.Write([]byte("some-password\n"))
 					Expect(err).ToNot(HaveOccurred())
-					fakeActor.CreateUserReturns(
-						v7action.User{GUID: "new-user-cc-guid"},
-						v7action.Warnings{"warning"},
-						nil)
+
 				})
 
-				It("prompts for a password", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Password:"))
+				When("the user already exists in UAA", func() {
+					BeforeEach(func() {
+						fakeActor.GetUserReturns(
+							v7action.User{GUID: "user-guid"},
+							nil)
+					})
 
-					Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
-					_, password, _ := fakeActor.CreateUserArgsForCall(0)
-					Expect(password).To(Equal("some-password"))
+					It("does not prompt for a password or attempt to create a user", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Not(Say("Password:")))
 
-					Expect(testUI.Out).To(Say("Creating user some-user..."))
-					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say("TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'."))
-					Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Out).To(Say("Creating user some-user..."))
+						Expect(fakeActor.CreateUserCallCount()).To(Equal(0))
+						Expect(testUI.Err).To(Say("User 'some-user' already exists."))
+						Expect(testUI.Out).To(Say("OK"))
+					})
 				})
-			})
-		})
 
-		When("no errors occur", func() {
-			BeforeEach(func() {
-				fakeActor.CreateUserReturns(
-					v7action.User{GUID: "new-user-cc-guid"},
-					v7action.Warnings{"warning"},
-					nil)
-				cmd.Origin = "some-origin"
-			})
+				When("the user does not yet exist in UAA", func() {
+					BeforeEach(func() {
+						fakeActor.CreateUserReturns(
+							v7action.User{GUID: "new-user-cc-guid"},
+							v7action.Warnings{"warning"},
+							nil)
+						fakeActor.GetUserReturns(
+							v7action.User{},
+							actionerror.UAAUserNotFoundError{})
+					})
 
-			It("creates the user and displays all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
+					It("prompts for a password", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Password:"))
 
-				Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
-				username, password, origin := fakeActor.CreateUserArgsForCall(0)
-				Expect(username).To(Equal("some-user"))
-				Expect(password).To(Equal("some-password"))
-				Expect(origin).To(Equal("some-origin"))
+						Expect(testUI.Out).To(Say("Creating user some-user..."))
 
-				Expect(testUI.Out).To(Say("Creating user some-user..."))
-				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).To(Say("TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'."))
-				Expect(testUI.Err).To(Say("warning"))
+						Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
+						_, password, _ := fakeActor.CreateUserArgsForCall(0)
+						Expect(password).To(Equal("some-password"))
+
+						Expect(testUI.Out).To(Say("OK"))
+						Expect(testUI.Out).To(Say("TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'."))
+						Expect(testUI.Err).To(Say("warning"))
+					})
+				})
 			})
 		})
 
@@ -183,6 +193,9 @@ var _ = Describe("create-user Command", func() {
 						v7action.User{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						returnedErr)
+					fakeActor.GetUserReturns(
+						v7action.User{},
+						actionerror.UAAUserNotFoundError{})
 				})
 
 				It("returns the same error and all warnings", func() {
@@ -201,6 +214,9 @@ var _ = Describe("create-user Command", func() {
 						v7action.User{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						returnedErr)
+					fakeActor.GetUserReturns(
+						v7action.User{},
+						actionerror.UAAUserNotFoundError{})
 				})
 
 				It("displays the error and all warnings", func() {

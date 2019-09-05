@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -119,6 +121,75 @@ var _ = Describe("User Actions", func() {
 			It("returns the same error and all warnings", func() {
 				Expect(actualErr).To(MatchError(returnedErr))
 				Expect(actualWarnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("GetUser", func() {
+		var (
+			actualUser User
+			actualErr  error
+		)
+
+		JustBeforeEach(func() {
+			actualUser, actualErr = actor.GetUser("some-user", "some-origin")
+		})
+
+		When("when the API returns a success response", func() {
+			When("the API returns one user", func() {
+				BeforeEach(func() {
+
+					fakeUAAClient.GetUsersReturns(
+						[]uaa.User{
+							{ID: "user-id"},
+						},
+						nil,
+					)
+				})
+
+				It("returns the single user", func() {
+					Expect(actualErr).NotTo(HaveOccurred())
+					Expect(actualUser).To(Equal(User{GUID: "user-id"}))
+
+					Expect(fakeUAAClient.GetUsersCallCount()).To(Equal(1))
+					username, origin := fakeUAAClient.GetUsersArgsForCall(0)
+					Expect(username).To(Equal("some-user"))
+					Expect(origin).To(Equal("some-origin"))
+				})
+			})
+
+			When("the API returns no user", func() {
+				BeforeEach(func() {
+					fakeUAAClient.GetUsersReturns(
+						[]uaa.User{},
+						nil,
+					)
+				})
+
+				It("returns an error indicating user was not found in UAA", func() {
+					Expect(actualUser).To(Equal(User{}))
+					Expect(actualErr).To(Equal(actionerror.UAAUserNotFoundError{}))
+					Expect(fakeUAAClient.GetUsersCallCount()).To(Equal(1))
+				})
+			})
+		})
+
+		When("the API returns an error", func() {
+			var apiError error
+
+			BeforeEach(func() {
+				apiError = errors.New("uaa-api-get-users-error")
+				fakeUAAClient.GetUsersReturns(
+					nil,
+					apiError,
+				)
+			})
+
+			It("returns error coming from the API", func() {
+				Expect(actualUser).To(Equal(User{}))
+				Expect(actualErr).To(MatchError("uaa-api-get-users-error"))
+
+				Expect(fakeUAAClient.GetUsersCallCount()).To(Equal(1))
 			})
 		})
 	})
