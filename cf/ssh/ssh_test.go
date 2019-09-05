@@ -835,13 +835,11 @@ var _ = Describe("SSH", func() {
 			It("sends keep alive messages at the expected interval", func() {
 				times := <-timesCh
 
-				// actual minimum is 200
-				// allowed maximum per interval is 500
-				// allowed total maximum is 1000
-				// midpoint(200, 1000) = 600
-				// allowed variance = 400
-				// add a fudge factor of 1% in the variance => 404
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 404*time.Millisecond))
+				// Expected interval time = 100 msec. Allow different fudge factor each way
+				Expect(times[1]).To(BeTemporally(">=", times[0].Add(90*time.Millisecond)))
+				Expect(times[1]).To(BeTemporally("<=", times[0].Add(500*time.Millisecond)))
+				Expect(times[2]).To(BeTemporally(">=", times[1].Add(90*time.Millisecond)))
+				Expect(times[2]).To(BeTemporally("<=", times[1].Add(500*time.Millisecond)))
 			})
 		})
 	})
@@ -1137,8 +1135,11 @@ var _ = Describe("SSH", func() {
 						times = append(times, t)
 					}
 
-					Expect(times[1]).To(BeTemporally("~", times[0].Add(300*time.Millisecond), 200*time.Millisecond))
-					Expect(times[2]).To(BeTemporally("~", times[1].Add(300*time.Millisecond), 200*time.Millisecond))
+					// Expected interval time = 100 msec. Allow different fudge factor each way
+					Expect(times[1]).To(BeTemporally(">=", times[0].Add(90*time.Millisecond)))
+					Expect(times[1]).To(BeTemporally("<=", times[0].Add(500*time.Millisecond)))
+					Expect(times[2]).To(BeTemporally(">=", times[1].Add(90*time.Millisecond)))
+					Expect(times[2]).To(BeTemporally("<=", times[1].Add(500*time.Millisecond)))
 				})
 			})
 		})
@@ -1221,13 +1222,11 @@ var _ = Describe("SSH", func() {
 				Expect(waitErr).NotTo(HaveOccurred())
 				times := <-timesCh
 
-				// actual minimum is 200
-				// allowed maximum per interval is 500
-				// allowed total maximum is 1000
-				// midpoint(200, 1000) = 600
-				// allowed variance = 400
-				// add a fudge factor of 1% in the variance => 404
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 404*time.Millisecond))
+				// Expected interval time = 100 msec. Allow different fudge factor each way
+				Expect(times[1]).To(BeTemporally(">=", times[0].Add(90*time.Millisecond)))
+				Expect(times[1]).To(BeTemporally("<=", times[0].Add(500*time.Millisecond)))
+				Expect(times[2]).To(BeTemporally(">=", times[1].Add(90*time.Millisecond)))
+				Expect(times[2]).To(BeTemporally("<=", times[1].Add(500*time.Millisecond)))
 			})
 		})
 	})
