@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/ssh"
+	sshCmd "code.cloudfoundry.org/cli/cf/ssh"
 	"code.cloudfoundry.org/cli/cf/ssh/options"
 	"code.cloudfoundry.org/cli/cf/ssh/sshfakes"
 	"code.cloudfoundry.org/cli/cf/ssh/terminal"
@@ -834,7 +834,13 @@ var _ = Describe("SSH", func() {
 
 			It("sends keep alive messages at the expected interval", func() {
 				times := <-timesCh
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(300*time.Millisecond), 200*time.Millisecond))
+
+				// actual minimum is 200
+				// allowed maximum per interval is 500
+				// allowed total maximum is 1000
+				// midpoint(200, 1000) = 600
+				// allowed variance = 400
+				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 400*time.Millisecond))
 			})
 		})
 	})
@@ -1213,7 +1219,13 @@ var _ = Describe("SSH", func() {
 			It("sends keep alive messages at the expected interval", func() {
 				Expect(waitErr).NotTo(HaveOccurred())
 				times := <-timesCh
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(200*time.Millisecond), 100*time.Millisecond))
+
+				// actual minimum is 200
+				// allowed maximum per interval is 500
+				// allowed total maximum is 1000
+				// midpoint(200, 1000) = 600
+				// allowed variance = 400
+				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 400*time.Millisecond))
 			})
 		})
 	})
