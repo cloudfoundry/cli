@@ -318,20 +318,21 @@ jobs:
       params:
         channel: '#cli-dev-internal'
         text: *slack_notification_text
-  - task: build
-    file: cli-ci/ci/cli/tasks/build-binaries.yml
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-dev-internal'
-        text: *slack_notification_text
-  - task: build-osx
-    file: cli-ci/ci/cli/tasks/build-osx-binary.yml
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-dev-internal'
-        text: *slack_notification_text
+  - in_parallel:
+    - task: build
+      file: cli-ci/ci/cli/tasks/build-binaries.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: *slack_notification_text
+    - task: build-osx
+      file: cli-ci/ci/cli/tasks/build-osx-binary.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-dev-internal'
+          text: *slack_notification_text
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
