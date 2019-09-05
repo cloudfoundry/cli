@@ -359,9 +359,7 @@ jobs:
           CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
           TARGET_V7: true
       - task: create-windows-installers
-        file: cli-ci/ci/cli/tasks/create-installers-windows.yml
-        params:
-          TARGET_V7: true
+        file: cli-ci/ci/cli-v7/tasks/create-installers-windows.yml
       - task: sign-and-repackage-installers-and-binaries
         file: cli-ci/ci/cli-release/tasks/sign-and-repackage-installers-and-binaries.yml
         params:
