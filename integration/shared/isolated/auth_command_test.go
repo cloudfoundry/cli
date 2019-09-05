@@ -377,7 +377,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("shows a deprecation warning", func() {
-			Eventually(session).Should(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
+			Eventually(session.Err).Should(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
 		})
 
 		When("the token has expired", func() {

@@ -2,6 +2,7 @@ package v6
 
 import (
 	"fmt"
+	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -57,6 +58,12 @@ func (cmd AuthCommand) Execute(args []string) error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--client-credentials", "--origin"},
 		}
+	}
+
+	if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
+		return errors.New("Service account currently logged in. Use 'cf logout' to log out service account and try again.")
+	} else if cmd.Config.UAAOAuthClient() != "cf" || cmd.Config.UAAOAuthClientSecret() != "" {
+		cmd.UI.DisplayWarning("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead.")
 	}
 
 	username, password, err := cmd.getUsernamePassword()
