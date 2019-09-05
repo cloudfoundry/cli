@@ -840,7 +840,8 @@ var _ = Describe("SSH", func() {
 				// allowed total maximum is 1000
 				// midpoint(200, 1000) = 600
 				// allowed variance = 400
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 400*time.Millisecond))
+				// add a fudge factor of 1% in the variance => 404
+				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 404*time.Millisecond))
 			})
 		})
 	})
@@ -1225,7 +1226,8 @@ var _ = Describe("SSH", func() {
 				// allowed total maximum is 1000
 				// midpoint(200, 1000) = 600
 				// allowed variance = 400
-				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 400*time.Millisecond))
+				// add a fudge factor of 1% in the variance => 404
+				Expect(times[2]).To(BeTemporally("~", times[0].Add(600*time.Millisecond), 404*time.Millisecond))
 			})
 		})
 	})
