@@ -252,16 +252,9 @@ func (actor Actor) StartApplication(appGUID string) (Warnings, error) {
 
 // RestartApplication restarts an application and waits for it to start.
 func (actor Actor) RestartApplication(appGUID string, noWait bool) (Warnings, error) {
-	var allWarnings Warnings
+	// var allWarnings Warnings
 	_, warnings, err := actor.CloudControllerClient.UpdateApplicationRestart(appGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	pollingWarnings, err := actor.PollStart(appGUID, noWait)
-	allWarnings = append(allWarnings, pollingWarnings...)
-	return allWarnings, err
+	return Warnings(warnings), err
 }
 
 // PollStart polls an application's processes until some are started. If noWait is false,

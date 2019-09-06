@@ -87,7 +87,7 @@ var _ = Describe("Cancel deployment command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("some current user error")
-			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+			fakeConfig.CurrentUserNameReturns("", expectedErr)
 		})
 
 		It("return an error", func() {

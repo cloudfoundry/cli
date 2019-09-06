@@ -32,6 +32,7 @@ func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (Deployment, 
 
 	return Deployment(ccDeployments[0]), Warnings(warnings), nil
 }
+
 func (actor Actor) CancelDeployment(deploymentGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.CancelDeployment(deploymentGUID)
 	return Warnings(warnings), err

@@ -1642,58 +1642,9 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
-			When("the noWait flag is passed", func() {
-				BeforeEach(func() {
-					processes := []ccv3.Process{{GUID: "some-web-process-guid", Type: "web"}, {GUID: "some-worker-process-guid", Type: "worker"}}
-					fakeCloudControllerClient.GetApplicationProcessesReturns(processes, ccv3.Warnings{"get-process-warnings"}, nil)
-
-					noWait = true
-				})
-
-				It("only polls the web process", func() {
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-web-process-guid"))
-				})
-			})
-
-			When("polling the application start is successful", func() {
-				BeforeEach(func() {
-					processes := []ccv3.Process{{GUID: "some-process-guid"}}
-					fakeCloudControllerClient.GetApplicationProcessesReturns(processes, ccv3.Warnings{"get-process-warnings"}, nil)
-					fakeCloudControllerClient.GetProcessInstancesReturns(nil, ccv3.Warnings{"some-process-instance-warnings"}, nil)
-				})
-
-				It("returns all the warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("restart-application-warning", "get-process-warnings", "some-process-instance-warnings"))
-				})
-
-				It("calls restart", func() {
-					Expect(fakeCloudControllerClient.UpdateApplicationRestartCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.UpdateApplicationRestartArgsForCall(0)).To(Equal("some-app-guid"))
-				})
-
-				It("polls for the application's process to start", func() {
-					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
-
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
-				})
-			})
-
-			When("polling the application start errors", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("some polling error")
-					fakeCloudControllerClient.GetApplicationProcessesReturns(nil, ccv3.Warnings{"get-process-warnings"}, expectedErr)
-				})
-
-				It("returns the warnings and error", func() {
-					Expect(executeErr).To(Equal(expectedErr))
-					Expect(warnings).To(ConsistOf("restart-application-warning", "get-process-warnings"))
-				})
+			It("does not error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("restart-application-warning"))
 			})
 		})
 

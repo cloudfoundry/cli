@@ -98,135 +98,242 @@ var _ = Describe("restart Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
-		When("stop app does not return an error", func() {
+		It("delegates to actor.GetApplicationByNameAndSpace", func() {
+			Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+			actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+			Expect(actualAppName).To(Equal(app))
+			Expect(actualSpaceGUID).To(Equal("some-space-guid"))
+		})
+
+		When("Getting the application fails", func() {
 			BeforeEach(func() {
-				fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, nil)
+				fakeActor.GetApplicationByNameAndSpaceReturns(
+					v7action.Application{},
+					v7action.Warnings{"get-app-warning"},
+					errors.New("get-app-error"),
+				)
 			})
 
-			When("start app does not return an error", func() {
+			It("displays all warnings and returns an error", func() {
+				Expect(executeErr).To(MatchError("get-app-error"))
+				Expect(testUI.Err).To(Say("get-app-warning"))
+			})
+		})
+
+		When("getting the application succeeds", func() {
+			BeforeEach(func() {
+				fakeActor.GetApplicationByNameAndSpaceReturns(
+					v7action.Application{GUID: "app-guid"},
+					v7action.Warnings{"get-app-warning"},
+					nil,
+				)
+			})
+
+			When("The deployment strategy is set to rolling", func() {
 				BeforeEach(func() {
-					fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+					cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
 				})
 
-				When("polling the app does not return an error", func() {
+				It("does not stop and start the app", func() {
+					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
+					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
+				})
+
+				It("delegates to actor.CreateDeployment", func() {
+					Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1))
+					actualAppGUID, actualDropletGUID := fakeActor.CreateDeploymentArgsForCall(0)
+					Expect(actualAppGUID).To(Equal("app-guid"))
+					Expect(actualDropletGUID).To(BeEmpty())
+				})
+
+				When("Creating the deployment fails", func() {
 					BeforeEach(func() {
-						fakeActor.PollStartReturns(v7action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
+						fakeActor.CreateDeploymentReturns("", v7action.Warnings{"create-deployment-warning"}, errors.New("create deployment failed"))
 					})
 
-					When("get app does not return an error", func() {
-						Context("if the app was already started", func() {
-							BeforeEach(func() {
-								fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-							})
+					It("returns an error and displays warnings", func() {
+						Expect(executeErr).To(MatchError("create deployment failed"))
+						Expect(testUI.Err).To(Say("get-app-warning"))
+						Expect(testUI.Err).To(Say("create-deployment-warning"))
+					})
+				})
 
-							It("says that the app was stopped, then started, and outputs warnings", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
+				When("creating the deployment succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.CreateDeploymentReturns(
+							"deployment-guid",
+							v7action.Warnings{"create-deployment-warning"},
+							nil,
+						)
+					})
 
-								Expect(testUI.Err).To(Say("get-warning-1"))
-								Expect(testUI.Err).To(Say("get-warning-2"))
-
-								Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
-								Expect(testUI.Err).To(Say("stop-warning-1"))
-								Expect(testUI.Err).To(Say("stop-warning-2"))
-								Expect(testUI.Out).To(Say(`Stopping app\.\.\.`))
-
-								Expect(testUI.Err).To(Say("start-warning-1"))
-								Expect(testUI.Err).To(Say("start-warning-2"))
-
-								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
-
-								Expect(testUI.Err).To(Say("poll-warning-1"))
-								Expect(testUI.Err).To(Say("poll-warning-2"))
-
-								Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-								appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-								Expect(appName).To(Equal("some-app"))
-								Expect(spaceGUID).To(Equal("some-space-guid"))
-
-								Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
-								appGUID := fakeActor.StopApplicationArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
-
-								Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-								appGUID = fakeActor.StartApplicationArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
-
-								Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-								appGUID, noWait := fakeActor.PollStartArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
-								Expect(noWait).To(Equal(false))
-							})
+					When("the no wait flag is set", func() {
+						BeforeEach(func() {
+							cmd.NoWait = true
 						})
 
-						Context("if the app was not already started", func() {
-							BeforeEach(func() {
-								fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-							})
-
-							It("says that the app was stopped, then started, and outputs warnings", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-
-								Expect(testUI.Err).To(Say("get-warning-1"))
-								Expect(testUI.Err).To(Say("get-warning-2"))
-
-								Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
-								Expect(testUI.Out).ToNot(Say("Stopping"))
-								Expect(testUI.Err).ToNot(Say("stop-warning"))
-
-								Expect(testUI.Err).To(Say("start-warning-1"))
-								Expect(testUI.Err).To(Say("start-warning-2"))
-
-								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
-								Expect(testUI.Err).To(Say("poll-warning-1"))
-								Expect(testUI.Err).To(Say("poll-warning-2"))
-
-								Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-								appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-								Expect(appName).To(Equal("some-app"))
-								Expect(spaceGUID).To(Equal("some-space-guid"))
-
-								Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
-
-								Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-								appGUID := fakeActor.StartApplicationArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
-
-								Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-								appGUID, noWait := fakeActor.PollStartArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
-								Expect(noWait).To(Equal(false))
-							})
+						It("calls poll start for rolling with no wait true", func() {
+							Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+							actualAppGUID, actualDeploymentGUID, actualNoWait := fakeActor.PollStartForRollingArgsForCall(0)
+							Expect(actualAppGUID).To(Equal("app-guid"))
+							Expect(actualDeploymentGUID).To(Equal("deployment-guid"))
+							Expect(actualNoWait).To(BeTrue())
 						})
 					})
 
-					When("the get app call returns an error", func() {
-						Context("which is an ApplicationNotFoundError", func() {
-							BeforeEach(func() {
-								fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{}, v7action.Warnings{"get-warning-1", "get-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
-							})
+					It("calls poll start for rolling with no wait true", func() {
+						Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+						actualAppGUID, actualDeploymentGUID, actualNoWait := fakeActor.PollStartForRollingArgsForCall(0)
+						Expect(actualAppGUID).To(Equal("app-guid"))
+						Expect(actualDeploymentGUID).To(Equal("deployment-guid"))
+						Expect(actualNoWait).To(BeFalse())
+					})
 
-							It("says that the app wasn't found", func() {
-								Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
-								Expect(testUI.Out).ToNot(Say("Stopping"))
-								Expect(testUI.Out).ToNot(Say("Waiting for app to start"))
+					When("polling start fails", func() {
+						BeforeEach(func() {
+							fakeActor.PollStartForRollingReturns(
+								v7action.Warnings{"rolling-poll-warning"},
+								errors.New("rolling-poll-error"),
+							)
+						})
 
-								Expect(testUI.Err).To(Say("get-warning-1"))
-								Expect(testUI.Err).To(Say("get-warning-2"))
+						It("displays all warnings and errors", func() {
+							Expect(executeErr).To(MatchError("rolling-poll-error"))
+							Expect(testUI.Err).To(Say("get-app-warning"))
+							Expect(testUI.Err).To(Say("create-deployment-warning"))
+							Expect(testUI.Err).To(Say("rolling-poll-warning"))
+						})
+					})
 
-								Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
-								Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
-							})
+					When("polling start succeeds", func() {
+						BeforeEach(func() {
+							fakeActor.PollStartForRollingReturns(
+								v7action.Warnings{"rolling-poll-warning"},
+								nil,
+							)
+						})
 
-							When("it is an unknown error", func() {
-								var expectedErr error
+						It("succeeds and prints warnings", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(testUI.Err).To(Say("get-app-warning"))
+							Expect(testUI.Err).To(Say("create-deployment-warning"))
+							Expect(testUI.Err).To(Say("rolling-poll-warning"))
+						})
 
+					})
+				})
+
+			})
+
+			When("stop app does not return an error", func() {
+				BeforeEach(func() {
+					fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, nil)
+				})
+
+				When("start app does not return an error", func() {
+					BeforeEach(func() {
+						fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+					})
+
+					When("polling the app does not return an error", func() {
+						BeforeEach(func() {
+							fakeActor.PollStartReturns(v7action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
+						})
+
+						When("get app does not return an error", func() {
+							Context("if the app was already started", func() {
 								BeforeEach(func() {
-									expectedErr = errors.New("some get app error")
-									fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+									fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 								})
 
-								It("says that the app failed to start", func() {
-									Expect(executeErr).To(Equal(expectedErr))
+								It("says that the app was stopped, then started, and outputs warnings", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Err).To(Say("get-warning-1"))
+									Expect(testUI.Err).To(Say("get-warning-2"))
+
+									Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
+									Expect(testUI.Err).To(Say("stop-warning-1"))
+									Expect(testUI.Err).To(Say("stop-warning-2"))
+									Expect(testUI.Out).To(Say(`Stopping app\.\.\.`))
+
+									Expect(testUI.Err).To(Say("start-warning-1"))
+									Expect(testUI.Err).To(Say("start-warning-2"))
+
+									Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
+
+									Expect(testUI.Err).To(Say("poll-warning-1"))
+									Expect(testUI.Err).To(Say("poll-warning-2"))
+
+									Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+									appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+									Expect(appName).To(Equal("some-app"))
+									Expect(spaceGUID).To(Equal("some-space-guid"))
+
+									Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+									appGUID := fakeActor.StopApplicationArgsForCall(0)
+									Expect(appGUID).To(Equal("some-app-guid"))
+
+									Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
+									appGUID = fakeActor.StartApplicationArgsForCall(0)
+									Expect(appGUID).To(Equal("some-app-guid"))
+
+									Expect(fakeActor.PollStartCallCount()).To(Equal(1))
+									appGUID, noWait := fakeActor.PollStartArgsForCall(0)
+									Expect(appGUID).To(Equal("some-app-guid"))
+									Expect(noWait).To(Equal(false))
+								})
+							})
+
+							Context("if the app was not already started", func() {
+								BeforeEach(func() {
+									fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+								})
+
+								It("says that the app was stopped, then started, and outputs warnings", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Err).To(Say("get-warning-1"))
+									Expect(testUI.Err).To(Say("get-warning-2"))
+
+									Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
+									Expect(testUI.Out).ToNot(Say("Stopping"))
+									Expect(testUI.Err).ToNot(Say("stop-warning"))
+
+									Expect(testUI.Err).To(Say("start-warning-1"))
+									Expect(testUI.Err).To(Say("start-warning-2"))
+
+									Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
+									Expect(testUI.Err).To(Say("poll-warning-1"))
+									Expect(testUI.Err).To(Say("poll-warning-2"))
+
+									Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+									appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+									Expect(appName).To(Equal("some-app"))
+									Expect(spaceGUID).To(Equal("some-space-guid"))
+
+									Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
+
+									Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
+									appGUID := fakeActor.StartApplicationArgsForCall(0)
+									Expect(appGUID).To(Equal("some-app-guid"))
+
+									Expect(fakeActor.PollStartCallCount()).To(Equal(1))
+									appGUID, noWait := fakeActor.PollStartArgsForCall(0)
+									Expect(appGUID).To(Equal("some-app-guid"))
+									Expect(noWait).To(Equal(false))
+								})
+							})
+						})
+
+						When("the get app call returns an error", func() {
+							Context("which is an ApplicationNotFoundError", func() {
+								BeforeEach(func() {
+									fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{}, v7action.Warnings{"get-warning-1", "get-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
+								})
+
+								It("says that the app wasn't found", func() {
+									Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 									Expect(testUI.Out).ToNot(Say("Stopping"))
 									Expect(testUI.Out).ToNot(Say("Waiting for app to start"))
 
@@ -236,13 +343,81 @@ var _ = Describe("restart Command", func() {
 									Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
 									Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
 								})
+
+								When("it is an unknown error", func() {
+									var expectedErr error
+
+									BeforeEach(func() {
+										expectedErr = errors.New("some get app error")
+										fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+									})
+
+									It("says that the app failed to start", func() {
+										Expect(executeErr).To(Equal(expectedErr))
+										Expect(testUI.Out).ToNot(Say("Stopping"))
+										Expect(testUI.Out).ToNot(Say("Waiting for app to start"))
+
+										Expect(testUI.Err).To(Say("get-warning-1"))
+										Expect(testUI.Err).To(Say("get-warning-2"))
+
+										Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
+										Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
+									})
+								})
 							})
+						})
+					})
+				})
+
+				When("the start app call returns an error", func() {
+					BeforeEach(func() {
+						fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+					})
+
+					Context("and the error is some random error", func() {
+						var expectedErr error
+
+						BeforeEach(func() {
+							expectedErr = errors.New("some start error")
+							fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+						})
+
+						It("says that the app failed to start", func() {
+							Expect(executeErr).To(Equal(expectedErr))
+							Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
+							Expect(testUI.Out).NotTo(Say(`Waiting for app to start\.\.\.`))
+
+							Expect(testUI.Err).To(Say("get-warning-1"))
+							Expect(testUI.Err).To(Say("get-warning-2"))
+							Expect(testUI.Err).To(Say("start-warning-1"))
+							Expect(testUI.Err).To(Say("start-warning-2"))
+
+							Expect(fakeActor.PollStartCallCount()).To(BeZero(), "Expected PollStart to not be called")
+						})
+					})
+
+					When("the start app call returns an ApplicationNotFoundError (someone else deleted app after we fetched app)", func() {
+						BeforeEach(func() {
+							fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
+						})
+
+						It("says that the app failed to start", func() {
+							Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
+							Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
+							Expect(testUI.Out).NotTo(Say(`Waiting for app to start\.\.\.`))
+
+							Expect(testUI.Err).To(Say("get-warning-1"))
+							Expect(testUI.Err).To(Say("get-warning-2"))
+							Expect(testUI.Err).To(Say("start-warning-1"))
+							Expect(testUI.Err).To(Say("start-warning-2"))
+
+							Expect(fakeActor.PollStartCallCount()).To(BeZero(), "Expected PollStart to not be called")
 						})
 					})
 				})
 			})
 
-			When("the start app call returns an error", func() {
+			When("the stop app call returns an error", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 				})
@@ -251,88 +426,42 @@ var _ = Describe("restart Command", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
-						expectedErr = errors.New("some start error")
-						fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+						expectedErr = errors.New("some stop error")
+						fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
 					})
 
 					It("says that the app failed to start", func() {
 						Expect(executeErr).To(Equal(expectedErr))
 						Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
-						Expect(testUI.Out).NotTo(Say(`Waiting for app to start\.\.\.`))
-
+						Expect(testUI.Out).To(Say(`Stopping app\.\.\.`))
 						Expect(testUI.Err).To(Say("get-warning-1"))
 						Expect(testUI.Err).To(Say("get-warning-2"))
-						Expect(testUI.Err).To(Say("start-warning-1"))
-						Expect(testUI.Err).To(Say("start-warning-2"))
+						Expect(testUI.Err).To(Say("stop-warning-1"))
+						Expect(testUI.Err).To(Say("stop-warning-2"))
 
-						Expect(fakeActor.PollStartCallCount()).To(BeZero(), "Expected PollStart to not be called")
+						Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
 					})
 				})
 
-				When("the start app call returns an ApplicationNotFoundError (someone else deleted app after we fetched app)", func() {
+				When("the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
+						fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 					})
 
 					It("says that the app failed to start", func() {
 						Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 						Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
-						Expect(testUI.Out).NotTo(Say(`Waiting for app to start\.\.\.`))
 
 						Expect(testUI.Err).To(Say("get-warning-1"))
 						Expect(testUI.Err).To(Say("get-warning-2"))
-						Expect(testUI.Err).To(Say("start-warning-1"))
-						Expect(testUI.Err).To(Say("start-warning-2"))
+						Expect(testUI.Err).To(Say("stop-warning-1"))
+						Expect(testUI.Err).To(Say("stop-warning-2"))
 
-						Expect(fakeActor.PollStartCallCount()).To(BeZero(), "Expected PollStart to not be called")
+						Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
 					})
 				})
 			})
-		})
 
-		When("the stop app call returns an error", func() {
-			BeforeEach(func() {
-				fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-			})
-
-			Context("and the error is some random error", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("some stop error")
-					fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
-				})
-
-				It("says that the app failed to start", func() {
-					Expect(executeErr).To(Equal(expectedErr))
-					Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
-					Expect(testUI.Out).To(Say(`Stopping app\.\.\.`))
-					Expect(testUI.Err).To(Say("get-warning-1"))
-					Expect(testUI.Err).To(Say("get-warning-2"))
-					Expect(testUI.Err).To(Say("stop-warning-1"))
-					Expect(testUI.Err).To(Say("stop-warning-2"))
-
-					Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
-				})
-			})
-
-			When("the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
-				BeforeEach(func() {
-					fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
-				})
-
-				It("says that the app failed to start", func() {
-					Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
-					Expect(testUI.Out).To(Say(`Restarting app some-app in org some-org / space some-space as steve\.\.\.`))
-
-					Expect(testUI.Err).To(Say("get-warning-1"))
-					Expect(testUI.Err).To(Say("get-warning-2"))
-					Expect(testUI.Err).To(Say("stop-warning-1"))
-					Expect(testUI.Err).To(Say("stop-warning-2"))
-
-					Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
-				})
-			})
 		})
 	})
 

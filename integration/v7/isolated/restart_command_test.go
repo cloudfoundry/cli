@@ -67,8 +67,12 @@ var _ = Describe("restart command", func() {
 	})
 
 	When("the environment is set up correctly", func() {
+		var (
+			userName string
+		)
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
+			userName, _ = helpers.GetCredentials()
 		})
 
 		AfterEach(func() {
@@ -76,6 +80,29 @@ var _ = Describe("restart command", func() {
 		})
 
 		When("the app exists", func() {
+			When("strategy rolling is given", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					})
+				})
+				It("creates a deploy", func() {
+					session := helpers.CF("restart", appName, "--strategy=rolling")
+					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
+					Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+32M`))
+					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+
+				})
+			})
+
 			When("the app is running", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
@@ -84,7 +111,6 @@ var _ = Describe("restart command", func() {
 				})
 
 				It("stops then restarts the app", func() {
-					userName, _ := helpers.GetCredentials()
 
 					session := helpers.CF("restart", appName)
 					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -113,7 +139,6 @@ var _ = Describe("restart command", func() {
 					})
 
 					It("starts the app", func() {
-						userName, _ := helpers.GetCredentials()
 
 						session := helpers.CF("restart", appName)
 						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -141,7 +166,6 @@ var _ = Describe("restart command", func() {
 					})
 
 					It("complains about not having a droplet", func() {
-						userName, _ := helpers.GetCredentials()
 
 						session := helpers.CF("restart", appName)
 						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))

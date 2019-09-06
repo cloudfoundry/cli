@@ -48,11 +48,6 @@ func (cmd *CancelDeploymentCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, err = cmd.Config.CurrentUser()
-	if err != nil {
-		return err
-	}
-
 	userName, err := cmd.Config.CurrentUserName()
 	if err != nil {
 		return err
