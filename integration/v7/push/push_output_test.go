@@ -3,6 +3,7 @@ package push
 import (
 	"path/filepath"
 	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -63,6 +64,7 @@ var _ = Describe("Output", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
 				Consistently(session).ShouldNot(Say(`Applying manifest`))
+				Consistently(session, 10*time.Second).ShouldNot(Say(`Manifest applied`))
 				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
 				Eventually(session).Should(Say(`Uploading files\.\.\.`))
 				Eventually(session).Should(Say("100.00%"))

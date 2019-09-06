@@ -19,6 +19,7 @@ var _ = Describe("Actor", func() {
 	Describe("PreparePushPlanSequence", func() {
 		It("is a list of functions for preparing the push plan", func() {
 			Expect(actor.PreparePushPlanSequence).To(matchers.MatchFuncsByName(
+				SetDefaultBitsPathForPushPlan,
 				SetupDropletPathForPushPlan,
 				actor.SetupAllResourcesForPushPlan,
 				SetupDeploymentStrategyForPushPlan,

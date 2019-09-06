@@ -29,11 +29,6 @@ func HandleAppPathOverride(manifest pushmanifestparser.Manifest, overrides FlagO
 
 	for i := range manifest.Applications {
 		if manifest.Applications[i].Path == "" {
-			pwd, err := os.Getwd()
-			if err != nil {
-				return pushmanifestparser.Manifest{}, err
-			}
-			manifest.Applications[i].Path = pwd
 			continue
 		}
 

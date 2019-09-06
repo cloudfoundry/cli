@@ -15,6 +15,110 @@ import (
 )
 
 var _ = Describe("push with a simple manifest and flags", func() {
+	DescribeTable("manifest conflicts with push flags",
+		func(manifest map[string]interface{}, expectedOutput string, flags ...string) {
+			helpers.WithHelloWorldApp(func(dir string) {
+				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+
+				pushCommandAndFlags := append([]string{PushCommandName}, flags...)
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, pushCommandAndFlags...)
+				Eventually(session.Err).Should(Say(regexp.QuoteMeta(expectedOutput)))
+				Eventually(session).Should(Exit(1))
+			})
+		},
+
+		Entry("Manifest buildpacks with docker flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name":       "app-name",
+						"buildpacks": []string{"ruby_buildpack"},
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --docker-image, -o cannot be used with the manifest property buildpacks",
+			"--docker-image", "docker",
+		),
+
+		Entry("Manifest path with docker flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name": "app-name",
+						"path": "~",
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --docker-image, -o cannot be used with the manifest property path",
+			"--docker-image", "docker",
+		),
+
+		Entry("Manifest docker with droplet flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name":   "app-name",
+						"docker": map[string]interface{}{"image": "docker"},
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --droplet cannot be used with the manifest property docker",
+			"--droplet", os.TempDir(),
+		),
+
+		Entry("Manifest buildpacks with droplet flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name":       "app-name",
+						"buildpacks": []string{"ruby_buildpack"},
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --droplet cannot be used with the manifest property buildpacks",
+			"--droplet", os.TempDir(),
+		),
+
+		Entry("Manifest path with droplet flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name": "app-name",
+						"path": os.TempDir(),
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --droplet cannot be used with the manifest property path",
+			"--droplet", os.TempDir(),
+		),
+
+		Entry("Manifest docker with buildpacks flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name":   "app-name",
+						"docker": map[string]interface{}{"image": "docker"},
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --buildpack, -b cannot be used with the manifest property docker",
+			"-b", "ruby_buildpack",
+		),
+
+		Entry("Manifest docker with path flag",
+			map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name":   "app-name",
+						"docker": map[string]interface{}{"image": "docker"},
+					},
+				},
+			},
+			"Incorrect Usage: The flag option --path, -p cannot be used with the manifest property docker",
+			"-p", os.TempDir(),
+		),
+	)
+
 	When("pushing multiple apps from the manifest", func() {
 		Context("manifest contains multiple apps and '--no-start' is provided", func() {
 			var appName1, appName2 string

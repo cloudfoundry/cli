@@ -177,7 +177,9 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	cmd.announcePushing(transformedManifest.AppNames(), user)
 
-	if transformedManifest.PathToManifest != "" {
+	hasManifest := transformedManifest.PathToManifest != ""
+
+	if hasManifest {
 		cmd.UI.DisplayText("Applying manifest file {{.Path}}...", map[string]interface{}{
 			"Path": transformedManifest.PathToManifest,
 		})
@@ -192,7 +194,9 @@ func (cmd PushCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayText("Manifest applied")
+	if hasManifest {
+		cmd.UI.DisplayText("Manifest applied")
+	}
 
 	pushPlans, warnings, err := cmd.Actor.CreatePushPlans(
 		cmd.Config.TargetedSpace().GUID,
@@ -261,8 +265,6 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 		log.Errorln("reading manifest:", err)
 		return pushmanifestparser.Manifest{}, err
 	}
-
-	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
 
 	return manifest, nil
 }

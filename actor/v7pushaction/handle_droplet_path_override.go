@@ -10,6 +10,29 @@ func HandleDropletPathOverride(manifest pushmanifestparser.Manifest, overrides F
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}
 		}
+
+		app := manifest.GetFirstApp()
+
+		if app.Docker != nil {
+			return manifest, translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--droplet",
+				ManifestProperty: "docker",
+			}
+		}
+
+		if app.Path != "" {
+			return manifest, translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--droplet",
+				ManifestProperty: "path",
+			}
+		}
+
+		if app.HasBuildpacks() {
+			return manifest, translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--droplet",
+				ManifestProperty: "buildpacks",
+			}
+		}
 	}
 
 	return manifest, nil

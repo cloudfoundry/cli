@@ -21,13 +21,12 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 		parsedManifest pushmanifestparser.Manifest
 		flagOverrides  FlagOverrides
-		currentDir     string
 		err            error
 	)
 
 	BeforeEach(func() {
+		flagOverrides = FlagOverrides{}
 		parsedManifest = pushmanifestparser.Manifest{}
-		currentDir, err = os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -96,28 +95,11 @@ var _ = Describe("HandleAppPathOverride", func() {
 					{},
 				},
 			}
-			flagOverrides = FlagOverrides{}
 		})
 
-		It("returns the original manifest", func() {
+		It("does not change the app path", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(transformedManifest.Applications[0].Path).To(Equal(currentDir))
-		})
-	})
-
-	When("the manifest contains an app without a path", func() {
-		BeforeEach(func() {
-			parsedManifest = pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{
-					{},
-				},
-			}
-			flagOverrides = FlagOverrides{}
-		})
-
-		It("replaces the path with the pwd", func() {
-			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(transformedManifest.Applications[0].Path).To(Equal(currentDir))
+			Expect(transformedManifest.Applications[0].Path).To(Equal(""))
 		})
 	})
 

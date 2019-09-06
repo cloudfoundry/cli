@@ -61,6 +61,68 @@ var _ = Describe("HandleDropletPathOverride", func() {
 				))
 			})
 		})
+
+		When("when docker is set in the manifest", func() {
+			BeforeEach(func() {
+				parsedManifest = pushmanifestparser.Manifest{
+					Applications: []pushmanifestparser.Application{
+						{
+							Name: "some-app",
+							Docker: &pushmanifestparser.Docker{
+								Image: "nginx:latest",
+							},
+						},
+					},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentManifestMismatchError{
+					Arg:              "--droplet",
+					ManifestProperty: "docker",
+				}))
+			})
+		})
+
+		When("when buildpacks is set in the manifest", func() {
+			BeforeEach(func() {
+				parsedManifest = pushmanifestparser.Manifest{
+					Applications: []pushmanifestparser.Application{
+						{
+							Name:                    "some-app",
+							RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"ruby_buildpack"}},
+						},
+					},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentManifestMismatchError{
+					Arg:              "--droplet",
+					ManifestProperty: "buildpacks",
+				}))
+			})
+		})
+
+		When("when path is set in the manifest", func() {
+			BeforeEach(func() {
+				parsedManifest = pushmanifestparser.Manifest{
+					Applications: []pushmanifestparser.Application{
+						{
+							Name: "some-app",
+							Path: "~",
+						},
+					},
+				}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentManifestMismatchError{
+					Arg:              "--droplet",
+					ManifestProperty: "path",
+				}))
+			})
+		})
 	})
 
 	When("the strategy flag override is not set", func() {

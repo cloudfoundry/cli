@@ -67,6 +67,7 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 	}
 
 	actor.PreparePushPlanSequence = []UpdatePushPlanFunc{
+		SetDefaultBitsPathForPushPlan,
 		SetupDropletPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
 		SetupDeploymentStrategyForPushPlan,
