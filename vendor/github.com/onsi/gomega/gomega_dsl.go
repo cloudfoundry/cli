@@ -24,7 +24,7 @@ import (
 	"github.com/onsi/gomega/types"
 )
 
-const GOMEGA_VERSION = "1.5.0"
+const GOMEGA_VERSION = "1.6.0"
 
 const nilFailHandlerPanic = `You are trying to make an assertion, but Gomega's fail handler is nil.
 If you're using Ginkgo then you probably forgot to put your assertion in an It().
@@ -280,7 +280,7 @@ func SetDefaultEventuallyPollingInterval(t time.Duration) {
 	defaultEventuallyPollingInterval = t
 }
 
-// SetDefaultConsistentlyDuration sets  the default duration for Consistently. Consistently will verify that your condition is satsified for this long.
+// SetDefaultConsistentlyDuration sets  the default duration for Consistently. Consistently will verify that your condition is satisfied for this long.
 func SetDefaultConsistentlyDuration(t time.Duration) {
 	defaultConsistentlyDuration = t
 }
