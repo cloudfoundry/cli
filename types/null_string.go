@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type NullString struct {
@@ -23,9 +22,9 @@ func NewNullString(optionalValue ...string) NullString {
 
 func (n NullString) MarshalJSON() ([]byte, error) {
 	if n.IsSet {
-		return []byte(fmt.Sprintf(`"%s"`, n.Value)), nil
+		return json.Marshal(n.Value)
 	}
-	return []byte("null"), nil
+	return json.Marshal(nil)
 }
 
 func (n *NullString) UnmarshalJSON(rawJSON []byte) error {

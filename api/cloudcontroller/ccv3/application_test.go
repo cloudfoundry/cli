@@ -118,7 +118,7 @@ var _ = Describe("Application", func() {
 						Metadata: &Metadata{
 							Labels: map[string]types.NullString{
 								"some-key":  types.NewNullString("some-value"),
-								"other-key": types.NewNullString("other-value")},
+								"other-key": types.NewNullString("other-value\nwith a newline & a \" quote")},
 						},
 					}
 				})
@@ -128,7 +128,7 @@ var _ = Describe("Application", func() {
 						"metadata": {
 							"labels": {
 								"some-key":"some-value",
-								"other-key":"other-value"
+								"other-key":"other-value\nwith a newline & a \" quote"
 							}
 						}
 					}`))
@@ -140,19 +140,19 @@ var _ = Describe("Application", func() {
 							Metadata: &Metadata{
 								Labels: map[string]types.NullString{
 									"some-key":      types.NewNullString("some-value"),
-									"other-key":     types.NewNullString("other-value"),
+									"other-key":     types.NewNullString("other-value\nwith a newline & a \" quote"),
 									"key-to-delete": types.NewNullString(),
 								},
 							},
 						}
 					})
 
-					It("should send nulls for those lables", func() {
+					It("should send nulls for those labels", func() {
 						Expect(string(appBytes)).To(MatchJSON(`{
 						"metadata": {
 							"labels": {
 								"some-key":"some-value",
-								"other-key":"other-value",
+								"other-key":"other-value\nwith a newline & a \" quote",
 								"key-to-delete":null
 							}
 						}
