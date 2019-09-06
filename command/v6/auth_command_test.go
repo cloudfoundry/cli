@@ -331,5 +331,25 @@ var _ = Describe("auth Command", func() {
 				})
 			})
 		})
+
+		When("client id or client secret are in the config.json", func() {
+			BeforeEach(func() {
+				fakeConfig.UAAOAuthClientReturns("AClientsId")
+			})
+			It("outputs a deprecation warning", func() {
+				Expect(testUI.Err).To(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
+			})
+		})
+	})
+
+	When("there is already a user logged in", func() {
+		BeforeEach(func() {
+			fakeConfig.UAAGrantTypeReturns("client_credentials")
+		})
+
+		It("should throw already logged in error", func() {
+			Expect(err).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+			Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
+		})
 	})
 })

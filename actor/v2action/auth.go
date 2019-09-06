@@ -3,7 +3,6 @@ package v2action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 )
@@ -14,9 +13,6 @@ import (
 // It unsets the currently targeted org and space whether authentication
 // succeeds or not.
 func (actor Actor) Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error {
-	if grantType == constant.GrantTypePassword && actor.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
-		return actionerror.PasswordGrantTypeLogoutRequiredError{}
-	}
 
 	actor.Config.UnsetOrganizationAndSpaceInformation()
 	credentials := make(map[string]string)

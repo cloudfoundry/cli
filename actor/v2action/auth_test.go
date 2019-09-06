@@ -3,7 +3,6 @@ package v2action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -75,17 +74,6 @@ var _ = Describe("Auth Actions", func() {
 
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(""))
-				})
-
-				When("a previous user authenticated with a client grant type", func() {
-					BeforeEach(func() {
-						fakeConfig.UAAGrantTypeReturns("client_credentials")
-					})
-
-					It("returns a PasswordGrantTypeLogoutRequiredError", func() {
-						Expect(actualErr).To(MatchError(actionerror.PasswordGrantTypeLogoutRequiredError{}))
-						Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
-					})
 				})
 			})
 
