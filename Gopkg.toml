@@ -44,8 +44,8 @@ required = ["github.com/gorilla/websocket"]
   name = "code.cloudfoundry.org/gofileutils"
 
 [[constraint]]
+  branch = "master"
   name = "code.cloudfoundry.org/lager"
-  version = "2.0.0"
 
 [[constraint]]
   branch = "master"
@@ -72,20 +72,20 @@ required = ["github.com/gorilla/websocket"]
   name = "github.com/cloudfoundry/sonde-go"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/docker/distribution"
-  version = "2.7.1"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/fatih/color"
-  version = "1.7.0"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/gogo/protobuf"
-  version = "1.3.0"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/google/go-querystring"
-  version = "1.0.0"
 
 [[constraint]]
   branch = "master"
@@ -96,12 +96,12 @@ required = ["github.com/gorilla/websocket"]
   version = "1.0.1"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/lunixbochs/vtclean"
-  version = "1.0.0"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/mattn/go-colorable"
-  version = "0.1.2"
 
 [[constraint]]
   branch = "master"
@@ -116,8 +116,8 @@ required = ["github.com/gorilla/websocket"]
   name = "github.com/nu7hatch/gouuid"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/onsi/ginkgo"
-  version = "1.10.1"
 
 # See the following:
 # https://github.com/golang/dep/issues/1799#issuecomment-381026769
@@ -127,16 +127,16 @@ required = ["github.com/gorilla/websocket"]
   name = "gopkg.in/fsnotify.v1"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/onsi/gomega"
-  version = "1.7.0"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/sabhiram/go-gitignore"
-  version = "1.0.2"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/sajari/fuzzy"
-  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
@@ -147,8 +147,8 @@ required = ["github.com/gorilla/websocket"]
   name = "github.com/tedsuo/rata"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/vito/go-interact"
-  version = "1.0.0"
 
 [[constraint]]
   branch = "master"
