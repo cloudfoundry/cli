@@ -345,7 +345,6 @@ var _ = Describe("auth command", func() {
 
 	Describe("Authenticating as a user, through a custom client", func() {
 		var accessTokenExpiration time.Duration
-		var session *Session
 		BeforeEach(func() {
 			customClientID, customClientSecret := helpers.SkipIfCustomClientCredentialsNotSet()
 
@@ -358,7 +357,7 @@ var _ = Describe("auth command", func() {
 				config.ConfigFile.UAAGrantType = ""
 			})
 
-			session = helpers.CF("auth", username, password)
+			session := helpers.CF("auth", username, password)
 			Eventually(session).Should(Exit(0))
 			accessTokenExpiration = 120 // this was configured in the pipeline
 		})
@@ -374,10 +373,6 @@ var _ = Describe("auth command", func() {
 
 			Expect(iatIsSet).To(BeTrue())
 			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
-		})
-
-		It("shows a deprecation warning", func() {
-			Eventually(session.Err).Should(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
 		})
 
 		When("the token has expired", func() {
