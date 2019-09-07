@@ -835,10 +835,10 @@ var _ = Describe("SSH", func() {
 			It("sends keep alive messages at the expected interval", func() {
 				times := <-timesCh
 
-				// Expected interval time = 100 msec. Allow different fudge factor each way
-				Expect(times[1]).To(BeTemporally(">=", times[0].Add(90*time.Millisecond)))
+				// Expected interval time = 100 msec
+				Expect(times[1]).To(BeTemporally(">=", times[0]))
 				Expect(times[1]).To(BeTemporally("<=", times[0].Add(500*time.Millisecond)))
-				Expect(times[2]).To(BeTemporally(">=", times[1].Add(90*time.Millisecond)))
+				Expect(times[2]).To(BeTemporally(">=", times[1]))
 				Expect(times[2]).To(BeTemporally("<=", times[1].Add(500*time.Millisecond)))
 			})
 		})
@@ -1135,10 +1135,10 @@ var _ = Describe("SSH", func() {
 						times = append(times, t)
 					}
 
-					// Expected interval time = 100 msec. Allow different fudge factor each way
-					Expect(times[1]).To(BeTemporally(">=", times[0].Add(90*time.Millisecond)))
+					// Expected interval time = 100 msec
+					Expect(times[1]).To(BeTemporally(">=", times[0]))
 					Expect(times[1]).To(BeTemporally("<=", times[0].Add(500*time.Millisecond)))
-					Expect(times[2]).To(BeTemporally(">=", times[1].Add(90*time.Millisecond)))
+					Expect(times[2]).To(BeTemporally(">=", times[1]))
 					Expect(times[2]).To(BeTemporally("<=", times[1].Add(500*time.Millisecond)))
 				})
 			})
@@ -1222,10 +1222,10 @@ var _ = Describe("SSH", func() {
 				Expect(waitErr).NotTo(HaveOccurred())
 				times := <-timesCh
 
-				// Expected interval time = 100 msec. Allow different fudge factor each way
-				Expect(times[1]).To(BeTemporally(">=", times[0].Add(90*time.Millisecond)))
+				// Expected interval time = 100 msec
+				Expect(times[1]).To(BeTemporally(">=", times[0]))
 				Expect(times[1]).To(BeTemporally("<=", times[0].Add(500*time.Millisecond)))
-				Expect(times[2]).To(BeTemporally(">=", times[1].Add(90*time.Millisecond)))
+				Expect(times[2]).To(BeTemporally(">=", times[1]))
 				Expect(times[2]).To(BeTemporally("<=", times[1].Add(500*time.Millisecond)))
 			})
 		})
