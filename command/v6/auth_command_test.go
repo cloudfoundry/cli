@@ -342,14 +342,28 @@ var _ = Describe("auth Command", func() {
 		})
 	})
 
-	When("there is already a user logged in", func() {
+	When("already logged in via client credentials", func() {
 		BeforeEach(func() {
 			fakeConfig.UAAGrantTypeReturns("client_credentials")
 		})
 
-		It("should throw already logged in error", func() {
-			Expect(err).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
-			Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
+		When("authenticating as a user", func() {
+			It("returns an already logged in error", func() {
+				Expect(err).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+				Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
+			})
+		})
+
+		When("authenticating as a client", func() {
+			BeforeEach(func() {
+				cmd.ClientCredentials = true
+				cmd.RequiredArgs.Username = "some-client-id"
+				cmd.RequiredArgs.Password = "some-client-secret"
+			})
+			It("does not error", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(0))
+			})
 		})
 	})
 })
