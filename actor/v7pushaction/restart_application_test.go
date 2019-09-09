@@ -40,48 +40,78 @@ var _ = Describe("RestartApplication", func() {
 		})
 	})
 
-	When("The app is running", func() {
+	It("Restarts the app", func() {
+		Expect(fakeV7Actor.RestartApplicationCallCount()).To(Equal(1))
+		Expect(fakeV7Actor.RestartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+	})
+
+	When("Restarting the app succeeds", func() {
 		BeforeEach(func() {
 			fakeV7Actor.RestartApplicationReturns(v7action.Warnings{"some-restarting-warning"}, nil)
 			paramPlan.Application.State = constant.ApplicationStarted
 		})
 
-		When("Restarting the app succeeds", func() {
-			It("Uploads a package and exits", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("some-restarting-warning"))
-				Expect(events).To(ConsistOf(RestartingApplication, RestartingApplicationComplete))
+		When("the noWait flag is set", func() {
+			BeforeEach(func() {
+				paramPlan.NoWait = true
+			})
 
-				Expect(fakeV7Actor.RestartApplicationCallCount()).To(Equal(1))
-				givenAppGUID, givenNoWait := fakeV7Actor.RestartApplicationArgsForCall(0)
-				Expect(givenAppGUID).To(Equal("some-app-guid"))
-				Expect(givenNoWait).To(Equal(false))
-				Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
+			It("calls PollStart with true", func() {
+				Expect(fakeV7Actor.PollStartCallCount()).To(Equal(1))
+				actualAppGUID, givenNoWait := fakeV7Actor.PollStartArgsForCall(0)
+				Expect(givenNoWait).To(Equal(true))
+				Expect(actualAppGUID).To(Equal("some-app-guid"))
 			})
 		})
 
-		When("Restarting the app fails", func() {
+		It("calls pollStart", func() {
+			Expect(fakeV7Actor.PollStartCallCount()).To(Equal(1))
+			actualAppGUID, givenNoWait := fakeV7Actor.PollStartArgsForCall(0)
+			Expect(givenNoWait).To(Equal(false))
+			Expect(actualAppGUID).To(Equal("some-app-guid"))
+		})
+
+		When("pollStart errors", func() {
 			BeforeEach(func() {
-				fakeV7Actor.RestartApplicationReturns(v7action.Warnings{"some-restarting-warning"}, errors.New("bummer"))
+				fakeV7Actor.PollStartReturns(
+					v7action.Warnings{"poll-start-warning"},
+					errors.New("poll-start-error"),
+				)
 			})
 
 			It("returns errors and warnings", func() {
-				Expect(executeErr).To(MatchError("bummer"))
-				Expect(warnings).To(ConsistOf("some-restarting-warning"))
-				Expect(events).To(ConsistOf(RestartingApplication))
+				Expect(executeErr).To(MatchError("poll-start-error"))
+				Expect(warnings).To(ConsistOf("some-restarting-warning", "poll-start-warning"))
+			})
+
+		})
+
+		When("pollStart succeeds", func() {
+			BeforeEach(func() {
+				fakeV7Actor.PollStartReturns(
+					v7action.Warnings{"poll-start-warning"},
+					nil,
+				)
+			})
+
+			It("Uploads a package and exits", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-restarting-warning", "poll-start-warning"))
+				Expect(events).To(ConsistOf(RestartingApplication, RestartingApplicationComplete))
 			})
 		})
 	})
 
-	When("the noWait flag is set", func() {
+	When("Restarting the app fails", func() {
 		BeforeEach(func() {
-			paramPlan.NoWait = true
+			fakeV7Actor.RestartApplicationReturns(v7action.Warnings{"some-restarting-warning"}, errors.New("bummer"))
 		})
 
-		It("calls RestartApplication with the flag value", func() {
-			Expect(fakeV7Actor.RestartApplicationCallCount()).To(Equal(1))
-			_, givenNoWait := fakeV7Actor.RestartApplicationArgsForCall(0)
-			Expect(givenNoWait).To(Equal(true))
+		It("returns errors and warnings", func() {
+			Expect(executeErr).To(MatchError("bummer"))
+			Expect(warnings).To(ConsistOf("some-restarting-warning"))
+			Expect(events).To(ConsistOf(RestartingApplication))
 		})
 	})
+
 })
