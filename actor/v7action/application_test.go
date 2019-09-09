@@ -2,8 +2,6 @@ package v7action_test
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -13,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/clock/fakeclock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,12 +22,14 @@ var _ = Describe("Application Actions", func() {
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 		fakeConfig                *v7actionfakes.FakeConfig
+		fakeClock                 *fakeclock.FakeClock
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, clock.NewClock())
+		fakeClock = fakeclock.NewFakeClock(time.Now())
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, fakeClock)
 	})
 
 	Describe("DeleteApplicationByNameAndSpace", func() {
@@ -737,7 +737,7 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("PollStart", func() {
+	FDescribe("PollStart", func() {
 		var (
 			appGUID string
 			noWait  bool
@@ -747,6 +747,8 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		BeforeEach(func() {
+			fakeConfig.StartupTimeoutReturns(4 * time.Second)
+			fakeConfig.PollingIntervalReturns(1)
 			appGUID = "some-guid"
 			noWait = false
 		})
@@ -766,236 +768,340 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		When("getting the application processes succeeds", func() {
-			var processes []ccv3.Process
-
+		When("getting the application process succeeds", func() {
 			BeforeEach(func() {
-				fakeConfig.StartupTimeoutReturns(time.Second)
-				fakeConfig.PollingIntervalReturns(0)
-			})
-
-			When("there is a single process", func() {
-				BeforeEach(func() {
-					processes = []ccv3.Process{{GUID: "abc123"}}
-					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						processes,
-						ccv3.Warnings{"get-app-warning-1"}, nil)
-				})
-
-				When("the polling times out", func() {
-					BeforeEach(func() {
-						fakeConfig.StartupTimeoutReturns(time.Millisecond)
-						fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
-						fakeCloudControllerClient.GetProcessInstancesReturns(
-							[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
-							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
-							nil,
-						)
-					})
-
-					It("returns the timeout error", func() {
-						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
-						Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
-					})
-
-					It("gets polling and timeout values from the config", func() {
-						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-					})
-				})
-
-				When("getting the process instances errors", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetProcessInstancesReturns(
-							nil,
-							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
-							errors.New("some-error"),
-						)
-					})
-
-					It("returns the error", func() {
-						Expect(executeErr).To(MatchError("some-error"))
-						Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
-					})
-				})
-
-				When("getting the process instances succeeds", func() {
-					var (
-						initialInstanceStates    []ccv3.ProcessInstance
-						eventualInstanceStates   []ccv3.ProcessInstance
-						processInstanceCallCount int
-					)
-
-					BeforeEach(func() {
-						processInstanceCallCount = 0
-
-						fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
-							defer func() { processInstanceCallCount++ }()
-							if processInstanceCallCount == 0 {
-								return initialInstanceStates,
-									ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
-									nil
-							} else {
-								return eventualInstanceStates,
-									ccv3.Warnings{fmt.Sprintf("get-process-warning-%d", processInstanceCallCount+2)},
-									nil
-							}
-						}
-					})
-
-					When("there are no process instances", func() {
-						BeforeEach(func() {
-							initialInstanceStates = []ccv3.ProcessInstance{}
-							eventualInstanceStates = []ccv3.ProcessInstance{}
-						})
-
-						It("should not return an error", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
-						})
-
-						It("should only call GetProcessInstances once before exiting", func() {
-							Expect(processInstanceCallCount).To(Equal(1))
-						})
-
-						It("should return correct warnings", func() {
-							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
-						})
-					})
-
-					When("all instances become running by the second call", func() {
-						BeforeEach(func() {
-							initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
-							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}}
-						})
-
-						It("should not return an error", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
-						})
-
-						It("should call GetProcessInstances twice", func() {
-							Expect(processInstanceCallCount).To(Equal(2))
-						})
-
-						It("should return correct warnings", func() {
-							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
-						})
-					})
-
-					When("at least one instance has become running by the second call", func() {
-						BeforeEach(func() {
-							initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
-							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceRunning}}
-						})
-
-						It("should not return an error", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
-						})
-
-						It("should call GetProcessInstances twice", func() {
-							Expect(processInstanceCallCount).To(Equal(2))
-						})
-
-						It("should return correct warnings", func() {
-							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
-						})
-					})
-
-					When("all of the instances have crashed by the second call", func() {
-						BeforeEach(func() {
-							initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
-							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}}
-						})
-
-						It("should not return an error", func() {
-							Expect(executeErr).To(MatchError(actionerror.AllInstancesCrashedError{}))
-						})
-
-						It("should call GetProcessInstances twice", func() {
-							Expect(processInstanceCallCount).To(Equal(2))
-						})
-
-						It("should return correct warnings", func() {
-							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
-						})
-					})
-				})
-			})
-
-			When("there are multiple processes", func() {
-				var (
-					processInstanceCallCount int
+				fakeCloudControllerClient.GetApplicationProcessesReturns(
+					[]ccv3.Process{
+						{GUID: "process1", Type: "web"},
+					},
+					ccv3.Warnings{"get-app-warning-1"},
+					nil,
 				)
 
+			})
+
+			It("gets the startup timeout", func() {
+				Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+			})
+
+			When("the no-wait flag is provided", func() {
 				BeforeEach(func() {
-					processInstanceCallCount = 0
-					fakeConfig.StartupTimeoutReturns(time.Millisecond)
-					fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
-
-					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
-						defer func() { processInstanceCallCount++ }()
-						if strings.HasPrefix(processGuid, "good") {
-							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}}, nil, nil
-						} else {
-							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}}, nil, nil
-						}
-					}
+					noWait = true
+					fakeCloudControllerClient.GetApplicationProcessesReturns(
+						[]ccv3.Process{
+							{GUID: "process1", Type: "web"},
+							{GUID: "process2", Type: "worker"},
+						},
+						ccv3.Warnings{"get-app-warning-1"},
+						nil,
+					)
 				})
 
-				When("none of the processes are ready", func() {
-					BeforeEach(func() {
-						processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "bad-2"}}
-						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							processes,
-							ccv3.Warnings{"get-app-warning-1"}, nil)
-					})
+				FIt("filters out the non web processes", func() {
+					// send something on the timer channel
+					fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
 
-					It("returns the timeout error", func() {
-						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
-					})
-				})
+					// assert on the cc call made within poll processes to make sure there is only the web process
+					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process1"))
 
-				When("some of the processes are ready", func() {
-					BeforeEach(func() {
-						processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "good-1"}}
-						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							processes,
-							ccv3.Warnings{"get-app-warning-1"}, nil)
-					})
-
-					It("returns the timeout error", func() {
-						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
-					})
-				})
-
-				When("all of the processes are ready", func() {
-					BeforeEach(func() {
-						processes = []ccv3.Process{{GUID: "good-1"}, {GUID: "good-2"}}
-						fakeCloudControllerClient.GetApplicationProcessesReturns(
-							processes,
-							ccv3.Warnings{"get-app-warning-1"}, nil)
-					})
-
-					It("returns nil", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-					})
 				})
 			})
 
-			When("there are multiple processes, and noWait is true", func() {
+			When("polling processes returns an error", func() {
 				BeforeEach(func() {
-					processes = []ccv3.Process{{GUID: "worker-guid", Type: "worker"}, {GUID: "web-guid", Type: "web"}}
-					fakeCloudControllerClient.GetApplicationProcessesReturns(
-						processes,
-						ccv3.Warnings{"get-app-warning-1"}, nil)
-					noWait = true
+					fakeCloudControllerClient.GetProcessInstancesReturns(nil, ccv3.Warnings{"poll-process-warning"}, errors.New("poll-process-error"))
 				})
 
-				It("only polls the web process", func() {
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("web-guid"))
+				It("returns the error and warnings", func() {
+					// send something on the timer channel
+					fakeClock.WaitForNWatchersAndIncrement(1*time.Millisecond, 2)
+
+					Eventually(executeErr).Should(MatchError("poll-process-error"))
+					Eventually(warnings).Should(ConsistOf("poll-process-warning", "get-app-warning-1"))
 				})
+			})
+
+			When("polling start timesout", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetProcessInstancesReturns(
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceStarting},
+						},
+						ccv3.Warnings{"poll-process-warning"},
+						nil,
+					)
+				})
+
+				It("returns a timeout error and any warnings", func() {
+					Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
+					Expect(warnings).To(ConsistOf("poll-process-warning", "get-app-warning-1"))
+				})
+			})
+
+			When("polling process eventually returns we should stop polling", func() {
+				BeforeEach(func() {
+
+					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceStarting},
+						},
+						ccv3.Warnings{"poll-process-warning1"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceRunning},
+						},
+						ccv3.Warnings{"poll-process-warning2"},
+						nil,
+					)
+				})
+
+				It("gets the polling interval", func() {
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+				})
+
+				It("returns success and any warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("poll-process-warning1", "get-app-warning-1", "poll-process-warning2"))
+				})
+
 			})
 		})
+
+		// When("getting the application processes succeeds", func() {
+		// 	var processes []ccv3.Process
+
+		// 	BeforeEach(func() {
+		// 		fakeConfig.StartupTimeoutReturns(time.Second)
+		// 		go func() {
+		// 			fakeClock.WaitForNWatchersAndIncrement(1*time.Second, 2)
+		// 			fakeClock.Increment(1 * time.Second)
+		// 		}()
+		// 	})
+
+		// 	When("there is a single process", func() {
+		// 		BeforeEach(func() {
+		// 			processes = []ccv3.Process{{GUID: "abc123"}}
+		// 			fakeCloudControllerClient.GetApplicationProcessesReturns(
+		// 				processes,
+		// 				ccv3.Warnings{"get-app-warning-1"}, nil)
+		// 		})
+
+		// 		When("the polling times out", func() {
+		// 			BeforeEach(func() {
+		// 				fakeCloudControllerClient.GetProcessInstancesReturns(
+		// 					[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
+		// 					ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
+		// 					nil,
+		// 				)
+		// 			})
+
+		// 			It("returns the timeout error", func() {
+		// 				Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
+		// 				Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
+		// 			})
+
+		// 			It("gets polling and timeout values from the config", func() {
+		// 				Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+		// 				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+		// 			})
+		// 		})
+
+		// 		When("getting the process instances errors", func() {
+		// 			BeforeEach(func() {
+		// 				fakeCloudControllerClient.GetProcessInstancesReturns(
+		// 					nil,
+		// 					ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
+		// 					errors.New("some-error"),
+		// 				)
+		// 			})
+
+		// 			It("returns the error", func() {
+		// 				Expect(executeErr).To(MatchError("some-error"))
+		// 				Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
+		// 			})
+		// 		})
+
+		// 		When("getting the process instances succeeds", func() {
+		// 			var (
+		// 				initialInstanceStates    []ccv3.ProcessInstance
+		// 				eventualInstanceStates   []ccv3.ProcessInstance
+		// 				processInstanceCallCount int
+		// 			)
+
+		// 			BeforeEach(func() {
+		// 				processInstanceCallCount = 0
+
+		// 				fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
+		// 					defer func() { processInstanceCallCount++ }()
+		// 					if processInstanceCallCount == 0 {
+		// 						return initialInstanceStates,
+		// 							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
+		// 							nil
+		// 					} else {
+		// 						return eventualInstanceStates,
+		// 							ccv3.Warnings{fmt.Sprintf("get-process-warning-%d", processInstanceCallCount+2)},
+		// 							nil
+		// 					}
+		// 				}
+		// 			})
+
+		// 			When("there are no process instances", func() {
+		// 				BeforeEach(func() {
+		// 					initialInstanceStates = []ccv3.ProcessInstance{}
+		// 					eventualInstanceStates = []ccv3.ProcessInstance{}
+		// 				})
+
+		// 				It("should not return an error", func() {
+		// 					Expect(executeErr).NotTo(HaveOccurred())
+		// 				})
+
+		// 				It("should only call GetProcessInstances once before exiting", func() {
+		// 					Expect(processInstanceCallCount).To(Equal(1))
+		// 				})
+
+		// 				It("should return correct warnings", func() {
+		// 					Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
+		// 				})
+		// 			})
+
+		// 			When("all instances become running by the second call", func() {
+		// 				BeforeEach(func() {
+		// 					initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+		// 					eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}}
+		// 				})
+
+		// 				It("should not return an error", func() {
+		// 					Expect(executeErr).NotTo(HaveOccurred())
+		// 				})
+
+		// 				It("should call GetProcessInstances twice", func() {
+		// 					Expect(processInstanceCallCount).To(Equal(2))
+		// 				})
+
+		// 				It("should return correct warnings", func() {
+		// 					Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+		// 				})
+		// 			})
+
+		// 			When("at least one instance has become running by the second call", func() {
+		// 				BeforeEach(func() {
+		// 					initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+		// 					eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceRunning}}
+		// 				})
+
+		// 				It("should not return an error", func() {
+		// 					Expect(executeErr).NotTo(HaveOccurred())
+		// 				})
+
+		// 				It("should call GetProcessInstances twice", func() {
+		// 					Expect(processInstanceCallCount).To(Equal(2))
+		// 				})
+
+		// 				It("should return correct warnings", func() {
+		// 					Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+		// 				})
+		// 			})
+
+		// 			When("all of the instances have crashed by the second call", func() {
+		// 				BeforeEach(func() {
+		// 					initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+		// 					eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}}
+		// 				})
+
+		// 				It("should not return an error", func() {
+		// 					Expect(executeErr).To(MatchError(actionerror.AllInstancesCrashedError{}))
+		// 				})
+
+		// 				It("should call GetProcessInstances twice", func() {
+		// 					Expect(processInstanceCallCount).To(Equal(2))
+		// 				})
+
+		// 				It("should return correct warnings", func() {
+		// 					Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+		// 				})
+		// 			})
+		// 		})
+		// 	})
+
+		// 	When("there are multiple processes", func() {
+		// 		var (
+		// 			processInstanceCallCount int
+		// 		)
+
+		// 		BeforeEach(func() {
+		// 			processInstanceCallCount = 0
+		// 			fakeConfig.StartupTimeoutReturns(time.Millisecond)
+		// 			fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
+
+		// 			fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
+		// 				defer func() { processInstanceCallCount++ }()
+		// 				if strings.HasPrefix(processGuid, "good") {
+		// 					return []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}}, nil, nil
+		// 				} else {
+		// 					return []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}}, nil, nil
+		// 				}
+		// 			}
+		// 		})
+
+		// 		When("none of the processes are ready", func() {
+		// 			BeforeEach(func() {
+		// 				processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "bad-2"}}
+		// 				fakeCloudControllerClient.GetApplicationProcessesReturns(
+		// 					processes,
+		// 					ccv3.Warnings{"get-app-warning-1"}, nil)
+		// 			})
+
+		// 			It("returns the timeout error", func() {
+		// 				Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
+		// 			})
+		// 		})
+
+		// 		When("some of the processes are ready", func() {
+		// 			BeforeEach(func() {
+		// 				processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "good-1"}}
+		// 				fakeCloudControllerClient.GetApplicationProcessesReturns(
+		// 					processes,
+		// 					ccv3.Warnings{"get-app-warning-1"}, nil)
+		// 			})
+
+		// 			It("returns the timeout error", func() {
+		// 				Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
+		// 			})
+		// 		})
+
+		// 		When("all of the processes are ready", func() {
+		// 			BeforeEach(func() {
+		// 				processes = []ccv3.Process{{GUID: "good-1"}, {GUID: "good-2"}}
+		// 				fakeCloudControllerClient.GetApplicationProcessesReturns(
+		// 					processes,
+		// 					ccv3.Warnings{"get-app-warning-1"}, nil)
+		// 			})
+
+		// 			It("returns nil", func() {
+		// 				Expect(executeErr).ToNot(HaveOccurred())
+		// 			})
+		// 		})
+		// 	})
+
+		// 	When("there are multiple processes, and noWait is true", func() {
+		// 		BeforeEach(func() {
+		// 			processes = []ccv3.Process{{GUID: "worker-guid", Type: "worker"}, {GUID: "web-guid", Type: "web"}}
+		// 			fakeCloudControllerClient.GetApplicationProcessesReturns(
+		// 				processes,
+		// 				ccv3.Warnings{"get-app-warning-1"}, nil)
+		// 			noWait = true
+		// 		})
+
+		// 		It("only polls the web process", func() {
+		// 			Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
+		// 			Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("web-guid"))
+		// 		})
+		// 	})
+		// })
 	})
 
 	Describe("PollStartForRolling", func() {
@@ -1714,5 +1820,122 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("restart-application-warning"))
 			})
 		})
+	})
+
+	Describe("PollProcesses", func() {
+		var (
+			processes []ccv3.Process
+
+			keepPolling bool
+			warnings    Warnings
+			executeErr  error
+		)
+
+		BeforeEach(func() {
+			processes = []ccv3.Process{
+				{GUID: "process-1"},
+				{GUID: "process-2"},
+			}
+		})
+
+		JustBeforeEach(func() {
+			keepPolling, warnings, executeErr = actor.PollProcesses(processes)
+		})
+
+		It("gets process instances for each process", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
+			Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-1"))
+			Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(1)).To(Equal("process-2"))
+		})
+
+		When("getting the process instances fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetProcessInstancesReturns(nil, ccv3.Warnings{"get-instances-warning"}, errors.New("get-instances-error"))
+			})
+
+			It("returns an error and warnings and terminates the loop", func() {
+				Expect(executeErr).To(MatchError("get-instances-error"))
+				Expect(warnings).To(ConsistOf("get-instances-warning"))
+				Expect(keepPolling).To(BeTrue())
+
+				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-1"))
+			})
+		})
+
+		When("getting the process instances is always successful", func() {
+			When("a process has all instances crashed", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetProcessInstancesReturns(
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceCrashed},
+						},
+						ccv3.Warnings{"get-process1-instances-warning"},
+						nil,
+					)
+				})
+
+				It("returns an all instances crashed error", func() {
+					Expect(executeErr).To(MatchError(actionerror.AllInstancesCrashedError{}))
+					Expect(warnings).To(ConsistOf("get-process1-instances-warning"))
+					Expect(keepPolling).To(BeTrue())
+				})
+			})
+
+			When("there are still instances in the starting state for a process", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceRunning},
+						},
+						ccv3.Warnings{"get-process1-instances-warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceStarting},
+						},
+						ccv3.Warnings{"get-process2-instances-warning"},
+						nil,
+					)
+				})
+
+				It("returns success and that we should keep polling", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-process1-instances-warning", "get-process2-instances-warning"))
+					Expect(keepPolling).To(BeFalse())
+				})
+			})
+
+			When("all the isntances of all processes are stable", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceRunning},
+						},
+						ccv3.Warnings{"get-process1-instances-warning"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
+						[]ccv3.ProcessInstance{
+							{State: constant.ProcessInstanceRunning},
+						},
+						ccv3.Warnings{"get-process2-instances-warning"},
+						nil,
+					)
+				})
+
+				It("returns success and that we should keep polling", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-process1-instances-warning", "get-process2-instances-warning"))
+					Expect(keepPolling).To(BeTrue())
+				})
+
+			})
+		})
+
 	})
 })

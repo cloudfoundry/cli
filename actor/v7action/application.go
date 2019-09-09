@@ -275,15 +275,13 @@ func (actor Actor) PollStart(appGUID string, noWait bool) (Warnings, error) {
 		return allWarnings, err
 	}
 
-	var filteredProcesses []ccv3.Process
+	filteredProcesses := processes
 	if noWait {
 		for _, process := range processes {
 			if process.Type == constant.ProcessTypeWeb {
 				filteredProcesses = append(filteredProcesses, process)
 			}
 		}
-	} else {
-		filteredProcesses = processes
 	}
 
 	timer := actor.Clock.NewTimer(time.Millisecond)
@@ -374,7 +372,7 @@ func (actor Actor) PollProcesses(processes []ccv3.Process) (bool, Warnings, erro
 		}
 
 		if instances.AllCrashed() {
-			return false, allWarnings, actionerror.AllInstancesCrashedError{}
+			return true, allWarnings, actionerror.AllInstancesCrashedError{}
 		}
 
 		//precondition: !instances.Empty() && no instances are running
