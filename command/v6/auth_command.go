@@ -60,17 +60,17 @@ func (cmd AuthCommand) Execute(args []string) error {
 		}
 	}
 
+	username, password, err := cmd.getUsernamePassword()
+	if err != nil {
+		return err
+	}
+
 	if !cmd.ClientCredentials {
 		if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
 			return errors.New("Service account currently logged in. Use 'cf logout' to log out service account and try again.")
 		} else if cmd.Config.UAAOAuthClient() != "cf" || cmd.Config.UAAOAuthClientSecret() != "" {
 			cmd.UI.DisplayWarning("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead.")
 		}
-	}
-
-	username, password, err := cmd.getUsernamePassword()
-	if err != nil {
-		return err
 	}
 
 	err = command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Actor.CloudControllerAPIVersion(), cmd.UI)

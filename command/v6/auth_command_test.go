@@ -339,6 +339,9 @@ var _ = Describe("auth Command", func() {
 			When("using --client-credentials", func() {
 				BeforeEach(func() {
 					cmd.ClientCredentials = true
+					cmd.RequiredArgs.Username = "some-client-id"
+					cmd.RequiredArgs.Password = "some-client-secret"
+
 				})
 				It("does not output a deprecation warning", func() {
 					Expect(testUI.Err).ToNot(Say("Deprecation warning"))
@@ -347,6 +350,8 @@ var _ = Describe("auth Command", func() {
 			When("logging in as a user", func() {
 				BeforeEach(func() {
 					cmd.ClientCredentials = false
+					cmd.RequiredArgs.Username = "some-username"
+					cmd.RequiredArgs.Password = "some-password"
 				})
 				It("outputs a deprecation warning", func() {
 					Expect(testUI.Err).To(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
@@ -361,6 +366,12 @@ var _ = Describe("auth Command", func() {
 		})
 
 		When("authenticating as a user", func() {
+			BeforeEach(func() {
+				cmd.ClientCredentials = false
+				cmd.RequiredArgs.Username = "some-username"
+				cmd.RequiredArgs.Password = "some-password"
+			})
+
 			It("returns an already logged in error", func() {
 				Expect(err).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 				Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
