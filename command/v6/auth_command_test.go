@@ -336,8 +336,21 @@ var _ = Describe("auth Command", func() {
 			BeforeEach(func() {
 				fakeConfig.UAAOAuthClientReturns("AClientsId")
 			})
-			It("outputs a deprecation warning", func() {
-				Expect(testUI.Err).To(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
+			When("using --client-credentials", func() {
+				BeforeEach(func() {
+					cmd.ClientCredentials = true
+				})
+				It("does not output a deprecation warning", func() {
+					Expect(testUI.Err).ToNot(Say("Deprecation warning"))
+				})
+			})
+			When("logging in as a user", func() {
+				BeforeEach(func() {
+					cmd.ClientCredentials = false
+				})
+				It("outputs a deprecation warning", func() {
+					Expect(testUI.Err).To(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
+				})
 			})
 		})
 	})
