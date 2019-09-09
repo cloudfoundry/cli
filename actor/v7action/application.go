@@ -367,7 +367,7 @@ func (actor Actor) PollProcesses(processes []ccv3.Process) (bool, Warnings, erro
 		}
 
 		if instances.AllCrashed() {
-			return false, allWarnings, actionerror.AllInstancesCrashedError{}
+			return true, allWarnings, actionerror.AllInstancesCrashedError{}
 		}
 
 		//precondition: !instances.Empty() && no instances are running
@@ -408,36 +408,37 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 }
 
 func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnings, error) {
-	var allWarnings Warnings
 	deployment, warnings, err := actor.CloudControllerClient.GetDeployment(deploymentGUID)
-	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return deployment, allWarnings, err
+		return deployment, Warnings(warnings), err
 	}
 
 	if deployment.StatusValue == constant.DeploymentStatusValueFinalized {
 		switch deployment.StatusReason {
 		case constant.DeploymentStatusReasonCanceled:
-			return deployment, allWarnings, errors.New("Deployment has been canceled")
+			return deployment, Warnings(warnings), errors.New("Deployment has been canceled")
 		case constant.DeploymentStatusReasonSuperseded:
-			return deployment, allWarnings, errors.New("Deployment has been superseded")
+			return deployment, Warnings(warnings), errors.New("Deployment has been superseded")
 		}
 	}
 
-	return deployment, allWarnings, nil
+	return deployment, Warnings(warnings), err
 }
 
 func (actor Actor) getProcesses(deployment ccv3.Deployment, appGUID string, noWait bool) ([]ccv3.Process, Warnings, error) {
 	if noWait {
+		// these are only web processes for now so we can just use these
 		return deployment.NewProcesses, nil, nil
 	}
 
+	// if the deployment is deployed we know web are all running and PollProcesses will see those as stable
+	// so just getting all processes is equivalent to just getting non-web ones and polling those
 	if isDeployed(deployment) {
 		processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
 		if err != nil {
 			return processes, Warnings(warnings), err
 		}
-		return processes, nil, nil
+		return processes, Warnings(warnings), nil
 	}
 
 	return nil, nil, nil
