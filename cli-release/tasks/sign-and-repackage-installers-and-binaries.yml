@@ -39,12 +39,12 @@ run:
     awk 'sub("$", "\r")' cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES > LICENSE
 
     mkdir win32 win64
-    cp extracted-binaries/cf-cli_win32.exe win32/cf${VERSION_SUFFIX}.exe
-    cp extracted-binaries/cf-cli_winx64.exe win64/cf${VERSION_SUFFIX}.exe
+    cp extracted-binaries/cf${VERSION_SUFFIX}-cli_win32.exe win32/cf${VERSION_SUFFIX}.exe
+    cp extracted-binaries/cf${VERSION_SUFFIX}-cli_winx64.exe win64/cf${VERSION_SUFFIX}.exe
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_win32.zip win32/cf${VERSION_SUFFIX}.exe
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_winx64.zip win64/cf${VERSION_SUFFIX}.exe
 
-    unzip winstallers/cf-cli-installer_winx64.zip
+    unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_winx64.zip
 
     mkdir signed-64
     osslsigncode sign \
@@ -52,13 +52,13 @@ run:
       -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
       -t http://timestamp.comodoca.com/authenticode \
       -h sha256 \
-      -in cf_installer.exe \
+      -in cf${VERSION_SUFFIX}_installer.exe \
       -out signed-64/cf${VERSION_SUFFIX}_installer.exe
-    rm -f cf_installer.exe
+    rm -f cf${VERSION_SUFFIX}_installer.exe
 
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_winx64.zip LICENSE NOTICE signed-64/cf${VERSION_SUFFIX}_installer.exe
 
-    unzip winstallers/cf-cli-installer_win32.zip
+    unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_win32.zip
 
     mkdir signed-32
     osslsigncode sign \
@@ -66,7 +66,7 @@ run:
       -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
       -t http://timestamp.comodoca.com/authenticode \
       -h sha256 \
-      -in cf_installer.exe \
+      -in cf${VERSION_SUFFIX}_installer.exe \
       -out signed-32/cf${VERSION_SUFFIX}_installer.exe
 
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_win32.zip LICENSE NOTICE signed-32/cf${VERSION_SUFFIX}_installer.exe
