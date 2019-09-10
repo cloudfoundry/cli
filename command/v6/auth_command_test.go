@@ -376,6 +376,10 @@ var _ = Describe("auth Command", func() {
 				Expect(err).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 				Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
 			})
+
+			It("the returned error is translatable", func() {
+				Expect(err).To(MatchError(translatableerror.PasswordGrantTypeLogoutRequiredError{}))
+			})
 		})
 
 		When("authenticating as a client", func() {
