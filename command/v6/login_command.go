@@ -148,7 +148,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	defer cmd.showStatus()
 
 	if cmd.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
-		return errors.New("Service account currently logged in. Use 'cf logout' to log out service account and try again.")
+		return translatableerror.PasswordGrantTypeLogoutRequiredError{}
 	} else if cmd.Config.UAAOAuthClient() != "cf" || cmd.Config.UAAOAuthClientSecret() != "" {
 		cmd.UI.DisplayWarning("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead.")
 	}

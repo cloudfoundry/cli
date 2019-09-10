@@ -285,6 +285,10 @@ var _ = Describe("login Command", func() {
 				Expect(executeErr).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 			})
 
+			It("the returned error is translatable", func() {
+				Expect(executeErr).To(MatchError(translatableerror.PasswordGrantTypeLogoutRequiredError{}))
+			})
+
 			When("client secret in the configuration is present", func() {
 				It("should not display a warning", func() {
 					Expect(testUI.Err).NotTo(Say("Deprecation warning:"))
