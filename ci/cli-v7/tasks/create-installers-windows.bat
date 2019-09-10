@@ -1,6 +1,6 @@
 SET ROOT_DIR=%CD%
 SET ESCAPED_ROOT_DIR=%ROOT_DIR:\=\\%
-SET /p VERSION=<%ROOT_DIR%\cli-ci\ci\VERSION_V7
+SET /p VERSION=<%ROOT_DIR%\cli-ci\BUILD_VERSION_V7
 
 SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=C:\Program Files (x86)\Inno Setup 5;%PATH%
