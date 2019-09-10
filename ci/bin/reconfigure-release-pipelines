@@ -19,7 +19,8 @@ configure_pipeline() {
   fly -t ci set-pipeline \
     -p $name \
     -c $pipeline \
-    -l <(lpass show "release-pipeline-concourse-credentials.yml" --notes)
+    -l <(lpass show "release-pipeline-concourse-credentials.yml" --notes) \
+    -l <(lpass show "VAT Concourse Credentials" --notes)
 }
 
 check_installed lpass

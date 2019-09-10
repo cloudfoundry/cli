@@ -20,6 +20,15 @@ resources:
     ignore_paths:
     - ci
 
+- name: bump-v7-version
+  type: semver
+  source:
+    driver: git
+    uri: git@github.com:cloudfoundry/cli
+    branch: master
+    file: BUILD_VERSION_V7
+    private_key: ((vat-bump-version-github-private-key))
+
 - name: cli-ci
   type: git
   source:
@@ -557,3 +566,17 @@ jobs:
       AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
       AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
       GPG_KEY_LOCATION: ((gpg-key-location))
+
+- name: bump-cli-v7-version
+  serial: true
+  plan:
+  - in_parallel:
+    - get: cli-v7
+      passed:
+      - update-rpm-repo-v7
+      - update-debian-repo-v7
+      - update-homebrew-v7
+      trigger: true
+    - put: bump-v7-version
+      params: {pre: beta}
+
