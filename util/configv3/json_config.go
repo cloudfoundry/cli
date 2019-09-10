@@ -8,29 +8,29 @@ import (
 
 // JSONConfig represents .cf/config.json.
 type JSONConfig struct {
-	ConfigVersion            int                `json:"ConfigVersion"`
-	Target                   string             `json:"Target"`
-	APIVersion               string             `json:"APIVersion"`
-	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
-	DopplerEndpoint          string             `json:"DopplerEndPoint"`
-	UAAEndpoint              string             `json:"UaaEndpoint"`
-	RoutingEndpoint          string             `json:"RoutingAPIEndpoint"`
 	AccessToken              string             `json:"AccessToken"`
-	SSHOAuthClient           string             `json:"SSHOAuthClient"`
-	UAAOAuthClient           string             `json:"UAAOAuthClient"`
-	UAAOAuthClientSecret     string             `json:"UAAOAuthClientSecret"`
-	UAAGrantType             string             `json:"UAAGrantType"`
-	RefreshToken             string             `json:"RefreshToken"`
-	TargetedOrganization     Organization       `json:"OrganizationFields"`
-	TargetedSpace            Space              `json:"SpaceFields"`
-	SkipSSLValidation        bool               `json:"SSLDisabled"`
+	APIVersion               string             `json:"APIVersion"`
 	AsyncTimeout             int                `json:"AsyncTimeout"`
-	Trace                    string             `json:"Trace"`
+	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
 	ColorEnabled             string             `json:"ColorEnabled"`
+	ConfigVersion            int                `json:"ConfigVersion"`
+	DopplerEndpoint          string             `json:"DopplerEndPoint"`
 	Locale                   string             `json:"Locale"`
-	PluginRepositories       []PluginRepository `json:"PluginRepos"`
 	MinCLIVersion            string             `json:"MinCLIVersion"`
 	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
+	TargetedOrganization     Organization       `json:"OrganizationFields"`
+	PluginRepositories       []PluginRepository `json:"PluginRepos"`
+	RefreshToken             string             `json:"RefreshToken"`
+	RoutingEndpoint          string             `json:"RoutingAPIEndpoint"`
+	TargetedSpace            Space              `json:"SpaceFields"`
+	SSHOAuthClient           string             `json:"SSHOAuthClient"`
+	SkipSSLValidation        bool               `json:"SSLDisabled"`
+	Target                   string             `json:"Target"`
+	Trace                    string             `json:"Trace"`
+	UAAEndpoint              string             `json:"UaaEndpoint"`
+	UAAGrantType             string             `json:"UAAGrantType"`
+	UAAOAuthClient           string             `json:"UAAOAuthClient"`
+	UAAOAuthClientSecret     string             `json:"UAAOAuthClientSecret"`
 }
 
 // Organization contains basic information about the targeted organization.
