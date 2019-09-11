@@ -148,6 +148,7 @@ func (f *FakeServiceBroker) Async() *FakeServiceBroker {
 
 func (f *FakeServiceBroker) Deploy() *FakeServiceBroker {
 	f.pushAppIfNecessary()
+	f.deregisterIgnoringFailures()
 	f.configure()
 	return f
 }
