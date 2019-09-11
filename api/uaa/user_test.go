@@ -101,7 +101,7 @@ var _ = Describe("User", func() {
 		})
 	})
 
-	Describe("GetUsers", func() {
+	Describe("ListUsers", func() {
 		var (
 			userName string
 			origin   string
@@ -117,7 +117,7 @@ var _ = Describe("User", func() {
 		})
 
 		JustBeforeEach(func() {
-			users, err = client.GetUsers(userName, origin)
+			users, err = client.ListUsers(userName, origin)
 		})
 
 		When("no errors occur", func() {
@@ -128,7 +128,7 @@ var _ = Describe("User", func() {
 
 					response := `{
 						"resources": [
-							{ "ID": "existing-user-id" }
+							{ "ID": "existing-user-id", "origin": "uaa" }
 						]
 					}`
 
@@ -144,7 +144,7 @@ var _ = Describe("User", func() {
 				It("gets users by username", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(users).To(Equal([]User{
-						{ID: "existing-user-id"},
+						{ID: "existing-user-id", Origin: "uaa"},
 					}))
 				})
 			})
@@ -203,6 +203,65 @@ var _ = Describe("User", func() {
 					StatusCode:  400,
 					RawResponse: []byte(response),
 				}))
+			})
+		})
+	})
+
+	Describe("DeleteUser", func() {
+		When("no errors occur", func() {
+			When("deleting user with origin", func() {
+				BeforeEach(func() {
+					deleteResponse := `{"ID": "some-user-guid"}`
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodDelete, "/Users/some-user-guid"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, deleteResponse),
+						),
+					)
+				})
+
+				It("deletes the user", func() {
+					user, err := client.DeleteUser("some-user-guid")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(user).To(Equal(User{
+						ID: "some-user-guid",
+					}))
+				})
+			})
+		})
+
+		When("an error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				response = `{
+							"error": "some-error",
+							"error_description": "some-description"
+						}`
+			})
+
+			When("delete user fails", func() {
+				BeforeEach(func() {
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodDelete, "/Users/some-user-guid"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusTeapot, response),
+						),
+					)
+				})
+
+				It("it errors", func() {
+					_, err := client.DeleteUser("some-user-guid")
+					Expect(err).To(MatchError(RawHTTPStatusError{
+						StatusCode:  http.StatusTeapot,
+						RawResponse: []byte(response),
+					}))
+				})
 			})
 		})
 	})

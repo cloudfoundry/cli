@@ -11,10 +11,11 @@ import (
 type User struct {
 	GUID      string
 	Username  string
+	Origin    string
 	CreatedAt time.Time
 }
 
-// GetUsers returns all the users in the targeted environment.
+// ListUsers returns all the users in the targeted environment.
 func GetUsers() []User {
 	var userPagesResponse struct {
 		NextURL   *string `json:"next_url"`
@@ -50,6 +51,43 @@ func GetUsers() []User {
 			break
 		}
 		nextURL = *userPagesResponse.NextURL
+	}
+
+	return allUsers
+}
+
+func GetUsersV3() []User {
+	var userPagesResponse struct {
+		Pagination struct {
+			NextURL *string `json:"next_url"`
+		} `json:"pagination"`
+		Resources []struct {
+			GUID     string `json:"guid"`
+			Origin   string `json:"origin"`
+			Username string `json:"username"`
+		} `json:"resources"`
+	}
+
+	var allUsers []User
+	nextURL := "/v3/users?per_page=50"
+
+	for {
+		session := CF("curl", nextURL)
+		Eventually(session).Should(Exit(0))
+
+		err := json.Unmarshal(session.Out.Contents(), &userPagesResponse)
+		Expect(err).NotTo(HaveOccurred())
+		for _, resource := range userPagesResponse.Resources {
+			allUsers = append(allUsers, User{
+				Origin:   resource.Origin,
+				Username: resource.Username,
+			})
+		}
+
+		if userPagesResponse.Pagination.NextURL == nil {
+			break
+		}
+		nextURL = *userPagesResponse.Pagination.NextURL
 	}
 
 	return allUsers
