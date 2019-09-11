@@ -13,6 +13,8 @@ import (
 type ProcessSummary struct {
 	Process
 
+	Sidecars []Sidecar
+
 	InstanceDetails []ProcessInstance
 }
 

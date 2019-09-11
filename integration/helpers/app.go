@@ -23,7 +23,7 @@ import (
 // proper buildpack.
 func WithHelloWorldApp(f func(dir string)) {
 	dir := TempDirAbsolutePath("", "simple-app")
-	defer os.RemoveAll(dir)
+	//defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
 	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
@@ -58,6 +58,24 @@ func WithMultiEndpointApp(f func(dir string)) {
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
+}
+
+func WithSidecarApp(f func(dir string), appName string) {
+	withSidecarManifest := func(dir string) {
+		err := ioutil.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
+applications:
+  - name: %s
+    sidecars:
+    - name: sidecar
+      process_types: [web]
+      command: sleep infinity`,
+			appName)), 0666)
+		Expect(err).ToNot(HaveOccurred())
+
+		f(dir)
+	}
+
+	WithHelloWorldApp(withSidecarManifest)
 }
 
 // WithNoResourceMatchedApp creates a simple application to use with your CLI

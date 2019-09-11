@@ -348,6 +348,13 @@ var _ = Describe("Application Summary Actions", func() {
 						ccv3.Warnings{"get-process-instances-warning"},
 						nil,
 					)
+
+					fakeCloudControllerClient.GetProcessSidecarsReturns(
+						[]ccv3.Sidecar{
+							Name: "sidecar_name",
+						},
+						nil
+					)
 				})
 
 				When("getting current droplet succeeds", func() {
@@ -395,6 +402,9 @@ var _ = Describe("Application Summary Actions", func() {
 												Type:       "web",
 												Command:    *types.NewFilteredString("[Redacted Value]"),
 												MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+											},
+											Sidecars: []Sidecar {
+												{ Name: "sidecar_name" },
 											},
 											InstanceDetails: []ProcessInstance{
 												{
