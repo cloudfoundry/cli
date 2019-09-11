@@ -79,7 +79,7 @@ var _ = Describe("User Actions", func() {
 			})
 		})
 
-		When("a create user request to the UAA returns an error", func() {
+		When("the UAA API returns an error", func() {
 			var returnedErr error
 
 			BeforeEach(func() {
@@ -190,6 +190,87 @@ var _ = Describe("User Actions", func() {
 				Expect(actualErr).To(MatchError("uaa-api-get-users-error"))
 
 				Expect(fakeUAAClient.GetUsersCallCount()).To(Equal(1))
+			})
+		})
+	})
+
+	Describe("DeleteUser", func() {
+		var (
+			actualWarnings Warnings
+			actualErr      error
+		)
+
+		JustBeforeEach(func() {
+			actualWarnings, actualErr = actor.DeleteUser("some-user", "some-origin")
+		})
+
+		When("no API errors occur", func() {
+			BeforeEach(func() {
+				fakeUAAClient.DeleteUserReturns(
+					uaa.User{
+						ID: "user-uaa-id",
+					},
+					nil,
+				)
+				fakeCloudControllerClient.DeleteUserReturns(
+					ccv3.Warnings{
+						"warning-1",
+						"warning-2",
+					},
+					nil,
+				)
+			})
+
+			It("Deletes user and returns all warnings", func() {
+				Expect(actualErr).NotTo(HaveOccurred())
+
+				// Expect(actualUser).To(Equal(User(deleteUser))) // TODO: think about if we want to return the deleted user
+				Expect(actualWarnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeUAAClient.DeleteUserCallCount()).To(Equal(1))
+				username, origin := fakeUAAClient.DeleteUserArgsForCall(0)
+				Expect(username).To(Equal("some-user"))
+				Expect(origin).To(Equal("some-origin"))
+
+				Expect(fakeCloudControllerClient.DeleteUserCallCount()).To(Equal(1))
+				uaaUserID := fakeCloudControllerClient.DeleteUserArgsForCall(0)
+				Expect(uaaUserID).To(Equal("user-uaa-id"))
+			})
+		})
+
+		When("the UAA API returns an error", func() {
+			var returnedErr error
+
+			BeforeEach(func() {
+				returnedErr = errors.New("some UAA error")
+				fakeUAAClient.DeleteUserReturns(
+					uaa.User{},
+					returnedErr,
+				)
+			})
+
+			It("returns the same error", func() {
+				Expect(actualErr).To(MatchError(returnedErr))
+			})
+		})
+
+		When("the CC API returns an error", func() {
+			var returnedErr error
+
+			BeforeEach(func() {
+				returnedErr = errors.New("some CC error")
+				fakeUAAClient.DeleteUserReturns(
+					uaa.User{},
+					nil,
+				)
+				fakeCloudControllerClient.DeleteUserReturns(
+					ccv3.Warnings{},
+					returnedErr,
+				)
+			})
+
+			It("returns the same error", func() {
+				Expect(actualErr).To(MatchError(returnedErr))
 			})
 		})
 	})

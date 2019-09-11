@@ -77,7 +77,7 @@ type commandList struct {
 	DeleteSharedDomain                 v7.DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
 	DeleteSpace                        v7.DeleteSpaceCommand                        `command:"delete-space" description:"Delete a space"`
 	DeleteSpaceQuota                   v6.DeleteSpaceQuotaCommand                   `command:"delete-space-quota" description:"Delete a space quota definition and unassign the space quota from all spaces"`
-	DeleteUser                         v6.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
+	DeleteUser                         v7.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
 	DisableFeatureFlag                 v7.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
 	DisableOrgIsolation                v6.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
 	DisableSSH                         v6.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`

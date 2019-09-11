@@ -21,6 +21,7 @@ const (
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
 	DeleteSpaceRequest                                          = "DeleteSpace"
+	DeleteUserRequest                                           = "DeleteUser"
 	GetApplicationDropletCurrentRequest                         = "GetApplicationDropletCurrent"
 	GetApplicationEnvRequest                                    = "GetApplicationEnv"
 	GetApplicationManifestRequest                               = "GetApplicationManifest"
@@ -197,4 +198,5 @@ var APIRoutes = []Route{
 	{Resource: StacksResource, Path: "/:stack_guid", Method: http.MethodPatch, Name: PatchStackRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
 	{Resource: UsersResource, Path: "/", Method: http.MethodPost, Name: PostUserRequest},
+	{Resource: UsersResource, Path: "/:user_guid", Method: http.MethodDelete, Name: DeleteUserRequest},
 }

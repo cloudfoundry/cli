@@ -48,3 +48,22 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 
 	return user, response.Warnings, err
 }
+
+func (client *Client) DeleteUser(uaaUserID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteUserRequest,
+		URIParams: internal.Params{
+			"user_guid": uaaUserID,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}

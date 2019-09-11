@@ -43,6 +43,10 @@ type paginatedUsersResponse struct {
 	Resources []newUserResponse `json:"resources"`
 }
 
+type listUsersResponse struct {
+	Resources []User `json:resources`
+}
+
 // CreateUser creates a new UAA user account with the provided password.
 func (client *Client) CreateUser(user string, password string, origin string) (User, error) {
 	userRequest := newUserRequestBody{
@@ -103,7 +107,7 @@ func (client Client) GetUsers(userName, origin string) ([]User, error) {
 	}
 
 	request, err := client.newRequest(requestOptions{
-		RequestName: internal.GetUsersRequest,
+		RequestName: internal.ListUsersRequest,
 		Header: http.Header{
 			"Content-Type": {"application/json"},
 		},
@@ -131,4 +135,59 @@ func (client Client) GetUsers(userName, origin string) ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (client *Client) DeleteUser(user string, origin string) (User, error) {
+	if origin == "" {
+		origin = "uaa"
+	}
+
+	listRequest, err := client.newRequest(requestOptions{
+		RequestName: internal.ListUsersRequest,
+		Header: http.Header{
+			"Content-Type": {"application/json"},
+		},
+		Query: url.Values{
+			"filter": {fmt.Sprintf("username eq \"%s\" and origin eq \"%s\"", user, origin)},
+		},
+	})
+
+	if err != nil {
+		return User{}, err
+	}
+
+	var listUsersResponse listUsersResponse
+	listResponse := Response{
+		Result: &listUsersResponse,
+	}
+
+	err = client.connection.Make(listRequest, &listResponse)
+	if err != nil {
+		return User{}, err
+	}
+	//TODO: what happens when we get multiple users back from UAA or
+	// no user is returned == ENOTFOUND
+	deleteRequest, err := client.newRequest(requestOptions{
+		RequestName: internal.DeleteUserRequest,
+		Header: http.Header{
+			"Content-Type": {"application/json"},
+		},
+		URIParams: map[string]string{"user_guid": User(listUsersResponse.Resources[0]).ID},
+	})
+
+	if err != nil {
+		return User{}, err
+	}
+
+	var deleteUserResponse newUserResponse
+	deleteResponse := Response{
+		Result: &deleteUserResponse,
+	}
+
+	err = client.connection.Make(deleteRequest, &deleteResponse)
+	if err != nil {
+		return User{}, err
+	}
+
+	return User(deleteUserResponse), nil
 }

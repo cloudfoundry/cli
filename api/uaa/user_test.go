@@ -206,4 +206,132 @@ var _ = Describe("User", func() {
 			})
 		})
 	})
+
+	Describe("DeleteUser", func() {
+		When("no errors occur", func() {
+			When("deleting user with origin", func() {
+				BeforeEach(func() {
+					listResponse := `{"resources":[{"id":"deleted-user-id"}]}`
+					deleteResponse := `{"ID": "deleted-user-id"}`
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/Users", "filter=username+eq+%22some-username%22+and+origin+eq+%22some-origin%22"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, listResponse),
+						),
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodDelete, "/Users/deleted-user-id"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, deleteResponse),
+						),
+					)
+				})
+
+				It("deletes the user", func() {
+					user, err := client.DeleteUser("some-username", "some-origin")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(user).To(Equal(User{
+						ID: "deleted-user-id",
+					}))
+				})
+			})
+
+			When("delete user without an origin", func() {
+				BeforeEach(func() {
+					listResponse := `{"resources":[{"id":"deleted-user-id"}]}`
+					deleteResponse := `{"ID": "deleted-user-id"}`
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/Users", "filter=username+eq+%22some-username%22+and+origin+eq+%22uaa%22"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, listResponse),
+						),
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodDelete, "/Users/deleted-user-id"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, deleteResponse),
+						),
+					)
+				})
+
+				It("deletes the user with origin set to uaa", func() {
+					user, err := client.DeleteUser("some-username", "")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(user).To(Equal(User{
+						ID: "deleted-user-id",
+					}))
+				})
+			})
+		})
+
+		When("an error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				response = `{
+							"error": "some-error",
+							"error_description": "some-description"
+						}`
+			})
+
+			When("list user fails", func() {
+				BeforeEach(func() {
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/Users", "filter=username+eq+%22some-username%22+and+origin+eq+%22uaa%22"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusTeapot, response),
+						),
+					)
+				})
+
+				It("returns the error", func() {
+					_, err := client.DeleteUser("some-username", "uaa")
+					Expect(err).To(MatchError(RawHTTPStatusError{
+						StatusCode:  http.StatusTeapot,
+						RawResponse: []byte(response),
+					}))
+				})
+			})
+
+			When("delete user fails", func() {
+				BeforeEach(func() {
+					listResponse := `{"resources":[{"id":"deleted-user-id"}]}`
+					deleteResponse := `{
+							"error": "some-error",
+							"error_description": "some-description"
+						}`
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/Users", "filter=username+eq+%22some-username%22+and+origin+eq+%22uaa%22"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, listResponse),
+						),
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodDelete, "/Users/deleted-user-id"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusTeapot, deleteResponse),
+						),
+					)
+				})
+
+				It("deletes the user with origin set to uaa", func() {
+					_, err := client.DeleteUser("some-username", "")
+					Expect(err).To(MatchError(RawHTTPStatusError{
+						StatusCode:  http.StatusTeapot,
+						RawResponse: []byte(response),
+					}))
+				})
+			})
+		})
+	})
 })

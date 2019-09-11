@@ -28,7 +28,7 @@ var _ = Describe("User", func() {
 			user, warnings, executeErr = client.CreateUser("some-uaa-guid")
 		})
 
-		When("an error does not occur", func() {
+		When("no error occurs", func() {
 			BeforeEach(func() {
 				response := `{
 				"guid": "some-uaa-guid",
@@ -98,6 +98,79 @@ var _ = Describe("User", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("DeleteUser", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.DeleteUser("some-uaa-guid")
+		})
+
+		When("no error occurs", func() {
+			BeforeEach(func() {
+				response := `{}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/users/some-uaa-guid"),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					),
+				)
+			})
+
+			It("deletes and returns all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+		{
+      "code": 10010,
+      "detail": "Isolation segment not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/users/some-uaa-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a delete warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a delete warning"))
 			})
 		})
 	})

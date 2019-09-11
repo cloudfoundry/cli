@@ -8,4 +8,5 @@ type UAAClient interface {
 	GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error)
 	GetUsers(userName, origin string) ([]uaa.User, error)
 	CreateUser(username string, password string, origin string) (uaa.User, error)
+	DeleteUser(username string, origin string) (uaa.User, error)
 }

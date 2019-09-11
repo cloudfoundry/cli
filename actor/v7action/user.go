@@ -44,3 +44,16 @@ func (actor Actor) GetUser(username, origin string) (User, error) {
 
 	return v7actionUser, nil
 }
+
+// DeleteUser
+func (actor Actor) DeleteUser(username string, origin string) (Warnings, error) {
+	// TODO: when origin is empty, is it nil or ""?
+	uaaUser, err := actor.UAAClient.DeleteUser(username, origin)
+	if err != nil {
+		return nil, err
+	}
+
+	ccWarnings, err := actor.CloudControllerClient.DeleteUser(uaaUser.ID)
+
+	return Warnings(ccWarnings), err
+}
