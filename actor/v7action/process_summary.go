@@ -13,6 +13,8 @@ import (
 type ProcessSummary struct {
 	Process
 
+	Sidecars []Sidecar
+
 	InstanceDetails []ProcessInstance
 }
 
@@ -107,8 +109,14 @@ func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValue
 }
 
 func (actor Actor) getProcessSummary(process Process) (ProcessSummary, Warnings, error) {
-	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+	sidecars, warnings, err := actor.CloudControllerClient.GetProcessSidecars(process.GUID)
 	allWarnings := Warnings(warnings)
+	if err != nil {
+		return ProcessSummary{}, allWarnings, err
+	}
+
+	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return ProcessSummary{}, allWarnings, err
 	}
@@ -116,8 +124,12 @@ func (actor Actor) getProcessSummary(process Process) (ProcessSummary, Warnings,
 	processSummary := ProcessSummary{
 		Process: process,
 	}
+	for _, sidecar := range sidecars {
+		processSummary.Sidecars = append(processSummary.Sidecars, Sidecar(sidecar))
+	}
 	for _, instance := range instances {
 		processSummary.InstanceDetails = append(processSummary.InstanceDetails, ProcessInstance(instance))
 	}
+
 	return processSummary, allWarnings, nil
 }

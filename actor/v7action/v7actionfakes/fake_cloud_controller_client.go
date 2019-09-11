@@ -945,6 +945,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetProcessSidecarsStub        func(string) ([]ccv3.Sidecar, ccv3.Warnings, error)
+	getProcessSidecarsMutex       sync.RWMutex
+	getProcessSidecarsArgsForCall []struct {
+		arg1 string
+	}
+	getProcessSidecarsReturns struct {
+		result1 []ccv3.Sidecar
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getProcessSidecarsReturnsOnCall map[int]struct {
+		result1 []ccv3.Sidecar
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetRouteDestinationsStub        func(string) ([]ccv3.RouteDestination, ccv3.Warnings, error)
 	getRouteDestinationsMutex       sync.RWMutex
 	getRouteDestinationsArgsForCall []struct {
@@ -5600,6 +5615,72 @@ func (fake *FakeCloudControllerClient) GetProcessInstancesReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetProcessSidecars(arg1 string) ([]ccv3.Sidecar, ccv3.Warnings, error) {
+	fake.getProcessSidecarsMutex.Lock()
+	ret, specificReturn := fake.getProcessSidecarsReturnsOnCall[len(fake.getProcessSidecarsArgsForCall)]
+	fake.getProcessSidecarsArgsForCall = append(fake.getProcessSidecarsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetProcessSidecars", []interface{}{arg1})
+	fake.getProcessSidecarsMutex.Unlock()
+	if fake.GetProcessSidecarsStub != nil {
+		return fake.GetProcessSidecarsStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getProcessSidecarsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetProcessSidecarsCallCount() int {
+	fake.getProcessSidecarsMutex.RLock()
+	defer fake.getProcessSidecarsMutex.RUnlock()
+	return len(fake.getProcessSidecarsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetProcessSidecarsCalls(stub func(string) ([]ccv3.Sidecar, ccv3.Warnings, error)) {
+	fake.getProcessSidecarsMutex.Lock()
+	defer fake.getProcessSidecarsMutex.Unlock()
+	fake.GetProcessSidecarsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetProcessSidecarsArgsForCall(i int) string {
+	fake.getProcessSidecarsMutex.RLock()
+	defer fake.getProcessSidecarsMutex.RUnlock()
+	argsForCall := fake.getProcessSidecarsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetProcessSidecarsReturns(result1 []ccv3.Sidecar, result2 ccv3.Warnings, result3 error) {
+	fake.getProcessSidecarsMutex.Lock()
+	defer fake.getProcessSidecarsMutex.Unlock()
+	fake.GetProcessSidecarsStub = nil
+	fake.getProcessSidecarsReturns = struct {
+		result1 []ccv3.Sidecar
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetProcessSidecarsReturnsOnCall(i int, result1 []ccv3.Sidecar, result2 ccv3.Warnings, result3 error) {
+	fake.getProcessSidecarsMutex.Lock()
+	defer fake.getProcessSidecarsMutex.Unlock()
+	fake.GetProcessSidecarsStub = nil
+	if fake.getProcessSidecarsReturnsOnCall == nil {
+		fake.getProcessSidecarsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Sidecar
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getProcessSidecarsReturnsOnCall[i] = struct {
+		result1 []ccv3.Sidecar
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetRouteDestinations(arg1 string) ([]ccv3.RouteDestination, ccv3.Warnings, error) {
 	fake.getRouteDestinationsMutex.Lock()
 	ret, specificReturn := fake.getRouteDestinationsReturnsOnCall[len(fake.getRouteDestinationsArgsForCall)]
@@ -8065,6 +8146,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getProcessMutex.RUnlock()
 	fake.getProcessInstancesMutex.RLock()
 	defer fake.getProcessInstancesMutex.RUnlock()
+	fake.getProcessSidecarsMutex.RLock()
+	defer fake.getProcessSidecarsMutex.RUnlock()
 	fake.getRouteDestinationsMutex.RLock()
 	defer fake.getRouteDestinationsMutex.RUnlock()
 	fake.getRoutesMutex.RLock()

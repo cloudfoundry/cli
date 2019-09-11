@@ -349,6 +349,18 @@ var _ = Describe("Application Summary Actions", func() {
 						nil,
 					)
 
+					fakeCloudControllerClient.GetProcessSidecarsReturns(
+						[]ccv3.Sidecar{
+							{
+								GUID:    "sidecar-guid",
+								Name:    "sidecar_name",
+								Command: *types.NewFilteredString("my-sidecar-command"),
+							},
+						},
+						ccv3.Warnings{"get-process-sidecars-warning"},
+						nil,
+					)
+
 					fakeCloudControllerClient.GetProcessInstancesReturns(
 						[]ccv3.ProcessInstance{
 							{
@@ -412,6 +424,13 @@ var _ = Describe("Application Summary Actions", func() {
 												Command:    *types.NewFilteredString("[Redacted Value]"),
 												MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 											},
+											Sidecars: []Sidecar{
+												{
+													GUID:    "sidecar-guid",
+													Name:    "sidecar_name",
+													Command: *types.NewFilteredString("my-sidecar-command"),
+												},
+											},
 											InstanceDetails: []ProcessInstance{
 												{
 													State:       constant.ProcessInstanceRunning,
@@ -430,6 +449,13 @@ var _ = Describe("Application Summary Actions", func() {
 												MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 												Type:       "some-type",
 												Command:    *types.NewFilteredString("some-start-command"),
+											},
+											Sidecars: []Sidecar{
+												{
+													GUID:    "sidecar-guid",
+													Name:    "sidecar_name",
+													Command: *types.NewFilteredString("my-sidecar-command"),
+												},
 											},
 											InstanceDetails: []ProcessInstance{
 												{
@@ -467,6 +493,8 @@ var _ = Describe("Application Summary Actions", func() {
 								"get-process-by-type-warning",
 								"get-process-instances-warning",
 								"get-process-instances-warning",
+								"get-process-sidecars-warning",
+								"get-process-sidecars-warning",
 								"get-app-droplet-warning",
 								"get-routes-warning",
 							))
@@ -506,6 +534,8 @@ var _ = Describe("Application Summary Actions", func() {
 								"get-process-by-type-warning",
 								"get-process-instances-warning",
 								"get-process-instances-warning",
+								"get-process-sidecars-warning",
+								"get-process-sidecars-warning",
 								"get-routes-warnings",
 							))
 						})
@@ -538,6 +568,13 @@ var _ = Describe("Application Summary Actions", func() {
 											Command:    *types.NewFilteredString("[Redacted Value]"),
 											MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 										},
+										Sidecars: []Sidecar{
+											{
+												GUID:    "sidecar-guid",
+												Name:    "sidecar_name",
+												Command: *types.NewFilteredString("my-sidecar-command"),
+											},
+										},
 										InstanceDetails: []ProcessInstance{
 											{
 												State:       constant.ProcessInstanceRunning,
@@ -556,6 +593,13 @@ var _ = Describe("Application Summary Actions", func() {
 											MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 											Type:       "some-type",
 											Command:    *types.NewFilteredString("some-start-command"),
+										},
+										Sidecars: []Sidecar{
+											{
+												GUID:    "sidecar-guid",
+												Name:    "sidecar_name",
+												Command: *types.NewFilteredString("my-sidecar-command"),
+											},
 										},
 										InstanceDetails: []ProcessInstance{
 											{
@@ -580,6 +624,8 @@ var _ = Describe("Application Summary Actions", func() {
 							"get-process-by-type-warning",
 							"get-process-instances-warning",
 							"get-process-instances-warning",
+							"get-process-sidecars-warning",
+							"get-process-sidecars-warning",
 							"get-app-droplet-warning",
 						))
 					})
@@ -606,6 +652,8 @@ var _ = Describe("Application Summary Actions", func() {
 							"get-process-by-type-warning",
 							"get-process-instances-warning",
 							"get-process-instances-warning",
+							"get-process-sidecars-warning",
+							"get-process-sidecars-warning",
 							"get-droplet-warning",
 						))
 					})

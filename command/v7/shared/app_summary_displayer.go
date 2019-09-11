@@ -101,8 +101,14 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command.Value)
 		}
 
+		var processSidecars []string
+		for _, sidecar := range process.Sidecars {
+			processSidecars = append(processSidecars, sidecar.Name)
+		}
+
 		keyValueTable := [][]string{
 			{display.UI.TranslateText("type:"), process.Type},
+			{display.UI.TranslateText("sidecars:"), strings.Join(processSidecars, ", ")},
 			{display.UI.TranslateText("instances:"), fmt.Sprintf("%d/%d", process.HealthyInstanceCount(), process.TotalInstanceCount())},
 			{display.UI.TranslateText("memory usage:"), fmt.Sprintf("%dM", process.MemoryInMB.Value)},
 			startCommandRow,

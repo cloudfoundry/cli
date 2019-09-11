@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"path"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -235,6 +237,20 @@ applications:
 				It("displays the app buildpacks", func() {
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Say(`buildpacks:\s+ruby_buildpack,\s+go`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the app uses sidecars", func() {
+				BeforeEach(func() {
+					helpers.WithSidecarApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", path.Join(appDir, "manifest.yml"), "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+					}, appName)
+				})
+
+				It("displays the sidecars", func() {
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say(`sidecars:\s+sidecar_name\s+`))
 					Eventually(session).Should(Exit(0))
 				})
 			})

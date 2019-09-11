@@ -60,6 +60,24 @@ func WithMultiEndpointApp(f func(dir string)) {
 	f(dir)
 }
 
+func WithSidecarApp(f func(dir string), appName string) {
+	withSidecarManifest := func(dir string) {
+		err := ioutil.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
+applications:
+  - name: %s
+    sidecars:
+    - name: sidecar_name
+      process_types: [web]
+      command: sleep infinity`,
+			appName)), 0666)
+		Expect(err).ToNot(HaveOccurred())
+
+		f(dir)
+	}
+
+	WithHelloWorldApp(withSidecarManifest)
+}
+
 // WithNoResourceMatchedApp creates a simple application to use with your CLI
 // command (typically CF Push). When pushing, be aware of specifying '-b
 // staticfile_buildpack" so that your app will correctly start up with the

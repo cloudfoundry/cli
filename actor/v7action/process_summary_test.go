@@ -14,9 +14,9 @@ var _ = Describe("Process Actions", func() {
 		BeforeEach(func() {
 			summary = ProcessSummary{
 				InstanceDetails: []ProcessInstance{
-					ProcessInstance{State: constant.ProcessInstanceRunning},
-					ProcessInstance{State: constant.ProcessInstanceRunning},
-					ProcessInstance{State: constant.ProcessInstanceDown},
+					{State: constant.ProcessInstanceRunning},
+					{State: constant.ProcessInstanceRunning},
+					{State: constant.ProcessInstanceDown},
 				},
 			}
 		})
@@ -59,6 +59,10 @@ var _ = Describe("Process Actions", func() {
 				{
 					Process: Process{
 						Type: constant.ProcessTypeWeb,
+					},
+					Sidecars: []Sidecar{
+						{Name: "authenticator"},
+						{Name: "clock"},
 					},
 					InstanceDetails: []ProcessInstance{
 						{State: constant.ProcessInstanceRunning},
