@@ -12,6 +12,7 @@ import (
 // location of .cf directory is written in the same way LoadConfig reads .cf
 // directory.
 func WriteConfig(c *Config) error {
+	println("INNER WRITE CONFIG")
 	rawConfig, err := json.MarshalIndent(c.ConfigFile, "", "  ")
 	if err != nil {
 		return err

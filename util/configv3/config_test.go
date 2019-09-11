@@ -41,4 +41,11 @@ var _ = Describe("Config", func() {
 			Expect(config.IsTTY()).To(BeTrue())
 		})
 	})
+
+	Describe("WriteConfig", func() {
+		It("Writes to the config file", func() {
+			Expect(true).To(BeFalse())
+
+		})
+	})
 })

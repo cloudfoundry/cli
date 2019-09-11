@@ -69,4 +69,5 @@ type Config interface {
 	UnsetUserInformation()
 	Verbose() (bool, []string)
 	WritePluginConfig() error
+	WriteConfig() error
 }

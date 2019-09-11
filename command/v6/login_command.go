@@ -118,6 +118,7 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *LoginCommand) Execute(args []string) error {
+
 	err := cmd.validateFlags()
 	if err != nil {
 		return err
@@ -163,6 +164,17 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	if authErr != nil {
 		return errors.New("Unable to authenticate.")
 	}
+
+	println("I'm in login command about to write config!")
+	err = cmd.Config.WriteConfig()
+	if err != nil {
+		return err
+	}
+	// if c, ok := cmd.Config.(*configv3.Config); ok {
+	// 	configWriteErr := configv3.WriteConfig(c)
+	// 	if configWriteErr != nil {
+	// 		fmt.Fprintf(os.Stderr, "Error writing config: %s", configWriteErr.Error())
+	// 	}
 
 	if cmd.Organization != "" {
 		org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)

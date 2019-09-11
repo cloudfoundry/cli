@@ -2,6 +2,8 @@
 package configv3
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -96,4 +98,13 @@ func (config *Config) Verbose() (bool, []string) {
 	}
 
 	return verbose, filePath
+}
+
+func (config *Config) WriteConfig() error {
+	println("OUTTER WRITECONFIG")
+	configWriteErr := WriteConfig(config)
+	if configWriteErr != nil {
+		fmt.Fprintf(os.Stderr, "Error writing config: %s", configWriteErr.Error())
+	}
+	return nil //TODO
 }
