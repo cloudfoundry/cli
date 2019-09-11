@@ -2,11 +2,13 @@ package fakeservicebroker
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"encoding/json"
 	"fmt"
 	"github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -56,6 +58,31 @@ func (f *FakeServiceBroker) alreadyPushedApp() bool {
 	return resp.StatusCode == http.StatusOK
 }
 
+func (f *FakeServiceBroker) getCatalogServiceNames() []string {
+	if !f.alreadyPushedApp() {
+		return nil
+	}
+
+	resp, err := http.Get(f.URL("/v2/catalog"))
+	Expect(err).ToNot(HaveOccurred())
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).ToNot(HaveOccurred())
+
+	var data map[string]interface{}
+	err = json.Unmarshal(body, &data)
+	Expect(err).ToNot(HaveOccurred(), fmt.Sprintf("expected '%s' to be a valid json", string(body)))
+
+	var serviceNames []string
+	for _, value := range data["services"].([]interface{}) {
+		service := value.(map[string]interface{})
+		serviceNames = append(serviceNames, service["name"].(string))
+	}
+
+	return serviceNames
+}
+
 func generateReusableBrokerName(suffix string) string {
 	return fmt.Sprintf("fake-service-broker-%s%02d", suffix, ginkgo.GinkgoParallelNode())
 }
@@ -96,14 +123,28 @@ func (f *FakeServiceBroker) deleteAppIgnoringFailures() {
 }
 
 func (f *FakeServiceBroker) deregister() {
-	Eventually(helpers.CF("purge-service-offering", f.ServiceName(), "-b", f.name, "-f")).Should(Exit(0))
+	f.purgeAllServiceOfferings(false)
+
 	Eventually(helpers.CF("delete-service-broker", f.name, "-f")).Should(Exit(0))
 	Eventually(helpers.CF("service-brokers")).Should(And(Exit(0), Not(Say(f.name))))
 }
 
 func (f *FakeServiceBroker) deregisterIgnoringFailures() {
-	Eventually(helpers.CF("purge-service-offering", f.ServiceName(), "-b", f.name, "-f")).Should(Exit())
+	f.purgeAllServiceOfferings(true)
+
 	Eventually(helpers.CF("delete-service-broker", f.name, "-f")).Should(Exit())
+}
+
+func (f *FakeServiceBroker) purgeAllServiceOfferings(ignoreFailures bool) {
+	for _, service := range f.getCatalogServiceNames() {
+		assertion := Eventually(helpers.CF("purge-service-offering", service, "-b", f.name, "-f"))
+
+		if ignoreFailures {
+			assertion.Should(Exit())
+		} else {
+			assertion.Should(Exit(0))
+		}
+	}
 }
 
 func (f *FakeServiceBroker) stopReusing() *FakeServiceBroker {
