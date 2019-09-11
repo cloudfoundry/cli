@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -94,6 +95,13 @@ func (f *FakeServiceBroker) register() {
 
 	Eventually(helpers.CF("create-service-broker", f.name, "username", "password", f.URL())).Should(Exit(0))
 	Eventually(helpers.CF("service-brokers")).Should(And(Exit(0), Say(f.name)))
+
+	Eventually(func() io.Reader {
+		session := helpers.CF("service-access", "-b", f.name)
+		Eventually(session).Should(Exit(0))
+
+		return session.Out
+	}).Should(Say(f.ServiceName()))
 }
 
 func (f *FakeServiceBroker) update() {
