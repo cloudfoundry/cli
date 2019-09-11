@@ -1,14 +1,13 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
 	"testing"
+
+	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
 )
 
 const (
-	CFEventuallyTimeout   = commonisolated.CFEventuallyTimeout
-	CFConsistentlyTimeout = commonisolated.CFConsistentlyTimeout
-	RealIsolationSegment  = commonisolated.RealIsolationSegment
+	RealIsolationSegment = commonisolated.RealIsolationSegment
 )
 
 var (
