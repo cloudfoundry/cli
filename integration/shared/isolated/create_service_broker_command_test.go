@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io"
 )
 
 var _ = Describe("create-service-broker command", func() {
@@ -143,8 +144,12 @@ var _ = Describe("create-service-broker command", func() {
 						session = helpers.CF("service-brokers")
 						Eventually(session).Should(Say(brokerName))
 
-						session = helpers.CF("marketplace")
-						Eventually(session).Should(Say(broker.ServicePlanName()))
+						Eventually(func() io.Reader {
+							session := helpers.CF("marketplace")
+							Eventually(session).Should(Exit(0))
+
+							return session.Out
+						}).Should(Say(broker.ServicePlanName()))
 
 						helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 						session = helpers.CF("marketplace")
