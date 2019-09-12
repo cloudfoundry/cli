@@ -74,10 +74,10 @@ type serviceBrokerRelationshipsSpaceData struct {
 }
 
 // CreateServiceBroker registers a new service broker.
-func (client *Client) CreateServiceBroker(name, username, password, brokerURL, spaceGUID string) (Warnings, error) {
+func (client *Client) CreateServiceBroker(name, username, password, brokerURL, spaceGUID string) (JobURL, Warnings, error) {
 	bodyBytes, err := json.Marshal(newServiceBroker(name, username, password, brokerURL, spaceGUID))
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -85,13 +85,14 @@ func (client *Client) CreateServiceBroker(name, username, password, brokerURL, s
 		Body:        bytes.NewReader(bodyBytes),
 	})
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	response := cloudcontroller.Response{}
 	err = client.connection.Make(request, &response)
+	jobURL := response.HTTPResponse.Header.Get("Location")
 
-	return response.Warnings, err
+	return JobURL(jobURL), response.Warnings, err
 }
 
 // GetServiceBrokers lists service brokers.

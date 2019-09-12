@@ -149,6 +149,7 @@ var _ = Describe("ServiceBroker", func() {
 		)
 
 		var (
+			jobURL       JobURL
 			warnings     Warnings
 			executeErr   error
 			spaceGUID    string
@@ -171,7 +172,7 @@ var _ = Describe("ServiceBroker", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.CreateServiceBroker(name, username, password, url, spaceGUID)
+			jobURL, warnings, executeErr = client.CreateServiceBroker(name, username, password, url, spaceGUID)
 		})
 
 		When("the Cloud Controller successfully creates the broker", func() {
@@ -180,12 +181,16 @@ var _ = Describe("ServiceBroker", func() {
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/service_brokers"),
 						VerifyJSONRepresenting(expectedBody),
-						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(http.StatusOK, "", http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {"some-job-url"},
+						}),
 					),
 				)
 			})
 
-			It("succeeds and returns warnings", func() {
+			It("succeeds, returns warnings and job URL", func() {
+				Expect(jobURL).To(Equal(JobURL("some-job-url")))
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
