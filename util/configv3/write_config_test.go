@@ -42,7 +42,7 @@ var _ = Describe("Config", func() {
 					CFColor: "false",
 				},
 			}
-			err := configv3.WriteConfig(config)
+			err := config.WriteConfig()
 			Expect(err).ToNot(HaveOccurred())
 
 			file, err = ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))

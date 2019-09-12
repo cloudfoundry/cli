@@ -164,6 +164,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return errors.New("Unable to authenticate.")
 	}
 
+	err = cmd.Config.WriteConfig()
+	if err != nil {
+		return fmt.Errorf("Error writing config: %s", err.Error())
+	}
+
 	if cmd.Organization != "" {
 		org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
 		cmd.UI.DisplayWarnings(warnings)

@@ -187,7 +187,7 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	}
 
 	defer func() {
-		configWriteErr := configv3.WriteConfig(cfConfig)
+		configWriteErr := cfConfig.WriteConfig()
 		if configWriteErr != nil {
 			fmt.Fprintf(os.Stderr, "Error writing config: %s", configWriteErr.Error())
 		}

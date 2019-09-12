@@ -94,7 +94,7 @@ func SetConfig(cb func(conf *configv3.Config)) {
 
 	cb(config)
 
-	err = configv3.WriteConfig(config)
+	err = config.WriteConfig()
 	Expect(err).ToNot(HaveOccurred())
 }
 

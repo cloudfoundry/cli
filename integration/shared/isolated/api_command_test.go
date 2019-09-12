@@ -53,7 +53,7 @@ var _ = Describe("api command", func() {
 							},
 						},
 					}
-					err := configv3.WriteConfig(&userConfig)
+					err := userConfig.WriteConfig()
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -95,7 +95,7 @@ var _ = Describe("api command", func() {
 						},
 					},
 				}
-				err := configv3.WriteConfig(&userConfig)
+				err := userConfig.WriteConfig()
 				Expect(err).ToNot(HaveOccurred())
 			})
 

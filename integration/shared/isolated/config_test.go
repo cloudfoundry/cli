@@ -107,7 +107,7 @@ var _ = Describe("Config", func() {
 
 				config.ConfigFile.Target = "http://1.2.3.4"
 
-				err = configv3.WriteConfig(config)
+				err = config.WriteConfig()
 				Expect(err).ToNot(HaveOccurred())
 			})
 

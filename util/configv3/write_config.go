@@ -11,7 +11,7 @@ import (
 // WriteConfig creates the .cf directory and then writes the config.json. The
 // location of .cf directory is written in the same way LoadConfig reads .cf
 // directory.
-func WriteConfig(c *Config) error {
+func (c *Config) WriteConfig() error {
 	rawConfig, err := json.MarshalIndent(c.ConfigFile, "", "  ")
 	if err != nil {
 		return err

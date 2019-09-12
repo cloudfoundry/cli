@@ -800,6 +800,42 @@ var _ = Describe("login Command", func() {
 		})
 	})
 
+	Describe("Config", func() {
+		When("a user has successfully authenticated", func() {
+			BeforeEach(func() {
+				cmd.APIEndpoint = "example.com"
+				cmd.Username = "some-user"
+				cmd.Password = "some-password"
+				fakeConfig.APIVersionReturns("3.4.5")
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+			})
+
+			It("writes to the config", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeConfig.WriteConfigCallCount()).To(Equal(1))
+			})
+
+			When("GetOrganizations fails", func() {
+				BeforeEach(func() {
+					fakeActor.GetOrganizationsReturns(nil, nil, errors.New("Org Failure"))
+				})
+				It("writes to the config", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(fakeConfig.WriteConfigCallCount()).To(Equal(1))
+				})
+			})
+
+			When("WriteConfig returns an error", func() {
+				BeforeEach(func() {
+					fakeConfig.WriteConfigReturns(errors.New("Config Failure"))
+				})
+				It("throws that error", func() {
+					Expect(executeErr).To(MatchError("Error writing config: Config Failure"))
+				})
+			})
+		})
+	})
+
 	Describe("Targeting Org", func() {
 		BeforeEach(func() {
 			cmd.APIEndpoint = "example.com"

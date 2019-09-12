@@ -518,6 +518,16 @@ type FakeConfig struct {
 		result1 bool
 		result2 []string
 	}
+	WriteConfigStub        func() error
+	writeConfigMutex       sync.RWMutex
+	writeConfigArgsForCall []struct {
+	}
+	writeConfigReturns struct {
+		result1 error
+	}
+	writeConfigReturnsOnCall map[int]struct {
+		result1 error
+	}
 	WritePluginConfigStub        func() error
 	writePluginConfigMutex       sync.RWMutex
 	writePluginConfigArgsForCall []struct {
@@ -3160,6 +3170,58 @@ func (fake *FakeConfig) VerboseReturnsOnCall(i int, result1 bool, result2 []stri
 	}{result1, result2}
 }
 
+func (fake *FakeConfig) WriteConfig() error {
+	fake.writeConfigMutex.Lock()
+	ret, specificReturn := fake.writeConfigReturnsOnCall[len(fake.writeConfigArgsForCall)]
+	fake.writeConfigArgsForCall = append(fake.writeConfigArgsForCall, struct {
+	}{})
+	fake.recordInvocation("WriteConfig", []interface{}{})
+	fake.writeConfigMutex.Unlock()
+	if fake.WriteConfigStub != nil {
+		return fake.WriteConfigStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.writeConfigReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) WriteConfigCallCount() int {
+	fake.writeConfigMutex.RLock()
+	defer fake.writeConfigMutex.RUnlock()
+	return len(fake.writeConfigArgsForCall)
+}
+
+func (fake *FakeConfig) WriteConfigCalls(stub func() error) {
+	fake.writeConfigMutex.Lock()
+	defer fake.writeConfigMutex.Unlock()
+	fake.WriteConfigStub = stub
+}
+
+func (fake *FakeConfig) WriteConfigReturns(result1 error) {
+	fake.writeConfigMutex.Lock()
+	defer fake.writeConfigMutex.Unlock()
+	fake.WriteConfigStub = nil
+	fake.writeConfigReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeConfig) WriteConfigReturnsOnCall(i int, result1 error) {
+	fake.writeConfigMutex.Lock()
+	defer fake.writeConfigMutex.Unlock()
+	fake.WriteConfigStub = nil
+	if fake.writeConfigReturnsOnCall == nil {
+		fake.writeConfigReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.writeConfigReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeConfig) WritePluginConfig() error {
 	fake.writePluginConfigMutex.Lock()
 	ret, specificReturn := fake.writePluginConfigReturnsOnCall[len(fake.writePluginConfigArgsForCall)]
@@ -3329,6 +3391,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.v7SetSpaceInformationMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
+	fake.writeConfigMutex.RLock()
+	defer fake.writeConfigMutex.RUnlock()
 	fake.writePluginConfigMutex.RLock()
 	defer fake.writePluginConfigMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
