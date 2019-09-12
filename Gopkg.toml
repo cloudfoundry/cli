@@ -53,11 +53,11 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/SermoDigital/jose"
-  version = "1.1.0"
+  version = ">=1.1.0"
 
 [[constraint]]
   name = "github.com/blang/semver"
-  version = "3.5.1"
+  version = ">=3.5.1"
 
 [[constraint]]
   branch = "master"
@@ -93,7 +93,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/kr/pty"
-  version = "1.0.1"
+  version = ">=1.0.1"
 
 [[constraint]]
   branch = "master"
@@ -117,7 +117,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/onsi/ginkgo"
-  version = "1.7.0"
+  version = ">=1.7.0"
 
 # See the following:
 # https://github.com/golang/dep/issues/1799#issuecomment-381026769
@@ -128,7 +128,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/onsi/gomega"
-  version = "1.6.0"
+  version = ">=1.6.0"
 
 [[constraint]]
   branch = "master"
@@ -140,7 +140,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = "1.0.3"
+  version = ">=1.0.3"
 
 [[constraint]]
   branch = "master"
@@ -164,12 +164,12 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "gopkg.in/cheggaaa/pb.v1"
-  version = "1.0.18"
+  version = ">=1.0.18"
 
 [[constraint]]
   name = "gopkg.in/yaml.v2"
-  version = "2.2.1"
+  version = ">=2.2.1"
 
 [[constraint]]
   name = "github.com/cloudfoundry/bosh-cli"
-  version = "5.5.1"
+  version = ">=5.5.1"
