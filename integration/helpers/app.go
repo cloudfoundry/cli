@@ -23,7 +23,7 @@ import (
 // proper buildpack.
 func WithHelloWorldApp(f func(dir string)) {
 	dir := TempDirAbsolutePath("", "simple-app")
-	//defer os.RemoveAll(dir)
+	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
 	err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)

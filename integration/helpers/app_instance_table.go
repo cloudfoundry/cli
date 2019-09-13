@@ -21,6 +21,7 @@ type AppInstanceRow struct {
 // app' output.
 type AppProcessTable struct {
 	Type          string
+	Sidecars      string
 	InstanceCount string
 	MemUsage      string
 	Instances     []AppInstanceRow

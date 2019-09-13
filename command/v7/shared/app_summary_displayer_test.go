@@ -57,6 +57,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 									},
+									Sidecars: []v7action.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -95,6 +96,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 									},
+									Sidecars: []v7action.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -118,6 +120,7 @@ var _ = Describe("app summary displayer", func() {
 
 					webProcessSummary := processTable.Processes[0]
 					Expect(webProcessSummary.Type).To(Equal("web"))
+					Expect(webProcessSummary.Sidecars).To(Equal(""))
 					Expect(webProcessSummary.InstanceCount).To(Equal("3/3"))
 					Expect(webProcessSummary.MemUsage).To(Equal("32M"))
 
@@ -139,6 +142,7 @@ var _ = Describe("app summary displayer", func() {
 
 					consoleProcessSummary := processTable.Processes[1]
 					Expect(consoleProcessSummary.Type).To(Equal("console"))
+					Expect(consoleProcessSummary.Sidecars).To(Equal(""))
 					Expect(consoleProcessSummary.InstanceCount).To(Equal("1/1"))
 					Expect(consoleProcessSummary.MemUsage).To(Equal("16M"))
 
@@ -163,6 +167,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 									},
+									Sidecars: []v7action.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{
 										v7action.ProcessInstance{
 											Index:       0,
@@ -181,6 +186,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 										DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 									},
+									Sidecars: []v7action.Sidecar{},
 								},
 							},
 						},
@@ -189,11 +195,13 @@ var _ = Describe("app summary displayer", func() {
 
 				It("lists instance stats for process types that have > 0 instances", func() {
 					Expect(testUI.Out).To(Say(`type:\s+web`))
+					Expect(testUI.Out).To(Say(`sidecars: `))
 					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 				})
 
 				It("does not show the instance stats table for process types with 0 instances", func() {
 					Expect(testUI.Out).To(Say(`type:\s+console`))
+					Expect(testUI.Out).To(Say(`sidecars: `))
 					Expect(testUI.Out).To(Say("There are no running instances of this process."))
 				})
 			})
@@ -208,6 +216,7 @@ var _ = Describe("app summary displayer", func() {
 										Type:       constant.ProcessTypeWeb,
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									},
+									Sidecars:        []v7action.Sidecar{},
 									InstanceDetails: []v7action.ProcessInstance{{State: constant.ProcessInstanceDown}},
 								}},
 						},
@@ -216,6 +225,7 @@ var _ = Describe("app summary displayer", func() {
 
 				It("displays the instances table", func() {
 					Expect(testUI.Out).To(Say(`type:\s+web`))
+					Expect(testUI.Out).To(Say(`sidecars: `))
 					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 				})
 			})
@@ -234,17 +244,20 @@ var _ = Describe("app summary displayer", func() {
 										Type:    constant.ProcessTypeWeb,
 										Command: *types.NewFilteredString("some-command-1"),
 									},
+									Sidecars: []v7action.Sidecar{},
 								},
 								{
 									Process: v7action.Process{
 										Type:    "console",
 										Command: *types.NewFilteredString("some-command-2"),
 									},
+									Sidecars: []v7action.Sidecar{},
 								},
 								{
 									Process: v7action.Process{
 										Type: "random",
 									},
+									Sidecars: []v7action.Sidecar{},
 								},
 							},
 						},
@@ -258,12 +271,15 @@ var _ = Describe("app summary displayer", func() {
 
 					It("displays the non-empty start command for each process", func() {
 						Expect(testUI.Out).To(Say(`type:\s+web`))
+						Expect(testUI.Out).To(Say(`sidecars: `))
 						Expect(testUI.Out).To(Say(`start command:\s+some-command-1`))
 
 						Expect(testUI.Out).To(Say(`type:\s+console`))
+						Expect(testUI.Out).To(Say(`sidecars: `))
 						Expect(testUI.Out).To(Say(`start command:\s+some-command-2`))
 
 						Expect(testUI.Out).To(Say(`type:\s+random`))
+						Expect(testUI.Out).To(Say(`sidecars: `))
 						Expect(testUI.Out).ToNot(Say("start command:"))
 					})
 				})
@@ -295,12 +311,58 @@ var _ = Describe("app summary displayer", func() {
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 								},
+								Sidecars: []v7action.Sidecar{},
 							},
 							{
 								Process: v7action.Process{
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+								},
+								Sidecars: []v7action.Sidecar{},
+							},
+						},
+					},
+				}
+			})
+
+			It("lists information for each of the processes", func() {
+				Expect(testUI.Out).To(Say(`type:\s+web`))
+				Expect(testUI.Out).To(Say(`sidecars: `))
+				Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+				Expect(testUI.Out).To(Say(`memory usage:\s+32M`))
+				Expect(testUI.Out).To(Say("There are no running instances of this process."))
+
+				Expect(testUI.Out).To(Say(`type:\s+console`))
+				Expect(testUI.Out).To(Say(`sidecars: `))
+				Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+				Expect(testUI.Out).To(Say(`memory usage:\s+16M`))
+				Expect(testUI.Out).To(Say("There are no running instances of this process."))
+			})
+
+			It("does not display the instance table", func() {
+				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+			})
+		})
+
+		When("the app has sidecars", func() {
+			BeforeEach(func() {
+				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: v7action.Application{
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
+						},
+						ProcessSummaries: v7action.ProcessSummaries{
+							{
+								Process: v7action.Process{
+									Type:       constant.ProcessTypeWeb,
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+								},
+								Sidecars: []v7action.Sidecar{
+									{Name: "authenticator"},
+									{Name: "clock"},
 								},
 							},
 						},
@@ -310,13 +372,9 @@ var _ = Describe("app summary displayer", func() {
 
 			It("lists information for each of the processes", func() {
 				Expect(testUI.Out).To(Say(`type:\s+web`))
+				Expect(testUI.Out).To(Say(`sidecars:\s+authenticator, clock`))
 				Expect(testUI.Out).To(Say(`instances:\s+0/0`))
 				Expect(testUI.Out).To(Say(`memory usage:\s+32M`))
-				Expect(testUI.Out).To(Say("There are no running instances of this process."))
-
-				Expect(testUI.Out).To(Say(`type:\s+console`))
-				Expect(testUI.Out).To(Say(`instances:\s+0/0`))
-				Expect(testUI.Out).To(Say(`memory usage:\s+16M`))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 			})
 
@@ -338,11 +396,13 @@ var _ = Describe("app summary displayer", func() {
 								Process: v7action.Process{
 									Type: constant.ProcessTypeWeb,
 								},
+								Sidecars: []v7action.Sidecar{},
 							},
 							{
 								Process: v7action.Process{
 									Type: "console",
 								},
+								Sidecars: []v7action.Sidecar{},
 							},
 						},
 					},
@@ -351,9 +411,11 @@ var _ = Describe("app summary displayer", func() {
 
 			It("lists information for each of the processes", func() {
 				Expect(testUI.Out).To(Say(`type:\s+web`))
+				Expect(testUI.Out).To(Say(`sidecars: `))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 
 				Expect(testUI.Out).To(Say(`type:\s+console`))
+				Expect(testUI.Out).To(Say(`sidecars: `))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 			})
 

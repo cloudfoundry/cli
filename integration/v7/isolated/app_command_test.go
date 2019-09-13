@@ -250,7 +250,7 @@ applications:
 
 				It("displays the sidecars", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say(`sidecars:\s+[sidecar_name]\s+`))
+					Eventually(session).Should(Say(`sidecars:\s+sidecar_name\s+`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
