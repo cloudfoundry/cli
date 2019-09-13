@@ -5,8 +5,7 @@ groups:
   - deploy
 - name: delete
   jobs:
-  - delete-cf
-  - delete-infrastructure
+  - delete-cf-and-underlying-infrastructure
 
 resources:
 - name: cf-deployment-concourse-tasks
@@ -129,7 +128,9 @@ jobs:
         params:
           release: gcp-bosh-pool
 
-- name: delete-cf
+# To ensure a clean state after this Concourse job, the Cloud Foundry must be deleted first.
+# The infrastructure that this Cloud Foundry was running on must be deleted afterward.
+- name: delete-cf-and-underlying-infrastructure
   serial_groups: [((stack-name))]
   build_logs_to_retain: 100
   plan:
@@ -145,21 +146,6 @@ jobs:
       bbl-state: state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
-  ensure:
-    put: gcp-bosh-pool
-    params:
-      release: gcp-bosh-pool
-
-- name: delete-infrastructure
-  serial_groups: [((stack-name))]
-  build_logs_to_retain: 100
-  plan:
-  - aggregate:
-    - get: cf-deployment-concourse-tasks
-    - get: state
-    - put: gcp-bosh-pool
-      params:
-        claim: ((stack-name)).cli.fun
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
