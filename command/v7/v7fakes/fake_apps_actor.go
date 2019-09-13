@@ -9,10 +9,11 @@ import (
 )
 
 type FakeAppsActor struct {
-	GetAppSummariesForSpaceStub        func(string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
+	GetAppSummariesForSpaceStub        func(string, string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 	getAppSummariesForSpaceMutex       sync.RWMutex
 	getAppSummariesForSpaceArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	getAppSummariesForSpaceReturns struct {
 		result1 []v7action.ApplicationSummary
@@ -28,16 +29,17 @@ type FakeAppsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAppsActor) GetAppSummariesForSpace(arg1 string) ([]v7action.ApplicationSummary, v7action.Warnings, error) {
+func (fake *FakeAppsActor) GetAppSummariesForSpace(arg1 string, arg2 string) ([]v7action.ApplicationSummary, v7action.Warnings, error) {
 	fake.getAppSummariesForSpaceMutex.Lock()
 	ret, specificReturn := fake.getAppSummariesForSpaceReturnsOnCall[len(fake.getAppSummariesForSpaceArgsForCall)]
 	fake.getAppSummariesForSpaceArgsForCall = append(fake.getAppSummariesForSpaceArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetAppSummariesForSpace", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetAppSummariesForSpace", []interface{}{arg1, arg2})
 	fake.getAppSummariesForSpaceMutex.Unlock()
 	if fake.GetAppSummariesForSpaceStub != nil {
-		return fake.GetAppSummariesForSpaceStub(arg1)
+		return fake.GetAppSummariesForSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -52,17 +54,17 @@ func (fake *FakeAppsActor) GetAppSummariesForSpaceCallCount() int {
 	return len(fake.getAppSummariesForSpaceArgsForCall)
 }
 
-func (fake *FakeAppsActor) GetAppSummariesForSpaceCalls(stub func(string) ([]v7action.ApplicationSummary, v7action.Warnings, error)) {
+func (fake *FakeAppsActor) GetAppSummariesForSpaceCalls(stub func(string, string) ([]v7action.ApplicationSummary, v7action.Warnings, error)) {
 	fake.getAppSummariesForSpaceMutex.Lock()
 	defer fake.getAppSummariesForSpaceMutex.Unlock()
 	fake.GetAppSummariesForSpaceStub = stub
 }
 
-func (fake *FakeAppsActor) GetAppSummariesForSpaceArgsForCall(i int) string {
+func (fake *FakeAppsActor) GetAppSummariesForSpaceArgsForCall(i int) (string, string) {
 	fake.getAppSummariesForSpaceMutex.RLock()
 	defer fake.getAppSummariesForSpaceMutex.RUnlock()
 	argsForCall := fake.getAppSummariesForSpaceArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeAppsActor) GetAppSummariesForSpaceReturns(result1 []v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {

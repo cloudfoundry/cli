@@ -243,8 +243,9 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Err).To(Say("warning-2"))
 
 				Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
-				spaceGUID := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+				spaceGUID, labels := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(labels).To(Equal(""))
 			})
 		})
 
@@ -273,8 +274,9 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Err).To(Say("warning"))
 
 				Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
-				spaceGUID := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+				spaceGUID, labelSelector := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(labelSelector).To(Equal(""))
 			})
 		})
 
@@ -289,6 +291,30 @@ var _ = Describe("apps Command", func() {
 				Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("No apps found"))
 			})
+
+		})
+	})
+	Context("when a labels flag is set", func() {
+		BeforeEach(func() {
+			cmd.Labels = "fish=moose"
+		})
+
+		It("passes the flag to the API", func() {
+			Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
+			_, labelSelector := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+			Expect(labelSelector).To(Equal("fish=moose"))
+		})
+	})
+
+	Context("when a labels flag is set", func() {
+		BeforeEach(func() {
+			cmd.Labels = "fish=moose"
+		})
+
+		It("passes the flag to the API", func() {
+			Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
+			_, labelSelector := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
+			Expect(labelSelector).To(Equal("fish=moose"))
 		})
 	})
 })

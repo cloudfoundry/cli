@@ -14,13 +14,14 @@ import (
 //go:generate counterfeiter . AppsActor
 
 type AppsActor interface {
-	GetAppSummariesForSpace(spaceGUID string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
+	GetAppSummariesForSpace(spaceGUID string, labels string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 }
 
 type AppsCommand struct {
 	usage           interface{} `usage:"CF_NAME apps"`
 	relatedCommands interface{} `related_commands:"events, logs, map-route, push, scale, start, stop, restart"`
 
+	Labels      string `long:"labels" description:"TODO"`
 	UI          command.UI
 	Config      command.Config
 	Actor       AppsActor
@@ -59,7 +60,7 @@ func (cmd AppsCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	summaries, warnings, err := cmd.Actor.GetAppSummariesForSpace(cmd.Config.TargetedSpace().GUID)
+	summaries, warnings, err := cmd.Actor.GetAppSummariesForSpace(cmd.Config.TargetedSpace().GUID, cmd.Labels)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

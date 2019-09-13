@@ -68,7 +68,8 @@ var _ = Describe("Application Summary Actions", func() {
 
 	Describe("GetAppSummariesForSpace", func() {
 		var (
-			spaceGUID string
+			spaceGUID     string
+			labelSelector string
 
 			summaries  []ApplicationSummary
 			warnings   Warnings
@@ -77,10 +78,11 @@ var _ = Describe("Application Summary Actions", func() {
 
 		BeforeEach(func() {
 			spaceGUID = "some-space-guid"
+			labelSelector = "some-key=some-value"
 		})
 
 		JustBeforeEach(func() {
-			summaries, warnings, executeErr = actor.GetAppSummariesForSpace(spaceGUID)
+			summaries, warnings, executeErr = actor.GetAppSummariesForSpace(spaceGUID, labelSelector)
 		})
 
 		When("getting the application is successful", func() {
@@ -227,6 +229,7 @@ var _ = Describe("Application Summary Actions", func() {
 				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
 					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{"some-key=some-value"}},
 				))
 
 				Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
@@ -234,6 +237,19 @@ var _ = Describe("Application Summary Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
 				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
+			})
+
+			When("there is no label selector", func() {
+				BeforeEach(func() {
+					labelSelector = ""
+				})
+				It("doesn't pass a label selection filter", func() {
+					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"name"}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					))
+				})
 			})
 		})
 

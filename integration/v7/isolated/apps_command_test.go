@@ -85,12 +85,12 @@ var _ = Describe("apps command", func() {
 			var domainName string
 
 			BeforeEach(func() {
+				domainName = helpers.DefaultSharedDomain()
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName2)).Should(Exit(0))
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName1)).Should(Exit(0))
 				})
 
-				domainName = helpers.DefaultSharedDomain()
 			})
 
 			It("displays apps in the list", func() {
@@ -118,6 +118,22 @@ var _ = Describe("apps command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 			})
+
+			When("the --labels flag is given", func() {
+
+				BeforeEach(func() {
+					Eventually(helpers.CF("set-label", "app", appName1, "environment=production", "tier=backend")).Should(Exit(0))
+					Eventually(helpers.CF("set-label", "app", appName2, "environment=staging", "tier=frontend")).Should(Exit(0))
+				})
+
+				It("displays apps with provided labels", func() {
+					session := helpers.CF("apps", "--labels", "environment in (production,staging),tier in (backend)")
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(appName1))
+					Expect(session).ShouldNot(Say(appName2))
+				})
+			})
 		})
+
 	})
 })

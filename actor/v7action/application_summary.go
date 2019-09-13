@@ -30,14 +30,18 @@ func (a ApplicationSummary) hasIsolationSegment() bool {
 		len(a.ProcessSummaries[0].InstanceDetails[0].IsolationSegment) > 0
 }
 
-func (actor Actor) GetAppSummariesForSpace(spaceGUID string) ([]ApplicationSummary, Warnings, error) {
+func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector string) ([]ApplicationSummary, Warnings, error) {
 	var allWarnings Warnings
 	var allSummaries []ApplicationSummary
 
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(
+	keys := []ccv3.Query{
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
-	)
+	}
+	if len(labelSelector) > 0 {
+		keys = append(keys, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+	apps, warnings, err := actor.CloudControllerClient.GetApplications(keys...)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
