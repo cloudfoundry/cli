@@ -66,7 +66,7 @@ var _ = Describe("Organization Actions", func() {
 				)
 			})
 
-			It("returns back the domains and warnings", func() {
+			It("returns back the organizations and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
