@@ -9,9 +9,10 @@ import (
 )
 
 type FakeOrgsActor struct {
-	GetOrganizationsStub        func() ([]v7action.Organization, v7action.Warnings, error)
+	GetOrganizationsStub        func(string) ([]v7action.Organization, v7action.Warnings, error)
 	getOrganizationsMutex       sync.RWMutex
 	getOrganizationsArgsForCall []struct {
+		arg1 string
 	}
 	getOrganizationsReturns struct {
 		result1 []v7action.Organization
@@ -27,15 +28,16 @@ type FakeOrgsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeOrgsActor) GetOrganizations() ([]v7action.Organization, v7action.Warnings, error) {
+func (fake *FakeOrgsActor) GetOrganizations(arg1 string) ([]v7action.Organization, v7action.Warnings, error) {
 	fake.getOrganizationsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationsReturnsOnCall[len(fake.getOrganizationsArgsForCall)]
 	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetOrganizations", []interface{}{})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizations", []interface{}{arg1})
 	fake.getOrganizationsMutex.Unlock()
 	if fake.GetOrganizationsStub != nil {
-		return fake.GetOrganizationsStub()
+		return fake.GetOrganizationsStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -50,10 +52,17 @@ func (fake *FakeOrgsActor) GetOrganizationsCallCount() int {
 	return len(fake.getOrganizationsArgsForCall)
 }
 
-func (fake *FakeOrgsActor) GetOrganizationsCalls(stub func() ([]v7action.Organization, v7action.Warnings, error)) {
+func (fake *FakeOrgsActor) GetOrganizationsCalls(stub func(string) ([]v7action.Organization, v7action.Warnings, error)) {
 	fake.getOrganizationsMutex.Lock()
 	defer fake.getOrganizationsMutex.Unlock()
 	fake.GetOrganizationsStub = stub
+}
+
+func (fake *FakeOrgsActor) GetOrganizationsArgsForCall(i int) string {
+	fake.getOrganizationsMutex.RLock()
+	defer fake.getOrganizationsMutex.RUnlock()
+	argsForCall := fake.getOrganizationsArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeOrgsActor) GetOrganizationsReturns(result1 []v7action.Organization, result2 v7action.Warnings, result3 error) {

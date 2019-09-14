@@ -13,6 +13,8 @@ const (
 	AppGUIDFilter QueryKey = "app_guids"
 	// GUIDFilter is a query parameter for listing objects by GUID.
 	GUIDFilter QueryKey = "guids"
+	// LabelSelectorFilter is a query parameter for listing objects by label
+	LabelSelectorFilter QueryKey = "label_selector"
 	// NameFilter is a query parameter for listing objects by name.
 	NameFilter QueryKey = "names"
 	// NoRouteFilter is a query parameter for skipping route creation and unmapping existing routes.

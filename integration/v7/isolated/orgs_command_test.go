@@ -75,6 +75,29 @@ var _ = Describe("orgs command", func() {
 				Eventually(session).Should(Say("%s", orgName1))
 				Eventually(session).Should(Exit(0))
 			})
+
+			When("the --labels flag is given", func() {
+
+				BeforeEach(func() {
+					Eventually(helpers.CF("set-label", "org", orgName1, "environment=production", "tier=backend")).Should(Exit(0))
+					Eventually(helpers.CF("set-label", "org", orgName2, "environment=staging", "tier=frontend")).Should(Exit(0))
+				})
+
+				It("displays only the organizations with labels that match the expression", func() {
+					session := helpers.CF("orgs", "--labels", "environment in (production,staging),tier in (backend)")
+					Eventually(session).Should(Exit(0))
+					Expect(session).ShouldNot(Say(orgName2))
+					Expect(session).Should(Say(orgName1))
+				})
+
+				When("the --labels selector is malformed", func() {
+					It("errors", func() {
+						session := helpers.CF("orgs", "--labels", "malformed in (")
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
 		})
+
 	})
 })

@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . OrgsActor
 
 type OrgsActor interface {
-	GetOrganizations() ([]v7action.Organization, v7action.Warnings, error)
+	GetOrganizations(labelSelector string) ([]v7action.Organization, v7action.Warnings, error)
 }
 
 type OrgsCommand struct {
@@ -23,6 +23,7 @@ type OrgsCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       OrgsActor
+	Labels      string `long:"labels" description:"Selector to filter organizations against"`
 }
 
 func (cmd *OrgsCommand) Setup(config command.Config, ui command.UI) error {
@@ -56,7 +57,7 @@ func (cmd OrgsCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	orgs, warnings, err := cmd.Actor.GetOrganizations()
+	orgs, warnings, err := cmd.Actor.GetOrganizations(cmd.Labels)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

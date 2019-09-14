@@ -125,6 +125,16 @@ var _ = Describe("orgs Command", func() {
 
 					Expect(fakeActor.GetOrganizationsCallCount()).To(Equal(1))
 				})
+
+				When("a label selector is provided to filter the orgs", func() {
+					BeforeEach(func() {
+						cmd.Labels = "some-label-selector"
+					})
+					It("passes the label selector to the actor", func() {
+						Expect(fakeActor.GetOrganizationsCallCount()).To(Equal(1))
+						Expect(fakeActor.GetOrganizationsArgsForCall(0)).To(Equal("some-label-selector"))
+					})
+				})
 			})
 
 			When("a translatable error is encountered getting orgs", func() {
