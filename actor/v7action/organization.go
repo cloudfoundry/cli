@@ -16,10 +16,14 @@ type Organization struct {
 	Metadata *Metadata
 }
 
-func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
-	ccOrgs, warnings, err := actor.CloudControllerClient.GetOrganizations(
+func (actor Actor) GetOrganizations(labelSelector string) ([]Organization, Warnings, error) {
+	queries := []ccv3.Query{
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
-	)
+	}
+	if len(labelSelector) > 0 {
+		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+	ccOrgs, warnings, err := actor.CloudControllerClient.GetOrganizations(queries...)
 	if err != nil {
 		return []Organization{}, Warnings(warnings), err
 	}

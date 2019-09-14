@@ -25,6 +25,8 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("GetOrganizations", func() {
 		var (
+			labelSelector string
+
 			ccv3Organizations []ccv3.Organization
 			organizations     []Organization
 
@@ -50,13 +52,10 @@ var _ = Describe("Organization Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			organizations, warnings, executeErr = actor.GetOrganizations()
+			organizations, warnings, executeErr = actor.GetOrganizations(labelSelector)
 		})
 
 		When("the API layer call is successful", func() {
-			expectedQuery := []ccv3.Query{
-				{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
-			}
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
@@ -66,12 +65,21 @@ var _ = Describe("Organization Actions", func() {
 				)
 			})
 
-			It("returns back the organizations and warnings", func() {
+			It("does not error", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+			})
 
+			It("does not pass through the label selector", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				expectedQuery := []ccv3.Query{
+					{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+				}
 				actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
 				Expect(actualQuery).To(Equal(expectedQuery))
+			})
+
+			It("returns back the organizations and warnings", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 
 				Expect(organizations).To(ConsistOf(
 					Organization{Name: organization1Name, GUID: organization1GUID},
@@ -79,7 +87,25 @@ var _ = Describe("Organization Actions", func() {
 					Organization{Name: organization3Name, GUID: organization3GUID},
 				))
 				Expect(warnings).To(ConsistOf("some-organizations-warning"))
+			})
+		})
 
+		When("a label selector is provided", func() {
+			BeforeEach(func() {
+				labelSelector = "some-label-selector"
+			})
+
+			It("passes the label selector through", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+
+				expectedQuery := []ccv3.Query{
+					{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+					{Key: ccv3.LabelSelectorFilter, Values: []string{"some-label-selector"}},
+				}
+				actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(actualQuery).To(Equal(expectedQuery))
 			})
 		})
 
