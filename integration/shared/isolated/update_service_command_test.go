@@ -110,7 +110,7 @@ var _ = Describe("update-service command", func() {
 			)
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().Register()
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 
 				serviceInstanceName = helpers.PrefixedRandomName("SI")

@@ -22,7 +22,7 @@ var _ = Describe("FakeServiceBroker", func() {
 	})
 
 	It("can create and reuse a service broker and use it, and dispose of it", func() {
-		broker = fakeservicebroker.New().Async().Register()
+		broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 		service := broker.ServiceName()
 		servicePlan := broker.ServicePlanName()
 		serviceInstance := helpers.PrefixedRandomName("si")
@@ -35,7 +35,7 @@ var _ = Describe("FakeServiceBroker", func() {
 	})
 
 	It("can reuse and reconfigure the broker that has service instances", func() {
-		broker = fakeservicebroker.New().Async().Register()
+		broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 
 		service := broker.ServiceName()
 		servicePlan := broker.ServicePlanName()
@@ -44,6 +44,6 @@ var _ = Describe("FakeServiceBroker", func() {
 		Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 		Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 
-		broker = fakeservicebroker.New().Async().Register()
+		broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 	})
 })

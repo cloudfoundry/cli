@@ -306,7 +306,7 @@ var _ = Describe("bind-service command", func() {
 
 				When("the service binding is blocking", func() {
 					BeforeEach(func() {
-						broker = fakeservicebroker.New().Register()
+						broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 
 						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 						Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance)).Should(Exit(0))
@@ -330,7 +330,7 @@ var _ = Describe("bind-service command", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 
-						broker = fakeservicebroker.New().Async().Register()
+						broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 
 						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 						Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance)).Should(Exit(0))

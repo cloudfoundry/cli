@@ -224,7 +224,7 @@ var _ = Describe("service command", func() {
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Register()
+					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 					service = broker.ServiceName()
 					servicePlan = broker.ServicePlanName()
 
@@ -471,7 +471,7 @@ var _ = Describe("service command", func() {
 			sourceSpaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, sourceSpaceName)
 
-			broker = fakeservicebroker.New().Register()
+			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 			service = broker.ServiceName()
 			servicePlan = broker.ServicePlanName()
 

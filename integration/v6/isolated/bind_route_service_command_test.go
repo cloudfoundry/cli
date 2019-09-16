@@ -68,7 +68,7 @@ var _ = Describe("bind-route-service command", func() {
 				serviceInstanceName = helpers.PrefixedRandomName("instance")
 				broker = fakeservicebroker.New()
 				broker.Services[0].Requires = []string{"route_forwarding"}
-				broker.Register()
+				broker.EnsureBrokerIsAvailable()
 
 				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 				Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstanceName)).Should(Exit(0))

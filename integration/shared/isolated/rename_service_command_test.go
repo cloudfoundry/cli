@@ -26,7 +26,7 @@ var _ = Describe("rename-service command", func() {
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
 
-			broker = fakeservicebroker.New().Register()
+			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 			serviceName = broker.ServiceName()
 
 			Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
