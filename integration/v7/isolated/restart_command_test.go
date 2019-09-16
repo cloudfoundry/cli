@@ -96,7 +96,7 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+1/1`))
-					Eventually(session).Should(Say(`memory usage:\s+32M`))
+					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
 					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
@@ -121,7 +121,7 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+1/1`))
-					Eventually(session).Should(Say(`memory usage:\s+32M`))
+					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
 					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
@@ -148,7 +148,7 @@ var _ = Describe("restart command", func() {
 						Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say(`instances:\s+1/1`))
-						Eventually(session).Should(Say(`memory usage:\s+32M`))
+						Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
 						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
 						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
