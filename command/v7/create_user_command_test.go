@@ -183,6 +183,26 @@ var _ = Describe("create-user Command", func() {
 			})
 		})
 
+		When("password is provided", func() {
+			BeforeEach(func() {
+				cmd.Args.Username = "some-user"
+				password := "password"
+				cmd.Args.Password = &password
+				cmd.Origin = ""
+			})
+
+			When("origin is empty string", func() {
+				It("defaults origin to 'uaa'", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.GetUserCallCount()).To(Equal(1))
+
+					username, origin := fakeActor.GetUserArgsForCall(0)
+					Expect(username).To(Equal("some-user"))
+					Expect(origin).To(Equal("uaa"))
+				})
+			})
+		})
+
 		When("an error occurs", func() {
 			When("the error is not translatable", func() {
 				var returnedErr error

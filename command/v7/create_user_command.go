@@ -64,8 +64,13 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 		return err
 	}
 
+	origin := cmd.Origin
+	if cmd.Origin == "" {
+		origin = "uaa"
+	}
+
 	//	Does the new user already exist?
-	_, err = cmd.Actor.GetUser(cmd.Args.Username, cmd.Origin)
+	_, err = cmd.Actor.GetUser(cmd.Args.Username, origin)
 	if err == nil {
 		// User already exists
 		cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{
