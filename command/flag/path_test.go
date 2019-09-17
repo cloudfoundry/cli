@@ -224,10 +224,22 @@ var _ = Describe("path types", func() {
 			})
 
 			When("the path exists", func() {
-				It("sets the path", func() {
-					err := pathWithExistenceCheck.UnmarshalFlag("abc")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(pathWithExistenceCheck).To(BeEquivalentTo("abc"))
+				When("the path is relative", func() {
+					It("expands the path", func() {
+						fullPath, err := filepath.EvalSymlinks(filepath.Join(tempDir, "abc"))
+						Expect(err).NotTo(HaveOccurred())
+						err = pathWithExistenceCheck.UnmarshalFlag("abc")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(pathWithExistenceCheck).To(BeEquivalentTo(fullPath))
+					})
+				})
+
+				When("the path is absolute", func() {
+					It("preserves the path", func() {
+						err := pathWithExistenceCheck.UnmarshalFlag(filepath.Join(tempDir, "abc"))
+						Expect(err).ToNot(HaveOccurred())
+						Expect(pathWithExistenceCheck).To(BeEquivalentTo(filepath.Join(tempDir, "abc")))
+					})
 				})
 			})
 		})

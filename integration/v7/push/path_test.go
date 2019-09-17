@@ -1,8 +1,10 @@
 package push
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 
@@ -190,6 +192,30 @@ var _ = Describe("handle path in manifest and flag override", func() {
 						Eventually(session).Should(Say(`name:\s+%s`, appName))
 						Eventually(session).Should(Say(`requested state:\s+started`))
 						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("The manifest is in a different directory than the app's source", func() {
+					FIt("pushes the app with a relative path to the app directory", func() {
+						manifestDir := helpers.TempDirAbsolutePath("", "manifest-dir")
+						defer os.RemoveAll(manifestDir)
+
+						err := ioutil.WriteFile(
+							filepath.Join(manifestDir, "manifest.yml"),
+							[]byte(fmt.Sprintf(`---
+applications:
+  - name: %s`,
+								appName)), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						helpers.WithHelloWorldApp(func(appDir string) {
+							err = os.Chdir("/")
+							Expect(err).ToNot(HaveOccurred())
+							session := helpers.CF(PushCommandName, appName, "-p", path.Join(".", appDir), "-f", path.Join(manifestDir, "manifest.yml"))
+							Eventually(session).Should(Say(`name:\s+%s`, appName))
+							Eventually(session).Should(Say(`requested state:\s+started`))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 			})

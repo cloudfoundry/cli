@@ -3,11 +3,11 @@ package v7pushaction_test
 import (
 	"io/ioutil"
 	"os"
+	"path"  // TODO: use "path/filepath" instead
 
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/pushmanifestparser"
-
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
 	. "github.com/onsi/ginkgo"
@@ -38,21 +38,21 @@ var _ = Describe("HandleAppPathOverride", func() {
 	})
 
 	When("the path flag override is set", func() {
-		var filePath string
+		var relativeAppFilePath string
 
 		BeforeEach(func() {
 			file, err := ioutil.TempFile("", "")
 			Expect(err).NotTo(HaveOccurred())
-			filePath = file.Name()
+			relativeAppFilePath = file.Name()
 			defer file.Close()
 
 			flagOverrides = FlagOverrides{
-				ProvidedAppPath: filePath,
+				ProvidedAppPath: relativeAppFilePath,
 			}
 		})
 
 		AfterEach(func() {
-			err := os.RemoveAll(filePath)
+			err := os.RemoveAll(relativeAppFilePath)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -76,14 +76,44 @@ var _ = Describe("HandleAppPathOverride", func() {
 				parsedManifest = pushmanifestparser.Manifest{
 					Applications: []pushmanifestparser.Application{
 						{
-							Path: "some-non-existent-path",
+							Path: "some-path",
 						},
 					},
+					PathToManifest: "/path/to/manifest.yml",
 				}
 			})
 
 			It("overrides the path for the first app in the manifest", func() {
-				Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(filePath))
+				Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(relativeAppFilePath))
+			})
+
+			When("the application's path is relative and passed as a flag", func() {
+				var cwd string
+				var absoluteAppFilehandle *os.File
+				BeforeEach(func() {
+					absoluteAppFilehandle, err = ioutil.TempFile("", "")
+					Expect(err).NotTo(HaveOccurred())
+					defer absoluteAppFilehandle.Close()
+					relativeAppFilePath = path.Join(".", absoluteAppFilehandle.Name())
+					flagOverrides.ProvidedAppPath = relativeAppFilePath
+
+					// TODO: Do NOT use Chdir! it affects ALL other threads
+					// Save the current working directory so you can return to it later
+					cwd, err = os.Getwd()
+					Expect(err).NotTo(HaveOccurred())
+					// Go to root directory before executing HandleAppPathOverride()
+					err = os.Chdir("/")
+					Expect(err).NotTo(HaveOccurred())
+				})
+				AfterEach(func() {
+					err = os.Chdir(cwd)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("doesn't override the path for the first app in the manifest", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(transformedManifest.Applications[0].Path).To(matchers.MatchPath(relativeAppFilePath))
+				})
 			})
 		})
 	})

@@ -34,6 +34,11 @@ func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
 		return err
 	}
 
+	path, err = filepath.Abs(path)
+	if err != nil {
+		return err
+	}
+
 	*p = PathWithExistenceCheck(path)
 	return nil
 }
