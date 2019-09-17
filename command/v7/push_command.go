@@ -78,7 +78,7 @@ type PushCommand struct {
 	Instances               flag.Instances                      `long:"instances" short:"i" description:"Number of instances"`
 	PathToManifest          flag.ManifestPathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	Memory                  string                              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	NoManifest              bool                                `long:"no-manifest" description:""`
+	NoManifest              bool                                `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
 	NoWait                  bool                                `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
