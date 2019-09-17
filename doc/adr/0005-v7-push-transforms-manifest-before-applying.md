@@ -16,13 +16,13 @@ As the V3 Acceleration Team was working on the V7 CLI version of `cf push`, we f
 
 ### The dream of the server-side manifest
 
-The dream of server-side manifests is that the CF CLI does not need to have any knowledge of push manifest contents in order fulfill `push`. In this dream world, the idea is that `push` can supply manifest contents as input a CAPI apply manifest endpoint without ever parsing the manifest. Once apply manifest runs, we expect that the desired state expressed by the CLI user is represented in the CAPI database. After that, `push` proceeds with uploading the soruce code and starting the app. 
+The dream of server-side manifests is that the CF CLI does not need to have any knowledge of push manifest contents in order fulfill `push`, that `push` can supply manifest contents as input to the API apply manifest endpoint without ever parsing the manifest. Once apply manifest runs, we expect that the desired state expressed by the CLI user is represented in the API database. After that, `push` proceeds with uploading the soruce code and starting the app.
 
-The drive to move to server-side manifest design: CAPI wanted to add additional manifest features (i.e. properties) without requiring any implementation changes on the CF CLI side. 
+CAPI wanted to add additional manifest features (i.e. properties) without requiring any implementation changes on the CF CLI side, which drove the move to server-side manifest design.
 
 See here for more on this topic:
-[V3 Server-Side Multi-App Manifests](https://docs.google.com/document/d/1z-0Ev-QCtuoT8nJCoNaVJmkMPNk4PYi_VGWzc8CwBIs/edit#)
-[Server Side Manifest Exploration](https://docs.google.com/document/d/1HKNz5Qaza9fx8QSQp4oWqzcg3Sv1tkyEhm_6qQFaQAM/edit#heading=h.qt2a8po833hn)
+* [V3 Server-Side Multi-App Manifests](https://docs.google.com/document/d/1z-0Ev-QCtuoT8nJCoNaVJmkMPNk4PYi_VGWzc8CwBIs/edit#)
+* [Server Side Manifest Exploration](https://docs.google.com/document/d/1HKNz5Qaza9fx8QSQp4oWqzcg3Sv1tkyEhm_6qQFaQAM/edit#heading=h.qt2a8po833hn)
 
 ### Adding support for diffing
 
@@ -43,7 +43,7 @@ Updating app with these attributes...
   health check type:   port
 - instances:           2
 + instances:           3
-  memory:              
+  memory:
 
   stack:               cflinuxfs3
   routes:
@@ -54,12 +54,12 @@ When we set out to explore adding the diff output to V7, we found there was no s
 
 ### Unfixable bugs due to overrides being handled too late
 
-We also wanted to fix cases where the API apply manifest endpoint returns an error due when the manifest property value is invalid, even if the corresponding flag override is acceptable.  
+We also wanted to fix cases where the API apply manifest endpoint returns an error due when the manifest property value is invalid, even if the corresponding flag override is acceptable.
 
-Here is an example: 
-[**CLI** user should not get a failed push when flag overrides are below quota limits but manifest values are above](https://www.pivotaltracker.com/story/show/167576661)
+Here is an example:
+* [**CLI** user should not get a failed push when flag overrides are below quota limits but manifest values are above](https://www.pivotaltracker.com/story/show/167576661)
 
-Prior to this change, manifest properties and flag overrides were handled with separate API calls. Manifest properties were applied first exactly as they are in the manifest file. Then if the apply-manifest request was successful, the flag overrides would be handled (e.g. by sending a request to scale the instances to the number specified by the `-i` flag). But if the manifest was invalid (e.g. had a memory setting that would put an app over its quota), the apply-manifest step would fail, even if there was a `-m` flag given that intended to set the memory to an acceptable value.
+Prior to this change, manifest properties and flag overrides were handled in separate API calls. Manifest properties were applied first exactly as they are in the manifest file. Then if the apply-manifest request was successful, the flag overrides would be handled (e.g. by sending a request to scale the instances to the number specified by the `-i` flag). But if the manifest was invalid (e.g. had a memory setting that would put an app over its quota), the apply-manifest step would fail, even if there was a `-m` flag given that intended to set the memory to an acceptable value.
 
 ## Decision
 
@@ -67,8 +67,8 @@ _The change that we're proposing or have agreed to implement._
 
 ### How did `push` work before this change?
 
-Before this change, `push` preserved manifest properties exactly as is and sends to the API apply-manifest endpoint.  
-The flag overrides would be handled after applying the manifest was complete. 
+Before this change, `push` preserved manifest properties exactly as is and sent these to the API apply-manifest endpoint.
+The flag overrides would be handled after applying the manifest was complete.
 
 ### How does `push` work with this change?
 
@@ -78,8 +78,9 @@ In addition, the API is now fully responsible for handling the logic of validati
 
 ### Case study: Lifecycle of a flag override
 
-Follow the path a flag override takes (e.g. `-i 4`) from the user, through the code (use code snippets!)
-    - show where the sequence of manifest transform functions is called
+We follow the path that a flag override takes (e.g. `-i 4`) from the user, through the code.
+
+Here is where the sequence of manifest transform functions is called:
 ```go
 func (cmd PushCommand) Execute(args []string) error {
     //...
@@ -109,15 +110,14 @@ func (actor Actor) HandleFlagOverrides(baseManifest pushmanifestparser.Manifest,
 }
 ```
 
-    - show where the sequence itself lives
-    
+Here is the list of functions in the transform sequence:
 ```go
 actor.TransformManifestSequence = []HandleFlagOverrideFunc{
     // app name override must come first, so it can trim the manifest
     // from multiple apps down to just one
     HandleAppNameOverride,
 
-    HandleInstancesOverride, // <== manifest transform function 
+    HandleInstancesOverride, // <== manifest transform function
     HandleStartCommandOverride,
     HandleHealthCheckTypeOverride,
     HandleHealthCheckEndpointOverride,
@@ -139,9 +139,9 @@ actor.TransformManifestSequence = []HandleFlagOverrideFunc{
     HandleDropletPathOverride,
 }
 ```
-    
-    - show one of the manifest transform function elements in the sequence
-    
+
+Here is an example transform function:
+
 ```go
 func HandleInstancesOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
     if overrides.Instances.IsSet {
@@ -161,8 +161,7 @@ func HandleInstancesOverride(manifest pushmanifestparser.Manifest, overrides Fla
     return manifest, nil
 }
 ```
-    - show manifest before & after
-    
+
 If this is the manifest YAML as provided by the CF CLI user:
 ```yaml
 applications:
@@ -172,7 +171,7 @@ applications:
 
 And the CF CLI user calls push to scale up the number of app instances:
 ```
-  cd push -i 3
+  cf push -i 3
 ```
 
 
@@ -188,17 +187,17 @@ applications:
 _What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated._
 
 ### Cleaner separation of concerns between CLI and API
-    
-One key outcome is that we have achieved a clearer separation of concerns between the CLI and the API when it comes to the manifest. The idea of "flag overrides" has always been a CLI-only concept, but there were cases where the responsibilities were getting blurred. 
+
+One key outcome is that we have achieved a clearer separation of concerns between the CLI and the API when it comes to the manifest. The idea of "flag overrides" has always been a CLI-only concept, but there were cases where the responsibilities were getting blurred.
 
 For example, consider `no-route`, which is available as a flag (`--no-route`) or as a manifest property (`no-route: true`). Before this refactor, in order to apply the manifest exactly as written but still allow the overriding behavior that the CLI required, we introduced `no_route` as a query parameter on the apply-manifest endpoint. So, when `--no-route` was given, the resulting request would look like `POST /v3/spaces/:guid/apply_manifest?no_route=true`. Although this worked, it was an example of a specific, one-off solution to a broader problem. We did not want to add query parameters for every overridable manifest property, and it was an instance of making the API overly-tailored to the CLI's use case.
 
-With this change, the `--no-route` override is handled fully on the CLI side, before applying the manifest, since flag overrides are the CLI's business. We were able to remove the `no_route` query parameter from the API endpoint and clean up some related code on the CAPI side.
+With this change, the `--no-route` override is handled fully on the CLI side, before applying the manifest, since flag overrides are the CLI's business. We were able to remove the `no_route` query parameter from the API endpoint and clean up some related code on the API side.
 
 ### Server-side manifests: closer to or further from the dream?
 
-If the goal of server-side manifests was to push as much as possible of the work related to validating/applying/resolving configuration changes to the API side, then this refactor gets us much closer to that goal. The CLI now leans fully on CAPI to apply the manifest, rather than applying the manifest and then "correcting" the configuration with additional API calls.
-     
+If the goal of server-side manifests was to push as much as possible of the work related to validating/applying/resolving configuration changes to the API side, then this refactor gets us much closer to that goal. The CLI now leans fully on the API to apply the manifest, rather than applying the manifest and then "correcting" the configuration with additional API calls.
+
 However, if the goal of server-side manifests was for the CLI to know as little as possible about the contents of the manifest, then this refactor is a deliberate departure from that goal. In order to apply the flag overrides, the CLI must parse almost the entire manifest.
 
 #### Risks
@@ -208,14 +207,14 @@ With server-side manifests, we wanted to allow CAPI to introduce new manifest pr
 #### Mitigations
 
 We accept the risk described above for these reasons:
-- We designed the CLI's new manifest parser to preserve any unrecognized YAML properties in the in-memory representation of the YAML, so they will be sent along to CAPI in the end. This means CAPI is free to make additive changes to the manifest specification, and users can leverage them without needing any CLI changes.
+- We designed the CLI's new manifest parser to preserve any unrecognized YAML properties in the in-memory representation of the YAML, so they will be sent along to the API in the end. This means CAPI is free to make additive changes to the manifest specification, and users can leverage them without needing any CLI changes.
 - If CAPI makes a _breaking_ change to the manifest specification, this will impact the CLI. However, we discussed this with the CAPI team, and they are unlikely to do so anytime soon, since it will also force any users to refactor their manifests (and require changes in any other clients dependent on the manifest spec). If they do want to make a breaking change, they will likely introduce the idea of _versioned manifests_ and continue to support multiple manifest specifications for some time.
 
-### Less leftovers when `push` fails
-Before the refactor, failed pushes could result in state changes. These changes would not get rolled back after the `push` exited with an error. 
+### Fewer leftovers when `push` fails
+Before the refactor, failed pushes could result in state changes. These changes would not get rolled back after the `push` exited with an error.
 
 Setup:
-Suppose the CLI user started with no existing app and a space memory quota of 500 MB. 
+Suppose the CLI user started with no existing app and a space memory quota of 500 MB.
 If they supplied a manifest:
 ```yaml
 applications:
@@ -224,7 +223,7 @@ applications:
   memory_in_mb: 10
 ```
 
-And they pushed with this command: 
+And they pushed with this command:
 `cf push -m 20MB`
 
 
@@ -244,7 +243,7 @@ applications:
 ```
 `push` would apply the manifest, and would fail with a validation error indicating that the desired memory is over quota.  Therefore we never even get to the step of scaling app instances.
 
-### Fewer CAPI requests per app
+### Fewer API requests per app
 
 A nice side-effect of this refactor is that the number of API calls required to push an app decreases considerably. Previously, to apply the manifest properties, we had to make one call to apply the manifest and then `n` calls for each app that we're pushing (where `n` is roughly the number of flag overrides). Now, we only have to make one call to apply the manifest for all pushed apps.
 
@@ -256,7 +255,7 @@ This refactor builds on the hexagonal architecture established in [this push ref
 
 ### Diff possibility
 
-Now, we have a simpler path towards implementing the diff output feature in V7. We now have a representation of the full desired manifest, after flag overrides have been applied. We can make a request to CAPI for the current manifest and compare the two manifests.
+Now, we have a simpler path towards implementing the diff output feature in V7. We now have a representation of the full desired manifest, after flag overrides have been applied. We can make [a request to the API for the current manifest](https://v3-apidocs.cloudfoundry.org/version/release-candidate/#generate-an-app-manifest) and compare the two manifests.
 
 ### Better captures user intent of flag overrides superceding manifest properties
 
