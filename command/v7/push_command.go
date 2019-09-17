@@ -237,6 +237,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 		},
 	}
 	if cmd.NoManifest {
+		log.Debugf("No manifest given, generating manifest")
 		return defaultManifest, nil
 	}
 
@@ -256,6 +257,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	}
 
 	if !exists {
+		log.Debugf("No manifest given, generating manifest")
 		return defaultManifest, nil
 	}
 
