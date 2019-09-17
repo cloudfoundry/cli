@@ -25,8 +25,6 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("GetOrganizations", func() {
 		var (
-			labelSelector string
-
 			ccv3Organizations []ccv3.Organization
 			organizations     []Organization
 
@@ -51,10 +49,6 @@ var _ = Describe("Organization Actions", func() {
 			}
 		})
 
-		JustBeforeEach(func() {
-			organizations, warnings, executeErr = actor.GetOrganizations(labelSelector)
-		})
-
 		When("the API layer call is successful", func() {
 
 			BeforeEach(func() {
@@ -63,6 +57,10 @@ var _ = Describe("Organization Actions", func() {
 					ccv3.Warnings{"some-organizations-warning"},
 					nil,
 				)
+			})
+
+			JustBeforeEach(func() {
+				organizations, warnings, executeErr = actor.GetOrganizations("")
 			})
 
 			It("does not error", func() {
@@ -91,8 +89,8 @@ var _ = Describe("Organization Actions", func() {
 		})
 
 		When("a label selector is provided", func() {
-			BeforeEach(func() {
-				labelSelector = "some-label-selector"
+			JustBeforeEach(func() {
+				organizations, warnings, executeErr = actor.GetOrganizations("some-label-selector")
 			})
 
 			It("passes the label selector through", func() {
@@ -107,6 +105,7 @@ var _ = Describe("Organization Actions", func() {
 				actualQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
 				Expect(actualQuery).To(Equal(expectedQuery))
 			})
+
 		})
 
 		When("when the API layer call returns an error", func() {
@@ -116,6 +115,10 @@ var _ = Describe("Organization Actions", func() {
 					ccv3.Warnings{"some-organizations-warning"},
 					errors.New("some-organizations-error"),
 				)
+			})
+
+			JustBeforeEach(func() {
+				organizations, warnings, executeErr = actor.GetOrganizations("")
 			})
 
 			It("returns the error and prints warnings", func() {
