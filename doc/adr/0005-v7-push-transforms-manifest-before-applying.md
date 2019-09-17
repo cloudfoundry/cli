@@ -8,27 +8,31 @@ Proposed
 
 ## Context
 
-_The issue motivating this decision, and any context that influences or constrains the decision._
+> _The issue motivating this decision, and any context that influences or constrains the decision._
 
 **NOTE:** This ADR builds on ideas introduced in [the last `push` refactor](/doc/adr/0004-v7-push-refactor.md). If you haven't read that ADR, please do so before reading this one.
 
-As the V3 Acceleration Team was working on the V7 CLI version of `cf push`, we found that the implementation made certain features difficult (or impossible) to implement. We refactored the first part of `cf push` to solve the problems described below.
+As the V3 Acceleration Team was working on the V7 CLI version of `cf push`, we found that the implementation made certain features difficult (or impossible) to implement. We refactored the first part of `cf push` as described below to solve some of these problems.
 
 ### The dream of the server-side manifest
 
-The dream of server-side manifests is that the CF CLI does not need to have any knowledge of push manifest contents in order fulfill `push`, that `push` can supply manifest contents as input to the API apply manifest endpoint without ever parsing the manifest. Once apply manifest runs, we expect that the desired state expressed by the CLI user is represented in the API database. After that, `push` proceeds with uploading the soruce code and starting the app.
+In December 2018, the CAPI, CLI, and V3 Acceleration teams began discussing the idea of "server-side manifests", in which CAPI would build endpoints that received a manifest and made the necessary changes on the API side. Previously, the `push` manifest file was a concept invented and implemented fully by the CLI.
 
-CAPI wanted to add additional manifest features (i.e. properties) without requiring any implementation changes on the CF CLI side, which drove the move to server-side manifest design.
+The results of this work were the V3 [app manifest](https://v3-apidocs.cloudfoundry.org#app-manifest) and [space manifest](https://v3-apidocs.cloudfoundry.org#space-manifest) endpoints.
 
-See here for more on this topic:
+One part of the dream of server-side manifests was that the CLI would no longer need to have any knowledge of manifest contents. The `push` command would pass manifest contents directly to the API without ever parsing the YAML. The API would apply the manifest as given, and the CLI would then upload source code for staging.
+
+The goal of this was to allow CAPI to add additional manifest features (i.e. properties) without requiring any implementation changes on the CLI side.
+
+See here for more on this topic, including the original goals of server-side manifests:
 * [V3 Server-Side Multi-App Manifests](https://docs.google.com/document/d/1z-0Ev-QCtuoT8nJCoNaVJmkMPNk4PYi_VGWzc8CwBIs/edit#)
 * [Server Side Manifest Exploration](https://docs.google.com/document/d/1HKNz5Qaza9fx8QSQp4oWqzcg3Sv1tkyEhm_6qQFaQAM/edit#heading=h.qt2a8po833hn)
 
 ### Adding support for diffing
 
-One goal for this refactor was to support the diff output in V7 `push`. This is a feature of V6 `push` that we got a lot of positive feedback about, and it was the last piece of `push` we needed to implement for parity with V6.
+At this point in time, V7 `push` does not print diff output like it does in V6. This is a feature of V6 `push` that we got a lot of positive feedback about, and it is the last piece of `push` we need to implement for parity with V6.
 
-The diff output shows the difference between the current state of the pushed apps and the desired state (as represented by the manifest and flag overrides), like this:
+The diff output is meant to show the difference between the current state of the pushed apps and the desired state (as represented by the manifest and flag overrides), like this:
 
 ```diff
 $ cf push -i 3
@@ -50,49 +54,64 @@ Updating app with these attributes...
     dora.sheer-shark.lite.cli.fun
 ```
 
-When we set out to explore adding the diff output to V7, we found there was no straightforward way to do so. In V6, we were already parsing the whole manifest and "actualizing" each property individually, but with V7, we intentionally didn't parse the whole manifest, so we did not have knowledge of the full desired state. Without this knowledge, we could not do the comparison necessary to output the diff.
+When we set out to explore adding the diff output to V7, we found there was **no straightforward way to do so**. In V6, we were already parsing the whole manifest and "actualizing" each property individually, but with V7, we intentionally didn't parse the whole manifest, so we did not have knowledge of the full desired state. Without this knowledge, we could not do the comparison necessary to output the diff.
 
 ### Unfixable bugs due to overrides being handled too late
 
-We also wanted to fix cases where the API apply manifest endpoint returns an error due when the manifest property value is invalid, even if the corresponding flag override is acceptable.
+There was a whole class of bugs that could not be fixed in V7 `push` before this refactor. These were cases where a manifest property value is invalid, but the corresponding flag override is acceptable. For example, you might have `memory_in_mb: 2000GB` in your manifest, which is over your quota, but you push with `-m 20MB`, which is fine.
 
-Here is an example:
+Prior to this change, manifest properties and flag overrides were handled in separate API calls. Manifest properties were applied first exactly as they are in the manifest file. Then if the apply-manifest request was successful, the flag overrides would be handled (e.g. by sending a request to scale the memory to the number specified by the `-m` flag). But if the manifest was invalid (e.g. had a memory setting that would put an app over its quota), the apply-manifest step would fail before even getting to the override step.
+
+We believe this was confusing and unexpected behavior for users: if a user passes `-m 20MB`, they would expect that to be the only number that mattered (not the memory value they're overriding in the manifest).
+
+Here is an example of such a bug:
 * [**CLI** user should not get a failed push when flag overrides are below quota limits but manifest values are above](https://www.pivotaltracker.com/story/show/167576661)
-
-Prior to this change, manifest properties and flag overrides were handled in separate API calls. Manifest properties were applied first exactly as they are in the manifest file. Then if the apply-manifest request was successful, the flag overrides would be handled (e.g. by sending a request to scale the instances to the number specified by the `-i` flag). But if the manifest was invalid (e.g. had a memory setting that would put an app over its quota), the apply-manifest step would fail, even if there was a `-m` flag given that intended to set the memory to an acceptable value.
 
 ## Decision
 
-_The change that we're proposing or have agreed to implement._
+> _The change that we're proposing or have agreed to implement._
+
+We refactored the first half of V7 `push` (all of the steps that come before uploading source code and creating a new droplet). Read on for details.
 
 ### How did `push` work before this change?
 
-Before this change, `push` preserved manifest properties exactly as is and sent these to the API apply-manifest endpoint.
+Before this change, `push` preserved manifest properties exactly as-is and sent these to the apply-manifest endpoint.
 The flag overrides would be handled after applying the manifest was complete.
 
-### How does `push` work with this change?
+### How does `push` work after this change?
 
-Now, `push` parses the manifest, transforms its in-memory representation of the manifest based on the given flag overrides, and then generates new YAML to send to the apply-manifest endpoint. The effect of this is that we eliminate the extra steps of "fixing" the app after the apply-manifest step runs. For example, we no longer need to send additional requests to scale an app's process when the `-i 4` flag is given. Instead, the manifest that we send to the API will have been modified to say `instances: 4`. See below for a detailed explanation of how this works.
+Now, `push` parses the manifest into an in-memory representation of the manifest. It transforms its representation of the manifest based on the given flag overrides, and then generates new YAML to send to the apply-manifest endpoint.
+
+The effect of this is that we eliminate the extra steps of "fixing" the app after the apply-manifest step runs. For example, we no longer need to send additional requests to scale an app's process when the `-i 4` flag is given. Instead, the manifest that we send to the API will have been modified to say `instances: 4`. See below for a detailed explanation of how this works.
 
 In addition, the API is now fully responsible for handling the logic of validating and resolving conflicts between manifest properties.
 
 ### Case study: Lifecycle of a flag override
 
-We follow the path that a flag override takes (e.g. `-i 4`) from the user, through the code.
+To see how this is implemented, we will follow the path that a flag override takes from the user, through the code, to the API.
 
-Here is where the sequence of manifest transform functions is called:
+Imagine a user runs `cf push -i 4`, with a manifest that looks like:
+
+```yaml
+applications:
+- name: dora
+  instances: 2
+```
+
+The `PushCommand` parses the manifest as-written and the given flag overrides. It passes them into `HandleFlagOverrides`, which returns a transformed manifest:
+
 ```go
 func (cmd PushCommand) Execute(args []string) error {
     //...
-
     transformedManifest, err := cmd.Actor.HandleFlagOverrides(baseManifest, flagOverrides)
     if err != nil {
         return err
     }
-
     //...
 }
 ```
+
+The `HandleFlagOverrides` method is another example of the hexagonal pattern established in [this refactor](/doc/adr/0004-v7-push-refactor.md). It passes the manifest through a sequence of functions (`TransformManifestSequence`):
 
 ```go
 func (actor Actor) HandleFlagOverrides(baseManifest pushmanifestparser.Manifest, flagOverrides FlagOverrides) (pushmanifestparser.Manifest, error) {
@@ -111,13 +130,14 @@ func (actor Actor) HandleFlagOverrides(baseManifest pushmanifestparser.Manifest,
 ```
 
 Here is the list of functions in the transform sequence:
+
 ```go
 actor.TransformManifestSequence = []HandleFlagOverrideFunc{
     // app name override must come first, so it can trim the manifest
     // from multiple apps down to just one
     HandleAppNameOverride,
 
-    HandleInstancesOverride, // <== manifest transform function
+    HandleInstancesOverride, // <== instances transform function!
     HandleStartCommandOverride,
     HandleHealthCheckTypeOverride,
     HandleHealthCheckEndpointOverride,
@@ -140,7 +160,7 @@ actor.TransformManifestSequence = []HandleFlagOverrideFunc{
 }
 ```
 
-Here is an example transform function:
+This is the `HandleInstancesOverride` method, which is responsible for transforming the manifest based on the `-i/--instances` flag, if given:
 
 ```go
 func HandleInstancesOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
@@ -162,29 +182,19 @@ func HandleInstancesOverride(manifest pushmanifestparser.Manifest, overrides Fla
 }
 ```
 
-If this is the manifest YAML as provided by the CF CLI user:
+After the manifest is transformed, we generate the following new YAML that is sent to the apply-manifest endpoint:
+
 ```yaml
 applications:
 - name: dora
-  instances: 2
+  instances: 4 # <== updated!
 ```
 
-And the CF CLI user calls push to scale up the number of app instances:
-```
-  cf push -i 3
-```
-
-
-After calling HandleFlagOverrides(), here is the YAML that we will send to the API apply-manifest endpoint:
-```yaml
-applications:
-- name: dora
-  instances: 3 # <== updated!
-```
+From the API's point of view, there are no "flag overrides". The override behavior is resolved fully on the CLI side before the manifest is ever applied.
 
 ## Consequences
 
-_What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated._
+> _What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated._
 
 ### Cleaner separation of concerns between CLI and API
 
