@@ -185,7 +185,7 @@ var _ = Describe("space Command", func() {
 				Expect(testUI.Out).To(Say(`org:\s+some-org`))
 				Expect(testUI.Out).To(Say(`apps:\s+app1, app2, app3`))
 				Expect(testUI.Out).To(Say(`services:\s+instance1, instance2`))
-				Expect(testUI.Out).NotTo(Say(`isolation segment:`))
+				Expect(testUI.Out).To(Say(`isolation segment:`))
 			})
 		})
 

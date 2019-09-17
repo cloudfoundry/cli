@@ -81,10 +81,9 @@ func (cmd SpaceCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("org:"), spaceSummary.OrgName},
 		{cmd.UI.TranslateText("apps:"), strings.Join(spaceSummary.AppNames, ", ")},
 		{cmd.UI.TranslateText("services:"), strings.Join(spaceSummary.ServiceInstanceNames, ", ")},
+		{cmd.UI.TranslateText("isolation segment:"), spaceSummary.IsolationSegmentName},
 	}
-	if spaceSummary.IsolationSegmentName != "" {
-		table = append(table, []string{cmd.UI.TranslateText("isolation segment:"), spaceSummary.IsolationSegmentName})
-	}
+
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 	return nil
 }
