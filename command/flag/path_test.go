@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	. "code.cloudfoundry.org/cli/command/flag"
 	flags "github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo"
@@ -226,11 +227,10 @@ var _ = Describe("path types", func() {
 			When("the path exists", func() {
 				When("the path is relative", func() {
 					It("expands the path", func() {
-						fullPath, err := filepath.EvalSymlinks(filepath.Join(tempDir, "abc"))
-						Expect(err).NotTo(HaveOccurred())
-						err = pathWithExistenceCheck.UnmarshalFlag("abc")
+						fullPath := filepath.Join(tempDir, "abc")
+						err := pathWithExistenceCheck.UnmarshalFlag("abc")
 						Expect(err).ToNot(HaveOccurred())
-						Expect(pathWithExistenceCheck).To(BeEquivalentTo(fullPath))
+						Expect(string(pathWithExistenceCheck)).To(matchers.MatchPath(fullPath))
 					})
 				})
 
