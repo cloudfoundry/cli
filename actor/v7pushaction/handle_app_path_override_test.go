@@ -3,12 +3,12 @@ package v7pushaction_test
 import (
 	"io/ioutil"
 	"os"
-	"path"  // TODO: use "path/filepath" instead
+	"path/filepath"
 
+	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/pushmanifestparser"
-	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -94,7 +94,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 					absoluteAppFilehandle, err = ioutil.TempFile("", "")
 					Expect(err).NotTo(HaveOccurred())
 					defer absoluteAppFilehandle.Close()
-					relativeAppFilePath = path.Join(".", absoluteAppFilehandle.Name())
+					relativeAppFilePath = filepath.Join(".", absoluteAppFilehandle.Name())
 					flagOverrides.ProvidedAppPath = relativeAppFilePath
 
 					// TODO: Do NOT use Chdir! it affects ALL other threads
