@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("delete-user command", func() {
+var _ = FDescribe("delete-user command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -39,12 +39,14 @@ var _ = Describe("delete-user command", func() {
 
 	When("the environment is setup correctly", func() {
 		var (
-			someUser string
+			someUser     string
+			someLdapUser string
+			noobUser     string
 		)
 
 		BeforeEach(func() {
 			helpers.LoginCF()
-			noobUser := helpers.NewUsername()
+			noobUser = helpers.NewUsername()
 			noobPassword := helpers.NewPassword()
 			session := helpers.CF("create-user", noobUser, noobPassword)
 			Eventually(session).Should(Exit(0))
@@ -59,11 +61,12 @@ var _ = Describe("delete-user command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		When("the logged in user is not authorized to delete new users", func() {
+		FWhen("the logged in user is not authorized to delete new users", func() {
 			It("fails with insufficient scope error", func() {
+				someUser = helpers.NewUsername()
 				session := helpers.CF("delete-user", someUser, "-f")
-				Eventually(session).Should(Say(`Deleting user %s\.\.\.`, someUser)) // TODO: really? how about the create? using -f to get round this for now
-				Eventually(session.Err).Should(Say(`You are not authorized to perform the requested action\.`))
+				Eventually(session).Should(Say(`Deleting user %s as %s\.\.\.`, someUser, noobUser))
+				Eventually(session.Err).Should(Say(`Server error, status code: 403: Access is denied\.  You do not have privileges to execute this command\.`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -79,141 +82,101 @@ var _ = Describe("delete-user command", func() {
 			})
 
 			When("the user to be deleted is found", func() {
-				It("deletes the user", func() {
-					session := helpers.CF("delete-user", someUser, "-f")
-					Eventually(session).Should(Say("Deleting user %s...", someUser))
+				When("the origin flag is NOT passed in", func() {
+					When("the user is in uaa", func() {
+						It("deletes the user", func() {
+							session := helpers.CF("delete-user", someUser, "-f")
+							Eventually(session).Should(Say("Deleting user %s...", someUser))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+
+						When("the user is NOT in uaa", func() {
+							BeforeEach(func() {
+								someLdapUser = helpers.NewUsername()
+								session := helpers.CF("create-user", someLdapUser, "--origin", "ldap")
+								Eventually(session).Should(Exit(0))
+							})
+
+							It("errors", func() {
+								session := helpers.CF("delete-user", someLdapUser, "-f")
+								Eventually(session).Should(Say("User '%s' is found in a different origin, please specify with --origin", someUser)) // TODO: reword
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+					})
+
+					When("the origin flag is passed in", func() {
+						When("the origin is UAA", func() {
+							It("deletes the user", func() {
+								session := helpers.CF("delete-user", someUser, "-f", "--origin", "uaa")
+								Eventually(session).Should(Say("Deleting user %s...", someUser))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
+
+						When("the origin is the empty string", func() {
+							When("the user is in uaa", func() {
+								It("deletes the user", func() {
+									session := helpers.CF("delete-user", someUser, "-f", "--origin", "")
+									Eventually(session).Should(Say("Deleting user %s...", someUser))
+									Eventually(session).Should(Say("OK"))
+									Eventually(session).Should(Exit(0))
+								})
+							})
+
+						})
+					})
+
+					When("the origin is not UAA", func() {
+						BeforeEach(func() {
+							someLdapUser = helpers.NewUsername()
+							session := helpers.CF("create-user", someLdapUser, "--origin", "ldap")
+							Eventually(session).Should(Exit(0))
+						})
+
+						It("deletes the user", func() {
+							session := helpers.CF("delete-user", someUser, "-f", "--origin", "ldap")
+							Eventually(session).Should(Say("Deleting user %s...", someUser))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("argument for flag is not present", func() {
+					})
+				})
+			})
+
+			When("the user does not exist", func() {
+				It("errors", func() {
+					session := helpers.CF("delete-user", "non-existent-user", "-f")
 					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("User 'non-existent-user' does not exist."))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			// 		When("passed invalid username", func() {
-			// 			DescribeTable("when passed funkyUsername",
-			// 				func(funkyUsername string) {
-			// 					session := helpers.CF("delete-user", funkyUsername, helpers.NewPassword())
-			// 					Eventually(session.Err).Should(Say("Username must match pattern: \\[\\\\p\\{L\\}\\+0\\-9\\+\\\\\\-_\\.@'!\\]\\+"))
-			// 					Eventually(session).Should(Say("FAILED"))
-			// 					Eventually(session).Should(Exit(1))
-			// 				},
+			//When("the user does not exist in CC but does exist in UAA", func() {
+			//	BeforeEach(func() {
+			//		someUser = helpers.NewUsername()
+			//		somePassword := helpers.NewPassword()
+			//		_, uaaClient, err := shared.NewClients(helpers.GetConfig(), nil, false, "")
+			//		_, err = uaaClient.CreateUser(someUser, somePassword, "uaa")
+			//		Expect(err).ToNot(HaveOccurred())
+			//	})
+			//
+			//	It("deletes the user", func() {
+			//		session := helpers.CF("delete-user", someUser, "-f")
+			//		Eventually(session).Should(Say("Deleting user %s...", someUser))
+			//		Eventually(session).Should(Say("OK"))
+			//		Eventually(session).Should(Exit(0))
+			//	})
+			//})
 
-			// 				Entry("fails when passed an emoji", "😀"),
-			// 				Entry("fails when passed a backtick", "`"),
-			// 			)
-
-			// 			When("the username is empty", func() {
-			// 				It("fails with a username must be provided error", func() {
-			// 					session := helpers.CF("delete-user", "", helpers.NewPassword())
-			// 					Eventually(session.Err).Should(Say("A username must be provided."))
-			// 					Eventually(session).Should(Say("FAILED"))
-			// 					Eventually(session).Should(Exit(1))
-			// 				})
-			// 			})
-			// 		})
-
-			// 		When("the user passes in an origin flag", func() {
-			// 			When("the origin is UAA", func() {
-			// 				When("password is not present", func() {
-			// 					It("errors and prints usage", func() {
-			// 						newUser := helpers.NewUsername()
-			// 						session := helpers.CF("delete-user", newUser, "--origin", "UAA")
-			// 						Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
-			// 						Eventually(session).Should(Say("FAILED"))
-			// 						Eventually(session).Should(Say("USAGE"))
-			// 						Eventually(session).Should(Exit(1))
-			// 					})
-			// 				})
-			// 			})
-			// 			When("the origin is the empty string", func() {
-			// 				When("password is not present", func() {
-			// 					It("errors and prints usage", func() {
-			// 						newUser := helpers.NewUsername()
-			// 						session := helpers.CF("delete-user", newUser, "--origin", "")
-			// 						Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
-			// 						Eventually(session).Should(Say("FAILED"))
-			// 						Eventually(session).Should(Say("USAGE"))
-			// 						Eventually(session).Should(Exit(1))
-			// 					})
-			// 				})
-			// 			})
-
-			// 			When("the origin is not UAA or empty", func() {
-			// 				It("deletes the new user in the specified origin", func() {
-			// 					newUser := helpers.NewUsername()
-			// 					session := helpers.CF("delete-user", newUser, "--origin", "ldap")
-			// 					Eventually(session).Should(Say("Creating user %s...", newUser))
-			// 					Eventually(session).Should(Say("OK"))
-			// 					Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
-			// 					Eventually(session).Should(Exit(0))
-			// 				})
-			// 			})
-
-			// 			When("argument for flag is not present", func() {
-			// 				It("fails with incorrect usage error", func() {
-			// 					session := helpers.CF("delete-user", helpers.NewUsername(), "--origin")
-			// 					Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--origin'"))
-			// 					Eventually(session).Should(Exit(1))
-			// 				})
-			// 			})
-			// 		})
-
-			// 		When("the user passes in a password-prompt flag", func() {
-			// 			It("prompts the user for their password", func() {
-			// 				newUser := helpers.NewUsername()
-			// 				buffer := NewBuffer()
-			// 				_, err := buffer.Write([]byte(fmt.Sprintf("%s\n", "some-password")))
-			// 				Expect(err).ToNot(HaveOccurred())
-			// 				session := helpers.CFWithStdin(buffer, "delete-user", newUser, "--password-prompt")
-			// 				Eventually(session).Should(Say("Password: "))
-			// 				Eventually(session).Should(Say("Creating user %s...", newUser))
-			// 				Eventually(session).Should(Say("OK"))
-			// 				Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
-			// 				Eventually(session).Should(Exit(0))
-			// 			})
-			// 		})
-
-			// 		When("password is not present", func() {
-			// 			It("fails with incorrect usage error", func() {
-			// 				session := helpers.CF("delete-user", helpers.NewUsername())
-			// 				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
-			// 				Eventually(session).Should(Say("FAILED"))
-			// 				Eventually(session).Should(Say("USAGE"))
-			// 				Eventually(session).Should(Exit(1))
-			// 			})
-			// 		})
-
-			// 		When("the user already exists", func() {
-			// 			var (
-			// 				newUser     string
-			// 				newPassword string
-			// 			)
-
-			// 			BeforeEach(func() {
-			// 				newUser = helpers.NewUsername()
-			// 				newPassword = helpers.NewPassword()
-			// 				session := helpers.CF("delete-user", newUser, newPassword)
-			// 				Eventually(session).Should(Exit(0))
-			// 			})
-
-			// 			It("fails with the user already exists message", func() {
-			// 				session := helpers.CF("delete-user", newUser, newPassword)
-			// 				Eventually(session.Err).Should(Say("User '%s' already exists.", newUser))
-			// 				Eventually(session).Should(Say("OK"))
-			// 				Consistently(session).ShouldNot(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
-			// 				Eventually(session).Should(Exit(0))
-			// 			})
-			// 		})
-
-			// 		When("the user does not already exist", func() {
-			// 			It("deletes the new user", func() {
-			// 				newUser := helpers.NewUsername()
-			// 				newPassword := helpers.NewPassword()
-			// 				session := helpers.CF("delete-user", newUser, newPassword)
-			// 				Eventually(session).Should(Say("Creating user %s...", newUser))
-			// 				Eventually(session).Should(Say("OK"))
-			// 				Eventually(session).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
-			// 				Eventually(session).Should(Exit(0))
-			// 			})
-			// 		})
+			//When("multiple users are found", func() {})
 		})
 	})
 })

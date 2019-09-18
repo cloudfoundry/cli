@@ -1,12 +1,12 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,14 +15,14 @@ import (
 
 var _ = Describe("delete-user Command", func() {
 	var (
-		cmd             DeleteUserCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDeleteUserActor
-		binaryName      string
-		executeErr      error
-		input           *Buffer
+		cmd                 DeleteUserCommand
+		testUI              *ui.UI
+		fakeConfig          *commandfakes.FakeConfig
+		fakeSharedActor     *commandfakes.FakeSharedActor
+		fakeActor           *v7fakes.FakeDeleteUserActor
+		binaryName          string
+		executeErr          error
+		input               *Buffer
 	)
 
 	BeforeEach(func() {
@@ -68,6 +68,9 @@ var _ = Describe("delete-user Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				cmd.Origin = "some-origin"
+				fakeActor.GetUserReturns(v7action.User{
+					GUID: "some-user-guid",
+				}, nil)
 				fakeActor.DeleteUserReturns(v7action.Warnings{"warning: user is about to be deleted"}, nil)
 			})
 
@@ -79,10 +82,15 @@ var _ = Describe("delete-user Command", func() {
 				It("deletes the user", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeActor.DeleteUserCallCount()).To(Equal(1))
-					username, origin := fakeActor.DeleteUserArgsForCall(0)
+					Expect(fakeActor.GetUserCallCount()).To(Equal(1))
+
+					username, origin := fakeActor.GetUserArgsForCall(0)
 					Expect(username).To(Equal("some-user"))
 					Expect(origin).To(Equal("some-origin"))
+
+					Expect(fakeActor.DeleteUserCallCount()).To(Equal(1))
+					userGuid := fakeActor.DeleteUserArgsForCall(0)
+					Expect(userGuid).To(Equal("some-user-guid"))
 
 					Expect(testUI.Out).To(Say(`Deleting user some-user\.\.\.`))
 					Expect(testUI.Out).To(Say("OK"))
@@ -105,10 +113,14 @@ var _ = Describe("delete-user Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(testUI.Out).To(Say(`Really delete the user some-user\? \[yN\]`))
-						Expect(fakeActor.DeleteUserCallCount()).To(Equal(1))
-						username, origin := fakeActor.DeleteUserArgsForCall(0)
+
+						username, origin := fakeActor.GetUserArgsForCall(0)
 						Expect(username).To(Equal("some-user"))
 						Expect(origin).To(Equal("some-origin"))
+
+						Expect(fakeActor.DeleteUserCallCount()).To(Equal(1))
+						userGuid := fakeActor.DeleteUserArgsForCall(0)
+						Expect(userGuid).To(Equal("some-user-guid"))
 
 						Expect(testUI.Out).To(Say(`Deleting user some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
@@ -135,7 +147,7 @@ var _ = Describe("delete-user Command", func() {
 					})
 				})
 
-				When("the user chooes the default", func() {
+				When("the user chooses the default", func() {
 					BeforeEach(func() {
 						_, err := input.Write([]byte("\n"))
 						Expect(err).ToNot(HaveOccurred())
@@ -156,43 +168,63 @@ var _ = Describe("delete-user Command", func() {
 			})
 		})
 
-		// TODO: When("an error occurs", func() {
-		// 	When("the error is not translatable", func() {
-		// 		var returnedErr error
+		When("an error occurs", func() {
+			BeforeEach(func() {
+				cmd.Force = true
+			})
 
-		// 		BeforeEach(func() {
-		// 			returnedErr = errors.New("non-translatable error")
-		// 			fakeActor.CreateUserReturns(
-		// 				v7action.User{},
-		// 				v7action.Warnings{"warning-1", "warning-2"},
-		// 				returnedErr)
-		// 		})
+			When("GetUser action errors", func() {
+				When("no user is found", func() {
+					var returnedErr error
 
-		// 		It("returns the same error and all warnings", func() {
-		// 			Expect(executeErr).To(MatchError(returnedErr))
-		// 			Expect(testUI.Err).To(Say("warning-1"))
-		// 			Expect(testUI.Err).To(Say("warning-2"))
-		// 		})
-		// 	})
+					BeforeEach(func() {
+						returnedErr = actionerror.UAAUserNotFoundError{Username: "some-user"}
+						fakeActor.GetUserReturns(
+							v7action.User{},
+							returnedErr)
+					})
 
-		// 	When("the error is a uaa.ConflictError", func() {
-		// 		var returnedErr error
+					It("returns the same error", func() {
+						Expect(executeErr).To(MatchError(returnedErr))
+						Expect(testUI.Out).To(Say(`OK`, ))
+						Expect(testUI.Out).To(Say(`User 'some-user' does not exist.`))
+					})
+				})
+			})
 
-		// 		BeforeEach(func() {
-		// 			returnedErr = uaa.ConflictError{}
-		// 			fakeActor.CreateUserReturns(
-		// 				v7action.User{},
-		// 				v7action.Warnings{"warning-1", "warning-2"},
-		// 				returnedErr)
-		// 		})
+			When("DeleteUser action errors", func() {
+				var returnedErr error
 
-		// 		It("displays the error and all warnings", func() {
-		// 			Expect(executeErr).To(BeNil())
-		// 			Expect(testUI.Err).To(Say("warning-1"))
-		// 			Expect(testUI.Err).To(Say("warning-2"))
-		// 			Expect(testUI.Err).To(Say("User 'some-user' already exists."))
-		// 		})
-		// 	})
-		// })
+				BeforeEach(func() {
+					returnedErr = uaa.ConflictError{}
+					fakeActor.GetUserReturns(
+						v7action.User{GUID: "some-guid"},
+						nil)
+					fakeActor.DeleteUserReturns(nil, returnedErr)
+				})
+
+				It("returns the same error", func() {
+					Expect(executeErr).To(MatchError(returnedErr))
+				})
+			})
+
+			When("DeleteUser action returns warnings", func() {
+				var returnedErr error
+
+				BeforeEach(func() {
+					fakeActor.GetUserReturns(
+						v7action.User{GUID: "some-guid"},
+						nil)
+					warnings := []string{"warning-1", "warning-2"}
+					fakeActor.DeleteUserReturns(warnings, returnedErr)
+				})
+
+				It("displays all warnings", func() {
+					Expect(executeErr).To(BeNil())
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+				})
+			})
+		})
 	})
 })

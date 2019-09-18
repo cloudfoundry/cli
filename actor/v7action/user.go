@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -28,32 +29,39 @@ func (actor Actor) CreateUser(username string, password string, origin string) (
 //   matching users should not be returned.
 //   However this does not handle the case where "origin" is provided as empty string.
 func (actor Actor) GetUser(username, origin string) (User, error) {
-	uaaUsers, err := actor.UAAClient.GetUsers(username, origin)
+	uaaUsers, err := actor.UAAClient.ListUsers(username, origin)
 	if err != nil {
 		return User{}, err
 	}
 
 	if len(uaaUsers) == 0 {
-		return User{}, actionerror.UAAUserNotFoundError{}
+		return User{}, actionerror.UAAUserNotFoundError{Username: username}
 	}
+	if len(uaaUsers) > 1 {
+		var origins []string
+		for _, user := range uaaUsers {
+			origins = append(origins, user.Origin)
+		}
+		return User{}, actionerror.MultipleUAAUsersFoundError{Username: username, Origins: origins}
+	}
+
 	uaaUser := uaaUsers[0]
 
 	v7actionUser := User{
 		GUID: uaaUser.ID,
 	}
-
 	return v7actionUser, nil
 }
 
 // DeleteUser
-func (actor Actor) DeleteUser(username string, origin string) (Warnings, error) {
-	// TODO: when origin is empty, is it nil or ""?
-	uaaUser, err := actor.UAAClient.DeleteUser(username, origin)
-	if err != nil {
+func (actor Actor) DeleteUser(userGuid string) (Warnings, error) {
+	ccWarnings, err := actor.CloudControllerClient.DeleteUser(userGuid)
+
+	if _, ok := err.(ccerror.ResourceNotFoundError); !ok && err != nil {
 		return nil, err
 	}
 
-	ccWarnings, err := actor.CloudControllerClient.DeleteUser(uaaUser.ID)
+	_, err = actor.UAAClient.DeleteUser(userGuid)
 
 	return Warnings(ccWarnings), err
 }

@@ -81,7 +81,7 @@ const (
 	GetStacksRequest                                     = "GetStacks"
 	GetUserProvidedServiceInstanceServiceBindingsRequest = "GetUserProvidedServiceInstanceServiceBindings"
 	GetUserProvidedServiceInstancesRequest               = "GetUserProvidedServiceInstances"
-	GetUsersRequest                                      = "GetUsers"
+	GetUsersRequest                                      = "ListUsers"
 	PostAppRequest                                       = "PostApp"
 	PostAppRestageRequest                                = "PostAppRestage"
 	PostBuildpackRequest                                 = "PostBuildpack"

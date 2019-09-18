@@ -9,11 +9,10 @@ import (
 )
 
 type FakeDeleteUserActor struct {
-	DeleteUserStub        func(string, string) (v7action.Warnings, error)
+	DeleteUserStub        func(string) (v7action.Warnings, error)
 	deleteUserMutex       sync.RWMutex
 	deleteUserArgsForCall []struct {
 		arg1 string
-		arg2 string
 	}
 	deleteUserReturns struct {
 		result1 v7action.Warnings
@@ -23,21 +22,34 @@ type FakeDeleteUserActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	GetUserStub        func(string, string) (v7action.User, error)
+	getUserMutex       sync.RWMutex
+	getUserArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getUserReturns struct {
+		result1 v7action.User
+		result2 error
+	}
+	getUserReturnsOnCall map[int]struct {
+		result1 v7action.User
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeleteUserActor) DeleteUser(arg1 string, arg2 string) (v7action.Warnings, error) {
+func (fake *FakeDeleteUserActor) DeleteUser(arg1 string) (v7action.Warnings, error) {
 	fake.deleteUserMutex.Lock()
 	ret, specificReturn := fake.deleteUserReturnsOnCall[len(fake.deleteUserArgsForCall)]
 	fake.deleteUserArgsForCall = append(fake.deleteUserArgsForCall, struct {
 		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("DeleteUser", []interface{}{arg1, arg2})
+	}{arg1})
+	fake.recordInvocation("DeleteUser", []interface{}{arg1})
 	fake.deleteUserMutex.Unlock()
 	if fake.DeleteUserStub != nil {
-		return fake.DeleteUserStub(arg1, arg2)
+		return fake.DeleteUserStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -52,17 +64,17 @@ func (fake *FakeDeleteUserActor) DeleteUserCallCount() int {
 	return len(fake.deleteUserArgsForCall)
 }
 
-func (fake *FakeDeleteUserActor) DeleteUserCalls(stub func(string, string) (v7action.Warnings, error)) {
+func (fake *FakeDeleteUserActor) DeleteUserCalls(stub func(string) (v7action.Warnings, error)) {
 	fake.deleteUserMutex.Lock()
 	defer fake.deleteUserMutex.Unlock()
 	fake.DeleteUserStub = stub
 }
 
-func (fake *FakeDeleteUserActor) DeleteUserArgsForCall(i int) (string, string) {
+func (fake *FakeDeleteUserActor) DeleteUserArgsForCall(i int) string {
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
 	argsForCall := fake.deleteUserArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *FakeDeleteUserActor) DeleteUserReturns(result1 v7action.Warnings, result2 error) {
@@ -91,11 +103,77 @@ func (fake *FakeDeleteUserActor) DeleteUserReturnsOnCall(i int, result1 v7action
 	}{result1, result2}
 }
 
+func (fake *FakeDeleteUserActor) GetUser(arg1 string, arg2 string) (v7action.User, error) {
+	fake.getUserMutex.Lock()
+	ret, specificReturn := fake.getUserReturnsOnCall[len(fake.getUserArgsForCall)]
+	fake.getUserArgsForCall = append(fake.getUserArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetUser", []interface{}{arg1, arg2})
+	fake.getUserMutex.Unlock()
+	if fake.GetUserStub != nil {
+		return fake.GetUserStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getUserReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeDeleteUserActor) GetUserCallCount() int {
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
+	return len(fake.getUserArgsForCall)
+}
+
+func (fake *FakeDeleteUserActor) GetUserCalls(stub func(string, string) (v7action.User, error)) {
+	fake.getUserMutex.Lock()
+	defer fake.getUserMutex.Unlock()
+	fake.GetUserStub = stub
+}
+
+func (fake *FakeDeleteUserActor) GetUserArgsForCall(i int) (string, string) {
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
+	argsForCall := fake.getUserArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeDeleteUserActor) GetUserReturns(result1 v7action.User, result2 error) {
+	fake.getUserMutex.Lock()
+	defer fake.getUserMutex.Unlock()
+	fake.GetUserStub = nil
+	fake.getUserReturns = struct {
+		result1 v7action.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeDeleteUserActor) GetUserReturnsOnCall(i int, result1 v7action.User, result2 error) {
+	fake.getUserMutex.Lock()
+	defer fake.getUserMutex.Unlock()
+	fake.GetUserStub = nil
+	if fake.getUserReturnsOnCall == nil {
+		fake.getUserReturnsOnCall = make(map[int]struct {
+			result1 v7action.User
+			result2 error
+		})
+	}
+	fake.getUserReturnsOnCall[i] = struct {
+		result1 v7action.User
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeDeleteUserActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

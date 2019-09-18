@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/clock"
 
@@ -13,7 +14,8 @@ import (
 //go:generate counterfeiter . DeleteUserActor
 
 type DeleteUserActor interface {
-	DeleteUser(username string, origin string) (v7action.Warnings, error)
+	DeleteUser(userGuid string) (v7action.Warnings, error)
+	GetUser(username, origin string) (v7action.User, error)
 }
 
 type DeleteUserCommand struct {
@@ -67,11 +69,27 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting user {{.TargetUser}}...", map[string]interface{}{
+	currentUser, _ := cmd.Config.CurrentUserName()
+
+	cmd.UI.DisplayTextWithFlavor("Deleting user {{.TargetUser}} as {{.CurrentUser}}...", map[string]interface{}{
 		"TargetUser": cmd.RequiredArgs.Username,
+		"CurrentUser": currentUser,
 	})
 
-	warnings, err := cmd.Actor.DeleteUser(cmd.RequiredArgs.Username, cmd.Origin)
+	user, err := cmd.Actor.GetUser(cmd.RequiredArgs.Username, cmd.Origin)
+
+	if err != nil {
+		if _, ok := err.(actionerror.UAAUserNotFoundError); ok {
+			cmd.UI.DisplayOK()
+			cmd.UI.DisplayTextWithFlavor(err.Error())
+			return nil
+		}
+		return err
+	//	TODO: if multiple users are found: User --origin to disambiguate.
+	}
+
+
+	warnings, err := cmd.Actor.DeleteUser(user.GUID)
 
 	if err != nil {
 		return err

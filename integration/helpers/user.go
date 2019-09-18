@@ -14,7 +14,7 @@ type User struct {
 	CreatedAt time.Time
 }
 
-// GetUsers returns all the users in the targeted environment.
+// ListUsers returns all the users in the targeted environment.
 func GetUsers() []User {
 	var userPagesResponse struct {
 		NextURL   *string `json:"next_url"`

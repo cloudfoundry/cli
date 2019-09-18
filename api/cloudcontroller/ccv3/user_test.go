@@ -131,8 +131,10 @@ var _ = Describe("User", func() {
 		})
 
 		When("the cloud controller returns errors and warnings", func() {
-			BeforeEach(func() {
-				response := `{
+			When("the error should be raise", func() {
+
+				BeforeEach(func() {
+					response := `{
   "errors": [
     {
       "code": 10008,
@@ -146,31 +148,32 @@ var _ = Describe("User", func() {
     }
   ]
 }`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v3/users/some-uaa-guid"),
-						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a delete warning"}}),
-					),
-				)
-			})
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodDelete, "/v3/users/some-uaa-guid"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a delete warning"}}),
+						),
+					)
+				})
 
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.MultiError{
-					ResponseCode: http.StatusTeapot,
-					Errors: []ccerror.V3Error{
-						{
-							Code:   10008,
-							Detail: "The request is semantically invalid: command presence",
-							Title:  "CF-UnprocessableEntity",
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Isolation segment not found",
+								Title:  "CF-ResourceNotFound",
+							},
 						},
-						{
-							Code:   10010,
-							Detail: "Isolation segment not found",
-							Title:  "CF-ResourceNotFound",
-						},
-					},
-				}))
-				Expect(warnings).To(ConsistOf("this is a delete warning"))
+					}))
+					Expect(warnings).To(ConsistOf("this is a delete warning"))
+				})
 			})
 		})
 	})

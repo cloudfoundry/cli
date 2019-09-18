@@ -12,7 +12,8 @@ import (
 
 // User represents an UAA user account.
 type User struct {
-	ID string
+	ID     string
+	Origin string
 }
 
 // newUserRequestBody represents the body of the request.
@@ -37,6 +38,7 @@ type email struct {
 // newUserResponse represents the HTTP JSON response.
 type newUserResponse struct {
 	ID string `json:"id"`
+	Origin string `json:"origin"`
 }
 
 type paginatedUsersResponse struct {
@@ -45,7 +47,7 @@ type paginatedUsersResponse struct {
 
 type listUsersResponse struct {
 	Resources []User `json:resources`
-}
+} // TODO: delete me
 
 // CreateUser creates a new UAA user account with the provided password.
 func (client *Client) CreateUser(user string, password string, origin string) (User, error) {
@@ -94,12 +96,12 @@ func (client *Client) CreateUser(user string, password string, origin string) (U
 	return User(userResponse), nil
 }
 
-// GetUsers gets a list of users from UAA with the given username and (if provided) origin.
+// ListUsers gets a list of users from UAA with the given username and (if provided) origin.
 // NOTE: that this is a paginated response and we are only currently returning the first page
 // of users. This will mean, if no origin is passed and there are more than 100 users with
 // the given username, only the first 100 will be returned. For our current purposes, this is
 // more than enough, but it would be a problem if we ever need to get all users with a username.
-func (client Client) GetUsers(userName, origin string) ([]User, error) {
+func (client Client) ListUsers(userName, origin string) ([]User, error) {
 	filter := fmt.Sprintf(`userName eq "%s"`, userName)
 
 	if origin != "" {
@@ -137,42 +139,13 @@ func (client Client) GetUsers(userName, origin string) ([]User, error) {
 	return users, nil
 }
 
-func (client *Client) DeleteUser(user string, origin string) (User, error) {
-	if origin == "" {
-		origin = "uaa"
-	}
-
-	listRequest, err := client.newRequest(requestOptions{
-		RequestName: internal.ListUsersRequest,
-		Header: http.Header{
-			"Content-Type": {"application/json"},
-		},
-		Query: url.Values{
-			"filter": {fmt.Sprintf("username eq \"%s\" and origin eq \"%s\"", user, origin)},
-		},
-	})
-
-	if err != nil {
-		return User{}, err
-	}
-
-	var listUsersResponse listUsersResponse
-	listResponse := Response{
-		Result: &listUsersResponse,
-	}
-
-	err = client.connection.Make(listRequest, &listResponse)
-	if err != nil {
-		return User{}, err
-	}
-	//TODO: what happens when we get multiple users back from UAA or
-	// no user is returned == ENOTFOUND
+func (client *Client) DeleteUser(userGuid string) (User, error) {
 	deleteRequest, err := client.newRequest(requestOptions{
 		RequestName: internal.DeleteUserRequest,
 		Header: http.Header{
 			"Content-Type": {"application/json"},
 		},
-		URIParams: map[string]string{"user_guid": User(listUsersResponse.Resources[0]).ID},
+		URIParams: map[string]string{"user_guid": userGuid},
 	})
 
 	if err != nil {

@@ -24,11 +24,10 @@ type FakeUAAClient struct {
 		result1 uaa.User
 		result2 error
 	}
-	DeleteUserStub        func(string, string) (uaa.User, error)
+	DeleteUserStub        func(string) (uaa.User, error)
 	deleteUserMutex       sync.RWMutex
 	deleteUserArgsForCall []struct {
 		arg1 string
-		arg2 string
 	}
 	deleteUserReturns struct {
 		result1 uaa.User
@@ -52,17 +51,17 @@ type FakeUAAClient struct {
 		result1 string
 		result2 error
 	}
-	GetUsersStub        func(string, string) ([]uaa.User, error)
-	getUsersMutex       sync.RWMutex
-	getUsersArgsForCall []struct {
+	ListUsersStub        func(string, string) ([]uaa.User, error)
+	listUsersMutex       sync.RWMutex
+	listUsersArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	getUsersReturns struct {
+	listUsersReturns struct {
 		result1 []uaa.User
 		result2 error
 	}
-	getUsersReturnsOnCall map[int]struct {
+	listUsersReturnsOnCall map[int]struct {
 		result1 []uaa.User
 		result2 error
 	}
@@ -135,17 +134,16 @@ func (fake *FakeUAAClient) CreateUserReturnsOnCall(i int, result1 uaa.User, resu
 	}{result1, result2}
 }
 
-func (fake *FakeUAAClient) DeleteUser(arg1 string, arg2 string) (uaa.User, error) {
+func (fake *FakeUAAClient) DeleteUser(arg1 string) (uaa.User, error) {
 	fake.deleteUserMutex.Lock()
 	ret, specificReturn := fake.deleteUserReturnsOnCall[len(fake.deleteUserArgsForCall)]
 	fake.deleteUserArgsForCall = append(fake.deleteUserArgsForCall, struct {
 		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("DeleteUser", []interface{}{arg1, arg2})
+	}{arg1})
+	fake.recordInvocation("DeleteUser", []interface{}{arg1})
 	fake.deleteUserMutex.Unlock()
 	if fake.DeleteUserStub != nil {
-		return fake.DeleteUserStub(arg1, arg2)
+		return fake.DeleteUserStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -160,17 +158,17 @@ func (fake *FakeUAAClient) DeleteUserCallCount() int {
 	return len(fake.deleteUserArgsForCall)
 }
 
-func (fake *FakeUAAClient) DeleteUserCalls(stub func(string, string) (uaa.User, error)) {
+func (fake *FakeUAAClient) DeleteUserCalls(stub func(string) (uaa.User, error)) {
 	fake.deleteUserMutex.Lock()
 	defer fake.deleteUserMutex.Unlock()
 	fake.DeleteUserStub = stub
 }
 
-func (fake *FakeUAAClient) DeleteUserArgsForCall(i int) (string, string) {
+func (fake *FakeUAAClient) DeleteUserArgsForCall(i int) string {
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
 	argsForCall := fake.deleteUserArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *FakeUAAClient) DeleteUserReturns(result1 uaa.User, result2 error) {
@@ -263,65 +261,65 @@ func (fake *FakeUAAClient) GetSSHPasscodeReturnsOnCall(i int, result1 string, re
 	}{result1, result2}
 }
 
-func (fake *FakeUAAClient) GetUsers(arg1 string, arg2 string) ([]uaa.User, error) {
-	fake.getUsersMutex.Lock()
-	ret, specificReturn := fake.getUsersReturnsOnCall[len(fake.getUsersArgsForCall)]
-	fake.getUsersArgsForCall = append(fake.getUsersArgsForCall, struct {
+func (fake *FakeUAAClient) ListUsers(arg1 string, arg2 string) ([]uaa.User, error) {
+	fake.listUsersMutex.Lock()
+	ret, specificReturn := fake.listUsersReturnsOnCall[len(fake.listUsersArgsForCall)]
+	fake.listUsersArgsForCall = append(fake.listUsersArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.recordInvocation("GetUsers", []interface{}{arg1, arg2})
-	fake.getUsersMutex.Unlock()
-	if fake.GetUsersStub != nil {
-		return fake.GetUsersStub(arg1, arg2)
+	fake.recordInvocation("ListUsers", []interface{}{arg1, arg2})
+	fake.listUsersMutex.Unlock()
+	if fake.ListUsersStub != nil {
+		return fake.ListUsersStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getUsersReturns
+	fakeReturns := fake.listUsersReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeUAAClient) GetUsersCallCount() int {
-	fake.getUsersMutex.RLock()
-	defer fake.getUsersMutex.RUnlock()
-	return len(fake.getUsersArgsForCall)
+func (fake *FakeUAAClient) ListUsersCallCount() int {
+	fake.listUsersMutex.RLock()
+	defer fake.listUsersMutex.RUnlock()
+	return len(fake.listUsersArgsForCall)
 }
 
-func (fake *FakeUAAClient) GetUsersCalls(stub func(string, string) ([]uaa.User, error)) {
-	fake.getUsersMutex.Lock()
-	defer fake.getUsersMutex.Unlock()
-	fake.GetUsersStub = stub
+func (fake *FakeUAAClient) ListUsersCalls(stub func(string, string) ([]uaa.User, error)) {
+	fake.listUsersMutex.Lock()
+	defer fake.listUsersMutex.Unlock()
+	fake.ListUsersStub = stub
 }
 
-func (fake *FakeUAAClient) GetUsersArgsForCall(i int) (string, string) {
-	fake.getUsersMutex.RLock()
-	defer fake.getUsersMutex.RUnlock()
-	argsForCall := fake.getUsersArgsForCall[i]
+func (fake *FakeUAAClient) ListUsersArgsForCall(i int) (string, string) {
+	fake.listUsersMutex.RLock()
+	defer fake.listUsersMutex.RUnlock()
+	argsForCall := fake.listUsersArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeUAAClient) GetUsersReturns(result1 []uaa.User, result2 error) {
-	fake.getUsersMutex.Lock()
-	defer fake.getUsersMutex.Unlock()
-	fake.GetUsersStub = nil
-	fake.getUsersReturns = struct {
+func (fake *FakeUAAClient) ListUsersReturns(result1 []uaa.User, result2 error) {
+	fake.listUsersMutex.Lock()
+	defer fake.listUsersMutex.Unlock()
+	fake.ListUsersStub = nil
+	fake.listUsersReturns = struct {
 		result1 []uaa.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUAAClient) GetUsersReturnsOnCall(i int, result1 []uaa.User, result2 error) {
-	fake.getUsersMutex.Lock()
-	defer fake.getUsersMutex.Unlock()
-	fake.GetUsersStub = nil
-	if fake.getUsersReturnsOnCall == nil {
-		fake.getUsersReturnsOnCall = make(map[int]struct {
+func (fake *FakeUAAClient) ListUsersReturnsOnCall(i int, result1 []uaa.User, result2 error) {
+	fake.listUsersMutex.Lock()
+	defer fake.listUsersMutex.Unlock()
+	fake.ListUsersStub = nil
+	if fake.listUsersReturnsOnCall == nil {
+		fake.listUsersReturnsOnCall = make(map[int]struct {
 			result1 []uaa.User
 			result2 error
 		})
 	}
-	fake.getUsersReturnsOnCall[i] = struct {
+	fake.listUsersReturnsOnCall[i] = struct {
 		result1 []uaa.User
 		result2 error
 	}{result1, result2}
@@ -336,8 +334,8 @@ func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	defer fake.deleteUserMutex.RUnlock()
 	fake.getSSHPasscodeMutex.RLock()
 	defer fake.getSSHPasscodeMutex.RUnlock()
-	fake.getUsersMutex.RLock()
-	defer fake.getUsersMutex.RUnlock()
+	fake.listUsersMutex.RLock()
+	defer fake.listUsersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
