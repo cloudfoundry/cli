@@ -37,7 +37,7 @@ var _ = Describe("New Clients", func() {
 	Describe("NewClients", func() {
 		When("the api endpoint is not set", func() {
 			It("returns an error", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true)
+				_, _, err := GetNewClientsAndConnectToCF(fakeConfig, testUI)
 				Expect(err).To(MatchError(translatableerror.NoAPISetError{
 					BinaryName: binaryName,
 				}))
@@ -54,7 +54,7 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("passes the value to the target", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true)
+				_, _, err := GetNewClientsAndConnectToCF(fakeConfig, testUI)
 				Expect(err.Error()).To(MatchRegexp("timeout"))
 			})
 		})
@@ -65,7 +65,7 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("returns an error", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true)
+				_, _, err := GetNewClientsAndConnectToCF(fakeConfig, testUI)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -91,19 +91,17 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("outputs a warning", func() {
-				NewClients(fakeConfig, testUI, true)
+				GetNewClientsAndConnectToCF(fakeConfig, testUI)
 				Expect(testUI.Err).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 			})
 		})
 
-		When("not targetting", func() {
-			It("does not target and returns no UAA client", func() {
-				ccClient, uaaClient, err := NewClients(fakeConfig, testUI, false)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ccClient).ToNot(BeNil())
-				Expect(uaaClient).To(BeNil())
-				Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(0))
-			})
+	})
+	Describe("NewWrapedCloudControllerClient", func() {
+		It("returns a cloud controller client and an auth wrapper", func() {
+			ccClient, authWrapper := NewWrappedCloudControllerClient(fakeConfig, testUI)
+			Expect(ccClient).ToNot(BeNil())
+			Expect(authWrapper).ToNot(BeNil())
 		})
 	})
 
