@@ -1,6 +1,9 @@
 package push
 
 import (
+	"io/ioutil"
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -96,6 +99,41 @@ var _ = Describe("push with health check type", func() {
 				session := helpers.CF("get-health-check", appName)
 				Eventually(session).Should(Say("web\\s+process"))
 				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	When("there is a manifest", func() {
+		var (
+			pathToManifest string
+		)
+		BeforeEach(func() {
+			tempDir, err := ioutil.TempDir("", "")
+			Expect(err).NotTo(HaveOccurred())
+			pathToManifest = filepath.Join(tempDir, "manifest.yml")
+
+			helpers.WriteManifest(pathToManifest, map[string]interface{}{
+				"applications": []map[string]interface{}{{
+					"name":                       "charlie",
+					"health-check-type":          "http",
+					"health-check-http-endpoint": "/",
+				}},
+			})
+
+		})
+
+		When("overriding with a health-check-type that is not http", func() {
+			It("succeeds", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+						PushCommandName, appName,
+						"--health-check-type", "port",
+						"--no-start",
+						"-f", pathToManifest,
+					)
+
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})

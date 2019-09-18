@@ -133,4 +133,27 @@ var _ = Describe("HandleHealthCheckTypeOverride", func() {
 			Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 		})
 	})
+
+	When("health check type flag is not http but manifest contains endpoint", func() {
+		BeforeEach(func() {
+			overrides.HealthCheckType = constant.Port
+
+			originalManifest.Applications = []pushmanifestparser.Application{
+				{
+					HealthCheckType:     constant.HTTP,
+					HealthCheckEndpoint: "/",
+				},
+			}
+		})
+
+		It("removes endpoint from the manifest and updated type", func() {
+
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(transformedManifest.Applications).To(ConsistOf(
+				pushmanifestparser.Application{
+					HealthCheckType: constant.Port,
+				},
+			))
+		})
+	})
 })
