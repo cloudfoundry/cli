@@ -36,7 +36,7 @@ func (cmd *PurgeServiceOfferingCommand) Setup(config command.Config, ui command.
 	cmd.UI = ui
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

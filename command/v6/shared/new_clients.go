@@ -11,16 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-// NewClients creates a new V2 Cloud Controller client and UAA client using the
-// passed in config.
-func NewClients(config command.Config, ui command.UI, connectToCF bool) (*ccv2.Client, *uaa.Client, error) {
-	if connectToCF {
-		return GetNewClientsAndConnectToCF(config, ui)
-	}
-	ccClient, _ := NewWrappedCloudControllerClient(config, ui)
-	return ccClient, nil, nil
-}
-
 func NewRouterClient(config command.Config, ui command.UI, uaaClient *uaa.Client) (*router.Client, error) {
 	routerConfig := router.Config{
 		AppName:    config.BinaryName(),

@@ -77,7 +77,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.ZdtActor = v3actor
 	cmd.V3PushActor = v3actor
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

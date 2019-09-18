@@ -45,7 +45,7 @@ func (cmd *SetOrgDefaultIsolationSegmentCommand) Setup(config command.Config, ui
 	}
 	cmd.Actor = v3action.NewActor(client, config, nil, nil)
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

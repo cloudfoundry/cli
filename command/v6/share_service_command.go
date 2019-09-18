@@ -45,7 +45,7 @@ func (cmd *ShareServiceCommand) Setup(config command.Config, ui command.UI) erro
 		return err
 	}
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

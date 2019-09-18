@@ -44,7 +44,7 @@ func (cmd *SetSpaceIsolationSegmentCommand) Setup(config command.Config, ui comm
 	}
 	cmd.Actor = v3action.NewActor(client, config, nil, nil)
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

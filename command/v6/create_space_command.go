@@ -31,7 +31,7 @@ type CreateSpaceCommand struct {
 }
 
 func (cmd *CreateSpaceCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}
