@@ -30,10 +30,7 @@ type APICommand struct {
 }
 
 func (cmd *APICommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, _, err := shared.NewClients(config, ui, false)
-	if err != nil {
-		return err
-	}
+	ccClient, _ := shared.NewWrappedCloudControllerClient(config, ui)
 
 	cmd.Actor = v2action.NewActor(ccClient, nil, config)
 	cmd.UI = ui

@@ -73,7 +73,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)
 	cmd.Actor = v3actor
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

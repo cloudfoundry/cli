@@ -36,7 +36,7 @@ func (cmd *ServiceAccessCommand) Setup(config command.Config, ui command.UI) err
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

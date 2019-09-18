@@ -46,7 +46,7 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

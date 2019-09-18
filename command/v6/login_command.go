@@ -74,7 +74,7 @@ var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targe
 }
 
 var checkerMaker CheckerMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (VersionChecker, error) {
-	client, uaa, err := shared.NewClients(config, ui, targetCF)
+	client, uaa, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return nil, err
 	}

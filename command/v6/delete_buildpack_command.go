@@ -31,7 +31,7 @@ type DeleteBuildpackCommand struct {
 func (cmd *DeleteBuildpackCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

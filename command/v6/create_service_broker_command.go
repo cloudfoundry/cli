@@ -33,7 +33,7 @@ func (cmd *CreateServiceBrokerCommand) Setup(config command.Config, ui command.U
 
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}

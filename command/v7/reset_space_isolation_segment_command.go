@@ -46,7 +46,7 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV2.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return err
 	}
