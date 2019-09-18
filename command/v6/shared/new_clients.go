@@ -50,8 +50,12 @@ func GetNewClientsAndConnectToCF(config command.Config, ui command.UI) (*ccv2.Cl
 	var err error
 
 	ccClient, authWrapper := NewWrappedCloudControllerClient(config, ui)
-	uaaClient := newWrappedUAAClient(config, ui, authWrapper)
-	ccClient, uaaClient, err = connectToCF(config, ui,  ccClient, uaaClient)
+
+	ccClient, err = connectToCF(config, ui,  ccClient)
+	if err != nil {
+		return nil, nil, err
+	}
+	uaaClient, err := newWrappedUAAClient(config, ui,ccClient, authWrapper)
 
 	return ccClient, uaaClient, err
 }
@@ -83,7 +87,8 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv
 	return ccClient, authWrapper
 }
 
-func newWrappedUAAClient(config command.Config, ui command.UI, authWrapper *ccWrapper.UAAAuthentication) *uaa.Client{
+func newWrappedUAAClient(config command.Config, ui command.UI,ccClient *ccv2.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error){
+	var err error
 	verbose, location := config.Verbose()
 
 	uaaClient := uaa.NewClient(config)
@@ -99,17 +104,21 @@ func newWrappedUAAClient(config command.Config, ui command.UI, authWrapper *ccWr
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
+	err = uaaClient.SetupResources(ccClient.AuthorizationEndpoint())
+	if err != nil {
+		return nil, err
+	}
 	uaaAuthWrapper.SetClient(uaaClient)
 	authWrapper.SetClient(uaaClient)
 
-	return uaaClient
+	return uaaClient, nil
 }
 
 
 
-func connectToCF(config command.Config, ui command.UI, ccClient *ccv2.Client, uaaClient *uaa.Client) (*ccv2.Client, *uaa.Client, error) {
+func connectToCF(config command.Config, ui command.UI, ccClient *ccv2.Client) (*ccv2.Client, error) {
 	if config.Target() == "" {
-		return nil, nil, translatableerror.NoAPISetError{
+		return nil, translatableerror.NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
@@ -120,18 +129,15 @@ func connectToCF(config command.Config, ui command.UI, ccClient *ccv2.Client, ua
 		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err = command.WarnIfAPIVersionBelowSupportedMinimum(ccClient.APIVersion(), ui); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if ccClient.AuthorizationEndpoint() == "" {
-		return nil, nil, translatableerror.AuthorizationEndpointNotFoundError{}
-	}
-	err = uaaClient.SetupResources(ccClient.AuthorizationEndpoint())
-	if err != nil {
-		return nil, nil, err
+		return nil, translatableerror.AuthorizationEndpointNotFoundError{}
 	}
 
-	return ccClient, uaaClient, err
+
+	return ccClient, err
 }
