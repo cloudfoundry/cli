@@ -114,7 +114,7 @@ func connectToCF(config command.Config, ui command.UI, ccClient *ccv2.Client, ua
 		}
 	}
 
-	_, err := ccClient.ConnectToCF(ccv2.TargetSettings{
+	_, err := ccClient.TargetCF(ccv2.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),
