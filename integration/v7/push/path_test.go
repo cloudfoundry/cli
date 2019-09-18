@@ -196,7 +196,7 @@ var _ = Describe("handle path in manifest and flag override", func() {
 				})
 
 				When("The manifest is in a different directory than the app's source", func() {
-					FIt("pushes the app with a relative path to the app directory", func() {
+					It("pushes the app with a relative path to the app directory", func() {
 						manifestDir := helpers.TempDirAbsolutePath("", "manifest-dir")
 						defer os.RemoveAll(manifestDir)
 
