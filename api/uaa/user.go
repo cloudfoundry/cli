@@ -45,10 +45,6 @@ type paginatedUsersResponse struct {
 	Resources []newUserResponse `json:"resources"`
 }
 
-type listUsersResponse struct {
-	Resources []User `json:resources`
-} // TODO: delete me
-
 // CreateUser creates a new UAA user account with the provided password.
 func (client *Client) CreateUser(user string, password string, origin string) (User, error) {
 	userRequest := newUserRequestBody{
@@ -164,4 +160,3 @@ func (client Client) ListUsers(userName, origin string) ([]User, error) {
 
 	return users, nil
 }
-

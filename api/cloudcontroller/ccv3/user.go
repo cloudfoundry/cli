@@ -2,9 +2,10 @@ package ccv3
 
 import (
 	"bytes"
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"encoding/json"
 )
 
 // User represents a Cloud Controller User.

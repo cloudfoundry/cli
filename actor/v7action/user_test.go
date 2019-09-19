@@ -1,9 +1,10 @@
 package v7action_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"errors"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"

@@ -24,6 +24,7 @@ var _ = Describe("delete-user Command", func() {
 		executeErr      error
 		input           *Buffer
 		currentUser     string
+		err             error
 	)
 
 	BeforeEach(func() {
@@ -32,7 +33,8 @@ var _ = Describe("delete-user Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeDeleteUserActor)
-		currentUser, _ = fakeConfig.CurrentUserName()
+		currentUser, err = fakeConfig.CurrentUserName()
+		Expect(err).NotTo(HaveOccurred())
 
 		cmd = DeleteUserCommand{
 			UI:          testUI,

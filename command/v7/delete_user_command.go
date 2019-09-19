@@ -45,9 +45,7 @@ func (cmd *DeleteUserCommand) Setup(config command.Config, ui command.UI) error 
 }
 
 func (cmd *DeleteUserCommand) Execute(args []string) error {
-	var err error
-
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
