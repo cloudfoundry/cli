@@ -34,7 +34,7 @@ func (cmd *CreateAppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, _, err := shared.NewClients(config, ui, true, "")
+	client, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
