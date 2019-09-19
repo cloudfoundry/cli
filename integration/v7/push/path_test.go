@@ -78,12 +78,14 @@ var _ = Describe("handle path in manifest and flag override", func() {
 
 		When("a single path is not valid", func() {
 			It("errors", func() {
+				expandedTempDir, err := filepath.EvalSymlinks(tempDir)
+				Expect(err).NotTo(HaveOccurred())
 				manifestPath := filepath.Join(tempDir, "manifest.yml")
 				helpers.WriteManifest(manifestPath, map[string]interface{}{
 					"applications": []map[string]interface{}{
 						{
 							"name": appName,
-							"path": "/I/am/a/potato",
+							"path": "potato",
 						},
 						{
 							"name": secondName,
@@ -92,7 +94,7 @@ var _ = Describe("handle path in manifest and flag override", func() {
 					},
 				})
 				session := helpers.CF(PushCommandName, appName, "-f", manifestPath)
-				Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path /I/am/a/potato"))
+				Eventually(session.Err).Should(helpers.SayPath("File not found locally, make sure the file exists at given path %s", filepath.Join(expandedTempDir, "potato")))
 				Eventually(session).Should(Exit(1))
 			})
 		})
