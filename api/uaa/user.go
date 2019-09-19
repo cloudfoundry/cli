@@ -96,6 +96,32 @@ func (client *Client) CreateUser(user string, password string, origin string) (U
 	return User(userResponse), nil
 }
 
+func (client *Client) DeleteUser(userGuid string) (User, error) {
+	deleteRequest, err := client.newRequest(requestOptions{
+		RequestName: internal.DeleteUserRequest,
+		Header: http.Header{
+			"Content-Type": {"application/json"},
+		},
+		URIParams: map[string]string{"user_guid": userGuid},
+	})
+
+	if err != nil {
+		return User{}, err
+	}
+
+	var deleteUserResponse newUserResponse
+	deleteResponse := Response{
+		Result: &deleteUserResponse,
+	}
+
+	err = client.connection.Make(deleteRequest, &deleteResponse)
+	if err != nil {
+		return User{}, err
+	}
+
+	return User(deleteUserResponse), nil
+}
+
 // ListUsers gets a list of users from UAA with the given username and (if provided) origin.
 // NOTE: that this is a paginated response and we are only currently returning the first page
 // of users. This will mean, if no origin is passed and there are more than 100 users with
@@ -139,28 +165,3 @@ func (client Client) ListUsers(userName, origin string) ([]User, error) {
 	return users, nil
 }
 
-func (client *Client) DeleteUser(userGuid string) (User, error) {
-	deleteRequest, err := client.newRequest(requestOptions{
-		RequestName: internal.DeleteUserRequest,
-		Header: http.Header{
-			"Content-Type": {"application/json"},
-		},
-		URIParams: map[string]string{"user_guid": userGuid},
-	})
-
-	if err != nil {
-		return User{}, err
-	}
-
-	var deleteUserResponse newUserResponse
-	deleteResponse := Response{
-		Result: &deleteUserResponse,
-	}
-
-	err = client.connection.Make(deleteRequest, &deleteResponse)
-	if err != nil {
-		return User{}, err
-	}
-
-	return User(deleteUserResponse), nil
-}
