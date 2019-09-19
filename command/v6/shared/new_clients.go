@@ -44,23 +44,21 @@ func NewRouterClient(config command.Config, ui command.UI, uaaClient *uaa.Client
 	return routerClient, nil
 }
 
-
-
-func GetNewClientsAndConnectToCF(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client, error){
+func GetNewClientsAndConnectToCF(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client, error) {
 	var err error
 
 	ccClient, authWrapper := NewWrappedCloudControllerClient(config, ui)
 
-	ccClient, err = connectToCF(config, ui,  ccClient)
+	ccClient, err = connectToCF(config, ui, ccClient)
 	if err != nil {
 		return nil, nil, err
 	}
-	uaaClient, err := newWrappedUAAClient(config, ui,ccClient, authWrapper)
+	uaaClient, err := newWrappedUAAClient(config, ui, ccClient, authWrapper)
 
 	return ccClient, uaaClient, err
 }
 
-func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv2.Client, *ccWrapper.UAAAuthentication){
+func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv2.Client, *ccWrapper.UAAAuthentication) {
 	ccWrappers := []ccv2.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -87,7 +85,7 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv
 	return ccClient, authWrapper
 }
 
-func newWrappedUAAClient(config command.Config, ui command.UI,ccClient *ccv2.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error){
+func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv2.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error) {
 	var err error
 	verbose, location := config.Verbose()
 
@@ -114,8 +112,6 @@ func newWrappedUAAClient(config command.Config, ui command.UI,ccClient *ccv2.Cli
 	return uaaClient, nil
 }
 
-
-
 func connectToCF(config command.Config, ui command.UI, ccClient *ccv2.Client) (*ccv2.Client, error) {
 	if config.Target() == "" {
 		return nil, translatableerror.NoAPISetError{
@@ -137,7 +133,6 @@ func connectToCF(config command.Config, ui command.UI, ccClient *ccv2.Client) (*
 	if ccClient.AuthorizationEndpoint() == "" {
 		return nil, translatableerror.AuthorizationEndpointNotFoundError{}
 	}
-
 
 	return ccClient, err
 }
