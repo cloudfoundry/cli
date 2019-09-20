@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -134,6 +135,19 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 					Expect(testUI.Err).To(Say("some-warning"))
 					Expect(executeErr).To(MatchError(errors.New("get-domain-by-name-errors")))
+				})
+			})
+
+			When("the domain is private, not shared", func() {
+				BeforeEach(func() {
+					fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid", OrganizationGUID: "private-org-guid"}, v7action.Warnings{"some-warning"}, nil)
+				})
+				It("returns an informative error message and does not delete the domain", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(executeErr).To(MatchError(translatableerror.NotSharedDomainError{DomainName: "some-domain.com"}))
+					Expect(testUI.Out).To(Say(`Deleting domain some-domain.com as steve\.\.\.`))
+					Expect(testUI.Err).To(Say("some-warning"))
+					Expect(fakeActor.DeleteDomainCallCount()).To(Equal(0))
 				})
 			})
 		})

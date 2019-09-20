@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
@@ -90,6 +91,11 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 			return nil
 		}
 		return err
+	}
+
+	// Private domains always have an organization guid; shared domains, never.
+	if domain.OrganizationGUID != "" {
+		return translatableerror.NotSharedDomainError{DomainName: cmd.RequiredArgs.Domain}
 	}
 
 	warnings, err = cmd.Actor.DeleteDomain(domain)
