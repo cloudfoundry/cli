@@ -380,7 +380,6 @@ func (cmd PushCommand) ValidateFlags() error {
 			Arg2: "--health-check-type=http, -u=http",
 		}
 
-
 	case cmd.DropletPath != "" && (cmd.DockerImage.Path != "" || cmd.DockerUsername != "" || cmd.AppPath != ""):
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
