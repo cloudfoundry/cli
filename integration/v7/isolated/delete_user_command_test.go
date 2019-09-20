@@ -83,7 +83,7 @@ var _ = Describe("delete-user command", func() {
 						session := helpers.CF("delete-user", someUser, "-f")
 						Eventually(session).Should(Say("Deleting user %s...", someUser))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("The username '%s' is found in multiple origins: uaa, ldap.", someUser))
+						Eventually(session.Err).Should(Say("The username '%s' is found in multiple origins: (uaa|ldap), (uaa|ldap).", someUser))
 						Eventually(session).Should(Exit(1))
 					})
 				})
