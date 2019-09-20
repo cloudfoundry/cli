@@ -318,6 +318,25 @@ var _ = Describe("Space", func() {
 						{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
 					}))
 			})
+
+			When("a label selector is provided", func() {
+
+				It("passes the label selector through", func() {
+					_, _, err := actor.GetOrganizationSpacesWithLabelSelector("some-org-guid", "some-label-selector")
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+
+					expectedQuery := []ccv3.Query{
+						{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+						{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+						{Key: ccv3.LabelSelectorFilter, Values: []string{"some-label-selector"}},
+					}
+					actualQuery := fakeCloudControllerClient.GetSpacesArgsForCall(0)
+					Expect(actualQuery).To(Equal(expectedQuery))
+				})
+
+			})
 		})
 
 		When("an error is encountered", func() {

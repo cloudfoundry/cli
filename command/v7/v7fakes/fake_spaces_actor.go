@@ -9,17 +9,18 @@ import (
 )
 
 type FakeSpacesActor struct {
-	GetOrganizationSpacesStub        func(string) ([]v7action.Space, v7action.Warnings, error)
-	getOrganizationSpacesMutex       sync.RWMutex
-	getOrganizationSpacesArgsForCall []struct {
+	GetOrganizationSpacesWithLabelSelectorStub        func(string, string) ([]v7action.Space, v7action.Warnings, error)
+	getOrganizationSpacesWithLabelSelectorMutex       sync.RWMutex
+	getOrganizationSpacesWithLabelSelectorArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
-	getOrganizationSpacesReturns struct {
+	getOrganizationSpacesWithLabelSelectorReturns struct {
 		result1 []v7action.Space
 		result2 v7action.Warnings
 		result3 error
 	}
-	getOrganizationSpacesReturnsOnCall map[int]struct {
+	getOrganizationSpacesWithLabelSelectorReturnsOnCall map[int]struct {
 		result1 []v7action.Space
 		result2 v7action.Warnings
 		result3 error
@@ -28,66 +29,67 @@ type FakeSpacesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpaces(arg1 string) ([]v7action.Space, v7action.Warnings, error) {
-	fake.getOrganizationSpacesMutex.Lock()
-	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
-	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
+func (fake *FakeSpacesActor) GetOrganizationSpacesWithLabelSelector(arg1 string, arg2 string) ([]v7action.Space, v7action.Warnings, error) {
+	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
+	ret, specificReturn := fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall[len(fake.getOrganizationSpacesWithLabelSelectorArgsForCall)]
+	fake.getOrganizationSpacesWithLabelSelectorArgsForCall = append(fake.getOrganizationSpacesWithLabelSelectorArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetOrganizationSpaces", []interface{}{arg1})
-	fake.getOrganizationSpacesMutex.Unlock()
-	if fake.GetOrganizationSpacesStub != nil {
-		return fake.GetOrganizationSpacesStub(arg1)
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetOrganizationSpacesWithLabelSelector", []interface{}{arg1, arg2})
+	fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
+	if fake.GetOrganizationSpacesWithLabelSelectorStub != nil {
+		return fake.GetOrganizationSpacesWithLabelSelectorStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getOrganizationSpacesReturns
+	fakeReturns := fake.getOrganizationSpacesWithLabelSelectorReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpacesCallCount() int {
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
-	return len(fake.getOrganizationSpacesArgsForCall)
+func (fake *FakeSpacesActor) GetOrganizationSpacesWithLabelSelectorCallCount() int {
+	fake.getOrganizationSpacesWithLabelSelectorMutex.RLock()
+	defer fake.getOrganizationSpacesWithLabelSelectorMutex.RUnlock()
+	return len(fake.getOrganizationSpacesWithLabelSelectorArgsForCall)
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpacesCalls(stub func(string) ([]v7action.Space, v7action.Warnings, error)) {
-	fake.getOrganizationSpacesMutex.Lock()
-	defer fake.getOrganizationSpacesMutex.Unlock()
-	fake.GetOrganizationSpacesStub = stub
+func (fake *FakeSpacesActor) GetOrganizationSpacesWithLabelSelectorCalls(stub func(string, string) ([]v7action.Space, v7action.Warnings, error)) {
+	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
+	defer fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
+	fake.GetOrganizationSpacesWithLabelSelectorStub = stub
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpacesArgsForCall(i int) string {
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
-	argsForCall := fake.getOrganizationSpacesArgsForCall[i]
-	return argsForCall.arg1
+func (fake *FakeSpacesActor) GetOrganizationSpacesWithLabelSelectorArgsForCall(i int) (string, string) {
+	fake.getOrganizationSpacesWithLabelSelectorMutex.RLock()
+	defer fake.getOrganizationSpacesWithLabelSelectorMutex.RUnlock()
+	argsForCall := fake.getOrganizationSpacesWithLabelSelectorArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpacesReturns(result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
-	fake.getOrganizationSpacesMutex.Lock()
-	defer fake.getOrganizationSpacesMutex.Unlock()
-	fake.GetOrganizationSpacesStub = nil
-	fake.getOrganizationSpacesReturns = struct {
+func (fake *FakeSpacesActor) GetOrganizationSpacesWithLabelSelectorReturns(result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
+	defer fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
+	fake.GetOrganizationSpacesWithLabelSelectorStub = nil
+	fake.getOrganizationSpacesWithLabelSelectorReturns = struct {
 		result1 []v7action.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
-	fake.getOrganizationSpacesMutex.Lock()
-	defer fake.getOrganizationSpacesMutex.Unlock()
-	fake.GetOrganizationSpacesStub = nil
-	if fake.getOrganizationSpacesReturnsOnCall == nil {
-		fake.getOrganizationSpacesReturnsOnCall = make(map[int]struct {
+func (fake *FakeSpacesActor) GetOrganizationSpacesWithLabelSelectorReturnsOnCall(i int, result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationSpacesWithLabelSelectorMutex.Lock()
+	defer fake.getOrganizationSpacesWithLabelSelectorMutex.Unlock()
+	fake.GetOrganizationSpacesWithLabelSelectorStub = nil
+	if fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall == nil {
+		fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall = make(map[int]struct {
 			result1 []v7action.Space
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getOrganizationSpacesReturnsOnCall[i] = struct {
+	fake.getOrganizationSpacesWithLabelSelectorReturnsOnCall[i] = struct {
 		result1 []v7action.Space
 		result2 v7action.Warnings
 		result3 error
@@ -97,8 +99,8 @@ func (fake *FakeSpacesActor) GetOrganizationSpacesReturnsOnCall(i int, result1 [
 func (fake *FakeSpacesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
+	fake.getOrganizationSpacesWithLabelSelectorMutex.RLock()
+	defer fake.getOrganizationSpacesWithLabelSelectorMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

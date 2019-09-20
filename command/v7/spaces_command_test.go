@@ -89,7 +89,7 @@ var _ = Describe("spaces Command", func() {
 
 			When("there are no spaces", func() {
 				BeforeEach(func() {
-					fakeActor.GetOrganizationSpacesReturns(
+					fakeActor.GetOrganizationSpacesWithLabelSelectorReturns(
 						[]v7action.Space{},
 						v7action.Warnings{"get-spaces-warning"},
 						nil,
@@ -105,14 +105,17 @@ var _ = Describe("spaces Command", func() {
 
 					Expect(testUI.Err).To(Say("get-spaces-warning"))
 
-					Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
-					Expect(fakeActor.GetOrganizationSpacesArgsForCall(0)).To(Equal("some-org-guid"))
+					Expect(fakeActor.GetOrganizationSpacesWithLabelSelectorCallCount()).To(Equal(1))
+
+					orgGUID, labelSelector := fakeActor.GetOrganizationSpacesWithLabelSelectorArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(labelSelector).To(Equal(""))
 				})
 			})
 
 			When("there are multiple spaces", func() {
 				BeforeEach(func() {
-					fakeActor.GetOrganizationSpacesReturns(
+					fakeActor.GetOrganizationSpacesWithLabelSelectorReturns(
 						[]v7action.Space{
 							{Name: "space-1"},
 							{Name: "space-2"},
@@ -133,14 +136,28 @@ var _ = Describe("spaces Command", func() {
 
 					Expect(testUI.Err).To(Say("get-spaces-warning"))
 
-					Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
-					Expect(fakeActor.GetOrganizationSpacesArgsForCall(0)).To(Equal("some-org-guid"))
+					Expect(fakeActor.GetOrganizationSpacesWithLabelSelectorCallCount()).To(Equal(1))
+					orgGUID, labelSelector := fakeActor.GetOrganizationSpacesWithLabelSelectorArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(labelSelector).To(Equal(""))
+				})
+
+				When("a label selector is provided to filter the spaces", func() {
+					BeforeEach(func() {
+						cmd.Labels = "some-label-selector"
+					})
+					It("passes the label selector to the actor", func() {
+						Expect(fakeActor.GetOrganizationSpacesWithLabelSelectorCallCount()).To(Equal(1))
+						orgGUID, labelSelector := fakeActor.GetOrganizationSpacesWithLabelSelectorArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(labelSelector).To(Equal("some-label-selector"))
+					})
 				})
 			})
 
 			When("a translatable error is encountered getting spaces", func() {
 				BeforeEach(func() {
-					fakeActor.GetOrganizationSpacesReturns(
+					fakeActor.GetOrganizationSpacesWithLabelSelectorReturns(
 						nil,
 						v7action.Warnings{"get-spaces-warning"},
 						actionerror.OrganizationNotFoundError{Name: "not-found-org"},
@@ -155,8 +172,10 @@ var _ = Describe("spaces Command", func() {
 
 					Expect(testUI.Err).To(Say("get-spaces-warning"))
 
-					Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
-					Expect(fakeActor.GetOrganizationSpacesArgsForCall(0)).To(Equal("some-org-guid"))
+					Expect(fakeActor.GetOrganizationSpacesWithLabelSelectorCallCount()).To(Equal(1))
+					orgGUID, labelSelector := fakeActor.GetOrganizationSpacesWithLabelSelectorArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(labelSelector).To(Equal(""))
 				})
 			})
 		})

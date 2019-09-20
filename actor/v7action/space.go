@@ -182,12 +182,18 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 	return spaceSummary, allWarnings, nil
 }
 
-// GetOrganizationSpaces returns a list of spaces in the specified org
-func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
-	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+// GetOrganizationSpacesWithLabelSelector returns a list of spaces in the specified org
+func (actor Actor) GetOrganizationSpacesWithLabelSelector(orgGUID string, labelSelector string) ([]Space, Warnings, error) {
+
+	queries := []ccv3.Query{
 		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
-	)
+	}
+	if len(labelSelector) > 0 {
+		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+
+	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(queries...)
 	if err != nil {
 		return []Space{}, Warnings(warnings), err
 	}
@@ -198,6 +204,11 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, err
 	}
 
 	return spaces, Warnings(warnings), nil
+}
+
+// GetOrganizationSpaces returns a list of spaces in the specified org
+func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
+	return actor.GetOrganizationSpacesWithLabelSelector(orgGUID, "")
 }
 
 func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (Warnings, error) {

@@ -12,12 +12,14 @@ import (
 //go:generate counterfeiter . SpacesActor
 
 type SpacesActor interface {
-	GetOrganizationSpaces(orgGUID string) ([]v7action.Space, v7action.Warnings, error)
+	GetOrganizationSpacesWithLabelSelector(orgGUID string, labelSelector string) ([]v7action.Space, v7action.Warnings, error)
 }
 
 type SpacesCommand struct {
 	usage           interface{} `usage:"CF_NAME spaces"`
 	relatedCommands interface{} `related_commands:"target"`
+
+	Labels string `long:"labels" description:"Selector to filter spaces against"`
 
 	UI          command.UI
 	Config      command.Config
@@ -56,7 +58,7 @@ func (cmd SpacesCommand) Execute([]string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(cmd.Config.TargetedOrganization().GUID)
+	spaces, warnings, err := cmd.Actor.GetOrganizationSpacesWithLabelSelector(cmd.Config.TargetedOrganization().GUID, cmd.Labels)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
