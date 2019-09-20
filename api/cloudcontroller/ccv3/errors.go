@@ -53,6 +53,8 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError, request *cloudcontr
 	}
 
 	switch rawHTTPStatusErr.StatusCode {
+	case http.StatusBadRequest: // 400
+		return handleBadRequest(firstErr, request)
 	case http.StatusUnauthorized: // 401
 		if firstErr.Title == "CF-InvalidAuthToken" {
 			return ccerror.InvalidAuthTokenError{Message: firstErr.Detail}
@@ -100,6 +102,14 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 			},
 		}
 	}
+}
+
+func handleBadRequest(errorResponse ccerror.V3Error, _ *cloudcontroller.Request) error {
+	switch errorResponse.Title {
+	case "CF-BadQueryParameter":
+		return ccerror.BadRequestError{Message: errorResponse.Detail}
+	}
+	return ccerror.BadRequestError{Message: errorResponse.Detail}
 }
 
 func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Request) error {

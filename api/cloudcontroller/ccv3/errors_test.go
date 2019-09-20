@@ -83,6 +83,31 @@ var _ = Describe("Error Wrapper", func() {
 			})
 
 			When("the error is a 4XX error", func() {
+				Context("(400) Bad Request", func() {
+					BeforeEach(func() {
+						serverResponseCode = http.StatusBadRequest
+					})
+
+					When("the query parameter is invalid", func(){
+						BeforeEach(func() {
+							serverResponse = `
+{
+   "errors": [
+      {
+         "detail": "The query parameter is invalid: Missing label_selector value",
+         "title": "CF-BadQueryParameter",
+         "code": 10005
+      }
+   ]
+}`
+						})
+
+						It("returns a BadRequestError", func() {
+							Expect(makeError).To(MatchError(ccerror.BadRequestError{Message: "The query parameter is invalid: Missing label_selector value"}))
+						})
+
+					})
+				})
 				Context("(401) Unauthorized", func() {
 					BeforeEach(func() {
 						serverResponseCode = http.StatusUnauthorized
