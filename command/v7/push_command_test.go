@@ -1061,6 +1061,7 @@ var _ = Describe("push Command", func() {
 			},
 			translatableerror.RequiredFlagsError{Arg1: "--endpoint", Arg2: "--health-check-type=http, -u=http"}),
 
+		// After this bug is fixed, we may not need this:
 		Entry("when --endpoint does not have a matching -u",
 			func() {
 				cmd.HealthCheckHTTPEndpoint = "/health"

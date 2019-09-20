@@ -138,4 +138,47 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 			Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 		})
 	})
+
+	When("manifest health check type is not set to http (app level), and health check endpoint flag is set", func() {
+		BeforeEach(func() {
+			overrides.HealthCheckEndpoint = "/health"
+
+			originalManifest.Applications = []pushmanifestparser.Application{
+				{
+					HealthCheckType: "port",
+				},
+			}
+		})
+
+		It("returns an error ", func() {
+			Expect(executeErr).To(MatchError(translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--endpoint",
+				ManifestProperty: "health-check-type",
+				ManifestValue:    "port",
+			}))
+		})
+	})
+
+	When("manifest health check type is not set to http (process level), and health check endpoint flag is set", func() {
+		BeforeEach(func() {
+			overrides.HealthCheckEndpoint = "/health"
+
+			originalManifest.Applications = []pushmanifestparser.Application{
+				{
+					Processes: []pushmanifestparser.Process{
+						{Type: "web", HealthCheckType: "port"},
+					},
+				},
+			}
+		})
+
+		It("returns an error ", func() {
+			Expect(executeErr).To(MatchError(translatableerror.ArgumentManifestMismatchError{
+				Arg:              "--endpoint",
+				ManifestProperty: "health-check-type",
+				ManifestValue:    "port",
+			}))
+		})
+	})
+
 })

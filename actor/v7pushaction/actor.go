@@ -46,8 +46,11 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 
 		HandleInstancesOverride,
 		HandleStartCommandOverride,
+
+		// Type must come before endpoint because endpoint validates against type
 		HandleHealthCheckTypeOverride,
 		HandleHealthCheckEndpointOverride,
+
 		HandleHealthCheckTimeoutOverride,
 		HandleMemoryOverride,
 		HandleDiskOverride,
