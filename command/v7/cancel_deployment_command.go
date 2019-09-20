@@ -34,7 +34,7 @@ func (cmd *CancelDeploymentCommand) Setup(config command.Config, ui command.UI) 
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}

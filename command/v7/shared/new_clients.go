@@ -9,9 +9,21 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-// NewClients creates a new V3 Cloud Controller client and UAA client using the
-// passed in config.
-func NewClients(config command.Config, ui command.UI, targetCF bool, minVersionV3 string) (*ccv3.Client, *uaa.Client, error) {
+func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersionV3 string) (*ccv3.Client, *uaa.Client, error) {
+	var err error
+
+	ccClient, authWrapper := NewWrappedCloudControllerClient(config, ui)
+
+	ccClient, err = connectToCF(config, ui, ccClient, minVersionV3)
+	if err != nil {
+		return nil, nil, err
+	}
+	uaaClient, err := newWrappedUAAClient(config, ui, ccClient, authWrapper)
+
+	return ccClient, uaaClient, err
+}
+
+func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv3.Client, *ccWrapper.UAAAuthentication) {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -34,42 +46,14 @@ func NewClients(config command.Config, ui command.UI, targetCF bool, minVersionV
 		JobPollingInterval: config.PollingInterval(),
 		Wrappers:           ccWrappers,
 	})
+	return ccClient, authWrapper
+}
 
-	if !targetCF {
-		return ccClient, nil, nil
-	}
-
-	if config.Target() == "" {
-		return nil, nil, translatableerror.NoAPISetError{
-			BinaryName: config.BinaryName(),
-		}
-	}
-
-	_, err := ccClient.TargetCF(ccv3.TargetSettings{
-		URL:               config.Target(),
-		SkipSSLValidation: config.SkipSSLValidation(),
-		DialTimeout:       config.DialTimeout(),
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if minVersionV3 != "" {
-		err = command.MinimumCCAPIVersionCheck(ccClient.CloudControllerAPIVersion(), minVersionV3)
-		if err != nil {
-			if _, ok := err.(translatableerror.MinimumCFAPIVersionNotMetError); ok {
-				return nil, nil, translatableerror.V3V2SwitchError{}
-			}
-			return nil, nil, err
-		}
-	}
-
-	if ccClient.UAA() == "" {
-		return nil, nil, translatableerror.UAAEndpointNotFoundError{}
-	}
+func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error) {
+	var err error
+	verbose, location := config.Verbose()
 
 	uaaClient := uaa.NewClient(config)
-
 	if verbose {
 		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
 	}
@@ -83,11 +67,39 @@ func NewClients(config command.Config, ui command.UI, targetCF bool, minVersionV
 
 	err = uaaClient.SetupResources(ccClient.UAA())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	uaaAuthWrapper.SetClient(uaaClient)
 	authWrapper.SetClient(uaaClient)
 
-	return ccClient, uaaClient, nil
+	return uaaClient, nil
+}
+
+func connectToCF(config command.Config, ui command.UI, ccClient *ccv3.Client, minVersionV3 string) (*ccv3.Client, error) {
+	if config.Target() == "" {
+		return nil, translatableerror.NoAPISetError{
+			BinaryName: config.BinaryName(),
+		}
+	}
+
+	_, err := ccClient.TargetCF(ccv3.TargetSettings{
+		URL:               config.Target(),
+		SkipSSLValidation: config.SkipSSLValidation(),
+		DialTimeout:       config.DialTimeout(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if minVersionV3 != "" {
+		err = command.MinimumCCAPIVersionCheck(ccClient.CloudControllerAPIVersion(), minVersionV3)
+		if err != nil {
+			if _, ok := err.(translatableerror.MinimumCFAPIVersionNotMetError); ok {
+				return nil, translatableerror.V3V2SwitchError{}
+			}
+			return nil, err
+		}
+	}
+	return ccClient, nil
 }
