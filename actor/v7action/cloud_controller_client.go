@@ -27,7 +27,7 @@ type CloudControllerClient interface {
 	CreateOrganization(orgName string) (ccv3.Organization, ccv3.Warnings, error)
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
 	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
-	CreateServiceBroker(name, username, password, url, spaceGUID string) (ccv3.Warnings, error)
+	CreateServiceBroker(name, username, password, url, spaceGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	CreateUser(userGUID string) (ccv3.User, ccv3.Warnings, error)
 	DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error)

@@ -84,11 +84,15 @@ var _ = Describe("create-service-broker command", func() {
 					helpers.QuickDeleteOrg(orgName)
 				})
 
-				It("registers the broker", func() {
+				It("registers the broker and service offerings and plans are available", func() {
 					session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL())
 					Eventually(session).Should(Say("Creating service broker %s as %s...", brokerName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("service-access", "-b", brokerName)
+					Eventually(session).Should(Say(broker.ServiceName()))
+					Eventually(session).Should(Say(broker.ServicePlanName()))
 
 					session = helpers.CF("service-brokers")
 					Eventually(session).Should(Say(brokerName))

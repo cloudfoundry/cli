@@ -3,20 +3,32 @@ package fakeservicebroker
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	. "github.com/onsi/gomega"
 )
 
 func (f *FakeServiceBroker) configure() {
+	Eventually(f.alreadyPushedApp).Should(
+		Equal(true),
+		fmt.Sprintf("Expected app to be pushed and eventually available on %s", f.URL()),
+	)
+
 	req, err := http.NewRequest("POST", f.URL("/config"), f.configJSON())
 	Expect(err).ToNot(HaveOccurred())
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := http.DefaultClient.Do(req)
 	Expect(err).ToNot(HaveOccurred())
-	Expect(resp.StatusCode).To(Equal(http.StatusOK))
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(resp.StatusCode).To(
+		Equal(http.StatusOK),
+		fmt.Sprintf("Expected POST /config to succeed. Response body: '%s'", string(body)),
+	)
 	defer resp.Body.Close()
 }
 

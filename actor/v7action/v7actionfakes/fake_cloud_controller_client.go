@@ -253,7 +253,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateServiceBrokerStub        func(string, string, string, string, string) (ccv3.Warnings, error)
+	CreateServiceBrokerStub        func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)
 	createServiceBrokerMutex       sync.RWMutex
 	createServiceBrokerArgsForCall []struct {
 		arg1 string
@@ -263,12 +263,14 @@ type FakeCloudControllerClient struct {
 		arg5 string
 	}
 	createServiceBrokerReturns struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	createServiceBrokerReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	CreateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	createSpaceMutex       sync.RWMutex
@@ -2597,7 +2599,7 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.createServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
 	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
@@ -2613,10 +2615,10 @@ func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 string, arg2 str
 		return fake.CreateServiceBrokerStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.createServiceBrokerReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) CreateServiceBrokerCallCount() int {
@@ -2625,7 +2627,7 @@ func (fake *FakeCloudControllerClient) CreateServiceBrokerCallCount() int {
 	return len(fake.createServiceBrokerArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(string, string, string, string, string) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = stub
@@ -2638,30 +2640,33 @@ func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) (st
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerReturns(result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = nil
 	fake.createServiceBrokerReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = nil
 	if fake.createServiceBrokerReturnsOnCall == nil {
 		fake.createServiceBrokerReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
 		})
 	}
 	fake.createServiceBrokerReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) CreateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
