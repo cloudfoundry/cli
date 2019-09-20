@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("push with health check type", func() {
+var _ = Describe("push with health check type", func() {
 	var (
 		appName string
 	)

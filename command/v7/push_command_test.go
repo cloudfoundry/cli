@@ -1061,27 +1061,6 @@ var _ = Describe("push Command", func() {
 			},
 			translatableerror.RequiredFlagsError{Arg1: "--endpoint", Arg2: "--health-check-type=http, -u=http"}),
 
-		// After this bug is fixed, we may not need this:
-		Entry("when --endpoint does not have a matching -u",
-			func() {
-				cmd.HealthCheckHTTPEndpoint = "/health"
-			},
-			translatableerror.RequiredFlagsError{Arg1: "--health-check-type=http, -u=http", Arg2: "--endpoint"}),
-
-		Entry("when --endpoint has a matching -u=process instead of a -u=http",
-			func() {
-				cmd.HealthCheckHTTPEndpoint = "/health"
-				cmd.HealthCheckType.Type = constant.Process
-			},
-			translatableerror.RequiredFlagsError{Arg1: "--health-check-type=http, -u=http", Arg2: "--endpoint"}),
-
-		Entry("when --endpoint has a matching -u=port instead of a -u=http",
-			func() {
-				cmd.HealthCheckHTTPEndpoint = "/health"
-				cmd.HealthCheckType.Type = constant.Port
-			},
-			translatableerror.RequiredFlagsError{Arg1: "--health-check-type=http, -u=http", Arg2: "--endpoint"}),
-
 		Entry("when -u http does have a matching --endpoint",
 			func() {
 				cmd.HealthCheckType.Type = constant.HTTP
