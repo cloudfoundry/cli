@@ -1,75 +1,65 @@
 package pushaction_test
 
 import (
-	"errors"
-	"io/ioutil"
-	"os"
-	"time"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"io/ioutil"
+	"os"
 )
 
-func streamsDrainedAndClosed(configStream <-chan ApplicationConfig, eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) bool {
-	var configStreamClosed, eventStreamClosed, warningsStreamClosed, errorStreamClosed bool
+func collectAllEvents(configStream <-chan ApplicationConfig, eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) ([]ApplicationConfig, []Event, Warnings, []error) {
+	var (
+		configStreamClosed, eventStreamClosed, warningsStreamClosed, errorStreamClosed bool
+
+		allConfigs  []ApplicationConfig
+		allEvents   []Event
+		allWarnings Warnings
+		allErrors   []error
+	)
+
 	for {
 		select {
-		case _, ok := <-configStream:
+		case config, ok := <-configStream:
 			if !ok {
 				configStreamClosed = true
 			}
-		case _, ok := <-eventStream:
+
+			allConfigs = append(allConfigs, config)
+		case event, ok := <-eventStream:
 			if !ok {
 				eventStreamClosed = true
 			}
-		case _, ok := <-warningsStream:
+
+			allEvents = append(allEvents, event)
+		case warning, ok := <-warningsStream:
 			if !ok {
 				warningsStreamClosed = true
 			}
-		case _, ok := <-errorStream:
+
+			allWarnings = append(allWarnings, warning...)
+		case err, ok := <-errorStream:
 			if !ok {
 				errorStreamClosed = true
 			}
+
+			if err != nil {
+				allErrors = append(allErrors, err)
+			}
 		}
+
 		if configStreamClosed && eventStreamClosed && warningsStreamClosed && errorStreamClosed {
 			break
 		}
 	}
-	return true
-}
 
-// TODO: for refactor: We can use the following style of code to validate that
-// each event is received in a specific order
-
-// Expect(nextEvent()).Should(Equal(SettingUpApplication))
-// Expect(nextEvent()).Should(Equal(CreatingApplication))
-// Expect(nextEvent()).Should(Equal(...))
-// Expect(nextEvent()).Should(Equal(...))
-// Expect(nextEvent()).Should(Equal(...))
-func setUpNextEvent(c <-chan ApplicationConfig, e <-chan Event, w <-chan Warnings) func() Event {
-	timeOut := time.Tick(500 * time.Millisecond)
-
-	return func() Event {
-		for {
-			select {
-			case <-c:
-			case event, ok := <-e:
-				if ok {
-					return event
-				}
-				return ""
-			case <-w:
-			case <-timeOut:
-				return ""
-			}
-		}
-	}
+	return allConfigs, allEvents, allWarnings, allErrors
 }
 
 var _ = Describe("Apply", func() {
@@ -86,7 +76,10 @@ var _ = Describe("Apply", func() {
 		errorStream    <-chan error
 		configStream   <-chan ApplicationConfig
 
-		nextEvent func() Event
+		allConfigs  []ApplicationConfig
+		allEvents   []Event
+		allWarnings Warnings
+		allErrors   []error
 	)
 
 	BeforeEach(func() {
@@ -105,11 +98,7 @@ var _ = Describe("Apply", func() {
 	JustBeforeEach(func() {
 		configStream, eventStream, warningsStream, errorStream = actor.Apply(config, fakeProgressBar)
 
-		nextEvent = setUpNextEvent(configStream, eventStream, warningsStream)
-	})
-
-	AfterEach(func() {
-		Eventually(streamsDrainedAndClosed(configStream, eventStream, warningsStream, errorStream)).Should(BeTrue())
+		allConfigs, allEvents, allWarnings, allErrors = collectAllEvents(configStream, eventStream, warningsStream, errorStream)
 	})
 
 	When("creating/updating the application is successful", func() {
@@ -125,9 +114,8 @@ var _ = Describe("Apply", func() {
 		})
 
 		JustBeforeEach(func() {
-			Eventually(eventStream).Should(Receive(Equal(SettingUpApplication)))
-			Eventually(warningsStream).Should(Receive(ConsistOf("create-application-warnings-1", "create-application-warnings-2")))
-			Eventually(eventStream).Should(Receive(Equal(CreatedApplication)))
+			Expect(allEvents).To(matchers.ContainElementsInOrder(SettingUpApplication, CreatedApplication))
+			Expect(allWarnings).To(matchers.ContainElementsInOrder("create-application-warnings-1", "create-application-warnings-2"))
 		})
 
 		When("the route creation is successful", func() {
@@ -139,9 +127,9 @@ var _ = Describe("Apply", func() {
 			})
 
 			JustBeforeEach(func() {
-				Eventually(eventStream).Should(Receive(Equal(CreatingAndMappingRoutes)))
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warnings-1", "create-route-warnings-2")))
-				Eventually(eventStream).Should(Receive(Equal(CreatedRoutes)))
+				Expect(allEvents).To(matchers.ContainElementsInOrder(CreatingAndMappingRoutes))
+				Expect(allWarnings).To(matchers.ContainElementsInOrder("create-route-warnings-1", "create-route-warnings-2"))
+				Expect(allEvents).To(matchers.ContainElementsInOrder(CreatedRoutes))
 			})
 
 			When("mapping the routes is successful", func() {
@@ -156,8 +144,8 @@ var _ = Describe("Apply", func() {
 				})
 
 				JustBeforeEach(func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("map-route-warnings-1", "map-route-warnings-2")))
-					Eventually(eventStream).Should(Receive(Equal(BoundRoutes)))
+					Expect(allWarnings).To(matchers.ContainElementsInOrder("map-route-warnings-1", "map-route-warnings-2"))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(BoundRoutes))
 				})
 
 				When("service binding is successful", func() {
@@ -166,9 +154,9 @@ var _ = Describe("Apply", func() {
 					})
 
 					JustBeforeEach(func() {
-						Eventually(eventStream).Should(Receive(Equal(ConfiguringServices)))
-						Eventually(warningsStream).Should(Receive(ConsistOf("bind-service-warnings-1", "bind-service-warnings-2")))
-						Eventually(eventStream).Should(Receive(Equal(BoundServices)))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(ConfiguringServices))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("bind-service-warnings-1", "bind-service-warnings-2"))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(BoundServices))
 					})
 
 					When("resource matching happens", func() {
@@ -177,8 +165,8 @@ var _ = Describe("Apply", func() {
 						})
 
 						JustBeforeEach(func() {
-							Eventually(eventStream).Should(Receive(Equal(ResourceMatching)))
-							Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
+							Expect(allEvents).To(matchers.ContainElementsInOrder(ResourceMatching))
+							Expect(allWarnings).To(matchers.ContainElementsInOrder("resource-warnings-1", "resource-warnings-2"))
 						})
 
 						When("there is at least one resource that has not been matched", func() {
@@ -201,7 +189,7 @@ var _ = Describe("Apply", func() {
 								})
 
 								JustBeforeEach(func() {
-									Eventually(eventStream).Should(Receive(Equal(CreatingArchive)))
+									Expect(allEvents).To(matchers.ContainElementsInOrder(CreatingArchive))
 								})
 
 								When("the upload is successful", func() {
@@ -210,13 +198,12 @@ var _ = Describe("Apply", func() {
 									})
 
 									JustBeforeEach(func() {
-										Eventually(eventStream).Should(Receive(Equal(UploadingApplicationWithArchive)))
-										Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
-										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+										Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplicationWithArchive, UploadWithArchiveComplete))
+										Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
 									})
 
 									It("sends the updated config and a complete event", func() {
-										Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
+										Expect(allConfigs).To(matchers.ContainElementsInOrder(ApplicationConfig{
 											CurrentApplication: Application{Application: createdApp},
 											CurrentRoutes:      createdRoutes,
 											CurrentServices:    desiredServices,
@@ -225,8 +212,8 @@ var _ = Describe("Apply", func() {
 											DesiredServices:    desiredServices,
 											UnmatchedResources: []v2action.Resource{{}},
 											Path:               "some-path",
-										})))
-										Eventually(eventStream).Should(Receive(Equal(Complete)))
+										}))
+										Expect(allEvents).To(matchers.ContainElementsInOrder(Complete))
 
 										Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
 									})
@@ -240,8 +227,8 @@ var _ = Describe("Apply", func() {
 							})
 
 							JustBeforeEach(func() {
-								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+								Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplication))
+								Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
 							})
 
 							When("the upload is successful", func() {
@@ -250,7 +237,7 @@ var _ = Describe("Apply", func() {
 								})
 
 								It("sends the updated config and a complete event", func() {
-									Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
+									Expect(allConfigs).To(matchers.ContainElementsInOrder(ApplicationConfig{
 										CurrentApplication: Application{Application: createdApp},
 										CurrentRoutes:      createdRoutes,
 										CurrentServices:    desiredServices,
@@ -258,8 +245,8 @@ var _ = Describe("Apply", func() {
 										DesiredRoutes:      createdRoutes,
 										DesiredServices:    desiredServices,
 										Path:               "some-path",
-									})))
-									Eventually(eventStream).Should(Receive(Equal(Complete)))
+									}))
+									Expect(allEvents).To(matchers.ContainElementsInOrder(Complete))
 
 									Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
 									_, _, reader, readerLength := fakeV2Actor.UploadApplicationPackageArgsForCall(0)
@@ -294,9 +281,9 @@ var _ = Describe("Apply", func() {
 							})
 
 							It("sends an updated config and a complete event", func() {
-								Eventually(eventStream).Should(Receive(Equal(UploadDropletComplete)))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
+								Expect(allEvents).To(matchers.ContainElementsInOrder(UploadDropletComplete))
+								Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
+								Expect(allConfigs).To(matchers.ContainElementsInOrder(ApplicationConfig{
 									CurrentApplication: Application{Application: createdApp},
 									CurrentRoutes:      createdRoutes,
 									CurrentServices:    desiredServices,
@@ -304,7 +291,7 @@ var _ = Describe("Apply", func() {
 									DesiredRoutes:      createdRoutes,
 									DesiredServices:    desiredServices,
 									DropletPath:        dropletPath,
-								})))
+								}))
 
 								Expect(fakeV2Actor.UploadDropletCallCount()).To(Equal(1))
 								_, droplet, dropletLength := fakeV2Actor.UploadDropletArgsForCall(0)
@@ -328,10 +315,9 @@ var _ = Describe("Apply", func() {
 		})
 
 		It("sends warnings and errors, then stops", func() {
-			Eventually(eventStream).Should(Receive(Equal(SettingUpApplication)))
-			Eventually(warningsStream).Should(Receive(ConsistOf("create-application-warnings-1", "create-application-warnings-2")))
-			Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-			Consistently(eventStream).ShouldNot(Receive())
+			Expect(allEvents).To(matchers.ContainElementsInOrder(SettingUpApplication))
+			Expect(allWarnings).To(matchers.ContainElementsInOrder("create-application-warnings-1", "create-application-warnings-2"))
+			Expect(allErrors).To(ContainElement(MatchError(expectedErr)))
 		})
 	})
 
@@ -356,9 +342,8 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("sends the UnmappingRoutes event and does not raise an error", func() {
-						Eventually(nextEvent).Should(Equal(UnmappingRoutes))
-						Eventually(warningsStream).Should(Receive(ConsistOf("unmapping-route-warnings")))
-						Eventually(nextEvent).Should(Equal(Complete))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(UnmappingRoutes, Complete))
+						Expect(allWarnings).To(ContainElement("unmapping-route-warnings"))
 					})
 				})
 
@@ -368,10 +353,10 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("sends the UnmappingRoutes event and raise an error", func() {
-						Eventually(nextEvent).Should(Equal(UnmappingRoutes))
-						Eventually(warningsStream).Should(Receive(ConsistOf("unmapping-route-warnings")))
-						Eventually(errorStream).Should(Receive(MatchError("ohno")))
-						Consistently(nextEvent).ShouldNot(Equal(Complete))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(UnmappingRoutes))
+						Expect(allEvents).NotTo(ContainElement(Complete))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("unmapping-route-warnings"))
+						Expect(allErrors).To(ContainElement(MatchError("ohno")))
 					})
 				})
 			})
@@ -382,8 +367,8 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("should not send the UnmappingRoutes event", func() {
-					Consistently(nextEvent).ShouldNot(Equal(UnmappingRoutes))
-					Consistently(errorStream).ShouldNot(Receive())
+					Expect(allEvents).NotTo(ContainElement(UnmappingRoutes))
+					Expect(allErrors).To(BeEmpty())
 
 					Expect(fakeV2Actor.UnmapRouteFromApplicationCallCount()).To(Equal(0))
 				})
@@ -396,7 +381,7 @@ var _ = Describe("Apply", func() {
 			})
 
 			It("should send the CreatingAndMappingRoutes event", func() {
-				Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
+				Expect(allEvents).To(ContainElement(CreatingAndMappingRoutes))
 			})
 
 			When("no new routes are provided", func() {
@@ -405,9 +390,9 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("should not send the CreatedRoutes event", func() {
-					Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
-					Eventually(warningsStream).Should(Receive(BeEmpty()))
-					Consistently(nextEvent).ShouldNot(Equal(CreatedRoutes))
+					Expect(allEvents).To(ContainElement(CreatingAndMappingRoutes))
+					Expect(allEvents).NotTo(ContainElement(CreatedRoutes))
+					Expect(allWarnings).To(BeEmpty())
 				})
 			})
 
@@ -422,10 +407,11 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("raise an error", func() {
-						Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
-						Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warning")))
-						Eventually(errorStream).Should(Receive(MatchError("ohno")))
-						Consistently(nextEvent).ShouldNot(EqualEither(CreatedRoutes, Complete))
+						Expect(allEvents).To(ContainElement(CreatingAndMappingRoutes))
+						Expect(allEvents).NotTo(ContainElement(CreatedRoutes))
+						Expect(allEvents).NotTo(ContainElement(Complete))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("create-route-warning"))
+						Expect(allErrors).To(ContainElement(MatchError("ohno")))
 					})
 				})
 
@@ -435,9 +421,8 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("should send the CreatedRoutes event", func() {
-						Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
-						Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warning")))
-						Expect(nextEvent()).To(Equal(CreatedRoutes))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(CreatingAndMappingRoutes, CreatedRoutes))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("create-route-warning"))
 					})
 				})
 			})
@@ -448,13 +433,9 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("should not send the BoundRoutes event", func() {
-					Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
+					Expect(allEvents).To(ContainElement(CreatingAndMappingRoutes))
 
-					// First warning picks up CreatedRoute warnings, second one picks up
-					// MapRoute warnings. No easy way to improve this today
-					Eventually(warningsStream).Should(Receive())
-					Eventually(warningsStream).Should(Receive())
-					Consistently(nextEvent).ShouldNot(Equal(BoundRoutes))
+					Expect(allEvents).NotTo(ContainElement(BoundRoutes))
 				})
 			})
 
@@ -469,10 +450,11 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("raise an error", func() {
-						Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
-						Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warning")))
-						Eventually(errorStream).Should(Receive(MatchError("ohno")))
-						Consistently(nextEvent).ShouldNot(EqualEither(BoundRoutes, Complete))
+						Expect(allEvents).To(ContainElement(CreatingAndMappingRoutes))
+						Expect(allEvents).NotTo(ContainElement(BoundRoutes))
+						Expect(allEvents).NotTo(ContainElement(Complete))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("bind-route-warning"))
+						Expect(allErrors).To(ContainElement(MatchError("ohno")))
 					})
 				})
 
@@ -482,9 +464,8 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("should send the BoundRoutes event", func() {
-						Eventually(nextEvent).Should(Equal(CreatingAndMappingRoutes))
-						Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warning")))
-						Expect(nextEvent()).To(Equal(BoundRoutes))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(CreatingAndMappingRoutes, BoundRoutes))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("bind-route-warning"))
 					})
 				})
 			})
@@ -509,7 +490,8 @@ var _ = Describe("Apply", func() {
 			})
 
 			It("should not send the ConfiguringServices or BoundServices event", func() {
-				Consistently(nextEvent).ShouldNot(EqualEither(ConfiguringServices, BoundServices))
+				Expect(allEvents).NotTo(ContainElement(ConfiguringServices))
+				Expect(allEvents).NotTo(ContainElement(BoundServices))
 			})
 		})
 
@@ -525,10 +507,11 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("raises an error", func() {
-					Eventually(nextEvent).Should(Equal(ConfiguringServices))
-					Eventually(warningsStream).Should(Receive(ConsistOf("bind-service-warning")))
-					Eventually(errorStream).Should(Receive(MatchError("ohno")))
-					Consistently(nextEvent).ShouldNot(EqualEither(BoundServices, Complete))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(BoundRoutes, ConfiguringServices))
+					Expect(allEvents).NotTo(ContainElement(BoundServices))
+					Expect(allEvents).NotTo(ContainElement(Complete))
+					Expect(allWarnings).To(matchers.ContainElementsInOrder("bind-service-warning"))
+					Expect(allErrors).To(ContainElement(MatchError("ohno")))
 				})
 			})
 
@@ -538,9 +521,8 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("sends the ConfiguringServices and BoundServices events", func() {
-					Eventually(nextEvent).Should(Equal(ConfiguringServices))
-					Eventually(warningsStream).Should(Receive(ConsistOf("bind-service-warning")))
-					Expect(nextEvent()).To(Equal(BoundServices))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(ConfiguringServices, BoundServices))
+					Expect(allWarnings).To(matchers.ContainElementsInOrder("bind-service-warning"))
 				})
 			})
 		})
@@ -574,35 +556,41 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("should send a RetryUpload event and retry uploading up to 3x", func() {
-						Eventually(nextEvent).Should(Equal(UploadingDroplet))
-						Eventually(warningsStream).Should(Receive(ConsistOf("droplet-upload-warning")))
-						Expect(nextEvent()).To(Equal(RetryUpload))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(
+							UploadingDroplet,
+							RetryUpload,
+							UploadingDroplet,
+							RetryUpload,
+							UploadingDroplet,
+							RetryUpload,
+						))
 
-						Expect(nextEvent()).To(Equal(UploadingDroplet))
-						Eventually(warningsStream).Should(Receive(ConsistOf("droplet-upload-warning")))
-						Expect(nextEvent()).To(Equal(RetryUpload))
+						Expect(allEvents).To(matchers.ContainElementTimes(RetryUpload, 3))
+						Expect(allEvents).NotTo(ContainElement(UploadDropletComplete))
+						Expect(allEvents).NotTo(ContainElement(Complete))
 
-						Expect(nextEvent()).To(Equal(UploadingDroplet))
-						Eventually(warningsStream).Should(Receive(ConsistOf("droplet-upload-warning")))
-						Expect(nextEvent()).To(Equal(RetryUpload))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder(
+							"droplet-upload-warning",
+							"droplet-upload-warning",
+							"droplet-upload-warning",
+						))
 
-						Consistently(nextEvent).ShouldNot(EqualEither(RetryUpload, UploadDropletComplete, Complete))
-						Eventually(fakeV2Actor.UploadDropletCallCount).Should(Equal(3))
-						Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
+						Expect(fakeV2Actor.UploadDropletCallCount()).To(Equal(3))
+						Expect(allErrors).To(ContainElement(MatchError(actionerror.UploadFailedError{Err: someErr})))
 					})
 				})
 
 				When("the error is not a retryable error", func() {
 					BeforeEach(func() {
-						fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"droplet-upload-warning"}, errors.New("ohnos"))
+						fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"droplet-upload-warning"}, errors.New("ohno"))
 					})
 
 					It("raises an error", func() {
-						Eventually(nextEvent).Should(Equal(UploadingDroplet))
-						Eventually(warningsStream).Should(Receive(ConsistOf("droplet-upload-warning")))
-						Eventually(errorStream).Should(Receive(MatchError("ohnos")))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingDroplet))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("droplet-upload-warning"))
+						Expect(allErrors).To(ContainElement(MatchError("ohno")))
 
-						Consistently(nextEvent).ShouldNot(EqualEither(RetryUpload, UploadDropletComplete, Complete))
+						Expect(allEvents).NotTo(ContainElement(EqualEither(RetryUpload, UploadDropletComplete, Complete)))
 					})
 				})
 			})
@@ -613,9 +601,8 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("sends the UploadingDroplet event", func() {
-					Eventually(nextEvent).Should(Equal(UploadingDroplet))
-					Expect(nextEvent()).To(Equal(UploadDropletComplete))
-					Eventually(warningsStream).Should(Receive(ConsistOf("droplet-upload-warning")))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingDroplet, UploadDropletComplete))
+					Expect(allWarnings).To(matchers.ContainElementsInOrder("droplet-upload-warning"))
 				})
 			})
 		})
@@ -627,8 +614,8 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("returns resource match warnings", func() {
-					Eventually(nextEvent).Should(Equal(ResourceMatching))
-					Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(ResourceMatching))
+					Expect(allWarnings).To(matchers.ContainElementsInOrder("resource-warnings-1", "resource-warnings-2"))
 				})
 
 				When("creating the archive is successful", func() {
@@ -646,7 +633,7 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("sends a CreatingArchive event", func() {
-						Eventually(nextEvent).Should(Equal(CreatingArchive))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(CreatingArchive))
 					})
 
 					When("the upload is successful", func() {
@@ -655,9 +642,9 @@ var _ = Describe("Apply", func() {
 						})
 
 						It("sends a UploadingApplicationWithArchive event", func() {
-							Eventually(nextEvent).Should(Equal(UploadingApplicationWithArchive))
-							Expect(nextEvent()).To(Equal(UploadWithArchiveComplete))
-							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+							Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplicationWithArchive))
+							Expect(allEvents).To(matchers.ContainElementsInOrder(UploadWithArchiveComplete))
+							Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
 						})
 					})
 
@@ -671,21 +658,26 @@ var _ = Describe("Apply", func() {
 							})
 
 							It("should send a RetryUpload event and retry uploading", func() {
-								Eventually(nextEvent).Should(Equal(UploadingApplicationWithArchive))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Expect(nextEvent()).To(Equal(RetryUpload))
+								Expect(allEvents).To(matchers.ContainElementsInOrder(
+									UploadingApplicationWithArchive,
+									RetryUpload,
+									UploadingApplicationWithArchive,
+									RetryUpload,
+									UploadingApplicationWithArchive,
+									RetryUpload,
+								))
 
-								Expect(nextEvent()).To(Equal(UploadingApplicationWithArchive))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Expect(nextEvent()).To(Equal(RetryUpload))
+								Expect(allEvents).To(matchers.ContainElementTimes(RetryUpload, 3))
+								Expect(allEvents).NotTo(ContainElement(EqualEither(UploadWithArchiveComplete, Complete)))
 
-								Expect(nextEvent()).To(Equal(UploadingApplicationWithArchive))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Expect(nextEvent()).To(Equal(RetryUpload))
+								Expect(allWarnings).To(matchers.ContainElementsInOrder(
+									"upload-warnings-1", "upload-warnings-2",
+									"upload-warnings-1", "upload-warnings-2",
+									"upload-warnings-1", "upload-warnings-2",
+								))
 
-								Consistently(nextEvent).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
-								Eventually(fakeV2Actor.UploadApplicationPackageCallCount).Should(Equal(3))
-								Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
+								Expect(fakeV2Actor.UploadApplicationPackageCallCount()).Should(Equal(3))
+								Expect(allErrors).To(ContainElement(MatchError(actionerror.UploadFailedError{Err: someErr})))
 							})
 
 						})
@@ -696,10 +688,11 @@ var _ = Describe("Apply", func() {
 							})
 
 							It("sends warnings and errors, then stops", func() {
-								Eventually(nextEvent).Should(Equal(UploadingApplicationWithArchive))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Consistently(nextEvent).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
-								Eventually(errorStream).Should(Receive(MatchError("dios mio")))
+
+								Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplicationWithArchive))
+								Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
+								Expect(allEvents).NotTo(ContainElement(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete)))
+								Expect(allErrors).To(ContainElement(MatchError("dios mio")))
 							})
 						})
 					})
@@ -711,10 +704,11 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("raises an error", func() {
-						Eventually(nextEvent).Should(Equal(ResourceMatching))
-						Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
-						Eventually(errorStream).Should(Receive(MatchError("some-error")))
-						Consistently(nextEvent).ShouldNot(Equal(Complete))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(ResourceMatching))
+						Expect(allEvents).NotTo(ContainElement(Complete))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("resource-warnings-1", "resource-warnings-2"))
+						Expect(allErrors).To(ContainElement(MatchError("some-error")))
+
 					})
 				})
 			})
@@ -725,9 +719,9 @@ var _ = Describe("Apply", func() {
 				})
 
 				It("sends the UploadingApplication event", func() {
-					Eventually(nextEvent).Should(Equal(ResourceMatching))
-					Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
-					Expect(nextEvent()).To(Equal(UploadingApplication))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(ResourceMatching))
+					Expect(allWarnings).To(matchers.ContainElementsInOrder("resource-warnings-1", "resource-warnings-2"))
+					Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplication))
 				})
 
 				When("the upload is successful", func() {
@@ -736,9 +730,9 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("uploads the application and completes", func() {
-						Eventually(nextEvent).Should(Equal(UploadingApplication))
-						Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-						Expect(nextEvent()).To(Equal(Complete))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplication))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(Complete))
 					})
 				})
 
@@ -748,10 +742,10 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("returns an error", func() {
-						Eventually(nextEvent).Should(Equal(UploadingApplication))
-						Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-						Eventually(errorStream).Should(Receive(MatchError("some-upload-error")))
-						Consistently(nextEvent).ShouldNot(Equal(Complete))
+						Expect(allEvents).To(matchers.ContainElementsInOrder(UploadingApplication))
+						Expect(allWarnings).To(matchers.ContainElementsInOrder("upload-warnings-1", "upload-warnings-2"))
+						Expect(allErrors).To(ContainElement(MatchError("some-upload-error")))
+						Expect(allEvents).NotTo(ContainElement(Complete))
 					})
 				})
 			})
@@ -765,7 +759,7 @@ var _ = Describe("Apply", func() {
 			})
 
 			It("should skip uploading anything", func() {
-				Consistently(nextEvent).ShouldNot(EqualEither(UploadingDroplet, UploadingApplication))
+				Expect(allEvents).NotTo(ContainElement(EqualEither(UploadingDroplet, UploadingApplication)))
 			})
 		})
 	})
