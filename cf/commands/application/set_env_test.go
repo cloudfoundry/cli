@@ -130,7 +130,6 @@ var _ = Describe("set-env command", func() {
 					[]string{
 						"Setting env variable",
 						"DATABASE_URL",
-						"mysql://new-example.com/my-db",
 						"my-app",
 						"my-org",
 						"my-space",
@@ -139,6 +138,8 @@ var _ = Describe("set-env command", func() {
 					[]string{"OK"},
 					[]string{"TIP"},
 				))
+
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"mysql://new-example.com/my-db"}))
 			})
 		})
 
@@ -149,7 +150,6 @@ var _ = Describe("set-env command", func() {
 				[]string{
 					"Setting env variable",
 					"MY_VAR",
-					"--has-a-cool-value",
 				},
 				[]string{"OK"},
 				[]string{"TIP"},
