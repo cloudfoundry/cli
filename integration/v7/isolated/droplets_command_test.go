@@ -102,7 +102,7 @@ var _ = Describe("droplets command", func() {
 			Context("with existing droplets", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
-						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "v3-push", appName)).Should(Exit(0))
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "push", appName)).Should(Exit(0))
 					})
 				})
 
