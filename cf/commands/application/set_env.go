@@ -66,10 +66,9 @@ func (cmd *SetEnv) Execute(c flags.FlagContext) error {
 	varValue := c.Args()[2]
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say(T("Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+	cmd.ui.Say(T("Setting env variable '{{.VarName}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"VarName":     terminal.EntityNameColor(varName),
-			"VarValue":    terminal.EntityNameColor(varValue),
 			"AppName":     terminal.EntityNameColor(app.Name),
 			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),

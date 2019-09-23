@@ -23,4 +23,33 @@ var _ = Describe("set-env command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 	})
+	When("the a name and value are provided", func() {
+		var (
+			orgName   string
+			spaceName string
+			appName   string
+		)
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			appName = helpers.NewAppName()
+			helpers.SetupCF(orgName, spaceName)
+			helpers.WithEmptyFilesApp(func(appDir string) {
+				Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+			})
+		})
+
+		It("sets the environment value but doesn't output the value", func() {
+			session := helpers.CF("set-env", appName, "key", "value")
+			Eventually(session).Should(Exit(0))
+			Expect(session).Should(Say("Setting env variable 'key' for app %s in org %s / space %s as admin...", appName, orgName, spaceName))
+			Expect(session).Should(Say("OK"))
+			session = helpers.CF("restart", appName)
+			Eventually(session).Should(Exit(0))
+			session = helpers.CF("env", appName)
+			Eventually(session).Should(Exit(0))
+			Expect(session).Should(Say(`key: value`))
+		})
+	})
 })
