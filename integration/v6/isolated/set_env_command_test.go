@@ -43,7 +43,7 @@ var _ = Describe("set-env command", func() {
 		It("sets the environment value but doesn't output the value", func() {
 			session := helpers.CF("set-env", appName, "key", "value")
 			Eventually(session).Should(Exit(0))
-			Expect(session).Should(Say("Setting env variable 'key' for app %s in org %s / space %s as admin...", appName, orgName, spaceName))
+			Expect(session).Should(Say("Setting env variable 'key' for app %s in org %s / space %s ", appName, orgName, spaceName))
 			Expect(session).Should(Say("OK"))
 			session = helpers.CF("restart", appName)
 			Eventually(session).Should(Exit(0))
