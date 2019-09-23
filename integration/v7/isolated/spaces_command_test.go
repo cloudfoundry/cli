@@ -54,7 +54,7 @@ var _ = Describe("spaces command", func() {
 			helpers.CreateSpace(spaceName6)
 		})
 
-		When("the --labels flag is given", func() {
+		XWhen("the --labels flag is given", func() {
 
 			BeforeEach(func() {
 				Eventually(helpers.CF("set-label", "space", spaceName1, "environment=production", "tier=backend")).Should(Exit(0))
