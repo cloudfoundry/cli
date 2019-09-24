@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:60b1695f63dd8f2427bebfd8fe9fc96b61b268fefa48b26ba6c74e23ef18785f"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "4934877ec33a400786749df4da6872b53d951cac"
+  version = "v6.46.1"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -158,7 +170,7 @@
   name = "github.com/cloudfoundry/cli-plugin-repo"
   packages = ["web"]
   pruneopts = "NUT"
-  revision = "e3bb94a32f8ffc29d1040354d8f081b07dc6e489"
+  revision = "3d7a270ed5624e2d61797f0c467d6117d54a107e"
 
 [[projects]]
   branch = "master"
