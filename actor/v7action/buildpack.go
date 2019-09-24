@@ -21,11 +21,13 @@ type Downloader interface {
 	Download(url string, tmpDirPath string) (string, error)
 }
 
-func (actor Actor) GetBuildpacks() ([]Buildpack, Warnings, error) {
-	ccv3Buildpacks, warnings, err := actor.CloudControllerClient.GetBuildpacks(ccv3.Query{
-		Key:    ccv3.OrderBy,
-		Values: []string{ccv3.PositionOrder},
-	})
+func (actor Actor) GetBuildpacks(labelSelector string) ([]Buildpack, Warnings, error) {
+	queries := []ccv3.Query{ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}}
+	if labelSelector != "" {
+		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+
+	ccv3Buildpacks, warnings, err := actor.CloudControllerClient.GetBuildpacks(queries...)
 
 	var buildpacks []Buildpack
 	for _, buildpack := range ccv3Buildpacks {

@@ -14,7 +14,7 @@ import (
 //go:generate counterfeiter . BuildpacksActor
 
 type BuildpacksActor interface {
-	GetBuildpacks() ([]v7action.Buildpack, v7action.Warnings, error)
+	GetBuildpacks(labelSelector string) ([]v7action.Buildpack, v7action.Warnings, error)
 }
 
 type BuildpacksCommand struct {
@@ -25,6 +25,7 @@ type BuildpacksCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       BuildpacksActor
+	Labels      string `long:"labels" description:"Selector to filter organizations against"`
 }
 
 func (cmd *BuildpacksCommand) Setup(config command.Config, ui command.UI) error {
@@ -58,7 +59,7 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	buildpacks, warnings, err := cmd.Actor.GetBuildpacks()
+	buildpacks, warnings, err := cmd.Actor.GetBuildpacks(cmd.Labels)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

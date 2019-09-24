@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("buildpacks command", func() {
+var _ = FDescribe("buildpacks command", func() {
 	When("--help is passed", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -74,6 +74,68 @@ var _ = Describe("buildpacks command", func() {
 				lockedRegex,
 				binaryFileRegex))
 			Eventually(session).Should(Exit(0))
+		})
+
+		When("the --labels flag is given", func() {
+			var (
+				buildpack1 string
+				buildpack2 string
+			)
+
+			BeforeEach(func() {
+				buildpack1 = helpers.NewBuildpackName()
+				buildpack2 = helpers.NewBuildpackName()
+				helpers.SetupBuildpackWithoutStack(buildpack1)
+				helpers.SetupBuildpackWithoutStack(buildpack2)
+				println("Buildpack1 ", buildpack1)
+				println("Buildpack2 ", buildpack2)
+				Eventually(helpers.CF("set-label", "buildpack", buildpack1, "environment=production", "tier=backend")).Should(Exit(0))
+				Eventually(helpers.CF("set-label", "buildpack", buildpack2, "environment=staging", "tier=frontend")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				session := helpers.CF("delete-buildpack", buildpack1, "-f")
+				Eventually(session).Should(Exit(0))
+				session = helpers.CF("delete-buildpack", buildpack2, "-f")
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("lists the buildpacks with --labels", func() {
+				session := helpers.CF("buildpacks", "--labels", "tier=frontend")
+
+				username, _ := helpers.GetCredentials()
+				Eventually(session).Should(Say("Getting buildpacks as %s...", username))
+				Eventually(session).Should(Say(`position\s+name\s+stack\s+enabled\s+locked\s+filename`))
+
+				positionRegex := `\d+`
+				enabledRegex := `true`
+				lockedRegex := `false`
+				stackRegex := ``
+
+				Eventually(session).ShouldNot(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+					positionRegex,
+					buildpack1,
+					stackRegex,
+					enabledRegex,
+					lockedRegex,
+					""))
+
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+asdf%s\s+%s`,
+					positionRegex,
+					buildpack2,
+					stackRegex,
+					enabledRegex,
+					lockedRegex,
+					""))
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("the --labels selector is malformed", func() {
+				It("errors", func() {
+					session := helpers.CF("buildpacks", "--labels", "malformed in (")
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 	})
 })

@@ -9,9 +9,10 @@ import (
 )
 
 type FakeBuildpacksActor struct {
-	GetBuildpacksStub        func() ([]v7action.Buildpack, v7action.Warnings, error)
+	GetBuildpacksStub        func(string) ([]v7action.Buildpack, v7action.Warnings, error)
 	getBuildpacksMutex       sync.RWMutex
 	getBuildpacksArgsForCall []struct {
+		arg1 string
 	}
 	getBuildpacksReturns struct {
 		result1 []v7action.Buildpack
@@ -27,15 +28,16 @@ type FakeBuildpacksActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeBuildpacksActor) GetBuildpacks() ([]v7action.Buildpack, v7action.Warnings, error) {
+func (fake *FakeBuildpacksActor) GetBuildpacks(arg1 string) ([]v7action.Buildpack, v7action.Warnings, error) {
 	fake.getBuildpacksMutex.Lock()
 	ret, specificReturn := fake.getBuildpacksReturnsOnCall[len(fake.getBuildpacksArgsForCall)]
 	fake.getBuildpacksArgsForCall = append(fake.getBuildpacksArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetBuildpacks", []interface{}{})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetBuildpacks", []interface{}{arg1})
 	fake.getBuildpacksMutex.Unlock()
 	if fake.GetBuildpacksStub != nil {
-		return fake.GetBuildpacksStub()
+		return fake.GetBuildpacksStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -50,10 +52,17 @@ func (fake *FakeBuildpacksActor) GetBuildpacksCallCount() int {
 	return len(fake.getBuildpacksArgsForCall)
 }
 
-func (fake *FakeBuildpacksActor) GetBuildpacksCalls(stub func() ([]v7action.Buildpack, v7action.Warnings, error)) {
+func (fake *FakeBuildpacksActor) GetBuildpacksCalls(stub func(string) ([]v7action.Buildpack, v7action.Warnings, error)) {
 	fake.getBuildpacksMutex.Lock()
 	defer fake.getBuildpacksMutex.Unlock()
 	fake.GetBuildpacksStub = stub
+}
+
+func (fake *FakeBuildpacksActor) GetBuildpacksArgsForCall(i int) string {
+	fake.getBuildpacksMutex.RLock()
+	defer fake.getBuildpacksMutex.RUnlock()
+	argsForCall := fake.getBuildpacksArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeBuildpacksActor) GetBuildpacksReturns(result1 []v7action.Buildpack, result2 v7action.Warnings, result3 error) {
