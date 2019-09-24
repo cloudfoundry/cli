@@ -35,22 +35,8 @@ type JSONConfig struct {
 
 // Organization contains basic information about the targeted organization.
 type Organization struct {
-	GUID            string          `json:"GUID"`
-	Name            string          `json:"Name"`
-	QuotaDefinition QuotaDefinition `json:"QuotaDefinition"`
-}
-
-// QuotaDefinition contains information about the organization's quota.
-type QuotaDefinition struct {
-	GUID                    string `json:"guid"`
-	Name                    string `json:"name"`
-	MemoryLimit             int    `json:"memory_limit"`
-	InstanceMemoryLimit     int    `json:"instance_memory_limit"`
-	TotalRoutes             int    `json:"total_routes"`
-	TotalServices           int    `json:"total_services"`
-	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
-	AppInstanceLimit        int    `json:"app_instance_limit"`
-	TotalReservedRoutePorts int    `json:"total_reserved_route_ports"`
+	GUID string `json:"GUID"`
+	Name string `json:"Name"`
 }
 
 // Space contains basic information about the targeted space.
@@ -140,7 +126,6 @@ func (config *Config) SetMinCLIVersion(minVersion string) {
 func (config *Config) SetOrganizationInformation(guid string, name string) {
 	config.ConfigFile.TargetedOrganization.GUID = guid
 	config.ConfigFile.TargetedOrganization.Name = name
-	config.ConfigFile.TargetedOrganization.QuotaDefinition = QuotaDefinition{}
 }
 
 // SetRefreshToken sets the current refresh token.
