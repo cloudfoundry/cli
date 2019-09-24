@@ -58,7 +58,7 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 		}
 
 		if !deleteUser {
-			cmd.UI.DisplayTextWithFlavor("User '{{.TargetUser}}' has not been deleted.", map[string]interface{}{
+			cmd.UI.DisplayText("User '{{.TargetUser}}' has not been deleted.", map[string]interface{}{
 				"TargetUser": cmd.RequiredArgs.Username,
 			})
 			cmd.UI.DisplayOK()
@@ -80,8 +80,8 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 	if err != nil {
 		// User never existed
 		if _, ok := err.(actionerror.UAAUserNotFoundError); ok {
-			cmd.UI.DisplayOK()
 			cmd.UI.DisplayTextWithFlavor(err.Error())
+			cmd.UI.DisplayOK()
 			return nil
 		}
 		return err

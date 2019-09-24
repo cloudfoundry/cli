@@ -190,8 +190,8 @@ var _ = Describe("delete-user Command", func() {
 
 					It("returns the same error", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(testUI.Out).To(Say(`OK`))
 						Expect(testUI.Out).To(Say(`User 'some-user' does not exist.`))
+						Expect(testUI.Out).To(Say(`OK`))
 					})
 				})
 			})

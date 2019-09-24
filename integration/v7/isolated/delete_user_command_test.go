@@ -107,8 +107,8 @@ var _ = Describe("delete-user command", func() {
 		When("the user does not exist", func() {
 			It("does not error but prints a message letting the user know it never existed", func() {
 				session := helpers.CF("delete-user", "non-existent-user", "-f")
-				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("User 'non-existent-user' does not exist."))
+				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
