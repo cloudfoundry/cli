@@ -370,11 +370,11 @@ var _ = Describe("delete-route command", func() {
 		})
 
 		When("the domain does not exist", func() {
-			It("displays error and exits 1", func() {
+			It("displays error and exits 0", func() {
 				session := helpers.CF("delete-route", "some-domain", "-f")
-				Eventually(session).Should(Say(`FAILED`))
+				Eventually(session).Should(Say("OK"))
 				Eventually(session.Err).Should(Say(`Domain 'some-domain' not found.`))
-				Eventually(session).Should(Exit(1))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 

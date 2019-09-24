@@ -214,6 +214,11 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
 
+	if _, ok := err.(actionerror.DomainNotFoundError); ok {
+		allWarnings = append(allWarnings, err.Error())
+		return allWarnings, nil
+	}
+
 	if err != nil {
 		return allWarnings, err
 	}
