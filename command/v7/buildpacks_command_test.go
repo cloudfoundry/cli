@@ -77,6 +77,17 @@ var _ = Describe("buildpacks Command", func() {
 			Expect(testUI.Out).To(Say(`Getting buildpacks as apple\.\.\.`))
 		})
 
+		When("the --labels flag is used", func() {
+			BeforeEach(func() {
+				cmd.Labels = "some-label-selector"
+			})
+
+			It("passes the label selector to the actor", func() {
+				labelSelector := fakeActor.GetBuildpacksArgsForCall(0)
+				Expect(labelSelector).To(Equal("some-label-selector"))
+			})
+		})
+
 		When("getting buildpacks fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetBuildpacksReturns(nil, v7action.Warnings{"some-warning-1", "some-warning-2"},

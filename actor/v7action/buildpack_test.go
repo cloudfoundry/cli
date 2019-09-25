@@ -194,13 +194,39 @@ var _ = Describe("Buildpack", func() {
 
 	Describe("GetBuildpacks", func() {
 		var (
-			buildpacks []Buildpack
-			warnings   Warnings
-			executeErr error
+			buildpacks    []Buildpack
+			warnings      Warnings
+			executeErr    error
+			labelSelector string
 		)
 
 		JustBeforeEach(func() {
-			buildpacks, warnings, executeErr = actor.GetBuildpacks()
+			buildpacks, warnings, executeErr = actor.GetBuildpacks(labelSelector)
+		})
+
+		It("calls CloudControllerClient.GetBuildpacks()", func() {
+			Expect(fakeCloudControllerClient.GetBuildpacksCallCount()).To(Equal(1))
+		})
+
+		When("a label selector is not provided", func() {
+			BeforeEach(func() {
+				labelSelector = ""
+			})
+			It("only passes through a OrderBy query to the CloudControllerClient", func() {
+				positionQuery := ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.PositionOrder}}
+				Expect(fakeCloudControllerClient.GetBuildpacksArgsForCall(0)).To(ConsistOf(positionQuery))
+			})
+		})
+
+		When("a label selector is provided", func() {
+			BeforeEach(func() {
+				labelSelector = "some-label-selector"
+			})
+
+			It("passes the labels selector through", func() {
+				labelQuery := ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}}
+				Expect(fakeCloudControllerClient.GetBuildpacksArgsForCall(0)).To(ContainElement(labelQuery))
+			})
 		})
 
 		When("getting buildpacks fails", func() {
@@ -236,12 +262,6 @@ var _ = Describe("Buildpack", func() {
 				Expect(buildpacks).To(Equal([]Buildpack{
 					{Name: "buildpack-1", Position: types.NullInt{Value: 1, IsSet: true}},
 					{Name: "buildpack-2", Position: types.NullInt{Value: 2, IsSet: true}},
-				}))
-
-				Expect(fakeCloudControllerClient.GetBuildpacksCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetBuildpacksArgsForCall(0)).To(ConsistOf(ccv3.Query{
-					Key:    ccv3.OrderBy,
-					Values: []string{ccv3.PositionOrder},
 				}))
 			})
 		})
