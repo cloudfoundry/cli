@@ -1,5 +1,7 @@
 // +build !V7
 
+// +build !V7
+
 /**
 * This is an example plugin where we use both arguments and flags. The plugin
 * will echo all arguments passed to it. The flag -uppercase will upcase the
