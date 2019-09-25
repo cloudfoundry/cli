@@ -119,7 +119,7 @@ type commandList struct {
 	Quotas                             v6.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	RemoveNetworkPolicy                v6.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
-	Rename                             v6.RenameCommand                             `command:"rename" description:"Rename an app"`
+	Rename                             v7.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RenameBuildpack                    v6.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
 	RenameOrg                          v7.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
 	RenameService                      v6.RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`

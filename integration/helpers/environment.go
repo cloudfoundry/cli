@@ -34,7 +34,7 @@ func CheckSpaceAndOrgTargetedCorrectly(command ...string) {
 	By("errors if org and space are not targeted")
 	session := CF(command...)
 	Eventually(session).Should(Say("FAILED"))
-	Eventually(session.Err).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
+	Eventually(session.Out).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
 	Eventually(session).Should(Exit(1))
 }
 

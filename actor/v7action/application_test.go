@@ -669,6 +669,7 @@ var _ = Describe("Application Actions", func() {
 			submitApp = Application{
 				GUID:                "some-app-guid",
 				StackName:           "some-stack-name",
+				Name:                "some-app-name",
 				LifecycleType:       constant.AppLifecycleTypeBuildpack,
 				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
 				Metadata: &Metadata{Labels: map[string]types.NullString{
@@ -687,6 +688,7 @@ var _ = Describe("Application Actions", func() {
 				apiResponseApp = ccv3.Application{
 					GUID:                "response-app-guid",
 					StackName:           "response-stack-name",
+					Name:                "response-app-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"response-buildpack-1", "response-buildpack-2"},
 				}
@@ -700,6 +702,7 @@ var _ = Describe("Application Actions", func() {
 			It("creates and returns the application and warnings", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(resultApp).To(Equal(Application{
+					Name:                apiResponseApp.Name,
 					GUID:                apiResponseApp.GUID,
 					StackName:           apiResponseApp.StackName,
 					LifecycleType:       apiResponseApp.LifecycleType,
@@ -713,6 +716,7 @@ var _ = Describe("Application Actions", func() {
 					StackName:           submitApp.StackName,
 					LifecycleType:       submitApp.LifecycleType,
 					LifecycleBuildpacks: submitApp.LifecycleBuildpacks,
+					Name:                submitApp.Name,
 					Metadata:            (*ccv3.Metadata)(submitApp.Metadata),
 				}))
 			})
@@ -1747,6 +1751,111 @@ var _ = Describe("Application Actions", func() {
 					Expect(warnings).To(ConsistOf("get-process1-instances-warning", "get-process2-instances-warning"))
 					Expect(keepPolling).To(BeTrue())
 				})
+
+			})
+		})
+
+	})
+
+	Describe("RenameApplicationByNameAndSpaceGUID", func() {
+		When("the app does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns an ApplicationNotFoundError and the warnings", func() {
+				_, warnings, err := actor.RenameApplicationByNameAndSpaceGUID("old-app-name", "new-app-name", "space-guid")
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(err).To(MatchError(actionerror.ApplicationNotFoundError{Name: "old-app-name"}))
+			})
+		})
+
+		When("the cloud controller client returns an error on application find", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"some-warning"},
+					expectedError)
+			})
+
+			It("returns the warnings and the error", func() {
+				_, warnings, err := actor.RenameApplicationByNameAndSpaceGUID("old-app-name", "new-app-name", "space-guid")
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+
+		When("the cloud controller client returns an error on application update", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "old-app-name",
+							GUID: "old-app-guid",
+						},
+					},
+					ccv3.Warnings{"get-app-warning"},
+					nil)
+				fakeCloudControllerClient.UpdateApplicationReturns(
+					ccv3.Application{},
+					ccv3.Warnings{"update-app-warning"},
+					expectedError)
+			})
+
+			It("returns the warnings and the error", func() {
+				_, warnings, err := actor.RenameApplicationByNameAndSpaceGUID("old-app-name", "new-app-name", "space-guid")
+				Expect(warnings).To(ConsistOf("get-app-warning", "update-app-warning"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+
+		When("the app exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "old-app-name",
+							GUID: "old-app-guid",
+						},
+					},
+					ccv3.Warnings{"get-app-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.UpdateApplicationReturns(
+					ccv3.Application{
+						Name: "new-app-name",
+						GUID: "old-app-guid",
+					},
+					ccv3.Warnings{"update-app-warning"},
+					nil,
+				)
+			})
+
+			It("changes the app name and returns the application and warnings", func() {
+				app, warnings, err := actor.RenameApplicationByNameAndSpaceGUID("old-app-name", "new-app-name", "some-space-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(app).To(Equal(Application{
+					Name: "new-app-name",
+					GUID: "old-app-guid",
+				}))
+				Expect(warnings).To(ConsistOf("get-app-warning", "update-app-warning"))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(
+					ccv3.Application{
+						Name: "new-app-name",
+						GUID: "old-app-guid",
+					}))
 
 			})
 		})

@@ -17,6 +17,20 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// CreateApp creates an empty app in CloudController with no package or droplet
+func CreateApp(app string) {
+	Eventually(CF("create-app", app)).Should(Exit(0))
+}
+
+// QuickDeleteApp deletes the app with the given name, if provided, using
+// 'cf curl /v3/app... -X DELETE'.
+func QuickDeleteApp(appName string) {
+	guid := AppGUID(appName)
+	url := fmt.Sprintf("/v3/apps/%s", guid)
+	session := CF("curl", "-X", "DELETE", url)
+	Eventually(session).Should(Exit(0))
+}
+
 // WithHelloWorldApp creates a simple application to use with your CLI command
 // (typically CF Push). When pushing, be aware of specifying '-b
 // staticfile_buildpack" so that your app will correctly start up with the

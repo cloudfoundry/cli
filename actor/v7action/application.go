@@ -385,6 +385,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Metadata:            (*ccv3.Metadata)(app.Metadata),
+		Name:                app.Name,
 	}
 
 	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccApp)
@@ -442,4 +443,21 @@ func (actor Actor) getProcesses(deployment ccv3.Deployment, appGUID string, noWa
 	}
 
 	return nil, nil, nil
+}
+
+func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spaceGUID string) (Application, Warnings, error) {
+	allWarnings := Warnings{}
+	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+	application.Name = newAppName
+	application, warnings, err = actor.UpdateApplication(application)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+
+	return application, allWarnings, nil
 }
