@@ -9,9 +9,10 @@ import (
 )
 
 type FakeStacksActor struct {
-	GetStacksStub        func() ([]v7action.Stack, v7action.Warnings, error)
+	GetStacksStub        func(string) ([]v7action.Stack, v7action.Warnings, error)
 	getStacksMutex       sync.RWMutex
 	getStacksArgsForCall []struct {
+		arg1 string
 	}
 	getStacksReturns struct {
 		result1 []v7action.Stack
@@ -27,15 +28,16 @@ type FakeStacksActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeStacksActor) GetStacks() ([]v7action.Stack, v7action.Warnings, error) {
+func (fake *FakeStacksActor) GetStacks(arg1 string) ([]v7action.Stack, v7action.Warnings, error) {
 	fake.getStacksMutex.Lock()
 	ret, specificReturn := fake.getStacksReturnsOnCall[len(fake.getStacksArgsForCall)]
 	fake.getStacksArgsForCall = append(fake.getStacksArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetStacks", []interface{}{})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetStacks", []interface{}{arg1})
 	fake.getStacksMutex.Unlock()
 	if fake.GetStacksStub != nil {
-		return fake.GetStacksStub()
+		return fake.GetStacksStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -50,10 +52,17 @@ func (fake *FakeStacksActor) GetStacksCallCount() int {
 	return len(fake.getStacksArgsForCall)
 }
 
-func (fake *FakeStacksActor) GetStacksCalls(stub func() ([]v7action.Stack, v7action.Warnings, error)) {
+func (fake *FakeStacksActor) GetStacksCalls(stub func(string) ([]v7action.Stack, v7action.Warnings, error)) {
 	fake.getStacksMutex.Lock()
 	defer fake.getStacksMutex.Unlock()
 	fake.GetStacksStub = stub
+}
+
+func (fake *FakeStacksActor) GetStacksArgsForCall(i int) string {
+	fake.getStacksMutex.RLock()
+	defer fake.getStacksMutex.RUnlock()
+	argsForCall := fake.getStacksArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeStacksActor) GetStacksReturns(result1 []v7action.Stack, result2 v7action.Warnings, result3 error) {
