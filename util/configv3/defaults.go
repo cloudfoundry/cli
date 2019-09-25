@@ -4,7 +4,7 @@ import "time"
 
 const (
 	// DefaultDialTimeout is the default timeout for the dail.
-	DefaultDialTimeout = 5 * time.Second
+	DefaultDialTimeout = 6 * time.Second
 
 	// DefaultNOAARetryCount is the default number of request retries.
 	DefaultNOAARetryCount = 5
