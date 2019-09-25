@@ -1,6 +1,6 @@
 // +build V7
 
-package plugin/v7/plugin/v7
+package v7
 
 import (
 	"fmt"

@@ -1,4 +1,6 @@
-package plugin/v7/fakecommand
+// +build V7
+
+package fakecommand
 
 import (
 	"fmt"

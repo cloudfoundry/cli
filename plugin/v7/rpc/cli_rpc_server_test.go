@@ -1,6 +1,6 @@
 // +build V7
 
-package plugin/v7/rpc_test
+package rpc_test
 
 import (
 	"errors"
