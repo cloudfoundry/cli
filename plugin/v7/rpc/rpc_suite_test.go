@@ -3,7 +3,7 @@
 package plugin/v7/rpc_test
 
 import (
-	"code.cloudfoundry.org/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/plugin/v7/rpc"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

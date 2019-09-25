@@ -4,7 +4,7 @@ package plugin/v7/rpcfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/plugin/v7/rpc"
 )
 
 type FakeTerminalOutputSwitch struct {

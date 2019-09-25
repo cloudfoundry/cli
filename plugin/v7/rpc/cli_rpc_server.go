@@ -10,8 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/plugin/v7"
+	"code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 
