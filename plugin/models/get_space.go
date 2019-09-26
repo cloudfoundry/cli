@@ -1,5 +1,3 @@
-// +build !V7
-
 package plugin_models
 
 type GetSpace_Model struct {

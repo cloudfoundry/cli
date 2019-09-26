@@ -1,5 +1,3 @@
-// +build !V7
-
 package rpc_test
 
 import (

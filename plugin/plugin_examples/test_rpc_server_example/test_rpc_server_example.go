@@ -1,5 +1,3 @@
-// +build !V7
-
 /**
 * This plugin demonstrate the use of Test driven development using the test rpc server
 * This allows the plugin to be tested independently without relying on CF CLI

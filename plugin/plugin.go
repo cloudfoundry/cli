@@ -1,5 +1,3 @@
-// +build !V7
-
 package plugin
 
 import "code.cloudfoundry.org/cli/plugin/models"
