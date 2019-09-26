@@ -13,7 +13,7 @@ import (
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	. "code.cloudfoundry.org/cli/plugin/v7/rpc"
-	. "code.cloudfoundry.org/cli/plugin/v7/rpc/fakecommand"
+	"code.cloudfoundry.org/cli/plugin/v7/rpc/fakecommand"
 	"code.cloudfoundry.org/cli/plugin/v7/rpc/rpcfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +21,7 @@ import (
 
 var _ = Describe("Server", func() {
 
-	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
+	_ = fakecommand.FakeCommand1{} //make sure fake_command is imported and self-registered with init()
 
 	var (
 		err        error
@@ -139,8 +139,6 @@ var _ = Describe("Server", func() {
 			Expect(rpcService.RpcCmd.PluginMetadata).To(Equal(metadata))
 		})
 	})
-
-	
 
 	Describe("disabling terminal output", func() {
 		var terminalOutputSwitch *rpcfakes.FakeTerminalOutputSwitch

@@ -32,13 +32,9 @@ type CliRpcService struct {
 	Server   *rpc.Server
 }
 
-//go:generate counterfeiter . TerminalOutputSwitch
-
 type TerminalOutputSwitch interface {
 	DisableTerminalOutput(bool)
 }
-
-//go:generate counterfeiter . OutputCapture
 
 type OutputCapture interface {
 	SetOutputBucket(io.Writer)
