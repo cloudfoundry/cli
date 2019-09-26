@@ -77,12 +77,29 @@ var _ = Describe("login Command", func() {
 				cmd.APIEndpoint = "api.example.com"
 			})
 
-			It("targets the provided api endpoint", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
-				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-				actualSettings := fakeActor.SetTargetArgsForCall(0)
-				Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+			When("the user specifies --skip-ssl-validation", func() {
+				BeforeEach(func() {
+					cmd.SkipSSLValidation = true
+				})
+				It("targets the provided api endpoint", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
+					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+					actualSettings := fakeActor.SetTargetArgsForCall(0)
+					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+					Expect(actualSettings.SkipSSLValidation).To(Equal(true))
+				})
+			})
+
+			When("the user does not specify --skip-ssl-validation", func() {
+				It("targets the provided api endpoint", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
+					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+					actualSettings := fakeActor.SetTargetArgsForCall(0)
+					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+					Expect(actualSettings.SkipSSLValidation).To(Equal(false))
+				})
 			})
 
 			It("prints all warnings", func() {
@@ -138,7 +155,7 @@ var _ = Describe("login Command", func() {
 				})
 			})
 
-			When("the user enters something at the prompt", func() {
+			When("config does not have an API endpoint set and the user enters the endpoint at the prompt", func() {
 				BeforeEach(func() {
 					cmd.APIEndpoint = ""
 					input.Write([]byte("api.example.com\n"))
@@ -146,18 +163,46 @@ var _ = Describe("login Command", func() {
 					fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
 				})
 
-				It("targets the API that the user inputted", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				When("the user specifies --skip-ssl-validation", func() {
+					BeforeEach(func() {
+						cmd.SkipSSLValidation = true
+					})
 
-					Expect(testUI.Out).To(Say("API endpoint:"))
-					Expect(testUI.Out).To(Say("api.example.com\n"))
-					Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
+					It("targets the API that the user inputted", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-					actualSettings := fakeActor.SetTargetArgsForCall(0)
-					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+						Expect(testUI.Out).To(Say("API endpoint:"))
+						Expect(testUI.Out).To(Say("api.example.com\n"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
 
-					Expect(fakeConfig.TargetCallCount()).To(Equal(2))
+						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+						actualSettings := fakeActor.SetTargetArgsForCall(0)
+						Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+						Expect(actualSettings.SkipSSLValidation).To(Equal(true))
+
+						Expect(fakeConfig.TargetCallCount()).To(Equal(2))
+					})
+				})
+
+				When("the user does not specify --skip-ssl-validation", func() {
+					BeforeEach(func() {
+						cmd.SkipSSLValidation = false
+					})
+
+					It("targets the API that the user inputted", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("API endpoint:"))
+						Expect(testUI.Out).To(Say("api.example.com\n"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
+
+						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+						actualSettings := fakeActor.SetTargetArgsForCall(0)
+						Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+						Expect(actualSettings.SkipSSLValidation).To(Equal(false))
+
+						Expect(fakeConfig.TargetCallCount()).To(Equal(2))
+					})
 				})
 			})
 
