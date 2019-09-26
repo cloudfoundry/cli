@@ -27,6 +27,8 @@ const (
 	SpaceGUIDFilter QueryKey = "space_guids"
 	// StatusValueFilter is a query parameter for listing deployments by status.value
 	StatusValueFilter QueryKey = "status_values"
+	// DomainGUIDFilter is a query param for listing events by target_guid
+	TargetGUIDFilter QueryKey = "target_guids"
 	// DomainGUIDFilter is a query param for listing objects by domain_guid
 	DomainGUIDFilter QueryKey = "domain_guids"
 	// HostsFilter is a query param for listing objects by hostname

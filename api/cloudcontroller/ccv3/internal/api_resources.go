@@ -8,6 +8,7 @@ const (
 	DeploymentsResource       = "deployments"
 	DomainsResource           = "domains"
 	DropletsResource          = "droplets"
+	EventsResource            = "audit_events"
 	FeatureFlagsResource      = "feature_flags"
 	IsolationSegmentsResource = "isolation_segments"
 	OrgsResource              = "organizations"

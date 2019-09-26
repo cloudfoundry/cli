@@ -40,6 +40,7 @@ const (
 	GetDomainsRequest                                           = "GetDomains"
 	GetDropletRequest                                           = "GetDroplet"
 	GetDropletsRequest                                          = "GetDroplets"
+	GetEventsRequest                                            = "GetEvents"
 	GetFeatureFlagRequest                                       = "GetFeatureFlag"
 	GetFeatureFlagsRequest                                      = "GetFeatureFlags"
 	GetIsolationSegmentOrganizationsRequest                     = "GetIsolationSegmentOrganizations"
@@ -149,6 +150,7 @@ var APIRoutes = []Route{
 	{Resource: DropletsResource, Path: "/", Method: http.MethodPost, Name: PostDropletRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid/upload", Method: http.MethodPost, Name: PostDropletBitsRequest},
+	{Resource: EventsResource, Path: "/", Method: http.MethodGet, Name: GetEventsRequest},
 	{Resource: FeatureFlagsResource, Path: "/", Method: http.MethodGet, Name: GetFeatureFlagsRequest},
 	{Resource: FeatureFlagsResource, Path: "/:name", Method: http.MethodGet, Name: GetFeatureFlagRequest},
 	{Resource: FeatureFlagsResource, Path: "/:name", Method: http.MethodPatch, Name: PatchFeatureFlagRequest},
