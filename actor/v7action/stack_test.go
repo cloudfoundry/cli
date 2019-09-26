@@ -34,8 +34,8 @@ var _ = Describe("Stack", func() {
 			stack, warnings, err = actor.GetStackByName("some-stack-name")
 		})
 
-		Describe("When there are errors", func() {
-			When("The client errors", func() {
+		Describe("there are errors", func() {
+			When("the client errors", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("CC Error")
 					fakeCloudControllerClient.GetStacksReturns(
@@ -45,13 +45,13 @@ var _ = Describe("Stack", func() {
 					)
 				})
 
-				It("Returns the same error", func() {
+				It("returns the same error", func() {
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})
 
-			When("The stack does not exist", func() {
+			When("the stack does not exist", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
 						[]ccv3.Stack{},
@@ -60,16 +60,16 @@ var _ = Describe("Stack", func() {
 					)
 				})
 
-				It("Returns a StackNotFound error", func() {
+				It("returns a StackNotFound error", func() {
 					Expect(err).To(MatchError(actionerror.StackNotFoundError{Name: "some-stack-name"}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})
 		})
 
-		Context("When there are no errors", func() {
+		Context("there are no errors", func() {
 
-			When("The stack exists", func() {
+			When("the stack exists", func() {
 				expectedStack := ccv3.Stack{
 					GUID:        "some-stack-guid",
 					Name:        "some-stack-name",
@@ -86,7 +86,7 @@ var _ = Describe("Stack", func() {
 					)
 				})
 
-				It("Returns the desired stack", func() {
+				It("returns the desired stack", func() {
 
 					actualParams := fakeCloudControllerClient.GetStacksArgsForCall(0)
 					Expect(actualParams).To(Equal(expectedParams))
@@ -111,8 +111,9 @@ var _ = Describe("Stack", func() {
 			stack2Name        string
 			stack2Description string
 
-			warnings   Warnings
-			executeErr error
+			warnings      Warnings
+			executeErr    error
+			labelSelector string
 		)
 
 		BeforeEach(func() {
@@ -123,7 +124,7 @@ var _ = Describe("Stack", func() {
 		})
 
 		JustBeforeEach(func() {
-			stacks, warnings, executeErr = actor.GetStacks()
+			stacks, warnings, executeErr = actor.GetStacks(labelSelector)
 		})
 
 		When("getting stacks returns an error", func() {
@@ -155,6 +156,24 @@ var _ = Describe("Stack", func() {
 					Expect(stacks).To(ConsistOf(Stack{Name: stack1Name, Description: stack1Description}, Stack{Name: stack2Name, Description: stack2Description}))
 					Expect(warnings).To(ConsistOf("some-stack-warning"))
 					Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
+				})
+				When("a label selctor is passed in", func() {
+					BeforeEach(func() {
+						labelSelector = "some-label-selector"
+					})
+
+					It("passes the selector to API", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
+
+						expectedQuery := []ccv3.Query{
+							{Key: ccv3.LabelSelectorFilter, Values: []string{"some-label-selector"}},
+						}
+						actualQuery := fakeCloudControllerClient.GetStacksArgsForCall(0)
+						Expect(actualQuery).To(Equal(expectedQuery))
+
+					})
 				})
 			})
 

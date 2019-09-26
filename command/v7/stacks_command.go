@@ -15,7 +15,7 @@ import (
 //go:generate counterfeiter . StacksActor
 
 type StacksActor interface {
-	GetStacks() ([]v7action.Stack, v7action.Warnings, error)
+	GetStacks(string) ([]v7action.Stack, v7action.Warnings, error)
 }
 
 type StacksCommand struct {
@@ -26,6 +26,7 @@ type StacksCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       StacksActor
+	Labels      string `long:"labels" description:"Selector to filter stacks against"`
 }
 
 func (cmd *StacksCommand) Setup(config command.Config, ui command.UI) error {
@@ -58,7 +59,7 @@ func (cmd StacksCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	stacks, warnings, err := cmd.Actor.GetStacks()
+	stacks, warnings, err := cmd.Actor.GetStacks(cmd.Labels)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -92,7 +92,7 @@ var _ = Describe("stacks Command", func() {
 			})
 		})
 
-		When("everything is perfect", func() {
+		When("StacksActor does not return an error", func() {
 			BeforeEach(func() {
 				stacks := []v7action.Stack{
 					{Name: "Stack2", Description: "desc2"},
@@ -101,8 +101,15 @@ var _ = Describe("stacks Command", func() {
 				fakeActor.GetStacksReturns(stacks, v7action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
-			It("asks the StacksActor for a list of stacks", func() {
-				Expect(fakeActor.GetStacksCallCount()).To(Equal(1))
+			When("the --labels flag is given", func() {
+				labelsFlagValue := "some-label-selector"
+				BeforeEach(func() {
+					cmd.Labels = labelsFlagValue
+				})
+				It("passes the label selector to GetStacks", func() {
+					labelSelector := fakeActor.GetStacksArgsForCall(0)
+					Expect(labelSelector).To(Equal(labelsFlagValue))
+				})
 			})
 
 			It("prints warnings", func() {

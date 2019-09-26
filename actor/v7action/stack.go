@@ -23,8 +23,22 @@ func (actor *Actor) GetStackByName(stackName string) (Stack, Warnings, error) {
 	return Stack(stacks[0]), Warnings(warnings), nil
 }
 
-func (actor Actor) GetStacks() ([]Stack, Warnings, error) {
-	ccv3Stacks, warnings, err := actor.CloudControllerClient.GetStacks()
+func (actor Actor) GetStacks(labelSelector string) ([]Stack, Warnings, error) {
+	var (
+		ccv3Stacks []ccv3.Stack
+		warnings   ccv3.Warnings
+		err        error
+	)
+	if len(labelSelector) > 0 {
+		queries := []ccv3.Query{
+			ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}},
+		}
+
+		ccv3Stacks, warnings, err = actor.CloudControllerClient.GetStacks(queries...)
+	} else {
+		ccv3Stacks, warnings, err = actor.CloudControllerClient.GetStacks()
+	}
+
 	if err != nil {
 		return nil, Warnings(warnings), err
 	}
