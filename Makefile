@@ -232,7 +232,11 @@ units: build ## Ensure the code looks good, compiles, and passes unit tests
 	@echo "\nSWEET SUITE SUCCESS"
 
 units-plugin:
+ifeq ($(TARGET),v6)
+	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes 1 -randomizeAllSpecs -randomizeSuites -flakeAttempts 2 -skipPackage integration,v7 ./**/plugin* ./plugin
+else
 	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes 1 -randomizeAllSpecs -randomizeSuites -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
+endif
 
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
