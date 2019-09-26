@@ -3,10 +3,6 @@
 package rpc
 
 import (
-	"os"
-
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 
 	"fmt"
@@ -18,11 +14,7 @@ import (
 	"io"
 
 	"sync"
-
-	"code.cloudfoundry.org/cli/cf/trace"
 )
-
-var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
 
 type CliRpcService struct {
 	listener net.Listener
@@ -31,6 +23,8 @@ type CliRpcService struct {
 	RpcCmd   *CliRpcCmd
 	Server   *rpc.Server
 }
+
+//go:generate counterfeiter . TerminalOutputSwitch
 
 type TerminalOutputSwitch interface {
 	DisableTerminalOutput(bool)
@@ -43,9 +37,6 @@ type OutputCapture interface {
 func NewRpcService(
 	outputCapture OutputCapture,
 	terminalOutputSwitch TerminalOutputSwitch,
-	cliConfig coreconfig.Repository,
-	repoLocator api.RepositoryLocator,
-	logger trace.Printer,
 	w io.Writer,
 	rpcServer *rpc.Server,
 ) (*CliRpcService, error) {
@@ -56,9 +47,6 @@ func NewRpcService(
 			MetadataMutex:        &sync.RWMutex{},
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
-			cliConfig:            cliConfig,
-			repoLocator:          repoLocator,
-			logger:               logger,
 			outputBucket:         &bytes.Buffer{},
 			stdout:               w,
 		},

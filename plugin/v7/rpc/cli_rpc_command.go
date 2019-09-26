@@ -8,9 +8,6 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/trace"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
@@ -22,10 +19,7 @@ type CliRpcCmd struct {
 	MetadataMutex        *sync.RWMutex
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
-	cliConfig            coreconfig.Repository
-	repoLocator          api.RepositoryLocator
 	outputBucket         *bytes.Buffer
-	logger               trace.Printer
 	stdout               io.Writer
 }
 

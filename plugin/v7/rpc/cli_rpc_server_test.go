@@ -8,20 +8,16 @@ import (
 	"os"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	. "code.cloudfoundry.org/cli/plugin/v7/rpc"
-	"code.cloudfoundry.org/cli/plugin/v7/rpc/fakecommand"
 	"code.cloudfoundry.org/cli/plugin/v7/rpc/rpcfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Server", func() {
-
-	_ = fakecommand.FakeCommand1{} //make sure fake_command is imported and self-registered with init()
 
 	var (
 		err        error
@@ -41,19 +37,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			_, err := NewRpcService(nil, nil, nil, rpc.DefaultServer)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -75,7 +71,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -103,7 +99,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -145,7 +141,7 @@ var _ = Describe("Server", func() {
 
 		BeforeEach(func() {
 			terminalOutputSwitch = new(rpcfakes.FakeTerminalOutputSwitch)
-			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -174,7 +170,7 @@ var _ = Describe("Server", func() {
 			outputCapture := terminal.NewTeePrinter(os.Stdout)
 			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
 
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, nil, nil, rpc.DefaultServer)
+			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, rpc.DefaultServer)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
