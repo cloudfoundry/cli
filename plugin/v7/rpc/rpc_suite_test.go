@@ -14,5 +14,5 @@ var rpcService *rpc.CliRpcService
 
 func TestRpc(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "RPC Suite")
+	RunSpecs(t, "V7 RPC Suite")
 }
