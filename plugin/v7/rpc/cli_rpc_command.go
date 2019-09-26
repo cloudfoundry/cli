@@ -6,14 +6,10 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"os"
-	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/api"
-	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
@@ -28,7 +24,6 @@ type CliRpcCmd struct {
 	terminalOutputSwitch TerminalOutputSwitch
 	cliConfig            coreconfig.Repository
 	repoLocator          api.RepositoryLocator
-	newCmdRunner         CommandRunner
 	outputBucket         *bytes.Buffer
 	logger               trace.Printer
 	stdout               io.Writer
@@ -71,42 +66,11 @@ func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
-	var err error
-	cmdRegistry := commandregistry.Commands
-
-	cmd.outputBucket = &bytes.Buffer{}
-	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
-
-	if cmdRegistry.CommandExists(args[0]) {
-		deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
-
-		//set deps objs to be the one used by all other commands
-		//once all commands are converted, we can make fresh deps for each command run
-		deps.Config = cmd.cliConfig
-		deps.RepoLocator = cmd.repoLocator
-
-		//set command ui's TeePrinter to be the one used by RpcService, for output to be captured
-		deps.UI = terminal.NewUI(os.Stdin, cmd.stdout, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
-
-		err = cmd.newCmdRunner.Command(args, deps, false)
-	} else {
-		*retVal = false
-		return nil
-	}
-
-	if err != nil {
-		*retVal = false
-		return err
-	}
-
-	*retVal = true
-	return nil
+	return errors.New("unimplemented")
 }
 
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
-	v := strings.TrimSuffix(cmd.outputBucket.String(), "\n")
-	*retVal = strings.Split(v, "\n")
-	return nil
+	return errors.New("unimplemented")
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
