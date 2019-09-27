@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"regexp"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -161,8 +162,8 @@ var _ = Describe("events Command", func() {
 			Expect(testUI.Out).To(Say("\n"))
 
 			Expect(testUI.Out).To(Say(`time\s+event\s+actor\s+description`))
-			Expect(testUI.Out).To(Say(`%s\s+audit.app.wow\s+user1`, createdAtOne.Local().Format("2006-01-02T15:04:05.00-0700")))
-			Expect(testUI.Out).To(Say(`%s\s+audit.app.cool\s+user2\s+`, createdAtTwo.Local().Format("2006-01-02T15:04:05.00-0700")))
+			Expect(testUI.Out).To(Say(`%s\s+audit.app.wow\s+user1\s+`, regexp.QuoteMeta(createdAtOne.Local().Format("2006-01-02T15:04:05.00-0700"))))
+			Expect(testUI.Out).To(Say(`%s\s+audit.app.cool\s+user2\s+`, regexp.QuoteMeta(createdAtTwo.Local().Format("2006-01-02T15:04:05.00-0700"))))
 			Expect(testUI.Out).To(Say(`index: 2, reason: test, cell_id: 1, instance: 4, exit_description: test, exit_status: 3, `))
 			Expect(testUI.Out).To(Say(`disk_quota: 2MB, instances: 5, memory: 256MB, command: start, environment_json: {"key":"val"}`))
 
