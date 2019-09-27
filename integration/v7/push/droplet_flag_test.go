@@ -30,7 +30,7 @@ var _ = Describe("--droplet flag", func() {
 				Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
 				originalApp = helpers.NewAppName()
-				session := helpers.CF(PushCommandName, originalApp, "-b", "staticfile_buildpack")
+				session := helpers.CF(PushCommandName, originalApp, "-b", "staticfile_buildpack", "-v")
 				Eventually(session).Should(Exit(0))
 
 				appGUID := helpers.AppGUID(originalApp)
