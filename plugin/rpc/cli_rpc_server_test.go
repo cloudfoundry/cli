@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 	. "code.cloudfoundry.org/cli/plugin/rpc"
 	cmdRunner "code.cloudfoundry.org/cli/plugin/rpc"
 	. "code.cloudfoundry.org/cli/plugin/rpc/fakecommand"
