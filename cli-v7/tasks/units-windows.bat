@@ -12,4 +12,4 @@ go get -u github.com/onsi/ginkgo/ginkgo
 
 ginkgo version
 
-ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration -flakeAttempts=2 .
+ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration -flakeAttempts=2 -tags="V7" .
