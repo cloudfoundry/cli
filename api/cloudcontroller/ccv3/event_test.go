@@ -1,9 +1,11 @@
 package ccv3_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"fmt"
 	"net/http"
+	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -11,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Task", func() {
+var _ = Describe("Event", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -86,20 +88,26 @@ var _ = Describe("Task", func() {
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/audit_events", "target_guids=some-target-guid&order_by=-created_at&per_page=1"),
 						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
-
 					),
 				)
 			})
 
 			It("returns the event guid of the most recent event", func() {
+				timestamp, err := time.Parse(time.RFC3339, "2016-06-08T16:41:23Z")
+				Expect(err).ToNot(HaveOccurred())
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning"))
 				Expect(events).To(ConsistOf(
 					Event{
-						GUID: "some-event-guid",
-						CreatedAt: "2016-06-08T16:41:23Z",
-						Type: "audit.app.update",
+						GUID:      "some-event-guid",
+						CreatedAt: timestamp,
+						Type:      "audit.app.update",
 						ActorName: "admin",
+						Data: map[string]interface{}{
+							"request": map[string]interface{}{
+								"recursive": true,
+							},
+						},
 					},
 				))
 			})

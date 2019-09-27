@@ -749,6 +749,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetEventsStub        func(...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error)
+	getEventsMutex       sync.RWMutex
+	getEventsArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getEventsReturns struct {
+		result1 []ccv3.Event
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getEventsReturnsOnCall map[int]struct {
+		result1 []ccv3.Event
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetFeatureFlagStub        func(string) (ccv3.FeatureFlag, ccv3.Warnings, error)
 	getFeatureFlagMutex       sync.RWMutex
 	getFeatureFlagArgsForCall []struct {
@@ -4778,6 +4793,72 @@ func (fake *FakeCloudControllerClient) GetDropletsReturnsOnCall(i int, result1 [
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetEvents(arg1 ...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error) {
+	fake.getEventsMutex.Lock()
+	ret, specificReturn := fake.getEventsReturnsOnCall[len(fake.getEventsArgsForCall)]
+	fake.getEventsArgsForCall = append(fake.getEventsArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetEvents", []interface{}{arg1})
+	fake.getEventsMutex.Unlock()
+	if fake.GetEventsStub != nil {
+		return fake.GetEventsStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getEventsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetEventsCallCount() int {
+	fake.getEventsMutex.RLock()
+	defer fake.getEventsMutex.RUnlock()
+	return len(fake.getEventsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetEventsCalls(stub func(...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error)) {
+	fake.getEventsMutex.Lock()
+	defer fake.getEventsMutex.Unlock()
+	fake.GetEventsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetEventsArgsForCall(i int) []ccv3.Query {
+	fake.getEventsMutex.RLock()
+	defer fake.getEventsMutex.RUnlock()
+	argsForCall := fake.getEventsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetEventsReturns(result1 []ccv3.Event, result2 ccv3.Warnings, result3 error) {
+	fake.getEventsMutex.Lock()
+	defer fake.getEventsMutex.Unlock()
+	fake.GetEventsStub = nil
+	fake.getEventsReturns = struct {
+		result1 []ccv3.Event
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetEventsReturnsOnCall(i int, result1 []ccv3.Event, result2 ccv3.Warnings, result3 error) {
+	fake.getEventsMutex.Lock()
+	defer fake.getEventsMutex.Unlock()
+	fake.GetEventsStub = nil
+	if fake.getEventsReturnsOnCall == nil {
+		fake.getEventsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Event
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getEventsReturnsOnCall[i] = struct {
+		result1 []ccv3.Event
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetFeatureFlag(arg1 string) (ccv3.FeatureFlag, ccv3.Warnings, error) {
 	fake.getFeatureFlagMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagReturnsOnCall[len(fake.getFeatureFlagArgsForCall)]
@@ -8201,6 +8282,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getDropletMutex.RUnlock()
 	fake.getDropletsMutex.RLock()
 	defer fake.getDropletsMutex.RUnlock()
+	fake.getEventsMutex.RLock()
+	defer fake.getEventsMutex.RUnlock()
 	fake.getFeatureFlagMutex.RLock()
 	defer fake.getFeatureFlagMutex.RUnlock()
 	fake.getFeatureFlagsMutex.RLock()

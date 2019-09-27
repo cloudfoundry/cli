@@ -90,7 +90,7 @@ type commandList struct {
 	EnableSSH                          v6.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
 	EnableServiceAccess                v6.EnableServiceAccessCommand                `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
 	Env                                v7.EnvCommand                                `command:"env" alias:"e" description:"Show all env variables for an app"`
-	Events                             v6.EventsCommand                             `command:"events" description:"Show recent app events"`
+	Events                             v7.EventsCommand                             `command:"events" description:"Show recent app events"`
 	FeatureFlag                        v7.FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
 	FeatureFlags                       v7.FeatureFlagsCommand                       `command:"feature-flags" description:"Retrieve list of feature flags with status"`
 	GetHealthCheck                     v7.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`

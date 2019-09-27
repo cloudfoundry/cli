@@ -9,24 +9,17 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("apps command", func() {
+var _ = Describe("events command", func() {
 	var (
 		orgName   string
 		spaceName string
-		appName1  string
-		appName2  string
+		appName   string
 	)
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
-		appName1 = helpers.PrefixedRandomName("app1")
-		appName2 = helpers.PrefixedRandomName("app2")
-		helpers.TurnOffExperimental()
-	})
-
-	AfterEach(func() {
-		helpers.TurnOnExperimental()
+		appName = helpers.PrefixedRandomName("app1")
 	})
 
 	Describe("help", func() {
@@ -34,20 +27,18 @@ var _ = Describe("apps command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("apps", "APPS", "List all apps in the target space"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("events", "APPS", "Show recent app events"))
 			})
 
 			It("Displays command usage to output", func() {
-				session := helpers.CF("apps", "--help")
+				session := helpers.CF("events", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("apps - List all apps in the target space"))
+				Eventually(session).Should(Say("events - Show recent app events"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf apps"))
-				Eventually(session).Should(Say("ALIAS:"))
-				Eventually(session).Should(Say("a"))
+				Eventually(session).Should(Say("cf events APP_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("events, logs, map-route, push, restart, scale, start, stop"))
+				Eventually(session).Should(Say("app, logs, map-route, unmap-route"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -56,7 +47,7 @@ var _ = Describe("apps command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "apps")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "events", appName)
 		})
 	})
 
@@ -72,68 +63,27 @@ var _ = Describe("apps command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("with no apps", func() {
-			It("displays empty list", func() {
-				session := helpers.CF("apps")
-				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Eventually(session).Should(Say("No apps found"))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		Context("with existing apps", func() {
-			var domainName string
-
+		Context("with an existing app", func() {
 			BeforeEach(func() {
-				domainName = helpers.DefaultSharedDomain()
-				helpers.WithProcfileApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName2)).Should(Exit(0))
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName1)).Should(Exit(0))
-				})
-
-			})
-
-			It("displays apps in the list", func() {
-				session := helpers.CF("apps")
-				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`name\s+requested state\s+processes\s+routes`))
-				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName1, appName1, domainName))
-				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName2, appName2, domainName))
-
+				session := helpers.CF("create-app", appName)
+				Eventually(session).Should(Exit(0))
+				session = helpers.CF("rename", appName, "other-app-name")
+				Eventually(session).Should(Exit(0))
+				session = helpers.CF("rename", "other-app-name", appName)
 				Eventually(session).Should(Exit(0))
 			})
 
-			When("one app is stopped", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("stop", appName1)).Should(Exit(0))
-				})
+			It("displays events in the list", func() {
+				session := helpers.CF("events", appName)
 
-				It("displays app as stopped", func() {
-					session := helpers.CF("apps")
-					Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-					Eventually(session).Should(Say(`name\s+requested state\s+processes\s+routes`))
-					Eventually(session).Should(Say(`%s\s+stopped\s+web:0/1, console:0/0\s+%s\.%s`, appName1, appName1, domainName))
-					Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName2, appName2, domainName))
+				Eventually(session).Should(Say(`Getting events for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`time\s+event\s+actor\s+description`))
+				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{2}-\d{4}\s+audit\.app\.update\s+%s`, userName))
+				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{2}-\d{4}\s+audit\.app\.update\s+%s`, userName))
+				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{2}-\d{4}\s+audit\.app\.create\s+%s`, userName))
 
-					Eventually(session).Should(Exit(0))
-				})
-			})
-
-			When("the --labels flag is given", func() {
-
-				BeforeEach(func() {
-					Eventually(helpers.CF("set-label", "app", appName1, "environment=production", "tier=backend")).Should(Exit(0))
-					Eventually(helpers.CF("set-label", "app", appName2, "environment=staging", "tier=frontend")).Should(Exit(0))
-				})
-
-				It("displays apps with provided labels", func() {
-					session := helpers.CF("apps", "--labels", "environment in (production,staging),tier in (backend)")
-					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say(appName1))
-					Expect(session).ShouldNot(Say(appName2))
-				})
+				Eventually(session).Should(Exit(0))
 			})
 		})
-
 	})
 })
