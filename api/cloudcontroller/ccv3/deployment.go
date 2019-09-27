@@ -156,6 +156,6 @@ func (client *Client) GetDeployments(query ...Query) ([]Deployment, Warnings, er
 		}
 		return nil
 	})
-	
+
 	return deployments, warnings, err
 }
