@@ -7,4 +7,4 @@ inputs:
 - name: cli-ci
 
 run:
-  path: cli-ci/ci/cli/tasks/units-windows.bat
+  path: cli-ci/ci/cli-v7/tasks/units-windows.bat
