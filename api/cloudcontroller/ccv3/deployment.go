@@ -156,8 +156,6 @@ func (client *Client) GetDeployments(query ...Query) ([]Deployment, Warnings, er
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, nil, err // untested
-	}
-	return deployments, warnings, nil
+	
+	return deployments, warnings, err
 }
