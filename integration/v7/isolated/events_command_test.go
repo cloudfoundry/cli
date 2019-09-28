@@ -78,9 +78,9 @@ var _ = Describe("events command", func() {
 
 				Eventually(session).Should(Say(`Getting events for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say(`time\s+event\s+actor\s+description`))
-				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{2}-\d{4}\s+audit\.app\.update\s+%s`, userName))
-				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{2}-\d{4}\s+audit\.app\.update\s+%s`, userName))
-				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{2}-\d{4}\s+audit\.app\.create\s+%s`, userName))
+				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.update\s+%s`, userName))
+				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.update\s+%s`, userName))
+				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.create\s+%s`, userName))
 
 				Eventually(session).Should(Exit(0))
 			})
