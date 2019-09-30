@@ -326,6 +326,7 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 	if err != nil {
 		return Warnings{}, err
 	}
+	defer progBar.Terminate()
 
 	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, pathToBuildpackBits, progressBarReader, size)
 	if err != nil {
@@ -335,7 +336,6 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 		return Warnings(warnings), err
 	}
 
-	progBar.Terminate()
 	return Warnings(warnings), nil
 }
 
