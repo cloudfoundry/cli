@@ -60,13 +60,13 @@ var _ = Describe("delete-space command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		It("fails and displays space not found", func() {
+		It("passes and displays space not found", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("delete-space", "-f", "-o", orgName, "please-do-not-exist-in-real-life")
 			Eventually(session).Should(Say("Deleting space please-do-not-exist-in-real-life in org %s as %s...", orgName, username))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say(`Space 'please-do-not-exist-in-real-life' not found\.`))
-			Eventually(session).Should(Exit(1))
+			Eventually(session).Should(Say("OK"))
+			Eventually(session.Err).Should(Say(`Space 'please-do-not-exist-in-real-life' does not exist.\.`))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 

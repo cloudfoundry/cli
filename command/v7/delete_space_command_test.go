@@ -117,12 +117,13 @@ var _ = Describe("delete-space Command", func() {
 							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v7action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: "some-space"})
 						})
 
-						It("returns the translatable error", func() {
-							Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
+						It("displays all warnings and does not error", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say(`Deleting space some-space in org some-org as some-user\.\.\.`))
 
 							Expect(testUI.Err).To(Say("warning-1"))
 							Expect(testUI.Err).To(Say("warning-2"))
+							Expect(testUI.Err).To(Say("Space '%s' does not exist.", cmd.RequiredArgs.Space))
 						})
 					})
 

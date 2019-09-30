@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
@@ -93,7 +94,14 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.DeleteSpaceByNameAndOrganizationName(cmd.RequiredArgs.Space, orgName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		switch err.(type) {
+		case actionerror.SpaceNotFoundError:
+			cmd.UI.DisplayWarningV7("Space '{{.SpaceName}}' does not exist.", map[string]interface{}{
+				"SpaceName": cmd.RequiredArgs.Space,
+			})
+		default:
+			return err
+		}
 	}
 
 	cmd.UI.DisplayOK()
