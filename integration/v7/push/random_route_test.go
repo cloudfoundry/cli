@@ -3,10 +3,10 @@ package push
 import (
 	"fmt"
 	"path"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -18,7 +18,7 @@ var _ = Describe("random route", func() {
 	)
 
 	BeforeEach(func() {
-		appName = fmt.Sprintf("app%d", config.GinkgoConfig.ParallelNode)
+		appName = fmt.Sprintf("app%d", time.Now().Nanosecond())
 	})
 
 	When("passed the --random-route flag", func() {
