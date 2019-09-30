@@ -79,12 +79,19 @@ var _ = Describe("events command", func() {
 				// tests to validate we are passing the `order_by=-created_at` query param to CAPI. The actual ordering is CAPIs concern.
 				session := helpers.CF("events", appName)
 
-				Eventually(session).Should(Say(`Getting events for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`time\s+event\s+actor\s+description`))
-				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)\s+%s`, userName))
-				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)\s+%s`, userName))
-				Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)\s+%s`, userName))
-
+				if helpers.ClientCredentialsTestMode() {
+					Eventually(session).Should(Say(`Getting events for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`time\s+event\s+actor\s+description`))
+					Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)`))
+					Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)`))
+					Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)`))
+				} else {
+					Eventually(session).Should(Say(`Getting events for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`time\s+event\s+actor\s+description`))
+					Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)\s+%s`, userName))
+					Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)\s+%s`, userName))
+					Eventually(session).Should(Say(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{2}[-+]\d{4}\s+audit\.app\.(update|create)\s+%s`, userName))
+				}
 				Eventually(session).Should(Exit(0))
 			})
 		})
