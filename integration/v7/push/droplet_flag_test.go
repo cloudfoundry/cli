@@ -30,8 +30,9 @@ var _ = Describe("--droplet flag", func() {
 				Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
 				originalApp = helpers.NewAppName()
-				session := helpers.CFWithEnv(map[string]string{"CF_LOG_LEVEL": "debug"}, PushCommandName, originalApp, "-b", "staticfile_buildpack", "-v")
-				Eventually(session).Should(Exit(0))
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, originalApp, "-b", "staticfile_buildpack", "-v")).Should(Exit(0))
+				})
 
 				appGUID := helpers.AppGUID(originalApp)
 				Eventually(helpers.CF("curl", fmt.Sprintf("/v2/apps/%s/droplet/download", appGUID), "--output", dropletPath)).Should(Exit(0))
