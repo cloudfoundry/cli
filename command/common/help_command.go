@@ -301,7 +301,7 @@ func (cmd HelpCommand) displayCommand() error {
 func (cmd HelpCommand) environmentalVariablesTableData() [][]string {
 	return [][]string{
 		{"CF_COLOR=false", cmd.UI.TranslateText("Do not colorize output")},
-		{"CF_DIAL_TIMEOUT=5", cmd.UI.TranslateText("Max wait time to establish a connection, including name resolution, in seconds")},
+		{"CF_DIAL_TIMEOUT=6", cmd.UI.TranslateText("Max wait time to establish a connection, including name resolution, in seconds")},
 		{"CF_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default config directory")},
 		{"CF_PLUGIN_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default plugin config directory")},
 		{"CF_TRACE=true", cmd.UI.TranslateText("Print API request diagnostics to stdout")},

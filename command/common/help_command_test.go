@@ -609,7 +609,7 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say(""))
 				Expect(testUI.Out).To(Say("ENVIRONMENT VARIABLES:"))
 				Expect(testUI.Out).To(Say("   CF_COLOR=false                     Do not colorize output"))
-				Expect(testUI.Out).To(Say("   CF_DIAL_TIMEOUT=5                  Max wait time to establish a connection, including name resolution, in seconds"))
+				Expect(testUI.Out).To(Say("   CF_DIAL_TIMEOUT=6                  Max wait time to establish a connection, including name resolution, in seconds"))
 				Expect(testUI.Out).To(Say("   CF_HOME=path/to/dir/               Override path to default config directory"))
 				Expect(testUI.Out).To(Say("   CF_PLUGIN_HOME=path/to/dir/        Override path to default plugin config directory"))
 				Expect(testUI.Out).To(Say("   CF_TRACE=true                      Print API request diagnostics to stdout"))
