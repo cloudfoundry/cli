@@ -77,7 +77,7 @@ else
     # Delete stack if stack happens to be integration stack
     if [[ $stack == INTEGRATION-STACK* ]]; then
       echo Deleting $stack
-      cf curl -X DELETE /v2/stacks/$(cf stack --guid $stack)
+      cf curl -X DELETE /v3/stacks/$(cf stack --guid $stack)
     fi
   done
   cf buildpacks | grep -i -e integration-buildpack | awk '{print $2}' | xargs_func cf delete-buildpack -f
