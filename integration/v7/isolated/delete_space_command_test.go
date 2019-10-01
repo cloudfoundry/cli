@@ -65,7 +65,7 @@ var _ = Describe("delete-space command", func() {
 			session := helpers.CF("delete-space", "-f", "-o", orgName, "please-do-not-exist-in-real-life")
 			Eventually(session).Should(Say("Deleting space please-do-not-exist-in-real-life in org %s as %s...", orgName, username))
 			Eventually(session).Should(Say("OK"))
-			Eventually(session.Err).Should(Say(`Space 'please-do-not-exist-in-real-life' does not exist.\.`))
+			Eventually(session.Err).Should(Say(`Space 'please-do-not-exist-in-real-life' does not exist.`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
