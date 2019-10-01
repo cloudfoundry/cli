@@ -19,6 +19,7 @@ var _ = Describe("push with different buildpack values", func() {
 	var (
 		appName string
 	)
+	staticFileGitRepo := "https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44"
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
@@ -233,7 +234,7 @@ var _ = Describe("push with different buildpack values", func() {
 								"name": appName,
 								"buildpacks": []string{
 									"https://github.com/cloudfoundry/ruby-buildpack",
-									"https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44",
+									staticFileGitRepo,
 								},
 							},
 						},
@@ -258,7 +259,7 @@ var _ = Describe("push with different buildpack values", func() {
 							{
 								"name": appName,
 								"buildpacks": []string{
-									"https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44",
+									staticFileGitRepo,
 								},
 							},
 						},
@@ -329,7 +330,7 @@ var _ = Describe("push with different buildpack values", func() {
 							"name":      appName,
 							"buildpack": "ruby_buildpack",
 							"buildpacks": []string{
-								"https://github.com/cloudfoundry/staticfile-buildpack",
+								staticFileGitRepo,
 							},
 						},
 					},
@@ -353,7 +354,7 @@ var _ = Describe("push with different buildpack values", func() {
 								"image": PublicDockerImage,
 							},
 							"buildpacks": []string{
-								"https://github.com/cloudfoundry/staticfile-buildpack",
+								staticFileGitRepo,
 							},
 						},
 					},
@@ -400,7 +401,7 @@ var _ = Describe("push with different buildpack values", func() {
 					"applications": []map[string]interface{}{
 						{
 							"name":      appName,
-							"buildpack": "https://github.com/cloudfoundry/staticfile-buildpack",
+							"buildpack": staticFileGitRepo,
 						},
 					},
 				})
@@ -434,7 +435,7 @@ var _ = Describe("push with different buildpack values", func() {
 						{
 							"name": appName,
 							"buildpacks": []string{
-								"https://github.com/cloudfoundry/staticfile-buildpack",
+								staticFileGitRepo,
 							},
 						},
 					},
