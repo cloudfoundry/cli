@@ -6,8 +6,11 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"strings"
 	"sync"
 
+	"code.cloudfoundry.org/cli/command"
+	v7command "code.cloudfoundry.org/cli/command/v7"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
@@ -17,6 +20,8 @@ import (
 type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
 	MetadataMutex        *sync.RWMutex
+	Config               command.Config
+	AppActor             v7command.AppActor
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
 	outputBucket         *bytes.Buffer
@@ -68,5 +73,8 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	return errors.New("unimplemented")
+	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, cmd.Config.TargetedSpace().GUID, true)
+	retVal.Name = app.Name
+	retVal.State = strings.ToLower(string(app.State))
+	return err
 }
