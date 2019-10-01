@@ -833,6 +833,24 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
+		When("the cc returns an invalid token error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, ccerror.InvalidAuthTokenError{Message: "ya blew it"})
+			})
+
+			It("tries again", func() {
+				Expect(fakeCloudControllerClient.UploadBuildpackCallCount()).To(Equal(2))
+			})
+
+			When("the cc returns a second invalid token error", func () {
+				It("returns the invalid token error and warnings", func() {
+				 Expect(warnings).To(ConsistOf("some-upload-warning"))
+				 Expect(executeErr).To(MatchError(ccerror.InvalidAuthTokenError{Message: "ya blew it"}))
+					
+				})
+			})
+		})
+
 		When("the upload is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-create-warning"}, nil)

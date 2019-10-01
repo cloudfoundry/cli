@@ -322,6 +322,15 @@ func (actor *Actor) checkIfNewStackExists(newStack string) (Warnings, error) {
 }
 
 func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {
+	warnings, err := actor.uploadBuildpack(GUID, pathToBuildpackBits, progBar)
+		if _, ok := err.(ccerror.InvalidAuthTokenError); ok {
+			warnings, err = actor.uploadBuildpack(GUID, pathToBuildpackBits, progBar)
+		}
+
+	return warnings, err
+}
+
+func (actor *Actor) uploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {
 	progressBarReader, size, err := progBar.Initialize(pathToBuildpackBits)
 	if err != nil {
 		return Warnings{}, err

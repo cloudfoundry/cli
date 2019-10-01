@@ -1,0 +1,25 @@
+## The issue
+
+If during `cf create-buildpack` the access token expires, then the command errors with an unhelpful "Invalid Auth Token" error.
+
+## Our previously proposed solution
+Try to upload the buildpack one more time.
+
+If the upload time is >10m then the buildpack upload will never succeed. It will try twice, just to fail.
+
+Error between messages:
+"Access token expired during upload, retrying..."
+
+## An alternate solution
+
+Fail the first time, and with a better error message.
+
+Suggested tip: "
+
+
+1. Retry option:
+  - If upload buildpack fails with InvalidAuthTokenError, display helpful error, retry once, and then show better InvalidAuthTokenError on failure
+
+2. More helpful error message option:
+  - If upload buildpack fails with InvalidAuthTokenError, provide detailed error message and TIP to avoid.
+  - "TIP: consider using `cf auth --client-credentials` to get an auth token with longer exipiry"
