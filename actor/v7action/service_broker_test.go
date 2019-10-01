@@ -94,6 +94,9 @@ var _ = Describe("Service Broker Actions", func() {
 		)
 
 		BeforeEach(func() {
+			serviceBroker1Name = "broker-name"
+			serviceBroker1Guid = "broker-guid"
+
 			ccv3ServiceBrokers = []ccv3.ServiceBroker{
 				{Name: serviceBrokerNotTheOneYouWant, GUID: notTheBrokerYouAreLookingFor},
 				{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
