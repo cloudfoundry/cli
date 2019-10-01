@@ -233,7 +233,7 @@ var _ = Describe("push with different buildpack values", func() {
 								"name": appName,
 								"buildpacks": []string{
 									"https://github.com/cloudfoundry/ruby-buildpack",
-									"https://github.com/cloudfoundry/staticfile-buildpack",
+									"https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44",
 								},
 							},
 						},
@@ -244,8 +244,8 @@ var _ = Describe("push with different buildpack values", func() {
 
 				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
 
-				Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack"`))
-				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack`))
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -258,7 +258,7 @@ var _ = Describe("push with different buildpack values", func() {
 							{
 								"name": appName,
 								"buildpacks": []string{
-									"https://github.com/cloudfoundry/staticfile-buildpack",
+									"https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44",
 								},
 							},
 						},
@@ -270,7 +270,7 @@ var _ = Describe("push with different buildpack values", func() {
 				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
 
 				// TODO: fix during app command rework to actually test that the second buildpack does not exist
-				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
