@@ -32,42 +32,45 @@ var _ = Describe("ServiceBroker", func() {
 		When("service brokers exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
-{
-	"pagination": {
-		"next": {
-			"href": "%s/v3/service_brokers?page=2&per_page=2"
-		}
-	},
-	"resources": [
-		{
-			"name": "service-broker-name-1",
-			"guid": "service-broker-guid-1",
-			"url": "service-broker-url-1",
-			"relationships": {}
-		},
-		{
-			"name": "service-broker-name-2",
-			"guid": "service-broker-guid-2",
-			"url": "service-broker-url-2",
-			"relationships": {}
-		}
-	]
-}`, server.URL())
+					{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/service_brokers?page=2&per_page=2"
+							}
+						},
+						"resources": [
+							{
+								"name": "service-broker-name-1",
+								"guid": "service-broker-guid-1",
+								"url": "service-broker-url-1",
+							    "status": "synchronization in progress",
+								"relationships": {}
+							},
+							{
+								"name": "service-broker-name-2",
+								"guid": "service-broker-guid-2",
+								"url": "service-broker-url-2",
+								"status": "synchronization failed",
+								"relationships": {}
+							}
+						]
+					}`, server.URL())
 
 				response2 := `
-{
-	"pagination": {
-		"next": null
-	},
-	"resources": [
-		{
-			"name": "service-broker-name-3",
-			"guid": "service-broker-guid-3",
-			"url": "service-broker-url-3",
-			"relationships": {}
-		}
-	]
-}`
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"name": "service-broker-name-3",
+								"guid": "service-broker-guid-3",
+								"url": "service-broker-url-3",
+								"status": "available",
+								"relationships": {}
+							}
+						]
+					}`
 
 				server.AppendHandlers(
 					CombineHandlers(
@@ -87,9 +90,9 @@ var _ = Describe("ServiceBroker", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(serviceBrokers).To(ConsistOf(
-					ServiceBroker{Name: "service-broker-name-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
-					ServiceBroker{Name: "service-broker-name-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
-					ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3"},
+					ServiceBroker{Name: "service-broker-name-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1", Status: "synchronization in progress"},
+					ServiceBroker{Name: "service-broker-name-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2", Status: "synchronization failed"},
+					ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3", Status: "available"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})

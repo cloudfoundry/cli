@@ -18,16 +18,34 @@ type ServiceBroker struct {
 	Name string
 	// URL is the url of the service broker.
 	URL string
+	// Status is the state of the service broker.
+	Status string
 }
 
-// serviceBrokerPresentation represents a Cloud Controller V3 Service Broker.
-type serviceBrokerPresentation struct {
+// serviceBrokerRequest represents a Cloud Controller V3 Service Broker (when creating and updating).
+type serviceBrokerRequest struct {
 	// GUID is a unique service broker identifier.
 	GUID string `json:"guid,omitempty"`
 	// Name is the name of the service broker.
 	Name string `json:"name"`
 	// URL is the url of the service broker.
 	URL string `json:"url"`
+	// Credentials contains the credentials for authenticating with the service broker.
+	Credentials serviceBrokerCredentials `json:"credentials"`
+	// This is the relationship for the space GUID
+	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
+}
+
+// serviceBrokerResponse represents a Cloud Controller V3 Service Broker (when reading).
+type serviceBrokerResponse struct {
+	// GUID is a unique service broker identifier.
+	GUID string `json:"guid,omitempty"`
+	// Name is the name of the service broker.
+	Name string `json:"name"`
+	// URL is the url of the service broker.
+	URL string `json:"url"`
+	// Status is the state of the service broker.
+	Status string `json:"status,omitempty"`
 	// Credentials contains the credentials for authenticating with the service broker.
 	Credentials serviceBrokerCredentials `json:"credentials"`
 	// This is the relationship for the space GUID
@@ -124,12 +142,12 @@ func (client *Client) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	}
 
 	var fullList []ServiceBroker
-	warnings, err := client.paginate(request, serviceBrokerPresentation{}, func(item interface{}) error {
-		if serviceBroker, ok := item.(serviceBrokerPresentation); ok {
+	warnings, err := client.paginate(request, serviceBrokerResponse{}, func(item interface{}) error {
+		if serviceBroker, ok := item.(serviceBrokerResponse); ok {
 			fullList = append(fullList, extractServiceBrokerData(serviceBroker))
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   serviceBrokerPresentation{},
+				Expected:   serviceBrokerResponse{},
 				Unexpected: item,
 			}
 		}
@@ -139,8 +157,8 @@ func (client *Client) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	return fullList, warnings, err
 }
 
-func newServiceBroker(name, username, password, brokerURL, spaceGUID string) serviceBrokerPresentation {
-	sbp := serviceBrokerPresentation{
+func newServiceBroker(name, username, password, brokerURL, spaceGUID string) serviceBrokerRequest {
+	sbp := serviceBrokerRequest{
 		Name: name,
 		URL:  brokerURL,
 		Credentials: serviceBrokerCredentials{
@@ -165,10 +183,11 @@ func newServiceBroker(name, username, password, brokerURL, spaceGUID string) ser
 	return sbp
 }
 
-func extractServiceBrokerData(sbp serviceBrokerPresentation) ServiceBroker {
+func extractServiceBrokerData(response serviceBrokerResponse) ServiceBroker {
 	return ServiceBroker{
-		Name: sbp.Name,
-		URL:  sbp.URL,
-		GUID: sbp.GUID,
+		Name:   response.Name,
+		URL:    response.URL,
+		GUID:   response.GUID,
+		Status: response.Status,
 	}
 }

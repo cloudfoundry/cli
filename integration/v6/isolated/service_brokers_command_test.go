@@ -25,13 +25,6 @@ var _ = Describe("service-brokers command", func() {
 		})
 	})
 
-	When("environment is not set up", func() {
-		It("displays an error and exits 1", func() {
-			Skip("Unrefactored command is writing login errors to STDOUT; remove skip when refactored")
-			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "service-brokers")
-		})
-	})
-
 	When("the environment is set up correctly", func() {
 		var (
 			username string
@@ -57,7 +50,7 @@ var _ = Describe("service-brokers command", func() {
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = fakeservicebroker.New().Register()
 			})
 
 			AfterEach(func() {

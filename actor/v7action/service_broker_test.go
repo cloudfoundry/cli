@@ -38,14 +38,16 @@ var _ = Describe("Service Broker Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceBrokersReturns([]ccv3.ServiceBroker{
 						{
-							GUID: "service-broker-guid-1",
-							Name: "service-broker-1",
-							URL:  "service-broker-url-1",
+							GUID:   "service-broker-guid-1",
+							Name:   "service-broker-1",
+							URL:    "service-broker-url-1",
+							Status: "synchronization in progress",
 						},
 						{
-							GUID: "service-broker-guid-2",
-							Name: "service-broker-2",
-							URL:  "service-broker-url-2",
+							GUID:   "service-broker-guid-2",
+							Name:   "service-broker-2",
+							URL:    "service-broker-url-2",
+							Status: "available",
 						},
 					}, ccv3.Warnings{"some-service-broker-warning"}, nil)
 				})
@@ -54,8 +56,8 @@ var _ = Describe("Service Broker Actions", func() {
 					Expect(executionError).NotTo(HaveOccurred())
 
 					Expect(serviceBrokers).To(ConsistOf(
-						ServiceBroker{Name: "service-broker-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
-						ServiceBroker{Name: "service-broker-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
+						ServiceBroker{Name: "service-broker-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1", Status: "synchronization in progress"},
+						ServiceBroker{Name: "service-broker-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2", Status: "available"},
 					))
 					Expect(warnings).To(ConsistOf("some-service-broker-warning"))
 					Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
