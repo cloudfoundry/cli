@@ -1,7 +1,9 @@
 // Package v7action contains the business logic for the commands/v3 package
 package v7action
 
-import "code.cloudfoundry.org/clock"
+import (
+	"code.cloudfoundry.org/clock"
+)
 
 // SortOrder is used for sorting.
 type SortOrder string

@@ -505,6 +505,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetAppFeatureStub        func(string, string) (ccv3.ApplicationFeature, ccv3.Warnings, error)
+	getAppFeatureMutex       sync.RWMutex
+	getAppFeatureArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getAppFeatureReturns struct {
+		result1 ccv3.ApplicationFeature
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getAppFeatureReturnsOnCall map[int]struct {
+		result1 ccv3.ApplicationFeature
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetApplicationDropletCurrentStub        func(string) (ccv3.Droplet, ccv3.Warnings, error)
 	getApplicationDropletCurrentMutex       sync.RWMutex
 	getApplicationDropletCurrentArgsForCall []struct {
@@ -1220,6 +1236,21 @@ type FakeCloudControllerClient struct {
 		result2 error
 	}
 	unsharePrivateDomainFromOrgReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	UpdateAppFeatureStub        func(string, bool, string) (ccv3.Warnings, error)
+	updateAppFeatureMutex       sync.RWMutex
+	updateAppFeatureArgsForCall []struct {
+		arg1 string
+		arg2 bool
+		arg3 string
+	}
+	updateAppFeatureReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	updateAppFeatureReturnsOnCall map[int]struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
@@ -3740,6 +3771,73 @@ func (fake *FakeCloudControllerClient) EntitleIsolationSegmentToOrganizationsRet
 	}
 	fake.entitleIsolationSegmentToOrganizationsReturnsOnCall[i] = struct {
 		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetAppFeature(arg1 string, arg2 string) (ccv3.ApplicationFeature, ccv3.Warnings, error) {
+	fake.getAppFeatureMutex.Lock()
+	ret, specificReturn := fake.getAppFeatureReturnsOnCall[len(fake.getAppFeatureArgsForCall)]
+	fake.getAppFeatureArgsForCall = append(fake.getAppFeatureArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetAppFeature", []interface{}{arg1, arg2})
+	fake.getAppFeatureMutex.Unlock()
+	if fake.GetAppFeatureStub != nil {
+		return fake.GetAppFeatureStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getAppFeatureReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetAppFeatureCallCount() int {
+	fake.getAppFeatureMutex.RLock()
+	defer fake.getAppFeatureMutex.RUnlock()
+	return len(fake.getAppFeatureArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetAppFeatureCalls(stub func(string, string) (ccv3.ApplicationFeature, ccv3.Warnings, error)) {
+	fake.getAppFeatureMutex.Lock()
+	defer fake.getAppFeatureMutex.Unlock()
+	fake.GetAppFeatureStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetAppFeatureArgsForCall(i int) (string, string) {
+	fake.getAppFeatureMutex.RLock()
+	defer fake.getAppFeatureMutex.RUnlock()
+	argsForCall := fake.getAppFeatureArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetAppFeatureReturns(result1 ccv3.ApplicationFeature, result2 ccv3.Warnings, result3 error) {
+	fake.getAppFeatureMutex.Lock()
+	defer fake.getAppFeatureMutex.Unlock()
+	fake.GetAppFeatureStub = nil
+	fake.getAppFeatureReturns = struct {
+		result1 ccv3.ApplicationFeature
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetAppFeatureReturnsOnCall(i int, result1 ccv3.ApplicationFeature, result2 ccv3.Warnings, result3 error) {
+	fake.getAppFeatureMutex.Lock()
+	defer fake.getAppFeatureMutex.Unlock()
+	fake.GetAppFeatureStub = nil
+	if fake.getAppFeatureReturnsOnCall == nil {
+		fake.getAppFeatureReturnsOnCall = make(map[int]struct {
+			result1 ccv3.ApplicationFeature
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getAppFeatureReturnsOnCall[i] = struct {
+		result1 ccv3.ApplicationFeature
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -6902,6 +7000,71 @@ func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgReturnsOnCall(
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateAppFeature(arg1 string, arg2 bool, arg3 string) (ccv3.Warnings, error) {
+	fake.updateAppFeatureMutex.Lock()
+	ret, specificReturn := fake.updateAppFeatureReturnsOnCall[len(fake.updateAppFeatureArgsForCall)]
+	fake.updateAppFeatureArgsForCall = append(fake.updateAppFeatureArgsForCall, struct {
+		arg1 string
+		arg2 bool
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateAppFeature", []interface{}{arg1, arg2, arg3})
+	fake.updateAppFeatureMutex.Unlock()
+	if fake.UpdateAppFeatureStub != nil {
+		return fake.UpdateAppFeatureStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateAppFeatureReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateAppFeatureCallCount() int {
+	fake.updateAppFeatureMutex.RLock()
+	defer fake.updateAppFeatureMutex.RUnlock()
+	return len(fake.updateAppFeatureArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateAppFeatureCalls(stub func(string, bool, string) (ccv3.Warnings, error)) {
+	fake.updateAppFeatureMutex.Lock()
+	defer fake.updateAppFeatureMutex.Unlock()
+	fake.UpdateAppFeatureStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateAppFeatureArgsForCall(i int) (string, bool, string) {
+	fake.updateAppFeatureMutex.RLock()
+	defer fake.updateAppFeatureMutex.RUnlock()
+	argsForCall := fake.updateAppFeatureArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCloudControllerClient) UpdateAppFeatureReturns(result1 ccv3.Warnings, result2 error) {
+	fake.updateAppFeatureMutex.Lock()
+	defer fake.updateAppFeatureMutex.Unlock()
+	fake.UpdateAppFeatureStub = nil
+	fake.updateAppFeatureReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateAppFeatureReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.updateAppFeatureMutex.Lock()
+	defer fake.updateAppFeatureMutex.Unlock()
+	fake.UpdateAppFeatureStub = nil
+	if fake.updateAppFeatureReturnsOnCall == nil {
+		fake.updateAppFeatureReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.updateAppFeatureReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateApplication(arg1 ccv3.Application) (ccv3.Application, ccv3.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -8326,6 +8489,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteUserMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
+	fake.getAppFeatureMutex.RLock()
+	defer fake.getAppFeatureMutex.RUnlock()
 	fake.getApplicationDropletCurrentMutex.RLock()
 	defer fake.getApplicationDropletCurrentMutex.RUnlock()
 	fake.getApplicationEnvironmentMutex.RLock()
@@ -8422,6 +8587,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.unmapRouteMutex.RUnlock()
 	fake.unsharePrivateDomainFromOrgMutex.RLock()
 	defer fake.unsharePrivateDomainFromOrgMutex.RUnlock()
+	fake.updateAppFeatureMutex.RLock()
+	defer fake.updateAppFeatureMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.updateApplicationApplyManifestMutex.RLock()

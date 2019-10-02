@@ -25,6 +25,7 @@ const (
 	DeleteUserRequest                                           = "DeleteUser"
 	GetApplicationDropletCurrentRequest                         = "GetApplicationDropletCurrent"
 	GetApplicationEnvRequest                                    = "GetApplicationEnv"
+	GetApplicationFeaturesRequest                               = "GetApplicationFeatures"
 	GetApplicationManifestRequest                               = "GetApplicationManifest"
 	GetApplicationProcessRequest                                = "GetApplicationProcess"
 	GetApplicationProcessesRequest                              = "GetApplicationProcesses"
@@ -67,6 +68,7 @@ const (
 	PatchApplicationCurrentDropletRequest                       = "PatchApplicationCurrentDroplet"
 	PatchApplicationEnvironmentVariablesRequest                 = "PatchApplicationEnvironmentVariables"
 	PatchApplicationRequest                                     = "PatchApplication"
+	PatchApplicationFeaturesRequest                             = "PatchApplicationFeatures"
 	PatchBuildpackRequest                                       = "PatchBuildpack"
 	PatchFeatureFlagRequest                                     = "PatchFeatureFlag"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
@@ -113,6 +115,8 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/", Method: http.MethodPost, Name: PostApplicationRequest},
 	{Resource: AppsResource, Path: "/:app_guid", Method: http.MethodDelete, Name: DeleteApplicationRequest},
 	{Resource: AppsResource, Path: "/:app_guid", Method: http.MethodPatch, Name: PatchApplicationRequest},
+	{Resource: AppsResource, Path: "/:app_guid/features/:name", Method: http.MethodPatch, Name: PatchApplicationFeaturesRequest},
+	{Resource: AppsResource, Path: "/:app_guid/features/:name", Method: http.MethodGet, Name: GetApplicationFeaturesRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostApplicationActionApplyManifest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/restart", Method: http.MethodPost, Name: PostApplicationActionRestartRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationActionStartRequest},

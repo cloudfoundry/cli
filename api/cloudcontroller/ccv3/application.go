@@ -2,12 +2,11 @@ package ccv3
 
 import (
 	"bytes"
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"encoding/json"
 )
 
 // Application represents a Cloud Controller V3 Application.
