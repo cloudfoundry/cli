@@ -22,8 +22,8 @@ func NewCliConnection(cliServerPort string) *cliConnection {
 	}
 }
 
-func (c *cliConnection) GetApp(appName string) (plugin_models.GetAppModel, error) {
-	var result plugin_models.GetAppModel
+func (c *cliConnection) GetApp(appName string) (plugin_models.Application, error) {
+	var result plugin_models.Application
 
 	err := c.withClientDo(func(client *rpc.Client) error {
 		return client.Call("CliRpcCmd.GetApp", appName, &result)

@@ -267,7 +267,7 @@ var _ = Describe("Server", func() {
 		Describe("GetApp", func() {
 
 			It("retrieves the app summary", func() {
-				result := plugin_models.GetAppModel{}
+				result := plugin_models.Application{}
 				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -279,22 +279,11 @@ var _ = Describe("Server", func() {
 			})
 
 			It("populates the plugin model with the retrieved app", func() {
-				result := plugin_models.GetAppModel{}
+				result := plugin_models.Application{}
 				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(result.Name).To(Equal("some-app"))
-				Expect(result.State).To(Equal("started"))
-				Expect(result.Guid).To(Equal("some-app-guid"))
-				Expect(result.BuildpackUrl).To(Equal("ruby_buildpack"))
-				Expect(result.Command).To(Equal("some-command-1"))
-				Expect(result.DiskQuota).To(Equal(int64(64)))
-				Expect(result.HealthCheckTimeout).To(Equal(60))
-				Expect(result.InstanceCount).To(Equal(5))
-				Expect(result.Memory).To(Equal(int64(512)))
-				Expect(result.RunningInstances).To(Equal(4))
-				Expect(result.SpaceGuid).To(Equal("some-space-guid"))
-				Expect(result.Stack.Name).To(Equal("some-stack"))
 			})
 
 			Context("when retrieving the app fails", func() {
@@ -302,7 +291,7 @@ var _ = Describe("Server", func() {
 					fakeAppActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, nil, errors.New("some-error"))
 				})
 				It("returns an error", func() {
-					result := plugin_models.GetAppModel{}
+					result := plugin_models.Application{}
 					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 					Expect(err).To(MatchError("some-error"))
 				})
