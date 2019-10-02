@@ -18,6 +18,7 @@ import (
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	. "code.cloudfoundry.org/cli/plugin/v7/rpc"
 	"code.cloudfoundry.org/cli/plugin/v7/rpc/rpcfakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -195,6 +196,36 @@ var _ = Describe("Server", func() {
 					Application: v7action.Application{
 						Name:  "some-app",
 						State: constant.ApplicationStarted,
+						GUID:  "some-app-guid",
+					},
+					ProcessSummaries: v7action.ProcessSummaries{
+						{
+							Process: v7action.Process{
+								Type:     constant.ProcessTypeWeb,
+								Command:  *types.NewFilteredString("some-command-1"),
+								DiskInMB: types.NullUint64{IsSet: true, Value: 64},
+							},
+						},
+						{
+							Process: v7action.Process{
+								Type:     "console",
+								Command:  *types.NewFilteredString("some-command-2"),
+								DiskInMB: types.NullUint64{IsSet: true, Value: 16},
+							},
+						},
+					},
+				},
+				CurrentDroplet: v7action.Droplet{
+					Stack: "cflinuxfs2",
+					Buildpacks: []v7action.DropletBuildpack{
+						{
+							Name:         "ruby_buildpack",
+							DetectOutput: "some-detect-output",
+						},
+						{
+							Name:         "some-buildpack",
+							DetectOutput: "",
+						},
 					},
 				},
 			}
@@ -237,6 +268,10 @@ var _ = Describe("Server", func() {
 
 				Expect(result.Name).To(Equal("some-app"))
 				Expect(result.State).To(Equal("started"))
+				Expect(result.Guid).To(Equal("some-app-guid"))
+				Expect(result.BuildpackUrl).To(Equal("ruby_buildpack"))
+				Expect(result.Command).To(Equal("some-command-1"))
+				Expect(result.DiskQuota).To(Equal(int64(64)))
 			})
 
 			Context("when retrieving the app fails", func() {
@@ -249,7 +284,9 @@ var _ = Describe("Server", func() {
 					Expect(err).To(MatchError("some-error"))
 				})
 			})
+			PContext("when there are warnings returned", func() {
 
+			})
 		})
 
 	})

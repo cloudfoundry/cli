@@ -76,5 +76,27 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, cmd.Config.TargetedSpace().GUID, true)
 	retVal.Name = app.Name
 	retVal.State = strings.ToLower(string(app.State))
+
+	// BackpackUrl is no longer singular, the current droplet may have many buildpacks associated
+	// TODO: Also expose current droplet as field on the model?
+	if len(app.CurrentDroplet.Buildpacks) > 0 {
+		retVal.BuildpackUrl = app.CurrentDroplet.Buildpacks[0].Name
+	}
+
+	// Command is no longer singular, the application may have multiple processes
+	// TODO: Also expose all processes as a field on the model?
+	if len(app.ProcessSummaries) > 0 {
+		retVal.Command = app.ProcessSummaries[0].Command.String()
+		retVal.DiskQuota = int64(app.ProcessSummaries[0].DiskInMB.Value)
+	}
+
+	// In v7 this requires calling actor.GetEnvironmentVariablesByApplicationNameAndSpace(appName, spaceGUID)
+	// cmd.pluginAppModel.EnvironmentVars = getSummaryApp.EnvironmentVars
+
+	// APP.DetectedStartCommand is v2-only
+	// cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
+
+	retVal.Guid = app.GUID
+
 	return err
 }
