@@ -73,8 +73,12 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, cmd.Config.TargetedSpace().GUID, true)
+	spaceGUID := cmd.Config.TargetedSpace().GUID
+	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, spaceGUID, true)
+
+	retVal.Guid = app.GUID
 	retVal.Name = app.Name
+	retVal.SpaceGuid = spaceGUID
 	retVal.State = strings.ToLower(string(app.State))
 
 	// BackpackUrl is no longer singular, the current droplet may have many buildpacks associated
@@ -88,6 +92,10 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	if len(app.ProcessSummaries) > 0 {
 		retVal.Command = app.ProcessSummaries[0].Command.String()
 		retVal.DiskQuota = int64(app.ProcessSummaries[0].DiskInMB.Value)
+		retVal.HealthCheckTimeout = int(app.ProcessSummaries[0].HealthCheckTimeout)
+		retVal.InstanceCount = app.ProcessSummaries[0].Instances.Value
+		retVal.Memory = int64(app.ProcessSummaries[0].MemoryInMB.Value)
+		retVal.RunningInstances = app.ProcessSummaries[0].HealthyInstanceCount()
 	}
 
 	// In v7 this requires calling actor.GetEnvironmentVariablesByApplicationNameAndSpace(appName, spaceGUID)
@@ -96,7 +104,16 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	// APP.DetectedStartCommand is v2-only
 	// cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
 
-	retVal.Guid = app.GUID
+	// In v7 this requires calling actor.GetApplicationPackages
+	// cmd.pluginAppModel.PackageState = getSummaryApp.PackageState
+
+	// We don't currently have this field in V7 (it does exist in CAPI v3)
+	// cmd.pluginAppModel.PackageUpdatedAt = getSummaryApp.PackageUpdatedAt
+
+	// The stack guid is not provided in the normal app response, we would need to call actor.GetStackByName to get this
+	retVal.Stack = &plugin_models.GetApp_Stack{
+		Name: app.StackName,
+	}
 
 	return err
 }

@@ -194,23 +194,40 @@ var _ = Describe("Server", func() {
 			summary := v7action.DetailedApplicationSummary{
 				ApplicationSummary: v7action.ApplicationSummary{
 					Application: v7action.Application{
-						Name:  "some-app",
-						State: constant.ApplicationStarted,
-						GUID:  "some-app-guid",
+						GUID:      "some-app-guid",
+						Name:      "some-app",
+						StackName: "some-stack",
+						State:     constant.ApplicationStarted,
 					},
 					ProcessSummaries: v7action.ProcessSummaries{
 						{
 							Process: v7action.Process{
-								Type:     constant.ProcessTypeWeb,
-								Command:  *types.NewFilteredString("some-command-1"),
-								DiskInMB: types.NullUint64{IsSet: true, Value: 64},
+								Type:               constant.ProcessTypeWeb,
+								Command:            *types.NewFilteredString("some-command-1"),
+								MemoryInMB:         types.NullUint64{IsSet: true, Value: 512},
+								DiskInMB:           types.NullUint64{IsSet: true, Value: 64},
+								HealthCheckTimeout: 60,
+								Instances:          types.NullInt{IsSet: true, Value: 5},
+							},
+							InstanceDetails: []v7action.ProcessInstance{
+								{State: constant.ProcessInstanceRunning},
+								{State: constant.ProcessInstanceRunning},
+								{State: constant.ProcessInstanceCrashed},
+								{State: constant.ProcessInstanceRunning},
+								{State: constant.ProcessInstanceRunning},
 							},
 						},
 						{
 							Process: v7action.Process{
-								Type:     "console",
-								Command:  *types.NewFilteredString("some-command-2"),
-								DiskInMB: types.NullUint64{IsSet: true, Value: 16},
+								Type:               "console",
+								Command:            *types.NewFilteredString("some-command-2"),
+								MemoryInMB:         types.NullUint64{IsSet: true, Value: 256},
+								DiskInMB:           types.NullUint64{IsSet: true, Value: 16},
+								HealthCheckTimeout: 120,
+								Instances:          types.NullInt{IsSet: true, Value: 1},
+							},
+							InstanceDetails: []v7action.ProcessInstance{
+								{State: constant.ProcessInstanceRunning},
 							},
 						},
 					},
@@ -272,6 +289,12 @@ var _ = Describe("Server", func() {
 				Expect(result.BuildpackUrl).To(Equal("ruby_buildpack"))
 				Expect(result.Command).To(Equal("some-command-1"))
 				Expect(result.DiskQuota).To(Equal(int64(64)))
+				Expect(result.HealthCheckTimeout).To(Equal(60))
+				Expect(result.InstanceCount).To(Equal(5))
+				Expect(result.Memory).To(Equal(int64(512)))
+				Expect(result.RunningInstances).To(Equal(4))
+				Expect(result.SpaceGuid).To(Equal("some-space-guid"))
+				Expect(result.Stack.Name).To(Equal("some-stack"))
 			})
 
 			Context("when retrieving the app fails", func() {
