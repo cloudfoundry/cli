@@ -121,7 +121,7 @@ var _ = Describe("purge-service-offering command", func() {
 					spaceName = helpers.NewSpaceName()
 					helpers.SetupCF(orgName, spaceName)
 
-					broker = fakeservicebroker.New().Register()
+					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 				})
 
 				AfterEach(func() {
@@ -247,10 +247,10 @@ var _ = Describe("purge-service-offering command", func() {
 						spaceName = helpers.NewSpaceName()
 						helpers.SetupCF(orgName, spaceName)
 
-						broker1 = fakeservicebroker.New().Register()
+						broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
 						broker2 = fakeservicebroker.NewAlternate()
 						broker2.Services[0].Name = broker1.ServiceName()
-						broker2.Register()
+						broker2.EnsureBrokerIsAvailable()
 
 						session := helpers.CF("enable-service-access", broker1.ServiceName(), "-b", broker1.Name())
 						Eventually(session).Should(Exit(0))

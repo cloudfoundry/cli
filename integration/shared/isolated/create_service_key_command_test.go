@@ -119,7 +119,7 @@ var _ = Describe("create-service-key command", func() {
 			var broker *fakeservicebroker.FakeServiceBroker
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().Register()
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 				service = broker.ServiceName()
 				servicePlan = broker.ServicePlanName()
 

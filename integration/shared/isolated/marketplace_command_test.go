@@ -63,9 +63,9 @@ var _ = Describe("marketplace command", func() {
 						helpers.SetupCF(org, space)
 						helpers.TargetOrgAndSpace(org, space)
 
-						broker1 = fakeservicebroker.New().Register()
+						broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
 						enableServiceAccess(broker1)
-						broker2 = fakeservicebroker.NewAlternate().Register()
+						broker2 = fakeservicebroker.NewAlternate().EnsureBrokerIsAvailable()
 						enableServiceAccess(broker2)
 
 						helpers.LogoutCF()
@@ -128,7 +128,7 @@ var _ = Describe("marketplace command", func() {
 						helpers.SetupCF(org1, space1)
 						helpers.TargetOrgAndSpace(org1, space1)
 
-						broker1 = fakeservicebroker.New().Register()
+						broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
 						enableServiceAccessForOrg(broker1, org1)
 
 						org2 = helpers.NewOrgName()
@@ -136,7 +136,7 @@ var _ = Describe("marketplace command", func() {
 						helpers.CreateOrgAndSpace(org2, space2)
 						helpers.TargetOrgAndSpace(org2, space2)
 
-						broker2 = fakeservicebroker.NewAlternate().Register()
+						broker2 = fakeservicebroker.NewAlternate().EnsureBrokerIsAvailable()
 						enableServiceAccess(broker2)
 					})
 
@@ -247,7 +247,7 @@ var _ = Describe("marketplace command", func() {
 							space = helpers.NewSpaceName()
 							helpers.SetupCF(org, space)
 
-							broker = fakeservicebroker.New().Register()
+							broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 							enableServiceAccess(broker)
 
 							helpers.LogoutCF()
@@ -320,7 +320,7 @@ var _ = Describe("marketplace command", func() {
 								space = helpers.NewSpaceName()
 								helpers.SetupCF(org, space)
 
-								broker = fakeservicebroker.New().Register()
+								broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 								enableServiceAccess(broker)
 							})
 
@@ -352,7 +352,7 @@ var _ = Describe("marketplace command", func() {
 								space = helpers.NewSpaceName()
 								helpers.SetupCF(org, space)
 
-								broker = fakeservicebroker.New().Register()
+								broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 								enableServiceAccessForOrg(broker, org)
 
 								helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)

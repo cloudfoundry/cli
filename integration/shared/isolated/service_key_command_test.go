@@ -37,7 +37,7 @@ var _ = Describe("service-key command", func() {
 
 	When("the service key is not found", func() {
 		BeforeEach(func() {
-			broker = fakeservicebroker.New().Register()
+			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 			service = broker.ServiceName()
 			servicePlan = broker.ServicePlanName()
 

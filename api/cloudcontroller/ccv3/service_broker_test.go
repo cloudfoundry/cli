@@ -140,6 +140,99 @@ var _ = Describe("ServiceBroker", func() {
 		})
 	})
 
+	Describe("DeleteServiceBroker", func() {
+		var (
+			warnings          Warnings
+			executeErr        error
+			serviceBrokerGUID string
+		)
+
+		BeforeEach(func() {
+			serviceBrokerGUID = "some-service-broker-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.DeleteServiceBroker(serviceBrokerGUID)
+		})
+
+		When("the Cloud Controller successfully deletes the broker", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/service_brokers/some-service-broker-guid"),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the broker is space scoped", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/service_brokers/some-service-broker-guid"),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the Cloud Controller fails to delete the broker", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Service broker not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/service_brokers/some-service-broker-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns parsed errors and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Service broker not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("CreateServiceBroker", func() {
 		const (
 			name     = "name"

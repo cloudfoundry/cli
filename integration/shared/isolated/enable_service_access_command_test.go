@@ -144,7 +144,7 @@ var _ = Describe("enable service access command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 
-				broker = fakeservicebroker.New().Register()
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 				service = broker.ServiceName()
 				servicePlan = broker.ServicePlanName()
 			})
@@ -218,7 +218,7 @@ var _ = Describe("enable service access command", func() {
 					secondBroker = fakeservicebroker.NewAlternate()
 					secondBroker.Services[0].Name = service
 					secondBroker.Services[0].Plans[0].Name = servicePlan
-					secondBroker.Register()
+					secondBroker.EnsureBrokerIsAvailable()
 				})
 
 				AfterEach(func() {

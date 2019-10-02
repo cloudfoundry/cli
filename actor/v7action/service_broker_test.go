@@ -78,6 +78,76 @@ var _ = Describe("Service Broker Actions", func() {
 		})
 	})
 
+	Describe("GetServiceBrokerByName", func() {
+		var (
+			ccv3ServiceBrokers []ccv3.ServiceBroker
+			serviceBroker      ServiceBroker
+
+			serviceBroker1Name string
+			serviceBroker1Guid string
+
+			serviceBrokerNotTheOneYouWant string
+			notTheBrokerYouAreLookingFor  string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			serviceBroker1Name = "broker-name"
+			serviceBroker1Guid = "broker-guid"
+
+			ccv3ServiceBrokers = []ccv3.ServiceBroker{
+				{Name: serviceBrokerNotTheOneYouWant, GUID: notTheBrokerYouAreLookingFor},
+				{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
+			}
+		})
+
+		JustBeforeEach(func() {
+			serviceBroker, warnings, executeErr = actor.GetServiceBrokerByName(serviceBroker1Name)
+		})
+
+		When("the API layer call is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					ccv3ServiceBrokers,
+					ccv3.Warnings{"some-service-broker-warning"},
+					nil,
+				)
+			})
+
+			It("returns back the serviceBrokers and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+
+				Expect(serviceBroker).To(Equal(
+					ServiceBroker{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
+				))
+				Expect(warnings).To(ConsistOf("some-service-broker-warning"))
+
+			})
+		})
+
+		When("when the API layer call returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ccv3.ServiceBroker{},
+					ccv3.Warnings{"some-service-broker-warning"},
+					errors.New("list-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("list-error"))
+				Expect(warnings).To(ConsistOf("some-service-broker-warning"))
+				Expect(serviceBroker).To(Equal(ServiceBroker{}))
+
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+			})
+		})
+	})
+
 	Describe("CreateServiceBroker", func() {
 		const (
 			name      = "name"
@@ -157,6 +227,48 @@ var _ = Describe("Service Broker Actions", func() {
 				fakeCloudControllerClient.CreateServiceBrokerReturns(
 					"", ccv3.Warnings{"some-other-warning"}, errors.New("invalid broker"),
 				)
+			})
+
+			It("fails and returns warnings", func() {
+				Expect(executionError).To(MatchError("invalid broker"))
+
+				Expect(warnings).To(ConsistOf("some-other-warning"))
+			})
+		})
+	})
+
+	Describe("DeleteServiceBroker", func() {
+		var (
+			serviceBrokerGUID = "some-service-broker-guid"
+			warnings          Warnings
+			executionError    error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executionError = actor.DeleteServiceBroker(serviceBrokerGUID)
+		})
+
+		When("the client request is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteServiceBrokerReturns(ccv3.Warnings{"some-deletion-warning"}, nil)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executionError).NotTo(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("some-deletion-warning"))
+			})
+
+			It("passes the service broker credentials to the client", func() {
+				Expect(fakeCloudControllerClient.DeleteServiceBrokerCallCount()).To(Equal(1))
+				actualServiceBrokerGUID := fakeCloudControllerClient.DeleteServiceBrokerArgsForCall(0)
+				Expect(actualServiceBrokerGUID).To(Equal(serviceBrokerGUID))
+			})
+		})
+
+		When("the client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteServiceBrokerReturns(ccv3.Warnings{"some-other-warning"}, errors.New("invalid broker"))
 			})
 
 			It("fails and returns warnings", func() {

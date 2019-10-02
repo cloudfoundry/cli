@@ -182,7 +182,7 @@ var _ = Describe("create-service command", func() {
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Register()
+					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 					service = broker.ServiceName()
 					servicePlan = broker.ServicePlanName()
 
@@ -296,7 +296,7 @@ var _ = Describe("create-service command", func() {
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Async().Register()
+					broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 					service = broker.ServiceName()
 					servicePlan = broker.ServicePlanName()
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
@@ -327,13 +327,13 @@ var _ = Describe("create-service command", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 
-					broker1 = fakeservicebroker.New().Register()
+					broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
 					service = broker1.ServiceName()
 					servicePlan = broker1.ServicePlanName()
 					broker2 = fakeservicebroker.NewAlternate()
 					broker2.Services[0].Name = service
 					broker2.Services[0].Plans[0].Name = servicePlan
-					broker2.Register()
+					broker2.EnsureBrokerIsAvailable()
 
 					Eventually(helpers.CF("enable-service-access", service, "-b", broker1.Name())).Should(Exit(0))
 					Eventually(helpers.CF("enable-service-access", service, "-b", broker2.Name())).Should(Exit(0))

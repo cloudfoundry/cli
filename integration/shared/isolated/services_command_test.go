@@ -79,7 +79,7 @@ var _ = Describe("services command", func() {
 			Eventually(helpers.CF("cups", userProvidedService1, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
 			Eventually(helpers.CF("cups", userProvidedService2, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
 
-			broker = fakeservicebroker.New().Register()
+			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 
 			managedService1 = helpers.PrefixedRandomName("MANAGED1")
@@ -179,7 +179,7 @@ var _ = Describe("services command", func() {
 			planWithNoMaintenanceInfo = broker.Services[0].Plans[1].Name
 			broker.Services[0].Plans[1].RemoveMaintenanceInfo()
 
-			broker.Register()
+			broker.EnsureBrokerIsAvailable()
 
 			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 

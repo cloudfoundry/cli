@@ -127,7 +127,7 @@ var _ = Describe("unbind-service command", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 
-					broker = fakeservicebroker.New().Async().Register()
+					broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 					service = broker.ServiceName()
 					servicePlan = broker.ServicePlanName()
 
@@ -163,7 +163,7 @@ var _ = Describe("unbind-service command", func() {
 
 			When("the unbinding is blocking", func() {
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().Register()
+					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 					service = broker.ServiceName()
 					servicePlan = broker.ServicePlanName()
 

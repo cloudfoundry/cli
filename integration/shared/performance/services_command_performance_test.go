@@ -34,7 +34,7 @@ var _ = Describe("services command performance", func() {
 		fmt.Printf("Number of samples (MAX_EXECUTIONS): %d\n", maxExecutions)
 		fmt.Printf("Number of service instances (NUMBER_OF_SERVICE_INSTANCES): %d\n", numberOfServices)
 
-		broker = fakeservicebroker.New().Register()
+		broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 
 		Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 

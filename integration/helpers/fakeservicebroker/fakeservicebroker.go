@@ -1,13 +1,50 @@
+// fakeservicebroker is a test helper for service broker tests. It can push an App that acts as a service broker, and
+// as an optimisation, it will reuse the same App so that multiple pushes aren't necessary. This saves significant time
+// when running tests.
+//
+// To make use of this optimisation, set 'KEEP_FAKE_SERVICE_BROKERS' to 'true'
 package fakeservicebroker
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gexec"
 )
+
+// Setup should be run in a SynchronisedBeforeSuite() to create the org and space,
+// otherwise the tests become flaky.
+func Setup() {
+	helpers.WithRandomHomeDir(func() {
+		helpers.SetAPI()
+		helpers.LoginCF()
+		helpers.CreateOrgAndSpaceUnlessExists(itsOrg, itsSpace)
+	})
+}
+
+// Cleanup should be run in a SynchronizedAfterSuite() to clean up the reusable broker apps
+func Cleanup() {
+	helpers.WithRandomHomeDir(func() {
+		helpers.SetAPI()
+		helpers.LoginCF()
+		helpers.CreateOrgAndSpaceUnlessExists(itsOrg, itsSpace)
+		helpers.TargetOrgAndSpace(itsOrg, itsSpace)
+
+		broker := New()
+		otherBroker := NewAlternate()
+
+		if os.Getenv("KEEP_FAKE_SERVICE_BROKERS") != "true" {
+			broker.stopReusing()
+			otherBroker.stopReusing()
+		}
+
+		broker.cleanup()
+		otherBroker.cleanup()
+	})
+}
 
 type FakeServiceBroker struct {
 	name      string
@@ -17,127 +54,26 @@ type FakeServiceBroker struct {
 	reusable  bool
 }
 
+// New creates a default object that can then be configured
 func New() *FakeServiceBroker {
-	integrationNameGenerator := func() string {
-		return helpers.PrefixedRandomName("INTEGRATION-PLAN")
-	}
-
-	firstPlanName := integrationNameGenerator()
-
-	return &FakeServiceBroker{
-		name:     generateReusableBrokerName(""),
-		reusable: true,
-		domain:   helpers.DefaultSharedDomain(),
-		Services: []service{
-			{
-				Name:                 helpers.PrefixedRandomName("INTEGRATION-SERVICE"),
-				ID:                   helpers.RandomName(),
-				Description:          helpers.PrefixedRandomName("fake service description"),
-				Bindable:             true,
-				InstancesRetrievable: true,
-				BindingsRetrievable:  true,
-				Metadata: metadata{
-					Shareable:        true,
-					DocumentationURL: "http://documentation.url",
-				},
-				Requires: []string{},
-				Plans: []plan{
-					{
-						Name:        firstPlanName,
-						ID:          helpers.RandomName(),
-						Description: helpers.PrefixedRandomName("fake plan description"),
-						MaintenanceInfo: &maintenanceInfo{
-							Version:     "2.0.0",
-							Description: "OS image update.\nExpect downtime.",
-						},
-					},
-					{
-						Name:        helpers.GenerateHigherName(integrationNameGenerator, firstPlanName),
-						ID:          helpers.RandomName(),
-						Description: helpers.PrefixedRandomName("fake plan description"),
-						MaintenanceInfo: &maintenanceInfo{
-							Version:     "2.0.0",
-							Description: "OS image update.\nExpect downtime.",
-						},
-					},
-				},
-			},
-		},
-		behaviors: behaviors{
-			Provision: map[string]responseMock{
-				"default": syncResponse().
-					withBody(map[string]interface{}{
-						"dashboard_url": "http://example.com",
-					}),
-			},
-			Fetch: map[string]map[string]responseMock{
-				"default": {
-					"in_progress": syncResponse().
-						withBody(map[string]interface{}{
-							"state":       "in progress",
-							"description": "not 100 percent done",
-						}),
-					"finished": syncResponse().
-						withBody(map[string]interface{}{
-							"state":       "succeeded",
-							"description": "100 percent done",
-						}),
-				},
-			},
-			Update: map[string]responseMock{
-				"default": syncResponse(),
-			},
-			Deprovision: map[string]responseMock{
-				"default": syncResponse(),
-			},
-			Bind: map[string]responseMock{
-				"default": syncResponse().
-					withStatus(http.StatusCreated).
-					withBody(map[string]interface{}{
-						"credentials": map[string]interface{}{
-							"uri":      "fake-service://fake-user:fake-password@fake-host:3306/fake-dbname",
-							"username": "fake-user",
-							"password": "fake-password",
-							"host":     "fake-host",
-							"port":     3306,
-							"database": "fake-dbname",
-						},
-					}),
-			},
-			FetchServiceBinding: map[string]responseMock{
-				"default": syncResponse().
-					withBody(map[string]interface{}{
-						"credentials": map[string]interface{}{
-							"uri":      "fake-service://fake-user:fake-password@fake-host:3306/fake-dbname",
-							"username": "fake-user",
-							"password": "fake-password",
-							"host":     "fake-host",
-							"port":     3306,
-							"database": "fake-dbname",
-						},
-					}),
-			},
-			Unbind: map[string]responseMock{
-				"default": syncResponse(),
-			},
-		},
-	}
+	return defaultConfig()
 }
 
 // NewAlternate returns a reusable broker with another name. Can be used in conjunction with New() if you need two brokers in the same test.
 func NewAlternate() *FakeServiceBroker {
-	f := New()
+	f := defaultConfig()
 	f.name = generateReusableBrokerName("other-")
 	return f
 }
 
+// WithName has the side-effect that the broker is not reusable
 func (f *FakeServiceBroker) WithName(name string) *FakeServiceBroker {
 	f.name = name
 	f.reusable = false
 	return f
 }
 
-func (f *FakeServiceBroker) Async() *FakeServiceBroker {
+func (f *FakeServiceBroker) WithAsyncBehaviour() *FakeServiceBroker {
 	f.behaviors.Provision["default"] = asyncResponse()
 	f.behaviors.Update["default"] = asyncResponse()
 	f.behaviors.Deprovision["default"] = asyncResponse()
@@ -146,17 +82,24 @@ func (f *FakeServiceBroker) Async() *FakeServiceBroker {
 	return f
 }
 
-func (f *FakeServiceBroker) Deploy() *FakeServiceBroker {
+// EnsureAppIsDeployed makes the fake service broker app available and does not run 'cf create-service-broker'
+func (f *FakeServiceBroker) EnsureAppIsDeployed() *FakeServiceBroker {
 	f.pushAppIfNecessary()
 	f.deregisterIgnoringFailures()
 	f.configure()
 	return f
 }
 
-func (f *FakeServiceBroker) Register() *FakeServiceBroker {
-	f.Deploy()
+// EnsureBrokerIsAvailable makes the service broker app available and runs 'cf create-service-broker'
+func (f *FakeServiceBroker) EnsureBrokerIsAvailable() *FakeServiceBroker {
+	f.EnsureAppIsDeployed()
 	f.register()
 	return f
+}
+
+func (f *FakeServiceBroker) EnableServiceAccess() {
+	session := helpers.CF("enable-service-access", f.ServiceName())
+	Eventually(session).Should(Exit(0))
 }
 
 func (f *FakeServiceBroker) Update() *FakeServiceBroker {
@@ -165,6 +108,8 @@ func (f *FakeServiceBroker) Update() *FakeServiceBroker {
 	return f
 }
 
+// Destroy always deletes the broker and app, meaning it can't be reused. In general you should not destroy brokers
+// as it makes tests slower.
 func (f *FakeServiceBroker) Destroy() {
 	f.deregister()
 	f.deleteApp()
@@ -192,32 +137,4 @@ func (f *FakeServiceBroker) ServicePlanName() string {
 
 func (f *FakeServiceBroker) Name() string {
 	return f.name
-}
-
-func Setup() {
-	helpers.WithRandomHomeDir(func() {
-		helpers.SetAPI()
-		helpers.LoginCF()
-		helpers.CreateOrgAndSpaceUnlessExists(itsOrg, itsSpace)
-	})
-}
-
-func Cleanup() {
-	helpers.WithRandomHomeDir(func() {
-		helpers.SetAPI()
-		helpers.LoginCF()
-		helpers.CreateOrgAndSpaceUnlessExists(itsOrg, itsSpace)
-		helpers.TargetOrgAndSpace(itsOrg, itsSpace)
-
-		broker := New()
-		otherBroker := NewAlternate()
-
-		if os.Getenv("KEEP_FAKE_SERVICE_BROKERS") != "true" {
-			broker.stopReusing()
-			otherBroker.stopReusing()
-		}
-
-		broker.cleanup()
-		otherBroker.cleanup()
-	})
 }

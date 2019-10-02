@@ -49,7 +49,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 		var broker *fakeservicebroker.FakeServiceBroker
 
 		BeforeEach(func() {
-			broker = fakeservicebroker.New().Register()
+			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 
 			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), managedServiceInstanceName)).Should(Exit(0))
