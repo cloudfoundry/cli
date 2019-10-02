@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -172,7 +173,22 @@ var _ = Describe("create buildpack Command", func() {
 					Expect(path).To(Equal(buildpackPath))
 				})
 
-				When("Uploading the buildpack fails due to an error", func() {
+				When("uploading the buildpack fails due to an auth token expired error", func() {
+					BeforeEach(func() {
+						fakeActor.UploadBuildpackReturns(
+							ccv3.JobURL(""),
+							v7action.Warnings{"some-create-bp-with-auth-warning"},
+							ccerror.InvalidAuthTokenError{Message: "token expired"},
+						)
+					})
+
+					It("alerts the user and retries the upload", func() {
+						Expect(testUI.Err).To(Say("Failed to upload buildpack due to auth token expiration, retrying..."))
+						Expect(fakeActor.UploadBuildpackCallCount()).To(Equal(2))
+					})
+				})
+
+				When("Uploading the buildpack fails due to a generic error", func() {
 					BeforeEach(func() {
 						fakeActor.UploadBuildpackReturns(
 							ccv3.JobURL(""),

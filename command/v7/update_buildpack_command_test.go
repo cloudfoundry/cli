@@ -437,17 +437,31 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 						})
 
 						When("uploading the buildpack fails", func() {
-							BeforeEach(func() {
-								expectedErr = errors.New("upload error")
-								fakeActor.UploadBuildpackReturns("", v7action.Warnings{"upload-warning1", "upload-warning2"}, expectedErr)
+
+							When("the client returns invalid auth token", func() {
+								BeforeEach(func() {
+									fakeActor.UploadBuildpackReturns("", v7action.Warnings{"some-create-bp-with-auth-warning"}, ccerror.InvalidAuthTokenError{Message: "token expired"})
+								})
+
+								It("alerts the user and retries the upload", func() {
+									Expect(testUI.Err).To(Say("Failed to upload buildpack due to auth token expiration, retrying..."))
+									Expect(fakeActor.UploadBuildpackCallCount()).To(Equal(2))
+								})
 							})
 
-							It("returns all warnings and an error", func() {
-								Expect(testUI.Err).To(Say("update-bp-warning1"))
-								Expect(testUI.Err).To(Say("update-bp-warning2"))
-								Expect(testUI.Err).To(Say("upload-warning1"))
-								Expect(testUI.Err).To(Say("upload-warning2"))
-								Expect(executeErr).To(MatchError(expectedErr))
+							When("a non token error occurs", func() {
+								BeforeEach(func() {
+									expectedErr = errors.New("upload error")
+									fakeActor.UploadBuildpackReturns("", v7action.Warnings{"upload-warning1", "upload-warning2"}, expectedErr)
+								})
+
+								It("returns all warnings and an error", func() {
+									Expect(testUI.Err).To(Say("update-bp-warning1"))
+									Expect(testUI.Err).To(Say("update-bp-warning2"))
+									Expect(testUI.Err).To(Say("upload-warning1"))
+									Expect(testUI.Err).To(Say("upload-warning2"))
+									Expect(executeErr).To(MatchError(expectedErr))
+								})
 							})
 						})
 

@@ -326,17 +326,15 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 	if err != nil {
 		return Warnings{}, err
 	}
+	defer progBar.Terminate()
 
 	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, pathToBuildpackBits, progressBarReader, size)
 	if err != nil {
 		if e, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
 			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: e.Message}
 		}
-		return Warnings(warnings), err
 	}
-
-	progBar.Terminate()
-	return Warnings(warnings), nil
+	return Warnings(warnings), err
 }
 
 func (actor *Actor) UploadBuildpackFromPath(inputPath, buildpackGUID string, progressBar SimpleProgressBar) (Warnings, error) {

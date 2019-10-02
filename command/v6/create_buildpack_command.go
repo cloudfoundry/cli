@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -107,6 +108,10 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	})
 
 	uploadWarnings, err := cmd.Actor.UploadBuildpack(buildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
+	if _, ok := err.(ccerror.InvalidAuthTokenError); ok {
+		cmd.UI.DisplayWarnings([]string{"Failed to upload buildpack due to auth token expiration, retrying..."})
+		uploadWarnings, err = cmd.Actor.UploadBuildpack(buildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
+	}
 	cmd.UI.DisplayWarnings(uploadWarnings)
 	if err != nil {
 		cmd.UI.DisplayNewline()

@@ -120,6 +120,8 @@ func (actor Actor) UploadBuildpack(guid string, pathToBuildpackBits string, prog
 		return "", Warnings{}, err
 	}
 
+	defer progressBar.Terminate()
+
 	jobURL, warnings, err := actor.CloudControllerClient.UploadBuildpack(guid, pathToBuildpackBits, wrappedReader, size)
 	if err != nil {
 		// TODO: Do we actually want to convert this error? Is this the right place?
@@ -128,9 +130,6 @@ func (actor Actor) UploadBuildpack(guid string, pathToBuildpackBits string, prog
 		}
 		return "", Warnings(warnings), err
 	}
-
-	// TODO: Should we defer the terminate instead?
-	progressBar.Terminate()
 
 	return jobURL, Warnings(warnings), nil
 }
