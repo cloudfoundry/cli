@@ -1861,4 +1861,57 @@ var _ = Describe("Application Actions", func() {
 		})
 
 	})
+	Describe("UpdateSSH", func() {
+		var (
+			app = Application{GUID: "some-app-guid"}
+			enabled = true
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateSSH(app, true)
+		})
+
+		When("the app exists", func() {
+			It("calls ccv3 to enable ssh", func() {
+				Expect(fakeCloudControllerClient.UpdateSSHCallCount()).To(Equal(1))
+				actualApp, actualEnabled := fakeCloudControllerClient.UpdateSSHArgsForCall(0)
+				Expect(actualApp).To(Equal(app.GUID))
+				Expect(actualEnabled).To(Equal(enabled))
+			})
+
+			When("the API layer call is successful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSSHReturns(ccv3.Warnings{"some-update-ssh-warning"}, nil)
+				})
+
+				It("does not error", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-update-ssh-warning"))
+				})
+			})
+
+
+			When("when the API layer call returns an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSSHReturns(
+						ccv3.Warnings{"some-update-ssh-warning"},
+						errors.New("some-update-ssh-error"),
+					)
+				})
+
+				It("returns the error and prints warnings", func() {
+					Expect(executeErr).To(MatchError("some-update-ssh-error"))
+					Expect(warnings).To(ConsistOf("some-update-ssh-warning"))
+
+					Expect(fakeCloudControllerClient.UpdateSSHCallCount()).To(Equal(1))
+				})
+
+			})
+		})
+	})
 })

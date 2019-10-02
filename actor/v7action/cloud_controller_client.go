@@ -42,6 +42,7 @@ type CloudControllerClient interface {
 	DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	DeleteSpace(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteUser(userGUID string) (ccv3.Warnings, error)
+	UpdateSSH(appGUID string, enabled bool) (ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetApplicationEnvironment(appGUID string) (ccv3.Environment, ccv3.Warnings, error)

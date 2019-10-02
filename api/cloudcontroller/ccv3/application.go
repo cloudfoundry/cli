@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -28,6 +29,13 @@ type Application struct {
 	Relationships Relationships
 	// State is the desired state of the application.
 	State constant.ApplicationState
+}
+
+type ApplicationFeature struct {
+	// Name of the application feature
+	Name string
+
+	Enabled bool
 }
 
 // MarshalJSON converts an Application into a Cloud Controller Application.
@@ -258,4 +266,43 @@ func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnin
 	err = client.connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
+}
+
+// UpdateSSH enables/disables the ability to ssh for a given application.
+func (client *Client) UpdateSSH(appGUID string, enabled bool) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchApplicationFeaturesRequest,
+		Body:        bytes.NewReader([]byte(fmt.Sprintf(`{"enabled":%t}`, enabled))),
+		URIParams:   map[string]string{"app_guid": appGUID, "name": "ssh"},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{
+	}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}
+
+func (client *Client) GetSSH(appGUID string) (ApplicationFeature, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetApplicationFeaturesRequest,
+		URIParams:   map[string]string{"app_guid": appGUID, "name": "ssh"},
+	})
+
+	if err != nil {
+		return ApplicationFeature{}, nil, err
+	}
+
+	var applicationFeature ApplicationFeature
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &applicationFeature,
+	}
+
+	_ = client.connection.Make(request, &response)
+
+	return applicationFeature, response.Warnings, nil
 }

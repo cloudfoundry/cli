@@ -212,7 +212,7 @@ var _ = Describe("delete-user Command", func() {
 				})
 			})
 
-			When("when everything succeeds", func() {
+			When("when everything succeeds", func() { // TODO: is this at the wrong place?
 				var returnedErr error
 
 				BeforeEach(func() {

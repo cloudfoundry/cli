@@ -461,3 +461,8 @@ func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spac
 
 	return application, allWarnings, nil
 }
+
+func (actor Actor) UpdateSSH(app Application, enabled bool) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.UpdateSSH(app.GUID, enabled)
+	return Warnings(warnings), err
+}
