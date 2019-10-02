@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"reflect"
 	"sync"
 
 	"code.cloudfoundry.org/cli/command"
@@ -74,8 +75,10 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) error {
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, spaceGUID, true)
+	assignableValue := plugin_models.Application(app)
 
-	retVal.Name = app.Name
+	to := reflect.ValueOf(retVal).Elem()
+	to.Set(reflect.ValueOf(assignableValue))
 
 	return err
 }

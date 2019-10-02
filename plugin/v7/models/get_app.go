@@ -2,6 +2,6 @@
 
 package models
 
-type Application struct {
-	Name string
-}
+import "code.cloudfoundry.org/cli/actor/v7action"
+
+type Application v7action.DetailedApplicationSummary

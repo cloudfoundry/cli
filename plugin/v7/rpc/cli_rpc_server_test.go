@@ -175,6 +175,7 @@ var _ = Describe("Server", func() {
 		var (
 			fakeAppActor *v7fakes.FakeAppActor
 			fakeConfig   *commandfakes.FakeConfig
+			summary      v7action.DetailedApplicationSummary
 		)
 
 		BeforeEach(func() {
@@ -191,7 +192,7 @@ var _ = Describe("Server", func() {
 
 			pingCli(rpcService.Port())
 
-			summary := v7action.DetailedApplicationSummary{
+			summary = v7action.DetailedApplicationSummary{
 				ApplicationSummary: v7action.ApplicationSummary{
 					Application: v7action.Application{
 						GUID:      "some-app-guid",
@@ -284,6 +285,8 @@ var _ = Describe("Server", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(result.Name).To(Equal("some-app"))
+				//fmt.Fprintf(os.Stdout, "%+v", result)
+				Expect(result).To(BeEquivalentTo(summary))
 			})
 
 			Context("when retrieving the app fails", func() {
