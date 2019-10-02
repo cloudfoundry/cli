@@ -19,7 +19,9 @@ var _ = Describe("push with different buildpack values", func() {
 	var (
 		appName string
 	)
+
 	staticFileGitRepo := "https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44"
+	rubyBuildpackGitRepo := "https://github.com/cloudfoundry/ruby-buildpack#v1.7.44"
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
@@ -233,7 +235,7 @@ var _ = Describe("push with different buildpack values", func() {
 							{
 								"name": appName,
 								"buildpacks": []string{
-									"https://github.com/cloudfoundry/ruby-buildpack",
+									rubyBuildpackGitRepo,
 									staticFileGitRepo,
 								},
 							},
@@ -245,7 +247,7 @@ var _ = Describe("push with different buildpack values", func() {
 
 				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
 
-				Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack`))
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack#v1.7.44`))
 				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack#v1.4.44`))
 				Eventually(session).Should(Exit(0))
 			})
