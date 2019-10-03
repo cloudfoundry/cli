@@ -180,11 +180,12 @@ var _ = Describe("push with different buildpack values", func() {
 					})
 
 					session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
-
-					Eventually(session).Should(Say(`\s+"buildpacks":\s+`))
-					Eventually(session).Should(Say(`php_buildpack`))
-					Eventually(session).Should(Say(`go_buildpack`))
 					Eventually(session).Should(Exit(0))
+
+					Expect(session).Should(Say(`\s+"buildpacks":\s+`))
+					Expect(session).ShouldNot(Say(`staticfile_buildpack`))
+					Expect(session).Should(Say(`php_buildpack`))
+					Expect(session).Should(Say(`go_buildpack`))
 				})
 			})
 

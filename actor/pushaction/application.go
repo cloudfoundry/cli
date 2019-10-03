@@ -165,7 +165,7 @@ func (actor Actor) ignoreSameStackGUID(config ApplicationConfig, v2App v2action.
 func (Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
 	buildpacks := config.DesiredApplication.Buildpacks
 
-	if len(buildpacks) == 1 {
+	if len(buildpacks) >= 1 {
 		var filtered types.FilteredString
 		filtered.ParseValue(buildpacks[0])
 		return filtered

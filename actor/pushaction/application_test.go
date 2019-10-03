@@ -296,11 +296,11 @@ var _ = Describe("Applications", func() {
 					fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"update-warning"}, nil)
 				})
 
-				It("does not set buildpack", func() {
+				It("sets the first provided buildpack", func() {
 					Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
 					submitApp := fakeV2Actor.UpdateApplicationArgsForCall(0)
 					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
-						"Buildpack": Equal(types.FilteredString{}),
+						"Buildpack": Equal(types.FilteredString{IsSet: true, Value: "ruby"}),
 					}))
 
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
@@ -482,11 +482,11 @@ var _ = Describe("Applications", func() {
 					fakeV2Actor.CreateApplicationReturns(createdApplication, v2action.Warnings{"create-warning"}, nil)
 				})
 
-				It("does not set buildpack", func() {
+				It("sets the first provided buildpack", func() {
 					Expect(fakeV2Actor.CreateApplicationCallCount()).To(Equal(1))
 					submitApp := fakeV2Actor.CreateApplicationArgsForCall(0)
 					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
-						"Buildpack": Equal(types.FilteredString{}),
+						"Buildpack": Equal(types.FilteredString{IsSet: true, Value: "ruby"}),
 					}))
 
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(createdApplication))
