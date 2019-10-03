@@ -4,9 +4,8 @@ package rpc
 
 import (
 	"bytes"
-	"errors"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"sync"
 
@@ -76,18 +75,18 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedApplicationSummary) error {
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, spaceGUID, true)
+	if err != nil {
+		return err
+	}
 
 	b, err := json.Marshal(app)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(b))
-
-  err = json.Unmarshal(b, retVal)
+	err = json.Unmarshal(b, retVal)
 	if err != nil {
 		panic(err)
 	}
-
-	return err
+	return nil
 }

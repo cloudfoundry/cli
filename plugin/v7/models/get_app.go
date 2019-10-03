@@ -3,8 +3,9 @@
 package models
 
 import (
-	"code.cloudfoundry.org/cli/types"
 	"time"
+
+	"code.cloudfoundry.org/cli/types"
 )
 
 type Metadata struct {
@@ -48,17 +49,17 @@ type Sidecar struct {
 type ProcessInstanceState string
 
 type ProcessInstance struct {
-	CPU float64
-	Details string
-	DiskQuota uint64
-	DiskUsage uint64
-	Index int64
+	CPU              float64
+	Details          string
+	DiskQuota        uint64
+	DiskUsage        uint64
+	Index            int64
 	IsolationSegment string
-	MemoryQuota uint64
-	MemoryUsage uint64
-	State ProcessInstanceState
-	Type string
-	Uptime time.Duration
+	MemoryQuota      uint64
+	MemoryUsage      uint64
+	State            ProcessInstanceState
+	Type             string
+	Uptime           time.Duration
 }
 
 type ProcessSummary struct {
@@ -92,7 +93,7 @@ type DropletState string
 
 type DropletBuildpack struct {
 	Name         string
-	DetectOutput string
+	DetectOutput string `json:"detect_output"`
 }
 
 type Droplet struct {

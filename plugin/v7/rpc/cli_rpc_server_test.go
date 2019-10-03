@@ -279,12 +279,11 @@ var _ = Describe("Server", func() {
 				Expect(withObfuscatedValues).To(BeTrue())
 			})
 
-			FIt("populates the plugin model with the retrieved app", func() {
+			It("populates the plugin model with the retrieved app", func() {
 				result := plugin_models.DetailedApplicationSummary{}
 				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(result.Name).To(Equal("some-app"))
 				//fmt.Fprintf(os.Stdout, "%+v", result)
 				Expect(result).To(BeEquivalentTo(summary))
 			})
