@@ -268,7 +268,7 @@ var _ = Describe("Server", func() {
 		Describe("GetApp", func() {
 
 			It("retrieves the app summary", func() {
-				result := plugin_models.Application{}
+				result := plugin_models.DetailedApplicationSummary{}
 				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -279,8 +279,8 @@ var _ = Describe("Server", func() {
 				Expect(withObfuscatedValues).To(BeTrue())
 			})
 
-			It("populates the plugin model with the retrieved app", func() {
-				result := plugin_models.Application{}
+			FIt("populates the plugin model with the retrieved app", func() {
+				result := plugin_models.DetailedApplicationSummary{}
 				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -294,7 +294,7 @@ var _ = Describe("Server", func() {
 					fakeAppActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, nil, errors.New("some-error"))
 				})
 				It("returns an error", func() {
-					result := plugin_models.Application{}
+					result := plugin_models.DetailedApplicationSummary{}
 					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 					Expect(err).To(MatchError("some-error"))
 				})

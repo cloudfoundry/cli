@@ -5,8 +5,9 @@ package rpc
 import (
 	"bytes"
 	"errors"
+	"encoding/json"
+	"fmt"
 	"io"
-	"reflect"
 	"sync"
 
 	"code.cloudfoundry.org/cli/command"
@@ -72,13 +73,21 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return errors.New("unimplemented")
 }
 
-func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.Application) error {
+func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedApplicationSummary) error {
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, spaceGUID, true)
-	assignableValue := plugin_models.Application(app)
 
-	to := reflect.ValueOf(retVal).Elem()
-	to.Set(reflect.ValueOf(assignableValue))
+	b, err := json.Marshal(app)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(b))
+
+  err = json.Unmarshal(b, retVal)
+	if err != nil {
+		panic(err)
+	}
 
 	return err
 }
