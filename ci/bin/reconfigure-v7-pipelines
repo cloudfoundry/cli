@@ -53,3 +53,4 @@ configure_pipeline V7 $pipelines_path/cli-v7/pipeline.yml
 configure_v7_infrastructure_pipeline inf-delfina delfina-pipeline mashed-potato
 configure_v7_infrastructure_pipeline inf-nopa nopa-pipeline mashed-potato
 configure_v7_infrastructure_pipeline inf-zerozero zerozero-pipeline mashed-potato
+configure_v7_infrastructure_pipeline inf-zuni zuni-pipeline mashed-potato
