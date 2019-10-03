@@ -16,7 +16,7 @@ type Plugin interface {
 	List of commands available to CliConnection variable passed into run
 **/
 type CliConnection interface {
-	GetApp(string) (plugin_models.Application, error)
+	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
 }
 
 type VersionType struct {
