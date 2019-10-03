@@ -1,9 +1,6 @@
 package v7
 
 import (
-	"fmt"
-	"strings"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
@@ -87,42 +84,14 @@ func (cmd EventsCommand) Execute(_ []string) error {
 
 	for _, event := range events {
 		table = append(table, []string{
-			event.CreatedAt.Local().Format("2006-01-02T15:04:05.00-0700"),
+			event.Time.Local().Format("2006-01-02T15:04:05.00-0700"),
 			event.Type,
 			event.ActorName,
-			formatDescription(event.Data, knownDataKeys),
+			event.Description,
 		})
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	return nil
-}
-
-var knownDataKeys = []string{
-	"index",
-	"reason",
-	"cell_id",
-	"instance",
-	"exit_description",
-	"exit_status",
-	"recursive",
-	"disk_quota",
-	"instances",
-	"memory",
-	"state",
-	"command",
-	"environment_json",
-}
-
-func formatDescription(data map[string]interface{}, keys []string) string {
-	var parts []string
-
-	for _, key := range keys {
-		if value, ok := data[key]; ok {
-			parts = append(parts, fmt.Sprintf("%s: %v", key, value))
-		}
-	}
-
-	return strings.Join(parts, ", ")
 }

@@ -58,8 +58,8 @@ var _ = Describe("Event Actions", func() {
 			When("the cc client returns the list of events", func() {
 				BeforeEach(func() {
 					ccEvents := []ccv3.Event{
-						{GUID: "event-1", Type: "audit.app.wow"},
-						{GUID: "event-2", Type: "audit.app.cool"},
+						{GUID: "event-1", Type: "audit.app.wow", Data: map[string]interface{}{"index": "17"}},
+						{GUID: "event-2", Type: "audit.app.cool", Data: map[string]interface{}{"unimportant_key": "23"}},
 					}
 
 					ccWarnings := ccv3.Warnings{
@@ -75,8 +75,8 @@ var _ = Describe("Event Actions", func() {
 
 				It("returns the events and warnings", func() {
 					Expect(events).To(Equal([]Event{
-						{GUID: "event-1", Type: "audit.app.wow"},
-						{GUID: "event-2", Type: "audit.app.cool"},
+						{GUID: "event-1", Type: "audit.app.wow", Description: "index: 17"},
+						{GUID: "event-2", Type: "audit.app.cool", Description: ""},
 					}))
 					Expect(warnings).To(ConsistOf("some-app-warnings", "some-event-warnings"))
 					Expect(err).NotTo(HaveOccurred())

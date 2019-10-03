@@ -125,28 +125,14 @@ var _ = Describe("events Command", func() {
 					GUID:      "some-event-guid-1",
 					Type:      "audit.app.wow",
 					ActorName: "user1",
-					CreatedAt: createdAtOne,
+					Time:      createdAtOne,
 				},
 				{
-					GUID:      "some-event-guid-2",
-					Type:      "audit.app.cool",
-					ActorName: "user2",
-					CreatedAt: createdAtTwo,
-					Data: map[string]interface{}{
-						"index":            2,
-						"reason":           "test",
-						"cell_id":          1,
-						"instance":         4,
-						"exit_description": "test",
-						"exit_status":      3,
-						"disk_quota":       "2MB",
-						"instances":        5,
-						"memory":           "256MB",
-						"command":          "start",
-						"environment_json": "{\"key\":\"val\"}",
-						"ignored_key":      2,
-						"ignored_key_2":    "anything",
-					},
+					GUID:        "some-event-guid-2",
+					Type:        "audit.app.cool",
+					ActorName:   "user2",
+					Time:        createdAtTwo,
+					Description: `"hello": "world"`,
 				},
 			}
 
@@ -164,8 +150,7 @@ var _ = Describe("events Command", func() {
 			Expect(testUI.Out).To(Say(`time\s+event\s+actor\s+description`))
 			Expect(testUI.Out).To(Say(`%s\s+audit.app.wow\s+user1\s+`, regexp.QuoteMeta(createdAtOne.Local().Format("2006-01-02T15:04:05.00-0700"))))
 			Expect(testUI.Out).To(Say(`%s\s+audit.app.cool\s+user2\s+`, regexp.QuoteMeta(createdAtTwo.Local().Format("2006-01-02T15:04:05.00-0700"))))
-			Expect(testUI.Out).To(Say(`index: 2, reason: test, cell_id: 1, instance: 4, exit_description: test, exit_status: 3, `))
-			Expect(testUI.Out).To(Say(`disk_quota: 2MB, instances: 5, memory: 256MB, command: start, environment_json: {"key":"val"}`))
+			Expect(testUI.Out).To(Say(`"hello": "world"`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
