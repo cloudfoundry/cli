@@ -118,7 +118,7 @@ var _ = Describe("rename command", func() {
 					session := helpers.CF("rename", appName, appNameNew)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Renaming app %s to %s in org %s / space %s as %s...", appName, appNameNew, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say("name must be unique in space"))
+					Eventually(session.Err).Should(Say("App with the name '%s' already exists.", appNameNew))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
