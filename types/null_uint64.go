@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"strconv"
 )
 
@@ -23,6 +24,30 @@ func (n *NullUint64) ParseStringValue(val string) error {
 	}
 
 	n.Value = uint64Val
+	n.IsSet = true
+
+	return nil
+}
+
+func (n *NullUint64) UnmarshalJSON(rawJSON []byte) error {
+	var value json.Number
+	err := json.Unmarshal(rawJSON, &value)
+	if err != nil {
+		return err
+	}
+
+	if value.String() == "" {
+		n.Value = 0
+		n.IsSet = false
+		return nil
+	}
+
+	valueInt, err := strconv.ParseUint(value.String(), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	n.Value = valueInt
 	n.IsSet = true
 
 	return nil

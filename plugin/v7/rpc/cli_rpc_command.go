@@ -4,7 +4,7 @@ package rpc
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/gob"
 	"errors"
 	"io"
 	"sync"
@@ -79,12 +79,16 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 		return err
 	}
 
-	b, err := json.Marshal(app)
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(app)
 	if err != nil {
 		panic(err)
 	}
 
-	err = json.Unmarshal(b, retVal)
+	err = dec.Decode(&retVal)
 	if err != nil {
 		panic(err)
 	}

@@ -41,9 +41,9 @@ type Process struct {
 }
 
 type Sidecar struct {
-	GUID    string               `json:"guid"`
-	Name    string               `json:"name"`
-	Command types.FilteredString `json:"command"`
+	GUID    string
+	Name    string
+	Command types.FilteredString
 }
 
 type ProcessInstanceState string
@@ -93,7 +93,7 @@ type DropletState string
 
 type DropletBuildpack struct {
 	Name         string
-	DetectOutput string `json:"detect_output"`
+	DetectOutput string
 }
 
 type Droplet struct {
