@@ -1,0 +1,209 @@
+package readonly
+
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/integration/helpers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
+)
+
+var _ = Describe("domains command", func() {
+	Describe("help", func() {
+		It("appears in cf help -a", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(HaveCommandInCategoryWithDescription("domains", "DOMAINS", "List domains in the target org"))
+		})
+
+		When("--help flag is set", func() {
+			It("displays command usage to output", func() {
+				session := helpers.CF("domains", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say(`\s+domains - List domains in the target org`))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say(`\s+cf domains`))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say(`\s+create-private-domain, create-route, create-shared-domain, routes`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	When("user is not logged in", func() {
+		BeforeEach(func() {
+			helpers.LogoutCF()
+		})
+
+		It("displays an error message and fails", func() {
+			session := helpers.CF("domains")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	When("a random argument is passed to the command", func() {
+		It("displays an error message and fails", func() {
+			session := helpers.CF("domains", "random-arg")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say(`Incorrect Usage: unexpected argument "random-arg"`))
+			Eventually(session).Should(Say("NAME:"))
+			Eventually(session).Should(Say(`\s+domains - List domains in the target org`))
+			Eventually(session).Should(Say("USAGE:"))
+			Eventually(session).Should(Say(`\s+cf domains`))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	When("logged in", func() {
+		var userName string
+
+		BeforeEach(func() {
+			userName, _ = helpers.GetCredentials()
+		})
+
+		When("no org is targeted", func() {
+			BeforeEach(func() {
+				helpers.LoginCF()
+			})
+
+			It("displays an error message and fails", func() {
+				session := helpers.CF("domains")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.`))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("an org is targeted", func() {
+			var (
+				orgName       string
+				sharedDomain1 helpers.Domain
+				sharedDomain2 helpers.Domain
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName := helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				sharedDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName("a"))
+				sharedDomain1.CreateShared()
+
+				sharedDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
+				sharedDomain2.CreateShared()
+			})
+
+			When("the targeted org has shared domains", func() {
+				It("displays the shared domains and denotes that they are shared", func() {
+					session := helpers.CF("domains")
+
+					Eventually(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
+					Eventually(session).Should(Say(`name\s+availability\s+internal`))
+					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+					Eventually(session).Should(Exit(0))
+				})
+
+				When("the shared domain is internal", func() {
+					var internalDomainName string
+
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
+						internalDomainName = helpers.NewDomainName()
+						internalDomain := helpers.NewDomain(orgName, internalDomainName)
+						internalDomain.CreateInternal()
+					})
+
+					It("displays the internal flag on the shared domain", func() {
+						session := helpers.CF("domains")
+
+						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+						Eventually(session).Should(Say(`name\s+availability\s+internal`))
+						Eventually(session).Should(Say(`%s\s+shared\s+true`, internalDomainName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("the targeted org has a private domain", func() {
+				var privateDomain1, privateDomain2 helpers.Domain
+
+				BeforeEach(func() {
+					privateDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName("a"))
+					privateDomain1.Create()
+
+					privateDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
+					privateDomain2.Create()
+				})
+
+				It("displays the private domains", func() {
+					session := helpers.CF("domains")
+
+					Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+					Eventually(session).Should(Say(`name\s+availability\s+internal`))
+					Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain1.Name))
+					Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
+					Eventually(session).Should(Exit(0))
+				})
+
+				When("targeting a different org", func() {
+					var (
+						newOrgName     string
+						privateDomain3 helpers.Domain
+					)
+
+					BeforeEach(func() {
+						newOrgName = helpers.NewOrgName()
+						newSpaceName := helpers.NewSpaceName()
+						helpers.SetupCF(newOrgName, newSpaceName)
+
+						privateDomain3 = helpers.NewDomain(newOrgName, helpers.NewDomainName("c"))
+						privateDomain3.Create()
+					})
+
+					It("should not display the private domains of other orgs", func() {
+						session := helpers.CF("domains")
+
+						Eventually(session).Should(Say(`Getting domains in org %s as %s`, newOrgName, userName))
+						Eventually(session).Should(Say(`name\s+availability\s+internal`))
+
+						Consistently(session).ShouldNot(Say(`%s`, privateDomain1.Name))
+						Consistently(session).ShouldNot(Say(`%s`, privateDomain2.Name))
+
+						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+						Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain3.Name))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("logged in as a user that cannot see private domains", func() {
+					var userName string
+
+					BeforeEach(func() {
+						userName = helpers.SwitchToOrgRole(orgName, "BillingManager")
+						helpers.TargetOrg(orgName)
+					})
+
+					It("only prints the shared domains", func() {
+						session := helpers.CF("domains")
+
+						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+						Eventually(session).Should(Say(`name\s+availability\s+internal`))
+						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+
+						Consistently(session).ShouldNot(Say(privateDomain1.Name))
+						Consistently(session).ShouldNot(Say(privateDomain2.Name))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+		})
+	})
+})
