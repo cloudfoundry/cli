@@ -2,6 +2,9 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -140,9 +143,16 @@ var _ = Describe("create-app Command", func() {
 				})
 			})
 
-			Context("due to an ApplicationAlreadyExistsError", func() {
+			Context("due to NameNotUniqueInSpaceError{}", func() {
 				BeforeEach(func() {
-					fakeActor.CreateApplicationInSpaceReturns(v7action.Application{}, v7action.Warnings{"I am a warning", "I am also a warning"}, actionerror.ApplicationAlreadyExistsError{Name: app})
+					fakeActor.CreateApplicationInSpaceReturns(
+						v7action.Application{},
+						v7action.Warnings{"I am a warning", "I am also a warning"},
+						ccerror.NameNotUniqueInSpaceError{
+							UnprocessableEntityError: ccerror.UnprocessableEntityError{
+								Message: fmt.Sprintf("Application '%s' already exists.", app),
+							},
+						})
 				})
 
 				It("displays the header and ok", func() {

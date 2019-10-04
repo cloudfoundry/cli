@@ -134,12 +134,12 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	//idea to make route already exist error flexible for all relevant error cases
 	errorString := errorResponse.Detail
 	err := ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
+	appNameTakenRegexp := regexp.MustCompile(`App with the name '.*' already exists\.`)
 	orgNameTakenRegexp := regexp.MustCompile(`Organization '.*' already exists\.`)
 	// boolean switch case with partial/regex string matchers
 	switch {
-	case strings.Contains(errorString,
-		"name must be unique in space"):
-		return ccerror.NameNotUniqueInSpaceError{}
+	case appNameTakenRegexp.MatchString(errorString):
+		return ccerror.NameNotUniqueInSpaceError{UnprocessableEntityError: err}
 	case strings.Contains(errorString,
 		"Name must be unique per organization"):
 		return ccerror.NameNotUniqueInOrgError{}

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
@@ -115,9 +114,6 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		})
 
 	if err != nil {
-		if _, ok := err.(ccerror.NameNotUniqueInSpaceError); ok {
-			return Application{}, Warnings(warnings), actionerror.ApplicationAlreadyExistsError{Name: app.Name}
-		}
 		return Application{}, Warnings(warnings), err
 	}
 

@@ -200,9 +200,6 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		})
 
 	if err != nil {
-		if _, ok := err.(ccerror.NameNotUniqueInSpaceError); ok {
-			return Application{}, Warnings(warnings), actionerror.ApplicationAlreadyExistsError{Name: app.Name}
-		}
 		return Application{}, Warnings(warnings), err
 	}
 

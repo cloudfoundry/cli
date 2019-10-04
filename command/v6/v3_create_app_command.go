@@ -1,9 +1,9 @@
 package v6
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -71,7 +71,7 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case actionerror.ApplicationAlreadyExistsError:
+		case ccerror.NameNotUniqueInSpaceError:
 			cmd.UI.DisplayWarning("App {{.AppName}} already exists", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})

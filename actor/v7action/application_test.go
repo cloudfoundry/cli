@@ -651,8 +651,8 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
-			It("returns the ApplicationAlreadyExistsError and warnings", func() {
-				Expect(err).To(MatchError(actionerror.ApplicationAlreadyExistsError{Name: "some-app-name"}))
+			It("returns the NameNotUniqueInSpaceError and warnings", func() {
+				Expect(err).To(MatchError(ccerror.NameNotUniqueInSpaceError{}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})

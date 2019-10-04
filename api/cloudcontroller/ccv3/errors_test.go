@@ -276,7 +276,9 @@ var _ = Describe("Error Wrapper", func() {
 						})
 
 						It("returns a NameNotUniqueInSpaceError", func() {
-							Expect(makeError).To(MatchError(ccerror.NameNotUniqueInSpaceError{}))
+							Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{
+								Message: "name must be unique in space",
+							}))
 						})
 					})
 

@@ -117,7 +117,7 @@ var _ = Describe("create-app command", func() {
 				session := helpers.CF("create-app", appName)
 				userName, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Creating app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`Application '%s' already exists\.`, appName))
+				Eventually(session).Should(Say(`App with the name '%s' already exists\.`, appName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})

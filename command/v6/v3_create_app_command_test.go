@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -140,9 +141,13 @@ var _ = Describe("v3-create-app Command", func() {
 				})
 			})
 
-			Context("due to an ApplicationAlreadyExistsError", func() {
+			Context("due to an NameNotUniqueInSpaceError{}", func() {
 				BeforeEach(func() {
-					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.ApplicationAlreadyExistsError{})
+					fakeActor.CreateApplicationInSpaceReturns(
+						v3action.Application{},
+						v3action.Warnings{"I am a warning", "I am also a warning"},
+						ccerror.NameNotUniqueInSpaceError{},
+					)
 				})
 
 				It("displays the header and ok", func() {
