@@ -261,7 +261,7 @@ var _ = Describe("Error Wrapper", func() {
 						serverResponseCode = http.StatusUnprocessableEntity
 					})
 
-					When("the name isn't unique to space", func() {
+					When("the name isn't unique to space (old error message)", func() {
 						BeforeEach(func() {
 							serverResponse = `
 {
@@ -276,9 +276,38 @@ var _ = Describe("Error Wrapper", func() {
 						})
 
 						It("returns a NameNotUniqueInSpaceError", func() {
-							Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{
-								Message: "name must be unique in space",
-							}))
+							Expect(makeError).To(Equal(
+								ccerror.NameNotUniqueInSpaceError{
+									UnprocessableEntityError: ccerror.UnprocessableEntityError{
+										Message: "name must be unique in space",
+									},
+								},
+							))
+						})
+					})
+
+					When("the name isn't unique to space (new error message)", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "App with the name 'eli' already exists.",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns a NameNotUniqueInSpaceError", func() {
+							Expect(makeError).To(Equal(
+								ccerror.NameNotUniqueInSpaceError{
+									UnprocessableEntityError: ccerror.UnprocessableEntityError{
+										Message: "App with the name 'eli' already exists.",
+									},
+								},
+							))
 						})
 					})
 

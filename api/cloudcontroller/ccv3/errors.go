@@ -138,7 +138,7 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	orgNameTakenRegexp := regexp.MustCompile(`Organization '.*' already exists\.`)
 	// boolean switch case with partial/regex string matchers
 	switch {
-	case appNameTakenRegexp.MatchString(errorString):
+	case appNameTakenRegexp.MatchString(errorString) || strings.Contains(errorString, "name must be unique in space"):
 		return ccerror.NameNotUniqueInSpaceError{UnprocessableEntityError: err}
 	case strings.Contains(errorString,
 		"Name must be unique per organization"):
