@@ -10,26 +10,26 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . EnableSSHActor
+//go:generate counterfeiter . DisableSSHActor
 
-type EnableSSHActor interface {
+type DisableSSHActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, v7action.Warnings, error)
 	UpdateAppFeature(app v7action.Application, enabled bool, featureName string) (v7action.Warnings, error)
 }
 
-type EnableSSHCommand struct {
+type DisableSSHCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
-	usage           interface{}  `usage:"CF_NAME enable-ssh APP_NAME"`
-	relatedCommands interface{}  `related_commands:"allow-space-ssh, space-ssh-allowed, ssh, ssh-enabled"`
+	usage           interface{}  `usage:"CF_NAME disable-ssh APP_NAME"`
+	relatedCommands interface{}  `related_commands:"disallow-space-ssh, space-ssh-allowed, ssh, ssh-enabled"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       EnableSSHActor
+	Actor       DisableSSHActor
 }
 
-func (cmd *EnableSSHCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *DisableSSHCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
@@ -43,7 +43,7 @@ func (cmd *EnableSSHCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd *EnableSSHCommand) Execute(args []string) error {
+func (cmd *DisableSSHCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText("Enabling ssh support for app {{.AppName}} as {{.CurrentUserName}}...", map[string]interface{}{
+	cmd.UI.DisplayText("Disabling ssh support for app {{.AppName}} as {{.CurrentUserName}}...", map[string]interface{}{
 		"AppName":         cmd.RequiredArgs.AppName,
 		"CurrentUserName": username,
 	})
@@ -72,13 +72,13 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(getAppFeatureWarnings)
 
-	if appFeature.Enabled {
-		cmd.UI.DisplayText("ssh support for app '{{.AppName}}' is already enabled.", map[string]interface{}{
+	if !appFeature.Enabled {
+		cmd.UI.DisplayText("ssh support for app '{{.AppName}}' is already disabled.", map[string]interface{}{
 			"AppName": cmd.RequiredArgs.AppName,
 		})
 	}
 
-	updateSSHWarnings, err := cmd.Actor.UpdateAppFeature(app, true, "ssh")
+	updateSSHWarnings, err := cmd.Actor.UpdateAppFeature(app, false, "ssh")
 	if err != nil {
 		return err
 	}

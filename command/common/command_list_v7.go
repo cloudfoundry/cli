@@ -80,7 +80,7 @@ type commandList struct {
 	DeleteUser                         v7.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
 	DisableFeatureFlag                 v7.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
 	DisableOrgIsolation                v6.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
-	DisableSSH                         v6.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
+	DisableSSH                         v7.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
 	DisableServiceAccess               v6.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
 	DisallowSpaceSSH                   v6.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
 	Domains                            v7.DomainsCommand                            `command:"domains" description:"List domains in the target org"`

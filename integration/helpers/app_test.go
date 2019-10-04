@@ -2,9 +2,6 @@ package helpers_test
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-)
-
-import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
