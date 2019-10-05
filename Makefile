@@ -60,7 +60,7 @@ fly-windows-isolated: check-target-env
 	CF_TEST_SUITE=./integration/shared/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-plugin: check-target-env
-	CF_TEST_SUITE=./integration/shared/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
+	CF_TEST_SUITE=./integration/$(TARGET)/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-push: check-target-env
 	CF_TEST_SUITE=./integration/v6/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
@@ -130,7 +130,7 @@ integration-versioned-isolated: build integration-cleanup ## Run all parallel-en
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/isolated
 
 integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
-	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
+	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/plugin
 
 ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests

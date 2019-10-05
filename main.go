@@ -7,21 +7,14 @@ import (
 	"reflect"
 	"strings"
 
-	netrpc "net/rpc"
-
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/plugin/v7/rpc"
+	"code.cloudfoundry.org/cli/plugin/transition"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
@@ -140,8 +133,7 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		parse([]string{"help", originalArgs[0]}, commandList)
 		return 1
 	case flags.ErrUnknownCommand:
-		// TODO: Don't break plugins when building v6!
-		runPlugin(originalArgs)
+		plugin_transition.RunPlugin()
 	case flags.ErrCommandRequired:
 		if common.Commands.VerboseOrVersion {
 			parse([]string{"version"}, commandList)
@@ -152,46 +144,6 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 	}
 	return 0
-}
-
-func runPlugin(args []string) {
-	config, err := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
-	})
-	if err != nil {
-		if _, ok := err.(translatableerror.EmptyConfigError); !ok {
-			panic(err)
-		}
-	}
-
-	sharedActor := sharedaction.NewActor(config)
-
-	ui, err := ui.NewUI(config)
-	if err != nil {
-		panic(err)
-	}
-	defer ui.FlushDeferred()
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		panic(err)
-	}
-
-	appActor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	server := netrpc.NewServer()
-	rpcService, err := rpc.NewRpcService(nil, nil, nil, server, config, appActor)
-
-	if err != nil {
-		panic(err)
-	}
-
-	plugins := config.Plugins()
-	ran := rpc.RunMethodIfExists(rpcService, args, plugins)
-	if !ran {
-		panic("oh no")
-	}
-
 }
 
 func isCommand(s string) bool {
@@ -273,7 +225,7 @@ func handleError(passedErr error, commandUI UI) error {
 			commandUI.DisplayWarning(typedErr.Error())
 		}
 
-		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
+		plugin_transition.RunPlugin()
 	case *ssh.ExitError:
 		exitStatus := typedErr.ExitStatus()
 		if sig := typedErr.Signal(); sig != "" {
