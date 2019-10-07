@@ -114,7 +114,7 @@ func (client *Client) CreateServiceBroker(name, username, password, brokerURL, s
 }
 
 // DeleteServiceBroker deletes a named service broker
-func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (Warnings, error) {
+func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteServiceBrokerRequest,
 		URIParams: map[string]string{
@@ -123,13 +123,14 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (Warnings, e
 	})
 
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	response := cloudcontroller.Response{}
 	err = client.connection.Make(request, &response)
+	jobURL := response.HTTPResponse.Header.Get("Location")
 
-	return response.Warnings, err
+	return JobURL(jobURL), response.Warnings, err
 }
 
 // GetServiceBrokers lists service brokers.

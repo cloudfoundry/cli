@@ -435,18 +435,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	DeleteServiceBrokerStub        func(string) (ccv3.Warnings, error)
+	DeleteServiceBrokerStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteServiceBrokerMutex       sync.RWMutex
 	deleteServiceBrokerArgsForCall []struct {
 		arg1 string
 	}
 	deleteServiceBrokerReturns struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	deleteServiceBrokerReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	DeleteServiceInstanceRelationshipsSharedSpaceStub        func(string, string) (ccv3.Warnings, error)
 	deleteServiceInstanceRelationshipsSharedSpaceMutex       sync.RWMutex
@@ -3479,7 +3481,7 @@ func (fake *FakeCloudControllerClient) DeleteRouteReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBroker(arg1 string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) DeleteServiceBroker(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.deleteServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.deleteServiceBrokerReturnsOnCall[len(fake.deleteServiceBrokerArgsForCall)]
 	fake.deleteServiceBrokerArgsForCall = append(fake.deleteServiceBrokerArgsForCall, struct {
@@ -3491,10 +3493,10 @@ func (fake *FakeCloudControllerClient) DeleteServiceBroker(arg1 string) (ccv3.Wa
 		return fake.DeleteServiceBrokerStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.deleteServiceBrokerReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) DeleteServiceBrokerCallCount() int {
@@ -3503,7 +3505,7 @@ func (fake *FakeCloudControllerClient) DeleteServiceBrokerCallCount() int {
 	return len(fake.deleteServiceBrokerArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBrokerCalls(stub func(string) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) DeleteServiceBrokerCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.deleteServiceBrokerMutex.Lock()
 	defer fake.deleteServiceBrokerMutex.Unlock()
 	fake.DeleteServiceBrokerStub = stub
@@ -3516,30 +3518,33 @@ func (fake *FakeCloudControllerClient) DeleteServiceBrokerArgsForCall(i int) str
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturns(result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.deleteServiceBrokerMutex.Lock()
 	defer fake.deleteServiceBrokerMutex.Unlock()
 	fake.DeleteServiceBrokerStub = nil
 	fake.deleteServiceBrokerReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteServiceBrokerReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.deleteServiceBrokerMutex.Lock()
 	defer fake.deleteServiceBrokerMutex.Unlock()
 	fake.DeleteServiceBrokerStub = nil
 	if fake.deleteServiceBrokerReturnsOnCall == nil {
 		fake.deleteServiceBrokerReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
 		})
 	}
 	fake.deleteServiceBrokerReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {

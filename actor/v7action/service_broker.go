@@ -51,6 +51,16 @@ func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID 
 }
 
 func (actor Actor) DeleteServiceBroker(serviceBrokerGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.DeleteServiceBroker(serviceBrokerGUID)
-	return Warnings(warnings), err
+	allWarnings := Warnings{}
+
+	jobURL, warnings, err := actor.CloudControllerClient.DeleteServiceBroker(serviceBrokerGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, warnings...)
+
+	return allWarnings, err
 }

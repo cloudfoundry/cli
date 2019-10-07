@@ -244,6 +244,7 @@ var _ = Describe("Service Broker Actions", func() {
 			serviceBrokerGUID = "some-service-broker-guid"
 			warnings          Warnings
 			executionError    error
+			expectedJobURL    = ccv3.JobURL("some-job-URL")
 		)
 
 		JustBeforeEach(func() {
@@ -252,13 +253,7 @@ var _ = Describe("Service Broker Actions", func() {
 
 		When("the client request is successful", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.DeleteServiceBrokerReturns(ccv3.Warnings{"some-deletion-warning"}, nil)
-			})
-
-			It("succeeds and returns warnings", func() {
-				Expect(executionError).NotTo(HaveOccurred())
-
-				Expect(warnings).To(ConsistOf("some-deletion-warning"))
+				fakeCloudControllerClient.DeleteServiceBrokerReturns(expectedJobURL, ccv3.Warnings{"some-deletion-warning"}, nil)
 			})
 
 			It("passes the service broker credentials to the client", func() {
@@ -266,11 +261,42 @@ var _ = Describe("Service Broker Actions", func() {
 				actualServiceBrokerGUID := fakeCloudControllerClient.DeleteServiceBrokerArgsForCall(0)
 				Expect(actualServiceBrokerGUID).To(Equal(serviceBrokerGUID))
 			})
+
+			It("passes the job url to the client for polling", func() {
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(
+					Equal(1), "Expected client.PollJob to be called once",
+				)
+
+				jobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+				Expect(jobURL).To(Equal(expectedJobURL))
+			})
+
+			When("the delete service broker job completes successfully", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-poll-warning"}, nil)
+				})
+
+				It("succeeds and returns warnings", func() {
+					Expect(executionError).NotTo(HaveOccurred())
+
+					Expect(warnings).To(ConsistOf("some-deletion-warning", "some-poll-warning"))
+				})
+			})
+
+			When("the delete service broker job fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(nil, errors.New("oopsie"))
+				})
+
+				It("succeeds and returns warnings", func() {
+					Expect(executionError).To(MatchError("oopsie"))
+				})
+			})
 		})
 
 		When("the client returns an error", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.DeleteServiceBrokerReturns(ccv3.Warnings{"some-other-warning"}, errors.New("invalid broker"))
+				fakeCloudControllerClient.DeleteServiceBrokerReturns("", ccv3.Warnings{"some-other-warning"}, errors.New("invalid broker"))
 			})
 
 			It("fails and returns warnings", func() {
