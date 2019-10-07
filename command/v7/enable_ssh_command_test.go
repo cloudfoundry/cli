@@ -131,11 +131,11 @@ var _ = Describe("enable-ssh Command", func() {
 						nil,
 					)
 				})
+
 				It("indicates that the feature was not enabled", func() {
 					Expect(fakeEnableSSHActor.GetSSHEnabledCallCount()).To(Equal(1))
-					Expect(testUI.Err).To(Say("get-ssh-reason"))
-					Expect(executeErr).To(HaveOccurred())
-
+					Expect(testUI.Out).To(Say("TIP: Ensure ssh is also enabled on the space and global level."))
+					Expect(executeErr).ToNot(HaveOccurred())
 				})
 			})
 		})
