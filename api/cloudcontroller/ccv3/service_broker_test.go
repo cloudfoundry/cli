@@ -257,9 +257,9 @@ var _ = Describe("ServiceBroker", func() {
 			expectedBody = map[string]interface{}{
 				"name": "name",
 				"url":  "url",
-				"credentials": map[string]interface{}{
+				"authentication": map[string]interface{}{
 					"type": "basic",
-					"data": map[string]string{
+					"credentials": map[string]string{
 						"username": "username",
 						"password": "password",
 					},

@@ -30,8 +30,8 @@ type serviceBrokerRequest struct {
 	Name string `json:"name"`
 	// URL is the url of the service broker.
 	URL string `json:"url"`
-	// Credentials contains the credentials for authenticating with the service broker.
-	Credentials serviceBrokerCredentials `json:"credentials"`
+	// Authentication contains the authentication for authenticating with the service broker.
+	Authentication serviceBrokerAuthentication `json:"authentication"`
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }
@@ -46,24 +46,24 @@ type serviceBrokerResponse struct {
 	URL string `json:"url"`
 	// Status is the state of the service broker.
 	Status string `json:"status,omitempty"`
-	// Credentials contains the credentials for authenticating with the service broker.
-	Credentials serviceBrokerCredentials `json:"credentials"`
+	// Authentication contains the authentication for authenticating with the service broker.
+	Authentication serviceBrokerAuthentication `json:"authentication"`
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }
 
-// serviceBrokerCredentials represents a data structure for the Credentials
+// serviceBrokerAuthentication represents a data structure for the Credentials
 // of V3 Service Broker.
-type serviceBrokerCredentials struct {
-	// Type is the type of credentials for the service broker, e.g. "basic"
+type serviceBrokerAuthentication struct {
+	// Type is the type of authentication for the service broker, e.g. "basic"
 	Type constant.ServiceBrokerCredentialsType `json:"type"`
-	// Data is the credentials data of the service broker of a particular type.
-	Data serviceBrokerCredentialsData `json:"data"`
+	// Data is the authentication data of the service broker of a particular type.
+	Credentials serviceBrokerBasicAuthCredentials `json:"credentials"`
 }
 
-// serviceBrokerCredentialsData represents a data structure for the Credentials Data
+// serviceBrokerBasicAuthCredentials represents a data structure for the Credentials Data
 // of V3 Service Broker Credentials.
-type serviceBrokerCredentialsData struct {
+type serviceBrokerBasicAuthCredentials struct {
 	// Username is the Basic Auth username for the service broker.
 	Username string `json:"username"`
 	// Password is the Basic Auth password for the service broker.
@@ -161,9 +161,9 @@ func newServiceBroker(name, username, password, brokerURL, spaceGUID string) ser
 	sbp := serviceBrokerRequest{
 		Name: name,
 		URL:  brokerURL,
-		Credentials: serviceBrokerCredentials{
+		Authentication: serviceBrokerAuthentication{
 			Type: constant.BasicCredentials,
-			Data: serviceBrokerCredentialsData{
+			Credentials: serviceBrokerBasicAuthCredentials{
 				Username: username,
 				Password: password,
 			},
