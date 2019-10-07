@@ -85,6 +85,11 @@ var _ = Describe("enable-ssh Command", func() {
 					v7action.Warnings{"some-update-ssh-warnings"},
 					nil,
 				)
+				fakeEnableSSHActor.GetSSHEnabledReturns(
+					ccv3.SSHEnabled{Enabled: true, Reason: ""},
+					v7action.Warnings{"some-get-ssh-enabled-warnings"},
+					nil,
+				)
 			})
 
 			It("enables ssh on the app", func() {
@@ -108,11 +113,30 @@ var _ = Describe("enable-ssh Command", func() {
 				Expect(enabled).To(Equal(true))
 				Expect(featureName).To(Equal("ssh"))
 
+				Expect(fakeEnableSSHActor.GetSSHEnabledCallCount()).To(Equal(1))
+
 				Expect(testUI.Err).To(Say("some-get-app-warnings"))
 				Expect(testUI.Err).To(Say("some-feature-warnings"))
 				Expect(testUI.Err).To(Say("some-update-ssh-warnings"))
+				Expect(testUI.Err).To(Say("some-get-ssh-enabled-warnings"))
 				Expect(testUI.Out).To(Say(`Enabling ssh support for app %s as %s\.\.\.`, appName, currentUserName))
 				Expect(testUI.Out).To(Say("OK"))
+			})
+
+			When("SSH is disabled at a level above the app level", func() {
+				BeforeEach(func() {
+					fakeEnableSSHActor.GetSSHEnabledReturns(
+						ccv3.SSHEnabled{Enabled: false, Reason: "get-ssh-reason"},
+						v7action.Warnings{"some-get-ssh-enabled-warnings"},
+						nil,
+					)
+				})
+				It("indicates that the feature was not enabled", func() {
+					Expect(fakeEnableSSHActor.GetSSHEnabledCallCount()).To(Equal(1))
+					Expect(testUI.Err).To(Say("get-ssh-reason"))
+					Expect(executeErr).To(HaveOccurred())
+
+				})
 			})
 		})
 

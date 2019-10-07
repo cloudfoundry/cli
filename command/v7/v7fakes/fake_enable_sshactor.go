@@ -42,6 +42,21 @@ type FakeEnableSSHActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetSSHEnabledStub        func(string) (ccv3.SSHEnabled, v7action.Warnings, error)
+	getSSHEnabledMutex       sync.RWMutex
+	getSSHEnabledArgsForCall []struct {
+		arg1 string
+	}
+	getSSHEnabledReturns struct {
+		result1 ccv3.SSHEnabled
+		result2 v7action.Warnings
+		result3 error
+	}
+	getSSHEnabledReturnsOnCall map[int]struct {
+		result1 ccv3.SSHEnabled
+		result2 v7action.Warnings
+		result3 error
+	}
 	UpdateAppFeatureStub        func(v7action.Application, bool, string) (v7action.Warnings, error)
 	updateAppFeatureMutex       sync.RWMutex
 	updateAppFeatureArgsForCall []struct {
@@ -195,6 +210,72 @@ func (fake *FakeEnableSSHActor) GetApplicationByNameAndSpaceReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeEnableSSHActor) GetSSHEnabled(arg1 string) (ccv3.SSHEnabled, v7action.Warnings, error) {
+	fake.getSSHEnabledMutex.Lock()
+	ret, specificReturn := fake.getSSHEnabledReturnsOnCall[len(fake.getSSHEnabledArgsForCall)]
+	fake.getSSHEnabledArgsForCall = append(fake.getSSHEnabledArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetSSHEnabled", []interface{}{arg1})
+	fake.getSSHEnabledMutex.Unlock()
+	if fake.GetSSHEnabledStub != nil {
+		return fake.GetSSHEnabledStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSSHEnabledReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeEnableSSHActor) GetSSHEnabledCallCount() int {
+	fake.getSSHEnabledMutex.RLock()
+	defer fake.getSSHEnabledMutex.RUnlock()
+	return len(fake.getSSHEnabledArgsForCall)
+}
+
+func (fake *FakeEnableSSHActor) GetSSHEnabledCalls(stub func(string) (ccv3.SSHEnabled, v7action.Warnings, error)) {
+	fake.getSSHEnabledMutex.Lock()
+	defer fake.getSSHEnabledMutex.Unlock()
+	fake.GetSSHEnabledStub = stub
+}
+
+func (fake *FakeEnableSSHActor) GetSSHEnabledArgsForCall(i int) string {
+	fake.getSSHEnabledMutex.RLock()
+	defer fake.getSSHEnabledMutex.RUnlock()
+	argsForCall := fake.getSSHEnabledArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeEnableSSHActor) GetSSHEnabledReturns(result1 ccv3.SSHEnabled, result2 v7action.Warnings, result3 error) {
+	fake.getSSHEnabledMutex.Lock()
+	defer fake.getSSHEnabledMutex.Unlock()
+	fake.GetSSHEnabledStub = nil
+	fake.getSSHEnabledReturns = struct {
+		result1 ccv3.SSHEnabled
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeEnableSSHActor) GetSSHEnabledReturnsOnCall(i int, result1 ccv3.SSHEnabled, result2 v7action.Warnings, result3 error) {
+	fake.getSSHEnabledMutex.Lock()
+	defer fake.getSSHEnabledMutex.Unlock()
+	fake.GetSSHEnabledStub = nil
+	if fake.getSSHEnabledReturnsOnCall == nil {
+		fake.getSSHEnabledReturnsOnCall = make(map[int]struct {
+			result1 ccv3.SSHEnabled
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getSSHEnabledReturnsOnCall[i] = struct {
+		result1 ccv3.SSHEnabled
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeEnableSSHActor) UpdateAppFeature(arg1 v7action.Application, arg2 bool, arg3 string) (v7action.Warnings, error) {
 	fake.updateAppFeatureMutex.Lock()
 	ret, specificReturn := fake.updateAppFeatureReturnsOnCall[len(fake.updateAppFeatureArgsForCall)]
@@ -267,6 +348,8 @@ func (fake *FakeEnableSSHActor) Invocations() map[string][][]interface{} {
 	defer fake.getAppFeatureMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getSSHEnabledMutex.RLock()
+	defer fake.getSSHEnabledMutex.RUnlock()
 	fake.updateAppFeatureMutex.RLock()
 	defer fake.updateAppFeatureMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

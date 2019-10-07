@@ -183,4 +183,88 @@ var _ = Describe("Application", func() {
 			})
 		})
 	})
+
+	Describe("GetSSHEnabled", func() {
+
+		var (
+			warnings   Warnings
+			executeErr error
+			appGUID    = "some-app-guid"
+			sshEnabled SSHEnabled
+		)
+
+		JustBeforeEach(func() {
+			sshEnabled, warnings, executeErr = client.GetSSHEnabled(appGUID)
+		})
+
+		When("no error occurs", func() {
+
+			BeforeEach(func() {
+				getResponse := fmt.Sprintf(`{
+   "enabled": false,
+   "reason": "Disabled for space some-space"
+}`)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/apps/%s/ssh_enabled", appGUID)),
+						RespondWith(http.StatusOK, getResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the SSHEnabled boolean", func() {
+
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(sshEnabled.Enabled).To(Equal(false))
+				Expect(sshEnabled.Reason).To(Equal("Disabled for space some-space"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+		"errors": [
+		  {
+		    "code": 10008,
+		    "detail": "The request is semantically invalid: command presence",
+		    "title": "CF-UnprocessableEntity"
+		  },
+		  {
+		    "code": 10010,
+		    "detail": "Org not found",
+		    "title": "CF-ResourceNotFound"
+		  }
+		]
+		}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/apps/%s/ssh_enabled", appGUID)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Org not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

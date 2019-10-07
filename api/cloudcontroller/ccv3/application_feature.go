@@ -12,6 +12,12 @@ type ApplicationFeature struct {
 	// Name of the application feature
 	Name    string
 	Enabled bool
+	//Reason  string `json:omitempty`
+}
+
+type SSHEnabled struct {
+	Enabled bool
+	Reason  string
 }
 
 func (client *Client) GetAppFeature(appGUID string, featureName string) (ApplicationFeature, Warnings, error) {
@@ -50,4 +56,24 @@ func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName
 	err = client.connection.Make(request, &response)
 
 	return response.Warnings, err
+}
+
+func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSSHEnabled,
+		URIParams:   map[string]string{"app_guid": appGUID},
+	})
+
+	if err != nil {
+		return SSHEnabled{}, nil, err
+	}
+
+	var sshEnabled SSHEnabled
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &sshEnabled,
+	}
+
+	err = client.connection.Make(request, &response)
+
+	return sshEnabled, response.Warnings, err
 }

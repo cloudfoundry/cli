@@ -128,6 +128,27 @@ var _ = Describe("enable-ssh command", func() {
 				})
 			})
 
+			When("ssh is disabled space-wide", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("disallow-space-ssh", spaceName)).Should(Exit(0))
+				})
+
+				It("informs the user", func() {
+					session := helpers.CF("enable-ssh", appName)
+
+					Eventually(session).Should(Say(`Enabling ssh support for app %s as %s\.\.\.`, appName, userName))
+
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("TIP: Ensure ssh is also enabled on the space and global level."))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			// We're not testing the failure case when ssh is globally disabled;
+			// It would require us to redeploy CAPI with the cloud_controller_ng job property
+			// cc.allow_app_ssh_access set to false, which is time-consuming & brittle
+			// https://github.com/cloudfoundry/capi-release/blob/8d08628fecf116a6a1512d8ad6413414b092fba8/jobs/cloud_controller_ng/spec#L754-L756
+
 		})
 	})
 })

@@ -85,6 +85,7 @@ type CloudControllerClient interface {
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
+	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, ccv3.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, ccv3.Warnings, error)
 	GetStacks(query ...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)

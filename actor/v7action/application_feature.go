@@ -14,3 +14,8 @@ func (actor Actor) UpdateAppFeature(app Application, enabled bool, featureName s
 	warnings, err := actor.CloudControllerClient.UpdateAppFeature(app.GUID, enabled, "ssh")
 	return Warnings(warnings), err
 }
+
+func (actor Actor) GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, Warnings, error) {
+	sshEnabled, warnings, err := actor.CloudControllerClient.GetSSHEnabled(appGUID)
+	return sshEnabled, Warnings(warnings), err
+}

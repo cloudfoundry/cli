@@ -1065,6 +1065,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetSSHEnabledStub        func(string) (ccv3.SSHEnabled, ccv3.Warnings, error)
+	getSSHEnabledMutex       sync.RWMutex
+	getSSHEnabledArgsForCall []struct {
+		arg1 string
+	}
+	getSSHEnabledReturns struct {
+		result1 ccv3.SSHEnabled
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getSSHEnabledReturnsOnCall map[int]struct {
+		result1 ccv3.SSHEnabled
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetServiceBrokersStub        func() ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []struct {
@@ -6231,6 +6246,72 @@ func (fake *FakeCloudControllerClient) GetRoutesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSSHEnabled(arg1 string) (ccv3.SSHEnabled, ccv3.Warnings, error) {
+	fake.getSSHEnabledMutex.Lock()
+	ret, specificReturn := fake.getSSHEnabledReturnsOnCall[len(fake.getSSHEnabledArgsForCall)]
+	fake.getSSHEnabledArgsForCall = append(fake.getSSHEnabledArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetSSHEnabled", []interface{}{arg1})
+	fake.getSSHEnabledMutex.Unlock()
+	if fake.GetSSHEnabledStub != nil {
+		return fake.GetSSHEnabledStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSSHEnabledReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSSHEnabledCallCount() int {
+	fake.getSSHEnabledMutex.RLock()
+	defer fake.getSSHEnabledMutex.RUnlock()
+	return len(fake.getSSHEnabledArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSSHEnabledCalls(stub func(string) (ccv3.SSHEnabled, ccv3.Warnings, error)) {
+	fake.getSSHEnabledMutex.Lock()
+	defer fake.getSSHEnabledMutex.Unlock()
+	fake.GetSSHEnabledStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetSSHEnabledArgsForCall(i int) string {
+	fake.getSSHEnabledMutex.RLock()
+	defer fake.getSSHEnabledMutex.RUnlock()
+	argsForCall := fake.getSSHEnabledArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetSSHEnabledReturns(result1 ccv3.SSHEnabled, result2 ccv3.Warnings, result3 error) {
+	fake.getSSHEnabledMutex.Lock()
+	defer fake.getSSHEnabledMutex.Unlock()
+	fake.GetSSHEnabledStub = nil
+	fake.getSSHEnabledReturns = struct {
+		result1 ccv3.SSHEnabled
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSSHEnabledReturnsOnCall(i int, result1 ccv3.SSHEnabled, result2 ccv3.Warnings, result3 error) {
+	fake.getSSHEnabledMutex.Lock()
+	defer fake.getSSHEnabledMutex.Unlock()
+	fake.GetSSHEnabledStub = nil
+	if fake.getSSHEnabledReturnsOnCall == nil {
+		fake.getSSHEnabledReturnsOnCall = make(map[int]struct {
+			result1 ccv3.SSHEnabled
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getSSHEnabledReturnsOnCall[i] = struct {
+		result1 ccv3.SSHEnabled
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceBrokers() ([]ccv3.ServiceBroker, ccv3.Warnings, error) {
 	fake.getServiceBrokersMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
@@ -8645,6 +8726,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getRouteDestinationsMutex.RUnlock()
 	fake.getRoutesMutex.RLock()
 	defer fake.getRoutesMutex.RUnlock()
+	fake.getSSHEnabledMutex.RLock()
+	defer fake.getSSHEnabledMutex.RUnlock()
 	fake.getServiceBrokersMutex.RLock()
 	defer fake.getServiceBrokersMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()

@@ -145,4 +145,73 @@ var _ = Describe("Application Feature Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetSSHEnabled", func() {
+		var (
+			appGUID    = "some-app-guid"
+			warnings   Warnings
+			executeErr error
+			sshEnabled ccv3.SSHEnabled
+		)
+
+		JustBeforeEach(func() {
+			sshEnabled, warnings, executeErr = actor.GetSSHEnabled(appGUID)
+		})
+		When("it succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSSHEnabledReturns(
+					ccv3.SSHEnabled{Reason: "some-reason", Enabled: true},
+					ccv3.Warnings{"some-ccv3-warning"},
+					nil,
+				)
+			})
+
+			It("calls ccv3 to check current ssh ability", func() {
+				Expect(fakeCloudControllerClient.GetSSHEnabledCallCount()).To(Equal(1))
+				appGuid := fakeCloudControllerClient.GetSSHEnabledArgsForCall(0)
+				Expect(appGuid).To(Equal(appGUID))
+			})
+
+			It("returns an sshEnabled", func() {
+				Expect(sshEnabled.Reason).To(Equal("some-reason"))
+				Expect(sshEnabled.Enabled).To(BeTrue())
+			})
+
+			It("returns a warning", func() {
+				Expect(warnings).To(ConsistOf("some-ccv3-warning"))
+			})
+
+			When("when it's disabled", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSSHEnabledReturns(
+						ccv3.SSHEnabled{Reason: "another-reason", Enabled: false},
+						ccv3.Warnings{"some-ccv3-warning"},
+						nil,
+					)
+				})
+
+				It("returns an sshEnabled", func() {
+					Expect(sshEnabled.Reason).To(Equal("another-reason"))
+					Expect(sshEnabled.Enabled).To(BeFalse())
+				})
+			})
+		})
+
+		When("when the API layer call returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSSHEnabledReturns(
+					ccv3.SSHEnabled{Reason: "some-third-reason", Enabled: false},
+					ccv3.Warnings{"some-get-ssh-warning"},
+					errors.New("some-get-ssh-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(executeErr).To(MatchError("some-get-ssh-error"))
+				Expect(warnings).To(ConsistOf("some-get-ssh-warning"))
+
+				Expect(fakeCloudControllerClient.GetSSHEnabledCallCount()).To(Equal(1))
+			})
+		})
+	})
 })

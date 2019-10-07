@@ -15,6 +15,7 @@ import (
 type EnableSSHActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, v7action.Warnings, error)
+	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, v7action.Warnings, error)
 	UpdateAppFeature(app v7action.Application, enabled bool, featureName string) (v7action.Warnings, error)
 }
 
@@ -82,8 +83,19 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-
 	cmd.UI.DisplayWarnings(updateSSHWarnings)
+
+	sshEnabled, getSSHEnabledWarnings, err := cmd.Actor.GetSSHEnabled(app.GUID)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayWarnings(getSSHEnabledWarnings)
+
 	cmd.UI.DisplayOK()
+
+	if !sshEnabled.Enabled {
+		cmd.UI.DisplayText("TIP: Ensure ssh is also enabled on the space and global level.")
+	}
+
 	return nil
 }
