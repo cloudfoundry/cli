@@ -3,16 +3,26 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // EnvironmentVariableGroups represents all environment variables for application
 type EnvironmentVariableGroups ccv3.Environment
+
+// EnvironmentVariableGroup represents a CC environment variable group (e.g. staging or running)
+type EnvironmentVariableGroup ccv3.EnvironmentVariables
 
 // EnvironmentVariablePair represents an environment variable and its value
 // on an application
 type EnvironmentVariablePair struct {
 	Key   string
 	Value string
+}
+
+// GetEnvironmentVariableGroup returns the values of an environment variable group.
+func (actor *Actor) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (EnvironmentVariableGroup, Warnings, error) {
+	ccEnvGroup, warnings, err := actor.CloudControllerClient.GetEnvironmentVariableGroup(group)
+	return EnvironmentVariableGroup(ccEnvGroup), Warnings(warnings), err
 }
 
 // GetEnvironmentVariablesByApplicationNameAndSpace returns the environment

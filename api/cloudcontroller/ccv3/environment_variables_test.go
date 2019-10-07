@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -15,6 +16,61 @@ var _ = Describe("EnvironmentVariables", func() {
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
+	})
+
+	Describe("GetEnvironmentVariableGroup", func() {
+		var (
+			envVars    EnvironmentVariables
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			envVars, warnings, executeErr = client.GetEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup)
+		})
+
+		When("the request errors", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/environment_variable_groups/staging"),
+						RespondWith(http.StatusTeapot, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusTeapot}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				responseBody := `{
+						"var": {
+							"DEBUG": "false",
+							"my-var": "my-val"
+						}
+					}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/environment_variable_groups/staging"),
+						RespondWith(http.StatusOK, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(envVars).To(Equal(EnvironmentVariables{
+					"DEBUG":  {Value: "false", IsSet: true},
+					"my-var": {Value: "my-val", IsSet: true},
+				}))
+			})
+		})
 	})
 
 	Describe("UpdateApplicationEnvironmentVariables", func() {

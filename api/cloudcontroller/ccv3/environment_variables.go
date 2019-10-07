@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
 )
@@ -32,6 +33,24 @@ func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
 	*variables = EnvironmentVariables(ccEnvVars.Var)
 
 	return err
+}
+
+// GetEnvironmentVariableGroup gets the values of a particular environment variable group.
+func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (EnvironmentVariables, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams:   internal.Params{"group_name": string(group)},
+		RequestName: internal.GetEnvironmentVariableGroupRequest,
+	})
+	if err != nil {
+		return EnvironmentVariables{}, nil, err
+	}
+
+	var responseEnvVars EnvironmentVariables
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseEnvVars,
+	}
+	err = client.connection.Make(request, &response)
+	return responseEnvVars, response.Warnings, err
 }
 
 // UpdateApplicationEnvironmentVariables adds/updates the user provided

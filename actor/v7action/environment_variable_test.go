@@ -3,6 +3,9 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -12,6 +15,72 @@ import (
 )
 
 var _ = Describe("Environment Variable Actions", func() {
+	Describe("GetEnvironmentVariableGroup", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+			fetchedEnvVariables       EnvironmentVariableGroup
+			executeErr                error
+			warnings                  Warnings
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+		})
+
+		JustBeforeEach(func() {
+			fetchedEnvVariables, warnings, executeErr = actor.GetEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup)
+		})
+
+		When("getting the environment variable group fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetEnvironmentVariableGroupReturns(
+					nil,
+					ccv3.Warnings{"get-env-var-group-warning"},
+					errors.New("get-env-var-group-error"),
+				)
+			})
+
+			It("fetches the environment variable group from CC", func() {
+				Expect(fakeCloudControllerClient.GetEnvironmentVariableGroupCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetEnvironmentVariableGroupArgsForCall(0)).To(Equal(constant.StagingEnvironmentVariableGroup))
+			})
+
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("get-env-var-group-error"))
+				Expect(warnings).To(ConsistOf("get-env-var-group-warning"))
+			})
+		})
+
+		When("getting the environment variable group succeeds", func() {
+			var envVars ccv3.EnvironmentVariables
+
+			BeforeEach(func() {
+				envVars = map[string]types.FilteredString{
+					"var_one": {IsSet: true, Value: "val_one"},
+				}
+
+				fakeCloudControllerClient.GetEnvironmentVariableGroupReturns(
+					envVars,
+					ccv3.Warnings{"get-env-var-group-warning"},
+					nil,
+				)
+			})
+
+			It("fetches the environment variable group from CC", func() {
+				Expect(fakeCloudControllerClient.GetEnvironmentVariableGroupCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetEnvironmentVariableGroupArgsForCall(0)).To(Equal(constant.StagingEnvironmentVariableGroup))
+			})
+
+			It("returns result and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(fetchedEnvVariables).To(Equal(EnvironmentVariableGroup(envVars)))
+				Expect(warnings).To(ConsistOf("get-env-var-group-warning"))
+			})
+		})
+	})
+
 	Describe("GetEnvironmentVariablesByApplicationNameAndSpace", func() {
 		var (
 			actor                     *Actor

@@ -149,6 +149,9 @@ func SetupV3Response() {
             },
             "users": {
                 "href": "SERVER_URL/v3/users"
+            },
+            "environment_variable_groups": {
+                "href": "SERVER_URL/v3/environment_variable_groups"
             }
 		}
 	}`, "SERVER_URL", serverURL, -1)

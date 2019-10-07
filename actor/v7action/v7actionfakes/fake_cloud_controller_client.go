@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type FakeCloudControllerClient struct {
@@ -775,6 +776,21 @@ type FakeCloudControllerClient struct {
 	}
 	getDropletsReturnsOnCall map[int]struct {
 		result1 []ccv3.Droplet
+		result2 ccv3.Warnings
+		result3 error
+	}
+	GetEnvironmentVariableGroupStub        func(constant.EnvironmentVariableGroupName) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	getEnvironmentVariableGroupMutex       sync.RWMutex
+	getEnvironmentVariableGroupArgsForCall []struct {
+		arg1 constant.EnvironmentVariableGroupName
+	}
+	getEnvironmentVariableGroupReturns struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getEnvironmentVariableGroupReturnsOnCall map[int]struct {
+		result1 ccv3.EnvironmentVariables
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -4967,6 +4983,72 @@ func (fake *FakeCloudControllerClient) GetDropletsReturnsOnCall(i int, result1 [
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroup(arg1 constant.EnvironmentVariableGroupName) (ccv3.EnvironmentVariables, ccv3.Warnings, error) {
+	fake.getEnvironmentVariableGroupMutex.Lock()
+	ret, specificReturn := fake.getEnvironmentVariableGroupReturnsOnCall[len(fake.getEnvironmentVariableGroupArgsForCall)]
+	fake.getEnvironmentVariableGroupArgsForCall = append(fake.getEnvironmentVariableGroupArgsForCall, struct {
+		arg1 constant.EnvironmentVariableGroupName
+	}{arg1})
+	fake.recordInvocation("GetEnvironmentVariableGroup", []interface{}{arg1})
+	fake.getEnvironmentVariableGroupMutex.Unlock()
+	if fake.GetEnvironmentVariableGroupStub != nil {
+		return fake.GetEnvironmentVariableGroupStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getEnvironmentVariableGroupReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupCallCount() int {
+	fake.getEnvironmentVariableGroupMutex.RLock()
+	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
+	return len(fake.getEnvironmentVariableGroupArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupCalls(stub func(constant.EnvironmentVariableGroupName) (ccv3.EnvironmentVariables, ccv3.Warnings, error)) {
+	fake.getEnvironmentVariableGroupMutex.Lock()
+	defer fake.getEnvironmentVariableGroupMutex.Unlock()
+	fake.GetEnvironmentVariableGroupStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupArgsForCall(i int) constant.EnvironmentVariableGroupName {
+	fake.getEnvironmentVariableGroupMutex.RLock()
+	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
+	argsForCall := fake.getEnvironmentVariableGroupArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupReturns(result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+	fake.getEnvironmentVariableGroupMutex.Lock()
+	defer fake.getEnvironmentVariableGroupMutex.Unlock()
+	fake.GetEnvironmentVariableGroupStub = nil
+	fake.getEnvironmentVariableGroupReturns = struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetEnvironmentVariableGroupReturnsOnCall(i int, result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+	fake.getEnvironmentVariableGroupMutex.Lock()
+	defer fake.getEnvironmentVariableGroupMutex.Unlock()
+	fake.GetEnvironmentVariableGroupStub = nil
+	if fake.getEnvironmentVariableGroupReturnsOnCall == nil {
+		fake.getEnvironmentVariableGroupReturnsOnCall = make(map[int]struct {
+			result1 ccv3.EnvironmentVariables
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getEnvironmentVariableGroupReturnsOnCall[i] = struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetEvents(arg1 ...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error) {
 	fake.getEventsMutex.Lock()
 	ret, specificReturn := fake.getEventsReturnsOnCall[len(fake.getEventsArgsForCall)]
@@ -8525,6 +8607,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getDropletMutex.RUnlock()
 	fake.getDropletsMutex.RLock()
 	defer fake.getDropletsMutex.RUnlock()
+	fake.getEnvironmentVariableGroupMutex.RLock()
+	defer fake.getEnvironmentVariableGroupMutex.RUnlock()
 	fake.getEventsMutex.RLock()
 	defer fake.getEventsMutex.RUnlock()
 	fake.getFeatureFlagMutex.RLock()
