@@ -40,7 +40,6 @@ func (client *Client) GetAppFeature(appGUID string, featureName string) (Applica
 	return applicationFeature, response.Warnings, err
 }
 
-
 func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSSHEnabled,
@@ -60,7 +59,6 @@ func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error
 
 	return sshEnabled, response.Warnings, err
 }
-
 
 // UpdateAppFeature enables/disables the ability to ssh for a given application.
 func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName string) (Warnings, error) {
