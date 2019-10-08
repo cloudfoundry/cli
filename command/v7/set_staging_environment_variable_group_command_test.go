@@ -3,6 +3,9 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -16,15 +19,14 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("running-environment-variable-group Command", func() {
+var _ = Describe("set-staging-environment-variable-group Command", func() {
 	var (
-		cmd             RunningEnvironmentVariableGroupCommand
+		cmd             SetStagingEnvironmentVariableGroupCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeRunningEnvironmentVariableGroupActor
+		fakeActor       *v7fakes.FakeSetStagingEnvironmentVariableGroupActor
 		executeErr      error
-		args            []string
 		binaryName      string
 	)
 
@@ -32,22 +34,23 @@ var _ = Describe("running-environment-variable-group Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeRunningEnvironmentVariableGroupActor)
-		args = nil
+		fakeActor = new(v7fakes.FakeSetStagingEnvironmentVariableGroupActor)
 
-		cmd = RunningEnvironmentVariableGroupCommand{
+		cmd = SetStagingEnvironmentVariableGroupCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 		}
 
+		cmd.RequiredArgs.EnvVarGroupJson = `{"key1":"val1", "key2":"val2"}`
+
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 	})
 
 	JustBeforeEach(func() {
-		executeErr = cmd.Execute(args)
+		executeErr = cmd.Execute(nil)
 	})
 
 	When("the environment is not set up correctly", func() {
@@ -72,13 +75,23 @@ var _ = Describe("running-environment-variable-group Command", func() {
 
 		It("should print text indicating its running", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Getting the running environment variable group as apple\.\.\.`))
+			Expect(testUI.Out).To(Say(`Setting the contents of the staging environment variable group as apple\.\.\.`))
 		})
 
-		When("getting the environment variables fails", func() {
+		When("jsonUnmarshalling fails", func() {
 			BeforeEach(func() {
-				fakeActor.GetEnvironmentVariableGroupReturns(
-					nil,
+				cmd.RequiredArgs.EnvVarGroupJson = "bad json"
+			})
+
+			It("should err", func() {
+				Expect(testUI.Err).To(Say("Invalid environment variable group provided. Please provide a valid JSON object."))
+				Expect(executeErr).To(HaveOccurred())
+			})
+		})
+
+		When("setting the environment variables fails", func() {
+			BeforeEach(func() {
+				fakeActor.SetEnvironmentVariableGroupReturns(
 					v7action.Warnings{"some-warning-1", "some-warning-2"},
 					errors.New("some-error"),
 				)
@@ -92,50 +105,24 @@ var _ = Describe("running-environment-variable-group Command", func() {
 			})
 		})
 
-		When("getting the environment variables succeeds", func() {
-			When("there are some environment variables", func() {
-				BeforeEach(func() {
-					envVars := v7action.EnvironmentVariableGroup{
-						"key_one": {IsSet: true, Value: "value_one"},
-						"key_two": {IsSet: true, Value: "value_two"},
-					}
-
-					fakeActor.GetEnvironmentVariableGroupReturns(
-						envVars,
-						v7action.Warnings{"some-warning-1", "some-warning-2"},
-						nil,
-					)
-				})
-
-				It("prints a table of env vars", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Err).To(Say("some-warning-1"))
-					Expect(testUI.Err).To(Say("some-warning-2"))
-					Expect(testUI.Out).To(Say(`variable name\s+assigned value`))
-					// We have to do complex regex match, for the results are returned in a random order
-					kv1Regex := `key_one\s+value_one`
-					kv2Regex := `key_two\s+value_two`
-					Expect(testUI.Out).To(Say("(%s\n%s)|(%s\n%s)", kv1Regex, kv2Regex, kv2Regex, kv1Regex))
-				})
+		When("setting the environment variables succeeds", func() {
+			BeforeEach(func() {
+				fakeActor.SetEnvironmentVariableGroupReturns(
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
+					nil,
+				)
 			})
 
-			When("there are no environment variables in the group", func() {
-				BeforeEach(func() {
-					envVars := v7action.EnvironmentVariableGroup{}
-
-					fakeActor.GetEnvironmentVariableGroupReturns(
-						envVars,
-						v7action.Warnings{"some-warning-1", "some-warning-2"},
-						nil,
-					)
-				})
-
-				It("prints a message indicating empty group", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(testUI.Err).To(Say("some-warning-1"))
-					Expect(testUI.Err).To(Say("some-warning-2"))
-					Expect(testUI.Out).To(Say("No running environment variable group has been set."))
-				})
+			It("should print text indicating its set", func() {
+				Expect(fakeActor.SetEnvironmentVariableGroupCallCount()).To(Equal(1))
+				group, envVars := fakeActor.SetEnvironmentVariableGroupArgsForCall(0)
+				Expect(group).To(Equal(constant.StagingEnvironmentVariableGroup))
+				Expect(envVars).To(Equal(ccv3.EnvironmentVariables{
+					"key1": {Value: "val1", IsSet: true},
+					"key2": {Value: "val2", IsSet: true},
+				}))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 	})

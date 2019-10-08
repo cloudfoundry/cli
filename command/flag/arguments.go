@@ -222,6 +222,10 @@ type SetSpaceQuotaArgs struct {
 	SpaceQuota string `positional-arg-name:"SPACE_QUOTA" required:"true" description:"The space quota"`
 }
 
+type SetStagingEnvVarGroup struct {
+	EnvVarGroupJson string `positional-arg-name:"JSON_STRING" required:"true" description:"json string"`
+}
+
 type V6SetHealthCheckArgs struct {
 	AppName     string                             `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	HealthCheck HealthCheckTypeWithDeprecatedValue `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`

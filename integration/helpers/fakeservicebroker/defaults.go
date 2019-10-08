@@ -1,8 +1,9 @@
 package fakeservicebroker
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"net/http"
+
+	"code.cloudfoundry.org/cli/integration/helpers"
 )
 
 func defaultConfig() *FakeServiceBroker {

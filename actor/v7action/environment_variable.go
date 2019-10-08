@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // EnvironmentVariableGroups represents all environment variables for application
@@ -54,6 +55,27 @@ func (actor *Actor) SetEnvironmentVariableByApplicationNameAndSpace(appName stri
 		})
 	warnings = append(warnings, v3Warnings...)
 	return warnings, apiErr
+}
+
+func (actor *Actor) SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars ccv3.EnvironmentVariables) (Warnings, error) {
+	warnings := ccv3.Warnings{}
+	if len(envVars) == 0 {
+		existingEnvVars, getWarnings, err := actor.CloudControllerClient.GetEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup)
+
+		if err != nil {
+			return Warnings(getWarnings), err
+		}
+
+		warnings = append(warnings, getWarnings...)
+
+		for k := range existingEnvVars {
+			envVars[k] = types.FilteredString{Value: "", IsSet: false}
+		}
+
+	}
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateEnvironmentVariableGroup(group, envVars) //ccv3.EnvironmentVariables{}
+
+	return Warnings(append(warnings, updateWarnings...)), err
 }
 
 // UnsetEnvironmentVariableByApplicationNameAndSpace removes an environment

@@ -104,6 +104,7 @@ type CloudControllerClient interface {
 	UpdateApplicationStart(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateApplicationStop(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateBuildpack(buildpack ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
+	UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateFeatureFlag(flag ccv3.FeatureFlag) (ccv3.FeatureFlag, ccv3.Warnings, error)
 	UpdateOrganization(org ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)
 	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)

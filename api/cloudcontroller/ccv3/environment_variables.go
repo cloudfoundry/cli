@@ -78,3 +78,24 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 	err = client.connection.Make(request, &response)
 	return responseEnvVars, response.Warnings, err
 }
+
+func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
+	bodyBytes, _ := json.Marshal(envVars)
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams:   internal.Params{"group_name": string(group)},
+		RequestName: internal.PatchEnvironmentVariableGroupRequest,
+		Body:        bytes.NewReader(bodyBytes),
+	})
+
+	if err != nil {
+		return EnvironmentVariables{}, nil, err
+	}
+
+	var responseEnvVars EnvironmentVariables
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseEnvVars,
+	}
+
+	err = client.connection.Make(request, &response)
+	return responseEnvVars, response.Warnings, err
+}
