@@ -18,14 +18,14 @@ type BuildpacksActor interface {
 }
 
 type BuildpacksCommand struct {
-	usage           interface{} `usage:"CF_NAME buildpacks"`
-	relatedCommands interface{} `related_commands:"push"`
+	usage           interface{} `usage:"CF_NAME buildpacks [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME buildpacks\n   CF_NAME buildpacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME buildpacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
+	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       BuildpacksActor
-	Labels      string `long:"labels" description:"Selector to filter organizations against"`
+	Labels      string `long:"labels" description:"Selector to filter buildpacks by labels"`
 }
 
 func (cmd *BuildpacksCommand) Setup(config command.Config, ui command.UI) error {
