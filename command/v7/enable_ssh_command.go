@@ -55,7 +55,7 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText("Enabling ssh support for app {{.AppName}} as {{.CurrentUserName}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Enabling ssh support for app {{.AppName}} as {{.CurrentUserName}}...", map[string]interface{}{
 		"AppName":         cmd.RequiredArgs.AppName,
 		"CurrentUserName": username,
 	})
@@ -74,7 +74,7 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(getAppFeatureWarnings)
 
 	if appFeature.Enabled {
-		cmd.UI.DisplayText("ssh support for app '{{.AppName}}' is already enabled.", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("ssh support for app '{{.AppName}}' is already enabled.", map[string]interface{}{
 			"AppName": cmd.RequiredArgs.AppName,
 		})
 	}
