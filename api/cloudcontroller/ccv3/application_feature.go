@@ -40,23 +40,6 @@ func (client *Client) GetAppFeature(appGUID string, featureName string) (Applica
 	return applicationFeature, response.Warnings, err
 }
 
-// UpdateAppFeature enables/disables the ability to ssh for a given application.
-func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchApplicationFeaturesRequest,
-		Body:        bytes.NewReader([]byte(fmt.Sprintf(`{"enabled":%t}`, enabled))),
-		URIParams:   map[string]string{"app_guid": appGUID, "name": featureName},
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
-}
 
 func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -76,4 +59,23 @@ func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error
 	err = client.connection.Make(request, &response)
 
 	return sshEnabled, response.Warnings, err
+}
+
+
+// UpdateAppFeature enables/disables the ability to ssh for a given application.
+func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchApplicationFeaturesRequest,
+		Body:        bytes.NewReader([]byte(fmt.Sprintf(`{"enabled":%t}`, enabled))),
+		URIParams:   map[string]string{"app_guid": appGUID, "name": featureName},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
 }
