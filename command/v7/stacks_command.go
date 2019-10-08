@@ -19,14 +19,14 @@ type StacksActor interface {
 }
 
 type StacksCommand struct {
-	usage           interface{} `usage:"CF_NAME stacks"`
-	relatedCommands interface{} `related_commands:"app, push"`
+	usage           interface{} `usage:"CF_NAME stacks [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME stacks\n   CF_NAME stacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME stacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
+	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       StacksActor
-	Labels      string `long:"labels" description:"Selector to filter stacks against"`
+	Labels      string `long:"labels" description:"Selector to filter stacks by labels"`
 }
 
 func (cmd *StacksCommand) Setup(config command.Config, ui command.UI) error {

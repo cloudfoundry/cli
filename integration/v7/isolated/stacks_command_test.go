@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"regexp"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -21,12 +23,17 @@ var _ = Describe("stacks command", func() {
 			session := helpers.CF("stacks", "--help")
 
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say(`stacks - List all stacks \(a stack is a pre-built file system, including an operating system, that can run apps\)`))
+			Eventually(session).Should(Say(regexp.QuoteMeta("stacks - List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)")))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`cf stacks`))
+			Eventually(session).Should(Say(regexp.QuoteMeta("cf stacks [--labels SELECTOR]")))
+			Eventually(session).Should(Say("EXAMPLES:"))
+			Eventually(session).Should(Say("cf stacks"))
+			Eventually(session).Should(Say(regexp.QuoteMeta("cf stacks --labels 'environment in (production,staging),tier in (backend)'")))
+			Eventually(session).Should(Say(regexp.QuoteMeta("cf stacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'")))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say(`--labels\s+Selector to filter stacks by labels`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say(`app, push`))
-
+			Eventually(session).Should(Say("create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
