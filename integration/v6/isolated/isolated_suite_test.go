@@ -1,8 +1,9 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
 	"testing"
+
+	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
 )
 
 const (

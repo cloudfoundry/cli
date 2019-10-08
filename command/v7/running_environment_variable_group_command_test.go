@@ -1,8 +1,6 @@
 package v7_test
 
 import (
-	"errors"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -10,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"errors"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -112,8 +111,10 @@ var _ = Describe("running-environment-variable-group Command", func() {
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 					Expect(testUI.Out).To(Say(`variable name\s+assigned value`))
-					Expect(testUI.Out).To(Say(`key_one\s+value_one`))
-					Expect(testUI.Out).To(Say(`key_two\s+value_two`))
+					// We have to do complex regex match, for the results are returned in a random order
+					kv1Regex := `key_one\s+value_one`
+					kv2Regex := `key_two\s+value_two`
+					Expect(testUI.Out).To(Say("(%s\n%s)|(%s\n%s)", kv1Regex, kv2Regex, kv2Regex, kv1Regex))
 				})
 			})
 

@@ -179,11 +179,89 @@ var _ = Describe("EnvironmentVariables", func() {
 					)
 				})
 
-				It("returns the error and warnings", func() {
+				It("returns the patchedEnvVars and warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(patchedEnvVars).To(Equal(EnvironmentVariables{
 						"DEBUG": {Value: "false", IsSet: true},
+					}))
+				})
+			})
+		})
+	})
+
+	Describe("UpdateEnvironmentVariableGroup", func() {
+		var (
+			warnings       Warnings
+			executeErr     error
+			envVars        EnvironmentVariables
+			patchedEnvVars EnvironmentVariables
+		)
+
+		JustBeforeEach(func() {
+			patchedEnvVars, warnings, executeErr = client.UpdateEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup, envVars)
+		})
+
+		When("the request errors", func() {
+			BeforeEach(func() {
+				envVars = EnvironmentVariables{"my-var": {Value: "my-val", IsSet: true}}
+
+				expectedBody := map[string]interface{}{
+					"var": map[string]string{
+						"my-var": "my-val",
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/environment_variable_groups/staging"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusTeapot, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusTeapot}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the request succeeds", func() {
+			When("env variable is being set", func() {
+				BeforeEach(func() {
+					envVars = EnvironmentVariables{
+						"my-var":    {Value: "my-val", IsSet: true},
+						"delete-me": {},
+					}
+
+					expectedBody := map[string]interface{}{
+						"var": map[string]interface{}{
+							"my-var":    "my-val",
+							"delete-me": nil,
+						},
+					}
+
+					responseBody := `{
+						"var": {
+							"my-var": "my-val"
+						}
+					}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/environment_variable_groups/staging"),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusOK, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the patchedEnvVars and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+					Expect(patchedEnvVars).To(Equal(EnvironmentVariables{
+						"my-var": {Value: "my-val", IsSet: true},
 					}))
 				})
 			})

@@ -81,6 +81,131 @@ var _ = Describe("Environment Variable Actions", func() {
 		})
 	})
 
+	Describe("SetEnvironmentVariableGroup", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+			executeErr                error
+			warnings                  Warnings
+			envVars                   ccv3.EnvironmentVariables
+		)
+
+		BeforeEach(func() {
+			envVars = ccv3.EnvironmentVariables{}
+			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.SetEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup, envVars)
+		})
+
+		When("Setting the environment variable group fails", func() {
+			When("user passes some env var group", func() {
+				BeforeEach(func() {
+					envVars = ccv3.EnvironmentVariables{
+						"key1": {Value: "val1", IsSet: true},
+						"key2": {Value: "val2", IsSet: true},
+					}
+
+					fakeCloudControllerClient.UpdateEnvironmentVariableGroupReturns(
+						nil,
+						ccv3.Warnings{"update-env-var-group-warning"},
+						errors.New("update-env-var-group-error"),
+					)
+				})
+
+				It("sets the environment variable group via CC", func() {
+					Expect(fakeCloudControllerClient.UpdateEnvironmentVariableGroupCallCount()).To(Equal(1))
+					actualGroup, actualEnvPair := fakeCloudControllerClient.UpdateEnvironmentVariableGroupArgsForCall(0)
+					Expect(actualGroup).To(Equal(constant.StagingEnvironmentVariableGroup))
+					Expect(actualEnvPair).To(Equal(envVars))
+				})
+
+				It("returns warnings and error", func() {
+					Expect(executeErr).To(MatchError("update-env-var-group-error"))
+					Expect(warnings).To(ConsistOf("update-env-var-group-warning"))
+				})
+
+			})
+
+			When("user passes in '{}'", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetEnvironmentVariableGroupReturns(
+						ccv3.EnvironmentVariables{},
+						ccv3.Warnings{},
+						errors.New("I love my corgi, Pancho!"),
+					)
+				})
+
+				It("propagates the error", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(executeErr).To(MatchError(errors.New("I love my corgi, Pancho!")))
+				})
+			})
+		})
+
+		When("Setting the environment variable group succeeds", func() {
+
+			When("user passes some env var group", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateEnvironmentVariableGroupReturns(
+						ccv3.EnvironmentVariables{
+							"key1": {Value: "val1", IsSet: true},
+							"key2": {Value: "val2", IsSet: true},
+						},
+						ccv3.Warnings{"update-env-var-group-warning"},
+						nil,
+					)
+				})
+
+				It("makes the API call to update the environment variable group and returns all warnings", func() {
+					Expect(fakeCloudControllerClient.UpdateEnvironmentVariableGroupCallCount()).To(Equal(1))
+					actualGroup, actualEnvPair := fakeCloudControllerClient.UpdateEnvironmentVariableGroupArgsForCall(0)
+					Expect(actualGroup).To(Equal(constant.StagingEnvironmentVariableGroup))
+					Expect(actualEnvPair).To(Equal(envVars))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("update-env-var-group-warning"))
+				})
+			})
+
+			When("user passes in '{}'", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetEnvironmentVariableGroupReturns(
+						ccv3.EnvironmentVariables{
+							"delete-me1": {Value: "val1", IsSet: true},
+							"delete-me2": {Value: "val2", IsSet: true},
+						},
+						ccv3.Warnings{"get-env-var-group-warning"},
+						nil,
+					)
+					fakeCloudControllerClient.UpdateEnvironmentVariableGroupReturns(
+						ccv3.EnvironmentVariables{},
+						ccv3.Warnings{"update-env-var-group-warning"},
+						nil,
+					)
+				})
+
+				It("nils the values of existing vars", func() {
+					Expect(fakeCloudControllerClient.GetEnvironmentVariableGroupCallCount()).To(Equal(1))
+					actualGroup := fakeCloudControllerClient.GetEnvironmentVariableGroupArgsForCall(0)
+					Expect(actualGroup).To(Equal(constant.StagingEnvironmentVariableGroup))
+
+					actualGroup, actualEnvPair := fakeCloudControllerClient.UpdateEnvironmentVariableGroupArgsForCall(0)
+					Expect(actualGroup).To(Equal(constant.StagingEnvironmentVariableGroup))
+
+					Expect(actualEnvPair).To(Equal(ccv3.EnvironmentVariables{
+						"delete-me1": {Value: "", IsSet: false},
+						"delete-me2": {Value: "", IsSet: false},
+					}))
+
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-env-var-group-warning", "update-env-var-group-warning"))
+				})
+			})
+		})
+	})
+
 	Describe("GetEnvironmentVariablesByApplicationNameAndSpace", func() {
 		var (
 			actor                     *Actor
@@ -340,6 +465,7 @@ var _ = Describe("Environment Variable Actions", func() {
 							nil,
 						)
 					})
+
 					It("makes the API call to update the app environment variables and returns all warnings", func() {
 						Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
