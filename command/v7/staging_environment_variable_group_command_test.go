@@ -97,7 +97,6 @@ var _ = Describe("staging-environment-variable-group Command", func() {
 				BeforeEach(func() {
 					envVars := v7action.EnvironmentVariableGroup{
 						"key_one": {IsSet: true, Value: "value_one"},
-						"key_two": {IsSet: true, Value: "value_two"},
 					}
 
 					fakeActor.GetEnvironmentVariableGroupReturns(
@@ -113,7 +112,6 @@ var _ = Describe("staging-environment-variable-group Command", func() {
 					Expect(testUI.Err).To(Say("some-warning-2"))
 					Expect(testUI.Out).To(Say(`variable name\s+assigned value`))
 					Expect(testUI.Out).To(Say(`key_one\s+value_one`))
-					Expect(testUI.Out).To(Say(`key_two\s+value_two`))
 				})
 			})
 
