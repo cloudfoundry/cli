@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"regexp"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -43,9 +45,15 @@ var _ = Describe("apps command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("apps - List all apps in the target space"))
 				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf apps [--labels SELECTOR]")))
+				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("cf apps"))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf apps --labels 'environment in (production,staging),tier in (backend)'")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf apps --labels 'env=dev,!chargeback-code,tier in (backend,worker)'")))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("a"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--labels\s+Selector to filter apps by labels`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("events, logs, map-route, push, restart, scale, start, stop"))
 

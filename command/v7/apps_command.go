@@ -18,10 +18,10 @@ type AppsActor interface {
 }
 
 type AppsCommand struct {
-	usage           interface{} `usage:"CF_NAME apps"`
+	usage           interface{} `usage:"CF_NAME apps [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME apps\n   CF_NAME apps --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME apps --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
 	relatedCommands interface{} `related_commands:"events, logs, map-route, push, scale, start, stop, restart"`
 
-	Labels      string `long:"labels" description:"TODO"`
+	Labels      string `long:"labels" description:"Selector to filter apps by labels"`
 	UI          command.UI
 	Config      command.Config
 	Actor       AppsActor
