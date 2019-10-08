@@ -137,7 +137,16 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		return 1
 	case flags.ErrUnknownCommand:
 		if !isHelpCommand(originalArgs) {
-			if isPluginCommand(originalArgs[0]) {
+			config, configErr := configv3.LoadConfig()
+			if configErr != nil {
+				if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
+
+					fmt.Fprintf(os.Stderr, "Empty Config, failed to load plugins")
+					return 1
+				}
+			}
+
+			if isPluginCommand(originalArgs[0], config.Plugins()) {
 				plugin_transition.RunPlugin()
 			} else {
 				// TODO Extract handling of unknown commands/suggested  commands out of legacy
@@ -160,10 +169,9 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 	return 0
 }
 
-func isPluginCommand(command string) bool {
+func isPluginCommand(command string, plugins []configv3.Plugin) bool {
 
-	config, _ := configv3.LoadConfig()
-	for _, metadata := range config.Plugins() {
+	for _, metadata := range plugins {
 		for _, pluginCommand := range metadata.Commands {
 			if command == pluginCommand.Name || command == pluginCommand.Alias {
 				return true
