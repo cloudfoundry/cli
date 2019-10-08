@@ -227,7 +227,11 @@ var _ = Describe("help command", func() {
 				Eventually(session).Should(Exit(1))
 			},
 
-			Entry("passing the --help flag", func() *exec.Cmd {
+			Entry("passing --help into rock (cf rock --help)", func() *exec.Cmd {
+				return exec.Command("cf", "rock", "--help")
+			}),
+
+			Entry("passing the --help flag (cf --help rock)", func() *exec.Cmd {
 				return exec.Command("cf", "--help", "rock")
 			}),
 

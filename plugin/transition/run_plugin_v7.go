@@ -53,5 +53,5 @@ func RunPlugin() {
 	if !ran {
 		panic("oh no")
 	}
-
+	// fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 }

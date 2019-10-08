@@ -7,11 +7,12 @@ import (
 	"reflect"
 	"strings"
 
+	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/plugin/transition"
+	plugin_transition "code.cloudfoundry.org/cli/plugin/transition"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -133,7 +134,18 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		parse([]string{"help", originalArgs[0]}, commandList)
 		return 1
 	case flags.ErrUnknownCommand:
-		plugin_transition.RunPlugin()
+		if !isHelpCommand(originalArgs) {
+			if isPluginCommand(originalArgs[0]) {
+				plugin_transition.RunPlugin()
+			} else {
+				// TODO Extract handling of unknown commands/suggested  commands out of legacy
+				cmd.Main(os.Getenv("CF_TRACE"), os.Args)
+
+			}
+		} else {
+			helpExitCode := parse([]string{"help", originalArgs[0]}, commandList)
+			return helpExitCode
+		}
 	case flags.ErrCommandRequired:
 		if common.Commands.VerboseOrVersion {
 			parse([]string{"version"}, commandList)
@@ -144,6 +156,28 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 	}
 	return 0
+}
+
+func isPluginCommand(command string) bool {
+
+	config, _ := configv3.LoadConfig()
+	for _, metadata := range config.Plugins() {
+		for _, pluginCommand := range metadata.Commands {
+			if command == pluginCommand.Name || command == pluginCommand.Alias {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isHelpCommand(args []string) bool {
+	for _, arg := range args {
+		if arg == "-h" || arg == "--help" || arg == "--h" {
+			return true
+		}
+	}
+	return false
 }
 
 func isCommand(s string) bool {
@@ -224,8 +258,7 @@ func handleError(passedErr error, commandUI UI) error {
 			commandUI.DisplayWarning("")
 			commandUI.DisplayWarning(typedErr.Error())
 		}
-
-		plugin_transition.RunPlugin()
+		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case *ssh.ExitError:
 		exitStatus := typedErr.ExitStatus()
 		if sig := typedErr.Signal(); sig != "" {

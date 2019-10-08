@@ -13,6 +13,7 @@ import (
 		* SendMetadata - used to fetch the plugin metadata
 **/
 func Start(cmd Plugin) {
+	println("Inside of start")
 	if len(os.Args) < 2 {
 		fmt.Printf("This cf CLI plugin is not intended to be run on its own\n\n")
 		os.Exit(1)

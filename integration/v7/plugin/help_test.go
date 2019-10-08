@@ -20,22 +20,22 @@ var _ = Describe("help", func() {
 
 	It("displays the plugin commands in master help", func() {
 		session := helpers.CF("help")
-		Eventually(session).Should(Say("TestPluginCommandWithAlias"))
+		Eventually(session).Should(Say("TestPluginCommandWithAliasV7"))
 		Eventually(session).Should(Exit(0))
 	})
 
 	DescribeTable("displays individual plugin help",
 		func(helpCommand ...string) {
 			session := helpers.CF(helpCommand...)
-			Eventually(session).Should(Say("TestPluginCommandWithAlias"))
+			Eventually(session).Should(Say("TestPluginCommandWithAliasV7"))
 			Eventually(session).Should(Say("This is my plugin help test. Banana."))
 			Eventually(session).Should(Say("I R Usage"))
 			Eventually(session).Should(Say(`--dis-flag\s+is a flag`))
 			Eventually(session).Should(Exit(0))
 		},
 
-		Entry("when passed to help", "help", "TestPluginCommandWithAlias"),
-		Entry("when when passed -h", "TestPluginCommandWithAlias", "-h"),
-		Entry("when when passed --help", "TestPluginCommandWithAlias", "--help"),
+		Entry("when passed to help", "help", "TestPluginCommandWithAliasV7"),
+		Entry("when passed -h", "TestPluginCommandWithAliasV7", "-h"),
+		Entry("when passed --help", "TestPluginCommandWithAliasV7", "--help"),
 	)
 })

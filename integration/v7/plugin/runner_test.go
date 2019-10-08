@@ -38,12 +38,12 @@ var _ = Describe("running plugins", func() {
 
 				It("lists the installed plugins", func() {
 					session := helpers.CF("plugins")
-					Eventually(session).Should(Say("Username"))
+					Eventually(session).Should(Say("CoolTest"))
 					Eventually(session).Should(Exit(0))
 				})
 
 				It("is able to run an installed plugin command", func() {
-					confirmTestPluginOutput("ApiEndpoint", helpers.GetAPI())
+					confirmTestPluginOutput("CoolTest", "I am a test plugin")
 				})
 			})
 		})
@@ -65,7 +65,7 @@ var _ = Describe("running plugins", func() {
 				})
 
 				It("can call a command by its alias", func() {
-					confirmTestPluginOutput("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "You called Test Plugin Command With Alias!")
+					confirmTestPluginOutput("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFV7", "You called Test Plugin Command V7 With Alias!")
 				})
 			})
 		})
