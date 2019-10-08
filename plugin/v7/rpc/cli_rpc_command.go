@@ -4,10 +4,13 @@ package rpc
 
 import (
 	"bytes"
+	"encoding/gob"
 	"errors"
 	"io"
 	"sync"
 
+	"code.cloudfoundry.org/cli/command"
+	v7command "code.cloudfoundry.org/cli/command/v7"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
@@ -17,6 +20,8 @@ import (
 type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
 	MetadataMutex        *sync.RWMutex
+	Config               command.Config
+	AppActor             v7command.AppActor
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
 	outputBucket         *bytes.Buffer
@@ -67,6 +72,25 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	return errors.New("unimplemented")
 }
 
-func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	return errors.New("unimplemented")
+func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedApplicationSummary) error {
+	spaceGUID := cmd.Config.TargetedSpace().GUID
+	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, spaceGUID, true)
+	if err != nil {
+		return err
+	}
+
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(app)
+	if err != nil {
+		panic(err)
+	}
+
+	err = dec.Decode(&retVal)
+	if err != nil {
+		panic(err)
+	}
+	return nil
 }

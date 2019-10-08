@@ -2,62 +2,110 @@
 
 package models
 
-import "time"
+import (
+	"time"
 
-type GetAppModel struct {
-	Guid                 string
-	Name                 string
-	BuildpackUrl         string
-	Command              string
-	DetectedStartCommand string
-	DiskQuota            int64 // in Megabytes
-	EnvironmentVars      map[string]interface{}
-	InstanceCount        int
-	Memory               int64 // in Megabytes
-	RunningInstances     int
-	HealthCheckTimeout   int
-	State                string
-	SpaceGuid            string
-	PackageUpdatedAt     *time.Time
-	PackageState         string
-	StagingFailedReason  string
-	Stack                *GetApp_Stack
-	Instances            []GetApp_AppInstanceFields
-	Routes               []GetApp_RouteSummary
-	Services             []GetApp_ServiceSummary
+	"code.cloudfoundry.org/cli/types"
+)
+
+type Metadata struct {
+	Labels map[string]types.NullString
 }
 
-type GetApp_AppInstanceFields struct {
-	State     string
-	Details   string
-	Since     time.Time
-	CpuUsage  float64 // percentage
-	DiskQuota int64   // in bytes
-	DiskUsage int64
-	MemQuota  int64
-	MemUsage  int64
+type AppLifecycleType string
+type ApplicationState string
+
+type Application struct {
+	Name                string
+	GUID                string
+	StackName           string
+	State               ApplicationState
+	LifecycleType       AppLifecycleType
+	LifecycleBuildpacks []string
+	Metadata            *Metadata
 }
 
-type GetApp_Stack struct {
-	Guid        string
-	Name        string
-	Description string
+type HealthCheckType string
+
+type Process struct {
+	GUID                         string
+	Type                         string
+	Command                      types.FilteredString
+	HealthCheckType              HealthCheckType
+	HealthCheckEndpoint          string
+	HealthCheckInvocationTimeout int64
+	HealthCheckTimeout           int64
+	Instances                    types.NullInt
+	MemoryInMB                   types.NullUint64
+	DiskInMB                     types.NullUint64
 }
 
-type GetApp_RouteSummary struct {
-	Guid   string
-	Host   string
-	Domain GetApp_DomainFields
-	Path   string
-	Port   int
+type Sidecar struct {
+	GUID    string
+	Name    string
+	Command types.FilteredString
 }
 
-type GetApp_DomainFields struct {
-	Guid string
-	Name string
+type ProcessInstanceState string
+
+type ProcessInstance struct {
+	CPU              float64
+	Details          string
+	DiskQuota        uint64
+	DiskUsage        uint64
+	Index            int64
+	IsolationSegment string
+	MemoryQuota      uint64
+	MemoryUsage      uint64
+	State            ProcessInstanceState
+	Type             string
+	Uptime           time.Duration
 }
 
-type GetApp_ServiceSummary struct {
-	Guid string
-	Name string
+type ProcessSummary struct {
+	Process
+
+	Sidecars []Sidecar
+
+	InstanceDetails []ProcessInstance
+}
+
+type ProcessSummaries []ProcessSummary
+
+type Route struct {
+	GUID       string
+	SpaceGUID  string
+	DomainGUID string
+	Host       string
+	Path       string
+	DomainName string
+	SpaceName  string
+	URL        string
+}
+
+type ApplicationSummary struct {
+	Application
+	ProcessSummaries ProcessSummaries
+	Routes           []Route
+}
+
+type DropletState string
+
+type DropletBuildpack struct {
+	Name         string
+	DetectOutput string
+}
+
+type Droplet struct {
+	GUID       string
+	State      DropletState
+	CreatedAt  string
+	Stack      string
+	Image      string
+	Buildpacks []DropletBuildpack
+}
+
+type DetailedApplicationSummary struct {
+	ApplicationSummary
+	CurrentDroplet Droplet
 }

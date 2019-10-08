@@ -14,14 +14,14 @@ var _ = Describe("Suggest Command", func() {
 		It("gives suggestions", func() {
 			command := exec.Command("cf", "logn")
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
+			Eventually(session).Should(Exit(1))
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session).Should(Say("'logn' is not a registered command. See 'cf help -a'"))
-			Eventually(session).Should(Say("Did you mean?"))
-			Eventually(session).Should(Exit(1))
+			Expect(session).To(Say("'logn' is not a registered command. See 'cf help -a'"))
+			Expect(session).To(Say("Did you mean?"))
 
-			Eventually(session.Out.Contents()).Should(ContainSubstring("login"))
-			Eventually(session.Out.Contents()).Should(ContainSubstring("logs"))
+			Expect(session.Out.Contents()).To(ContainSubstring("login"))
+			Expect(session.Out.Contents()).To(ContainSubstring("logs"))
 		})
 	})
 
@@ -29,11 +29,12 @@ var _ = Describe("Suggest Command", func() {
 		It("gives suggestions", func() {
 			command := exec.Command("cf", "zzz")
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
-			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session).Should(Say("'zzz' is not a registered command. See 'cf help -a'"))
-			Consistently(session).ShouldNot(Say("Did you mean?"))
 			Eventually(session).Should(Exit(1))
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(session).To(Say("'zzz' is not a registered command. See 'cf help -a'"))
+			Expect(session).ToNot(Say("Did you mean?"))
 		})
 	})
 })

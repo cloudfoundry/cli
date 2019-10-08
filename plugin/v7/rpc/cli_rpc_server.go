@@ -3,6 +3,8 @@
 package rpc
 
 import (
+	"code.cloudfoundry.org/cli/command"
+	v7command "code.cloudfoundry.org/cli/command/v7"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 
 	"fmt"
@@ -39,12 +41,16 @@ func NewRpcService(
 	terminalOutputSwitch TerminalOutputSwitch,
 	w io.Writer,
 	rpcServer *rpc.Server,
+	config command.Config,
+	appActor v7command.AppActor,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		Server: rpcServer,
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
 			MetadataMutex:        &sync.RWMutex{},
+			Config:               config,
+			AppActor:             appActor,
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
 			outputBucket:         &bytes.Buffer{},

@@ -6,11 +6,11 @@ import (
 	"os"
 	"os/exec"
 
-	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-func RunMethodIfExists(rpcService *CliRpcService, args []string, pluginList map[string]pluginconfig.PluginMetadata) bool {
-	for _, metadata := range pluginList {
+func RunMethodIfExists(rpcService *CliRpcService, args []string, plugins []configv3.Plugin) bool {
+	for _, metadata := range plugins {
 		for _, command := range metadata.Commands {
 			if command.Name == args[0] || command.Alias == args[0] {
 				args[0] = command.Name
