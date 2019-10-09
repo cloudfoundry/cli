@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,13 +22,17 @@ var _ = Describe("spaces command", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("spaces", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`\s+spaces - List all spaces in an org`))
+				Eventually(session).Should(Say("spaces - List all spaces in an org"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`\s+cf spaces`))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf spaces [--labels SELECTOR]")))
+				Eventually(session).Should(Say("EXAMPLES:"))
+				Eventually(session).Should(Say("cf spaces"))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf spaces --labels 'environment in (production,staging),tier in (backend)'")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf spaces --labels 'env=dev,!chargeback-code,tier in (backend,worker)'")))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--labels"))
+				Eventually(session).Should(Say(`--labels\s+Selector to filter spaces by labels`))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say(`\s+target`))
+				Eventually(session).Should(Say("create-space, set-space-role, space, space-users"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
