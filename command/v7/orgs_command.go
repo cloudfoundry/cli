@@ -16,14 +16,14 @@ type OrgsActor interface {
 }
 
 type OrgsCommand struct {
-	usage           interface{} `usage:"CF_NAME orgs"`
-	relatedCommands interface{} `related_commands:"create-org, org, org-users"`
+	usage           interface{} `usage:"CF_NAME orgs [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME orgs\n   CF_NAME orgs --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME orgs --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
+	relatedCommands interface{} `related_commands:"create-org, org, org-users, set-org-role"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       OrgsActor
-	Labels      string `long:"labels" description:"Selector to filter organizations against"`
+	Labels      string `long:"labels" description:"Selector to filter orgs by labels"`
 }
 
 func (cmd *OrgsCommand) Setup(config command.Config, ui command.UI) error {
