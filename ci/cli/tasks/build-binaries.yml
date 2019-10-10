@@ -26,7 +26,10 @@ run:
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
 
-    go version
+    if go version | grep -vs $TARGET_GO_VERSION; then
+      echo "target go version $TARGET_GO_VERSION"
+      exit 1
+    end
 
     mv i18n-data/i18n_resources.go $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources
 

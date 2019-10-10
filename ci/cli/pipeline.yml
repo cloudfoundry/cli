@@ -321,6 +321,8 @@ jobs:
   - in_parallel:
     - task: build
       file: cli-ci/ci/cli/tasks/build-binaries.yml
+      params:
+        TARGET_GO_VERSION: go1.12.10
       on_failure:
         put: slack-alert
         params:
@@ -328,6 +330,8 @@ jobs:
           text: *slack_notification_text
     - task: build-osx
       file: cli-ci/ci/cli/tasks/build-osx-binary.yml
+      params:
+        TARGET_GO_VERSION: go1.12.10
       on_failure:
         put: slack-alert
         params:
