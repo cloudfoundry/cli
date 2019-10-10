@@ -51,7 +51,7 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 
 	serviceBrokerName := cmd.RequiredArgs.ServiceBroker
 	if !cmd.Force {
-		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the service-broker {{.ServiceBroker}}?", map[string]interface{}{
+		confirmed, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the service-broker {{.ServiceBroker}}?", map[string]interface{}{
 			"ServiceBroker": serviceBrokerName,
 		})
 
@@ -59,7 +59,7 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 			return promptErr
 		}
 
-		if !response {
+		if !confirmed {
 			cmd.UI.DisplayText("'{{.ServiceBroker}}' has not been deleted.", map[string]interface{}{
 				"ServiceBroker": serviceBrokerName,
 			})

@@ -40,7 +40,7 @@ type CloudControllerClient interface {
 	DeleteOrganization(orgGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteOrphanedRoutes(spaceGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv3.JobURL, ccv3.Warnings, error)
-	DeleteServiceBroker(serviceBrokerGUID string) (ccv3.Warnings, error)
+	DeleteServiceBroker(serviceBrokerGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	DeleteSpace(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteUser(userGUID string) (ccv3.Warnings, error)

@@ -148,6 +148,7 @@ var _ = Describe("ServiceBroker", func() {
 			warnings          Warnings
 			executeErr        error
 			serviceBrokerGUID string
+			jobURL            JobURL
 		)
 
 		BeforeEach(func() {
@@ -155,7 +156,7 @@ var _ = Describe("ServiceBroker", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.DeleteServiceBroker(serviceBrokerGUID)
+			jobURL, warnings, executeErr = client.DeleteServiceBroker(serviceBrokerGUID)
 		})
 
 		When("the Cloud Controller successfully deletes the broker", func() {
@@ -163,7 +164,10 @@ var _ = Describe("ServiceBroker", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v3/service_brokers/some-service-broker-guid"),
-						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(http.StatusOK, "", http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {"some-job-url"},
+						}),
 					),
 				)
 			})
@@ -171,6 +175,7 @@ var _ = Describe("ServiceBroker", func() {
 			It("succeeds and returns warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(jobURL).To(Equal(JobURL("some-job-url")))
 			})
 		})
 
