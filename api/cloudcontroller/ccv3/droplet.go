@@ -27,6 +27,8 @@ type Droplet struct {
 	Stack string `json:"stack,omitempty"`
 	// State is the current state of the droplet.
 	State constant.DropletState `json:"state"`
+
+	// TODO: package guid
 }
 
 // DropletBuildpack is the name and output of a buildpack used to create a

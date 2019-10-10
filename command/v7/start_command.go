@@ -16,6 +16,10 @@ type StartActor interface {
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
+	AppNeedsToStage(app v7action.Application) (bool, error)
+	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 }
 
 type StartCommand struct {
@@ -71,6 +75,12 @@ func (cmd StartCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 		return nil
 	}
+
+		// get app's current droplet (and its package guid)
+		// get app's latest staged droplet?
+		// get app's newest package?
+	//if cmd.Actor.AppNeedsToStage(app)
+	//  cmd.Actor.Build() <- probably exists
 
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,

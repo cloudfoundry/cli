@@ -257,6 +257,10 @@ func (actor Actor) RestartApplication(appGUID string, noWait bool) (Warnings, er
 	return Warnings(warnings), err
 }
 
+func (actor Actor) AppNeedsToStage(app Application) (bool, error) {
+	return false, nil
+}
+
 // PollStart polls an application's processes until some are started. If noWait is false,
 // it waits for at least one instance of all processes to be running. If noWait is true,
 // it only waits for an instance of the web process to be running.
