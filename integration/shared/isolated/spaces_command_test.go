@@ -23,8 +23,6 @@ var _ = Describe("spaces command", func() {
 				Eventually(session).Should(Say(`\s+spaces - List all spaces in an org`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`\s+cf spaces`))
-				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say(`\s+target`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
