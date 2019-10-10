@@ -52,7 +52,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.TurnOffColors()
 
 	var err error
-	testPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_v7")
+	testPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_v7", "-tags=V7")
 	Expect(err).ToNot(HaveOccurred())
 
 	overrideTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_command_overrides")
