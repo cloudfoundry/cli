@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -72,7 +73,8 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Done AccessToken:", result)
 	case "GetApp":
 		result, _ := cliConnection.GetApp(args[1])
-		fmt.Println("Done GetApp:", result)
+		fmt.Println(prettyPrint(result))
+		// fmt.Println("Done GetApp:", result)
 	case "GetApps":
 		result, _ := cliConnection.GetApps()
 		fmt.Println("Done GetApps:", result)
@@ -167,4 +169,9 @@ func uninstalling() {
 
 func main() {
 	plugin.Start(new(Test1))
+}
+
+func prettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }

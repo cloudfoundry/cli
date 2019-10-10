@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
@@ -15,7 +16,9 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	switch args[0] {
 	case "GetApp":
 		result, _ := cliConnection.GetApp(args[1])
-		fmt.Println("Done GetApp:", result)
+		// fmt.Printf("%+v\n", result)
+		fmt.Println(prettyPrint(result))
+		// fmt.Println("Done GetApp:", result)
 	case "TestPluginCommandWithAliasV7", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFV7":
 		fmt.Println("You called Test Plugin Command V7 With Alias!")
 	case "CoolTest":
@@ -59,4 +62,9 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 
 func main() {
 	plugin.Start(new(Test1))
+}
+
+func prettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }
