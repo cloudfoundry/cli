@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"code.cloudfoundry.org/cli/command/plugin"
-	"code.cloudfoundry.org/cli/command/v6"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 var Commands commandList
