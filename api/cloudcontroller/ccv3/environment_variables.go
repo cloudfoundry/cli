@@ -80,7 +80,12 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 }
 
 func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
-	bodyBytes, _ := json.Marshal(envVars)
+	bodyBytes, err := json.Marshal(envVars)
+
+	if err != nil {
+		return EnvironmentVariables{}, nil, err
+	}
+
 	request, err := client.newHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"group_name": string(group)},
 		RequestName: internal.PatchEnvironmentVariableGroupRequest,
