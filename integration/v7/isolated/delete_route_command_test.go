@@ -373,8 +373,8 @@ var _ = Describe("delete-route command", func() {
 			It("displays error and exits 0", func() {
 				session := helpers.CF("delete-route", "some-domain", "-f")
 				Eventually(session).Should(Say("OK"))
-				Eventually(session.Err).Should(Say(`Domain 'some-domain' not found.`))
 				Eventually(session).Should(Exit(0))
+				Expect(string(session.Err.Contents())).To(Equal("Domain 'some-domain' not found.\n"))
 			})
 		})
 

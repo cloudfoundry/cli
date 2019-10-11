@@ -199,6 +199,11 @@ type FakeUI struct {
 	displayWarningsArgsForCall []struct {
 		arg1 []string
 	}
+	DisplayWarningsV7Stub        func([]string)
+	displayWarningsV7Mutex       sync.RWMutex
+	displayWarningsV7ArgsForCall []struct {
+		arg1 []string
+	}
 	GetErrStub        func() io.Writer
 	getErrMutex       sync.RWMutex
 	getErrArgsForCall []struct {
@@ -1280,6 +1285,42 @@ func (fake *FakeUI) DisplayWarningsArgsForCall(i int) []string {
 	return argsForCall.arg1
 }
 
+func (fake *FakeUI) DisplayWarningsV7(arg1 []string) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.displayWarningsV7Mutex.Lock()
+	fake.displayWarningsV7ArgsForCall = append(fake.displayWarningsV7ArgsForCall, struct {
+		arg1 []string
+	}{arg1Copy})
+	fake.recordInvocation("DisplayWarningsV7", []interface{}{arg1Copy})
+	fake.displayWarningsV7Mutex.Unlock()
+	if fake.DisplayWarningsV7Stub != nil {
+		fake.DisplayWarningsV7Stub(arg1)
+	}
+}
+
+func (fake *FakeUI) DisplayWarningsV7CallCount() int {
+	fake.displayWarningsV7Mutex.RLock()
+	defer fake.displayWarningsV7Mutex.RUnlock()
+	return len(fake.displayWarningsV7ArgsForCall)
+}
+
+func (fake *FakeUI) DisplayWarningsV7Calls(stub func([]string)) {
+	fake.displayWarningsV7Mutex.Lock()
+	defer fake.displayWarningsV7Mutex.Unlock()
+	fake.DisplayWarningsV7Stub = stub
+}
+
+func (fake *FakeUI) DisplayWarningsV7ArgsForCall(i int) []string {
+	fake.displayWarningsV7Mutex.RLock()
+	defer fake.displayWarningsV7Mutex.RUnlock()
+	argsForCall := fake.displayWarningsV7ArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeUI) GetErr() io.Writer {
 	fake.getErrMutex.Lock()
 	ret, specificReturn := fake.getErrReturnsOnCall[len(fake.getErrArgsForCall)]
@@ -1779,6 +1820,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayWarningV7Mutex.RUnlock()
 	fake.displayWarningsMutex.RLock()
 	defer fake.displayWarningsMutex.RUnlock()
+	fake.displayWarningsV7Mutex.RLock()
+	defer fake.displayWarningsV7Mutex.RUnlock()
 	fake.getErrMutex.RLock()
 	defer fake.getErrMutex.RUnlock()
 	fake.getInMutex.RLock()

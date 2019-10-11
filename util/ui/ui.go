@@ -254,13 +254,24 @@ func (ui *UI) DisplayWarning(template string, templateValues ...map[string]inter
 	fmt.Fprintf(ui.Err, "%s\n\n", ui.TranslateText(template, templateValues...))
 }
 
-// DisplayWarnings translates the warnings and outputs to ui.Err.
+// Translates warnings and outputs them to ui.Err.
+// Prints each warning with a trailing newline.
+// Prints the final warning with two trailing newlines.
 func (ui *UI) DisplayWarnings(warnings []string) {
+
 	for _, warning := range warnings {
 		fmt.Fprintf(ui.Err, "%s\n", ui.TranslateText(warning))
 	}
 	if len(warnings) > 0 {
 		fmt.Fprintln(ui.Err)
+	}
+}
+
+// Translates warnings and outputs them to ui.Err.
+// Prints each warning with a trailing newline.
+func (ui *UI) DisplayWarningsV7(warnings []string) {
+	for _, warning := range warnings {
+		fmt.Fprintf(ui.Err, "%s\n", ui.TranslateText(warning))
 	}
 }
 
@@ -271,7 +282,7 @@ func (ui *UI) DisplayWarningV7(template string, templateValues ...map[string]int
 	fmt.Fprintf(ui.Err, "%s\n", ui.TranslateText(template, templateValues...))
 }
 
-// FlushDeferred diplays text previously deferred (using DeferText) to the UI's
+// FlushDeferred displays text previously deferred (using DeferText) to the UI's
 // `Out`.
 func (ui *UI) FlushDeferred() {
 	ui.terminalLock.Lock()

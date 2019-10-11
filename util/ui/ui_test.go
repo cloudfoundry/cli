@@ -400,6 +400,49 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	// Covers the happy paths, additional cases are tested in TranslateText
+	Describe("DisplayWarningsV7", func() {
+		It("displays the warnings to ui.Err", func() {
+			ui.DisplayWarningsV7([]string{"warning-1", "warning-2"})
+			Expect(ui.Err).To(Say("warning-1\n"))
+			Expect(ui.Err).To(Say("warning-2\n"))
+		})
+
+		When("the locale is not set to english", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				errBuff = NewBuffer()
+				ui.Err = errBuff
+			})
+
+			When("there are multiple warnings", func() {
+				It("displays translated warnings to ui.Err", func() {
+					ui.DisplayWarningsV7([]string{"un-translateable warning", "FEATURE FLAGS", "Number of instances"})
+					Expect(string(errBuff.Contents())).To(Equal("un-translateable warning\nINDICATEURS DE FONCTION\nNombre d'instances\n"))
+				})
+			})
+
+			When("there is a single warning ", func() {
+				It("displays the translated warning to ui.Err", func() {
+					ui.DisplayWarningsV7([]string{"un-translateable warning"})
+					Expect(string(errBuff.Contents())).To(Equal("un-translateable warning\n"))
+				})
+			})
+
+			Context("there are no warnings", func() {
+				It("does not print out a new line", func() {
+					ui.DisplayWarningsV7(nil)
+					Expect(errBuff.Contents()).To(BeEmpty())
+				})
+			})
+		})
+	})
+
 	Describe("TranslateText", func() {
 		It("returns the template", func() {
 			Expect(ui.TranslateText("some-template")).To(Equal("some-template"))
