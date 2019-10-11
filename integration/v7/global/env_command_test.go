@@ -96,8 +96,8 @@ var _ = Describe("env command", func() {
 				Eventually(helpers.CF("set-env", appName, "Capital-env-var", "some-other-env-value")).Should(Exit(0))
 				Eventually(helpers.CF("create-user-provided-service", userProvidedServiceName)).Should(Exit(0))
 				Eventually(helpers.CF("bind-service", appName, userProvidedServiceName)).Should(Exit(0))
-				Eventually(helpers.CF("set-running-environment-variable-group", `{"running-env-name": "running-env-value", "number": 1, "Xstring": "X"}`)).Should(Exit(0))
-				Eventually(helpers.CF("set-staging-environment-variable-group", `{"staging-env-name": "staging-env-value", "number": 2, "Ystring": "Y"}`)).Should(Exit(0))
+				Eventually(helpers.CF("set-running-environment-variable-group", `{"running-env-name": "running-env-value", "Xstring": "X"}`)).Should(Exit(0))
+				Eventually(helpers.CF("set-staging-environment-variable-group", `{"staging-env-name": "staging-env-value", "Ystring": "Y"}`)).Should(Exit(0))
 			})
 
 			AfterEach(func() {
@@ -125,12 +125,10 @@ var _ = Describe("env command", func() {
 
 				Eventually(session).Should(Say("Running Environment Variable Groups:"))
 				Eventually(session).Should(Say(`Xstring:\s+X`))
-				Eventually(session).Should(Say(`number:\s+1`))
 				Eventually(session).Should(Say(`running-env-name:\s+running-env-value`))
 
 				Eventually(session).Should(Say("Staging Environment Variable Groups:"))
 				Eventually(session).Should(Say(`Ystring:\s+Y`))
-				Eventually(session).Should(Say(`number:\s+2`))
 				Eventually(session).Should(Say(`staging-env-name:\s+staging-env-value`))
 
 				Eventually(session).Should(Exit(0))
