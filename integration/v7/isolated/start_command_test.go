@@ -1,17 +1,20 @@
 package isolated
 
 import (
-	"regexp"
-
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"regexp"
 )
 
-var _ = Describe("start command", func() {
+const (
+	PushCommandName       = "push"
+)
+
+var _ = FDescribe("start command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -145,13 +148,57 @@ var _ = Describe("start command", func() {
 			})
 
 			When("the app is not staged", func() {
-				It("complains about not having a droplet", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+						Eventually(session).Should(Say(`\s+name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Exit(0))
+					})
+
+					helpers.WithBananaPantsApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+						Eventually(session).Should(Say(`Uploading files\.\.\.`))
+						Eventually(session).Should(Say("100.00%"))
+						Eventually(session).Should(Say(`Waiting for API to complete processing files\.\.\.`))
+						Eventually(session).Should(Say(`\s+name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+stopped`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				It("stages and starts the app", func() {
 					session := helpers.CF("start", appName)
+					userName, _ := helpers.GetCredentials()
 
-					Eventually(session.Err).Should(Say(`Assign a droplet before starting this app\.`))
-					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Package staged"))
+					Eventually(session).Should(Say(`droplet guid:\s+%s`, helpers.GUIDRegex))
+					Eventually(session).Should(Say(`state:\s+staged`))
+					Eventually(session).Should(Say(`created:\s+%s`, helpers.UserFriendlyDateRegex))
 
-					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+32M`))
+					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+
+					Eventually(session).Should(Exit(0))
+				})
+
+				When("the app is not staged and cannot be staged", func() {
+					It("gives an error", func() {
+						session := helpers.CF("start", appName)
+
+						Eventually(session.Err).Should(Say(`No package or droplet on this app.`))
+						Eventually(session).Should(Say("FAILED"))
+
+						Eventually(session).Should(Exit(1))
+					})
 				})
 			})
 		})

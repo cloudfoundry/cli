@@ -257,8 +257,90 @@ func (actor Actor) RestartApplication(appGUID string, noWait bool) (Warnings, er
 	return Warnings(warnings), err
 }
 
-func (actor Actor) AppNeedsToStage(app Application) (bool, error) {
-	return false, nil
+func (actor Actor) AppNeedsToStage(app Application) (bool, Warnings, error) {
+	var err error
+	var allWarnings Warnings
+
+	//Trigger build and assign resulting droplet when:
+	// There is no package (list package is empty -order by descending for later) -return false
+	//- There is no droplet (list droplets is empty) and there is a package on the app return true
+	//- The app's current droplet (get app current droplet.guid) == the app's latest (list builds ordered by created at desc filter staged??) STAGED droplet AND
+	//- The app's latest droplets package (found on latest build object) != the app's newest package (list packages[0])
+	//
+	//if we're gonna build AND the latest package has a FAILED state, exit 1
+
+	currentDroplet, warnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(app.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return false, allWarnings, err
+	}
+
+	droplets, warnings, err := actor.CloudControllerClient.GetDroplets(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return false, allWarnings, err
+	}
+
+	packages, warnings, err := actor.CloudControllerClient.GetPackages(ccv3.Query{
+		Key:    ccv3.AppGUIDFilter,
+		Values: []string{app.GUID},
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return false, allWarnings, err
+	}
+
+	newestDroplet := droplets[0]
+	if newestDroplet.GUID == currentDroplet.GUID {
+
+		newerPackages, err := findMostRecentPackages(packages, currentDroplet)
+		if err != nil {
+			return false, allWarnings, err
+		}
+
+		if len(newerPackages) > 0 {
+			return true, allWarnings, nil
+		}
+	}
+
+	recentPackages, err := findMostRecentPackages(packages, newestDroplet)
+	if err != nil {
+		return false, allWarnings, err
+	}
+	if len(recentPackages) > 0 {
+		return true, allWarnings, nil
+	}
+
+	return false, allWarnings, nil
+}
+
+func findMostRecentPackages(packages []ccv3.Package, droplet ccv3.Droplet) ([]ccv3.Package, error) {
+	var newerPackages []ccv3.Package
+
+	dropletCreatedAt, err := parseCreatedAt(droplet.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, pkg := range packages {
+		packageCreatedAt, err := parseCreatedAt(pkg.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		if packageCreatedAt.After(dropletCreatedAt) {
+			newerPackages = append(newerPackages, pkg)
+		}
+	}
+
+	return newerPackages, nil
+}
+
+func parseCreatedAt(createdAt string) (time.Time, error) {
+	return time.Parse(time.RFC3339, createdAt)
 }
 
 // PollStart polls an application's processes until some are started. If noWait is false,

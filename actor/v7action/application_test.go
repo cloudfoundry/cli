@@ -1757,6 +1757,198 @@ var _ = Describe("Application Actions", func() {
 
 	})
 
+	Describe("AppNeedsToStage", func() {
+		var (
+			shouldStage bool
+			warnings    Warnings
+			executeErr  error
+		)
+
+		JustBeforeEach(func() {
+			shouldStage, warnings, executeErr = actor.AppNeedsToStage(Application{
+				Name:                "some-app-name",
+				GUID:                "some-app-guid",
+				LifecycleType:       constant.AppLifecycleTypeBuildpack,
+				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
+			})
+		})
+
+		// Nothing to stage.
+		XWhen("There are no packages on the app", func() {
+			When("getting the packages succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetPackagesReturns([] ccv3.Package{}, ccv3.Warnings{"get-packages-warnings"}, nil)
+				})
+
+				It("checks for packages", func() {
+					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+					))
+				})
+
+				It("returns false", func() {
+					Expect(shouldStage).To(Equal(false))
+					Expect(warnings).To(ConsistOf("get-packages-warnings"))
+					Expect(executeErr).To(BeNil())
+				})
+			})
+
+			When("getting the packages fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetPackagesReturns(
+						nil,
+						ccv3.Warnings{"get-packages-warnings"},
+						errors.New("get-packages-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(warnings).To(ConsistOf("get-packages-warnings"))
+					Expect(executeErr).To(MatchError("get-packages-error"))
+				})
+			})
+		})
+
+		When("the app has a current droplet", func() {
+			var currentDroplet ccv3.Droplet
+
+			BeforeEach(func() {
+				currentDroplet = ccv3.Droplet{GUID: "current-droplet", CreatedAt: "2019-01-01T06:00:00Z"}
+				fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+					currentDroplet,
+					ccv3.Warnings{"get-current-droplet-warning"},
+					nil)
+			})
+
+			When("the current droplet is the latest droplet", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDropletsReturns(
+						[]ccv3.Droplet{
+							currentDroplet,
+							{GUID: "older-droplet-guid"},
+						},
+						ccv3.Warnings{"get-droplets-warning"},
+						nil)
+				})
+
+				When("there is at least one package newer than the current droplet for the app", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetPackagesReturns(
+							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-12-23T06:00:00Z"}},
+							ccv3.Warnings{"get-packages-warning"},
+							nil)
+					})
+
+					It("returns true", func() {
+						Expect(shouldStage).To(BeTrue())
+						Expect(warnings).To(ConsistOf(
+							"get-current-droplet-warning",
+							"get-droplets-warning",
+							"get-packages-warning"))
+					})
+				})
+
+				When("there is no package newer than the current droplet for the app", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetPackagesReturns(
+							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2018-05-01T06:00:00Z"}},
+							ccv3.Warnings{"get-packages-warning"},
+							nil)
+					})
+
+					//It starts the app without changing the current droplet
+					It("returns false", func() {
+						Expect(shouldStage).To(BeFalse())
+						Expect(executeErr).NotTo(HaveOccurred())
+					})
+				})
+			})
+
+			When("the current droplet is not the latest droplet", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDropletsReturns(
+						[]ccv3.Droplet{
+							{GUID: "newer-droplet-guid", CreatedAt: "2018-05-01T06:00:00Z"},
+							currentDroplet,
+						},
+						ccv3.Warnings{"get-droplets-warning"},
+						nil)
+				})
+
+				When("there are no packages newer than the newest droplet", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetPackagesReturns(
+							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2017-01-01T06:00:00Z"}},
+							ccv3.Warnings{"get-packages-warning"},
+							nil)
+					})
+
+					//It sets current droplet to newest droplet
+					It("returns false", func() {
+						Expect(shouldStage).To(BeFalse())
+						Expect(executeErr).NotTo(HaveOccurred())
+					})
+				})
+
+				When("there is at least one package newer than the newest droplet", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetPackagesReturns(
+							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-01-01T06:00:00Z"}},
+							ccv3.Warnings{"get-packages-warning"},
+							nil)
+					})
+
+					//It stages newest package & sets current droplet to newest droplet
+					It("returns true", func() {
+						Expect(shouldStage).To(BeTrue())
+						Expect(executeErr).NotTo(HaveOccurred())
+					})
+				})
+			})
+		})
+
+		XWhen("the app does not have a current droplet", func() {
+
+		})
+
+		// Definitely stage!
+		//When("there is no current or latest droplet but there is a package on the app", func() {
+		//	It("returns true", func() {
+		//
+		//	})
+		//})
+		//
+		////is this possible? What does it mean?
+		//When("there is no current droplet on the app", func() {
+		//	It("returns ", func() {
+		//
+		//	})
+		//})
+		//
+		//// The droplet has been set manually or by a rollback. Do not stage
+		//When("the current droplet is not the latest droplet and there is a package on the app", func() {
+		//	It("returns false", func() {
+		//
+		//	})
+		//})
+		//
+		//// The droplet has been set manually or the app has been stopped. Do not stage
+		//When("the current droplet is the latest droplet and is created after the latest package", func() {
+		//	It("returns false", func() {
+		//
+		//	})
+		//})
+		//
+		//// There is a new package that wants to be staged. Maybe user did a cf push --no-start
+		//When("the current droplet is the latest droplet but there is a newer package than the latest droplet", func() {
+		//	It("returns true", func() {
+		//
+		//	})
+		//})
+
+	})
+
 	Describe("RenameApplicationByNameAndSpaceGUID", func() {
 		When("the app does not exist", func() {
 			BeforeEach(func() {
