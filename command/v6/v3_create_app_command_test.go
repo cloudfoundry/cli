@@ -1,8 +1,9 @@
 package v6_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"errors"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"

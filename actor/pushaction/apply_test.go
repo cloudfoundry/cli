@@ -1,17 +1,18 @@
 package pushaction_test
 
 import (
+	"errors"
+	"io/ioutil"
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
 )
 
 func collectAllEvents(configStream <-chan ApplicationConfig, eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) ([]ApplicationConfig, []Event, Warnings, []error) {
