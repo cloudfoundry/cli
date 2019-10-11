@@ -15,19 +15,6 @@ var _ = Describe("spaces command", func() {
 		orgName = helpers.NewOrgName()
 	})
 
-	Describe("help", func() {
-		When("--help flag is set", func() {
-			It("displays command usage to output", func() {
-				session := helpers.CF("spaces", "--help")
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`\s+spaces - List all spaces in an org`))
-				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`\s+cf spaces`))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-	})
-
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "spaces")
