@@ -91,10 +91,10 @@ func generateReusableBrokerName(suffix string) string {
 
 func (f *FakeServiceBroker) register() {
 	if f.reusable {
-		f.deregisterIgnoringFailures()
+		f.deregister()
 	}
 
-	Eventually(helpers.CF("create-service-broker", f.name, "username", "password", f.URL())).Should(Exit(0))
+	Eventually(helpers.CF("create-service-broker", f.name, f.username, f.password, f.URL())).Should(Exit(0))
 	Eventually(helpers.CF("service-brokers")).Should(And(Exit(0), Say(f.name)))
 
 	Eventually(func() io.Reader {
@@ -111,8 +111,8 @@ func (f *FakeServiceBroker) update() {
 }
 
 func (f *FakeServiceBroker) cleanup() {
-	f.deregisterIgnoringFailures()
-	f.deleteAppIgnoringFailures()
+	f.deregister()
+	f.deleteApp()
 }
 
 func (f *FakeServiceBroker) deleteApp() {
@@ -123,22 +123,7 @@ func (f *FakeServiceBroker) deleteApp() {
 	Eventually(helpers.CF("delete", f.name, "-f", "-r")).Should(Exit(0))
 }
 
-func (f *FakeServiceBroker) deleteAppIgnoringFailures() {
-	if f.reusable {
-		return
-	}
-
-	Eventually(helpers.CF("delete", f.name, "-f", "-r")).Should(Exit(0))
-}
-
 func (f *FakeServiceBroker) deregister() {
-	f.purgeAllServiceOfferings(false)
-
-	Eventually(helpers.CF("delete-service-broker", f.name, "-f")).Should(Exit(0))
-	Eventually(helpers.CF("service-brokers")).Should(And(Exit(0), Not(Say(f.name))))
-}
-
-func (f *FakeServiceBroker) deregisterIgnoringFailures() {
 	f.purgeAllServiceOfferings(true)
 
 	Eventually(helpers.CF("delete-service-broker", f.name, "-f")).Should(Exit())
