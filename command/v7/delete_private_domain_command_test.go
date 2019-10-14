@@ -97,6 +97,7 @@ var _ = Describe("delete-private-domain Command", func() {
 
 		It("displays OK and returns with success", func() {
 			Expect(testUI.Err).To(Say("get-domain-warnings"))
+			Expect(testUI.Out).To(Say("Deleting private domain some-domain.com as steve..."))
 			Expect(testUI.Err).To(Say(`Domain 'some-domain.com' does not exist\.`))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).ToNot(HaveOccurred())
