@@ -15,6 +15,8 @@ func defaultConfig() *FakeServiceBroker {
 
 	return &FakeServiceBroker{
 		name:     generateReusableBrokerName(""),
+		username: "username",
+		password: "password",
 		reusable: true,
 		domain:   helpers.DefaultSharedDomain(),
 		Services: []service{
