@@ -59,7 +59,7 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 
 	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
 	cmd.UI.DisplayWarningsV7(warnings)
-	
+
 	cmd.UI.DisplayTextWithFlavor("Deleting private domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
 		"DomainName": domainName,
 		"Username":   currentUser.Name,
