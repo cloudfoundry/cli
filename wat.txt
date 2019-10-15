@@ -1,0 +1,98 @@
+When the app does not have a current droplet:
+    When there are there no droplets for this app:
+        When there are no packages for this app:
+            It returns an error
+        When there are some packages for this app:
+            It stages the latest package & sets current droplet to resulting droplet
+    When there are some droplets for this app:
+        When this is not the newest droplet:
+            When there are no packages newer than the newest droplet:
+                It sets current droplet to newest droplet
+            When there are some packages newer than the newest droplet:
+                It stages that package & sets current droplet to resulting droplet
+        When this is the newest droplet:
+            When there are no packages newer than this droplet:
+                It starts the app without changing the current droplet
+            When there are some packages newer than this droplet:
+                It stages that package & sets current droplet to resulting droplet
+When the app has a current droplet:
+    When this is not the newest droplet:
+        When there are no packages newer than the newest droplet:
+            It sets current droplet to newest droplet
+        When there are some packages newer than the newest droplet:
+            It stages that package & sets current droplet to resulting droplet
+    When this is the newest droplet:
+        When there are no packages newer than this droplet:
+            It starts the app without changing the current droplet
+        When there are some packages newer than this droplet:
+            It stages that package & sets current droplet to resulting droplet
+
+
+When the app does not have a current droplet:
+    When there are there no droplets for this app:
+        When there are no packages for this app:
+            error
+        When there are some packages for this app:
+            build conditionally
+    When there are some droplets for this app:
+        When this is not the newest droplet:
+            When there are no packages newer than the newest droplet:
+              build conditionally (it won't build)
+            When there are some packages newer than the newest droplet:
+              build conditionally (it might build?)
+        When this is the newest droplet:
+            When there are no packages newer than this droplet:
+              build conditionally (it wont)
+            When there are some packages newer than this droplet:
+              build conditionally  (it will)
+When the app has a current droplet:
+    When this is not the newest droplet:
+        When there are no packages newer than the newest droplet:
+          
+        When there are some packages newer than the newest droplet:
+    When this is the newest droplet:
+        When there are no packages newer than this droplet:
+        When there are some packages newer than this droplet:
+
+
+Current AppsManager behavior:
+- Get Current Droplet for the app
+- If there is no Current Droplet, get the most recently STAGED droplet
+- If there is no STAGED droplet, build a droplet from the most recent READY package
+- Set the current droplet to whichever droplet comes out of that logic
+- Hit /actions/start to start the app
+
+
+
+func ensureCurrentDropletIsSetAndStart() {
+  currentDroplet = getCurrentDropletForApp()
+
+  if currentDroplet == nil {
+    newestStagedDroplet = getNewestStagedDroplet()
+
+    if newestStagedDroplet != nil {
+      setCurrentDropletForApp(newestStagedDroplet)
+    } else {
+      newestReadyPackage = getNewestReadyPackage()
+
+      if newestReadyPackage == nil {
+        return ERROR("no packages ready for app")
+      }
+
+      startStreamingStagingLogs()
+      resultingDroplet = startBuildAndPoll(newestReadyPackage)
+      stopStreamStagingLogs()
+
+      setCurrentDropletForApp(resultingDroplet)
+    }
+  }
+
+  startAppAndWait()
+}
+
+ASSUMPTIONS MADE BY ABOVE LOGIC:
+- if there is a current droplet set, we should always use it (e.g. if the user set one manually)
+- we should never try to set the droplet to one that isn't STAGED
+- we should never try to stage a package that isn't READY
+
+
