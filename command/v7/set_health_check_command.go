@@ -73,7 +73,7 @@ func (cmd SetHealthCheckCommand) Execute(args []string) error {
 		cmd.InvocationTimeout.Value,
 	)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

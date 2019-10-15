@@ -73,13 +73,13 @@ func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	})
 
 	space, v2Warnings, err := cmd.ActorV2.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.SpaceName)
-	cmd.UI.DisplayWarnings(v2Warnings)
+	cmd.UI.DisplayWarningsV7(v2Warnings)
 	if err != nil {
 		return err
 	}
 
 	newIsolationSegmentName, warnings, err := cmd.Actor.ResetSpaceIsolationSegment(cmd.Config.TargetedOrganization().GUID, space.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

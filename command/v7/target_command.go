@@ -136,7 +136,7 @@ func (cmd *TargetCommand) setOrgAndSpace() error {
 // setOrg sets organization
 func (cmd *TargetCommand) setOrg() error {
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func (cmd *TargetCommand) setOrg() error {
 // and no space arg was provided.
 func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(orgGUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -171,7 +171,7 @@ func (cmd *TargetCommand) setSpace() error {
 	}
 
 	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, cmd.Config.TargetedOrganization().GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

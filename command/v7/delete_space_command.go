@@ -92,7 +92,7 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.DeleteSpaceByNameAndOrganizationName(cmd.RequiredArgs.Space, orgName)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		switch err.(type) {
 		case actionerror.SpaceNotFoundError:

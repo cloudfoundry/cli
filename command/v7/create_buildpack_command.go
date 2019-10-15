@@ -90,7 +90,7 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 		Position: types.NullInt{IsSet: true, Value: cmd.RequiredArgs.Position},
 		Enabled:  types.NullBool{IsSet: true, Value: !cmd.Disable},
 	})
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -102,10 +102,10 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	})
 	jobURL, warnings, err := cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	if _, ok := err.(ccerror.InvalidAuthTokenError); ok {
-		cmd.UI.DisplayWarnings([]string{"Failed to upload buildpack due to auth token expiration, retrying..."})
+		cmd.UI.DisplayWarningsV7([]string{"Failed to upload buildpack due to auth token expiration, retrying..."})
 		jobURL, warnings, err = cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	}
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return cmd.wrapWithTip(err)
 	}
@@ -115,7 +115,7 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 		"BuildpackName": cmd.RequiredArgs.Buildpack,
 	})
 	warnings, err = cmd.Actor.PollUploadBuildpackJob(jobURL)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err != nil {
 		return cmd.wrapWithTip(err)

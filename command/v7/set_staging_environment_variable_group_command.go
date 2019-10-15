@@ -75,7 +75,7 @@ func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) erro
 		constant.StagingEnvironmentVariableGroup,
 		envVars,
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

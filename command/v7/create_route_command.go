@@ -72,7 +72,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 	_, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteAlreadyExistsError); ok {
 			cmd.UI.DisplayWarningV7(err.Error())

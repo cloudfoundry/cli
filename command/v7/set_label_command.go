@@ -115,7 +115,7 @@ func (cmd SetLabelCommand) executeApp(username string, labels map[string]types.N
 		cmd.Config.TargetedSpace().GUID,
 		labels)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	return err
 }
@@ -141,7 +141,7 @@ func (cmd SetLabelCommand) executeBuildpack(username string, labels map[string]t
 	)
 
 	warnings, err := cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, labels)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	return err
 }
@@ -164,7 +164,7 @@ func (cmd SetLabelCommand) executeOrg(username string, labels map[string]types.N
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName,
 		labels)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	return err
 }
@@ -191,7 +191,7 @@ func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types
 		cmd.Config.TargetedOrganization().GUID,
 		labels)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	return err
 }
@@ -212,7 +212,7 @@ func (cmd SetLabelCommand) executeStack(username string, labels map[string]types
 	)
 
 	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	return err
 }

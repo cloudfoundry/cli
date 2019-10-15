@@ -59,14 +59,14 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	}
 
 	domain, warnings, err := cmd.Actor.GetDomainByName(cmd.RequiredArgs.Domain)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.App, spaceGUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	path := cmd.Path.Path
 	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
 	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	})
 
 	destination, warnings, err := cmd.Actor.GetRouteDestinationByAppGUID(route.GUID, app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteDestinationNotFoundError); ok {
 			cmd.UI.DisplayText("Route to be unmapped is not currently mapped to the application.")
@@ -100,7 +100,7 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.UnmapRoute(route.GUID, destination.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

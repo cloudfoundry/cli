@@ -58,7 +58,7 @@ func (cmd OrgsCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	orgs, warnings, err := cmd.Actor.GetOrganizations(cmd.Labels)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

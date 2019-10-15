@@ -62,7 +62,7 @@ func (cmd SharePrivateDomainCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.SharePrivateDomain(domain, orgName)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

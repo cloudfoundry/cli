@@ -56,7 +56,7 @@ func (cmd FeatureFlagsCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	flags, warnings, err := cmd.Actor.GetFeatureFlags()
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

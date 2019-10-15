@@ -142,7 +142,7 @@ func (cmd UpdateBuildpackCommand) updateBuildpack() (v7action.Buildpack, error) 
 		cmd.CurrentStack,
 		desiredBuildpack,
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return updatedBuildpack, err
 	}
@@ -163,10 +163,10 @@ func (cmd UpdateBuildpackCommand) uploadBits(user configv3.User, updatedBuildpac
 		cmd.ProgressBar,
 	)
 	if _, ok := err.(ccerror.InvalidAuthTokenError); ok {
-		cmd.UI.DisplayWarnings([]string{"Failed to upload buildpack due to auth token expiration, retrying..."})
+		cmd.UI.DisplayWarningsV7([]string{"Failed to upload buildpack due to auth token expiration, retrying..."})
 		jobURL, warnings, err = cmd.Actor.UploadBuildpack(updatedBuildpack.GUID, buildpackBitsPath, cmd.ProgressBar)
 	}
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (cmd UpdateBuildpackCommand) uploadBits(user configv3.User, updatedBuildpac
 	})
 
 	warnings, err = cmd.Actor.PollUploadBuildpackJob(jobURL)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

@@ -62,7 +62,7 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 
 	_, warnings, err := cmd.Actor.CreateOrganization(orgName)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.OrganizationNameTakenError); ok {
 			cmd.UI.DisplayText(err.Error())

@@ -77,7 +77,7 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 	}
 
 	warnings, err := cmd.Actor.CreateServiceBroker(cmd.RequiredArgs.ServiceBroker, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password, cmd.RequiredArgs.URL, space.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err == nil {
 		cmd.UI.DisplayOK()

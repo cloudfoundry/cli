@@ -64,7 +64,7 @@ func (cmd EventsCommand) Execute(_ []string) error {
 		appName,
 		cmd.Config.TargetedSpace().GUID,
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

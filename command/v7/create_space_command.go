@@ -63,7 +63,7 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 	} else {
 		orgName = cmd.Organization
 		org, warnings, err := cmd.Actor.GetOrganizationByName(orgName)
-		cmd.UI.DisplayWarnings(warnings)
+		cmd.UI.DisplayWarningsV7(warnings)
 		if err != nil {
 			return err
 		}
@@ -86,7 +86,7 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 
 	_, warnings, err := cmd.Actor.CreateSpace(spaceName, orgGUID)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.SpaceAlreadyExistsError); ok {
 			cmd.UI.DisplayText(err.Error())

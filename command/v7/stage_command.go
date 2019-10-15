@@ -70,7 +70,7 @@ func (cmd StageCommand) Execute(args []string) error {
 	})
 
 	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
-	cmd.UI.DisplayWarnings(logWarnings)
+	cmd.UI.DisplayWarningsV7(logWarnings)
 	if logErr != nil {
 		return logErr
 	}

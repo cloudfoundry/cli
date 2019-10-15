@@ -56,7 +56,7 @@ func (cmd *StackCommand) Execute(args []string) error {
 
 func (cmd *StackCommand) getStack(stackName string) (v7action.Stack, error) {
 	stack, warnings, err := cmd.Actor.GetStackByName(cmd.RequiredArgs.StackName)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	return stack, err
 }
 

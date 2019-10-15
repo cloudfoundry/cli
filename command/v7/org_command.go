@@ -64,7 +64,7 @@ func (cmd OrgCommand) Execute(args []string) error {
 
 func (cmd OrgCommand) displayOrgGUID() error {
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.Organization)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	cmd.UI.DisplayNewline()
 
 	orgSummary, warnings, err := cmd.Actor.GetOrganizationSummaryByName(cmd.RequiredArgs.Organization)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	}
 
 	isolationSegments, v7Warnings, err := cmd.Actor.GetIsolationSegmentsByOrganization(orgSummary.GUID)
-	cmd.UI.DisplayWarnings(v7Warnings)
+	cmd.UI.DisplayWarningsV7(v7Warnings)
 	if err != nil {
 		return err
 	}

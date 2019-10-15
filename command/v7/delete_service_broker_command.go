@@ -74,7 +74,7 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 
 	serviceBroker, warnings, err := cmd.Actor.GetServiceBrokerByName(serviceBrokerName)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.ServiceBrokerNotFoundError); ok {
 			// TODO: Verify the correct error message to display for idempotent case
@@ -90,7 +90,7 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 
 	warnings, err = cmd.Actor.DeleteServiceBroker(serviceBroker.GUID)
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

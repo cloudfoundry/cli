@@ -76,7 +76,7 @@ func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 		})
 	}
 	warnings, err := cmd.Actor.DeleteBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.Stack)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err != nil {
 		switch err.(type) {

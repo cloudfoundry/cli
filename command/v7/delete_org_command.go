@@ -76,7 +76,7 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 	})
 
 	warnings, err := cmd.Actor.DeleteOrganization(cmd.RequiredArgs.Organization)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		switch err.(type) {
 		case actionerror.OrganizationNotFoundError:

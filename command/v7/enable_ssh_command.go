@@ -64,14 +64,14 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayWarnings(getAppWarnings)
+	cmd.UI.DisplayWarningsV7(getAppWarnings)
 
 	appFeature, getAppFeatureWarnings, err := cmd.Actor.GetAppFeature(app.GUID, "ssh")
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayWarnings(getAppFeatureWarnings)
+	cmd.UI.DisplayWarningsV7(getAppFeatureWarnings)
 
 	if appFeature.Enabled {
 		cmd.UI.DisplayTextWithFlavor("ssh support for app '{{.AppName}}' is already enabled.", map[string]interface{}{
@@ -83,13 +83,13 @@ func (cmd *EnableSSHCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayWarnings(updateSSHWarnings)
+	cmd.UI.DisplayWarningsV7(updateSSHWarnings)
 
 	sshEnabled, getSSHEnabledWarnings, err := cmd.Actor.GetSSHEnabled(app.GUID)
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayWarnings(getSSHEnabledWarnings)
+	cmd.UI.DisplayWarningsV7(getSSHEnabledWarnings)
 
 	cmd.UI.DisplayOK()
 

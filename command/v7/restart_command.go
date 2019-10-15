@@ -64,7 +64,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 	}
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		false,
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -106,21 +106,21 @@ func (cmd RestartCommand) DowntimeRestart(app v7action.Application) error {
 		cmd.UI.DisplayText("Stopping app...\n")
 
 		warnings, err = cmd.Actor.StopApplication(app.GUID)
-		cmd.UI.DisplayWarnings(warnings)
+		cmd.UI.DisplayWarningsV7(warnings)
 		if err != nil {
 			return err
 		}
 	}
 
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayText("Waiting for app to start...\n")
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	return err
 }
 
@@ -132,14 +132,14 @@ func (cmd RestartCommand) ZeroDowntimeRestart(app v7action.Application) error {
 	)
 
 	deploymentGUID, warnings, err := cmd.Actor.CreateDeployment(app.GUID, "")
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayText("Waiting for app to deploy...\n")
 	warnings, err = cmd.Actor.PollStartForRolling(app.GUID, deploymentGUID, cmd.NoWait)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

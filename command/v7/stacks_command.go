@@ -60,7 +60,7 @@ func (cmd StacksCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	stacks, warnings, err := cmd.Actor.GetStacks(cmd.Labels)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

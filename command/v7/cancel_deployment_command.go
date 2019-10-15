@@ -64,19 +64,19 @@ func (cmd *CancelDeploymentCommand) Execute(args []string) error {
 	)
 
 	application, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
 	deployment, warnings, err := cmd.Actor.GetLatestActiveDeploymentForApp(application.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
 	warnings, err = cmd.Actor.CancelDeployment(deployment.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

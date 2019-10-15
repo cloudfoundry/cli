@@ -57,7 +57,7 @@ func (cmd CheckRouteCommand) Execute(args []string) error {
 
 	path := cmd.Path.Path
 	matches, warnings, err := cmd.Actor.CheckRoute(cmd.RequiredArgs.Domain, cmd.Hostname, path)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err != nil {
 		return err

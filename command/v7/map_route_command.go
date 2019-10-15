@@ -60,14 +60,14 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 	}
 
 	domain, warnings, err := cmd.Actor.GetDomainByName(cmd.RequiredArgs.Domain)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.App, spaceGUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 	path := cmd.Path.Path
 	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
 	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
 			return err
@@ -93,7 +93,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			cmd.Hostname,
 			path,
 		)
-		cmd.UI.DisplayWarnings(warnings)
+		cmd.UI.DisplayWarningsV7(warnings)
 		if err != nil {
 			return err
 		}
@@ -108,7 +108,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 	})
 	dest, warnings, err := cmd.Actor.GetRouteDestinationByAppGUID(route.GUID, app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteDestinationNotFoundError); !ok {
 			return err
@@ -123,7 +123,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		return nil
 	}
 	warnings, err = cmd.Actor.MapRoute(route.GUID, app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

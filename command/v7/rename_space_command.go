@@ -65,7 +65,7 @@ func (cmd RenameSpaceCommand) Execute(args []string) error {
 		cmd.RequiredArgs.NewSpaceName,
 		cmd.Config.TargetedOrganization().GUID,
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}

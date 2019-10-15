@@ -103,7 +103,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	})
 
 	_, warnings, err := cmd.Actor.CreateUser(cmd.Args.Username, password, cmd.Origin)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err != nil {
 		if _, ok := err.(uaa.ConflictError); ok {

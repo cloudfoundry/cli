@@ -93,7 +93,7 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	cmd.UI.DisplayOK()
 
 	return nil

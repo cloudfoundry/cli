@@ -58,7 +58,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	}
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -80,14 +80,14 @@ func (cmd StartCommand) Execute(args []string) error {
 	})
 
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 	cmd.UI.DisplayText("\nWaiting for app to start...")
 
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		false,
 	)
-	cmd.UI.DisplayWarnings(warnings)
+	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
