@@ -48,8 +48,6 @@ func Cleanup() {
 
 type FakeServiceBroker struct {
 	name      string
-	username  string
-	password  string
 	Services  []service
 	domain    string
 	behaviors behaviors
@@ -87,7 +85,7 @@ func (f *FakeServiceBroker) WithAsyncBehaviour() *FakeServiceBroker {
 // EnsureAppIsDeployed makes the fake service broker app available and does not run 'cf create-service-broker'
 func (f *FakeServiceBroker) EnsureAppIsDeployed() *FakeServiceBroker {
 	f.pushAppIfNecessary()
-	f.deregister()
+	f.deregisterIgnoringFailures()
 	f.configure()
 	return f
 }
@@ -139,12 +137,4 @@ func (f *FakeServiceBroker) ServicePlanName() string {
 
 func (f *FakeServiceBroker) Name() string {
 	return f.name
-}
-
-func (f *FakeServiceBroker) Username() string {
-	return f.username
-}
-
-func (f *FakeServiceBroker) Password() string {
-	return f.password
 }
