@@ -9,19 +9,6 @@ import (
 )
 
 type FakeStartActor struct {
-	AppNeedsToStageStub        func(v7action.Application) (bool, error)
-	appNeedsToStageMutex       sync.RWMutex
-	appNeedsToStageArgsForCall []struct {
-		arg1 v7action.Application
-	}
-	appNeedsToStageReturns struct {
-		result1 bool
-		result2 error
-	}
-	appNeedsToStageReturnsOnCall map[int]struct {
-		result1 bool
-		result2 error
-	}
 	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
@@ -73,6 +60,21 @@ type FakeStartActor struct {
 		result2 <-chan error
 		result3 v7action.Warnings
 		result4 error
+	}
+	GetUnstagedNewestPackageGUIDStub        func(string) (string, v7action.Warnings, error)
+	getUnstagedNewestPackageGUIDMutex       sync.RWMutex
+	getUnstagedNewestPackageGUIDArgsForCall []struct {
+		arg1 string
+	}
+	getUnstagedNewestPackageGUIDReturns struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
+	getUnstagedNewestPackageGUIDReturnsOnCall map[int]struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
 	}
 	PollStartStub        func(string, bool) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
@@ -134,69 +136,6 @@ type FakeStartActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeStartActor) AppNeedsToStage(arg1 v7action.Application) (bool, error) {
-	fake.appNeedsToStageMutex.Lock()
-	ret, specificReturn := fake.appNeedsToStageReturnsOnCall[len(fake.appNeedsToStageArgsForCall)]
-	fake.appNeedsToStageArgsForCall = append(fake.appNeedsToStageArgsForCall, struct {
-		arg1 v7action.Application
-	}{arg1})
-	fake.recordInvocation("AppNeedsToStage", []interface{}{arg1})
-	fake.appNeedsToStageMutex.Unlock()
-	if fake.AppNeedsToStageStub != nil {
-		return fake.AppNeedsToStageStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.appNeedsToStageReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeStartActor) AppNeedsToStageCallCount() int {
-	fake.appNeedsToStageMutex.RLock()
-	defer fake.appNeedsToStageMutex.RUnlock()
-	return len(fake.appNeedsToStageArgsForCall)
-}
-
-func (fake *FakeStartActor) AppNeedsToStageCalls(stub func(v7action.Application) (bool, error)) {
-	fake.appNeedsToStageMutex.Lock()
-	defer fake.appNeedsToStageMutex.Unlock()
-	fake.AppNeedsToStageStub = stub
-}
-
-func (fake *FakeStartActor) AppNeedsToStageArgsForCall(i int) v7action.Application {
-	fake.appNeedsToStageMutex.RLock()
-	defer fake.appNeedsToStageMutex.RUnlock()
-	argsForCall := fake.appNeedsToStageArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeStartActor) AppNeedsToStageReturns(result1 bool, result2 error) {
-	fake.appNeedsToStageMutex.Lock()
-	defer fake.appNeedsToStageMutex.Unlock()
-	fake.AppNeedsToStageStub = nil
-	fake.appNeedsToStageReturns = struct {
-		result1 bool
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeStartActor) AppNeedsToStageReturnsOnCall(i int, result1 bool, result2 error) {
-	fake.appNeedsToStageMutex.Lock()
-	defer fake.appNeedsToStageMutex.Unlock()
-	fake.AppNeedsToStageStub = nil
-	if fake.appNeedsToStageReturnsOnCall == nil {
-		fake.appNeedsToStageReturnsOnCall = make(map[int]struct {
-			result1 bool
-			result2 error
-		})
-	}
-	fake.appNeedsToStageReturnsOnCall[i] = struct {
-		result1 bool
-		result2 error
-	}{result1, result2}
 }
 
 func (fake *FakeStartActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
@@ -403,6 +342,72 @@ func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsO
 		result3 v7action.Warnings
 		result4 error
 	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUID(arg1 string) (string, v7action.Warnings, error) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	ret, specificReturn := fake.getUnstagedNewestPackageGUIDReturnsOnCall[len(fake.getUnstagedNewestPackageGUIDArgsForCall)]
+	fake.getUnstagedNewestPackageGUIDArgsForCall = append(fake.getUnstagedNewestPackageGUIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetUnstagedNewestPackageGUID", []interface{}{arg1})
+	fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	if fake.GetUnstagedNewestPackageGUIDStub != nil {
+		return fake.GetUnstagedNewestPackageGUIDStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getUnstagedNewestPackageGUIDReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDCallCount() int {
+	fake.getUnstagedNewestPackageGUIDMutex.RLock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
+	return len(fake.getUnstagedNewestPackageGUIDArgsForCall)
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDCalls(stub func(string) (string, v7action.Warnings, error)) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	fake.GetUnstagedNewestPackageGUIDStub = stub
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDArgsForCall(i int) string {
+	fake.getUnstagedNewestPackageGUIDMutex.RLock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
+	argsForCall := fake.getUnstagedNewestPackageGUIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	fake.GetUnstagedNewestPackageGUIDStub = nil
+	fake.getUnstagedNewestPackageGUIDReturns = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	fake.GetUnstagedNewestPackageGUIDStub = nil
+	if fake.getUnstagedNewestPackageGUIDReturnsOnCall == nil {
+		fake.getUnstagedNewestPackageGUIDReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getUnstagedNewestPackageGUIDReturnsOnCall[i] = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeStartActor) PollStart(arg1 string, arg2 bool) (v7action.Warnings, error) {
@@ -667,14 +672,14 @@ func (fake *FakeStartActor) StartApplicationReturnsOnCall(i int, result1 v7actio
 func (fake *FakeStartActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.appNeedsToStageMutex.RLock()
-	defer fake.appNeedsToStageMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getDetailedAppSummaryMutex.RLock()
 	defer fake.getDetailedAppSummaryMutex.RUnlock()
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getUnstagedNewestPackageGUIDMutex.RLock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()

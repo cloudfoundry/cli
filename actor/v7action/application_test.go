@@ -1757,38 +1757,35 @@ var _ = Describe("Application Actions", func() {
 
 	})
 
-	Describe("AppNeedsToStage", func() {
+	FDescribe("GetUnstagedNewestPackageGUID", func() {
 		var (
-			shouldStage bool
-			warnings    Warnings
-			executeErr  error
+			packageToStage string
+			warnings       Warnings
+			executeErr     error
 		)
 
 		JustBeforeEach(func() {
-			shouldStage, warnings, executeErr = actor.AppNeedsToStage(Application{
-				Name:                "some-app-name",
-				GUID:                "some-app-guid",
-				LifecycleType:       constant.AppLifecycleTypeBuildpack,
-				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
-			})
+			packageToStage, warnings, executeErr = actor.GetUnstagedNewestPackage("some-app-guid")
 		})
 
 		// Nothing to stage.
-		XWhen("There are no packages on the app", func() {
+		When("There are no packages on the app", func() {
 			When("getting the packages succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetPackagesReturns([] ccv3.Package{}, ccv3.Warnings{"get-packages-warnings"}, nil)
+					fakeCloudControllerClient.GetPackagesReturns([]ccv3.Package{}, ccv3.Warnings{"get-packages-warnings"}, nil)
 				})
 
 				It("checks for packages", func() {
 					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
 					))
 				})
 
-				It("returns false", func() {
-					Expect(shouldStage).To(Equal(false))
+				It("returns empty string", func() {
+					Expect(packageToStage).To(Equal(""))
 					Expect(warnings).To(ConsistOf("get-packages-warnings"))
 					Expect(executeErr).To(BeNil())
 				})
@@ -1810,143 +1807,56 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		When("the app has a current droplet", func() {
-			var currentDroplet ccv3.Droplet
-
+		When("there are packages", func() {
 			BeforeEach(func() {
-				currentDroplet = ccv3.Droplet{GUID: "current-droplet", CreatedAt: "2019-01-01T06:00:00Z"}
-				fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-					currentDroplet,
-					ccv3.Warnings{"get-current-droplet-warning"},
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-01-01T06:00:00Z"}},
+					ccv3.Warnings{"get-packages-warning"},
 					nil)
 			})
 
-			When("the current droplet is the latest droplet", func() {
+			It("checks for the packages latest droplet", func() {
+				Expect(fakeCloudControllerClient.GetPackageDropletsCallCount()).To(Equal(1))
+				packageGuid, queries := fakeCloudControllerClient.GetPackageDropletsArgsForCall(0)
+				Expect(packageGuid).To(Equal("package-guid"))
+				Expect(queries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"STAGED"}},
+				))
+			})
+
+			When("the newest package's has a STAGED droplet", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetDropletsReturns(
-						[]ccv3.Droplet{
-							currentDroplet,
-							{GUID: "older-droplet-guid"},
-						},
-						ccv3.Warnings{"get-droplets-warning"},
-						nil)
+					fakeCloudControllerClient.GetPackageDropletsReturns(
+						[]ccv3.Droplet{{State: constant.DropletStaged}},
+						ccv3.Warnings{"get-package-droplet-warning"},
+						nil,
+					)
 				})
 
-				When("there is at least one package newer than the current droplet for the app", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetPackagesReturns(
-							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-12-23T06:00:00Z"}},
-							ccv3.Warnings{"get-packages-warning"},
-							nil)
-					})
-
-					It("returns true", func() {
-						Expect(shouldStage).To(BeTrue())
-						Expect(warnings).To(ConsistOf(
-							"get-current-droplet-warning",
-							"get-droplets-warning",
-							"get-packages-warning"))
-					})
-				})
-
-				When("there is no package newer than the current droplet for the app", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetPackagesReturns(
-							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2018-05-01T06:00:00Z"}},
-							ccv3.Warnings{"get-packages-warning"},
-							nil)
-					})
-
-					//It starts the app without changing the current droplet
-					It("returns false", func() {
-						Expect(shouldStage).To(BeFalse())
-						Expect(executeErr).NotTo(HaveOccurred())
-					})
+				It("returns empty string", func() {
+					Expect(packageToStage).To(Equal(""))
+					Expect(warnings).To(ConsistOf("get-packages-warning", "get-package-droplet-warning"))
+					Expect(executeErr).To(BeNil())
 				})
 			})
 
-			When("the current droplet is not the latest droplet", func() {
+			When("the package has no STAGED droplets", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetDropletsReturns(
-						[]ccv3.Droplet{
-							{GUID: "newer-droplet-guid", CreatedAt: "2018-05-01T06:00:00Z"},
-							currentDroplet,
-						},
-						ccv3.Warnings{"get-droplets-warning"},
-						nil)
+					fakeCloudControllerClient.GetPackageDropletsReturns(
+						[]ccv3.Droplet{},
+						ccv3.Warnings{"get-package-droplet-warning"},
+						nil,
+					)
 				})
 
-				When("there are no packages newer than the newest droplet", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetPackagesReturns(
-							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2017-01-01T06:00:00Z"}},
-							ccv3.Warnings{"get-packages-warning"},
-							nil)
-					})
-
-					//It sets current droplet to newest droplet
-					It("returns false", func() {
-						Expect(shouldStage).To(BeFalse())
-						Expect(executeErr).NotTo(HaveOccurred())
-					})
-				})
-
-				When("there is at least one package newer than the newest droplet", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetPackagesReturns(
-							[] ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-01-01T06:00:00Z"}},
-							ccv3.Warnings{"get-packages-warning"},
-							nil)
-					})
-
-					//It stages newest package & sets current droplet to newest droplet
-					It("returns true", func() {
-						Expect(shouldStage).To(BeTrue())
-						Expect(executeErr).NotTo(HaveOccurred())
-					})
+				It("returns the guid of the newest package", func() {
+					Expect(packageToStage).To(Equal("package-guid"))
+					Expect(warnings).To(ConsistOf("get-packages-warning", "get-package-droplet-warning"))
+					Expect(executeErr).To(BeNil())
 				})
 			})
 		})
-
-		XWhen("the app does not have a current droplet", func() {
-
-		})
-
-		// Definitely stage!
-		//When("there is no current or latest droplet but there is a package on the app", func() {
-		//	It("returns true", func() {
-		//
-		//	})
-		//})
-		//
-		////is this possible? What does it mean?
-		//When("there is no current droplet on the app", func() {
-		//	It("returns ", func() {
-		//
-		//	})
-		//})
-		//
-		//// The droplet has been set manually or by a rollback. Do not stage
-		//When("the current droplet is not the latest droplet and there is a package on the app", func() {
-		//	It("returns false", func() {
-		//
-		//	})
-		//})
-		//
-		//// The droplet has been set manually or the app has been stopped. Do not stage
-		//When("the current droplet is the latest droplet and is created after the latest package", func() {
-		//	It("returns false", func() {
-		//
-		//	})
-		//})
-		//
-		//// There is a new package that wants to be staged. Maybe user did a cf push --no-start
-		//When("the current droplet is the latest droplet but there is a newer package than the latest droplet", func() {
-		//	It("returns true", func() {
-		//
-		//	})
-		//})
-
 	})
 
 	Describe("RenameApplicationByNameAndSpaceGUID", func() {

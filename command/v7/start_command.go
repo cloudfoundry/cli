@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
@@ -16,7 +17,7 @@ type StartActor interface {
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
-	AppNeedsToStage(app v7action.Application) (bool, error)
+	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
@@ -31,6 +32,7 @@ type StartCommand struct {
 
 	UI          command.UI
 	Config      command.Config
+	NOAAClient  v7action.NOAAClient
 	SharedActor command.SharedActor
 	Actor       StartActor
 }
@@ -40,12 +42,13 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	return nil
 }
@@ -76,11 +79,25 @@ func (cmd StartCommand) Execute(args []string) error {
 		return nil
 	}
 
-		// get app's current droplet (and its package guid)
-		// get app's latest staged droplet?
-		// get app's newest package?
-	//if cmd.Actor.AppNeedsToStage(app)
-	//  cmd.Actor.Build() <- probably exists
+	var droplet v7action.Droplet
+	packageGuid, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
+	if packageGuid != "" {
+		dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(packageGuid, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+
+		logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		cmd.UI.DisplayWarnings(logWarnings)
+		if logErr != nil {
+			return logErr
+		}
+
+		droplet, err = shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Package staged")
+	}
 
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,

@@ -1,9 +1,10 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"errors"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -20,7 +21,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("start Command", func() {
+var _ = FDescribe("start Command", func() {
 	var (
 		cmd             v7.StartCommand
 		testUI          *ui.UI
@@ -29,10 +30,10 @@ var _ = Describe("start Command", func() {
 		fakeActor       *v7fakes.FakeStartActor
 		fakeNOAAClient  *v7actionfakes.FakeNOAAClient
 
-		binaryName      string
-		executeErr      error
-		app             string
-		packageGUID		string
+		binaryName  string
+		executeErr  error
+		app         string
+		packageGUID string
 	)
 
 	BeforeEach(func() {
@@ -239,15 +240,16 @@ var _ = Describe("start Command", func() {
 		})
 	})
 
-	When("the app needs staging", func() {
+	FWhen("the app needs staging", func() {
 		BeforeEach(func() {
 			app = "some-app"
-			fakeActor.AppNeedsToStageReturns(true, nil)
+			fakeActor.GetUnstagedNewestPackageGUIDReturns(packageGUID, v7action.Warnings{"needs-stage-warnings"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
+				GUID: "some-space-guid",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped, LifecycleType: constant.AppLifecycleTypeBuildpack}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
@@ -298,7 +300,7 @@ var _ = Describe("start Command", func() {
 					fakeActor.SetApplicationDropletReturns(v7action.Warnings{"some-set-droplet-warning"}, nil)
 				})
 
-				It("outputs the droplet GUID", func() {
+				FIt("outputs the droplet GUID", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					createdAtTimeParsed, err := time.Parse(time.RFC3339, dropletCreateTime)
@@ -315,7 +317,7 @@ var _ = Describe("start Command", func() {
 					Expect(testUI.Err).To(Say("some-other-warning"))
 				})
 
-				It("stages the package", func() {
+				FIt("stages the package", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
 					guidArg, appNameArg, spaceGUIDArg := fakeActor.StagePackageArgsForCall(0)
@@ -324,7 +326,7 @@ var _ = Describe("start Command", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 				})
 
-				It("displays staging logs and their warnings", func() {
+				FIt("displays staging logs and their warnings", func() {
 					Expect(testUI.Out).To(Say("Here are some staging logs!"))
 					Expect(testUI.Out).To(Say("Here are some other staging logs!"))
 
@@ -433,137 +435,137 @@ var _ = Describe("start Command", func() {
 		})
 	})
 
-		When("the get application returns an unknown error", func() {
-			var expectedErr error
+	When("the get application returns an unknown error", func() {
+		var expectedErr error
 
-			BeforeEach(func() {
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-					Name: "some-org",
-				})
-				fakeConfig.TargetedSpaceReturns(configv3.Space{
-					Name: "some-space",
-				})
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-				expectedErr = errors.New("some-error")
-				fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+		BeforeEach(func() {
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+				Name: "some-org",
 			})
-
-			It("says that the app failed to start", func() {
-				Expect(executeErr).To(Equal(expectedErr))
-				Expect(testUI.Out).ToNot(Say("Starting"))
-
-				Expect(testUI.Err).To(Say("get-warning-1"))
-				Expect(testUI.Err).To(Say("get-warning-2"))
-
-				Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
+			fakeConfig.TargetedSpaceReturns(configv3.Space{
+				Name: "some-space",
 			})
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			expectedErr = errors.New("some-error")
+			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
 
-		When("the start application returns an unknown error", func() {
-			var expectedErr error
+		It("says that the app failed to start", func() {
+			Expect(executeErr).To(Equal(expectedErr))
+			Expect(testUI.Out).ToNot(Say("Starting"))
 
-			BeforeEach(func() {
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-					Name: "some-org",
-				})
-				fakeConfig.TargetedSpaceReturns(configv3.Space{
-					Name: "some-space",
-				})
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-				fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-				expectedErr = errors.New("some-error")
-				fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
-			})
+			Expect(testUI.Err).To(Say("get-warning-1"))
+			Expect(testUI.Err).To(Say("get-warning-2"))
 
-			It("says that the app failed to start", func() {
-				Expect(executeErr).To(Equal(expectedErr))
-				Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
-
-				Expect(testUI.Err).To(Say("get-warning-1"))
-				Expect(testUI.Err).To(Say("get-warning-2"))
-				Expect(testUI.Err).To(Say("start-warning-1"))
-				Expect(testUI.Err).To(Say("start-warning-2"))
-			})
-		})
-
-		When("getting the application summary returns an error", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-				fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
-			})
-
-			It("returns the error and prints warnings", func() {
-				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
-
-				Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
-
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
-			})
-		})
-
-		When("getting the application summary is successful", func() {
-			BeforeEach(func() {
-				fakeConfig.TargetedSpaceReturns(configv3.Space{
-					Name: "some-space",
-					GUID: "some-space-guid",
-				})
-				summary := v7action.DetailedApplicationSummary{
-					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
-							Name:  "some-app",
-							State: constant.ApplicationStarted,
-						},
-						ProcessSummaries: v7action.ProcessSummaries{
-							{
-								Process: v7action.Process{
-									Type:    constant.ProcessTypeWeb,
-									Command: *types.NewFilteredString("some-command-1"),
-								},
-							},
-							{
-								Process: v7action.Process{
-									Type:    "console",
-									Command: *types.NewFilteredString("some-command-2"),
-								},
-							},
-						},
-					},
-					CurrentDroplet: v7action.Droplet{
-						Stack: "cflinuxfs2",
-						Buildpacks: []v7action.DropletBuildpack{
-							{
-								Name:         "ruby_buildpack",
-								DetectOutput: "some-detect-output",
-							},
-							{
-								Name:         "some-buildpack",
-								DetectOutput: "",
-							},
-						},
-					},
-				}
-				fakeActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
-			})
-
-			It("prints the application summary and outputs warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
-				Expect(testUI.Out).To(Say(`name:\s+some-app`))
-				Expect(testUI.Out).To(Say(`requested state:\s+started`))
-				Expect(testUI.Out).ToNot(Say("start command:"))
-
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
-
-				Expect(fakeActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
-				appName, spaceGUID, withObfuscatedValues := fakeActor.GetDetailedAppSummaryArgsForCall(0)
-				Expect(appName).To(Equal("some-app"))
-				Expect(spaceGUID).To(Equal("some-space-guid"))
-				Expect(withObfuscatedValues).To(BeFalse())
-			})
+			Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
 		})
 	})
+
+	When("the start application returns an unknown error", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+				Name: "some-org",
+			})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{
+				Name: "some-space",
+			})
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			expectedErr = errors.New("some-error")
+			fakeActor.StartApplicationReturns(v7action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+		})
+
+		It("says that the app failed to start", func() {
+			Expect(executeErr).To(Equal(expectedErr))
+			Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
+
+			Expect(testUI.Err).To(Say("get-warning-1"))
+			Expect(testUI.Err).To(Say("get-warning-2"))
+			Expect(testUI.Err).To(Say("start-warning-1"))
+			Expect(testUI.Err).To(Say("start-warning-2"))
+		})
+	})
+
+	When("getting the application summary returns an error", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
+			fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+		})
+
+		It("returns the error and prints warnings", func() {
+			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
+
+			Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
+
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(testUI.Err).To(Say("warning-2"))
+		})
+	})
+
+	When("getting the application summary is successful", func() {
+		BeforeEach(func() {
+			fakeConfig.TargetedSpaceReturns(configv3.Space{
+				Name: "some-space",
+				GUID: "some-space-guid",
+			})
+			summary := v7action.DetailedApplicationSummary{
+				ApplicationSummary: v7action.ApplicationSummary{
+					Application: v7action.Application{
+						Name:  "some-app",
+						State: constant.ApplicationStarted,
+					},
+					ProcessSummaries: v7action.ProcessSummaries{
+						{
+							Process: v7action.Process{
+								Type:    constant.ProcessTypeWeb,
+								Command: *types.NewFilteredString("some-command-1"),
+							},
+						},
+						{
+							Process: v7action.Process{
+								Type:    "console",
+								Command: *types.NewFilteredString("some-command-2"),
+							},
+						},
+					},
+				},
+				CurrentDroplet: v7action.Droplet{
+					Stack: "cflinuxfs2",
+					Buildpacks: []v7action.DropletBuildpack{
+						{
+							Name:         "ruby_buildpack",
+							DetectOutput: "some-detect-output",
+						},
+						{
+							Name:         "some-buildpack",
+							DetectOutput: "",
+						},
+					},
+				},
+			}
+			fakeActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
+		})
+
+		It("prints the application summary and outputs warnings", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
+			Expect(testUI.Out).To(Say(`name:\s+some-app`))
+			Expect(testUI.Out).To(Say(`requested state:\s+started`))
+			Expect(testUI.Out).ToNot(Say("start command:"))
+
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(testUI.Err).To(Say("warning-2"))
+
+			Expect(fakeActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
+			appName, spaceGUID, withObfuscatedValues := fakeActor.GetDetailedAppSummaryArgsForCall(0)
+			Expect(appName).To(Equal("some-app"))
+			Expect(spaceGUID).To(Equal("some-space-guid"))
+			Expect(withObfuscatedValues).To(BeFalse())
+		})
+	})
+})
