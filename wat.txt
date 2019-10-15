@@ -27,6 +27,51 @@ When the app has a current droplet:
         When there are some packages newer than this droplet:
             It stages that package & sets current droplet to resulting droplet
 
+v smart cli + `--latest`:
+when the app is already started:
+  exit 0
+When there are no packages:
+  when there is a current droplet:
+    it starts
+  when there is not a current droplet:
+    it errors
+When there are packages:
+  when there is no current droplet:
+    It stages the newest package & sets current droplet to resulting droplet
+  when there is a current droplet:
+    when the droplet's package is not the newest:
+      it stages and starts
+    when the droplet's package is the newest
+      it starts without staging
+
+for `cf start --latest`:
+when the app is already started:
+  exit 0
+When there are no packages:
+  when there is a current droplet:
+    it starts
+  when there is not a current droplet:
+    it errors
+When there are packages:
+  It stages the newest package & sets current droplet to resulting droplet
+
+
+v2-preserving + `cf7 start --never-stage`
+if the app is already started:
+  exit early
+When there are no packages:
+  when there is a current droplet:
+    it starts
+  when there is not a current droplet:
+    it errors
+When there are packages:
+  when GET /v3/packages/:latest_package_guid/droplets has no STAGED droplets
+    stage latest_package_guid
+  otherwise
+    start without staging
+
+for `cf start --never-stage`:
+  just start the thing
 
 When the app does not have a current droplet:
     When there are there no droplets for this app:
@@ -36,9 +81,9 @@ When the app does not have a current droplet:
             build conditionally
     When there are some droplets for this app:
         When this is not the newest droplet:
-            When there are no packages newer than the newest droplet:
-              build conditionally (it won't build)
-            When there are some packages newer than the newest droplet:
+            When there are no packages newer than the newest STAGED droplet: (set-droplet)
+              build conditionally (it won't build),
+            When there are some packages newer than the newest droplet: (set-droplet THEN no-start)
               build conditionally (it might build?)
         When this is the newest droplet:
             When there are no packages newer than this droplet:
@@ -48,11 +93,34 @@ When the app does not have a current droplet:
 When the app has a current droplet:
     When this is not the newest droplet:
         When there are no packages newer than the newest droplet:
-          
+            build conditionally (it wont)
         When there are some packages newer than the newest droplet:
+            build conditionally (it will)
     When this is the newest droplet:
         When there are no packages newer than this droplet:
+            build conditionally (it won't)
         When there are some packages newer than this droplet:
+            build conditionally (it will)
+
+when there are no packages:
+  error
+when there are packages:
+  when the newest package is not BUILD_STATE: STAGED
+    when the build fails
+      stream logs & error
+    when the build runs
+      stream logs and start
+  when the build doesn't run
+    start
+
+for `cf start --latest`:
+when there are no packages:
+  error
+when there are packages:
+  when the build fails
+    stream logs & error
+  when the build runs
+    stream logs and start
 
 
 Current AppsManager behavior:
