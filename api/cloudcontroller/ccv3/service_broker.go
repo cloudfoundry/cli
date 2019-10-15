@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -27,11 +28,11 @@ type serviceBrokerRequest struct {
 	// GUID is a unique service broker identifier.
 	GUID string `json:"guid,omitempty"`
 	// Name is the name of the service broker.
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// URL is the url of the service broker.
-	URL string `json:"url"`
+	URL string `json:"url,omitempty"`
 	// Authentication contains the authentication for authenticating with the service broker.
-	Authentication serviceBrokerAuthentication `json:"authentication"`
+	Authentication *serviceBrokerAuthentication `json:"authentication,omitempty"`
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }
@@ -113,6 +114,58 @@ func (client *Client) CreateServiceBroker(name, username, password, brokerURL, s
 	return JobURL(jobURL), response.Warnings, err
 }
 
+// UpdateServiceBroker updates an existing service broker.
+func (client *Client) UpdateServiceBroker(serviceBrokerGUID, name, username, password, url string) (JobURL, Warnings, error) {
+
+	brokerUpdateRequest, err := newUpdateServiceBroker(name, username, password, url)
+	if err != nil {
+		return "", nil, err
+	}
+
+	bodyBytes, err := json.Marshal(brokerUpdateRequest)
+	if err != nil {
+		return "", nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchServiceBrokerRequest,
+		URIParams: map[string]string{
+			"service_broker_guid": serviceBrokerGUID,
+		},
+		Body: bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	jobURL := response.HTTPResponse.Header.Get("Location")
+	return JobURL(jobURL), response.Warnings, err
+}
+
+func newUpdateServiceBroker(name, username, password, brokerURL string) (serviceBrokerRequest, error) {
+	if (username == "" && password != "") || (username != "" && password == "") {
+		return serviceBrokerRequest{}, errors.New("boom!") // TODO: fix this
+	}
+	request := serviceBrokerRequest{
+		Name: name,
+		URL:  brokerURL,
+	}
+
+	if username != "" && password != "" {
+		request.Authentication = &serviceBrokerAuthentication{
+			Type: constant.BasicCredentials,
+			Credentials: serviceBrokerBasicAuthCredentials{
+				Username: username,
+				Password: password,
+			},
+		}
+	}
+
+	return request, nil
+}
+
 // DeleteServiceBroker deletes a named service broker
 func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -162,7 +215,7 @@ func newServiceBroker(name, username, password, brokerURL, spaceGUID string) ser
 	sbp := serviceBrokerRequest{
 		Name: name,
 		URL:  brokerURL,
-		Authentication: serviceBrokerAuthentication{
+		Authentication: &serviceBrokerAuthentication{
 			Type: constant.BasicCredentials,
 			Credentials: serviceBrokerBasicAuthCredentials{
 				Username: username,

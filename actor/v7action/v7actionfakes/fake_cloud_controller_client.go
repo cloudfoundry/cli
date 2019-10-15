@@ -1504,6 +1504,25 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateServiceBrokerStub        func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)
+	updateServiceBrokerMutex       sync.RWMutex
+	updateServiceBrokerArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}
+	updateServiceBrokerReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateServiceBrokerReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	updateSpaceMutex       sync.RWMutex
 	updateSpaceArgsForCall []struct {
@@ -8201,6 +8220,76 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.updateServiceBrokerMutex.Lock()
+	ret, specificReturn := fake.updateServiceBrokerReturnsOnCall[len(fake.updateServiceBrokerArgsForCall)]
+	fake.updateServiceBrokerArgsForCall = append(fake.updateServiceBrokerArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.updateServiceBrokerMutex.Unlock()
+	if fake.UpdateServiceBrokerStub != nil {
+		return fake.UpdateServiceBrokerStub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateServiceBrokerReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerCallCount() int {
+	fake.updateServiceBrokerMutex.RLock()
+	defer fake.updateServiceBrokerMutex.RUnlock()
+	return len(fake.updateServiceBrokerArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerCalls(stub func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.updateServiceBrokerMutex.Lock()
+	defer fake.updateServiceBrokerMutex.Unlock()
+	fake.UpdateServiceBrokerStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerArgsForCall(i int) (string, string, string, string, string) {
+	fake.updateServiceBrokerMutex.RLock()
+	defer fake.updateServiceBrokerMutex.RUnlock()
+	argsForCall := fake.updateServiceBrokerArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateServiceBrokerMutex.Lock()
+	defer fake.updateServiceBrokerMutex.Unlock()
+	fake.UpdateServiceBrokerStub = nil
+	fake.updateServiceBrokerReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateServiceBrokerMutex.Lock()
+	defer fake.updateServiceBrokerMutex.Unlock()
+	fake.UpdateServiceBrokerStub = nil
+	if fake.updateServiceBrokerReturnsOnCall == nil {
+		fake.updateServiceBrokerReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateServiceBrokerReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
 	fake.updateSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSpaceReturnsOnCall[len(fake.updateSpaceArgsForCall)]
@@ -8955,6 +9044,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateProcessMutex.RUnlock()
 	fake.updateResourceMetadataMutex.RLock()
 	defer fake.updateResourceMetadataMutex.RUnlock()
+	fake.updateServiceBrokerMutex.RLock()
+	defer fake.updateServiceBrokerMutex.RUnlock()
 	fake.updateSpaceMutex.RLock()
 	defer fake.updateSpaceMutex.RUnlock()
 	fake.updateSpaceApplyManifestMutex.RLock()

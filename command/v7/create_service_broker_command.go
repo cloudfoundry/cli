@@ -78,10 +78,10 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 
 	warnings, err := cmd.Actor.CreateServiceBroker(cmd.RequiredArgs.ServiceBroker, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password, cmd.RequiredArgs.URL, space.GUID)
 	cmd.UI.DisplayWarningsV7(warnings)
-
-	if err == nil {
-		cmd.UI.DisplayOK()
+	if err != nil {
+		return err
 	}
 
-	return err
+	cmd.UI.DisplayOK()
+	return nil
 }

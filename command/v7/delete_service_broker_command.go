@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeleteServiceBrokerActor
+//go:generate counterfeiter . UpdateServiceBrokerActor
 
 type DeleteServiceBrokerActor interface {
 	GetServiceBrokerByName(serviceBrokerName string) (v7action.ServiceBroker, v7action.Warnings, error)

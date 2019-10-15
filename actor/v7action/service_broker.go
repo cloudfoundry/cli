@@ -50,6 +50,20 @@ func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID 
 	return allWarnings, err
 }
 
+func (actor Actor) UpdateServiceBroker(serviceBrokerGUID, name, username, password, url string) (Warnings, error) {
+	allWarnings := Warnings{}
+
+	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(serviceBrokerGUID, name, username, password, url)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, warnings...)
+	return allWarnings, err
+}
+
 func (actor Actor) DeleteServiceBroker(serviceBrokerGUID string) (Warnings, error) {
 	allWarnings := Warnings{}
 

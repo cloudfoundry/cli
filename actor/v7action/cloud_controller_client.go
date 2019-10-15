@@ -114,9 +114,12 @@ type CloudControllerClient interface {
 	UpdateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	UpdateServiceBroker(serviceBrokerGUID, name, username, password, url string) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadBitsPackage(pkg ccv3.Package, matchedResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)
 	UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadDropletBits(dropletGUID string, dropletPath string, droplet io.Reader, dropletLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }
+
+// TODO: Split this enormous interface
