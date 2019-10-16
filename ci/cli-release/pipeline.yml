@@ -416,7 +416,7 @@ jobs:
 - name: update-claw-v7
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       resource: cli-v7
       trigger: true
@@ -425,7 +425,7 @@ jobs:
     - get: edge-linux-binary-64
       resource: edge-linux-binary-64-v7
       passed: [create-and-sign-installers-v7]
-  - aggregate:
+  - in_parallel:
     - task: claw.run.pivotal.io
       file: cli-ci/ci/cli-release/tasks/update-claw-v7.yml
       params:
@@ -470,7 +470,7 @@ jobs:
 - name: update-debian-repo-v7
   serial: true
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cli
       resource: cli-v7
       trigger: true
