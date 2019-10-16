@@ -10,7 +10,7 @@ import (
 	"github.com/onsi/gomega/types"
 )
 
-var _ = FDescribe("update-service-broker command", func() {
+var _ = Describe("update-service-broker command", func() {
 	When("logged in", func() {
 		var (
 			org        string
