@@ -87,6 +87,7 @@ type PushCommand struct {
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StartCommand            flag.Command                        `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	Strategy                flag.DeploymentStrategy             `long:"strategy" description:"Deployment strategy, either rolling or null."`
+	Task                    bool                                `long:"task" description:"Push an app that is used only to execute tasks. The app will be staged, but not started and will have no route assigned."`
 	Vars                    []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles        []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	dockerPassword          interface{}                         `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
@@ -315,6 +316,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		PathsToVarsFiles:    pathsToVarsFiles,
 		Vars:                cmd.Vars,
 		NoManifest:          cmd.NoManifest,
+		Task:                cmd.Task,
 	}, nil
 }
 
@@ -394,6 +396,14 @@ func (cmd PushCommand) ValidateFlags() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
 				"--no-start",
+				"--strategy=rolling",
+			},
+		}
+
+	case cmd.Task && cmd.Strategy == flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--task",
 				"--strategy=rolling",
 			},
 		}

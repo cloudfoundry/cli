@@ -976,6 +976,7 @@ var _ = Describe("push Command", func() {
 			cmd.PathToManifest = "/manifest/path"
 			cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{"/vars1", "/vars2"}
 			cmd.Vars = []template.VarKV{{Name: "key", Value: "val"}}
+			cmd.Task = true
 		})
 
 		JustBeforeEach(func() {
@@ -1003,6 +1004,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.ManifestPath).To(Equal("/manifest/path"))
 			Expect(overrides.PathsToVarsFiles).To(Equal([]string{"/vars1", "/vars2"}))
 			Expect(overrides.Vars).To(Equal([]template.VarKV{{Name: "key", Value: "val"}}))
+			Expect(overrides.Task).To(BeTrue())
 		})
 
 		When("a docker image is provided", func() {
@@ -1152,5 +1154,16 @@ var _ = Describe("push Command", func() {
 				cmd.Buildpacks = []string{"some-docker-username", "null"}
 			},
 			translatableerror.InvalidBuildpacksError{}),
+
+		Entry("task and strategy flags are passed",
+			func() {
+				cmd.Task = true
+				cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+			},
+			translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--task", "--strategy=rolling",
+				},
+			}),
 	)
 })

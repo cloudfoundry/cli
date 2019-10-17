@@ -5,8 +5,8 @@ import (
 	"code.cloudfoundry.org/cli/util/pushmanifestparser"
 )
 
-func HandleNoRouteOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
-	if overrides.NoRoute {
+func HandleTaskOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
+	if overrides.Task {
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}
 		}

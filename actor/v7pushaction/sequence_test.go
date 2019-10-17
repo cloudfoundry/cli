@@ -111,5 +111,17 @@ var _ = Describe("Actor", func() {
 				Expect(sequence).To(matchers.MatchFuncsByName(actor.StagePackageForApplication, actor.CreateDeploymentForApplication))
 			})
 		})
+
+		When("the plan has task application type", func() {
+			BeforeEach(func() {
+				plan = PushPlan{
+					TaskTypeApplication: true,
+				}
+			})
+
+			It("returns a sequence that stages, sets droplet, and stops the app", func() {
+				Expect(sequence).To(matchers.MatchFuncsByName(actor.StagePackageForApplication, actor.StopApplication, actor.SetDropletForApplication))
+			})
+		})
 	})
 })
