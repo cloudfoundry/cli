@@ -12,6 +12,12 @@ import (
 // NewV3BasedClients creates a new V3 Cloud Controller client and UAA client using the
 // passed in config.
 func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Client, *uaa.Client, error) {
+	return NewV3BasedClientsWithAuthorizationEndpoint(config, ui, targetCF, "")
+}
+
+// NewV3BasedClients creates a new V3 Cloud Controller client and UAA client using the
+// passed in config.
+func NewV3BasedClientsWithAuthorizationEndpoint(config command.Config, ui command.UI, targetCF bool, authorizationEndpoint string) (*ccv3.Client, *uaa.Client, error) {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -71,7 +77,11 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*cc
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(ccClient.UAA())
+	if authorizationEndpoint == "" {
+		authorizationEndpoint = ccClient.UAA()
+	}
+
+	err = uaaClient.SetupResources(authorizationEndpoint)
 	if err != nil {
 		return nil, nil, err
 	}
