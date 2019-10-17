@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:5579d171c21fa6078ed325bc11b689d5ea406ad73e1428bbcc2f662cb1703969"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "fc6aad7f890ae627e33a8d7d514c93a7558678b4"
+  version = "v6.47.0"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -466,7 +478,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:90d51692e0c17ce68b8d2e4dbb36a21d7e7ff72230af4dad8a4eb0ad7a0eb8e5"
+  digest = "1:494765a2000cd2bf92e2777b7ffeebde0ed8bc71a54ba54ea64aaf60900a6de3"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -479,7 +491,7 @@
     "ssh/terminal",
   ]
   pruneopts = "NUT"
-  revision = "5c40567a22f818bd14a1ea7245dad9f8ef0691aa"
+  revision = "87dc89f01550277dc22b74ffcf4cd89fa2f40f4c"
 
 [[projects]]
   branch = "master"
