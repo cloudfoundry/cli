@@ -85,10 +85,12 @@ sudo yum install cf-cli
 
 #### Installers and compressed binaries
 
+**Note:** cf CLI `6.47` release does not include the Windows installer because we are in the middle of renewing the certificate. We are currently working to include the Windows installer in the next release. Please reach out on Slack Cloud Foundry #cli if you have feedback or questions. We've removed the links below and will be updating them once we have the cert. Thanks for your patience. 
+
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
-| Installers | [pkg](https://packages.cloudfoundry.org/stable?release=macosx64&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64&source=github) | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&source=github) |
-| Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64-exe&source=github) | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github) |
+| Installers | [pkg](https://packages.cloudfoundry.org/stable?release=macosx64&source=github) | | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&source=github) |
+| Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&source=github) |  | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github) |
 
 Release notes, and 32 bit releases can be found [here](https://github.com/cloudfoundry/cli/releases).
 
@@ -151,6 +153,9 @@ sudo yum install cf7-cli
 
 
 #### Installers and compressed binaries
+
+
+**Note:** cf CLI `7.0.0beta26` release does not include the Windows installer because we are in the middle of renewing the certificate. We are currently working to include the Windows installer in the next release. Please reach out on Slack Cloud Foundry #cli if you have feedback or questions. We've removed the links below and will be updating them once we have the cert. Thanks for your patience. 
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
