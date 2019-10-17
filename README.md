@@ -154,8 +154,8 @@ sudo yum install cf7-cli
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
-| Installers |[pkg](https://packages.cloudfoundry.org/stable?release=macosx64&version=v7&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64&version=v7&source=github)| [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&version=v7&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github) |
-| Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=v7&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64-exe&version=v7&source=github) | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github) |
+| Installers |[pkg](https://packages.cloudfoundry.org/stable?release=macosx64&version=v7&source=github) | | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&version=v7&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&version=v7&source=github) |
+| Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=v7&source=github) | | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v7&source=github) |
 
 Release notes, and 32 bit releases can be found [here](https://github.com/cloudfoundry/cli/releases).
 
