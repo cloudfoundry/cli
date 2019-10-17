@@ -71,7 +71,7 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*cc
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(ccClient.UAA())
+	err = uaaClient.SetupResources("https://login.lyra-836.appcloud.swisscom.com")
 	if err != nil {
 		return nil, nil, err
 	}
