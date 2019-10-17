@@ -71,7 +71,7 @@ func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool) (*cc
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(ccClient.UAA())
+	err = uaaClient.SetupResources("https://iam.cloud.ibm.com/cloudfoundry/login/us-south")
 	if err != nil {
 		return nil, nil, err
 	}
