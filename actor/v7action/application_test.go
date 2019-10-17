@@ -1757,7 +1757,7 @@ var _ = Describe("Application Actions", func() {
 
 	})
 
-	FDescribe("GetUnstagedNewestPackageGUID", func() {
+	Describe("GetUnstagedNewestPackageGUID", func() {
 		var (
 			packageToStage string
 			warnings       Warnings
@@ -1765,7 +1765,7 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			packageToStage, warnings, executeErr = actor.GetUnstagedNewestPackage("some-app-guid")
+			packageToStage, warnings, executeErr = actor.GetUnstagedNewestPackageGUID("some-app-guid")
 		})
 
 		// Nothing to stage.

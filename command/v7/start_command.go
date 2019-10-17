@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
@@ -8,6 +9,8 @@ import (
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
+	"strings"
+	"time"
 )
 
 //go:generate counterfeiter . StartActor
@@ -79,10 +82,14 @@ func (cmd StartCommand) Execute(args []string) error {
 		return nil
 	}
 
-	var droplet v7action.Droplet
 	packageGuid, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
 	if packageGuid != "" {
-		dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(packageGuid, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+		cmd.UI.DisplayTextWithFlavor("Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   cmd.RequiredArgs.AppName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		})
 
 		logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
 		cmd.UI.DisplayWarnings(logWarnings)
@@ -90,13 +97,43 @@ func (cmd StartCommand) Execute(args []string) error {
 			return logErr
 		}
 
-		droplet, err = shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+		dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(packageGuid, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+
+		droplet, err := shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 		if err != nil {
 			return err
 		}
 
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Package staged")
+
+		t, err := time.Parse(time.RFC3339, droplet.CreatedAt)
+		if err != nil {
+			return err
+		}
+
+		table := [][]string{
+			{cmd.UI.TranslateText("droplet guid:"), droplet.GUID},
+			{cmd.UI.TranslateText("state:"), strings.ToLower(string(droplet.State))},
+			{cmd.UI.TranslateText("created:"), cmd.UI.UserFriendlyDate(t)},
+		}
+
+		cmd.UI.DisplayKeyValueTable("", table, 3)
+
+		cmd.UI.DisplayTextWithFlavor("Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":     cmd.RequiredArgs.AppName,
+			"DropletGUID": droplet.GUID,
+			"OrgName":     cmd.Config.TargetedOrganization().Name,
+			"SpaceName":   cmd.Config.TargetedSpace().Name,
+			"Username":    user.Name,
+		})
+		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayOK()
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
@@ -116,6 +153,11 @@ func (cmd StartCommand) Execute(args []string) error {
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
+		if _, ok := err.(actionerror.UAAUserNotFoundError); ok {
+			cmd.UI.DisplayTextWithFlavor(err.Error())
+			cmd.UI.DisplayOK()
+			return nil
+		}
 		return err
 	}
 

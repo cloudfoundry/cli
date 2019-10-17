@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	PushCommandName       = "push"
+	PushCommandName = "push"
 )
 
-var _ = FDescribe("start command", func() {
+var _ = Describe("start command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -82,7 +82,7 @@ var _ = FDescribe("start command", func() {
 		})
 
 		When("the app exists", func() {
-			When("the app is staged", func() {
+			When("the app does not need to be staged", func() {
 				BeforeEach(func() {
 					var packageGUID string
 
@@ -147,7 +147,7 @@ var _ = FDescribe("start command", func() {
 				})
 			})
 
-			When("the app is not staged", func() {
+			When("the app needs to be staged", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
@@ -189,16 +189,16 @@ var _ = FDescribe("start command", func() {
 
 					Eventually(session).Should(Exit(0))
 				})
+			})
 
-				When("the app is not staged and cannot be staged", func() {
-					It("gives an error", func() {
-						session := helpers.CF("start", appName)
+			When("the app cannot be started or staged", func() {
+				It("gives an error", func() {
+					session := helpers.CF("start", appName)
 
-						Eventually(session.Err).Should(Say(`No package or droplet on this app.`))
-						Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`App can not start with out a package to stage or a droplet to run.`))
+					Eventually(session).Should(Say("FAILED"))
 
-						Eventually(session).Should(Exit(1))
-					})
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

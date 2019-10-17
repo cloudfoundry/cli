@@ -94,32 +94,6 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, War
 	return responseDroplet, response.Warnings, err
 }
 
-func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetPackageDropletsRequest,
-		URIParams:   map[string]string{"package_guid": packageGUID},
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var responseDroplets []Droplet
-	warnings, err := client.paginate(request, Droplet{}, func(item interface{}) error {
-		if droplet, ok := item.(Droplet); ok {
-			responseDroplets = append(responseDroplets, droplet)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Droplet{},
-				Unexpected: item,
-			}
-		}
-		return nil
-	})
-
-	return responseDroplets, warnings, err
-}
-
 // GetDroplet returns a droplet with the given GUID.
 func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -143,6 +117,33 @@ func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) 
 func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDropletsRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var responseDroplets []Droplet
+	warnings, err := client.paginate(request, Droplet{}, func(item interface{}) error {
+		if droplet, ok := item.(Droplet); ok {
+			responseDroplets = append(responseDroplets, droplet)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Droplet{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return responseDroplets, warnings, err
+}
+
+// GetPackageDroplets returns the droplets that run the specified packages
+func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]Droplet, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetPackageDropletsRequest,
+		URIParams:   map[string]string{"package_guid": packageGUID},
 		Query:       query,
 	})
 	if err != nil {

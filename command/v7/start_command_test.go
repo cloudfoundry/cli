@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = FDescribe("start Command", func() {
+var _ = Describe("start Command", func() {
 	var (
 		cmd             v7.StartCommand
 		testUI          *ui.UI
@@ -55,6 +55,7 @@ var _ = FDescribe("start Command", func() {
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			NOAAClient:  fakeNOAAClient,
 		}
 	})
 
@@ -240,7 +241,7 @@ var _ = FDescribe("start Command", func() {
 		})
 	})
 
-	FWhen("the app needs staging", func() {
+	When("the app needs staging", func() {
 		BeforeEach(func() {
 			app = "some-app"
 			fakeActor.GetUnstagedNewestPackageGUIDReturns(packageGUID, v7action.Warnings{"needs-stage-warnings"}, nil)
@@ -252,7 +253,7 @@ var _ = FDescribe("start Command", func() {
 				GUID: "some-space-guid",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped, LifecycleType: constant.AppLifecycleTypeBuildpack}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped, LifecycleType: constant.AppLifecycleTypeBuildpack, GUID: "some-app-guid"}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 		})
 
 		When("the logging does not error", func() {
@@ -300,7 +301,7 @@ var _ = FDescribe("start Command", func() {
 					fakeActor.SetApplicationDropletReturns(v7action.Warnings{"some-set-droplet-warning"}, nil)
 				})
 
-				FIt("outputs the droplet GUID", func() {
+				It("outputs the droplet GUID", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					createdAtTimeParsed, err := time.Parse(time.RFC3339, dropletCreateTime)
@@ -317,7 +318,7 @@ var _ = FDescribe("start Command", func() {
 					Expect(testUI.Err).To(Say("some-other-warning"))
 				})
 
-				FIt("stages the package", func() {
+				It("stages the package", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
 					guidArg, appNameArg, spaceGUIDArg := fakeActor.StagePackageArgsForCall(0)
@@ -326,7 +327,7 @@ var _ = FDescribe("start Command", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 				})
 
-				FIt("displays staging logs and their warnings", func() {
+				It("displays staging logs and their warnings", func() {
 					Expect(testUI.Out).To(Say("Here are some staging logs!"))
 					Expect(testUI.Out).To(Say("Here are some other staging logs!"))
 
@@ -343,6 +344,40 @@ var _ = FDescribe("start Command", func() {
 					Expect(guidArg).To(Equal(packageGUID))
 					Expect(appNameArg).To(Equal(app))
 					Expect(spaceGUIDArg).To(Equal(spaceGUID))
+				})
+
+				When("Assigning the droplet is successful", func() {
+					BeforeEach(func() {
+						fakeActor.SetApplicationDropletReturns(v7action.Warnings{"some-set-droplet-warning"}, nil)
+					})
+					It("displays that the droplet was assigned", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("Setting app some-app to droplet some-droplet-guid in org some-org / space some-space as steve..."))
+
+						Expect(testUI.Err).To(Say("warning-1"))
+						Expect(testUI.Err).To(Say("warning-2"))
+						Expect(testUI.Out).To(Say("OK"))
+
+						Expect(fakeActor.SetApplicationDropletCallCount()).To(Equal(1))
+						appGuid, dropletGUID := fakeActor.SetApplicationDropletArgsForCall(0)
+						Expect(appGuid).To(Equal("some-app-guid"))
+						Expect(dropletGUID).To(Equal("some-droplet-guid"))
+
+					})
+				})
+
+				When("Assigning the droplet is not successful", func() {
+					var expectedErr error
+					BeforeEach(func() {
+						expectedErr = errors.New("some-error")
+						fakeActor.SetApplicationDropletReturns(v7action.Warnings{"some-set-droplet-warning"}, expectedErr)
+					})
+					It("errors and displays warnings", func() {
+						Expect(testUI.Out).To(Say("Setting app some-app to droplet some-droplet-guid in org some-org / space some-space as steve..."))
+						Expect(executeErr).To(HaveOccurred())
+						Expect(testUI.Err).To(Say("some-set-droplet-warning"))
+					})
 				})
 			})
 
