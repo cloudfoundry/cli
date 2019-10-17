@@ -8,6 +8,16 @@ import (
 )
 
 type FakeVersionChecker struct {
+	AuthorizationEndpointStub        func() string
+	authorizationEndpointMutex       sync.RWMutex
+	authorizationEndpointArgsForCall []struct {
+	}
+	authorizationEndpointReturns struct {
+		result1 string
+	}
+	authorizationEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
 	cloudControllerAPIVersionArgsForCall []struct {
@@ -30,6 +40,58 @@ type FakeVersionChecker struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeVersionChecker) AuthorizationEndpoint() string {
+	fake.authorizationEndpointMutex.Lock()
+	ret, specificReturn := fake.authorizationEndpointReturnsOnCall[len(fake.authorizationEndpointArgsForCall)]
+	fake.authorizationEndpointArgsForCall = append(fake.authorizationEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("AuthorizationEndpoint", []interface{}{})
+	fake.authorizationEndpointMutex.Unlock()
+	if fake.AuthorizationEndpointStub != nil {
+		return fake.AuthorizationEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.authorizationEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeVersionChecker) AuthorizationEndpointCallCount() int {
+	fake.authorizationEndpointMutex.RLock()
+	defer fake.authorizationEndpointMutex.RUnlock()
+	return len(fake.authorizationEndpointArgsForCall)
+}
+
+func (fake *FakeVersionChecker) AuthorizationEndpointCalls(stub func() string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = stub
+}
+
+func (fake *FakeVersionChecker) AuthorizationEndpointReturns(result1 string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = nil
+	fake.authorizationEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeVersionChecker) AuthorizationEndpointReturnsOnCall(i int, result1 string) {
+	fake.authorizationEndpointMutex.Lock()
+	defer fake.authorizationEndpointMutex.Unlock()
+	fake.AuthorizationEndpointStub = nil
+	if fake.authorizationEndpointReturnsOnCall == nil {
+		fake.authorizationEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.authorizationEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeVersionChecker) CloudControllerAPIVersion() string {
@@ -139,6 +201,8 @@ func (fake *FakeVersionChecker) MinCLIVersionReturnsOnCall(i int, result1 string
 func (fake *FakeVersionChecker) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.authorizationEndpointMutex.RLock()
+	defer fake.authorizationEndpointMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()

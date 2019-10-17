@@ -9,12 +9,13 @@ import (
 )
 
 type FakeActorMaker struct {
-	NewActorStub        func(command.Config, command.UI, bool) (v6.LoginActor, error)
+	NewActorStub        func(command.Config, command.UI, bool, string) (v6.LoginActor, error)
 	newActorMutex       sync.RWMutex
 	newActorArgsForCall []struct {
 		arg1 command.Config
 		arg2 command.UI
 		arg3 bool
+		arg4 string
 	}
 	newActorReturns struct {
 		result1 v6.LoginActor
@@ -28,18 +29,19 @@ type FakeActorMaker struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeActorMaker) NewActor(arg1 command.Config, arg2 command.UI, arg3 bool) (v6.LoginActor, error) {
+func (fake *FakeActorMaker) NewActor(arg1 command.Config, arg2 command.UI, arg3 bool, arg4 string) (v6.LoginActor, error) {
 	fake.newActorMutex.Lock()
 	ret, specificReturn := fake.newActorReturnsOnCall[len(fake.newActorArgsForCall)]
 	fake.newActorArgsForCall = append(fake.newActorArgsForCall, struct {
 		arg1 command.Config
 		arg2 command.UI
 		arg3 bool
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("NewActor", []interface{}{arg1, arg2, arg3})
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("NewActor", []interface{}{arg1, arg2, arg3, arg4})
 	fake.newActorMutex.Unlock()
 	if fake.NewActorStub != nil {
-		return fake.NewActorStub(arg1, arg2, arg3)
+		return fake.NewActorStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -54,17 +56,17 @@ func (fake *FakeActorMaker) NewActorCallCount() int {
 	return len(fake.newActorArgsForCall)
 }
 
-func (fake *FakeActorMaker) NewActorCalls(stub func(command.Config, command.UI, bool) (v6.LoginActor, error)) {
+func (fake *FakeActorMaker) NewActorCalls(stub func(command.Config, command.UI, bool, string) (v6.LoginActor, error)) {
 	fake.newActorMutex.Lock()
 	defer fake.newActorMutex.Unlock()
 	fake.NewActorStub = stub
 }
 
-func (fake *FakeActorMaker) NewActorArgsForCall(i int) (command.Config, command.UI, bool) {
+func (fake *FakeActorMaker) NewActorArgsForCall(i int) (command.Config, command.UI, bool, string) {
 	fake.newActorMutex.RLock()
 	defer fake.newActorMutex.RUnlock()
 	argsForCall := fake.newActorArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActorMaker) NewActorReturns(result1 v6.LoginActor, result2 error) {

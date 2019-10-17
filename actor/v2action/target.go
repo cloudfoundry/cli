@@ -41,3 +41,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 
 	return Warnings(warnings), nil
 }
+
+func (actor Actor) AuthorizationEndpoint() string {
+	return actor.CloudControllerClient.AuthorizationEndpoint()
+}

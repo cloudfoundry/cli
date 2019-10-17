@@ -76,6 +76,46 @@ var _ = Describe("login command", func() {
 		})
 	})
 
+	Describe("authorization endpoint", func() {
+		When("an authorization endpoint is advertised by the server", func() {
+			var server *ghttp.Server
+
+			BeforeEach(func() {
+				server = helpers.StartMockServerWithCustomAuthorizationEndpoint("/custom/authorization/endpoint")
+
+				fakeTokenResponse := map[string]string{
+					"access_token":  helpers.BuildTokenString(time.Now().Add(time.Hour)),
+					"token_type":    "bearer",
+					"refresh_token": "refresh-token",
+				}
+				server.RouteToHandler(http.MethodGet, "/login",
+					func(http.ResponseWriter, *http.Request) {
+						Fail("The advertized authorization_endpoint should be used in preference to the UAA endpoint")
+					},
+				)
+				server.RouteToHandler(http.MethodGet, "/v3/organizations",
+					ghttp.RespondWith(http.StatusOK, `{"total_results": 0, "total_pages": 1, "resources": []}`))
+
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/custom/authorization/endpoint/oauth/token"),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse),
+					),
+				)
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("requests a token from the authorization endpoint and exits successfully", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("-v", "login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
 	Describe("Minimum Version Check", func() {
 		When("the v2 API version is less than the minimum supported version", func() {
 			var server *ghttp.Server

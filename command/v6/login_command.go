@@ -38,12 +38,13 @@ type LoginActor interface {
 type VersionChecker interface {
 	MinCLIVersion() string
 	CloudControllerAPIVersion() string
+	AuthorizationEndpoint() string
 }
 
 //go:generate counterfeiter . ActorMaker
 
 type ActorMaker interface {
-	NewActor(command.Config, command.UI, bool) (LoginActor, error)
+	NewActor(command.Config, command.UI, bool, string) (LoginActor, error)
 }
 
 //go:generate counterfeiter . CheckerMaker
@@ -52,19 +53,19 @@ type CheckerMaker interface {
 	NewVersionChecker(command.Config, command.UI, bool) (VersionChecker, error)
 }
 
-type ActorMakerFunc func(command.Config, command.UI, bool) (LoginActor, error)
+type ActorMakerFunc func(command.Config, command.UI, bool, string) (LoginActor, error)
 type CheckerMakerFunc func(command.Config, command.UI, bool) (VersionChecker, error)
 
-func (a ActorMakerFunc) NewActor(config command.Config, ui command.UI, targetCF bool) (LoginActor, error) {
-	return a(config, ui, targetCF)
+func (a ActorMakerFunc) NewActor(config command.Config, ui command.UI, targetCF bool, authorizationEndpoint string) (LoginActor, error) {
+	return a(config, ui, targetCF, authorizationEndpoint)
 }
 
 func (c CheckerMakerFunc) NewVersionChecker(config command.Config, ui command.UI, targetCF bool) (VersionChecker, error) {
 	return c(config, ui, targetCF)
 }
 
-var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (LoginActor, error) {
-	client, uaa, err := shared.NewV3BasedClients(config, ui, targetCF)
+var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool, authorizationEndpoint string) (LoginActor, error) {
+	client, uaa, err := shared.NewV3BasedClientsWithAuthorizationEndpoint(config, ui, targetCF, authorizationEndpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +107,7 @@ type LoginCommand struct {
 
 func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.ActorMaker = actorMaker
-	actor, err := cmd.ActorMaker.NewActor(config, ui, false)
+	actor, err := cmd.ActorMaker.NewActor(config, ui, false, "")
 	if err != nil {
 		return err
 	}
@@ -448,19 +449,19 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 }
 
 func (cmd *LoginCommand) reloadActorAndChecker() error {
-	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true)
-	if err != nil {
-		return err
-	}
-
-	cmd.Actor = newActor
-
 	newChecker, err := cmd.CheckerMaker.NewVersionChecker(cmd.Config, cmd.UI, true)
 	if err != nil {
 		return err
 	}
 
 	cmd.Checker = newChecker
+
+	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true, cmd.Checker.AuthorizationEndpoint())
+	if err != nil {
+		return err
+	}
+
+	cmd.Actor = newActor
 
 	return nil
 }

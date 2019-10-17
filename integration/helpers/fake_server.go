@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	DefaultV2Version string = "2.131.0"
-	DefaultV3Version string = "3.66.0"
+	DefaultV2Version         string = "2.131.0"
+	DefaultV3Version         string = "3.66.0"
+	DefaultAuthorizationPath string = ""
 )
 
 // StartAndTargetMockServerWithAPIVersions starts and targets a server with the given V2 and V3
@@ -28,16 +29,22 @@ func StartAndTargetMockServerWithAPIVersions(v2Version string, v3Version string)
 // StartMockServerWithMinimumCLIVersion starts a server with the default V2 and V3
 // API versions and the given minimum CLI version.
 func StartMockServerWithMinimumCLIVersion(minCLIVersion string) *Server {
-	return startServerWithVersions(DefaultV2Version, DefaultV3Version, &minCLIVersion)
+	return startServerWithVersions(DefaultV2Version, DefaultV3Version, &minCLIVersion, DefaultAuthorizationPath)
 }
 
 // StartMockServerWithAPIVersions starts a server with the given V2 and V3
 // API versions
 func StartMockServerWithAPIVersions(v2Version string, v3Version string) *Server {
-	return startServerWithVersions(v2Version, v3Version, nil)
+	return startServerWithVersions(v2Version, v3Version, nil, DefaultAuthorizationPath)
 }
 
-func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersion *string) *Server {
+// StartMockServerWithAPIVersions starts a server with the given V2 and V3
+// API versions
+func StartMockServerWithCustomAuthorizationEndpoint(authorizationPath string) *Server {
+	return startServerWithVersions(DefaultV2Version, DefaultV3Version, nil, authorizationPath)
+}
+
+func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersion *string, authorizationPath string) *Server {
 	server := NewTLSServer()
 
 	rootResponse := fmt.Sprintf(`{
@@ -85,7 +92,7 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
 		MinCLIVersion         *string `json:"min_cli_version"`
 	}{
 		APIVersion:            v2Version,
-		AuthorizationEndpoint: server.URL(),
+		AuthorizationEndpoint: server.URL() + authorizationPath,
 		MinCLIVersion:         minimumCLIVersion}
 
 	server.RouteToHandler(http.MethodGet, "/v2/info", RespondWithJSONEncoded(http.StatusOK, v2InfoResponse))
@@ -98,15 +105,17 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
 				"href": "SERVER_URL/v3/spaces"
 			}
 		}}`, "SERVER_URL", server.URL(), -1)
+
 	server.RouteToHandler(http.MethodGet, "/v3", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
 		res.Write([]byte(v3Response))
 	})
 
-	server.RouteToHandler(http.MethodGet, "/login", func(res http.ResponseWriter, req *http.Request) {
+	server.RouteToHandler(http.MethodGet, authorizationPath+"/login", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
 		res.Write([]byte(`{"links":{}}`))
 	})
+
 	server.RouteToHandler(http.MethodGet, "/", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
 		res.Write([]byte(rootResponse))
