@@ -28,10 +28,10 @@ var _ = Describe("login Command", func() {
 		cmd              LoginCommand
 		testUI           *ui.UI
 		fakeActor        *v6fakes.FakeLoginActor
-		fakeChecker      *v6fakes.FakeVersionChecker
+		fakeV2Actor      *v6fakes.FakeV2LoginActor
 		fakeConfig       *commandfakes.FakeConfig
 		fakeActorMaker   *v6fakes.FakeActorMaker
-		fakeCheckerMaker *v6fakes.FakeCheckerMaker
+		fakeV2ActorMaker *v6fakes.FakeV2ActorMaker
 		executeErr       error
 		input            *Buffer
 	)
@@ -44,9 +44,9 @@ var _ = Describe("login Command", func() {
 		fakeActorMaker = new(v6fakes.FakeActorMaker)
 		fakeActorMaker.NewActorReturns(fakeActor, nil)
 
-		fakeChecker = new(v6fakes.FakeVersionChecker)
-		fakeCheckerMaker = new(v6fakes.FakeCheckerMaker)
-		fakeCheckerMaker.NewVersionCheckerReturns(fakeChecker, nil)
+		fakeV2Actor = new(v6fakes.FakeV2LoginActor)
+		fakeV2ActorMaker = new(v6fakes.FakeV2ActorMaker)
+		fakeV2ActorMaker.NewV2ActorReturns(fakeV2Actor, nil)
 		binaryName = "some-executable"
 		fakeConfig.BinaryNameReturns(binaryName)
 
@@ -57,7 +57,7 @@ var _ = Describe("login Command", func() {
 			Actor:        fakeActor,
 			ActorMaker:   fakeActorMaker,
 			Config:       fakeConfig,
-			CheckerMaker: fakeCheckerMaker,
+			V2ActorMaker: fakeV2ActorMaker,
 		}
 		cmd.APIEndpoint = ""
 	})
@@ -276,7 +276,7 @@ var _ = Describe("login Command", func() {
 			fakeAPI = "whatever.com"
 			fakeConfig.TargetReturns(fakeAPI)
 
-			fakeChecker.MinCLIVersionReturns("9000.0.0")
+			fakeV2Actor.MinCLIVersionReturns("9000.0.0")
 		})
 
 		It("sets the minimum CLI version in the config", func() {
@@ -287,7 +287,7 @@ var _ = Describe("login Command", func() {
 
 		When("The current version is below the minimum supported", func() {
 			BeforeEach(func() {
-				fakeChecker.CloudControllerAPIVersionReturns("2.123.0")
+				fakeV2Actor.CloudControllerAPIVersionReturns("2.123.0")
 				fakeConfig.BinaryVersionReturns("1.2.3")
 				fakeConfig.MinCLIVersionReturns("9000.0.0")
 			})
@@ -546,7 +546,7 @@ var _ = Describe("login Command", func() {
 								Actor:        fakeActor,
 								ActorMaker:   fakeActorMaker,
 								Config:       fakeConfig,
-								CheckerMaker: fakeCheckerMaker,
+								V2ActorMaker: fakeV2ActorMaker,
 							}
 						})
 
@@ -571,7 +571,7 @@ var _ = Describe("login Command", func() {
 								Actor:        fakeActor,
 								ActorMaker:   fakeActorMaker,
 								Config:       fakeConfig,
-								CheckerMaker: fakeCheckerMaker,
+								V2ActorMaker: fakeV2ActorMaker,
 							}
 						})
 
@@ -591,7 +591,7 @@ var _ = Describe("login Command", func() {
 								Actor:        fakeActor,
 								ActorMaker:   fakeActorMaker,
 								Config:       fakeConfig,
-								CheckerMaker: fakeCheckerMaker,
+								V2ActorMaker: fakeV2ActorMaker,
 							}
 						})
 
@@ -617,7 +617,7 @@ var _ = Describe("login Command", func() {
 								Actor:        fakeActor,
 								ActorMaker:   fakeActorMaker,
 								Config:       fakeConfig,
-								CheckerMaker: fakeCheckerMaker,
+								V2ActorMaker: fakeV2ActorMaker,
 							}
 						})
 
@@ -764,7 +764,7 @@ var _ = Describe("login Command", func() {
 						Actor:        fakeActor,
 						ActorMaker:   fakeActorMaker,
 						Config:       fakeConfig,
-						CheckerMaker: fakeCheckerMaker,
+						V2ActorMaker: fakeV2ActorMaker,
 						SSO:          true,
 					}
 				})

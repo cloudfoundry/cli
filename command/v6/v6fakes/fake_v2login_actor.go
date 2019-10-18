@@ -7,7 +7,7 @@ import (
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
-type FakeVersionChecker struct {
+type FakeV2LoginActor struct {
 	AuthorizationEndpointStub        func() string
 	authorizationEndpointMutex       sync.RWMutex
 	authorizationEndpointArgsForCall []struct {
@@ -42,7 +42,7 @@ type FakeVersionChecker struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeVersionChecker) AuthorizationEndpoint() string {
+func (fake *FakeV2LoginActor) AuthorizationEndpoint() string {
 	fake.authorizationEndpointMutex.Lock()
 	ret, specificReturn := fake.authorizationEndpointReturnsOnCall[len(fake.authorizationEndpointArgsForCall)]
 	fake.authorizationEndpointArgsForCall = append(fake.authorizationEndpointArgsForCall, struct {
@@ -59,19 +59,19 @@ func (fake *FakeVersionChecker) AuthorizationEndpoint() string {
 	return fakeReturns.result1
 }
 
-func (fake *FakeVersionChecker) AuthorizationEndpointCallCount() int {
+func (fake *FakeV2LoginActor) AuthorizationEndpointCallCount() int {
 	fake.authorizationEndpointMutex.RLock()
 	defer fake.authorizationEndpointMutex.RUnlock()
 	return len(fake.authorizationEndpointArgsForCall)
 }
 
-func (fake *FakeVersionChecker) AuthorizationEndpointCalls(stub func() string) {
+func (fake *FakeV2LoginActor) AuthorizationEndpointCalls(stub func() string) {
 	fake.authorizationEndpointMutex.Lock()
 	defer fake.authorizationEndpointMutex.Unlock()
 	fake.AuthorizationEndpointStub = stub
 }
 
-func (fake *FakeVersionChecker) AuthorizationEndpointReturns(result1 string) {
+func (fake *FakeV2LoginActor) AuthorizationEndpointReturns(result1 string) {
 	fake.authorizationEndpointMutex.Lock()
 	defer fake.authorizationEndpointMutex.Unlock()
 	fake.AuthorizationEndpointStub = nil
@@ -80,7 +80,7 @@ func (fake *FakeVersionChecker) AuthorizationEndpointReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeVersionChecker) AuthorizationEndpointReturnsOnCall(i int, result1 string) {
+func (fake *FakeV2LoginActor) AuthorizationEndpointReturnsOnCall(i int, result1 string) {
 	fake.authorizationEndpointMutex.Lock()
 	defer fake.authorizationEndpointMutex.Unlock()
 	fake.AuthorizationEndpointStub = nil
@@ -94,7 +94,7 @@ func (fake *FakeVersionChecker) AuthorizationEndpointReturnsOnCall(i int, result
 	}{result1}
 }
 
-func (fake *FakeVersionChecker) CloudControllerAPIVersion() string {
+func (fake *FakeV2LoginActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
@@ -111,19 +111,19 @@ func (fake *FakeVersionChecker) CloudControllerAPIVersion() string {
 	return fakeReturns.result1
 }
 
-func (fake *FakeVersionChecker) CloudControllerAPIVersionCallCount() int {
+func (fake *FakeV2LoginActor) CloudControllerAPIVersionCallCount() int {
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
-func (fake *FakeVersionChecker) CloudControllerAPIVersionCalls(stub func() string) {
+func (fake *FakeV2LoginActor) CloudControllerAPIVersionCalls(stub func() string) {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = stub
 }
 
-func (fake *FakeVersionChecker) CloudControllerAPIVersionReturns(result1 string) {
+func (fake *FakeV2LoginActor) CloudControllerAPIVersionReturns(result1 string) {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
@@ -132,7 +132,7 @@ func (fake *FakeVersionChecker) CloudControllerAPIVersionReturns(result1 string)
 	}{result1}
 }
 
-func (fake *FakeVersionChecker) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+func (fake *FakeV2LoginActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
@@ -146,7 +146,7 @@ func (fake *FakeVersionChecker) CloudControllerAPIVersionReturnsOnCall(i int, re
 	}{result1}
 }
 
-func (fake *FakeVersionChecker) MinCLIVersion() string {
+func (fake *FakeV2LoginActor) MinCLIVersion() string {
 	fake.minCLIVersionMutex.Lock()
 	ret, specificReturn := fake.minCLIVersionReturnsOnCall[len(fake.minCLIVersionArgsForCall)]
 	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct {
@@ -163,19 +163,19 @@ func (fake *FakeVersionChecker) MinCLIVersion() string {
 	return fakeReturns.result1
 }
 
-func (fake *FakeVersionChecker) MinCLIVersionCallCount() int {
+func (fake *FakeV2LoginActor) MinCLIVersionCallCount() int {
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	return len(fake.minCLIVersionArgsForCall)
 }
 
-func (fake *FakeVersionChecker) MinCLIVersionCalls(stub func() string) {
+func (fake *FakeV2LoginActor) MinCLIVersionCalls(stub func() string) {
 	fake.minCLIVersionMutex.Lock()
 	defer fake.minCLIVersionMutex.Unlock()
 	fake.MinCLIVersionStub = stub
 }
 
-func (fake *FakeVersionChecker) MinCLIVersionReturns(result1 string) {
+func (fake *FakeV2LoginActor) MinCLIVersionReturns(result1 string) {
 	fake.minCLIVersionMutex.Lock()
 	defer fake.minCLIVersionMutex.Unlock()
 	fake.MinCLIVersionStub = nil
@@ -184,7 +184,7 @@ func (fake *FakeVersionChecker) MinCLIVersionReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeVersionChecker) MinCLIVersionReturnsOnCall(i int, result1 string) {
+func (fake *FakeV2LoginActor) MinCLIVersionReturnsOnCall(i int, result1 string) {
 	fake.minCLIVersionMutex.Lock()
 	defer fake.minCLIVersionMutex.Unlock()
 	fake.MinCLIVersionStub = nil
@@ -198,7 +198,7 @@ func (fake *FakeVersionChecker) MinCLIVersionReturnsOnCall(i int, result1 string
 	}{result1}
 }
 
-func (fake *FakeVersionChecker) Invocations() map[string][][]interface{} {
+func (fake *FakeV2LoginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.authorizationEndpointMutex.RLock()
@@ -214,7 +214,7 @@ func (fake *FakeVersionChecker) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeVersionChecker) recordInvocation(key string, args []interface{}) {
+func (fake *FakeV2LoginActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -226,4 +226,4 @@ func (fake *FakeVersionChecker) recordInvocation(key string, args []interface{})
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v6.VersionChecker = new(FakeVersionChecker)
+var _ v6.V2LoginActor = new(FakeV2LoginActor)

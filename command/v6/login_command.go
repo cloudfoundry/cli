@@ -33,9 +33,9 @@ type LoginActor interface {
 	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
 }
 
-//go:generate counterfeiter . VersionChecker
+//go:generate counterfeiter . V2LoginActor
 
-type VersionChecker interface {
+type V2LoginActor interface {
 	MinCLIVersion() string
 	CloudControllerAPIVersion() string
 	AuthorizationEndpoint() string
@@ -47,21 +47,21 @@ type ActorMaker interface {
 	NewActor(command.Config, command.UI, bool, string) (LoginActor, error)
 }
 
-//go:generate counterfeiter . CheckerMaker
+//go:generate counterfeiter . V2ActorMaker
 
-type CheckerMaker interface {
-	NewVersionChecker(command.Config, command.UI, bool) (VersionChecker, error)
+type V2ActorMaker interface {
+	NewV2Actor(command.Config, command.UI, bool) (V2LoginActor, error)
 }
 
 type ActorMakerFunc func(command.Config, command.UI, bool, string) (LoginActor, error)
-type CheckerMakerFunc func(command.Config, command.UI, bool) (VersionChecker, error)
+type V2ActorMakerFunc func(command.Config, command.UI, bool) (V2LoginActor, error)
 
 func (a ActorMakerFunc) NewActor(config command.Config, ui command.UI, targetCF bool, authorizationEndpoint string) (LoginActor, error) {
 	return a(config, ui, targetCF, authorizationEndpoint)
 }
 
-func (c CheckerMakerFunc) NewVersionChecker(config command.Config, ui command.UI, targetCF bool) (VersionChecker, error) {
-	return c(config, ui, targetCF)
+func (a V2ActorMakerFunc) NewV2Actor(config command.Config, ui command.UI, targetCF bool) (V2LoginActor, error) {
+	return a(config, ui, targetCF)
 }
 
 var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool, authorizationEndpoint string) (LoginActor, error) {
@@ -74,7 +74,7 @@ var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targe
 	return v3Actor, nil
 }
 
-var checkerMaker CheckerMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (VersionChecker, error) {
+var v2ActorMaker V2ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (V2LoginActor, error) {
 	client, uaa, err := shared.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {
 		return nil, err
@@ -100,8 +100,8 @@ type LoginCommand struct {
 	UI           command.UI
 	Actor        LoginActor
 	ActorMaker   ActorMaker
-	Checker      VersionChecker
-	CheckerMaker CheckerMaker
+	V2Actor      V2LoginActor
+	V2ActorMaker V2ActorMaker
 	Config       command.Config
 }
 
@@ -111,7 +111,7 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.CheckerMaker = checkerMaker
+	cmd.V2ActorMaker = v2ActorMaker
 	cmd.Actor = actor
 	cmd.UI = ui
 	cmd.Config = config
@@ -299,7 +299,7 @@ func (cmd *LoginCommand) targetAPI(settings v3action.TargetSettings) error {
 		cmd.UI.DisplayWarning("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
 	}
 
-	return cmd.reloadActorAndChecker()
+	return cmd.reloadActors()
 }
 
 func (cmd *LoginCommand) authenticate() error {
@@ -413,8 +413,8 @@ func (cmd *LoginCommand) authenticateSSO() error {
 }
 
 func (cmd *LoginCommand) checkMinCLIVersion() error {
-	cmd.Config.SetMinCLIVersion(cmd.Checker.MinCLIVersion())
-	return command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Checker.CloudControllerAPIVersion(), cmd.UI)
+	cmd.Config.SetMinCLIVersion(cmd.V2Actor.MinCLIVersion())
+	return command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.V2Actor.CloudControllerAPIVersion(), cmd.UI)
 }
 
 func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPrompt, credentials map[string]string, passwordKeys []string) (map[string]string, error) {
@@ -448,15 +448,15 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 	return credentialsCopy, nil
 }
 
-func (cmd *LoginCommand) reloadActorAndChecker() error {
-	newChecker, err := cmd.CheckerMaker.NewVersionChecker(cmd.Config, cmd.UI, true)
+func (cmd *LoginCommand) reloadActors() error {
+	newV2Actor, err := cmd.V2ActorMaker.NewV2Actor(cmd.Config, cmd.UI, true)
 	if err != nil {
 		return err
 	}
 
-	cmd.Checker = newChecker
+	cmd.V2Actor = newV2Actor
 
-	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true, cmd.Checker.AuthorizationEndpoint())
+	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true, cmd.V2Actor.AuthorizationEndpoint())
 	if err != nil {
 		return err
 	}
