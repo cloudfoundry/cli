@@ -61,14 +61,11 @@ func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) erro
 	cmd.UI.DisplayTextWithFlavor("Setting the contents of the staging environment variable group as {{.Username}}...", map[string]interface{}{
 		"Username": user.Name,
 	})
-	cmd.UI.DisplayNewline()
+
 	var envVars ccv3.EnvironmentVariables
-
 	err = json.Unmarshal([]byte(fmt.Sprintf(`{"var":%s}`, cmd.RequiredArgs.EnvVarGroupJson)), &envVars)
-
 	if err != nil {
-		cmd.UI.DisplayError(errors.New("Invalid environment variable group provided. Please provide a valid JSON object."))
-		return err
+		return errors.New("Invalid environment variable group provided. Please provide a valid JSON object.")
 	}
 
 	warnings, err := cmd.Actor.SetEnvironmentVariableGroup(

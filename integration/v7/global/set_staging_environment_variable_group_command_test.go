@@ -102,4 +102,14 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 			Expect(string(session.Out.Contents())).ToNot(MatchRegexp(fmt.Sprintf(`%s\s+%s`, key2, val2)))
 		})
 	})
+
+	When("user passes invalid JSON", func() {
+		It("fails helpfully", func() {
+			session := helpers.CF("set-staging-environment-variable-group", `not json...`)
+			Eventually(session).Should(Say("Setting the contents of the staging environment variable group as"))
+			Eventually(session.Err).Should(Say("Invalid environment variable group provided. Please provide a valid JSON object."))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
 })
