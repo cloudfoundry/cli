@@ -349,6 +349,25 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
+					When("the buildpack is invalid", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "Assign a droplet before starting this app.",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns an InvalidStartError", func() {
+							Expect(makeError).To(MatchError(ccerror.InvalidStartError{}))
+						})
+					})
+
 					When("the detail describes something else", func() {
 						BeforeEach(func() {
 							serverResponse = `

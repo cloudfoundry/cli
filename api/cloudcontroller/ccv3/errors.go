@@ -149,6 +149,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	case strings.Contains(errorString,
 		"Buildpack must be an existing admin buildpack or a valid git URI"):
 		return ccerror.InvalidBuildpackError{}
+	case strings.Contains(errorString,
+		"Assign a droplet before starting this app."):
+		return ccerror.InvalidStartError{}
 	case orgNameTakenRegexp.MatchString(errorString):
 		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
 	default:

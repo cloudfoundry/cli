@@ -43,6 +43,8 @@ const (
 	StackFilter QueryKey = "stacks"
 	// Unmapped filter is a query parameter specifying unmapped routes
 	UnmappedFilter QueryKey = "unmapped"
+	// States filter is a query parameter when getting a package's droplets by state
+	StatesFilter QueryKey = "states"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"

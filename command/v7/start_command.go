@@ -1,10 +1,12 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
@@ -16,6 +18,10 @@ type StartActor interface {
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
+	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
+	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 }
 
 type StartCommand struct {
@@ -27,6 +33,7 @@ type StartCommand struct {
 
 	UI          command.UI
 	Config      command.Config
+	NOAAClient  v7action.NOAAClient
 	SharedActor command.SharedActor
 	Actor       StartActor
 }
@@ -36,12 +43,13 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	return nil
 }
@@ -78,17 +86,54 @@ func (cmd StartCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
+	cmd.UI.DisplayNewline()
+
+	packageGuid, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
+	cmd.UI.DisplayWarningsV7(warnings)
+	if err != nil {
+		return err
+	}
+	if packageGuid != "" {
+		cmd.UI.DisplayText("Staging app and tracing logs")
+
+		logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		cmd.UI.DisplayWarningsV7(logWarnings)
+		if logErr != nil {
+			return logErr
+		}
+
+		dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(packageGuid, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+
+		droplet, err := shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+		if err != nil {
+			return err
+		}
+
+		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
+		cmd.UI.DisplayWarningsV7(warnings)
+		if err != nil {
+			return err
+		}
+	}
+
+	cmd.UI.DisplayText("\nWaiting for app to start...")
 
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayText("\nWaiting for app to start...")
+
+	cmd.UI.DisplayNewline()
 
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
+		if _, ok := err.(actionerror.UAAUserNotFoundError); ok {
+			cmd.UI.DisplayTextWithFlavor(err.Error())
+			cmd.UI.DisplayOK()
+			return nil
+		}
 		return err
 	}
 

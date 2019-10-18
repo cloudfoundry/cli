@@ -1757,6 +1757,108 @@ var _ = Describe("Application Actions", func() {
 
 	})
 
+	Describe("GetUnstagedNewestPackageGUID", func() {
+		var (
+			packageToStage string
+			warnings       Warnings
+			executeErr     error
+		)
+
+		JustBeforeEach(func() {
+			packageToStage, warnings, executeErr = actor.GetUnstagedNewestPackageGUID("some-app-guid")
+		})
+
+		// Nothing to stage.
+		When("There are no packages on the app", func() {
+			When("getting the packages succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetPackagesReturns([]ccv3.Package{}, ccv3.Warnings{"get-packages-warnings"}, nil)
+				})
+
+				It("checks for packages", func() {
+					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+						ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					))
+				})
+
+				It("returns empty string", func() {
+					Expect(packageToStage).To(Equal(""))
+					Expect(warnings).To(ConsistOf("get-packages-warnings"))
+					Expect(executeErr).To(BeNil())
+				})
+			})
+
+			When("getting the packages fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetPackagesReturns(
+						nil,
+						ccv3.Warnings{"get-packages-warnings"},
+						errors.New("get-packages-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(warnings).To(ConsistOf("get-packages-warnings"))
+					Expect(executeErr).To(MatchError("get-packages-error"))
+				})
+			})
+		})
+
+		When("there are packages", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{{GUID: "package-guid", CreatedAt: "2019-01-01T06:00:00Z"}},
+					ccv3.Warnings{"get-packages-warning"},
+					nil)
+			})
+
+			It("checks for the packages latest droplet", func() {
+				Expect(fakeCloudControllerClient.GetPackageDropletsCallCount()).To(Equal(1))
+				packageGuid, queries := fakeCloudControllerClient.GetPackageDropletsArgsForCall(0)
+				Expect(packageGuid).To(Equal("package-guid"))
+				Expect(queries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+					ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"STAGED"}},
+				))
+			})
+
+			When("the newest package's has a STAGED droplet", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetPackageDropletsReturns(
+						[]ccv3.Droplet{{State: constant.DropletStaged}},
+						ccv3.Warnings{"get-package-droplet-warning"},
+						nil,
+					)
+				})
+
+				It("returns empty string", func() {
+					Expect(packageToStage).To(Equal(""))
+					Expect(warnings).To(ConsistOf("get-packages-warning", "get-package-droplet-warning"))
+					Expect(executeErr).To(BeNil())
+				})
+			})
+
+			When("the package has no STAGED droplets", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetPackageDropletsReturns(
+						[]ccv3.Droplet{},
+						ccv3.Warnings{"get-package-droplet-warning"},
+						nil,
+					)
+				})
+
+				It("returns the guid of the newest package", func() {
+					Expect(packageToStage).To(Equal("package-guid"))
+					Expect(warnings).To(ConsistOf("get-packages-warning", "get-package-droplet-warning"))
+					Expect(executeErr).To(BeNil())
+				})
+			})
+		})
+	})
+
 	Describe("RenameApplicationByNameAndSpaceGUID", func() {
 		When("the app does not exist", func() {
 			BeforeEach(func() {

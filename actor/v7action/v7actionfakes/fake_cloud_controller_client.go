@@ -977,6 +977,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetPackageDropletsStub        func(string, ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
+	getPackageDropletsMutex       sync.RWMutex
+	getPackageDropletsArgsForCall []struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}
+	getPackageDropletsReturns struct {
+		result1 []ccv3.Droplet
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getPackageDropletsReturnsOnCall map[int]struct {
+		result1 []ccv3.Droplet
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetPackagesStub        func(...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error)
 	getPackagesMutex       sync.RWMutex
 	getPackagesArgsForCall []struct {
@@ -5871,6 +5887,73 @@ func (fake *FakeCloudControllerClient) GetPackageReturnsOnCall(i int, result1 cc
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetPackageDroplets(arg1 string, arg2 ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error) {
+	fake.getPackageDropletsMutex.Lock()
+	ret, specificReturn := fake.getPackageDropletsReturnsOnCall[len(fake.getPackageDropletsArgsForCall)]
+	fake.getPackageDropletsArgsForCall = append(fake.getPackageDropletsArgsForCall, struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}{arg1, arg2})
+	fake.recordInvocation("GetPackageDroplets", []interface{}{arg1, arg2})
+	fake.getPackageDropletsMutex.Unlock()
+	if fake.GetPackageDropletsStub != nil {
+		return fake.GetPackageDropletsStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getPackageDropletsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetPackageDropletsCallCount() int {
+	fake.getPackageDropletsMutex.RLock()
+	defer fake.getPackageDropletsMutex.RUnlock()
+	return len(fake.getPackageDropletsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetPackageDropletsCalls(stub func(string, ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)) {
+	fake.getPackageDropletsMutex.Lock()
+	defer fake.getPackageDropletsMutex.Unlock()
+	fake.GetPackageDropletsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetPackageDropletsArgsForCall(i int) (string, []ccv3.Query) {
+	fake.getPackageDropletsMutex.RLock()
+	defer fake.getPackageDropletsMutex.RUnlock()
+	argsForCall := fake.getPackageDropletsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetPackageDropletsReturns(result1 []ccv3.Droplet, result2 ccv3.Warnings, result3 error) {
+	fake.getPackageDropletsMutex.Lock()
+	defer fake.getPackageDropletsMutex.Unlock()
+	fake.GetPackageDropletsStub = nil
+	fake.getPackageDropletsReturns = struct {
+		result1 []ccv3.Droplet
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetPackageDropletsReturnsOnCall(i int, result1 []ccv3.Droplet, result2 ccv3.Warnings, result3 error) {
+	fake.getPackageDropletsMutex.Lock()
+	defer fake.getPackageDropletsMutex.Unlock()
+	fake.GetPackageDropletsStub = nil
+	if fake.getPackageDropletsReturnsOnCall == nil {
+		fake.getPackageDropletsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Droplet
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getPackageDropletsReturnsOnCall[i] = struct {
+		result1 []ccv3.Droplet
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetPackages(arg1 ...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error) {
 	fake.getPackagesMutex.Lock()
 	ret, specificReturn := fake.getPackagesReturnsOnCall[len(fake.getPackagesArgsForCall)]
@@ -8802,6 +8885,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getOrganizationsMutex.RUnlock()
 	fake.getPackageMutex.RLock()
 	defer fake.getPackageMutex.RUnlock()
+	fake.getPackageDropletsMutex.RLock()
+	defer fake.getPackageDropletsMutex.RUnlock()
 	fake.getPackagesMutex.RLock()
 	defer fake.getPackagesMutex.RUnlock()
 	fake.getProcessMutex.RLock()

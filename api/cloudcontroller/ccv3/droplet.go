@@ -137,6 +137,33 @@ func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 	return responseDroplets, warnings, err
 }
 
+// GetPackageDroplets returns the droplets that run the specified packages
+func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]Droplet, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetPackageDropletsRequest,
+		URIParams:   map[string]string{"package_guid": packageGUID},
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var responseDroplets []Droplet
+	warnings, err := client.paginate(request, Droplet{}, func(item interface{}) error {
+		if droplet, ok := item.(Droplet); ok {
+			responseDroplets = append(responseDroplets, droplet)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Droplet{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return responseDroplets, warnings, err
+}
+
 // UploadDropletBits asynchronously uploads bits from a .tgz file located at dropletPath to the
 // droplet with guid dropletGUID. It returns a job URL pointing to the asynchronous upload job.
 func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, droplet io.Reader, dropletLength int64) (JobURL, Warnings, error) {

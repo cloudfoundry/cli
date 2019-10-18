@@ -1,14 +1,19 @@
 package isolated
 
 import (
-	"regexp"
-
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
+
+	"regexp"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+)
+
+const (
+	PushCommandName = "push"
 )
 
 var _ = Describe("start command", func() {
@@ -79,7 +84,7 @@ var _ = Describe("start command", func() {
 		})
 
 		When("the app exists", func() {
-			When("the app is staged", func() {
+			When("the app does not need to be staged", func() {
 				BeforeEach(func() {
 					var packageGUID string
 
@@ -144,11 +149,54 @@ var _ = Describe("start command", func() {
 				})
 			})
 
-			When("the app is not staged", func() {
-				It("complains about not having a droplet", func() {
+			When("the app needs to be staged", func() {
+				var packageGUID = ""
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+						Eventually(session).Should(Say(`\s+name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("stop", appName)
+					Eventually(session).Should(Say("OK"))
+
+					helpers.WithBananaPantsApp(func(dir string) {
+						pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "create-package", appName)
+						Eventually(pkgSession).Should(Exit(0))
+						regex := regexp.MustCompile(`Package with guid '(.+)' has been created.`)
+						matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
+						Expect(matches).To(HaveLen(2))
+
+						packageGUID = matches[1]
+					})
+				})
+
+				It("stages and starts the app", func() {
 					session := helpers.CF("start", appName)
 
-					Eventually(session.Err).Should(Say(`Assign a droplet before starting this app\.`))
+					Eventually(session).Should(Say(`Staging app and tracing logs`))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+32M`))
+					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+
+					Eventually(session).Should(Exit(0))
+
+					Expect(helpers.GetPackageFirstDroplet(packageGUID)).To(Equal(helpers.GetAppDroplet(helpers.AppGUID(appName))))
+				})
+			})
+
+			When("the app cannot be started or staged", func() {
+				It("gives an error", func() {
+					session := helpers.CF("start", appName)
+
+					Eventually(session.Err).Should(Say(`App can not start with out a package to stage or a droplet to run.`))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

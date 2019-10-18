@@ -42,6 +42,40 @@ type FakeStartActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetStreamingLogsForApplicationByNameAndSpaceStub        func(string, string, v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
+	getStreamingLogsForApplicationByNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 v7action.NOAAClient
+	}
+	getStreamingLogsForApplicationByNameAndSpaceReturns struct {
+		result1 <-chan *v7action.LogMessage
+		result2 <-chan error
+		result3 v7action.Warnings
+		result4 error
+	}
+	getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 <-chan *v7action.LogMessage
+		result2 <-chan error
+		result3 v7action.Warnings
+		result4 error
+	}
+	GetUnstagedNewestPackageGUIDStub        func(string) (string, v7action.Warnings, error)
+	getUnstagedNewestPackageGUIDMutex       sync.RWMutex
+	getUnstagedNewestPackageGUIDArgsForCall []struct {
+		arg1 string
+	}
+	getUnstagedNewestPackageGUIDReturns struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
+	getUnstagedNewestPackageGUIDReturnsOnCall map[int]struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
 	PollStartStub        func(string, bool) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
 	pollStartArgsForCall []struct {
@@ -55,6 +89,37 @@ type FakeStartActor struct {
 	pollStartReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
+	}
+	SetApplicationDropletStub        func(string, string) (v7action.Warnings, error)
+	setApplicationDropletMutex       sync.RWMutex
+	setApplicationDropletArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	setApplicationDropletReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	setApplicationDropletReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	StagePackageStub        func(string, string, string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	stagePackageMutex       sync.RWMutex
+	stagePackageArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	stagePackageReturns struct {
+		result1 <-chan v7action.Droplet
+		result2 <-chan v7action.Warnings
+		result3 <-chan error
+	}
+	stagePackageReturnsOnCall map[int]struct {
+		result1 <-chan v7action.Droplet
+		result2 <-chan v7action.Warnings
+		result3 <-chan error
 	}
 	StartApplicationStub        func(string) (v7action.Warnings, error)
 	startApplicationMutex       sync.RWMutex
@@ -208,6 +273,143 @@ func (fake *FakeStartActor) GetDetailedAppSummaryReturnsOnCall(i int, result1 v7
 	}{result1, result2, result3}
 }
 
+func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpace(arg1 string, arg2 string, arg3 v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)]
+	fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall = append(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 v7action.NOAAClient
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetStreamingLogsForApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
+	if fake.GetStreamingLogsForApplicationByNameAndSpaceStub != nil {
+		return fake.GetStreamingLogsForApplicationByNameAndSpaceStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	fakeReturns := fake.getStreamingLogsForApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
+}
+
+func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpaceCallCount() int {
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	return len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpaceCalls(stub func(string, string, v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)) {
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = stub
+}
+
+func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, v7action.NOAAClient) {
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpaceReturns(result1 <-chan *v7action.LogMessage, result2 <-chan error, result3 v7action.Warnings, result4 error) {
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = nil
+	fake.getStreamingLogsForApplicationByNameAndSpaceReturns = struct {
+		result1 <-chan *v7action.LogMessage
+		result2 <-chan error
+		result3 v7action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeStartActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsOnCall(i int, result1 <-chan *v7action.LogMessage, result2 <-chan error, result3 v7action.Warnings, result4 error) {
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = nil
+	if fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 <-chan *v7action.LogMessage
+			result2 <-chan error
+			result3 v7action.Warnings
+			result4 error
+		})
+	}
+	fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 <-chan *v7action.LogMessage
+		result2 <-chan error
+		result3 v7action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUID(arg1 string) (string, v7action.Warnings, error) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	ret, specificReturn := fake.getUnstagedNewestPackageGUIDReturnsOnCall[len(fake.getUnstagedNewestPackageGUIDArgsForCall)]
+	fake.getUnstagedNewestPackageGUIDArgsForCall = append(fake.getUnstagedNewestPackageGUIDArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetUnstagedNewestPackageGUID", []interface{}{arg1})
+	fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	if fake.GetUnstagedNewestPackageGUIDStub != nil {
+		return fake.GetUnstagedNewestPackageGUIDStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getUnstagedNewestPackageGUIDReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDCallCount() int {
+	fake.getUnstagedNewestPackageGUIDMutex.RLock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
+	return len(fake.getUnstagedNewestPackageGUIDArgsForCall)
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDCalls(stub func(string) (string, v7action.Warnings, error)) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	fake.GetUnstagedNewestPackageGUIDStub = stub
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDArgsForCall(i int) string {
+	fake.getUnstagedNewestPackageGUIDMutex.RLock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
+	argsForCall := fake.getUnstagedNewestPackageGUIDArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	fake.GetUnstagedNewestPackageGUIDStub = nil
+	fake.getUnstagedNewestPackageGUIDReturns = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeStartActor) GetUnstagedNewestPackageGUIDReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.getUnstagedNewestPackageGUIDMutex.Lock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.Unlock()
+	fake.GetUnstagedNewestPackageGUIDStub = nil
+	if fake.getUnstagedNewestPackageGUIDReturnsOnCall == nil {
+		fake.getUnstagedNewestPackageGUIDReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getUnstagedNewestPackageGUIDReturnsOnCall[i] = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeStartActor) PollStart(arg1 string, arg2 bool) (v7action.Warnings, error) {
 	fake.pollStartMutex.Lock()
 	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
@@ -270,6 +472,138 @@ func (fake *FakeStartActor) PollStartReturnsOnCall(i int, result1 v7action.Warni
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeStartActor) SetApplicationDroplet(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.setApplicationDropletMutex.Lock()
+	ret, specificReturn := fake.setApplicationDropletReturnsOnCall[len(fake.setApplicationDropletArgsForCall)]
+	fake.setApplicationDropletArgsForCall = append(fake.setApplicationDropletArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("SetApplicationDroplet", []interface{}{arg1, arg2})
+	fake.setApplicationDropletMutex.Unlock()
+	if fake.SetApplicationDropletStub != nil {
+		return fake.SetApplicationDropletStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.setApplicationDropletReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeStartActor) SetApplicationDropletCallCount() int {
+	fake.setApplicationDropletMutex.RLock()
+	defer fake.setApplicationDropletMutex.RUnlock()
+	return len(fake.setApplicationDropletArgsForCall)
+}
+
+func (fake *FakeStartActor) SetApplicationDropletCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.setApplicationDropletMutex.Lock()
+	defer fake.setApplicationDropletMutex.Unlock()
+	fake.SetApplicationDropletStub = stub
+}
+
+func (fake *FakeStartActor) SetApplicationDropletArgsForCall(i int) (string, string) {
+	fake.setApplicationDropletMutex.RLock()
+	defer fake.setApplicationDropletMutex.RUnlock()
+	argsForCall := fake.setApplicationDropletArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeStartActor) SetApplicationDropletReturns(result1 v7action.Warnings, result2 error) {
+	fake.setApplicationDropletMutex.Lock()
+	defer fake.setApplicationDropletMutex.Unlock()
+	fake.SetApplicationDropletStub = nil
+	fake.setApplicationDropletReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeStartActor) SetApplicationDropletReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.setApplicationDropletMutex.Lock()
+	defer fake.setApplicationDropletMutex.Unlock()
+	fake.SetApplicationDropletStub = nil
+	if fake.setApplicationDropletReturnsOnCall == nil {
+		fake.setApplicationDropletReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.setApplicationDropletReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeStartActor) StagePackage(arg1 string, arg2 string, arg3 string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+	fake.stagePackageMutex.Lock()
+	ret, specificReturn := fake.stagePackageReturnsOnCall[len(fake.stagePackageArgsForCall)]
+	fake.stagePackageArgsForCall = append(fake.stagePackageArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("StagePackage", []interface{}{arg1, arg2, arg3})
+	fake.stagePackageMutex.Unlock()
+	if fake.StagePackageStub != nil {
+		return fake.StagePackageStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.stagePackageReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeStartActor) StagePackageCallCount() int {
+	fake.stagePackageMutex.RLock()
+	defer fake.stagePackageMutex.RUnlock()
+	return len(fake.stagePackageArgsForCall)
+}
+
+func (fake *FakeStartActor) StagePackageCalls(stub func(string, string, string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)) {
+	fake.stagePackageMutex.Lock()
+	defer fake.stagePackageMutex.Unlock()
+	fake.StagePackageStub = stub
+}
+
+func (fake *FakeStartActor) StagePackageArgsForCall(i int) (string, string, string) {
+	fake.stagePackageMutex.RLock()
+	defer fake.stagePackageMutex.RUnlock()
+	argsForCall := fake.stagePackageArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeStartActor) StagePackageReturns(result1 <-chan v7action.Droplet, result2 <-chan v7action.Warnings, result3 <-chan error) {
+	fake.stagePackageMutex.Lock()
+	defer fake.stagePackageMutex.Unlock()
+	fake.StagePackageStub = nil
+	fake.stagePackageReturns = struct {
+		result1 <-chan v7action.Droplet
+		result2 <-chan v7action.Warnings
+		result3 <-chan error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeStartActor) StagePackageReturnsOnCall(i int, result1 <-chan v7action.Droplet, result2 <-chan v7action.Warnings, result3 <-chan error) {
+	fake.stagePackageMutex.Lock()
+	defer fake.stagePackageMutex.Unlock()
+	fake.StagePackageStub = nil
+	if fake.stagePackageReturnsOnCall == nil {
+		fake.stagePackageReturnsOnCall = make(map[int]struct {
+			result1 <-chan v7action.Droplet
+			result2 <-chan v7action.Warnings
+			result3 <-chan error
+		})
+	}
+	fake.stagePackageReturnsOnCall[i] = struct {
+		result1 <-chan v7action.Droplet
+		result2 <-chan v7action.Warnings
+		result3 <-chan error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeStartActor) StartApplication(arg1 string) (v7action.Warnings, error) {
@@ -342,8 +676,16 @@ func (fake *FakeStartActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getDetailedAppSummaryMutex.RLock()
 	defer fake.getDetailedAppSummaryMutex.RUnlock()
+	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getUnstagedNewestPackageGUIDMutex.RLock()
+	defer fake.getUnstagedNewestPackageGUIDMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
+	fake.setApplicationDropletMutex.RLock()
+	defer fake.setApplicationDropletMutex.RUnlock()
+	fake.stagePackageMutex.RLock()
+	defer fake.stagePackageMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

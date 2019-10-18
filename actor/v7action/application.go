@@ -254,6 +254,40 @@ func (actor Actor) RestartApplication(appGUID string, noWait bool) (Warnings, er
 	return Warnings(warnings), err
 }
 
+func (actor Actor) GetUnstagedNewestPackageGUID(appGUID string) (string, Warnings, error) {
+	var err error
+	var allWarnings Warnings
+	packages, warnings, err := actor.CloudControllerClient.GetPackages(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return "", allWarnings, err
+	}
+	if len(packages) == 0 {
+		return "", allWarnings, nil
+	}
+
+	newestPackage := packages[0]
+
+	droplets, warnings, err := actor.CloudControllerClient.GetPackageDroplets(
+		newestPackage.GUID,
+		ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"STAGED"}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+	)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return "", allWarnings, err
+	}
+
+	if len(droplets) == 0 {
+		return newestPackage.GUID, allWarnings, nil
+	}
+
+	return "", allWarnings, nil
+}
+
 // PollStart polls an application's processes until some are started. If noWait is false,
 // it waits for at least one instance of all processes to be running. If noWait is true,
 // it only waits for an instance of the web process to be running.
