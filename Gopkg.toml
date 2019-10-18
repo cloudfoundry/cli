@@ -128,7 +128,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/onsi/gomega"
-  version = ">=1.6.0"
+  version = ">=1.7.0"
 
 [[constraint]]
   branch = "master"

@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:5579d171c21fa6078ed325bc11b689d5ea406ad73e1428bbcc2f662cb1703969"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "fc6aad7f890ae627e33a8d7d514c93a7558678b4"
+  version = "v6.47.0"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -380,7 +392,7 @@
   version = "v1.7.0"
 
 [[projects]]
-  digest = "1:20237a6d616a2a70a29fcc2ac93e7039a39eed0d040ef4a818479fcd953f9466"
+  digest = "1:ea16fcd1a32d43b41c74bc22ab35f488b41ac4ebde4172fe9ffe623a2335f035"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -402,8 +414,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "27d50ea6455b212cf516609fa58b2b5dce1abc81"
-  version = "v1.6.0"
+  revision = "bdebf9e0ece900259084cfa4121b97ce1a540939"
+  version = "v1.7.0"
 
 [[projects]]
   digest = "1:e0cc8395ea893c898ff5eb0850f4d9851c1f57c78c232304a026379a47a552d0"
