@@ -57,25 +57,28 @@ func (actor *Actor) SetEnvironmentVariableByApplicationNameAndSpace(appName stri
 	return warnings, apiErr
 }
 
-func (actor *Actor) SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars ccv3.EnvironmentVariables) (Warnings, error) {
-	warnings := ccv3.Warnings{}
-	if len(envVars) == 0 {
-		existingEnvVars, getWarnings, err := actor.CloudControllerClient.GetEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup)
+// SetEnvironmentVariableGroup sets a given environment variable group according to the given
+// keys and values. Any existing variables that are not present in the given set of variables
+// will be unset.
+func (actor *Actor) SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, newEnvVars ccv3.EnvironmentVariables) (Warnings, error) {
+	var allWarnings Warnings
 
-		if err != nil {
-			return Warnings(getWarnings), err
-		}
-
-		warnings = append(warnings, getWarnings...)
-
-		for k := range existingEnvVars {
-			envVars[k] = types.FilteredString{Value: "", IsSet: false}
-		}
-
+	existingEnvVars, warnings, err := actor.CloudControllerClient.GetEnvironmentVariableGroup(group)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
 	}
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateEnvironmentVariableGroup(group, envVars) //ccv3.EnvironmentVariables{}
 
-	return Warnings(append(warnings, updateWarnings...)), err
+	for k := range existingEnvVars {
+		if _, ok := newEnvVars[k]; !ok {
+			newEnvVars[k] = types.FilteredString{Value: "", IsSet: false}
+		}
+	}
+
+	_, warnings, err = actor.CloudControllerClient.UpdateEnvironmentVariableGroup(group, newEnvVars)
+	allWarnings = append(allWarnings, warnings...)
+
+	return allWarnings, err
 }
 
 // UnsetEnvironmentVariableByApplicationNameAndSpace removes an environment

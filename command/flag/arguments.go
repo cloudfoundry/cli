@@ -222,7 +222,7 @@ type SetSpaceQuotaArgs struct {
 	SpaceQuota string `positional-arg-name:"SPACE_QUOTA" required:"true" description:"The space quota"`
 }
 
-type SetStagingEnvVarGroup struct {
+type SetEnvVarGroup struct {
 	EnvVarGroupJson string `positional-arg-name:"JSON_STRING" required:"true" description:"json string"`
 }
 

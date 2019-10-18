@@ -15,24 +15,24 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . SetStagingEnvironmentVariableGroupActor
+//go:generate counterfeiter . SetRunningEnvironmentVariableGroupActor
 
-type SetStagingEnvironmentVariableGroupActor interface {
+type SetRunningEnvironmentVariableGroupActor interface {
 	SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars ccv3.EnvironmentVariables) (v7action.Warnings, error)
 }
 
-type SetStagingEnvironmentVariableGroupCommand struct {
+type SetRunningEnvironmentVariableGroupCommand struct {
 	RequiredArgs    flag.SetEnvVarGroup `positional-args:"yes"`
-	usage           interface{}         `usage:"CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+	usage           interface{}         `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
 	relatedCommands interface{}         `related_commands:"set-env, staging-environment-variable-group"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       SetStagingEnvironmentVariableGroupActor
+	Actor       SetRunningEnvironmentVariableGroupActor
 }
 
-func (cmd *SetStagingEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *SetRunningEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
@@ -47,7 +47,7 @@ func (cmd *SetStagingEnvironmentVariableGroupCommand) Setup(config command.Confi
 	return nil
 }
 
-func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) error {
+func (cmd SetRunningEnvironmentVariableGroupCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) erro
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Setting the contents of the staging environment variable group as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Setting the contents of the running environment variable group as {{.Username}}...", map[string]interface{}{
 		"Username": user.Name,
 	})
 	cmd.UI.DisplayNewline()
@@ -72,7 +72,7 @@ func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) erro
 	}
 
 	warnings, err := cmd.Actor.SetEnvironmentVariableGroup(
-		constant.StagingEnvironmentVariableGroup,
+		constant.RunningEnvironmentVariableGroup,
 		envVars,
 	)
 	cmd.UI.DisplayWarningsV7(warnings)

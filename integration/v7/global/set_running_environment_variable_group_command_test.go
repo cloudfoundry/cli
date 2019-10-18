@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("set-staging-environment-variable-group command", func() {
+var _ = Describe("set-running-environment-variable-group command", func() {
 	var (
 		key1 string
 		key2 string
@@ -28,18 +28,18 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 	})
 
 	AfterEach(func() {
-		session := helpers.CF("set-staging-environment-variable-group", "{}")
+		session := helpers.CF("set-running-environment-variable-group", "{}")
 		Eventually(session).Should(Exit(0))
 	})
 
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
-				session := helpers.CF("set-staging-environment-variable-group", "--help")
+				session := helpers.CF("set-running-environment-variable-group", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("set-staging-environment-variable-group - Pass parameters as JSON to create a staging environment variable group"))
+				Eventually(session).Should(Say("set-running-environment-variable-group - Pass parameters as JSON to create a running environment variable group"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf set-staging-environment-variable-group '{"name":"value","name":"value"}'`))
+				Eventually(session).Should(Say(`cf set-running-environment-variable-group '{"name":"value","name":"value"}'`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("set-env, staging-environment-variable-group"))
 				Eventually(session).Should(Exit(0))
@@ -47,14 +47,14 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 		})
 	})
 
-	It("sets staging environment variables", func() {
+	It("sets running environment variables", func() {
 		json := fmt.Sprintf(`{"%s":"%s", "%s":"%s"}`, key1, val1, key2, val2)
-		session := helpers.CF("set-staging-environment-variable-group", json)
-		Eventually(session).Should(Say("Setting the contents of the staging environment variable group as"))
+		session := helpers.CF("set-running-environment-variable-group", json)
+		Eventually(session).Should(Say("Setting the contents of the running environment variable group as"))
 		Eventually(session).Should(Say("OK"))
 		Eventually(session).Should(Exit(0))
 
-		session = helpers.CF("staging-environment-variable-group")
+		session = helpers.CF("running-environment-variable-group")
 		Eventually(session).Should(Exit(0))
 		// We cannot use `Say()`, for the results are returned in a random order
 		Expect(string(session.Out.Contents())).To(MatchRegexp(`%s\s+%s`, key1, val1))
@@ -64,18 +64,18 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 	When("user passes in '{}'", func() {
 		BeforeEach(func() {
 			json := fmt.Sprintf(`{"%s":"%s", "%s":"%s"}`, key1, val1, key2, val2)
-			session := helpers.CF("set-staging-environment-variable-group", json)
+			session := helpers.CF("set-running-environment-variable-group", json)
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("clears the environment group", func() {
 			json := fmt.Sprintf(`{}`)
-			session := helpers.CF("set-staging-environment-variable-group", json)
-			Eventually(session).Should(Say("Setting the contents of the staging environment variable group as"))
+			session := helpers.CF("set-running-environment-variable-group", json)
+			Eventually(session).Should(Say("Setting the contents of the running environment variable group as"))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 
-			session = helpers.CF("staging-environment-variable-group")
+			session = helpers.CF("running-environment-variable-group")
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).ToNot(MatchRegexp(fmt.Sprintf(`%s\s+%s`, key1, val1)))
 			Expect(string(session.Out.Contents())).ToNot(MatchRegexp(fmt.Sprintf(`%s\s+%s`, key2, val2)))
@@ -85,18 +85,18 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 	When("user unsets some, but not all. variables", func() {
 		BeforeEach(func() {
 			json := fmt.Sprintf(`{"%s":"%s", "%s":"%s"}`, key1, val1, key2, val2)
-			session := helpers.CF("set-staging-environment-variable-group", json)
+			session := helpers.CF("set-running-environment-variable-group", json)
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("clears the removed variables", func() {
 			json := fmt.Sprintf(`{"%s":"%s"}`, key1, val1)
-			session := helpers.CF("set-staging-environment-variable-group", json)
-			Eventually(session).Should(Say("Setting the contents of the staging environment variable group as"))
+			session := helpers.CF("set-running-environment-variable-group", json)
+			Eventually(session).Should(Say("Setting the contents of the running environment variable group as"))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 
-			session = helpers.CF("staging-environment-variable-group")
+			session = helpers.CF("running-environment-variable-group")
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchRegexp(fmt.Sprintf(`%s\s+%s`, key1, val1)))
 			Expect(string(session.Out.Contents())).ToNot(MatchRegexp(fmt.Sprintf(`%s\s+%s`, key2, val2)))
