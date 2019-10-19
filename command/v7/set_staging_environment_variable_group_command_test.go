@@ -84,8 +84,7 @@ var _ = Describe("set-staging-environment-variable-group Command", func() {
 			})
 
 			It("should err", func() {
-				Expect(testUI.Err).To(Say("Invalid environment variable group provided. Please provide a valid JSON object."))
-				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError("Invalid environment variable group provided. Please provide a valid JSON object."))
 			})
 		})
 
