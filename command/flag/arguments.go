@@ -60,10 +60,6 @@ type SecurityGroup struct {
 	ServiceGroup string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group"`
 }
 
-type ServiceBroker struct {
-	ServiceBroker string `positional-arg-name:"SERVICE_BROKER" required:"true" description:"The service broker"`
-}
-
 type Space struct {
 	Space string `positional-arg-name:"SPACE" required:"true" description:"The space"`
 }
@@ -285,6 +281,10 @@ type ServiceAuthTokenArgs struct {
 type DeleteServiceAuthTokenArgs struct {
 	Label    string `positional-arg-name:"LABEL" required:"true" description:"The token label"`
 	Provider string `positional-arg-name:"PROVIDER" required:"true" description:"The token provider"`
+}
+
+type ServiceBroker struct {
+	ServiceBroker string `positional-arg-name:"SERVICE_BROKER" required:"true" description:"The service broker"`
 }
 
 type ServiceBrokerArgs struct {

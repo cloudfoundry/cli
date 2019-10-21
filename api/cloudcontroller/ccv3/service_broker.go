@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -22,16 +23,29 @@ type ServiceBroker struct {
 	Status string
 }
 
+type ServiceBrokerModel struct {
+	// Name is the name of the service broker.
+	Name string
+	// URL is the url of the service broker.
+	URL string
+	// Username is the Basic Auth username for the service broker.
+	Username string
+	// Password is the Basic Auth password for the service broker.
+	Password string
+	// Space GUID for the space that the broker is in. Empty when not a space-scoped service broker.
+	SpaceGUID string
+}
+
 // serviceBrokerRequest represents a Cloud Controller V3 Service Broker (when creating and updating).
 type serviceBrokerRequest struct {
 	// GUID is a unique service broker identifier.
 	GUID string `json:"guid,omitempty"`
 	// Name is the name of the service broker.
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// URL is the url of the service broker.
-	URL string `json:"url"`
+	URL string `json:"url,omitempty"`
 	// Authentication contains the authentication for authenticating with the service broker.
-	Authentication serviceBrokerAuthentication `json:"authentication"`
+	Authentication *serviceBrokerAuthentication `json:"authentication,omitempty"`
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }
@@ -92,8 +106,8 @@ type serviceBrokerRelationshipsSpaceData struct {
 }
 
 // CreateServiceBroker registers a new service broker.
-func (client *Client) CreateServiceBroker(name, username, password, brokerURL, spaceGUID string) (JobURL, Warnings, error) {
-	bodyBytes, err := json.Marshal(newServiceBroker(name, username, password, brokerURL, spaceGUID))
+func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
+	bodyBytes, err := json.Marshal(newServiceBroker(serviceBroker))
 	if err != nil {
 		return "", nil, err
 	}
@@ -158,30 +172,86 @@ func (client *Client) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	return fullList, warnings, err
 }
 
-func newServiceBroker(name, username, password, brokerURL, spaceGUID string) serviceBrokerRequest {
-	sbp := serviceBrokerRequest{
-		Name: name,
-		URL:  brokerURL,
-		Authentication: serviceBrokerAuthentication{
+// UpdateServiceBroker updates an existing service broker.
+func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
+
+	brokerUpdateRequest, err := newUpdateServiceBroker(serviceBroker)
+	if err != nil {
+		return "", nil, err
+	}
+
+	bodyBytes, err := json.Marshal(brokerUpdateRequest)
+	if err != nil {
+		return "", nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchServiceBrokerRequest,
+		URIParams: map[string]string{
+			"service_broker_guid": serviceBrokerGUID,
+		},
+		Body: bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	jobURL := response.HTTPResponse.Header.Get("Location")
+	return JobURL(jobURL), response.Warnings, err
+}
+
+func newServiceBroker(serviceBroker ServiceBrokerModel) serviceBrokerRequest {
+	serviceBrokerRequest := serviceBrokerRequest{
+		Name: serviceBroker.Name,
+		URL:  serviceBroker.URL,
+		Authentication: &serviceBrokerAuthentication{
 			Type: constant.BasicCredentials,
 			Credentials: serviceBrokerBasicAuthCredentials{
-				Username: username,
-				Password: password,
+				Username: serviceBroker.Username,
+				Password: serviceBroker.Password,
 			},
 		},
 	}
 
-	if spaceGUID != "" {
-		sbp.Relationships = &serviceBrokerRelationships{
+	if serviceBroker.SpaceGUID != "" {
+		serviceBrokerRequest.Relationships = &serviceBrokerRelationships{
 			Space: serviceBrokerRelationshipsSpace{
 				Data: serviceBrokerRelationshipsSpaceData{
-					GUID: spaceGUID,
+					GUID: serviceBroker.SpaceGUID,
 				},
 			},
 		}
 	}
 
-	return sbp
+	return serviceBrokerRequest
+}
+
+func newUpdateServiceBroker(serviceBroker ServiceBrokerModel) (serviceBrokerRequest, error) {
+	name := serviceBroker.Name
+	username := serviceBroker.Username
+	password := serviceBroker.Password
+	brokerURL := serviceBroker.URL
+	if (username == "" && password != "") || (username != "" && password == "") {
+		return serviceBrokerRequest{}, errors.New("boom!") // TODO: fix this
+	}
+	request := serviceBrokerRequest{
+		Name: name,
+		URL:  brokerURL,
+	}
+
+	if username != "" && password != "" {
+		request.Authentication = &serviceBrokerAuthentication{
+			Type: constant.BasicCredentials,
+			Credentials: serviceBrokerBasicAuthCredentials{
+				Username: username,
+				Password: password,
+			},
+		}
+	}
+
+	return request, nil
 }
 
 func extractServiceBrokerData(response serviceBrokerResponse) ServiceBroker {

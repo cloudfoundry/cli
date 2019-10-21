@@ -273,7 +273,14 @@ var _ = Describe("ServiceBroker", func() {
 		})
 
 		JustBeforeEach(func() {
-			jobURL, warnings, executeErr = client.CreateServiceBroker(name, username, password, url, spaceGUID)
+			serviceBrokerRequest := ServiceBrokerModel{
+				Name:      name,
+				URL:       url,
+				Username:  username,
+				Password:  password,
+				SpaceGUID: spaceGUID,
+			}
+			jobURL, warnings, executeErr = client.CreateServiceBroker(serviceBrokerRequest)
 		})
 
 		When("the Cloud Controller successfully creates the broker", func() {
@@ -365,6 +372,167 @@ var _ = Describe("ServiceBroker", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("UpdateServiceBroker", func() {
+		var (
+			name, guid, url, username, password string
+			jobURL                              JobURL
+			warnings                            Warnings
+			executeErr                          error
+			expectedBody                        map[string]interface{}
+		)
+
+		BeforeEach(func() {
+			expectedBody = map[string]interface{}{
+				"url": "new-url",
+				"authentication": map[string]interface{}{
+					"type": "basic",
+					"credentials": map[string]string{
+						"username": "new-username",
+						"password": "new-password",
+					},
+				},
+			}
+			name = ""
+			guid = "broker-guid"
+			url = "new-url"
+			username = "new-username"
+			password = "new-password"
+		})
+
+		When("the Cloud Controller successfully updates the broker", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/service_brokers/"+guid),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, "", http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {"some-job-url"},
+						}),
+					),
+				)
+			})
+
+			It("succeeds, returns warnings and job URL", func() {
+				jobURL, warnings, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Name:     name,
+						URL:      url,
+						Username: username,
+						Password: password,
+					})
+
+				Expect(jobURL).To(Equal(JobURL("some-job-url")))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the Cloud Controller fails to update the broker", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Isolation segment not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/service_brokers/"+guid),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns parsed errors and warnings", func() {
+				jobURL, warnings, executeErr = client.UpdateServiceBroker(guid,
+					ServiceBrokerModel{
+						Name:     name,
+						URL:      url,
+						Username: username,
+						Password: password,
+					})
+
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("only name is provided", func() {
+			BeforeEach(func() {
+				name = "some-name"
+				username = ""
+				password = ""
+				url = ""
+
+				expectedBody = map[string]interface{}{
+					"name": name,
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/service_brokers/"+guid),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, "", http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {"some-job-url"},
+						}),
+					),
+				)
+			})
+
+			It("includes only the name in the request body", func() {
+				jobURL, warnings, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Name: name,
+					})
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		When("partial authentication credentials are provided", func() {
+			It("errors without sending any request", func() {
+				_, _, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{Password: password},
+				)
+				Expect(executeErr).To(HaveOccurred())
+
+				_, _, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{Username: username},
+				)
+				Expect(executeErr).To(HaveOccurred())
 			})
 		})
 	})

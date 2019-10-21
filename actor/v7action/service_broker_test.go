@@ -183,13 +183,13 @@ var _ = Describe("Service Broker Actions", func() {
 				Expect(fakeCloudControllerClient.CreateServiceBrokerCallCount()).To(
 					Equal(1), "Expected client.CreateServiceBroker to be called once",
 				)
-				// FIXME: nu pls, put me in a single object, pls :’(
-				n, u, p, l, s := fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)
-				Expect(n).To(Equal(name))
-				Expect(u).To(Equal(username))
-				Expect(p).To(Equal(password))
-				Expect(l).To(Equal(url))
-				Expect(s).To(Equal(spaceGUID))
+
+				serviceBroker := fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)
+				Expect(serviceBroker.Name).To(Equal(name))
+				Expect(serviceBroker.Username).To(Equal(username))
+				Expect(serviceBroker.Password).To(Equal(password))
+				Expect(serviceBroker.URL).To(Equal(url))
+				Expect(serviceBroker.SpaceGUID).To(Equal(spaceGUID))
 			})
 
 			It("passes the job url to the client for polling", func() {
@@ -235,6 +235,99 @@ var _ = Describe("Service Broker Actions", func() {
 				Expect(executionError).To(MatchError("invalid broker"))
 
 				Expect(warnings).To(ConsistOf("some-other-warning"))
+			})
+		})
+	})
+
+	Describe("UpdateServiceBroker", func() {
+		const (
+			emptyName = ""
+			guid      = "broker-guid"
+			url       = "url"
+			username  = "username"
+			password  = "password"
+		)
+
+		var (
+			expectedJobURL = ccv3.JobURL("some-job-url")
+		)
+
+		It("passes the service broker creds and url to the client", func() {
+			_, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+			Expect(executionError).ToNot(HaveOccurred())
+
+			Expect(fakeCloudControllerClient.UpdateServiceBrokerCallCount()).To(Equal(1))
+			guid, serviceBroker := fakeCloudControllerClient.UpdateServiceBrokerArgsForCall(0)
+			Expect(guid).To(Equal(guid))
+			Expect(serviceBroker.Name).To(BeEmpty())
+			Expect(serviceBroker.Username).To(Equal(username))
+			Expect(serviceBroker.Password).To(Equal(password))
+			Expect(serviceBroker.URL).To(Equal(url))
+		})
+
+		It("passes the job url to the client for polling", func() {
+			fakeCloudControllerClient.UpdateServiceBrokerReturns(
+				expectedJobURL, ccv3.Warnings{"some-update-warning"}, nil,
+			)
+
+			_, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+			Expect(executionError).ToNot(HaveOccurred())
+
+			Expect(fakeCloudControllerClient.PollJobCallCount()).To(
+				Equal(1), "Expected client.PollJob to be called once",
+			)
+
+			jobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+			Expect(jobURL).To(Equal(expectedJobURL))
+		})
+
+		When("async job succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceBrokerReturns(
+					expectedJobURL, ccv3.Warnings{"some-update-warning"}, nil,
+				)
+				fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-poll-warning"}, nil)
+			})
+
+			It("succeeds and returns warnings", func() {
+				warnings, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+
+				Expect(executionError).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-update-warning", "some-poll-warning"))
+			})
+		})
+
+		When("async job fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceBrokerReturns(
+					expectedJobURL, ccv3.Warnings{"some-update-warning"}, nil,
+				)
+				fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-poll-warning"}, errors.New("job-execution-failed"))
+			})
+
+			It("succeeds and returns warnings", func() {
+				warnings, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+
+				Expect(executionError).To(MatchError("job-execution-failed"))
+				Expect(warnings).To(ConsistOf("some-update-warning", "some-poll-warning"))
+			})
+		})
+
+		When("the client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServiceBrokerReturns(
+					"", ccv3.Warnings{"some-other-warning"}, errors.New("invalid broker"),
+				)
+			})
+
+			It("fails and returns warnings", func() {
+				warnings, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+
+				Expect(executionError).To(MatchError("invalid broker"))
+				Expect(warnings).To(ConsistOf("some-other-warning"))
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(
+					Equal(0), "Expected client.PollJob to not have been called",
+				)
 			})
 		})
 	})
