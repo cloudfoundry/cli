@@ -54,7 +54,7 @@ var _ = Describe("update-service-broker command", func() {
 			})
 		})
 
-		When("the update fails before starting a synchronization job", func() {
+		When("the update fails", func() {
 			It("prints an error message", func() {
 				broker := fakeservicebroker.New().EnsureBrokerIsAvailable()
 
@@ -68,26 +68,6 @@ var _ = Describe("update-service-broker command", func() {
 				Eventually(session.Err).Should(
 					Say("Url must be a valid url"),
 				)
-
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("the update fails after starting a synchronization job", func() {
-			It("prints an error message and the job guid", func() {
-				broker := fakeservicebroker.New().EnsureBrokerIsAvailable()
-
-				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL()+".net")
-
-				Eventually(session.Wait().Out).Should(SatisfyAll(
-					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
-					Say("FAILED"),
-				))
-
-				Eventually(session.Err).Should(SatisfyAll(
-					Say("Job (.*) failed"),
-					Say("The service broker could not be reached"),
-				))
 
 				Eventually(session).Should(Exit(1))
 			})
