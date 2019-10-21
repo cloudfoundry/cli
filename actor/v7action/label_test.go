@@ -106,6 +106,78 @@ var _ = Describe("Labels", func() {
 		})
 	})
 
+	Context("UpdateDomainLabelsByDomainName", func() {
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateDomainLabelsByDomainName(resourceName, labels)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+					ccv3.Warnings([]string{"warning-1", "warning-2"}),
+					nil,
+				)
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					ccv3.ResourceMetadata{},
+					ccv3.Warnings{"warning-updating-metadata"},
+					nil,
+				)
+			})
+
+			It("sets the domain labels", func() {
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, domainGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(resourceType).To(BeEquivalentTo("domain"))
+				Expect(domainGUID).To(BeEquivalentTo("some-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-updating-metadata"))
+			})
+		})
+
+		When("there are client errors", func() {
+			When("fetching the domain fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDomainsReturns(
+						[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
+						errors.New("get-domains-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-failure-1", "warning-failure-2"))
+					Expect(executeErr).To(MatchError("get-domains-error"))
+				})
+			})
+
+			When("updating the domain fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDomainsReturns(
+						[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+						ccv3.Warnings([]string{"warning-1", "warning-2"}),
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
+						ccv3.ResourceMetadata{},
+						ccv3.Warnings{"warning-updating-metadata"},
+						errors.New("update-domain-error"),
+					)
+				})
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-updating-metadata"))
+					Expect(executeErr).To(MatchError("update-domain-error"))
+				})
+			})
+		})
+	})
+
 	Context("UpdateOrganizationLabelsByOrganizationName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateOrganizationLabelsByOrganizationName(resourceName, labels)

@@ -137,6 +137,7 @@ var _ = Describe("Metadata", func() {
 		}
 
 		testForResourceType("app", "")
+		testForResourceType("domain", "")
 		testForResourceType("buildpack", "")
 		testForResourceType("org", "organization")
 		testForResourceType("space", "")

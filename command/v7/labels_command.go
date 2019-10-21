@@ -21,6 +21,7 @@ type ResourceType string
 const (
 	App       ResourceType = "app"
 	Buildpack ResourceType = "buildpack"
+	Domain    ResourceType = "domain"
 	Org       ResourceType = "org"
 	Space     ResourceType = "space"
 	Stack     ResourceType = "stack"

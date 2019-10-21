@@ -102,6 +102,12 @@ func (d Domain) Delete() {
 	Eventually(CF("delete-domain", d.Name, "-f")).Should(Exit(0))
 }
 
+// DeletePrivate uses 'cf delete-private-domain' to delete the domain without asking for
+// confirmation.
+func (d Domain) DeletePrivate() {
+	Eventually(CF("delete-private-domain", d.Name, "-f")).Should(Exit(0))
+}
+
 // DeleteShared uses 'cf delete-shared-domain' to delete the shared domain
 // without asking for confirmation.
 func (d Domain) DeleteShared() {

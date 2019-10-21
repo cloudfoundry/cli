@@ -74,6 +74,7 @@ const (
 	PatchApplicationFeaturesRequest                             = "PatchApplicationFeatures"
 	PatchEnvironmentVariableGroupRequest                        = "PatchEnvironmentVariableGroup"
 	PatchBuildpackRequest                                       = "PatchBuildpack"
+	PatchDomainRequest                                          = "PatchDomain"
 	PatchFeatureFlagRequest                                     = "PatchFeatureFlag"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
 	PatchOrganizationRequest                                    = "PatchOrganization"
@@ -154,6 +155,7 @@ var APIRoutes = []Route{
 	{Resource: DomainsResource, Path: "/", Method: http.MethodPost, Name: PostDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid", Method: http.MethodDelete, Name: DeleteDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid", Method: http.MethodGet, Name: GetDomainRequest},
+	{Resource: DomainsResource, Path: "/:domain_guid", Method: http.MethodPatch, Name: PatchDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations", Method: http.MethodPost, Name: SharePrivateDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations/:org_guid", Method: http.MethodDelete, Name: DeleteSharedOrgFromDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/route_reservations", Method: http.MethodGet, Name: GetDomainRouteReservationsRequest},

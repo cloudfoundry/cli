@@ -58,6 +58,14 @@ func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStack(buildpackName s
 	return actor.updateResourceMetadata("buildpack", buildpack.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
+func (actor *Actor) UpdateDomainLabelsByDomainName(domainName string, labels map[string]types.NullString) (Warnings, error) {
+	domain, warnings, err := actor.GetDomainByName(domainName)
+	if err != nil {
+		return warnings, err
+	}
+	return actor.updateResourceMetadata("domain", domain.GUID, ccv3.Metadata{Labels: labels}, warnings)
+}
+
 func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, labels map[string]types.NullString) (Warnings, error) {
 	org, warnings, err := actor.GetOrganizationByName(orgName)
 	if err != nil {

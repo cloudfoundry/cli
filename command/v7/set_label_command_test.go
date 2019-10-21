@@ -244,6 +244,126 @@ var _ = Describe("set-label command", func() {
 		})
 	})
 
+	When("setting labels on domains", func() {
+		BeforeEach(func() {
+			resourceName = "example.com"
+			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+			fakeActor = new(v7fakes.FakeSetLabelActor)
+			fakeConfig = new(commandfakes.FakeConfig)
+			fakeSharedActor = new(commandfakes.FakeSharedActor)
+			cmd = SetLabelCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			}
+			cmd.RequiredArgs = flag.SetLabelArgs{
+				ResourceType: "domain",
+				ResourceName: resourceName,
+				Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+			}
+
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
+
+			fakeActor.UpdateDomainLabelsByDomainNameReturns(
+				v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("doesn't error", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+
+		It("outputs that the label is being set", func() {
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as some-user...`), resourceName))
+			Expect(testUI.Out).To(Say("OK"))
+		})
+
+		It("sets the provided labels on the domain", func() {
+			Expect(fakeActor.UpdateDomainLabelsByDomainNameCallCount()).To(Equal(1))
+			name, labels := fakeActor.UpdateDomainLabelsByDomainNameArgsForCall(0)
+			Expect(name).To(Equal(resourceName), "failed to pass domain name")
+			Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+				"FOO": types.NewNullString("BAR"),
+				"ENV": types.NewNullString("FAKE"),
+			}))
+		})
+
+		It("prints all warnings", func() {
+			Expect(testUI.Err).To(Say("some-warning-1"))
+			Expect(testUI.Err).To(Say("some-warning-2"))
+		})
+
+		When("updating the domain labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateDomainLabelsByDomainNameReturns(
+					v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+					errors.New("some-updating-error"),
+				)
+			})
+			It("displays warnings and an error message", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError("some-updating-error"))
+			})
+		})
+
+		When("some provided labels do not have a value part", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs = flag.SetLabelArgs{
+					ResourceType: "domain",
+					ResourceName: resourceName,
+					Labels:       []string{"FOO=BAR", "MISSING_EQUALS", "ENV=FAKE"},
+				}
+			})
+
+			It("complains about the missing equal sign", func() {
+				Expect(executeErr).To(MatchError("Metadata error: no value provided for label 'MISSING_EQUALS'"))
+			})
+		})
+
+		When("the resource type argument is not lowercase", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs = flag.SetLabelArgs{
+					ResourceType: "DoMaiN",
+					ResourceName: resourceName,
+					Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+				}
+			})
+
+			It("sets the provided labels on the domain", func() {
+				Expect(fakeActor.UpdateDomainLabelsByDomainNameCallCount()).To(Equal(1))
+				name, labels := fakeActor.UpdateDomainLabelsByDomainNameArgsForCall(0)
+				Expect(name).To(Equal(resourceName), "failed to pass domain name")
+				Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+					"FOO": types.NewNullString("BAR"),
+					"ENV": types.NewNullString("FAKE"),
+				}))
+			})
+
+			It("prints the flavor text in lowercase", func() {
+				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as some-user...`), resourceName))
+			})
+		})
+
+		When("fetching the current user's name fails", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("boom"))
+			})
+		})
+
+	})
+
 	When("setting labels on orgs", func() {
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())

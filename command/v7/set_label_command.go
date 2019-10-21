@@ -19,6 +19,7 @@ import (
 type SetLabelActor interface {
 	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateDomainLabelsByDomainName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
@@ -74,6 +75,8 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		err = cmd.executeApp(username, labels)
 	case Buildpack:
 		err = cmd.executeBuildpack(username, labels)
+	case Domain:
+		err = cmd.executeDomain(username, labels)
 	case Org:
 		err = cmd.executeOrg(username, labels)
 	case Space:
@@ -214,6 +217,21 @@ func (cmd SetLabelCommand) executeStack(username string, labels map[string]types
 	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
 	cmd.UI.DisplayWarningsV7(warnings)
 
+	return err
+}
+
+func (cmd SetLabelCommand) executeDomain(username string, labels map[string]types.NullString) error {
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"User":         username,
+		},
+	)
+
+	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, labels)
+	cmd.UI.DisplayWarningsV7(warnings)
 	return err
 }
 

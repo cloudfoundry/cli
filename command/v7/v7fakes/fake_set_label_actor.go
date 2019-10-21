@@ -40,6 +40,20 @@ type FakeSetLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateDomainLabelsByDomainNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
+	updateDomainLabelsByDomainNameMutex       sync.RWMutex
+	updateDomainLabelsByDomainNameArgsForCall []struct {
+		arg1 string
+		arg2 map[string]types.NullString
+	}
+	updateDomainLabelsByDomainNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateDomainLabelsByDomainNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateOrganizationLabelsByOrganizationNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
 	updateOrganizationLabelsByOrganizationNameMutex       sync.RWMutex
 	updateOrganizationLabelsByOrganizationNameArgsForCall []struct {
@@ -212,6 +226,70 @@ func (fake *FakeSetLabelActor) UpdateBuildpackLabelsByBuildpackNameAndStackRetur
 		})
 	}
 	fake.updateBuildpackLabelsByBuildpackNameAndStackReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateDomainLabelsByDomainNameMutex.Lock()
+	ret, specificReturn := fake.updateDomainLabelsByDomainNameReturnsOnCall[len(fake.updateDomainLabelsByDomainNameArgsForCall)]
+	fake.updateDomainLabelsByDomainNameArgsForCall = append(fake.updateDomainLabelsByDomainNameArgsForCall, struct {
+		arg1 string
+		arg2 map[string]types.NullString
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateDomainLabelsByDomainName", []interface{}{arg1, arg2})
+	fake.updateDomainLabelsByDomainNameMutex.Unlock()
+	if fake.UpdateDomainLabelsByDomainNameStub != nil {
+		return fake.UpdateDomainLabelsByDomainNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateDomainLabelsByDomainNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainNameCallCount() int {
+	fake.updateDomainLabelsByDomainNameMutex.RLock()
+	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
+	return len(fake.updateDomainLabelsByDomainNameArgsForCall)
+}
+
+func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainNameCalls(stub func(string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateDomainLabelsByDomainNameMutex.Lock()
+	defer fake.updateDomainLabelsByDomainNameMutex.Unlock()
+	fake.UpdateDomainLabelsByDomainNameStub = stub
+}
+
+func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainNameArgsForCall(i int) (string, map[string]types.NullString) {
+	fake.updateDomainLabelsByDomainNameMutex.RLock()
+	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
+	argsForCall := fake.updateDomainLabelsByDomainNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateDomainLabelsByDomainNameMutex.Lock()
+	defer fake.updateDomainLabelsByDomainNameMutex.Unlock()
+	fake.UpdateDomainLabelsByDomainNameStub = nil
+	fake.updateDomainLabelsByDomainNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateDomainLabelsByDomainNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateDomainLabelsByDomainNameMutex.Lock()
+	defer fake.updateDomainLabelsByDomainNameMutex.Unlock()
+	fake.UpdateDomainLabelsByDomainNameStub = nil
+	if fake.updateDomainLabelsByDomainNameReturnsOnCall == nil {
+		fake.updateDomainLabelsByDomainNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateDomainLabelsByDomainNameReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -417,6 +495,8 @@ func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RLock()
 	defer fake.updateBuildpackLabelsByBuildpackNameAndStackMutex.RUnlock()
+	fake.updateDomainLabelsByDomainNameMutex.RLock()
+	defer fake.updateDomainLabelsByDomainNameMutex.RUnlock()
 	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
 	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
 	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
