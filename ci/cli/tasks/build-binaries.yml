@@ -26,13 +26,10 @@ run:
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
 
-    export TARGET_GO_VERSION=${TARGET_GO_VERSION:-"UNSET"}
-    if go version | grep -v "\b$TARGET_GO_VERSION\b"; then
-      echo "ERROR: expected target go version [ $TARGET_GO_VERSION ]"
+    if go version | grep -vs $TARGET_GO_VERSION; then
+      echo "target go version $TARGET_GO_VERSION"
       exit 1
     fi
-
-    go version
 
     mv i18n-data/i18n_resources.go $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources
 
