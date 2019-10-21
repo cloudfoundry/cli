@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cf-acceptance-tests/assets/go_calls_ruby",
-	"GoVersion": "go1.11",
+	"GoVersion": "go1.12",
 	"GodepVersion": "v79",
 	"Deps": []
 }
