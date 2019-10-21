@@ -10,7 +10,7 @@ import (
 	"github.com/onsi/gomega/types"
 )
 
-var _ = FDescribe("update-service-broker command", func() {
+var _ = Describe("update-service-broker command", func() {
 	When("logged in", func() {
 		var (
 			org        string
@@ -63,8 +63,12 @@ var _ = FDescribe("update-service-broker command", func() {
 				Eventually(session.Wait().Out).Should(SatisfyAll(
 					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
 					Say("FAILED"),
-					Say("Server error, status code: 400, error code: 270011, message: not-a-valid-url is not a valid URL"),
 				))
+
+				Eventually(session.Err).Should(
+					Say("Url must be a valid url"),
+				)
+
 				Eventually(session).Should(Exit(1))
 			})
 		})

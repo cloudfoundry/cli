@@ -239,7 +239,7 @@ var _ = Describe("Service Broker Actions", func() {
 		})
 	})
 
-	FDescribe("UpdateServiceBroker", func() {
+	Describe("UpdateServiceBroker", func() {
 		const (
 			emptyName = ""
 			guid      = "broker-guid"

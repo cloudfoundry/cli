@@ -53,6 +53,20 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 		return err
 	}
 
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor(
+		"Updating service broker {{.ServiceBroker}} as {{.Username}}...",
+		map[string]interface{}{
+			"Username":      user.Name,
+			"ServiceBroker": cmd.RequiredArgs.ServiceBroker,
+			"Org":           cmd.Config.TargetedOrganizationName(),
+		},
+	)
+
 	warnings, err = cmd.Actor.UpdateServiceBroker(
 		serviceBroker.GUID,
 		"",
@@ -64,6 +78,8 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	cmd.UI.DisplayOK()
 
 	return nil
 }
