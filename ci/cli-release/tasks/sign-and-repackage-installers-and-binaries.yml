@@ -27,6 +27,7 @@ run:
   - |
     set -ex
 
+    # Accommodate V6 and V7
     if [ "$TARGET_V7" == "true" ]; then
       VERSION=$(cat cli/BUILD_VERSION_V7)
       VERSION_SUFFIX="7"
@@ -35,15 +36,19 @@ run:
       VERSION_SUFFIX=""
     fi
 
+    # insert the redundant carriage-returns (^M, hex code 0x0d) that Windows knows & loves
     awk 'sub("$", "\r")' cli/ci/license/NOTICE > NOTICE
     awk 'sub("$", "\r")' cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES > LICENSE
 
+
+    # zip the already-signed binaries into output, signed-windows-zips
     mkdir win32 win64
     cp extracted-binaries/cf${VERSION_SUFFIX}-cli_win32.exe win32/cf${VERSION_SUFFIX}.exe
     cp extracted-binaries/cf${VERSION_SUFFIX}-cli_winx64.exe win64/cf${VERSION_SUFFIX}.exe
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_win32.zip win32/cf${VERSION_SUFFIX}.exe
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_winx64.zip win64/cf${VERSION_SUFFIX}.exe
 
+    # Unzip, sign, then zip windows 32 installer, into output, signed-windows-zips
     unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_winx64.zip
 
     mkdir signed-64
@@ -58,6 +63,7 @@ run:
 
     zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_winx64.zip LICENSE NOTICE signed-64/cf${VERSION_SUFFIX}_installer.exe
 
+    # Unzip, sign, then zip windows 64 installer
     unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_win32.zip
 
     mkdir signed-32
