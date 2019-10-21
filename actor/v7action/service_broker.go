@@ -35,11 +35,16 @@ func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (ServiceBrok
 	return ServiceBroker{}, warnings, actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
 }
 
-// FIXME: please, put me in a single parameter object.
 func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID string) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceBroker(name, username, password, url, spaceGUID)
+	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceBroker(ccv3.ServiceBrokerModel{
+		Name:      name,
+		URL:       url,
+		Username:  username,
+		Password:  password,
+		SpaceGUID: spaceGUID,
+	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
@@ -53,7 +58,14 @@ func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID 
 func (actor Actor) UpdateServiceBroker(serviceBrokerGUID, name, username, password, url string) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(serviceBrokerGUID, name, username, password, url)
+	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(
+		serviceBrokerGUID,
+		ccv3.ServiceBrokerModel{
+			Name:     name,
+			URL:      url,
+			Username: username,
+			Password: password,
+		})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err

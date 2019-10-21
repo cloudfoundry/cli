@@ -254,14 +254,10 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateServiceBrokerStub        func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)
+	CreateServiceBrokerStub        func(ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
 	createServiceBrokerMutex       sync.RWMutex
 	createServiceBrokerArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
+		arg1 ccv3.ServiceBrokerModel
 	}
 	createServiceBrokerReturns struct {
 		result1 ccv3.JobURL
@@ -1504,14 +1500,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateServiceBrokerStub        func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateServiceBrokerStub        func(string, ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
 	updateServiceBrokerMutex       sync.RWMutex
 	updateServiceBrokerArgsForCall []struct {
 		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
+		arg2 ccv3.ServiceBrokerModel
 	}
 	updateServiceBrokerReturns struct {
 		result1 ccv3.JobURL
@@ -2742,20 +2735,16 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (ccv3.JobURL, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.createServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
 	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
-	}{arg1, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1, arg2, arg3, arg4, arg5})
+		arg1 ccv3.ServiceBrokerModel
+	}{arg1})
+	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1})
 	fake.createServiceBrokerMutex.Unlock()
 	if fake.CreateServiceBrokerStub != nil {
-		return fake.CreateServiceBrokerStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.CreateServiceBrokerStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2770,17 +2759,17 @@ func (fake *FakeCloudControllerClient) CreateServiceBrokerCallCount() int {
 	return len(fake.createServiceBrokerArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.createServiceBrokerMutex.Lock()
 	defer fake.createServiceBrokerMutex.Unlock()
 	fake.CreateServiceBrokerStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) (string, string, string, string, string) {
+func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) ccv3.ServiceBrokerModel {
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
 	argsForCall := fake.createServiceBrokerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1
 }
 
 func (fake *FakeCloudControllerClient) CreateServiceBrokerReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
@@ -8220,20 +8209,17 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (ccv3.JobURL, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateServiceBroker(arg1 string, arg2 ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.updateServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.updateServiceBrokerReturnsOnCall[len(fake.updateServiceBrokerArgsForCall)]
 	fake.updateServiceBrokerArgsForCall = append(fake.updateServiceBrokerArgsForCall, struct {
 		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
-	}{arg1, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2, arg3, arg4, arg5})
+		arg2 ccv3.ServiceBrokerModel
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2})
 	fake.updateServiceBrokerMutex.Unlock()
 	if fake.UpdateServiceBrokerStub != nil {
-		return fake.UpdateServiceBrokerStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.UpdateServiceBrokerStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -8248,17 +8234,17 @@ func (fake *FakeCloudControllerClient) UpdateServiceBrokerCallCount() int {
 	return len(fake.updateServiceBrokerArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateServiceBrokerCalls(stub func(string, string, string, string, string) (ccv3.JobURL, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerCalls(stub func(string, ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.updateServiceBrokerMutex.Lock()
 	defer fake.updateServiceBrokerMutex.Unlock()
 	fake.UpdateServiceBrokerStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateServiceBrokerArgsForCall(i int) (string, string, string, string, string) {
+func (fake *FakeCloudControllerClient) UpdateServiceBrokerArgsForCall(i int) (string, ccv3.ServiceBrokerModel) {
 	fake.updateServiceBrokerMutex.RLock()
 	defer fake.updateServiceBrokerMutex.RUnlock()
 	argsForCall := fake.updateServiceBrokerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCloudControllerClient) UpdateServiceBrokerReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {

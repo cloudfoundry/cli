@@ -48,7 +48,7 @@ var _ = Describe("update-service-broker command", func() {
 
 				Eventually(session).Should(SatisfyAll(
 					Say("FAILED"),
-					Say("Service broker `does-not-exist` not found"),
+					Say("Service Broker does-not-exist not found"),
 				))
 				Eventually(session).Should(Exit(1))
 			})
@@ -82,7 +82,7 @@ var _ = Describe("update-service-broker command", func() {
 
 	When("the environment is not targeted correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.UnrefactoredCheckEnvironmentTargetedCorrectly(false, false, isolated.ReadOnlyOrg, "update-service-broker", "broker-name", "username", "password", "https://test.com")
+			helpers.UnrefactoredCheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "update-service-broker", "broker-name", "username", "password", "https://test.com")
 		})
 	})
 

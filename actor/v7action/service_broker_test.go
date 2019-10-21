@@ -183,13 +183,13 @@ var _ = Describe("Service Broker Actions", func() {
 				Expect(fakeCloudControllerClient.CreateServiceBrokerCallCount()).To(
 					Equal(1), "Expected client.CreateServiceBroker to be called once",
 				)
-				// FIXME: nu pls, put me in a single object, pls :’(
-				n, u, p, l, s := fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)
-				Expect(n).To(Equal(name))
-				Expect(u).To(Equal(username))
-				Expect(p).To(Equal(password))
-				Expect(l).To(Equal(url))
-				Expect(s).To(Equal(spaceGUID))
+
+				serviceBroker := fakeCloudControllerClient.CreateServiceBrokerArgsForCall(0)
+				Expect(serviceBroker.Name).To(Equal(name))
+				Expect(serviceBroker.Username).To(Equal(username))
+				Expect(serviceBroker.Password).To(Equal(password))
+				Expect(serviceBroker.URL).To(Equal(url))
+				Expect(serviceBroker.SpaceGUID).To(Equal(spaceGUID))
 			})
 
 			It("passes the job url to the client for polling", func() {
@@ -257,12 +257,12 @@ var _ = Describe("Service Broker Actions", func() {
 			Expect(executionError).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.UpdateServiceBrokerCallCount()).To(Equal(1))
-			actualGUID, actualName, actualUsername, actualPassword, actualURL := fakeCloudControllerClient.UpdateServiceBrokerArgsForCall(0)
-			Expect(actualGUID).To(Equal(guid))
-			Expect(actualName).To(BeEmpty())
-			Expect(actualUsername).To(Equal(username))
-			Expect(actualPassword).To(Equal(password))
-			Expect(actualURL).To(Equal(url))
+			guid, serviceBroker := fakeCloudControllerClient.UpdateServiceBrokerArgsForCall(0)
+			Expect(guid).To(Equal(guid))
+			Expect(serviceBroker.Name).To(BeEmpty())
+			Expect(serviceBroker.Username).To(Equal(username))
+			Expect(serviceBroker.Password).To(Equal(password))
+			Expect(serviceBroker.URL).To(Equal(url))
 		})
 
 		It("passes the job url to the client for polling", func() {

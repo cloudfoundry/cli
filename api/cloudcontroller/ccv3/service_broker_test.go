@@ -273,7 +273,14 @@ var _ = Describe("ServiceBroker", func() {
 		})
 
 		JustBeforeEach(func() {
-			jobURL, warnings, executeErr = client.CreateServiceBroker(name, username, password, url, spaceGUID)
+			serviceBrokerRequest := ServiceBrokerModel{
+				Name:      name,
+				URL:       url,
+				Username:  username,
+				Password:  password,
+				SpaceGUID: spaceGUID,
+			}
+			jobURL, warnings, executeErr = client.CreateServiceBroker(serviceBrokerRequest)
 		})
 
 		When("the Cloud Controller successfully creates the broker", func() {
@@ -411,7 +418,14 @@ var _ = Describe("ServiceBroker", func() {
 			})
 
 			It("succeeds, returns warnings and job URL", func() {
-				jobURL, warnings, executeErr = client.UpdateServiceBroker(guid, name, username, password, url)
+				jobURL, warnings, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Name:     name,
+						URL:      url,
+						Username: username,
+						Password: password,
+					})
 
 				Expect(jobURL).To(Equal(JobURL("some-job-url")))
 				Expect(executeErr).NotTo(HaveOccurred())
@@ -446,7 +460,13 @@ var _ = Describe("ServiceBroker", func() {
 			})
 
 			It("returns parsed errors and warnings", func() {
-				jobURL, warnings, executeErr = client.UpdateServiceBroker(guid, name, username, password, url)
+				jobURL, warnings, executeErr = client.UpdateServiceBroker(guid,
+					ServiceBrokerModel{
+						Name:     name,
+						URL:      url,
+						Username: username,
+						Password: password,
+					})
 
 				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
@@ -491,16 +511,27 @@ var _ = Describe("ServiceBroker", func() {
 			})
 
 			It("includes only the name in the request body", func() {
-				jobURL, warnings, executeErr = client.UpdateServiceBroker(guid, name, username, password, url)
+				jobURL, warnings, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Name: name,
+					})
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
 		})
 
 		When("partial authentication credentials are provided", func() {
 			It("errors without sending any request", func() {
-				_, _, executeErr = client.UpdateServiceBroker(guid, name, "", password, url)
+				_, _, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{Password: password},
+				)
 				Expect(executeErr).To(HaveOccurred())
-				_, _, executeErr = client.UpdateServiceBroker(guid, name, username, "", url)
+
+				_, _, executeErr = client.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{Username: username},
+				)
 				Expect(executeErr).To(HaveOccurred())
 			})
 		})
