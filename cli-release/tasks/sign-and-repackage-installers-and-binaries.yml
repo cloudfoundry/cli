@@ -14,6 +14,7 @@ params:
 inputs:
 - name: certificates
 - name: cli
+- name: extracted-binaries
 - name: winstallers
 
 outputs:
@@ -36,6 +37,12 @@ run:
 
     awk 'sub("$", "\r")' cli/ci/license/NOTICE > NOTICE
     awk 'sub("$", "\r")' cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES > LICENSE
+
+    mkdir win32 win64
+    cp extracted-binaries/cf${VERSION_SUFFIX}-cli_win32.exe win32/cf${VERSION_SUFFIX}.exe
+    cp extracted-binaries/cf${VERSION_SUFFIX}-cli_winx64.exe win64/cf${VERSION_SUFFIX}.exe
+    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_win32.zip win32/cf${VERSION_SUFFIX}.exe
+    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_winx64.zip win64/cf${VERSION_SUFFIX}.exe
 
     unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_winx64.zip
 
