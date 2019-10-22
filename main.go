@@ -146,8 +146,8 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 				}
 			}
 
-			if isPluginCommand(originalArgs[0], config.Plugins()) {
-				plugin_transition.RunPlugin()
+			if plugin, ok := isPluginCommand(originalArgs[0], config.Plugins()); ok {
+				plugin_transition.RunPlugin(plugin)
 			} else {
 				// TODO Extract handling of unknown commands/suggested  commands out of legacy
 				cmd.Main(os.Getenv("CF_TRACE"), os.Args)
@@ -169,16 +169,16 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 	return 0
 }
 
-func isPluginCommand(command string, plugins []configv3.Plugin) bool {
-
-	for _, metadata := range plugins {
-		for _, pluginCommand := range metadata.Commands {
+func isPluginCommand(command string, plugins []configv3.Plugin) (configv3.Plugin, bool) {
+	for _, plugin := range plugins {
+		for _, pluginCommand := range plugin.Commands {
 			if command == pluginCommand.Name || command == pluginCommand.Alias {
-				return true
+				return plugin, true
 			}
 		}
 	}
-	return false
+
+	return configv3.Plugin{}, false
 }
 
 func isHelpCommand(args []string) bool {
