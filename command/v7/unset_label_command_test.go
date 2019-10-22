@@ -396,6 +396,96 @@ var _ = Describe("unset-label command", func() {
 		})
 	})
 
+	When("unsetting labels on domains", func() {
+
+		var resourceName string
+		BeforeEach(func() {
+			resourceName = "example.com"
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
+				ResourceType: "domain",
+				ResourceName: resourceName,
+			}
+			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.UpdateDomainLabelsByDomainNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+				nil)
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("doesn't error", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+
+		It("informs the user that labels are being removed", func() {
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for domain %s as some-user...`), resourceName))
+		})
+
+		It("removes the provided labels from the domain", func() {
+			Expect(fakeActor.UpdateDomainLabelsByDomainNameCallCount()).To(Equal(1))
+			name, labels := fakeActor.UpdateDomainLabelsByDomainNameArgsForCall(0)
+			Expect(name).To(Equal(resourceName), "failed to pass domain name")
+			Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+				"some-label":     types.NewNullString(),
+				"some-other-key": types.NewNullString(),
+			}))
+		})
+
+		It("prints all warnings", func() {
+			Expect(testUI.Err).To(Say("some-warning-1"))
+			Expect(testUI.Err).To(Say("some-warning-2"))
+		})
+
+		When("the resource type argument is not lowercase", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.ResourceType = "DoMaiN"
+			})
+
+			It("passes the correct parameters into the actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeActor.UpdateDomainLabelsByDomainNameCallCount()).To(Equal(1))
+
+				name, labels := fakeActor.UpdateDomainLabelsByDomainNameArgsForCall(0)
+				Expect(name).To(Equal(resourceName), "failed to pass domain name")
+				Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+					"some-label":     types.NewNullString(),
+					"some-other-key": types.NewNullString(),
+				}))
+			})
+		})
+
+		When("updating the domain labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateDomainLabelsByDomainNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"))
+			})
+
+			It("prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
+			})
+		})
+
+		When("getting the user fails", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+				cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("could not get user"))
+			})
+		})
+	})
+
 	When("Unsetting labels on orgs", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.UnsetLabelArgs{

@@ -36,6 +36,7 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))
+			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
@@ -60,6 +61,10 @@ var _ = Describe("unset-label command", func() {
 			Metadata struct {
 				Labels map[string]string
 			}
+		}
+
+		type resourceCollection struct {
+			Resources []commonResource
 		}
 
 		BeforeEach(func() {
@@ -241,6 +246,49 @@ var _ = Describe("unset-label command", func() {
 						Expect(buildpack.Metadata.Labels["public-facing1"]).To(Equal("false"))
 					})
 				})
+			})
+		})
+
+		When("unsetting labels from a domain", func() {
+
+			var (
+				domainName string
+				domain     helpers.Domain
+			)
+
+			BeforeEach(func() {
+				domainName = helpers.NewDomainName("labels")
+				domain = helpers.NewDomain(orgName, domainName)
+
+				helpers.SetupCFWithOrgOnly(orgName)
+				domain.CreatePrivate()
+
+				session := helpers.CF("set-label", "domain", domainName,
+					"some-key=some-value", "some-other-key=some-other-value", "some-third-key=other")
+				Eventually(session).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				domain.DeletePrivate()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("unsets the specified labels on the domain", func() {
+				session := helpers.CF("unset-label", "domain", domainName,
+					"some-other-key", "some-third-key")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for domain %s as %s...`), domainName, username))
+				Consistently(session).ShouldNot(Say("\n\nOK"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("curl", fmt.Sprintf("/v3/domains?names=%s", domainName))
+				Eventually(session).Should(Exit(0))
+				domainJSON := session.Out.Contents()
+				var domains resourceCollection
+				Expect(json.Unmarshal(domainJSON, &domains)).To(Succeed())
+				Expect(len(domains.Resources)).To(Equal(1))
+				Expect(len(domains.Resources[0].Metadata.Labels)).To(Equal(1))
+				Expect(domains.Resources[0].Metadata.Labels["some-key"]).To(Equal("some-value"))
 			})
 		})
 
