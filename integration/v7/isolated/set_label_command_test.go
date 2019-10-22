@@ -37,6 +37,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("RESOURCES:"))
 				Eventually(session).Should(Say(`\s+app`))
 				Eventually(session).Should(Say(`\s+buildpack`))
+				Eventually(session).Should(Say(`\s+domain`))
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say(`\s+stack`))
