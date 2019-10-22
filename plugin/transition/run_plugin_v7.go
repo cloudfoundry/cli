@@ -16,10 +16,11 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-func RunPlugin() {
+func RunPlugin(plugin configv3.Plugin) {
 	config, err := configv3.LoadConfig(configv3.FlagOverride{
 		Verbose: common.Commands.VerboseOrVersion,
 	})
+
 	if err != nil {
 		if _, ok := err.(translatableerror.EmptyConfigError); !ok {
 			panic(err)
@@ -40,18 +41,14 @@ func RunPlugin() {
 		panic(err)
 	}
 
-	appActor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	v7Actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 
 	server := netrpc.NewServer()
-	rpcService, err := rpc.NewRpcService(nil, nil, nil, server, config, appActor)
+	rpcService, err := rpc.NewRpcService(nil, nil, nil, server, config, v7Actor)
+
 	if err != nil {
 		panic(err)
 	}
 
-	plugins := config.Plugins()
-	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], plugins)
-	if !ran {
-		panic("oh no")
-	}
-	// fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
+	rpc.RunMethodIfExists(rpcService, os.Args[1:], plugin)
 }
