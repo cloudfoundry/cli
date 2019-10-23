@@ -3,14 +3,14 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -198,7 +198,7 @@ var _ = Describe("create-user Command", func() {
 
 					username, origin := fakeActor.GetUserArgsForCall(0)
 					Expect(username).To(Equal("some-user"))
-					Expect(origin).To(Equal("uaa"))
+					Expect(origin).To(Equal(constant.DefaultOriginUaa))
 				})
 			})
 		})

@@ -74,7 +74,7 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 
 	origin := cmd.Origin
 	if cmd.Origin == "" {
-		origin = "uaa"
+		origin = constant.DefaultOriginUaa
 	}
 
 	targetUserGUID := cmd.Args.Username

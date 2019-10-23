@@ -2,6 +2,8 @@ package actionerror
 
 import (
 	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // UserNotFoundError is an error wrapper that represents the case
@@ -13,7 +15,7 @@ type UAAUserNotFoundError struct {
 
 // Error method to display the error message.
 func (e UAAUserNotFoundError) Error() string {
-	if e.Origin != "" && e.Origin != "uaa" {
+	if e.Origin != "" && e.Origin != constant.DefaultOriginUaa {
 		return fmt.Sprintf("User '%s' with origin '%s' does not exist.", e.Username, e.Origin)
 	}
 

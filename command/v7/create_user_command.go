@@ -3,15 +3,15 @@ package v7
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/clock"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . CreateUserActor
@@ -66,7 +66,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 
 	origin := cmd.Origin
 	if cmd.Origin == "" {
-		origin = "uaa"
+		origin = constant.DefaultOriginUaa
 	}
 
 	//	Does the new user already exist?
@@ -126,7 +126,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 }
 
 func (cmd *CreateUserCommand) passwordRequired() bool {
-	if (cmd.Origin == "" || strings.ToLower(cmd.Origin) == "uaa") && !cmd.PasswordPrompt {
+	if (cmd.Origin == "" || strings.ToLower(cmd.Origin) == constant.DefaultOriginUaa) && !cmd.PasswordPrompt {
 		if cmd.Args.Password == nil {
 			return true
 		}
