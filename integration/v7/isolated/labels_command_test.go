@@ -35,6 +35,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))
+			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
@@ -309,6 +310,61 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
+		Describe("domain labels", func() {
+			var (
+				domainName string
+				domain     helpers.Domain
+			)
+
+			BeforeEach(func() {
+				domainName = helpers.NewDomainName("labels")
+				domain = helpers.NewDomain(orgName, domainName)
+
+				helpers.SetupCFWithOrgOnly(orgName)
+				domain.CreatePrivate()
+			})
+
+			AfterEach(func() {
+				domain.DeletePrivate()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			FWhen("there are labels set on the domain", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "domain", domainName, "some-other-key=some-other-value", "some-key=some-value")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("lists the labels", func() {
+					session := helpers.CF("labels", "domain", domainName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for domain %s as %s...\n\n"), domainName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Eventually(session).Should(Say(`some-key\s+some-value`))
+					Eventually(session).Should(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			// When("there are no labels set on the application", func() {
+			// 	It("indicates that there are no labels", func() {
+			// 		session := helpers.CF("labels", "app", appName)
+			// 		Eventually(session).Should(Exit(0))
+			// 		Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for app %s in org %s / space %s as %s...\n\n"), appName, orgName, spaceName, username))
+			// 		Expect(session).ToNot(Say(`key\s+value`))
+			// 		Expect(session).Should(Say("No labels found."))
+			// 	})
+			// })
+
+			// When("the app does not exist", func() {
+			// 	It("displays an error", func() {
+			// 		session := helpers.CF("labels", "app", "non-existent-app")
+			// 		Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app non-existent-app in org %s / space %s as %s...\n\n"), orgName, spaceName, username))
+			// 		Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
+			// 		Eventually(session).Should(Say("FAILED"))
+			// 		Eventually(session).Should(Exit(1))
+			// 	})
+			// })
+		})
 		Describe("org labels", func() {
 			BeforeEach(func() {
 				helpers.SetupCFWithOrgOnly(orgName)

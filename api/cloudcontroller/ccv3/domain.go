@@ -15,6 +15,9 @@ type Domain struct {
 	Name             string         `json:"name"`
 	Internal         types.NullBool `json:"internal,omitempty"`
 	OrganizationGUID string         `json:"orgguid,omitempty"`
+
+	// Metadata is used for custom tagging of API resources
+	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
 func (d Domain) MarshalJSON() ([]byte, error) {

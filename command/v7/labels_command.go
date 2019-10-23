@@ -31,6 +31,7 @@ const (
 
 type LabelsActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
+	GetDomainLabels(domainName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
@@ -80,6 +81,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchAppLabels(username)
 	case Buildpack:
 		labels, warnings, err = cmd.fetchBuildpackLabels(username)
+	case Domain:
+		labels, warnings, err = cmd.fetchDomainLabels(username)
 	case Org:
 		labels, warnings, err = cmd.fetchOrgLabels(username)
 	case Space:
@@ -115,6 +118,22 @@ func (cmd LabelsCommand) fetchAppLabels(username string) (map[string]types.NullS
 	return cmd.Actor.GetApplicationLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 }
 
+func (cmd LabelsCommand) fetchDomainLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Getting labels for domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
+		"DomainName": cmd.RequiredArgs.ResourceName,
+		"Username":   username,
+	})
+
+	cmd.UI.DisplayNewline()
+
+	return cmd.Actor.GetDomainLabels(cmd.RequiredArgs.ResourceName)
+}
+
 func (cmd LabelsCommand) fetchOrgLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
@@ -127,7 +146,6 @@ func (cmd LabelsCommand) fetchOrgLabels(username string) (map[string]types.NullS
 	})
 
 	cmd.UI.DisplayNewline()
-
 	return cmd.Actor.GetOrganizationLabels(cmd.RequiredArgs.ResourceName)
 }
 

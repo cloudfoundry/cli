@@ -42,6 +42,21 @@ type FakeLabelsActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetDomainLabelsStub        func(string) (map[string]types.NullString, v7action.Warnings, error)
+	getDomainLabelsMutex       sync.RWMutex
+	getDomainLabelsArgsForCall []struct {
+		arg1 string
+	}
+	getDomainLabelsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getDomainLabelsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetOrganizationLabelsStub        func(string) (map[string]types.NullString, v7action.Warnings, error)
 	getOrganizationLabelsMutex       sync.RWMutex
 	getOrganizationLabelsArgsForCall []struct {
@@ -220,6 +235,72 @@ func (fake *FakeLabelsActor) GetBuildpackLabelsReturnsOnCall(i int, result1 map[
 		})
 	}
 	fake.getBuildpackLabelsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetDomainLabels(arg1 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getDomainLabelsMutex.Lock()
+	ret, specificReturn := fake.getDomainLabelsReturnsOnCall[len(fake.getDomainLabelsArgsForCall)]
+	fake.getDomainLabelsArgsForCall = append(fake.getDomainLabelsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetDomainLabels", []interface{}{arg1})
+	fake.getDomainLabelsMutex.Unlock()
+	if fake.GetDomainLabelsStub != nil {
+		return fake.GetDomainLabelsStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getDomainLabelsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeLabelsActor) GetDomainLabelsCallCount() int {
+	fake.getDomainLabelsMutex.RLock()
+	defer fake.getDomainLabelsMutex.RUnlock()
+	return len(fake.getDomainLabelsArgsForCall)
+}
+
+func (fake *FakeLabelsActor) GetDomainLabelsCalls(stub func(string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getDomainLabelsMutex.Lock()
+	defer fake.getDomainLabelsMutex.Unlock()
+	fake.GetDomainLabelsStub = stub
+}
+
+func (fake *FakeLabelsActor) GetDomainLabelsArgsForCall(i int) string {
+	fake.getDomainLabelsMutex.RLock()
+	defer fake.getDomainLabelsMutex.RUnlock()
+	argsForCall := fake.getDomainLabelsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeLabelsActor) GetDomainLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getDomainLabelsMutex.Lock()
+	defer fake.getDomainLabelsMutex.Unlock()
+	fake.GetDomainLabelsStub = nil
+	fake.getDomainLabelsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetDomainLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getDomainLabelsMutex.Lock()
+	defer fake.getDomainLabelsMutex.Unlock()
+	fake.GetDomainLabelsStub = nil
+	if fake.getDomainLabelsReturnsOnCall == nil {
+		fake.getDomainLabelsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getDomainLabelsReturnsOnCall[i] = struct {
 		result1 map[string]types.NullString
 		result2 v7action.Warnings
 		result3 error
@@ -432,6 +513,8 @@ func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationLabelsMutex.RUnlock()
 	fake.getBuildpackLabelsMutex.RLock()
 	defer fake.getBuildpackLabelsMutex.RUnlock()
+	fake.getDomainLabelsMutex.RLock()
+	defer fake.getDomainLabelsMutex.RUnlock()
 	fake.getOrganizationLabelsMutex.RLock()
 	defer fake.getOrganizationLabelsMutex.RUnlock()
 	fake.getSpaceLabelsMutex.RLock()
