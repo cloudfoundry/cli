@@ -36,7 +36,8 @@ func (f *FakeServiceBroker) configJSON() io.Reader {
 	f.behaviors.Catalog = syncResponse().
 		withBody(map[string]interface{}{
 			"services": f.Services,
-		})
+		}).
+		withStatus(f.catalogStatus)
 
 	config := configuration{Behaviors: f.behaviors}
 

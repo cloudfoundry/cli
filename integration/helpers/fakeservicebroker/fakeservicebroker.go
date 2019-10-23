@@ -50,10 +50,11 @@ type FakeServiceBroker struct {
 	name      string
 	username  string
 	password  string
-	Services  []service
-	domain    string
-	behaviors behaviors
-	reusable  bool
+	Services      []service
+	domain        string
+	behaviors     behaviors
+	reusable      bool
+	catalogStatus int
 }
 
 // New creates a default object that can then be configured
@@ -65,6 +66,11 @@ func New() *FakeServiceBroker {
 func NewAlternate() *FakeServiceBroker {
 	f := defaultConfig()
 	f.name = generateReusableBrokerName("other-")
+	return f
+}
+
+func (f *FakeServiceBroker) WithCatalogStatus(statusCode int) *FakeServiceBroker {
+	f.catalogStatus = statusCode
 	return f
 }
 
@@ -102,6 +108,11 @@ func (f *FakeServiceBroker) EnsureBrokerIsAvailable() *FakeServiceBroker {
 func (f *FakeServiceBroker) EnableServiceAccess() {
 	session := helpers.CF("enable-service-access", f.ServiceName())
 	Eventually(session).Should(Exit(0))
+}
+
+func (f *FakeServiceBroker) Configure() *FakeServiceBroker {
+	f.configure()
+	return f
 }
 
 func (f *FakeServiceBroker) Update() *FakeServiceBroker {

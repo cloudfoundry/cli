@@ -73,10 +73,20 @@ var _ = Describe("update-service-broker command", func() {
 		})
 
 		When("the update fails after starting a synchronization job", func() {
-			It("prints an error message and the job guid", func() {
-				broker := fakeservicebroker.New().EnsureBrokerIsAvailable()
+			var broker *fakeservicebroker.FakeServiceBroker
 
-				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL()+".net")
+			BeforeEach(func() {
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker.WithCatalogStatus(500).Configure()
+			})
+
+			AfterEach(func() {
+				broker.WithCatalogStatus(200).Configure()
+				broker.Destroy()
+			})
+
+			It("prints an error message and the job guid", func() {
+				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL())
 
 				Eventually(session.Wait().Out).Should(SatisfyAll(
 					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
@@ -85,7 +95,8 @@ var _ = Describe("update-service-broker command", func() {
 
 				Eventually(session.Err).Should(SatisfyAll(
 					Say("Job (.*) failed"),
-					Say("The service broker could not be reached"),
+					Say("The service broker returned an invalid response for the request "),
+					Say("Status Code: 500 Internal Server Error"),
 				))
 
 				Eventually(session).Should(Exit(1))

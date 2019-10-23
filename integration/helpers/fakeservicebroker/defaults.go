@@ -14,11 +14,12 @@ func defaultConfig() *FakeServiceBroker {
 	firstPlanName := integrationNameGenerator()
 
 	return &FakeServiceBroker{
-		name:     generateReusableBrokerName(""),
-		username: "username",
-		password: "password",
-		reusable: true,
-		domain:   helpers.DefaultSharedDomain(),
+		name:          generateReusableBrokerName(""),
+		username:      "username",
+		password:      "password",
+		reusable:      true,
+		domain:        helpers.DefaultSharedDomain(),
+		catalogStatus: http.StatusOK,
 		Services: []service{
 			{
 				Name:                 helpers.PrefixedRandomName("INTEGRATION-SERVICE"),
