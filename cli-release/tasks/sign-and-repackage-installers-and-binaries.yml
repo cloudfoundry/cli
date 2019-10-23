@@ -50,13 +50,17 @@ run:
 
     & 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe' `
       sign `
-      /t http://timestamp.sectigo.com `
+      /tr http://timestamp.sectigo.com `
+      /td sha256 `
+      /fd sha256 `
       /n "Cloudfoundry.org Foundation, Inc" `
       .\cf${Suffix}-cli-installer_win32\cf_installer.exe
 
     & 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe' `
       sign `
-      /t http://timestamp.sectigo.com `
+      /tr http://timestamp.sectigo.com `
+      /td sha256 `
+      /fd sha256 `
       /n "Cloudfoundry.org Foundation, Inc" `
       .\cf${Suffix}-cli-installer_winx64\cf_installer.exe
 
