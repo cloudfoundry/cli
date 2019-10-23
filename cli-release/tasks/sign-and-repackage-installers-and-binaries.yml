@@ -1,18 +1,10 @@
 ---
-platform: linux
-
-image_resource:
-  type: docker-image
-  source:
-    repository: cfcli/cli-package
+platform: windows
 
 params:
-  CERT_LOCATION:
-  CERT_PASSWORD_LOCATION:
   TARGET_V7:
 
 inputs:
-- name: certificates
 - name: cli
 - name: extracted-binaries
 - name: winstallers
@@ -21,58 +13,54 @@ outputs:
 - name: signed-windows-zips
 
 run:
-  path: bash
+  path: powershell.exe
   args:
-  - -c
+  - -command
   - |
-    set -ex
+    # Print current directory & contents to make debugging easier, for we cannot hijack, but we can `cd`
+    Get-ChildItem
 
-    # Accommodate V6 and V7
-    if [ "$TARGET_V7" == "true" ]; then
-      VERSION=$(cat cli/BUILD_VERSION_V7)
-      VERSION_SUFFIX="7"
-    else
-      VERSION=$(cat cli/BUILD_VERSION)
-      VERSION_SUFFIX=""
-    fi
+    if ($TARGET_V7 -eq "true") {
+      Set-Variable Suffix "7"
+      type .\cli\BUILD_VERSION_V7 | Set-Variable Version
+    } else {
+      Set-Variable Suffix ""
+      type .\cli\BUILD_VERSION | Set-Variable Version
+    }
 
-    # insert the redundant carriage-returns (^M, hex code 0x0d) that Windows knows & loves
-    awk 'sub("$", "\r")' cli/ci/license/NOTICE > NOTICE
-    awk 'sub("$", "\r")' cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES > LICENSE
+    # transform the `LICENSE` & `NOTICE` files to include Windows's CRLF https://en.wikipedia.org/wiki/Newline#Representation
+    Get-Content .\cli\ci\license\NOTICE | Set-Content NOTICE
+    Get-Content .\cli\ci\license\LICENSE-WITH-3RD-PARTY-LICENSES | Set-Content LICENSE
 
+    New-Item -Name win32 -Type "Directory"
+    New-Item -Name winx64 -Type "Directory"
 
-    # zip the already-signed binaries into output, signed-windows-zips
-    mkdir win32 win64
-    cp extracted-binaries/cf${VERSION_SUFFIX}-cli_win32.exe win32/cf${VERSION_SUFFIX}.exe
-    cp extracted-binaries/cf${VERSION_SUFFIX}-cli_winx64.exe win64/cf${VERSION_SUFFIX}.exe
-    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_win32.zip win32/cf${VERSION_SUFFIX}.exe
-    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli_${VERSION}_winx64.zip win64/cf${VERSION_SUFFIX}.exe
+    Copy-Item -Path extracted-binaries/cf${Suffix}-cli_win32.exe -Destination win32/cf${Suffix}.exe
+    Copy-Item -Path extracted-binaries/cf${Suffix}-cli_winx64.exe -Destination winx64/cf${Suffix}.exe
 
-    # Unzip, sign, then zip windows 32 installer, into output, signed-windows-zips
-    unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_winx64.zip
+    Compress-Archive -Path .\LICENSE, .\NOTICE, .\win32\cf${Suffix}.exe `
+      -DestinationPath .\signed-windows-zips/cf${Suffix}-cli_${Version}_win32.zip
+    Compress-Archive -Path .\LICENSE, .\NOTICE, .\winx64\cf${Suffix}.exe `
+      -DestinationPath .\signed-windows-zips/cf${Suffix}-cli_${Version}_winx64.zip
 
-    mkdir signed-64
-    osslsigncode sign \
-      -pkcs12 certificates/$CERT_LOCATION \
-      -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
-      -t http://timestamp.comodoca.com/authenticode \
-      -h sha256 \
-      -in cf${VERSION_SUFFIX}_installer.exe \
-      -out signed-64/cf${VERSION_SUFFIX}_installer.exe
-    rm -f cf${VERSION_SUFFIX}_installer.exe
+    Expand-Archive -Path .\winstallers\cf${Suffix}-cli-installer_win32.zip `
+      -DestinationPath .\cf${Suffix}-cli-installer_win32
+    Expand-Archive -Path .\winstallers\cf${Suffix}-cli-installer_winx64.zip `
+      -DestinationPath .\cf${Suffix}-cli-installer_winx64
 
-    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_winx64.zip LICENSE NOTICE signed-64/cf${VERSION_SUFFIX}_installer.exe
+    & 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe' `
+      sign `
+      /t http://timestamp.sectigo.com `
+      /n "Cloudfoundry.org Foundation, Inc" `
+      .\cf${Suffix}-cli-installer_win32\cf_installer.exe
 
-    # Unzip, sign, then zip windows 64 installer
-    unzip winstallers/cf${VERSION_SUFFIX}-cli-installer_win32.zip
+    & 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe' `
+      sign `
+      /t http://timestamp.sectigo.com `
+      /n "Cloudfoundry.org Foundation, Inc" `
+      .\cf${Suffix}-cli-installer_winx64\cf_installer.exe
 
-    mkdir signed-32
-    osslsigncode sign \
-      -pkcs12 certificates/$CERT_LOCATION \
-      -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
-      -t http://timestamp.comodoca.com/authenticode \
-      -h sha256 \
-      -in cf${VERSION_SUFFIX}_installer.exe \
-      -out signed-32/cf${VERSION_SUFFIX}_installer.exe
-
-    zip -j signed-windows-zips/cf${VERSION_SUFFIX}-cli-installer_${VERSION}_win32.zip LICENSE NOTICE signed-32/cf${VERSION_SUFFIX}_installer.exe
+    Compress-Archive -Path .\LICENSE, .\NOTICE, .\cf${Suffix}-cli-installer_win32\cf_installer.exe `
+      -DestinationPath .\signed-windows-zips\cf${Suffix}-cli-installer_${Version}_win32.zip
+    Compress-Archive -Path .\LICENSE, .\NOTICE, .\cf${Suffix}-cli-installer_winx64\cf_installer.exe `
+      -DestinationPath .\signed-windows-zips\cf${Suffix}-cli-installer_${Version}_winx64.zip
