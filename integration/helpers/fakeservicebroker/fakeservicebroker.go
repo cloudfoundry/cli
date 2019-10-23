@@ -47,9 +47,9 @@ func Cleanup() {
 }
 
 type FakeServiceBroker struct {
-	name      string
-	username  string
-	password  string
+	name          string
+	username      string
+	password      string
 	Services      []service
 	domain        string
 	behaviors     behaviors
