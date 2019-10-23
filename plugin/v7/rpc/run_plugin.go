@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-func RunMethodIfExists(rpcService *CliRpcService, args []string, plugin configv3.Plugin) {
+func RunMethod(rpcService *CliRpcService, args []string, plugin configv3.Plugin) {
 	err := rpcService.Start()
 	if err != nil {
 		os.Exit(1)
@@ -32,14 +32,8 @@ func RunMethodIfExists(rpcService *CliRpcService, args []string, plugin configv3
 	}
 }
 
+//nolint:errcheck
 func stopPlugin(plugin *exec.Cmd) {
-	err := plugin.Process.Kill()
-	if err != nil {
-		os.Exit(1)
-	}
-
-	err = plugin.Wait()
-	if err != nil {
-		os.Exit(1)
-	}
+	plugin.Process.Kill()
+	plugin.Wait()
 }

@@ -50,5 +50,5 @@ func RunPlugin(plugin configv3.Plugin) {
 		panic(err)
 	}
 
-	rpc.RunMethodIfExists(rpcService, os.Args[1:], plugin)
+	rpc.RunMethod(rpcService, os.Args[1:], plugin)
 }
