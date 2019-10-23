@@ -84,8 +84,8 @@ var _ = Describe("set-org-role command", func() {
 
 					It("prints an appropriate error and exits 1", func() {
 						session := helpers.CF("set-org-role", "notaclient", orgName, "OrgManager", "--client")
+						Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Server error, status code: 403: Access is denied.  You do not have privileges to execute this command."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
