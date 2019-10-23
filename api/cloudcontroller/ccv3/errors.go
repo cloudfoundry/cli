@@ -136,6 +136,8 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	err := ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
 	appNameTakenRegexp := regexp.MustCompile(`App with the name '.*' already exists\.`)
 	orgNameTakenRegexp := regexp.MustCompile(`Organization '.*' already exists\.`)
+	roleExistsRegexp := regexp.MustCompile(`User '.*' already has '.*' role.*`)
+
 	// boolean switch case with partial/regex string matchers
 	switch {
 	case appNameTakenRegexp.MatchString(errorString) || strings.Contains(errorString, "name must be unique in space"):
@@ -154,6 +156,8 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 		return ccerror.InvalidStartError{}
 	case orgNameTakenRegexp.MatchString(errorString):
 		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
+	case roleExistsRegexp.MatchString(errorString):
+		return ccerror.RoleAlreadyExistsError{UnprocessableEntityError: err}
 	default:
 		return err
 	}

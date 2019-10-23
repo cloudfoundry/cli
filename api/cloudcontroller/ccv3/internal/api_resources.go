@@ -17,6 +17,7 @@ const (
 	ProcessesResource                 = "processes"
 	ResourceMatches                   = "resource_matches"
 	ServiceBrokersResource            = "service_brokers"
+	RolesResource                     = "roles"
 	RoutesResource                    = "routes"
 	ServiceInstancesResource          = "service_instances"
 	SpacesResource                    = "spaces"

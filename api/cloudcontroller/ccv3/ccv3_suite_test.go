@@ -144,6 +144,9 @@ func SetupV3Response() {
 			"resource_matches": {
 				"href": "SERVER_URL/v3/resource_matches"
 			},
+            "roles": {
+                "href": "SERVER_URL/v3/roles"
+            },
             "routes": {
                 "href": "SERVER_URL/v3/routes"
             },

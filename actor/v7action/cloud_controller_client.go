@@ -27,6 +27,7 @@ type CloudControllerClient interface {
 	CreateIsolationSegment(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	CreateOrganization(orgName string) (ccv3.Organization, ccv3.Warnings, error)
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
+	CreateRole(role ccv3.Role) (ccv3.Role, ccv3.Warnings, error)
 	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
 	CreateServiceBroker(serviceBroker ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
 	CreateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)

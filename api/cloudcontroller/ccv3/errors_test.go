@@ -330,6 +330,31 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
+					When("the role already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "User 'wow' already has 'organization_auditor' role in organization 'wow'.",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns a RoleAlreadyExistsError", func() {
+							Expect(makeError).To(Equal(
+								ccerror.RoleAlreadyExistsError{
+									UnprocessableEntityError: ccerror.UnprocessableEntityError{
+										Message: "User 'wow' already has 'organization_auditor' role in organization 'wow'.",
+									},
+								}),
+							)
+						})
+					})
+
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `

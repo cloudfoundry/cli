@@ -239,6 +239,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateRoleStub        func(ccv3.Role) (ccv3.Role, ccv3.Warnings, error)
+	createRoleMutex       sync.RWMutex
+	createRoleArgsForCall []struct {
+		arg1 ccv3.Role
+	}
+	createRoleReturns struct {
+		result1 ccv3.Role
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createRoleReturnsOnCall map[int]struct {
+		result1 ccv3.Role
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateRouteStub        func(ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
@@ -2664,6 +2679,72 @@ func (fake *FakeCloudControllerClient) CreatePackageReturnsOnCall(i int, result1
 	}
 	fake.createPackageReturnsOnCall[i] = struct {
 		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateRole(arg1 ccv3.Role) (ccv3.Role, ccv3.Warnings, error) {
+	fake.createRoleMutex.Lock()
+	ret, specificReturn := fake.createRoleReturnsOnCall[len(fake.createRoleArgsForCall)]
+	fake.createRoleArgsForCall = append(fake.createRoleArgsForCall, struct {
+		arg1 ccv3.Role
+	}{arg1})
+	fake.recordInvocation("CreateRole", []interface{}{arg1})
+	fake.createRoleMutex.Unlock()
+	if fake.CreateRoleStub != nil {
+		return fake.CreateRoleStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createRoleReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateRoleCallCount() int {
+	fake.createRoleMutex.RLock()
+	defer fake.createRoleMutex.RUnlock()
+	return len(fake.createRoleArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateRoleCalls(stub func(ccv3.Role) (ccv3.Role, ccv3.Warnings, error)) {
+	fake.createRoleMutex.Lock()
+	defer fake.createRoleMutex.Unlock()
+	fake.CreateRoleStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateRoleArgsForCall(i int) ccv3.Role {
+	fake.createRoleMutex.RLock()
+	defer fake.createRoleMutex.RUnlock()
+	argsForCall := fake.createRoleArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateRoleReturns(result1 ccv3.Role, result2 ccv3.Warnings, result3 error) {
+	fake.createRoleMutex.Lock()
+	defer fake.createRoleMutex.Unlock()
+	fake.CreateRoleStub = nil
+	fake.createRoleReturns = struct {
+		result1 ccv3.Role
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateRoleReturnsOnCall(i int, result1 ccv3.Role, result2 ccv3.Warnings, result3 error) {
+	fake.createRoleMutex.Lock()
+	defer fake.createRoleMutex.Unlock()
+	fake.CreateRoleStub = nil
+	if fake.createRoleReturnsOnCall == nil {
+		fake.createRoleReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Role
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createRoleReturnsOnCall[i] = struct {
+		result1 ccv3.Role
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -8862,6 +8943,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createOrganizationMutex.RUnlock()
 	fake.createPackageMutex.RLock()
 	defer fake.createPackageMutex.RUnlock()
+	fake.createRoleMutex.RLock()
+	defer fake.createRoleMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()

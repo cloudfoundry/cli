@@ -104,6 +104,7 @@ const (
 	PostPackageRequest                                          = "PostPackage"
 	PostPackageBitsRequest                                      = "PostPackageBits"
 	PostResourceMatchesRequest                                  = "PostResourceMatches"
+	PostRoleRequest                                             = "PostRole"
 	PostRouteRequest                                            = "PostRoute"
 	PostServiceBrokerRequest                                    = "PostServiceBroker"
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
@@ -195,6 +196,7 @@ var APIRoutes = []Route{
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/sidecars", Method: http.MethodGet, Name: GetProcessSidecarsRequest},
 	{Resource: ResourceMatches, Path: "/", Method: http.MethodPost, Name: PostResourceMatchesRequest},
+	{Resource: RolesResource, Path: "/", Method: http.MethodPost, Name: PostRoleRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodPost, Name: PostRouteRequest},
 	{Resource: RoutesResource, Path: "/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},

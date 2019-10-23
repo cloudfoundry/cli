@@ -171,6 +171,7 @@ var _ = Describe("User Actions", func() {
 					Expect(actualUser).To(Equal(User{}))
 					Expect(actualErr).To(Equal(actionerror.UAAUserNotFoundError{
 						Username: "some-user",
+						Origin:   "some-origin",
 					}))
 					Expect(fakeUAAClient.ListUsersCallCount()).To(Equal(1))
 				})
