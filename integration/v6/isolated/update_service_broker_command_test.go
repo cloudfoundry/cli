@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"github.com/onsi/gomega/types"
 )
 
 var _ = Describe("update-service-broker command", func() {
@@ -75,7 +74,7 @@ var _ = Describe("update-service-broker command", func() {
 			session := helpers.CF("update-service-broker", "b1")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `USERNAME`, `PASSWORD` and `URL` were not provided"))
-			Eventually(session).Should(matchUpdateServiceBrokersHelpMessage())
+			eventuallyRendersUpdateServiceBrokerHelp(session)
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -90,19 +89,17 @@ var _ = Describe("update-service-broker command", func() {
 		It("displays command usage to output", func() {
 			session := helpers.CF("update-service-broker", "--help")
 
-			Eventually(session).Should(matchUpdateServiceBrokersHelpMessage())
+			eventuallyRendersUpdateServiceBrokerHelp(session)
 			Eventually(session).Should(Exit(0))
 		})
 	})
 })
 
-func matchUpdateServiceBrokersHelpMessage() types.GomegaMatcher {
-	return SatisfyAll(
-		Say("NAME:"),
-		Say("update-service-broker - Update a service broker"),
-		Say("USAGE:"),
-		Say("cf update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"),
-		Say("SEE ALSO:"),
-		Say("rename-service-broker, service-brokers"),
-	)
+func eventuallyRendersUpdateServiceBrokerHelp(s *Session) {
+	Eventually(s).Should(Say("NAME:"))
+	Eventually(s).Should(Say("update-service-broker - Update a service broker"))
+	Eventually(s).Should(Say("USAGE:"))
+	Eventually(s).Should(Say("cf update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"))
+	Eventually(s).Should(Say("SEE ALSO:"))
+	Eventually(s).Should(Say("rename-service-broker, service-brokers"))
 }
