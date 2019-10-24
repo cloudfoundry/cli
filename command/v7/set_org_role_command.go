@@ -133,7 +133,7 @@ func convertRoleType(givenRole flag.OrgRole) (constant.RoleType, error) {
 		return constant.OrgAuditorRole, nil
 	case "OrgManager":
 		return constant.OrgManagerRole, nil
-	case "OrgBillingManager":
+	case "BillingManager":
 		return constant.OrgBillingManagerRole, nil
 	default:
 		return "", errors.New("Invalid role type.")
