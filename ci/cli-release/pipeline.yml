@@ -360,16 +360,12 @@ jobs:
       - task: sign-windows-binaries
         file: cli-ci/ci/cli-release/tasks/sign-windows-binaries.yml
         params:
-          CERT_LOCATION: ((windows-certificate-location))
-          CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
           TARGET_V7: true
       - task: create-windows-installers
         file: cli-ci/ci/cli-v7/tasks/create-installers-windows.yml
       - task: sign-and-repackage-installers-and-binaries
         file: cli-ci/ci/cli-release/tasks/sign-and-repackage-installers-and-binaries.yml
         params:
-          CERT_LOCATION: ((windows-certificate-location))
-          CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
           TARGET_V7: true
 
   - task: upload-releases
