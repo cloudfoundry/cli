@@ -16,16 +16,3 @@ RUN gem install deb-s3
 
 # for rpmsigning process
 RUN apt install -y expect
-
-# osslsigncode
-RUN apt install -y autoconf build-essential libcurl4-openssl-dev
-
-RUN cd /tmp && \
-  curl -L https://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz | \
-    tar xzf - && \
-  cd osslsigncode-1.7.1 && \
-  ./configure && \
-  make && \
-  make install && \
-  cd .. && \
-  rm -rf osslsigncode-1.7.1
