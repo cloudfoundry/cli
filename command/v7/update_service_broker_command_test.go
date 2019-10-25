@@ -71,11 +71,11 @@ var _ = Describe("update-service-broker command", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(fakeUpdateServiceBrokerActor.UpdateServiceBrokerCallCount()).To(Equal(1))
-			serviceBrokerGUID, _, user, pass, serviceBrokerURL := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
+			serviceBrokerGUID, model := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
 			Expect(serviceBrokerGUID).To(Equal(guid))
-			Expect(user).To(Equal(username))
-			Expect(pass).To(Equal(password))
-			Expect(serviceBrokerURL).To(Equal(url))
+			Expect(model.Username).To(Equal(username))
+			Expect(model.Password).To(Equal(password))
+			Expect(model.URL).To(Equal(url))
 
 			Expect(testUI.Err).To(Say("update service broker warning"))
 		})

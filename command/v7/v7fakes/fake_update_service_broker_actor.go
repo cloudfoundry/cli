@@ -25,14 +25,11 @@ type FakeUpdateServiceBrokerActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	UpdateServiceBrokerStub        func(string, string, string, string, string) (v7action.Warnings, error)
+	UpdateServiceBrokerStub        func(string, ccv3.ServiceBrokerModel) (v7action.Warnings, error)
 	updateServiceBrokerMutex       sync.RWMutex
 	updateServiceBrokerArgsForCall []struct {
 		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
+		arg2 ccv3.ServiceBrokerModel
 	}
 	updateServiceBrokerReturns struct {
 		result1 v7action.Warnings
@@ -112,20 +109,17 @@ func (fake *FakeUpdateServiceBrokerActor) GetServiceBrokerByNameReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (v7action.Warnings, error) {
+func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBroker(arg1 string, arg2 ccv3.ServiceBrokerModel) (v7action.Warnings, error) {
 	fake.updateServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.updateServiceBrokerReturnsOnCall[len(fake.updateServiceBrokerArgsForCall)]
 	fake.updateServiceBrokerArgsForCall = append(fake.updateServiceBrokerArgsForCall, struct {
 		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
-	}{arg1, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2, arg3, arg4, arg5})
+		arg2 ccv3.ServiceBrokerModel
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateServiceBroker", []interface{}{arg1, arg2})
 	fake.updateServiceBrokerMutex.Unlock()
 	if fake.UpdateServiceBrokerStub != nil {
-		return fake.UpdateServiceBrokerStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.UpdateServiceBrokerStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -140,17 +134,17 @@ func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBrokerCallCount() int {
 	return len(fake.updateServiceBrokerArgsForCall)
 }
 
-func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBrokerCalls(stub func(string, string, string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBrokerCalls(stub func(string, ccv3.ServiceBrokerModel) (v7action.Warnings, error)) {
 	fake.updateServiceBrokerMutex.Lock()
 	defer fake.updateServiceBrokerMutex.Unlock()
 	fake.UpdateServiceBrokerStub = stub
 }
 
-func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBrokerArgsForCall(i int) (string, string, string, string, string) {
+func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBrokerArgsForCall(i int) (string, ccv3.ServiceBrokerModel) {
 	fake.updateServiceBrokerMutex.RLock()
 	defer fake.updateServiceBrokerMutex.RUnlock()
 	argsForCall := fake.updateServiceBrokerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeUpdateServiceBrokerActor) UpdateServiceBrokerReturns(result1 v7action.Warnings, result2 error) {

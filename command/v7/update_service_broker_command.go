@@ -13,7 +13,7 @@ import (
 
 type UpdateServiceBrokerActor interface {
 	GetServiceBrokerByName(serviceBrokerName string) (v7action.ServiceBroker, v7action.Warnings, error)
-	UpdateServiceBroker(serviceBrokerGUID, name, user, password, url string) (v7action.Warnings, error)
+	UpdateServiceBroker(serviceBrokerGUID string, model v7action.ServiceBrokerModel) (v7action.Warnings, error)
 }
 
 type UpdateServiceBrokerCommand struct {
@@ -69,10 +69,11 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 
 	warnings, err = cmd.Actor.UpdateServiceBroker(
 		serviceBroker.GUID,
-		"",
-		cmd.RequiredArgs.Username,
-		cmd.RequiredArgs.Password,
-		cmd.RequiredArgs.URL,
+		v7action.ServiceBrokerModel{
+			Username: cmd.RequiredArgs.Username,
+			Password: cmd.RequiredArgs.Password,
+			URL:      cmd.RequiredArgs.URL,
+		},
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

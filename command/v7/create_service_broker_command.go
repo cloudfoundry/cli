@@ -13,7 +13,7 @@ import (
 //go:generate counterfeiter . CreateServiceBrokerActor
 
 type CreateServiceBrokerActor interface {
-	CreateServiceBroker(name, user, password, url, spaceGUID string) (v7action.Warnings, error)
+	CreateServiceBroker(model v7action.ServiceBrokerModel) (v7action.Warnings, error)
 }
 
 type CreateServiceBrokerCommand struct {
@@ -76,7 +76,15 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 		)
 	}
 
-	warnings, err := cmd.Actor.CreateServiceBroker(cmd.RequiredArgs.ServiceBroker, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password, cmd.RequiredArgs.URL, space.GUID)
+	warnings, err := cmd.Actor.CreateServiceBroker(
+		v7action.ServiceBrokerModel{
+			Name:      cmd.RequiredArgs.ServiceBroker,
+			Username:  cmd.RequiredArgs.Username,
+			Password:  cmd.RequiredArgs.Password,
+			URL:       cmd.RequiredArgs.URL,
+			SpaceGUID: space.GUID,
+		},
+	)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
