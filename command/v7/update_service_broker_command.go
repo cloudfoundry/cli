@@ -63,7 +63,6 @@ func (cmd UpdateServiceBrokerCommand) Execute(args []string) error {
 		map[string]interface{}{
 			"Username":      user.Name,
 			"ServiceBroker": cmd.RequiredArgs.ServiceBroker,
-			"Org":           cmd.Config.TargetedOrganizationName(),
 		},
 	)
 
