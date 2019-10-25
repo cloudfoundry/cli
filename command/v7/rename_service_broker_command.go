@@ -1,9 +1,9 @@
 package v7
 
 import (
-"code.cloudfoundry.org/cli/command"
-"code.cloudfoundry.org/cli/command/flag"
-"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 type RenameServiceBrokerCommand struct {
