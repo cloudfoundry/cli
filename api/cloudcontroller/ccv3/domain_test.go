@@ -597,7 +597,14 @@ var _ = Describe("Domain", func() {
 			BeforeEach(func() {
 				response := `{
 	      	"name": "domain-name-1",
-	      	"guid": "domain-guid-1"
+	      	"guid": "domain-guid-1",
+					"metadata": {
+						"annotations": {},
+						"labels": {
+							"fun": "superfun",
+							"fun2": "super--fun"
+						}
+					}
 	    }`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -610,9 +617,13 @@ var _ = Describe("Domain", func() {
 			It("returns a domain and prints all warnings", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 
-				Expect(domain).To(Equal(Domain{
-					Name: "domain-name-1",
-					GUID: "domain-guid-1",
+				Expect(domain.Name).To(Equal("domain-name-1"))
+
+				Expect(domain.GUID).To(Equal("domain-guid-1"))
+
+				Expect(domain.Metadata.Labels).To(Equal(map[string]types.NullString{
+					"fun":  types.NewNullString("superfun"),
+					"fun2": types.NewNullString("super--fun"),
 				}))
 
 				Expect(warnings).To(ConsistOf("this is a warning"))

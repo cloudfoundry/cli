@@ -35,6 +35,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say("RESOURCES:"))
 			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say(`\s+buildpack`))
+			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
@@ -309,6 +310,61 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
+		Describe("domain labels", func() {
+			var (
+				domainName string
+				domain     helpers.Domain
+			)
+
+			BeforeEach(func() {
+				domainName = helpers.NewDomainName("labels")
+				domain = helpers.NewDomain(orgName, domainName)
+
+				helpers.SetupCFWithOrgOnly(orgName)
+				domain.CreatePrivate()
+			})
+
+			AfterEach(func() {
+				domain.DeletePrivate()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			When("there are labels set on the domain", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "domain", domainName, "some-other-key=some-other-value", "some-key=some-value")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("lists the labels", func() {
+					session := helpers.CF("labels", "domain", domainName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(Say(regexp.QuoteMeta("Getting labels for domain %s as %s...\n\n"), domainName, username))
+					Expect(session).To(Say(`key\s+value`))
+					Expect(session).To(Say(`some-key\s+some-value`))
+					Expect(session).To(Say(`some-other-key\s+some-other-value`))
+				})
+			})
+
+			When("there are no labels set on the domain", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "domain", domainName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).To(Say(regexp.QuoteMeta("Getting labels for domain %s as %s...\n\n"), domainName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Expect(session).Should(Say("No labels found."))
+				})
+			})
+
+			When("the domain does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "domain", "non-existent-domain")
+					Eventually(session).Should(Exit(1))
+					Expect(session).To(Say(regexp.QuoteMeta("Getting labels for domain non-existent-domain as %s...\n\n"), username))
+					Expect(session.Err).To(Say("Domain 'non-existent-domain' not found"))
+					Expect(session).To(Say("FAILED"))
+				})
+			})
+		})
 		Describe("org labels", func() {
 			BeforeEach(func() {
 				helpers.SetupCFWithOrgOnly(orgName)

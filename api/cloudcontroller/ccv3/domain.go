@@ -15,6 +15,9 @@ type Domain struct {
 	Name             string         `json:"name"`
 	Internal         types.NullBool `json:"internal,omitempty"`
 	OrganizationGUID string         `json:"orgguid,omitempty"`
+
+	// Metadata is used for custom tagging of API resources
+	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
 func (d Domain) MarshalJSON() ([]byte, error) {
@@ -67,6 +70,7 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 				} `json:"data,omitempty"`
 			} `json:"organization,omitempty"`
 		} `json:"relationships,omitempty"`
+		Metadata *Metadata
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccRouteStruct)
@@ -78,7 +82,7 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 	d.Name = ccRouteStruct.Name
 	d.Internal = ccRouteStruct.Internal
 	d.OrganizationGUID = ccRouteStruct.Relationships.Organization.Data.GUID
-
+	d.Metadata = ccRouteStruct.Metadata
 	return nil
 }
 
