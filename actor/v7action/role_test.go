@@ -22,12 +22,58 @@ var _ = Describe("Role Actions", func() {
 		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
 	})
 
-	Describe("CreateOrgRole", func() {
+	Describe("CreateRole", func() {
 		var (
 			role       Role
 			warnings   Warnings
 			executeErr error
 		)
+		// Context("creating an org role", func() {
+		// 	JustBeforeEach(func() {
+		// 		role, warnings, executeErr = actor.CreateOrgRole(constant.OrgAuditorRole, "user-guid", "org-guid")
+		// 	})
+		// 	BeforeEach(func() {
+		// 		fakeCloudControllerClient.CreateRoleReturns(
+		// 			ccv3.Role{
+		// 				Type:     constant.OrgAuditorRole,
+		// 				UserGUID: "user-guid",
+		// 				OrgGUID:  "org-guid",
+		// 			},
+		// 			ccv3.Warnings{"create-role-warning"},
+		// 			nil,
+		// 		)
+		// 	})
+
+		// 	It("returns the role and any warnings", func() {
+		// 		Expect(role).To(Equal(
+		// 			Role{
+		// 				Type:     constant.OrgAuditorRole,
+		// 				UserGUID: "user-guid",
+		// 				OrgGUID:  "org-guid",
+		// 			},
+		// 		))
+		// 		Expect(warnings).To(ConsistOf("create-role-warning"))
+		// 		Expect(executeErr).ToNot(HaveOccurred())
+
+		// 		Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(1))
+		// 		passedRole := fakeCloudControllerClient.CreateRoleArgsForCall(0)
+
+		// 		Expect(passedRole).To(Equal(
+		// 			ccv3.Role{
+		// 				Type:     constant.OrgAuditorRole,
+		// 				UserGUID: "user-guid",
+		// 				OrgGUID:  "org-guid",
+		// 			},
+		// 		))
+		// 	})
+		// })
+
+		// })
+		// Context("creating a space role", func() {
+
+		// })
+		// Context("creating an org role when both an org and space are provided", func() {
+		// })
 
 		JustBeforeEach(func() {
 			role, warnings, executeErr = actor.CreateOrgRole(constant.OrgAuditorRole, "user-guid", "org-guid")

@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 )
 
-var _ = FDescribe("set-org-role command", func() {
+var _ = Describe("set-org-role command", func() {
 	When("the set_roles_by_username flag is disabled", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
