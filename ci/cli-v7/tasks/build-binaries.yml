@@ -31,6 +31,7 @@ run:
     if go version | grep -v "\b$TARGET_GO_VERSION\b"; then
       echo "ERROR: expected target go version [ $TARGET_GO_VERSION ]"
       exit 1
+    fi
 
     go version
 
