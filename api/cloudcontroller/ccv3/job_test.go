@@ -93,6 +93,7 @@ var _ = Describe("Job", func() {
 						"updated_at": "2016-06-08T16:41:27Z",
 						"operation": "app.delete",
 						"state": "PROCESSING",
+						"warnings": [{"detail": "a warning"}, {"detail": "another warning"}],
 						"links": {
 							"self": {
 								"href": "/v3/jobs/job-guid"
@@ -110,7 +111,7 @@ var _ = Describe("Job", func() {
 
 			It("returns job with all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2", "a warning", "another warning"}))
 				Expect(job.GUID).To(Equal("job-guid"))
 				Expect(job.State).To(Equal(constant.JobProcessing))
 			})
@@ -136,8 +137,7 @@ var _ = Describe("Job", func() {
 								"href": "/v3/jobs/job-guid"
 							}
 						}
-					}
-				}`
+					}`
 
 				server.AppendHandlers(
 					CombineHandlers(

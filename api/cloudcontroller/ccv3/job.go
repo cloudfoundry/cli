@@ -16,6 +16,8 @@ type Job struct {
 	GUID string `json:"guid"`
 	// State is the state of the job.
 	State constant.JobState `json:"state"`
+	// Warnings are the warnings emitted by the job during its processing.
+	Warnings []jobWarning `json:"warnings"`
 }
 
 // Errors returns back a list of
@@ -55,6 +57,10 @@ func (job Job) IsComplete() bool {
 	return job.State == constant.JobComplete
 }
 
+type jobWarning struct {
+	Detail string `json:"detail"`
+}
+
 // JobErrorDetails provides information regarding a job's error.
 type JobErrorDetails struct {
 	// Code is a numeric code for this error.
@@ -78,7 +84,13 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 	}
 
 	err = client.connection.Make(request, &response)
-	return job, response.Warnings, err
+	warnings := response.Warnings
+
+	for _, jobWarning := range job.Warnings {
+		warnings = append(warnings, jobWarning.Detail)
+	}
+
+	return job, warnings, err
 }
 
 // PollJob will keep polling the given job until the job has terminated, an

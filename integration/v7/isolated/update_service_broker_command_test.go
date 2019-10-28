@@ -41,6 +41,36 @@ var _ = Describe("update-service-broker command", func() {
 			Eventually(session.Out).Should(Say("%s[[:space:]]+%s", broker1.Name(), broker2.URL()))
 		})
 
+		When("the service broker was updated but warnings happened", func() {
+			var (
+				serviceInstance string
+				broker          *fakeservicebroker.FakeServiceBroker
+			)
+
+			BeforeEach(func() {
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker.EnableServiceAccess()
+
+				serviceInstance = helpers.NewServiceInstanceName()
+				session := helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance, "-b", broker.Name())
+				Eventually(session).Should(Exit(0))
+
+				broker.Services[0].Plans[0].Name = "different-plan-name"
+				broker.Services[0].Plans[0].ID = "different-plan-id"
+				broker.Configure()
+			})
+
+			It("should yield a warning", func() {
+				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL())
+
+				Eventually(session.Wait().Out).Should(SatisfyAll(
+					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
+					Say("OK"),
+				))
+				Eventually(session.Err).Should(Say("Warning: Service plans are missing from the broker's catalog"))
+			})
+		})
+
 		When("the service broker doesn't exist", func() {
 			It("prints an error message", func() {
 				session := helpers.CF("update-service-broker", "does-not-exist", "test-user", "test-password", "http://test.com")
@@ -65,7 +95,7 @@ var _ = Describe("update-service-broker command", func() {
 				))
 
 				Eventually(session.Err).Should(
-					Say("Url must be a valid url"),
+					Say("Url 'not-a-valid-url' must be a valid url"),
 				)
 
 				Eventually(session).Should(Exit(1))
