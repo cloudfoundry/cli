@@ -6,6 +6,7 @@ import (
 )
 
 type ServiceBroker = ccv3.ServiceBroker
+type ServiceBrokerModel = ccv3.ServiceBrokerModel
 
 func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers()
@@ -35,16 +36,10 @@ func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (ServiceBrok
 	return ServiceBroker{}, warnings, actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
 }
 
-func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID string) (Warnings, error) {
+func (actor Actor) CreateServiceBroker(model ServiceBrokerModel) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceBroker(ccv3.ServiceBrokerModel{
-		Name:      name,
-		URL:       url,
-		Username:  username,
-		Password:  password,
-		SpaceGUID: spaceGUID,
-	})
+	jobURL, warnings, err := actor.CloudControllerClient.CreateServiceBroker(model)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
@@ -55,17 +50,10 @@ func (actor Actor) CreateServiceBroker(name, username, password, url, spaceGUID 
 	return allWarnings, err
 }
 
-func (actor Actor) UpdateServiceBroker(serviceBrokerGUID, name, username, password, url string) (Warnings, error) {
+func (actor Actor) UpdateServiceBroker(serviceBrokerGUID string, model ServiceBrokerModel) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(
-		serviceBrokerGUID,
-		ccv3.ServiceBrokerModel{
-			Name:     name,
-			URL:      url,
-			Username: username,
-			Password: password,
-		})
+	jobURL, warnings, err := actor.CloudControllerClient.UpdateServiceBroker(serviceBrokerGUID, model)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err

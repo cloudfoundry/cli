@@ -165,7 +165,15 @@ var _ = Describe("Service Broker Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executionError = actor.CreateServiceBroker(name, username, password, url, spaceGUID)
+			warnings, executionError = actor.CreateServiceBroker(
+				ServiceBrokerModel{
+					Name:      name,
+					URL:       url,
+					Username:  username,
+					Password:  password,
+					SpaceGUID: spaceGUID,
+				},
+			)
 		})
 
 		When("the client request is successful", func() {
@@ -241,11 +249,10 @@ var _ = Describe("Service Broker Actions", func() {
 
 	Describe("UpdateServiceBroker", func() {
 		const (
-			emptyName = ""
-			guid      = "broker-guid"
-			url       = "url"
-			username  = "username"
-			password  = "password"
+			guid     = "broker-guid"
+			url      = "url"
+			username = "username"
+			password = "password"
 		)
 
 		var (
@@ -253,7 +260,14 @@ var _ = Describe("Service Broker Actions", func() {
 		)
 
 		It("passes the service broker creds and url to the client", func() {
-			_, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+			_, executionError := actor.UpdateServiceBroker(
+				guid,
+				ServiceBrokerModel{
+					Username: username,
+					Password: password,
+					URL:      url,
+				},
+			)
 			Expect(executionError).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.UpdateServiceBrokerCallCount()).To(Equal(1))
@@ -270,7 +284,14 @@ var _ = Describe("Service Broker Actions", func() {
 				expectedJobURL, ccv3.Warnings{"some-update-warning"}, nil,
 			)
 
-			_, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+			_, executionError := actor.UpdateServiceBroker(
+				guid,
+				ServiceBrokerModel{
+					Username: username,
+					Password: password,
+					URL:      url,
+				},
+			)
 			Expect(executionError).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.PollJobCallCount()).To(
@@ -290,7 +311,14 @@ var _ = Describe("Service Broker Actions", func() {
 			})
 
 			It("succeeds and returns warnings", func() {
-				warnings, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+				warnings, executionError := actor.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Username: username,
+						Password: password,
+						URL:      url,
+					},
+				)
 
 				Expect(executionError).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-update-warning", "some-poll-warning"))
@@ -306,7 +334,14 @@ var _ = Describe("Service Broker Actions", func() {
 			})
 
 			It("succeeds and returns warnings", func() {
-				warnings, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+				warnings, executionError := actor.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Username: username,
+						Password: password,
+						URL:      url,
+					},
+				)
 
 				Expect(executionError).To(MatchError("job-execution-failed"))
 				Expect(warnings).To(ConsistOf("some-update-warning", "some-poll-warning"))
@@ -321,7 +356,14 @@ var _ = Describe("Service Broker Actions", func() {
 			})
 
 			It("fails and returns warnings", func() {
-				warnings, executionError := actor.UpdateServiceBroker(guid, emptyName, username, password, url)
+				warnings, executionError := actor.UpdateServiceBroker(
+					guid,
+					ServiceBrokerModel{
+						Username: username,
+						Password: password,
+						URL:      url,
+					},
+				)
 
 				Expect(executionError).To(MatchError("invalid broker"))
 				Expect(warnings).To(ConsistOf("some-other-warning"))

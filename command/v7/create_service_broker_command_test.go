@@ -98,13 +98,13 @@ var _ = Describe("create-service-broker Command", func() {
 		It("passes the data to the actor layer", func() {
 			Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
 
-			n, u, p, l, s := fakeActor.CreateServiceBrokerArgsForCall(0)
+			model := fakeActor.CreateServiceBrokerArgsForCall(0)
 
-			Expect(n).To(Equal("service-broker-name"))
-			Expect(u).To(Equal("username"))
-			Expect(p).To(Equal("password"))
-			Expect(l).To(Equal("https://example.org/super-broker"))
-			Expect(s).To(Equal(""))
+			Expect(model.Name).To(Equal("service-broker-name"))
+			Expect(model.Username).To(Equal("username"))
+			Expect(model.Password).To(Equal("password"))
+			Expect(model.URL).To(Equal("https://example.org/super-broker"))
+			Expect(model.SpaceGUID).To(Equal(""))
 
 		})
 
@@ -152,8 +152,8 @@ var _ = Describe("create-service-broker Command", func() {
 			It("looks up the space guid and passes it to the actor", func() {
 				Expect(fakeActor.CreateServiceBrokerCallCount()).To(Equal(1))
 
-				_, _, _, _, s := fakeActor.CreateServiceBrokerArgsForCall(0)
-				Expect(s).To(Equal("fake-space-guid"))
+				model := fakeActor.CreateServiceBrokerArgsForCall(0)
+				Expect(model.SpaceGUID).To(Equal("fake-space-guid"))
 			})
 		})
 	})

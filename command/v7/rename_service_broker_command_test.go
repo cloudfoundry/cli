@@ -1,9 +1,10 @@
 package v7_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -15,21 +16,20 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("update-service-broker command", func() {
+var _ = Describe("rename-service-broker command", func() {
 	const (
-		binaryName        = "cf-command"
-		serviceBrokerName = "fake-service-broker-name"
-		username          = "fake-username"
-		password          = "fake-password"
-		url               = "fake-url"
+		binaryName    = "cf-command"
+		oldBrokerName = "old-name"
+		newBrokerName = "new-name"
 	)
 
 	var (
-		cmd                          *v7.UpdateServiceBrokerCommand
+		cmd                          *v7.RenameServiceBrokerCommand
 		fakeUpdateServiceBrokerActor *v7fakes.FakeUpdateServiceBrokerActor
 		fakeSharedActor              *commandfakes.FakeSharedActor
 		fakeConfig                   *commandfakes.FakeConfig
 		testUI                       *ui.UI
+		executeErr                   error
 	)
 
 	BeforeEach(func() {
@@ -37,12 +37,10 @@ var _ = Describe("update-service-broker command", func() {
 		fakeSharedActor = &commandfakes.FakeSharedActor{}
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
-		cmd = &v7.UpdateServiceBrokerCommand{
-			RequiredArgs: flag.ServiceBrokerArgs{
-				ServiceBroker: serviceBrokerName,
-				Username:      username,
-				Password:      password,
-				URL:           url,
+		cmd = &v7.RenameServiceBrokerCommand{
+			RequiredArgs: flag.RenameServiceBrokerArgs{
+				OldServiceBrokerName: oldBrokerName,
+				NewServiceBrokerName: newBrokerName,
 			},
 			Actor:       fakeUpdateServiceBrokerActor,
 			SharedActor: fakeSharedActor,
@@ -57,27 +55,43 @@ var _ = Describe("update-service-broker command", func() {
 		BeforeEach(func() {
 			fakeUpdateServiceBrokerActor.GetServiceBrokerByNameReturns(
 				v7action.ServiceBroker{GUID: guid},
-				v7action.Warnings{},
+				v7action.Warnings{"get broker by name warning"},
 				nil,
 			)
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "user"}, nil)
 		})
 
-		It("succeeds", func() {
-			fakeUpdateServiceBrokerActor.UpdateServiceBrokerReturns(v7action.Warnings{"update service broker warning"}, nil)
+		When("rename succeeds", func() {
+			BeforeEach(func() {
+				fakeUpdateServiceBrokerActor.UpdateServiceBrokerReturns(v7action.Warnings{"update service broker warning"}, nil)
+				executeErr = cmd.Execute(nil)
+			})
 
-			err := cmd.Execute(nil)
-			Expect(err).NotTo(HaveOccurred())
+			It("does not return any errors", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
 
-			Expect(fakeUpdateServiceBrokerActor.UpdateServiceBrokerCallCount()).To(Equal(1))
-			serviceBrokerGUID, model := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
-			Expect(serviceBrokerGUID).To(Equal(guid))
-			Expect(model.Username).To(Equal(username))
-			Expect(model.Password).To(Equal(password))
-			Expect(model.URL).To(Equal(url))
+			It("calls actor correctly and passes the new name", func() {
+				Expect(fakeUpdateServiceBrokerActor.UpdateServiceBrokerCallCount()).To(Equal(1))
+				serviceBrokerGUID, model := fakeUpdateServiceBrokerActor.UpdateServiceBrokerArgsForCall(0)
+				Expect(serviceBrokerGUID).To(Equal(guid))
+				Expect(model).To(Equal(
+					v7action.ServiceBrokerModel{
+						Name: newBrokerName,
+					},
+				))
+			})
 
-			Expect(testUI.Err).To(Say("update service broker warning"))
+			It("yields warnings", func() {
+				Expect(testUI.Err).To(Say("get broker by name warning"))
+				Expect(testUI.Err).To(Say("update service broker warning"))
+			})
+
+			It("obtains broker GUID correctly by name", func() {
+				Expect(fakeUpdateServiceBrokerActor.GetServiceBrokerByNameCallCount()).To(Equal(1))
+				Expect(fakeUpdateServiceBrokerActor.GetServiceBrokerByNameArgsForCall(0)).To(Equal(oldBrokerName))
+			})
 		})
 
 		When("the UpdateServiceBroker actor fails to get the broker name", func() {
@@ -86,22 +100,19 @@ var _ = Describe("update-service-broker command", func() {
 					v7action.ServiceBroker{},
 					v7action.Warnings{"some-warning"},
 					actionerror.ServiceBrokerNotFoundError{
-						Name: serviceBrokerName,
+						Name: oldBrokerName,
 					},
 				)
 			})
 
 			It("returns the error and displays all warnings", func() {
 				err := cmd.Execute(nil)
-				Expect(err).To(MatchError(actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}))
+				Expect(err).To(MatchError(actionerror.ServiceBrokerNotFoundError{Name: oldBrokerName}))
 				Expect(testUI.Err).To(Say("some-warning"))
-
-				Expect(fakeUpdateServiceBrokerActor.GetServiceBrokerByNameCallCount()).To(Equal(1))
-				Expect(fakeUpdateServiceBrokerActor.GetServiceBrokerByNameArgsForCall(0)).To(Equal(serviceBrokerName))
 			})
 		})
 
-		When("the UpdateServiceBroker actor fails to update the broker", func() {
+		When("the UpdateServiceBroker actor fails to rename the broker", func() {
 			It("returns the error and displays any warnings", func() {
 				fakeUpdateServiceBrokerActor.UpdateServiceBrokerReturns(v7action.Warnings{"a-warning"}, errors.New("something went wrong"))
 
