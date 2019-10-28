@@ -8,4 +8,7 @@ const (
 	OrgAuditorRole        RoleType = "organization_auditor"
 	OrgManagerRole        RoleType = "organization_manager"
 	OrgBillingManagerRole RoleType = "organization_billing_manager"
+	SpaceDeveloperRole    RoleType = "space_developer"
+	SpaceAuditorRole      RoleType = "space_auditor"
+	SpaceManagerRole      RoleType = "space_manager"
 )

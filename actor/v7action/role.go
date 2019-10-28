@@ -16,3 +16,13 @@ func (actor Actor) CreateOrgRole(roleType constant.RoleType, userGUID string, or
 
 	return Role(role), Warnings(warnings), err
 }
+
+func (actor Actor) CreateSpaceRole(roleType constant.RoleType, userGUID string, spaceGUID string) (Role, Warnings, error) {
+	role, warnings, err := actor.CloudControllerClient.CreateRole(ccv3.Role{
+		Type:      roleType,
+		UserGUID:  userGUID,
+		SpaceGUID: spaceGUID,
+	})
+
+	return Role(role), Warnings(warnings), err
+}

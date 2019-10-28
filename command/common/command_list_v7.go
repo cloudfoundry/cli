@@ -159,7 +159,7 @@ type commandList struct {
 	SetRunningEnvironmentVariableGroup v7.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
 	SetSpaceIsolationSegment           v6.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
 	SetSpaceQuota                      v6.SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a space quota definition to a space"`
-	SetSpaceRole                       v6.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
+	SetSpaceRole                       v7.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
 	SetStagingEnvironmentVariableGroup v7.SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`
 	SharePrivateDomain                 v7.SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with a specific org"`
 	ShareService                       v6.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`

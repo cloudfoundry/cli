@@ -25,8 +25,8 @@ type SetOrgRoleActor interface {
 type SetOrgRoleCommand struct {
 	Args              flag.SetOrgRoleArgs `positional-args:"yes"`
 	ClientCredentials bool                `long:"client" description:"Assign an org role to a client-id of a (non-user) service account"`
-	Origin            string              `long:"origin" description:"Origin for mapping a user account to a user in an external identity provider"`
-	usage             interface{}         `usage:"CF_NAME set-org-role USERNAME ORG ROLE [--client]\n   CF_NAME set-org-role USERNAME ORG ROLE [--origin]\n\nROLES:\n   OrgManager - Invite and manage users, select and change plans, and set spending limits\n   BillingManager - Create and manage the billing account and payment info\n   OrgAuditor - Read-only access to org info and reports"`
+	Origin            string              `long:"origin" description:"Indicates the identity provider to be used for authentication"`
+	usage             interface{}         `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n   CF_NAME set-org-role USERNAME ORG ROLE [--client CLIENT]\n   CF_NAME set-org-role USERNAME ORG ROLE [--origin ORIGIN]\n\nROLES:\n   OrgManager - Invite and manage users, select and change plans, and set spending limits\n   BillingManager - Create and manage the billing account and payment info\n   OrgAuditor - Read-only access to org info and reports"`
 	relatedCommands   interface{}         `related_commands:"org-users, set-space-role"`
 
 	UI          command.UI

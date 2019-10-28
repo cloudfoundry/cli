@@ -18,13 +18,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("set-org-role Command", func() {
+var _ = Describe("set-space-role Command", func() {
 	var (
-		cmd             SetOrgRoleCommand
+		cmd             SetSpaceRoleCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSetOrgRoleActor
+		fakeActor       *v7fakes.FakeSetSpaceRoleActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -35,9 +35,9 @@ var _ = Describe("set-org-role Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetOrgRoleActor)
+		fakeActor = new(v7fakes.FakeSetSpaceRoleActor)
 
-		cmd = SetOrgRoleCommand{
+		cmd = SetSpaceRoleCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
@@ -56,8 +56,18 @@ var _ = Describe("set-org-role Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "current-user"}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{GUID: "some-org-guid", Name: "some-org-name"},
+			v7action.Organization{
+				GUID:     "some-org-guid",
+				Name:     "some-org-name",
+				Metadata: nil,
+			},
 			v7action.Warnings{"get-org-warning"},
+			nil,
+		)
+
+		fakeActor.GetSpaceByNameAndOrganizationReturns(
+			v7action.Space{GUID: "some-space-guid", Name: "some-space-name"},
+			v7action.Warnings{"get-space-warning"},
 			nil,
 		)
 
@@ -70,7 +80,8 @@ var _ = Describe("set-org-role Command", func() {
 	When("neither origin nor client flag is provided", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceDeveloper"}
 			cmd.Args.Username = "target-user"
 		})
 
@@ -81,16 +92,24 @@ var _ = Describe("set-org-role Command", func() {
 			Expect(givenOrigin).To(Equal("uaa"))
 		})
 
-		It("creates the org role", func() {
+		It("creates the org user role", func() {
 			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
 			givenRoleType, givenUserGUID, givenOrgGUID := fakeActor.CreateOrgRoleArgsForCall(0)
-			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
+			Expect(givenRoleType).To(Equal(constant.OrgUserRole))
 			Expect(givenUserGUID).To(Equal("target-user-guid"))
 			Expect(givenOrgGUID).To(Equal("some-org-guid"))
 		})
 
+		It("creates the space role", func() {
+			Expect(fakeActor.CreateSpaceRoleCallCount()).To(Equal(1))
+			givenRoleType, givenUserGUID, givenSpaceGUID := fakeActor.CreateSpaceRoleArgsForCall(0)
+			Expect(givenRoleType).To(Equal(constant.SpaceDeveloperRole))
+			Expect(givenUserGUID).To(Equal("target-user-guid"))
+			Expect(givenSpaceGUID).To(Equal("some-space-guid"))
+		})
+
 		It("displays flavor text and returns without error", func() {
-			Expect(testUI.Out).To(Say("Assigning role OrgAuditor to user target-user in org some-org-name as current-user..."))
+			Expect(testUI.Out).To(Say("Assigning role SpaceDeveloper to user target-user in org some-org-name / space some-space-name as current-user..."))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).NotTo(HaveOccurred())
 		})
@@ -99,7 +118,8 @@ var _ = Describe("set-org-role Command", func() {
 	When("origin flag is provided", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user"
 			cmd.Origin = "ldap"
 		})
@@ -111,16 +131,16 @@ var _ = Describe("set-org-role Command", func() {
 			Expect(givenOrigin).To(Equal("ldap"))
 		})
 
-		It("creates the org role", func() {
-			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
-			givenRoleType, givenUserGUID, givenOrgGUID := fakeActor.CreateOrgRoleArgsForCall(0)
-			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
+		It("creates the space role", func() {
+			Expect(fakeActor.CreateSpaceRoleCallCount()).To(Equal(1))
+			givenRoleType, givenUserGUID, givenSpaceGUID := fakeActor.CreateSpaceRoleArgsForCall(0)
+			Expect(givenRoleType).To(Equal(constant.SpaceAuditorRole))
 			Expect(givenUserGUID).To(Equal("target-user-guid"))
-			Expect(givenOrgGUID).To(Equal("some-org-guid"))
+			Expect(givenSpaceGUID).To(Equal("some-space-guid"))
 		})
 
 		It("displays flavor text and returns without error", func() {
-			Expect(testUI.Out).To(Say("Assigning role OrgAuditor to user target-user in org some-org-name as current-user..."))
+			Expect(testUI.Out).To(Say("Assigning role SpaceAuditor to user target-user in org some-org-name / space some-space-name as current-user..."))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).NotTo(HaveOccurred())
 		})
@@ -129,7 +149,8 @@ var _ = Describe("set-org-role Command", func() {
 	When("client flag is provided", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user"
 			cmd.ClientCredentials = true
 		})
@@ -138,16 +159,16 @@ var _ = Describe("set-org-role Command", func() {
 			Expect(fakeActor.GetUserCallCount()).To(Equal(0))
 		})
 
-		It("creates the org role", func() {
-			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
-			givenRoleType, givenUserGUID, givenOrgGUID := fakeActor.CreateOrgRoleArgsForCall(0)
-			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
+		It("creates the space role", func() {
+			Expect(fakeActor.CreateSpaceRoleCallCount()).To(Equal(1))
+			givenRoleType, givenUserGUID, givenSpaceGUID := fakeActor.CreateSpaceRoleArgsForCall(0)
+			Expect(givenRoleType).To(Equal(constant.SpaceAuditorRole))
 			Expect(givenUserGUID).To(Equal("target-user"))
-			Expect(givenOrgGUID).To(Equal("some-org-guid"))
+			Expect(givenSpaceGUID).To(Equal("some-space-guid"))
 		})
 
 		It("displays flavor text and returns without error", func() {
-			Expect(testUI.Out).To(Say("Assigning role OrgAuditor to user target-user in org some-org-name as current-user..."))
+			Expect(testUI.Out).To(Say("Assigning role SpaceAuditor to user target-user in org some-org-name / space some-space-name as current-user..."))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).NotTo(HaveOccurred())
 		})
@@ -156,7 +177,8 @@ var _ = Describe("set-org-role Command", func() {
 	When("both client and origin flags are provided", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user"
 			cmd.Origin = "ldap"
 			cmd.ClientCredentials = true
@@ -172,10 +194,11 @@ var _ = Describe("set-org-role Command", func() {
 	When("the role already exists", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user"
 
-			fakeActor.CreateOrgRoleReturns(
+			fakeActor.CreateSpaceRoleReturns(
 				v7action.Role{},
 				v7action.Warnings{"create-role-warning"},
 				ccerror.RoleAlreadyExistsError{},
@@ -184,16 +207,27 @@ var _ = Describe("set-org-role Command", func() {
 
 		It("displays warnings and returns without error", func() {
 			Expect(testUI.Err).To(Say("create-role-warning"))
-			Expect(testUI.Err).To(Say("User 'target-user' already has role 'OrgAuditor' in org 'some-org-name'."))
+			Expect(testUI.Err).To(Say("User 'target-user' already has role 'SpaceAuditor' in org 'some-org-name' / space 'some-space-name'."))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).NotTo(HaveOccurred())
+		})
+	})
+
+	When("invalid role arg is given", func() {
+		BeforeEach(func() {
+			cmd.Args.Role = flag.SpaceRole{Role: "Astronaut"}
+		})
+
+		It("returns an error", func() {
+			Expect(executeErr).To(MatchError("Invalid role type."))
 		})
 	})
 
 	When("getting the user fails", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user"
 
 			fakeActor.GetUserReturns(
@@ -207,40 +241,68 @@ var _ = Describe("set-org-role Command", func() {
 		})
 	})
 
-	When("when the role argument is invalid", func() {
-		BeforeEach(func() {
-			cmd.Args.Role = flag.OrgRole{Role: "MiddleManager"}
-		})
-
-		It("returns an error", func() {
-			Expect(executeErr).To(MatchError("Invalid role type."))
-		})
-	})
-
 	When("getting the org fails", func() {
 		BeforeEach(func() {
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 
 			fakeActor.GetOrganizationByNameReturns(
 				v7action.Organization{},
-				v7action.Warnings{"get-org-warning"},
+				v7action.Warnings{"get-user-warning"},
 				errors.New("get-org-error"),
 			)
 		})
 
 		It("displays warnings and returns an error", func() {
-			Expect(testUI.Err).To(Say("get-org-warning"))
+			Expect(testUI.Err).To(Say("get-user-warning"))
 			Expect(executeErr).To(MatchError("get-org-error"))
 		})
 	})
 
-	When("creating the role fails", func() {
+	When("getting the space fails", func() {
+		BeforeEach(func() {
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
+
+			fakeActor.GetSpaceByNameAndOrganizationReturns(
+				v7action.Space{},
+				v7action.Warnings{"get-space-warning"},
+				errors.New("get-space-error"),
+			)
+		})
+
+		It("displays warnings and returns an error", func() {
+			Expect(testUI.Err).To(Say("get-space-warning"))
+			Expect(executeErr).To(MatchError("get-space-error"))
+		})
+	})
+
+	When("creating the org role fails", func() {
 		BeforeEach(func() {
 			cmd.Args.Organization = "some-org-name"
-			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user"
 
 			fakeActor.CreateOrgRoleReturns(
+				v7action.Role{},
+				v7action.Warnings{"create-org-role-warning"},
+				errors.New("create-org-role-error"),
+			)
+		})
+
+		It("displays warnings and returns without error", func() {
+			Expect(testUI.Err).To(Say("create-org-role-warning"))
+			Expect(executeErr).To(MatchError("create-org-role-error"))
+		})
+	})
+
+	When("creating the space role fails", func() {
+		BeforeEach(func() {
+			cmd.Args.Organization = "some-org-name"
+			cmd.Args.Space = "some-space-name"
+			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
+			cmd.Args.Username = "target-user"
+
+			fakeActor.CreateSpaceRoleReturns(
 				v7action.Role{},
 				v7action.Warnings{"create-role-warning"},
 				errors.New("create-role-error"),

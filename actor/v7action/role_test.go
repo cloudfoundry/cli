@@ -86,4 +86,69 @@ var _ = Describe("Role Actions", func() {
 			})
 		})
 	})
+
+	Describe("CreateSpaceRole", func() {
+		var (
+			returnedRole Role
+			warnings     Warnings
+			executeErr   error
+		)
+
+		JustBeforeEach(func() {
+			returnedRole, warnings, executeErr = actor.CreateSpaceRole(constant.SpaceDeveloperRole, "user-guid", "space-guid")
+		})
+
+		When("the API call to create the returnedRole is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateRoleReturns(
+					ccv3.Role{
+						Type:      constant.SpaceDeveloperRole,
+						UserGUID:  "user-guid",
+						SpaceGUID: "space-guid",
+					},
+					ccv3.Warnings{"create-returnedRole-warning"},
+					nil,
+				)
+			})
+
+			It("returns the returnedRole and any warnings", func() {
+				Expect(returnedRole).To(Equal(
+					Role{
+						Type:      constant.SpaceDeveloperRole,
+						UserGUID:  "user-guid",
+						SpaceGUID: "space-guid",
+					},
+				))
+				Expect(warnings).To(ConsistOf("create-returnedRole-warning"))
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(1))
+				passedRole := fakeCloudControllerClient.CreateRoleArgsForCall(0)
+
+				Expect(passedRole).To(Equal(
+					ccv3.Role{
+						Type:      constant.SpaceDeveloperRole,
+						UserGUID:  "user-guid",
+						SpaceGUID: "space-guid",
+					},
+				))
+			})
+		})
+
+		When("the API call to create the returnedRole returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateRoleReturns(
+					ccv3.Role{},
+					ccv3.Warnings{"create-returnedRole-warning"},
+					errors.New("create-returnedRole-error"),
+				)
+			})
+
+			It("it returns an error and warnings", func() {
+				Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(1))
+				Expect(warnings).To(ConsistOf("create-returnedRole-warning"))
+				Expect(executeErr).To(MatchError("create-returnedRole-error"))
+			})
+		})
+	})
 })
