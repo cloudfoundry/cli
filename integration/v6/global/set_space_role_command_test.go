@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 )
 
-var _ = Describe("set-space-role command", func() {
+var _ = FDescribe("set-space-role command", func() {
 	When("the set_roles_by_username flag is disabled", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
