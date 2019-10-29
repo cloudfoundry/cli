@@ -65,7 +65,7 @@ var _ = Describe("update-service-broker command", func() {
 				))
 
 				Eventually(session.Err).Should(
-					Say("Url must be a valid url"),
+					Say("must be a valid url"),
 				)
 
 				Eventually(session).Should(Exit(1))
