@@ -77,7 +77,7 @@ var _ = Describe("service-brokers Command", func() {
 		})
 	})
 
-	When("the user is logged in and a space is targetted", func() {
+	When("the user is logged in and a space is targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -142,6 +142,30 @@ var _ = Describe("service-brokers Command", func() {
 				Expect(testUI.Out).To(Say("name\\s+url\\s+status"))
 				Expect(testUI.Out).To(Say("foo\\s+http://foo.url\\s+available"))
 				Expect(testUI.Out).To(Say("bar\\s+https://bar.com\\s+available"))
+				Expect(testUI.Err).To(Say("service-broker-warnings"))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		When("there is a service broker with an unknown status", func() {
+			BeforeEach(func() {
+				serviceBrokers := []v7action.ServiceBroker{
+					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo", Status: "available"},
+					{Name: "buzz", URL: "http://buzz.url", GUID: "guid-buzz", Status: "unknown"},
+					{Name: "bar", URL: "https://bar.com", GUID: "guid-bar", Status: "available"},
+				}
+				fakeActor.GetServiceBrokersReturns(serviceBrokers, v7action.Warnings{"service-broker-warnings"}, nil)
+			})
+
+			It("prints a table header and the broker details", func() {
+				Expect(testUI.Out).To(Say("name\\s+url\\s+status"))
+				Expect(testUI.Out).To(Say("foo\\s+http://foo.url\\s+available"))
+				Expect(testUI.Out).To(Say("bar\\s+https://bar.com\\s+available"))
+				Expect(testUI.Out).To(Say(
+					"TIP: Some of the brokers have status 'unknown'. "+
+						"To resolve this, please update these service brokers with '%s update-service-broker BROKER USERNAME PASSWORD URL'",
+					binaryName,
+				))
 				Expect(testUI.Err).To(Say("service-broker-warnings"))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
