@@ -96,7 +96,7 @@ var _ = Describe("set-space-role command", func() {
 					It("prints an appropriate error and exits 1", func() {
 						session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Server error, status code: 403: Access is denied.  You do not have privileges to execute this command."))
+						Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -112,7 +112,7 @@ var _ = Describe("set-space-role command", func() {
 				It("fails with an appropriate error message", func() {
 					session := helpers.CF("set-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("Client nonexistent-client not found"))
+					Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
