@@ -14,7 +14,7 @@ import (
 type Task struct {
 	// Command represents the command that will be executed. May be excluded
 	// based on the user's role.
-	Command string `json:"command"`
+	Command string `json:"command,omitempty"`
 	// CreatedAt represents the time with zone when the object was created.
 	CreatedAt string `json:"created_at,omitempty"`
 	// DiskInMB represents the disk in MB allocated for the task.
@@ -30,6 +30,20 @@ type Task struct {
 	SequenceID int64 `json:"sequence_id,omitempty"`
 	// State represents the task state.
 	State constant.TaskState `json:"state,omitempty"`
+	// Tasks can use a process as a template to fill in
+	// command, memory, disk values
+	//
+	// Using a pointer so that it can be set to nil to prevent
+	// json serialization when no template is used
+	Template *TaskTemplate `json:"template,omitempty"`
+}
+
+type TaskTemplate struct {
+	Process TaskProcessTemplate `json:"process,omitempty"`
+}
+
+type TaskProcessTemplate struct {
+	Guid string `json:"guid,omitempty"`
 }
 
 // CreateApplicationTask runs a command in the Application environment
