@@ -92,6 +92,23 @@ applications:
 	WithHelloWorldApp(withSidecarManifest)
 }
 
+func WithTaskApp(f func(dir string), appName string) {
+	withTaskManifest := func(dir string) {
+		err := ioutil.WriteFile(filepath.Join(dir, "manifest.yml"), []byte(fmt.Sprintf(`---
+applications:
+- name: %s
+  processes:
+  - type: task
+    command: echo hi`,
+			appName)), 0666)
+		Expect(err).ToNot(HaveOccurred())
+
+		f(dir)
+	}
+
+	WithHelloWorldApp(withTaskManifest)
+}
+
 // WithNoResourceMatchedApp creates a simple application to use with your CLI
 // command (typically CF Push). When pushing, be aware of specifying '-b
 // staticfile_buildpack" so that your app will correctly start up with the
