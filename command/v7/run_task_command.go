@@ -94,7 +94,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	}
 	if cmd.Process != "" {
 		process, warnings, err := cmd.Actor.GetProcessByTypeAndApplication(cmd.Process, application.GUID)
-		cmd.UI.DisplayWarnings(v7action.Warnings(warnings))
+		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
 		}
