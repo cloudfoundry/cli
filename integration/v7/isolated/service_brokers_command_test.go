@@ -94,5 +94,34 @@ var _ = Describe("service-brokers command", func() {
 				})
 			})
 		})
+
+		When("the broker has unknown status (was created via V6/V2)", func() {
+			var (
+				orgName   string
+				spaceName string
+				broker    *fakeservicebroker.FakeServiceBroker
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureRegisteredViaV2()
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("prints a table of service brokers with unknown status and a tip about it", func() {
+				Eventually(session).Should(Say("Getting service brokers as %s...", username))
+				Eventually(session).Should(Say(`name\s+url\s+status`))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker.Name(), broker.URL(), "unknown"))
+				Eventually(session).Should(Say(`TIP: Some of the brokers have status 'unknown'. ` +
+					`To resolve this, please update these service brokers with 'cf update-service-broker BROKER USERNAME PASSWORD URL'`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
