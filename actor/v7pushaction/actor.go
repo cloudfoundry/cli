@@ -56,6 +56,7 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 		HandleDiskOverride,
 		HandleNoRouteOverride,
 		HandleRandomRouteOverride,
+		HandleTaskOverride,
 
 		// this must come after all routing related transforms
 		HandleDefaultRouteOverride,
@@ -76,6 +77,7 @@ func NewActor(v3Actor V7Actor, sharedActor SharedActor) *Actor {
 		SetupDeploymentStrategyForPushPlan,
 		SetupNoStartForPushPlan,
 		SetupNoWaitForPushPlan,
+		SetupTaskAppForPushPlan,
 	}
 
 	actor.ChangeApplicationSequence = func(plan PushPlan) []ChangeApplicationFunc {

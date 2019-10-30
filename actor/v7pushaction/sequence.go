@@ -50,6 +50,15 @@ func (actor Actor) GetPrepareApplicationSourceSequence(plan PushPlan) []ChangeAp
 }
 
 func (actor Actor) GetRuntimeSequence(plan PushPlan) []ChangeApplicationFunc {
+
+	if plan.TaskTypeApplication {
+		return actor.getTaskAppRuntimeSequence(plan)
+	} else {
+		return actor.getDefaultRuntimeSequence(plan)
+	}
+}
+
+func (actor Actor) getDefaultRuntimeSequence(plan PushPlan) []ChangeApplicationFunc {
 	var runtimeSequence []ChangeApplicationFunc
 
 	if ShouldStagePackage(plan) {
@@ -71,6 +80,16 @@ func (actor Actor) GetRuntimeSequence(plan PushPlan) []ChangeApplicationFunc {
 			runtimeSequence = append(runtimeSequence, actor.RestartApplication)
 		}
 	}
+
+	return runtimeSequence
+}
+
+func (actor Actor) getTaskAppRuntimeSequence(plan PushPlan) []ChangeApplicationFunc {
+	var runtimeSequence []ChangeApplicationFunc
+
+	runtimeSequence = append(runtimeSequence, actor.StagePackageForApplication)
+	runtimeSequence = append(runtimeSequence, actor.StopApplication)
+	runtimeSequence = append(runtimeSequence, actor.SetDropletForApplication)
 
 	return runtimeSequence
 }

@@ -25,6 +25,7 @@ var _ = Describe("Actor", func() {
 				SetupDeploymentStrategyForPushPlan,
 				SetupNoStartForPushPlan,
 				SetupNoWaitForPushPlan,
+				SetupTaskAppForPushPlan,
 			))
 		})
 	})

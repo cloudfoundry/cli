@@ -16,9 +16,10 @@ type PushPlan struct {
 
 	Application v7action.Application
 
-	NoStart  bool
-	NoWait   bool
-	Strategy constant.DeploymentStrategy
+	NoStart             bool
+	NoWait              bool
+	Strategy            constant.DeploymentStrategy
+	TaskTypeApplication bool
 
 	DockerImageCredentials v7action.DockerImageCredentials
 
@@ -56,6 +57,7 @@ type FlagOverrides struct {
 	PathsToVarsFiles    []string
 	Vars                []template.VarKV
 	NoManifest          bool
+	Task                bool
 }
 
 func (state PushPlan) String() string {
