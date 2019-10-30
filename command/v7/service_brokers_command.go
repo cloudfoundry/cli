@@ -59,7 +59,6 @@ func (cmd *ServiceBrokersCommand) Execute(args []string) error {
 	}
 
 	cmd.displayServiceBrokers(serviceBrokers)
-	cmd.displayTipAboutUnknownStatusWhenPresent(serviceBrokers)
 
 	return nil
 }
@@ -86,23 +85,4 @@ func (cmd *ServiceBrokersCommand) displayServiceBrokersTable(serviceBrokers []v7
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
-}
-
-func (cmd *ServiceBrokersCommand) displayTipAboutUnknownStatusWhenPresent(serviceBrokers []v7action.ServiceBroker) {
-	for _, serviceBroker := range serviceBrokers {
-		if serviceBroker.Status == "unknown" {
-			cmd.displayTipAboutUnknownStatus()
-			return
-		}
-	}
-}
-
-func (cmd *ServiceBrokersCommand) displayTipAboutUnknownStatus() {
-	cmd.UI.DisplayText(
-		"TIP: Some of the brokers have status 'unknown'. "+
-			"To resolve this, please update these service brokers with '{{.Command}} update-service-broker BROKER USERNAME PASSWORD URL'",
-		map[string]interface{}{
-			"Command": cmd.Config.BinaryName(),
-		},
-	)
 }

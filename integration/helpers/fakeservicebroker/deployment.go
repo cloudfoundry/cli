@@ -95,30 +95,6 @@ func (f *FakeServiceBroker) register() {
 	}
 
 	Eventually(helpers.CF("create-service-broker", f.name, f.username, f.password, f.URL())).Should(Exit(0))
-
-	f.waitForBrokerToBeRegistered()
-}
-
-func (f *FakeServiceBroker) registerViaV2() {
-	if f.reusable {
-		f.deregister()
-	}
-
-	broker := map[string]interface{}{
-		"name":          f.name,
-		"broker_url":    f.URL(),
-		"auth_username": f.username,
-		"auth_password": f.password,
-	}
-	data, err := json.Marshal(broker)
-	Expect(err).NotTo(HaveOccurred())
-
-	Eventually(helpers.CF("curl", "-X", "POST", "/v2/service_brokers", "-d", string(data))).Should(Exit(0))
-
-	f.waitForBrokerToBeRegistered()
-}
-
-func (f *FakeServiceBroker) waitForBrokerToBeRegistered() {
 	Eventually(helpers.CF("service-brokers")).Should(And(Exit(0), Say(f.name)))
 
 	Eventually(func() io.Reader {
