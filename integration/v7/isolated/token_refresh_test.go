@@ -34,7 +34,7 @@ var _ = Describe("Token Refreshing", func() {
 				When("running a v7 command", func() {
 					When("the cloud controller client encounters an invalid token response", func() {
 						It("refreshes the token", func() {
-							session := helpers.CF("run-task", "app", "'echo banana'")
+							session := helpers.CF("run-task", "app", "--command", "'echo banana'")
 							Eventually(session.Err).Should(Say("App 'app' not found"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -55,7 +55,7 @@ var _ = Describe("Token Refreshing", func() {
 				When("running a v7 command", func() {
 					When("the cloud controller client encounters an invalid token response", func() {
 						It("refreshes the token", func() {
-							session := helpers.CF("run-task", "app", "'echo banana'")
+							session := helpers.CF("run-task", "app", "--command", "'echo banana'")
 							Eventually(session.Err).Should(Say("App 'app' not found"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -82,7 +82,7 @@ var _ = Describe("Token Refreshing", func() {
 			When("running a v7 command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("displays an error and exits 1", func() {
-						session := helpers.CF("run-task", "app", "'echo banana'")
+						session := helpers.CF("run-task", "app", "--command", "'echo banana'")
 						Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
 						Eventually(session).Should(Exit(1))
 					})
