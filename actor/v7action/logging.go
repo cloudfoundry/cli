@@ -1,14 +1,19 @@
 package v7action
 
 import (
+	"context"
+	"errors"
+	"log"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	noaaErrors "github.com/cloudfoundry/noaa/errors"
-	"github.com/cloudfoundry/sonde-go/events"
-	log "github.com/sirupsen/logrus"
+	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
+	logcache "code.cloudfoundry.org/log-cache-release/src/pkg/client"
+	"code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1"
+	"github.com/sirupsen/logrus"
 )
 
 const StagingLog = "STG"
@@ -17,7 +22,7 @@ var flushInterval = 300 * time.Millisecond
 
 type LogMessage struct {
 	message        string
-	messageType    events.LogMessage_MessageType
+	messageType    string
 	timestamp      time.Time
 	sourceType     string
 	sourceInstance string
@@ -28,10 +33,7 @@ func (log LogMessage) Message() string {
 }
 
 func (log LogMessage) Type() string {
-	if log.messageType == events.LogMessage_OUT {
-		return "OUT"
-	}
-	return "ERR"
+	return log.messageType
 }
 
 func (log LogMessage) Staging() bool {
@@ -50,10 +52,10 @@ func (log LogMessage) SourceInstance() string {
 	return log.sourceInstance
 }
 
-func NewLogMessage(message string, messageType int, timestamp time.Time, sourceType string, sourceInstance string) *LogMessage {
+func NewLogMessage(message string, messageType string, timestamp time.Time, sourceType string, sourceInstance string) *LogMessage {
 	return &LogMessage{
 		message:        message,
-		messageType:    events.LogMessage_MessageType(messageType),
+		messageType:    messageType,
 		timestamp:      timestamp,
 		sourceType:     sourceType,
 		sourceInstance: sourceInstance,
@@ -72,29 +74,84 @@ func (lm LogMessages) Swap(i, j int) {
 	lm[i], lm[j] = lm[j], lm[i]
 }
 
-func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error) {
-	log.Info("Start Tailing Logs")
-
-	ready := actor.setOnConnectBlocker(client)
-
-	incomingLogStream, incomingErrStream := client.TailingLogs(appGUID, actor.Config.AccessToken())
-
-	outgoingLogStream, outgoingErrStream := actor.blockOnConnect(ready)
-
-	go actor.streamLogsBetween(incomingLogStream, incomingErrStream, outgoingLogStream, outgoingErrStream)
-
-	return outgoingLogStream, outgoingErrStream
+type channelWriter struct {
+	errChannel chan error
 }
 
-func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error, Warnings, error) {
+func (c channelWriter) Write(bytes []byte) (n int, err error) {
+	c.errChannel <- errors.New(strings.Trim(string(bytes), "\n"))
+
+	return len(bytes), nil
+}
+
+func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage, <-chan error, context.CancelFunc) {
+	logrus.Info("Start Tailing Logs")
+
+	outgoingLogStream := make(chan LogMessage, 1000)
+	outgoingErrStream := make(chan error, 1000)
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	go func() {
+		defer close(outgoingLogStream)
+		defer close(outgoingErrStream)
+
+		logcache.Walk(
+			ctx,
+			appGUID,
+			logcache.Visitor(func(envelopes []*loggregator_v2.Envelope) bool {
+				logMessages := convertEnvelopesToLogMessages(envelopes)
+				for _, logMessage := range logMessages {
+					select {
+					case <-ctx.Done():
+						return false
+					default:
+						outgoingLogStream <- *logMessage
+					}
+				}
+
+				return true
+			}),
+			client.Read,
+			logcache.WithWalkStartTime(time.Now().Add(-5*time.Second)),
+			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
+			logcache.WithWalkBackoff(logcache.NewAlwaysRetryBackoff(250*time.Millisecond)),
+			logcache.WithWalkLogger(log.New(channelWriter{
+				errChannel: outgoingErrStream,
+			}, "", 0)),
+		)
+	}()
+
+	return outgoingLogStream, outgoingErrStream, cancelFunc
+}
+
+func convertEnvelopesToLogMessages(envelopes []*loggregator_v2.Envelope) []*LogMessage {
+	var logMessages []*LogMessage
+	for _, envelope := range envelopes {
+		logEnvelope, ok := envelope.GetMessage().(*loggregator_v2.Envelope_Log)
+		if !ok {
+			continue
+		}
+		log := logEnvelope.Log
+
+		logMessages = append(logMessages, NewLogMessage(
+			string(log.Payload),
+			loggregator_v2.Log_Type_name[int32(log.Type)],
+			time.Unix(0, envelope.GetTimestamp()),
+			envelope.GetTags()["source_type"],
+			envelope.GetInstanceId(),
+		))
+	}
+	return logMessages
+}
+
+func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client LogCacheClient) (<-chan LogMessage, <-chan error, context.CancelFunc, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
-		return nil, nil, allWarnings, err
+		return nil, nil, nil, allWarnings, err
 	}
 
-	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
+	messages, logErrs, cancelFunc := GetStreamingLogs(app.GUID, client)
 
-	return messages, logErrs, allWarnings, err
+	return messages, logErrs, cancelFunc, allWarnings, err
 }
 
 func (actor Actor) blockOnConnect(ready <-chan bool) (chan *LogMessage, chan error) {
@@ -139,61 +196,4 @@ func (Actor) setOnConnectBlocker(client NOAAClient) <-chan bool {
 	client.SetOnConnectCallback(callOnConnectOrRetry)
 
 	return ready
-}
-
-func (actor Actor) streamLogsBetween(incomingLogStream <-chan *events.LogMessage, incomingErrStream <-chan error, outgoingLogStream chan<- *LogMessage, outgoingErrStream chan<- error) {
-	log.Info("Processing Log Stream")
-
-	defer close(outgoingLogStream)
-	defer close(outgoingErrStream)
-
-	ticker := time.NewTicker(flushInterval)
-	defer ticker.Stop()
-
-	var logsToBeSorted LogMessages
-	var eventClosed, errClosed bool
-
-dance:
-	for {
-		select {
-		case event, ok := <-incomingLogStream:
-			if !ok {
-				if !errClosed {
-					log.Debug("logging event stream closed")
-				}
-				eventClosed = true
-				break
-			}
-
-			logsToBeSorted = append(logsToBeSorted, &LogMessage{
-				message:        string(event.GetMessage()),
-				messageType:    event.GetMessageType(),
-				timestamp:      time.Unix(0, event.GetTimestamp()),
-				sourceInstance: event.GetSourceInstance(),
-				sourceType:     event.GetSourceType(),
-			})
-		case err, ok := <-incomingErrStream:
-			if !ok {
-				if !errClosed {
-					log.Debug("logging error stream closed")
-				}
-				errClosed = true
-				break
-			}
-
-			if _, ok := err.(noaaErrors.RetryError); ok {
-				break
-			}
-
-			if err != nil {
-				outgoingErrStream <- err
-			}
-		case <-ticker.C:
-			logsToBeSorted = actor.flushLogs(logsToBeSorted, outgoingLogStream)
-			if eventClosed && errClosed {
-				log.Debug("stopping log processing")
-				break dance
-			}
-		}
-	}
 }

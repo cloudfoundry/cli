@@ -1,12 +1,13 @@
 package v7
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
@@ -20,7 +21,7 @@ type StartActor interface {
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 }
 
@@ -31,11 +32,11 @@ type StartCommand struct {
 	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	UI          command.UI
-	Config      command.Config
-	NOAAClient  v7action.NOAAClient
-	SharedActor command.SharedActor
-	Actor       StartActor
+	UI             command.UI
+	Config         command.Config
+	LogCacheClient v7action.LogCacheClient
+	SharedActor    command.SharedActor
+	Actor          StartActor
 }
 
 func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
@@ -43,13 +44,13 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	return nil
 }
@@ -96,11 +97,12 @@ func (cmd StartCommand) Execute(args []string) error {
 	if packageGuid != "" {
 		cmd.UI.DisplayText("Staging app and tracing logs")
 
-		logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 		cmd.UI.DisplayWarningsV7(logWarnings)
 		if logErr != nil {
 			return logErr
 		}
+		defer stopLogStreamFunc()
 
 		dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(packageGuid, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 
@@ -108,6 +110,8 @@ func (cmd StartCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
+
+		stopLogStreamFunc()
 
 		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
 		cmd.UI.DisplayWarningsV7(warnings)

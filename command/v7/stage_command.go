@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -8,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 )
@@ -16,7 +16,7 @@ import (
 //go:generate counterfeiter . StageActor
 
 type StageActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 }
 
@@ -28,11 +28,11 @@ type StageCommand struct {
 
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 
-	UI          command.UI
-	Config      command.Config
-	NOAAClient  v7action.NOAAClient
-	SharedActor command.SharedActor
-	Actor       StageActor
+	UI             command.UI
+	Config         command.Config
+	LogCacheClient v7action.LogCacheClient
+	SharedActor    command.SharedActor
+	Actor          StageActor
 }
 
 func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
@@ -40,13 +40,13 @@ func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	return nil
 }
@@ -69,11 +69,12 @@ func (cmd StageCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 	cmd.UI.DisplayWarningsV7(logWarnings)
 	if logErr != nil {
 		return logErr
 	}
+	defer stopLogStreamFunc()
 
 	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(
 		cmd.PackageGUID,
@@ -86,6 +87,7 @@ func (cmd StageCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	stopLogStreamFunc()
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("Package staged")

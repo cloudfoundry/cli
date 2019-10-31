@@ -17,6 +17,9 @@ type InfoLinks struct {
 	// Logging is the link to the Logging API.
 	Logging APILink `json:"logging"`
 
+	// Logging is the link to the Logging API.
+	LogCache APILink `json:"log_cache"`
+
 	// NetworkPolicyV1 is the link to the Container to Container Networking
 	// API.
 	NetworkPolicyV1 APILink `json:"network_policy_v1"`
@@ -54,6 +57,11 @@ func (info Info) CloudControllerAPIVersion() string {
 // Logging returns the HREF of the Loggregator Traffic Controller.
 func (info Info) Logging() string {
 	return info.Links.Logging.HREF
+}
+
+// Logging returns the HREF of the Loggregator Traffic Controller.
+func (info Info) LogCache() string {
+	return info.Links.LogCache.HREF
 }
 
 // NetworkPolicyV1 returns the HREF of the Container Networking v1 Policy API

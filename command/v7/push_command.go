@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -12,15 +13,14 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/progressbar"
 	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	logcache "code.cloudfoundry.org/log-cache-release/src/pkg/client"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
@@ -48,7 +48,7 @@ type PushActor interface {
 type V7ActorForPush interface {
 	AppActor
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
@@ -95,16 +95,17 @@ type PushCommand struct {
 	envCFStagingTimeout     interface{}                         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	Config          command.Config
-	UI              command.UI
-	NOAAClient      v3action.NOAAClient
-	Actor           PushActor
-	VersionActor    V7ActorForPush
-	SharedActor     command.SharedActor
-	ProgressBar     ProgressBar
-	PWD             string
-	ManifestLocator ManifestLocator
-	ManifestParser  PushManifestParser
+	Config            command.Config
+	UI                command.UI
+	LogCacheClient    *logcache.Client
+	loggingCancelFunc context.CancelFunc
+	Actor             PushActor
+	VersionActor      V7ActorForPush
+	SharedActor       command.SharedActor
+	ProgressBar       ProgressBar
+	PWD               string
+	ManifestLocator   ManifestLocator
+	ManifestParser    PushManifestParser
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -124,7 +125,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.VersionActor = v7actor
 	cmd.Actor = v7pushaction.NewActor(v7actor, sharedActor)
 
-	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
@@ -546,14 +547,17 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) er
 	case v7pushaction.StartingStaging:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Staging app and tracing logs...")
-		logStream, errStream, warnings, err := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		logStream, errStream, cancelFunc, warnings, err := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 		cmd.UI.DisplayWarningsV7(warnings)
 		if err != nil {
 			return err
 		}
+		cmd.loggingCancelFunc = cancelFunc
 		go cmd.getLogs(logStream, errStream)
 	case v7pushaction.StagingComplete:
-		cmd.NOAAClient.Close()
+		if cmd.loggingCancelFunc != nil {
+			cmd.loggingCancelFunc()
+		}
 	case v7pushaction.RestartingApplication:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayTextWithFlavor(
@@ -579,7 +583,7 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) er
 	return nil
 }
 
-func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream <-chan error) {
+func (cmd PushCommand) getLogs(logStream <-chan v7action.LogMessage, errStream <-chan error) {
 	for {
 		select {
 		case logMessage, open := <-logStream:

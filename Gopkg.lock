@@ -49,6 +49,14 @@
   revision = "18cdb3586e7fca967680b3330d9c21e3f7d3e767"
 
 [[projects]]
+  digest = "1:3d3b0f6dde190db3efcdf2aa6cb3c23be30b5a53c31e91ce9408b62f9e11849c"
+  name = "code.cloudfoundry.org/go-loggregator"
+  packages = ["rpc/loggregator_v2"]
+  pruneopts = "NUT"
+  revision = "b8d176783c8a6280a34f0e19e0e8f57d722773a1"
+  version = "v7.7.0"
+
+[[projects]]
   branch = "master"
   digest = "1:ef4eaf0b9b15b3f5e5afaf6a52303c39d46a9c3b6d13d0d81e4b785002606692"
   name = "code.cloudfoundry.org/gofileutils"
@@ -67,6 +75,33 @@
   ]
   pruneopts = "NUT"
   revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
+
+[[projects]]
+  digest = "1:1654251758862f756b89c0e293cae8b4de7125ad5c9686f68998613860e3ad37"
+  name = "code.cloudfoundry.org/log-cache"
+  packages = [
+    "pkg/marshaler",
+    "pkg/rpc/logcache_v1",
+  ]
+  pruneopts = "NUT"
+  revision = "73f7c04d741ab02f4471e6d2653c6d71ff6dbd49"
+  version = "v2.3.1"
+
+[[projects]]
+  digest = "1:169d7c92e6f2bded9fee53f6d4a163750df3a8fc4d4e544268547cbc99813651"
+  name = "code.cloudfoundry.org/log-cache-release"
+  packages = ["src/pkg/client"]
+  pruneopts = "NUT"
+  revision = "c7e8f8c2a628cb13a17519f451edcd8efa35b240"
+  version = "v2.6.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d884ec0e4fd80c9fd201d158ac3ff45a38ff0cb13acbf2041da8818915f854de"
+  name = "code.cloudfoundry.org/rfc5424"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "236a6d29298aea12f69978f33393d12465abc429"
 
 [[projects]]
   branch = "master"
@@ -226,7 +261,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0a0ef0f4f66e63db86dc2f865bdede9c9902976e86ecf02173ed559b765f99d2"
+  digest = "1:dc984388f49af46e504fb1a57adb644b9152882e88f8fc3160800b7e7dc352b2"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
@@ -234,15 +269,26 @@
     "protoc-gen-gogo/descriptor",
   ]
   pruneopts = "NUT"
-  revision = "616a82ed12d78d24d4839363e8f3c5d3f20627cf"
+  revision = "5628607bb4c51c3157aacc3a50f0ab707582b805"
 
 [[projects]]
-  branch = "master"
-  digest = "1:b1ef763b6334cf7eb68249217b77955fdae4d2475e13d7d38eb4b452f0633944"
+  digest = "1:c1d3f945cf852aefbd54f7d77140b5a6cf6ab4dab88d02f8d734ea452586427d"
   name = "github.com/golang/protobuf"
-  packages = ["proto"]
+  packages = [
+    "descriptor",
+    "jsonpb",
+    "proto",
+    "protoc-gen-go/descriptor",
+    "ptypes",
+    "ptypes/any",
+    "ptypes/duration",
+    "ptypes/struct",
+    "ptypes/timestamp",
+    "ptypes/wrappers",
+  ]
   pruneopts = "NUT"
-  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+  revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
+  version = "v1.3.2"
 
 [[projects]]
   branch = "master"
@@ -259,6 +305,18 @@
   packages = ["."]
   pruneopts = "NUT"
   revision = "b89020ee79b89a7f932c5617d218fc06db382f53"
+
+[[projects]]
+  digest = "1:9d63e42ed7c2074f54e5090047cec94091624e1fcd4767ef9e785a2ba999bce8"
+  name = "github.com/grpc-ecosystem/grpc-gateway"
+  packages = [
+    "internal",
+    "runtime",
+    "utilities",
+  ]
+  pruneopts = "NUT"
+  revision = "ece8fdf051b731392b407fdb9a9b1b9ffb6f9793"
+  version = "v1.11.3"
 
 [[projects]]
   digest = "1:41933d387bfa3eaa6a82647914ed7044f7b8355764c24fb920892bc8c03ef0c3"
@@ -483,14 +541,21 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:276556ec29ad295168d8f07a1b432584396e196340a4797f7518f1aac6f3582d"
+  digest = "1:968e3c0bed1c4aa30a3c8e088e4d38cb9543367facb68d843a61a7fa3f0a745e"
   name = "golang.org/x/net"
   packages = [
+    "context",
     "html",
     "html/atom",
     "html/charset",
+    "http/httpguts",
+    "http2",
+    "http2/hpack",
+    "idna",
     "internal/socks",
+    "internal/timeseries",
     "proxy",
+    "trace",
     "websocket",
   ]
   pruneopts = "NUT"
@@ -510,9 +575,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b2d97c24b6f7cc3a6a230308e911d9c77512833e1be69688214408ae7db46390"
+  digest = "1:e2ad569a7931fbb2b1bda8fa8dffc61c67555822f4fc95e619f0270d7a7eaee3"
   name = "golang.org/x/text"
   packages = [
+    "collate",
+    "collate/build",
     "encoding",
     "encoding/charmap",
     "encoding/htmlindex",
@@ -523,18 +590,80 @@
     "encoding/simplifiedchinese",
     "encoding/traditionalchinese",
     "encoding/unicode",
+    "internal/colltab",
     "internal/gen",
     "internal/language",
     "internal/language/compact",
     "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
     "internal/utf8internal",
     "language",
     "runes",
+    "secure/bidirule",
     "transform",
+    "unicode/bidi",
     "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
   ]
   pruneopts = "NUT"
   revision = "fe223c5a2583471b2791ca99e716c65b4a76117e"
+
+[[projects]]
+  branch = "master"
+  digest = "1:802a0ee14db7898b2bf4a1bea346b8dcb68e900dcf89d501cc65339439ef60d4"
+  name = "google.golang.org/genproto"
+  packages = [
+    "googleapis/api/annotations",
+    "googleapis/api/httpbody",
+    "googleapis/rpc/status",
+    "protobuf/field_mask",
+  ]
+  pruneopts = "NUT"
+  revision = "919d9bdd9fe6f1a5dd95ce5d5e4cdb8fd3c516d0"
+
+[[projects]]
+  digest = "1:3402d0f99f4bdc28b92dfbf22cbab88e1790b83209e812157c68803d4fc089d0"
+  name = "google.golang.org/grpc"
+  packages = [
+    ".",
+    "balancer",
+    "balancer/base",
+    "balancer/roundrobin",
+    "binarylog/grpc_binarylog_v1",
+    "codes",
+    "connectivity",
+    "credentials",
+    "credentials/internal",
+    "encoding",
+    "encoding/proto",
+    "grpclog",
+    "internal",
+    "internal/backoff",
+    "internal/balancerload",
+    "internal/binarylog",
+    "internal/channelz",
+    "internal/envconfig",
+    "internal/grpcrand",
+    "internal/grpcsync",
+    "internal/syscall",
+    "internal/transport",
+    "keepalive",
+    "metadata",
+    "naming",
+    "peer",
+    "resolver",
+    "resolver/dns",
+    "resolver/passthrough",
+    "serviceconfig",
+    "stats",
+    "status",
+    "tap",
+  ]
+  pruneopts = "NUT"
+  revision = "f6d0f9ee430895e87ef1ceb5ac8f39725bafceef"
+  version = "v1.24.0"
 
 [[projects]]
   digest = "1:30f55ee34f367e29620faaae69dcdf6b78a86348f3a1472cf63f2dbba0f9d4f7"
@@ -584,8 +713,11 @@
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_io",
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_net",
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh",
+    "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
     "code.cloudfoundry.org/gofileutils/fileutils",
     "code.cloudfoundry.org/lager/lagertest",
+    "code.cloudfoundry.org/log-cache-release/src/pkg/client",
+    "code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1",
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",
     "github.com/SermoDigital/jose/jws",
