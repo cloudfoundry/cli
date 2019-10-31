@@ -43,7 +43,7 @@ var _ = Describe("Verbose", func() {
 				envMap = map[string]string{"CF_TRACE": env}
 			}
 
-			command := []string{"run-task", "app", "echo"}
+			command := []string{"run-task", "app", "--command", "echo"}
 
 			if flag {
 				command = append(command, "-v")
@@ -109,7 +109,7 @@ var _ = Describe("Verbose", func() {
 				envMap = map[string]string{"CF_TRACE": env}
 			}
 
-			command := []string{"run-task", "app", "echo"}
+			command := []string{"run-task", "app", "--command", "echo"}
 
 			if flag {
 				command = append(command, "-v")
