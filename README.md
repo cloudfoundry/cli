@@ -54,6 +54,8 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 
 ### Downloading the V6 CLI
 
+It is recommended to download installers from the published URLs or using one of the documented package managers (APT/deb/homebrew repos).  Published URLs may redirect requests to URLs that may change over time, so may installer filenames change over time.
+
 #### Installing using a package manager
 
 **Mac OS X** and **Linux** using [Homebrew](https://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
