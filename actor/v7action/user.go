@@ -25,6 +25,7 @@ func (actor Actor) CreateUser(username string, password string, origin string) (
 // GetUser gets a user in UAA with the given username and (if provided) origin.
 // It returns an error if no matching user is found.
 // It returns an error if multiple matching users are found.
+// NOTE: The UAA /Users endpoint used here requires admin scopes.
 func (actor Actor) GetUser(username, origin string) (User, error) {
 	uaaUsers, err := actor.UAAClient.ListUsers(username, origin)
 	if err != nil {

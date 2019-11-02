@@ -124,7 +124,7 @@ var _ = Describe("set-org-role command", func() {
 				It("fails with an appropriate error message", func() {
 					session := helpers.CF("set-org-role", targetUser, orgName, "OrgManager", "--origin", origin)
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("User 'some-user' with origin 'some-origin' does not exist."))
+					Eventually(session.Err).Should(Say("No user exists with the username 'some-user' and origin 'some-origin'."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -198,7 +198,7 @@ var _ = Describe("set-org-role command", func() {
 				session := helpers.CF("set-org-role", "not-exists", orgName, "OrgAuditor")
 				Eventually(session).Should(Say("Assigning role OrgAuditor to user not-exists in org %s as %s...", orgName, currentUsername))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("User 'not-exists' does not exist."))
+				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists' and origin 'uaa'."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

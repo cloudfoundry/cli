@@ -17,7 +17,8 @@ import (
 //go:generate counterfeiter . SetOrgRoleActor
 
 type SetOrgRoleActor interface {
-	CreateOrgRole(roleType constant.RoleType, userGUID string, orgGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateOrgRoleByUserGUID(roleType constant.RoleType, userGUID string, orgGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateOrgRoleByUserName(roleType constant.RoleType, userName string, origin string, orgGUID string) (v7action.Role, v7action.Warnings, error)
 	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
 	GetUser(username, origin string) (v7action.User, error)
 }
@@ -72,20 +73,6 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 		"CurrentUserName": currentUser.Name,
 	})
 
-	origin := cmd.Origin
-	if cmd.Origin == "" {
-		origin = constant.DefaultOriginUaa
-	}
-
-	targetUserGUID := cmd.Args.Username
-	if !cmd.ClientCredentials {
-		targetUser, err := cmd.Actor.GetUser(cmd.Args.Username, origin)
-		if err != nil {
-			return err
-		}
-		targetUserGUID = targetUser.GUID
-	}
-
 	roleType, err := convertRoleType(cmd.Args.Role)
 	if err != nil {
 		return err
@@ -96,8 +83,16 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	origin := cmd.Origin
+	if cmd.Origin == "" {
+		origin = constant.DefaultOriginUaa
+	}
 
-	_, warnings, err = cmd.Actor.CreateOrgRole(roleType, targetUserGUID, org.GUID)
+	if cmd.ClientCredentials {
+		_, warnings, err = cmd.Actor.CreateOrgRoleByUserGUID(roleType, cmd.Args.Username, org.GUID)
+	} else {
+		_, warnings, err = cmd.Actor.CreateOrgRoleByUserName(roleType, cmd.Args.Username, origin, org.GUID)
+	}
 	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err != nil {

@@ -9,6 +9,18 @@ import (
 )
 
 var _ = Describe("set-space-role command", func() {
+	var (
+		privilegedUsername string
+		orgName            string
+		spaceName          string
+	)
+
+	BeforeEach(func() {
+		privilegedUsername = helpers.LoginCF()
+		orgName = ReadOnlyOrg
+		spaceName = ReadOnlySpace
+	})
+
 	Describe("help text and argument validation", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -61,18 +73,6 @@ var _ = Describe("set-space-role command", func() {
 	})
 
 	When("logged in as a privileged user", func() {
-		var (
-			privilegedUsername string
-			orgName            string
-			spaceName          string
-		)
-
-		BeforeEach(func() {
-			privilegedUsername = helpers.LoginCF()
-			orgName = ReadOnlyOrg
-			spaceName = ReadOnlySpace
-		})
-
 		When("the --client flag is passed", func() {
 			var clientID string
 
@@ -96,7 +96,7 @@ var _ = Describe("set-space-role command", func() {
 					It("prints an appropriate error and exits 1", func() {
 						session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
+						Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -141,19 +141,6 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			When("the logged in user has insufficient permissions", func() {
-				BeforeEach(func() {
-					helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceAuditor")
-				})
-
-				It("prints out the error message from CC API and exits 1", func() {
-					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
 			When("the user already has the desired role", func() {
 				BeforeEach(func() {
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
@@ -192,9 +179,42 @@ var _ = Describe("set-space-role command", func() {
 				session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
 				Eventually(session).Should(Say("Assigning role SpaceAuditor to user not-exists in org %s / space %s as %s...", orgName, spaceName, privilegedUsername))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("User 'not-exists' does not exist."))
+				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists' and origin 'uaa'."))
 				Eventually(session).Should(Exit(1))
 			})
+		})
+	})
+
+	When("the logged in user has insufficient permissions to see the user", func() {
+		var username string
+
+		BeforeEach(func() {
+			username, _ = helpers.CreateUser()
+			helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceAuditor")
+		})
+
+		It("prints out the error message from CC API and exits 1", func() {
+			session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	When("the logged in user has insufficient permissions to create roles in the space", func() {
+		var userInOrg string
+
+		BeforeEach(func() {
+			userInOrg, _ = helpers.CreateUser()
+			Eventually(helpers.CF("set-org-role", userInOrg, orgName, "OrgAuditor")).Should(Exit(0))
+			helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceAuditor")
+		})
+
+		It("prints out the error message from CC API and exits 1", func() {
+			session := helpers.CF("set-space-role", userInOrg, orgName, spaceName, "SpaceAuditor")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 })

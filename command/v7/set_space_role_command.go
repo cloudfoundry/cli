@@ -17,8 +17,10 @@ import (
 //go:generate counterfeiter . SetSpaceRoleActor
 
 type SetSpaceRoleActor interface {
-	CreateSpaceRole(roleType constant.RoleType, userGUID string, spaceGUID string) (v7action.Role, v7action.Warnings, error)
-	CreateOrgRole(roleType constant.RoleType, userGUID string, orgGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateOrgRoleByUserGUID(roleType constant.RoleType, userGUID string, orgGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateOrgRoleByUserName(roleType constant.RoleType, userName string, origin string, orgGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateSpaceRoleByUserGUID(roleType constant.RoleType, userGUID string, spaceGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateSpaceRoleByUserName(roleType constant.RoleType, userName string, origin string, spaceGUID string) (v7action.Role, v7action.Warnings, error)
 	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
 	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
 	GetUser(username, origin string) (v7action.User, error)
@@ -75,20 +77,6 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		"CurrentUserName": currentUser.Name,
 	})
 
-	origin := cmd.Origin
-	if cmd.Origin == "" {
-		origin = "uaa"
-	}
-
-	targetUserGUID := cmd.Args.Username
-	if !cmd.ClientCredentials {
-		targetUser, err := cmd.Actor.GetUser(cmd.Args.Username, origin)
-		if err != nil {
-			return err
-		}
-		targetUserGUID = targetUser.GUID
-	}
-
 	roleType, err := convertSpaceRoleType(cmd.Args.Role)
 	if err != nil {
 		return err
@@ -106,7 +94,16 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		return err
 	}
 
-	_, warnings, err = cmd.Actor.CreateOrgRole(constant.OrgUserRole, targetUserGUID, org.GUID)
+	origin := cmd.Origin
+	if cmd.Origin == "" {
+		origin = "uaa"
+	}
+
+	if cmd.ClientCredentials {
+		_, warnings, err = cmd.Actor.CreateOrgRoleByUserGUID(constant.OrgUserRole, cmd.Args.Username, org.GUID)
+	} else {
+		_, warnings, err = cmd.Actor.CreateOrgRoleByUserName(constant.OrgUserRole, cmd.Args.Username, origin, org.GUID)
+	}
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, isIdempotentError := err.(ccerror.RoleAlreadyExistsError); !isIdempotentError {
@@ -114,7 +111,11 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		}
 	}
 
-	_, warnings, err = cmd.Actor.CreateSpaceRole(roleType, targetUserGUID, space.GUID)
+	if cmd.ClientCredentials {
+		_, warnings, err = cmd.Actor.CreateSpaceRoleByUserGUID(roleType, cmd.Args.Username, space.GUID)
+	} else {
+		_, warnings, err = cmd.Actor.CreateSpaceRoleByUserName(roleType, cmd.Args.Username, origin, space.GUID)
+	}
 	cmd.UI.DisplayWarningsV7(warnings)
 
 	if err != nil {
