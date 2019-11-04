@@ -32,7 +32,7 @@ var _ = Describe("Space", func() {
 		)
 
 		JustBeforeEach(func() {
-			_, warnings, executeErr = actor.CreateSpace("space-name", "org-guid")
+			space, warnings, executeErr = actor.CreateSpace("space-name", "org-guid")
 		})
 
 		When("the API layer calls are successful", func() {
