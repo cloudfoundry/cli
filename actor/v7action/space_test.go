@@ -26,6 +26,7 @@ var _ = Describe("Space", func() {
 
 	Describe("CreateSpace", func() {
 		var (
+			space      Space
 			warnings   Warnings
 			executeErr error
 		)
@@ -38,8 +39,15 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateSpaceReturns(
 					ccv3.Space{GUID: "space-guid", Name: "space-name"},
-					ccv3.Warnings{"create-warning-1", "create-warning-2"},
+					ccv3.Warnings{"not-fatal-warning"},
 					nil)
+			})
+
+			It("creates a space successfully", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(space.Name).To(Equal("space-name"))
+				Expect(space.GUID).To(Equal("space-guid"))
+				Expect(warnings).To(ConsistOf("not-fatal-warning"))
 			})
 		})
 
