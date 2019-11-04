@@ -10,9 +10,17 @@ import (
 )
 
 var _ = Describe("set-space-role command", func() {
+	var (
+		orgName   string
+		spaceName string
+	)
+
 	When("the set_roles_by_username flag is disabled", func() {
 		BeforeEach(func() {
+			spaceName = helpers.NewSpaceName()
 			helpers.LoginCF()
+			orgName = helpers.CreateAndTargetOrg()
+			helpers.CreateSpace(spaceName)
 			helpers.DisableFeatureFlag("set_roles_by_username")
 		})
 
@@ -22,9 +30,9 @@ var _ = Describe("set-space-role command", func() {
 
 		When("the user does not exist", func() {
 			It("prints the error from UAA and exits 1", func() {
-				session := helpers.CF("set-space-role", "not-exists", "some-org", "some-space", "SpaceDeveloper")
+				session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceDeveloper")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("User 'not-exists' does not exist"))
+				Eventually(session.Err).Should(Say("No user exists with the username 'not-exists' and origin 'uaa'."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
