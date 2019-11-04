@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:60b1695f63dd8f2427bebfd8fe9fc96b61b268fefa48b26ba6c74e23ef18785f"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "4934877ec33a400786749df4da6872b53d951cac"
+  version = "v6.46.1"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -510,7 +522,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b2d97c24b6f7cc3a6a230308e911d9c77512833e1be69688214408ae7db46390"
+  digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -534,7 +546,7 @@
     "unicode/cldr",
   ]
   pruneopts = "NUT"
-  revision = "fe223c5a2583471b2791ca99e716c65b4a76117e"
+  revision = "3d0f7978add91030e5e8976ff65ccdd828286cba"
 
 [[projects]]
   digest = "1:30f55ee34f367e29620faaae69dcdf6b78a86348f3a1472cf63f2dbba0f9d4f7"
