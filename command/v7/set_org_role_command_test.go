@@ -119,7 +119,7 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Organization = "some-org-name"
 			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
 			cmd.Args.Username = "target-user-name"
-			cmd.ClientCredentials = true
+			cmd.IsClient = true
 		})
 
 		It("does not try to get the user", func() {
@@ -147,7 +147,7 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
 			cmd.Args.Username = "target-user-name"
 			cmd.Origin = "ldap"
-			cmd.ClientCredentials = true
+			cmd.IsClient = true
 		})
 
 		It("returns an error", func() {

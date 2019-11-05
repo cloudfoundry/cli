@@ -24,10 +24,10 @@ type SetOrgRoleActor interface {
 }
 
 type SetOrgRoleCommand struct {
-	Args              flag.SetOrgRoleArgs `positional-args:"yes"`
-	ClientCredentials bool                `long:"client" description:"Assign an org role to a client-id of a (non-user) service account"`
-	Origin            string              `long:"origin" description:"Indicates the identity provider to be used for authentication"`
-	usage             interface{}         `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n   CF_NAME set-org-role USERNAME ORG ROLE [--client CLIENT]\n   CF_NAME set-org-role USERNAME ORG ROLE [--origin ORIGIN]\n\nROLES:\n   OrgManager - Invite and manage users, select and change plans, and set spending limits\n   BillingManager - Create and manage the billing account and payment info\n   OrgAuditor - Read-only access to org info and reports"`
+	Args     flag.SetOrgRoleArgs `positional-args:"yes"`
+	IsClient bool                `long:"client" description:"Assign an org role to a client-id of a (non-user) service account"`
+	Origin   string              `long:"origin" description:"Indicates the identity provider to be used for authentication"`
+	usage    interface{}         `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n   CF_NAME set-org-role USERNAME ORG ROLE [--client]\n   CF_NAME set-org-role USERNAME ORG ROLE [--origin ORIGIN]\n\nROLES:\n   OrgManager - Invite and manage users, select and change plans, and set spending limits\n   BillingManager - Create and manage the billing account and payment info\n   OrgAuditor - Read-only access to org info and reports"`
 	relatedCommands   interface{}         `related_commands:"org-users, set-space-role"`
 
 	UI          command.UI
@@ -88,7 +88,7 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 		origin = constant.DefaultOriginUaa
 	}
 
-	if cmd.ClientCredentials {
+	if cmd.IsClient {
 		_, warnings, err = cmd.Actor.CreateOrgRoleByUserGUID(roleType, cmd.Args.Username, org.GUID)
 	} else {
 		_, warnings, err = cmd.Actor.CreateOrgRoleByUserName(roleType, cmd.Args.Username, origin, org.GUID)
@@ -113,7 +113,7 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 }
 
 func (cmd SetOrgRoleCommand) validateFlags() error {
-	if cmd.ClientCredentials && cmd.Origin != "" {
+	if cmd.IsClient && cmd.Origin != "" {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--client", "--origin"},
 		}

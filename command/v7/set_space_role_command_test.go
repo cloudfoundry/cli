@@ -136,7 +136,7 @@ var _ = Describe("set-space-role Command", func() {
 			cmd.Args.Space = "some-space-name"
 			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user-name"
-			cmd.ClientCredentials = true
+			cmd.IsClient = true
 		})
 
 		It("does not try to get the user", func() {
@@ -165,7 +165,7 @@ var _ = Describe("set-space-role Command", func() {
 			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 			cmd.Args.Username = "target-user-name"
 			cmd.Origin = "ldap"
-			cmd.ClientCredentials = true
+			cmd.IsClient = true
 		})
 
 		It("returns an error", func() {

@@ -27,10 +27,10 @@ type SetSpaceRoleActor interface {
 }
 
 type SetSpaceRoleCommand struct {
-	Args              flag.SetSpaceRoleArgs `positional-args:"yes"`
-	ClientCredentials bool                  `long:"client" description:"Assign a space role to a client-id of a (non-user) service account"`
-	Origin            string                `long:"origin" description:"Indicates the identity provider to be used for authentication"`
-	usage             interface{}           `usage:"CF_NAME set-space-role USERNAME ORG SPACE ROLE\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--client CLIENT]\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space"`
+	Args     flag.SetSpaceRoleArgs `positional-args:"yes"`
+	IsClient bool                  `long:"client" description:"Assign a space role to a client-id of a (non-user) service account"`
+	Origin   string                `long:"origin" description:"Indicates the identity provider to be used for authentication"`
+	usage    interface{}           `usage:"CF_NAME set-space-role USERNAME ORG SPACE ROLE\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space"`
 	relatedCommands   interface{}           `related_commands:"space-users"`
 
 	UI          command.UI
@@ -99,7 +99,7 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		origin = "uaa"
 	}
 
-	if cmd.ClientCredentials {
+	if cmd.IsClient {
 		_, warnings, err = cmd.Actor.CreateOrgRoleByUserGUID(constant.OrgUserRole, cmd.Args.Username, org.GUID)
 	} else {
 		_, warnings, err = cmd.Actor.CreateOrgRoleByUserName(constant.OrgUserRole, cmd.Args.Username, origin, org.GUID)
@@ -111,7 +111,7 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		}
 	}
 
-	if cmd.ClientCredentials {
+	if cmd.IsClient {
 		_, warnings, err = cmd.Actor.CreateSpaceRoleByUserGUID(roleType, cmd.Args.Username, space.GUID)
 	} else {
 		_, warnings, err = cmd.Actor.CreateSpaceRoleByUserName(roleType, cmd.Args.Username, origin, space.GUID)
@@ -137,7 +137,7 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 }
 
 func (cmd SetSpaceRoleCommand) validateFlags() error {
-	if cmd.ClientCredentials && cmd.Origin != "" {
+	if cmd.IsClient && cmd.Origin != "" {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--client", "--origin"},
 		}
