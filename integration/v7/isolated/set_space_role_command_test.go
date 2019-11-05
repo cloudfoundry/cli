@@ -29,7 +29,7 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say("set-space-role - Assign a space role to a user"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf set-space-role USERNAME ORG SPACE ROLE"))
-				Eventually(session).Should(Say(`cf set-space-role USERNAME ORG SPACE ROLE \[--client CLIENT\]`))
+				Eventually(session).Should(Say(`cf set-space-role USERNAME ORG SPACE ROLE \[--client\]`))
 				Eventually(session).Should(Say(`cf set-space-role USERNAME ORG SPACE ROLE \[--origin ORIGIN\]`))
 				Eventually(session).Should(Say("ROLES:"))
 				Eventually(session).Should(Say("SpaceManager - Invite and manage users, and enable features for a given space"))

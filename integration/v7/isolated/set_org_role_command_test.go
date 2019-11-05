@@ -24,7 +24,7 @@ var _ = Describe("set-org-role command", func() {
 				Eventually(session).Should(Say(`\s+set-org-role - Assign an org role to a user`))
 				Eventually(session).Should(Say(`USAGE:`))
 				Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE`))
-				Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE \[--client CLIENT\]`))
+				Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE \[--client\]`))
 				Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE \[--origin ORIGIN\]`))
 				Eventually(session).Should(Say(`ROLES:`))
 				Eventually(session).Should(Say(`\s+OrgManager - Invite and manage users, select and change plans, and set spending limits`))
