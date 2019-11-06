@@ -74,14 +74,22 @@ func CreateSpace(space string) {
 	Eventually(CF("create-space", space)).Should(Exit(0))
 }
 
-// SetUserAsOrgDeveloper sets the user as a org developer with `cf set-org-role`.
-func SetOrgRole(username, org, role string) {
-	Eventually(CF("set-org-role", username, org, role, "--client")).Should(Exit(0))
+// SetOrgRole sets the org role with `cf set-org-role`.
+func SetOrgRole(username, org, role string, isClient bool) {
+	if isClient {
+		Eventually(CF("set-org-role", username, org, role, "--client")).Should(Exit(0))
+	} else {
+		Eventually(CF("set-org-role", username, org, role)).Should(Exit(0))
+	}
 }
 
-// SetUserAsSpaceDeveloper sets the user as a space developer with `cf set-space-role`.
-func SetSpaceRole(username, org, space, role string) {
-	Eventually(CF("set-space-role", username, org, space, role, "--client")).Should(Exit(0))
+// SetSpaceRole sets the space role with `cf set-org-role`.
+func SetSpaceRole(username, org, space, role string, isClient bool) {
+	if isClient {
+		Eventually(CF("set-space-role", username, org, space, role, "--client")).Should(Exit(0))
+	} else {
+		Eventually(CF("set-space-role", username, org, space, role)).Should(Exit(0))
+	}
 }
 
 // GetOrgGUID gets the GUID of an org with the given name.

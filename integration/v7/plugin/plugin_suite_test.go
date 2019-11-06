@@ -101,9 +101,9 @@ func createTargetedOrgAndSpace() (string, string) {
 	username, _ := helpers.GetCredentials()
 	helpers.CreateOrgAndSpace(org, space)
 	helpers.TargetOrgAndSpace(org, space)
-	helpers.SetOrgRole(username, org, "OrgManager")
-	helpers.SetSpaceRole(username, org, space, "SpaceDeveloper")
-	helpers.SetSpaceRole(username, org, space, "SpaceManager")
+	helpers.SetOrgRole(username, org, "OrgManager", helpers.ClientCredentialsTestMode())
+	helpers.SetSpaceRole(username, org, space, "SpaceDeveloper", helpers.ClientCredentialsTestMode())
+	helpers.SetSpaceRole(username, org, space, "SpaceManager", helpers.ClientCredentialsTestMode())
 	return org, space
 }
 
