@@ -58,7 +58,7 @@ run:
     go get -u github.com/onsi/ginkgo/ginkgo
 
     set +e
-    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -keepGoing integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -keepGoing integration/shared/isolated integration/v6/isolated integration/v6/plugin integration/v6/push
     parallel_failed=$?
 
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -keepGoing integration/shared/global integration/v6/global
