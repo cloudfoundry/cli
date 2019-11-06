@@ -1162,16 +1162,6 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
-	TokenEndpointStub        func() string
-	tokenEndpointMutex       sync.RWMutex
-	tokenEndpointArgsForCall []struct {
-	}
-	tokenEndpointReturns struct {
-		result1 string
-	}
-	tokenEndpointReturnsOnCall map[int]struct {
-		result1 string
-	}
 	UpdateApplicationStub        func(ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
@@ -6533,58 +6523,6 @@ func (fake *FakeCloudControllerClient) TargetCFReturnsOnCall(i int, result1 ccv2
 	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) TokenEndpoint() string {
-	fake.tokenEndpointMutex.Lock()
-	ret, specificReturn := fake.tokenEndpointReturnsOnCall[len(fake.tokenEndpointArgsForCall)]
-	fake.tokenEndpointArgsForCall = append(fake.tokenEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("TokenEndpoint", []interface{}{})
-	fake.tokenEndpointMutex.Unlock()
-	if fake.TokenEndpointStub != nil {
-		return fake.TokenEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.tokenEndpointReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeCloudControllerClient) TokenEndpointCallCount() int {
-	fake.tokenEndpointMutex.RLock()
-	defer fake.tokenEndpointMutex.RUnlock()
-	return len(fake.tokenEndpointArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) TokenEndpointCalls(stub func() string) {
-	fake.tokenEndpointMutex.Lock()
-	defer fake.tokenEndpointMutex.Unlock()
-	fake.TokenEndpointStub = stub
-}
-
-func (fake *FakeCloudControllerClient) TokenEndpointReturns(result1 string) {
-	fake.tokenEndpointMutex.Lock()
-	defer fake.tokenEndpointMutex.Unlock()
-	fake.TokenEndpointStub = nil
-	fake.tokenEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeCloudControllerClient) TokenEndpointReturnsOnCall(i int, result1 string) {
-	fake.tokenEndpointMutex.Lock()
-	defer fake.tokenEndpointMutex.Unlock()
-	fake.TokenEndpointStub = nil
-	if fake.tokenEndpointReturnsOnCall == nil {
-		fake.tokenEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.tokenEndpointReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeCloudControllerClient) UpdateApplication(arg1 ccv2.Application) (ccv2.Application, ccv2.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -8054,8 +7992,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.setSpaceQuotaMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
-	fake.tokenEndpointMutex.RLock()
-	defer fake.tokenEndpointMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.updateBuildpackMutex.RLock()

@@ -86,7 +86,6 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("GET /v2/info"))
 				Eventually(session).Should(Say("RESPONSE:"))
-				Eventually(session).Should(Say(`"token_endpoint": "http.*"`))
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /Users"))
 				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))

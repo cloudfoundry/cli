@@ -354,7 +354,6 @@ const getInfoResponseBody string = `
    "version": 2,
    "description": "Cloud Foundry sponsored by ABC",
    "authorization_endpoint": "https://login.run.abc.com",
-   "token_endpoint": "https://uaa.run.abc.com",
    "min_cli_version": null,
    "min_recommended_cli_version": null,
    "api_version": "2.35.0",

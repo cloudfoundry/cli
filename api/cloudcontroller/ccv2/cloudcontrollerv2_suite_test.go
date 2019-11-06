@@ -69,7 +69,6 @@ func SetupV2InfoResponse(apiVersion string) {
 		"version":0,
 		"description":"",
 		"authorization_endpoint":"https://login.APISERVER",
-		"token_endpoint":"https://uaa.APISERVER",
 		"min_cli_version":null,
 		"min_recommended_cli_version":null,
 		"api_version":"%s",

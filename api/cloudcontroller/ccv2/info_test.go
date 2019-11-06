@@ -33,7 +33,6 @@ var _ = Describe("Info", func() {
 					"version":0,
 					"description":"",
 					"authorization_endpoint":"https://login.APISERVER",
-					"token_endpoint":"https://uaa.APISERVER",
 					"min_cli_version":"6.22.1",
 					"min_recommended_cli_version":null,
 					"api_version":"2.59.0",
@@ -64,7 +63,6 @@ var _ = Describe("Info", func() {
 			Expect(info.MinimumRecommendedCLIVersion).To(BeEmpty())
 			Expect(info.Name).To(Equal("faceman test server"))
 			Expect(info.RoutingEndpoint).To(MatchRegexp("https://%s/routing", serverAPIURL))
-			Expect(info.TokenEndpoint).To(MatchRegexp("https://uaa.%s", serverAPIURL))
 		})
 
 		It("sets the http endpoint and warns user", func() {

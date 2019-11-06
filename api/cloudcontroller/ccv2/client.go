@@ -107,7 +107,6 @@ type Client struct {
 	dopplerEndpoint           string
 	minCLIVersion             string
 	routingEndpoint           string
-	tokenEndpoint             string
 
 	jobPollingInterval time.Duration
 	jobPollingTimeout  time.Duration

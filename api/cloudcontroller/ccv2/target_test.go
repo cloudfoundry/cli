@@ -32,7 +32,6 @@ var _ = Describe("Target", func() {
 					"version":0,
 					"description":"",
 					"authorization_endpoint":"https://login.APISERVER",
-					"token_endpoint":"https://uaa.APISERVER",
 					"min_cli_version":null,
 					"min_recommended_cli_version":null,
 					"api_version":"2.59.0",
@@ -101,7 +100,6 @@ var _ = Describe("Target", func() {
 						Expect(client.AuthorizationEndpoint()).To(MatchRegexp("https://login.%s", serverAPIURL))
 						Expect(client.DopplerEndpoint()).To(MatchRegexp("wss://doppler.%s", serverAPIURL))
 						Expect(client.RoutingEndpoint()).To(MatchRegexp("https://%s/routing", serverAPIURL))
-						Expect(client.TokenEndpoint()).To(MatchRegexp("https://uaa.%s", serverAPIURL))
 					})
 				})
 

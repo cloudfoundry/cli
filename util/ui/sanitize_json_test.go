@@ -28,7 +28,6 @@ var _ = Describe("SanitizeJSON", func() {
 			},
 			{
 			"real password ": "CrAzY_PaSSw0rd",
-			"token_endpoint": "some url",
 			"testtokentest": "CrAzY_PaSSw0rd",
 			"simple": "https://www.google.com/search?q=i+am+a+potato&oq=I+am+a+potato&aqs=chrome.0.0l6.2383j0j8&client=ubuntu&sourceid=chrome&ie=UTF-8"
 			}
@@ -43,7 +42,6 @@ var _ = Describe("SanitizeJSON", func() {
 					"some other url":"jdbc:mysql://hostname/db-name?password=CrAzY_PaSSw0rd&user=username",
 					"some url":"jdbc:mysql://hostname/db-name?user=username&password=CrAzY_PaSSw0rd",
 					"testtokentest": "CrAzY_PaSSw0rd",
-					"token_endpoint": "some url",
 					"uri":"postgres://some-user-name:CrAzY_PaSSw0rd@10.0.0.1:5432/some-other-data"
 				},
 				"ary": [

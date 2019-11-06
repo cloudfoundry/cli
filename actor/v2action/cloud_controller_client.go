@@ -109,5 +109,4 @@ type CloudControllerClient interface {
 	DopplerEndpoint() string
 	MinCLIVersion() string
 	RoutingEndpoint() string
-	TokenEndpoint() string
 }

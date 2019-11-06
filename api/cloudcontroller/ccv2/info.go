@@ -34,10 +34,6 @@ type APIInformation struct {
 
 	// RoutingEndpoint is the Routing endpoint for the targeted Cloud Controller.
 	RoutingEndpoint string `json:"routing_endpoint"`
-
-	// TokenEndpoint is the endpoint to retrieve a refresh token for the targeted
-	// Cloud Controller.
-	TokenEndpoint string `json:"token_endpoint"`
 }
 
 // API returns the Cloud Controller API URL for the targeted Cloud Controller.
@@ -94,9 +90,4 @@ func (client *Client) MinCLIVersion() string {
 // Controller.
 func (client *Client) RoutingEndpoint() string {
 	return client.routingEndpoint
-}
-
-// TokenEndpoint returns the Token endpoint for the targeted Cloud Controller.
-func (client *Client) TokenEndpoint() string {
-	return client.tokenEndpoint
 }
