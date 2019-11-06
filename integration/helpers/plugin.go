@@ -18,18 +18,8 @@ type PluginCommand struct {
 
 // InstallConfigurablePlugin builds and installs a plugin called 'configurable_plugin'
 // with the given name, version, and commands.
-func InstallConfigurablePlugin(name string, version string, pluginCommands []PluginCommand) {
-	path := BuildConfigurablePlugin("configurable_plugin", name, version, pluginCommands)
-	Eventually(CF("install-plugin", "-f", path)).Should(Exit(0))
-	Eventually(CFWithEnv(
-		map[string]string{"CF_CLI_EXPERIMENTAL": "true"},
-		"install-plugin", "-f", path)).Should(Exit(0))
-}
-
-// InstallConfigurablePluginFailsUninstall builds and installs a plugin called 'configurable_plugin_fails_uninstall'
-// with the given name, version, and commands.
-func InstallConfigurablePluginFailsUninstall(name string, version string, pluginCommands []PluginCommand) {
-	path := BuildConfigurablePlugin("configurable_plugin_fails_uninstall", name, version, pluginCommands)
+func InstallConfigurablePlugin(pluginType string, name string, version string, pluginCommands []PluginCommand) {
+	path := BuildConfigurablePlugin(pluginType, name, version, pluginCommands)
 	Eventually(CF("install-plugin", "-f", path)).Should(Exit(0))
 }
 

@@ -19,7 +19,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		var binaryPath string
 
 		BeforeEach(func() {
-			helpers.InstallConfigurablePlugin("banana-plugin-name-1", "2.0.1", []helpers.PluginCommand{
+			helpers.InstallConfigurablePlugin("configurable_plugin_v7", "banana-plugin-name-1", "2.0.1", []helpers.PluginCommand{
 				{Name: "banana-command-1", Help: "banana-command-1"},
 			})
 

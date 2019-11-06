@@ -329,7 +329,7 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has a command that is the same as another plugin command", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
@@ -356,7 +356,7 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has a command that is the same as another plugin alias", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
@@ -430,7 +430,7 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has an alias that is the same as another plugin command", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
@@ -457,7 +457,7 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has an alias that is the same as another plugin alias", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command", Alias: "existing-alias"},
 								})
@@ -486,7 +486,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("alias and command conflicts", func() {
 					When("the plugin has a command and an alias that are both taken by another plugin", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command", Alias: "existing-alias"},
 								})

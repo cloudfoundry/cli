@@ -8,6 +8,7 @@ import "code.cloudfoundry.org/cli/util/configv3"
 type Config interface {
 	AddPlugin(configv3.Plugin)
 	AddPluginRepository(repoName string, repoURL string)
+	BinaryVersion() string
 	GetPlugin(pluginName string) (configv3.Plugin, bool)
 	PluginHome() string
 	PluginRepositories() []configv3.PluginRepository

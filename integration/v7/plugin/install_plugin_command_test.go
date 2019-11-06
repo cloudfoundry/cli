@@ -20,8 +20,9 @@ import (
 
 var _ = Describe("install-plugin command", func() {
 	var (
-		buffer     *Buffer
-		pluginPath string
+		buffer       *Buffer
+		pluginPath   string
+		v6PluginPath string
 	)
 
 	AfterEach(func() {
@@ -94,7 +95,7 @@ var _ = Describe("install-plugin command", func() {
 
 			Expect(os.Setenv("CF_PLUGIN_HOME", newPluginHome)).ToNot(HaveOccurred())
 
-			pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+			pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 				[]helpers.PluginCommand{
 					{Name: "some-command", Help: "some-command-help"},
 				},
@@ -127,7 +128,7 @@ var _ = Describe("install-plugin command", func() {
 				err = os.Setenv("GOARCH", "amd64")
 				Expect(err).ToNot(HaveOccurred())
 
-				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 					[]helpers.PluginCommand{
 						{Name: "some-command", Help: "some-command-help"},
 					},
@@ -153,11 +154,27 @@ var _ = Describe("install-plugin command", func() {
 
 		When("the file is compiled for the correct os and architecture", func() {
 			BeforeEach(func() {
-				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 					[]helpers.PluginCommand{
 						{Name: "some-command", Help: "some-command-help"},
 					},
 				)
+			})
+
+			When("the plugin is a v6 plugin", func() {
+				BeforeEach(func() {
+					v6PluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-v6-plugin", "1.0.0",
+						[]helpers.PluginCommand{
+							{Name: "some-v6-command", Help: "some-command-help"},
+						},
+					)
+				})
+
+				It("rejects the non v7 plugin", func() {
+					session := helpers.CF("install-plugin", v6PluginPath, "-f")
+					Eventually(session).Should(Exit(1), "Expected install-plugin to fail, but it succeeded.")
+					Expect(session.Err).To(Say("This plugin is not compatible with this version of the CLI"))
+				})
 			})
 
 			When("the -f flag is given", func() {
@@ -286,7 +303,7 @@ var _ = Describe("install-plugin command", func() {
 					When("the plugin has a command that is the same as a built-in command", func() {
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "some-plugin", "1.1.1",
+								"configurable_plugin_v7", "some-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "version"},
 								})
@@ -308,7 +325,7 @@ var _ = Describe("install-plugin command", func() {
 					When("the plugin has a command that is the same as a built-in alias", func() {
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "some-plugin", "1.1.1",
+								"configurable_plugin_v7", "some-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "cups"},
 								})
@@ -329,13 +346,13 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has a command that is the same as another plugin command", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin_v7", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
 
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "new-plugin", "1.1.1",
+								"configurable_plugin_v7", "new-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
@@ -356,13 +373,13 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has a command that is the same as another plugin alias", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin_v7", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
 
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "new-plugin", "1.1.1",
+								"configurable_plugin_v7", "new-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "new-command", Alias: "existing-command"},
 								})
@@ -387,7 +404,7 @@ var _ = Describe("install-plugin command", func() {
 
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "some-plugin", "1.1.1",
+								"configurable_plugin_v7", "some-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "some-command", Alias: "version"},
 								})
@@ -409,7 +426,7 @@ var _ = Describe("install-plugin command", func() {
 					When("the plugin has an alias that is the same as a built-in alias", func() {
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "some-plugin", "1.1.1",
+								"configurable_plugin_v7", "some-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "some-command", Alias: "cups"},
 								})
@@ -430,13 +447,13 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has an alias that is the same as another plugin command", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin_v7", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command"},
 								})
 
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "new-plugin", "1.1.1",
+								"configurable_plugin_v7", "new-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "new-command", Alias: "existing-command"},
 								})
@@ -457,13 +474,13 @@ var _ = Describe("install-plugin command", func() {
 
 					When("the plugin has an alias that is the same as another plugin alias", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin_v7", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command", Alias: "existing-alias"},
 								})
 
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "new-plugin", "1.1.1",
+								"configurable_plugin_v7", "new-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "new-command", Alias: "existing-alias"},
 								})
@@ -486,13 +503,13 @@ var _ = Describe("install-plugin command", func() {
 				Context("alias and command conflicts", func() {
 					When("the plugin has a command and an alias that are both taken by another plugin", func() {
 						BeforeEach(func() {
-							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
+							helpers.InstallConfigurablePlugin("configurable_plugin_v7", "existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command", Alias: "existing-alias"},
 								})
 
 							pluginPath = helpers.BuildConfigurablePlugin(
-								"configurable_plugin", "new-plugin", "1.1.1",
+								"configurable_plugin_v7", "new-plugin", "1.1.1",
 								[]helpers.PluginCommand{
 									{Name: "existing-command", Alias: "existing-alias"},
 								})
@@ -656,7 +673,7 @@ var _ = Describe("install-plugin command", func() {
 				)
 
 				BeforeEach(func() {
-					pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+					pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 						[]helpers.PluginCommand{
 							{Name: "some-command", Help: "some-command-help"},
 						},
@@ -805,7 +822,7 @@ var _ = Describe("install-plugin command", func() {
 			)
 
 			BeforeEach(func() {
-				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 					[]helpers.PluginCommand{
 						{Name: "some-command", Help: "some-command-help"},
 					},

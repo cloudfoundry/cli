@@ -78,6 +78,11 @@ func (r RPCService) GetMetadata(path string) (configv3.Plugin, error) {
 			Minor: metadata.Version.Minor,
 			Build: metadata.Version.Build,
 		},
+		LibraryVersion: configv3.PluginVersion{
+			Major: metadata.LibraryVersion.Major,
+			Minor: metadata.LibraryVersion.Minor,
+			Build: metadata.LibraryVersion.Build,
+		},
 		Commands: make([]configv3.PluginCommand, len(metadata.Commands)),
 	}
 

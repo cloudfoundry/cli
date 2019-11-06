@@ -20,6 +20,16 @@ type FakeConfig struct {
 		arg1 string
 		arg2 string
 	}
+	BinaryVersionStub        func() string
+	binaryVersionMutex       sync.RWMutex
+	binaryVersionArgsForCall []struct {
+	}
+	binaryVersionReturns struct {
+		result1 string
+	}
+	binaryVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	GetPluginStub        func(string) (configv3.Plugin, bool)
 	getPluginMutex       sync.RWMutex
 	getPluginArgsForCall []struct {
@@ -143,6 +153,58 @@ func (fake *FakeConfig) AddPluginRepositoryArgsForCall(i int) (string, string) {
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	argsForCall := fake.addPluginRepositoryArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeConfig) BinaryVersion() string {
+	fake.binaryVersionMutex.Lock()
+	ret, specificReturn := fake.binaryVersionReturnsOnCall[len(fake.binaryVersionArgsForCall)]
+	fake.binaryVersionArgsForCall = append(fake.binaryVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("BinaryVersion", []interface{}{})
+	fake.binaryVersionMutex.Unlock()
+	if fake.BinaryVersionStub != nil {
+		return fake.BinaryVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.binaryVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) BinaryVersionCallCount() int {
+	fake.binaryVersionMutex.RLock()
+	defer fake.binaryVersionMutex.RUnlock()
+	return len(fake.binaryVersionArgsForCall)
+}
+
+func (fake *FakeConfig) BinaryVersionCalls(stub func() string) {
+	fake.binaryVersionMutex.Lock()
+	defer fake.binaryVersionMutex.Unlock()
+	fake.BinaryVersionStub = stub
+}
+
+func (fake *FakeConfig) BinaryVersionReturns(result1 string) {
+	fake.binaryVersionMutex.Lock()
+	defer fake.binaryVersionMutex.Unlock()
+	fake.BinaryVersionStub = nil
+	fake.binaryVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) BinaryVersionReturnsOnCall(i int, result1 string) {
+	fake.binaryVersionMutex.Lock()
+	defer fake.binaryVersionMutex.Unlock()
+	fake.BinaryVersionStub = nil
+	if fake.binaryVersionReturnsOnCall == nil {
+		fake.binaryVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.binaryVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) GetPlugin(arg1 string) (configv3.Plugin, bool) {
@@ -454,6 +516,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
+	fake.binaryVersionMutex.RLock()
+	defer fake.binaryVersionMutex.RUnlock()
 	fake.getPluginMutex.RLock()
 	defer fake.getPluginMutex.RUnlock()
 	fake.pluginHomeMutex.RLock()

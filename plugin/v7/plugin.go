@@ -26,10 +26,11 @@ type VersionType struct {
 }
 
 type PluginMetadata struct {
-	Name          string
-	Version       VersionType
-	MinCliVersion VersionType
-	Commands      []Command
+	Name           string
+	Version        VersionType
+	LibraryVersion VersionType
+	MinCliVersion  VersionType
+	Commands       []Command
 }
 
 type Usage struct {

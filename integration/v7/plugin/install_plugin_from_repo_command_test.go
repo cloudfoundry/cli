@@ -138,7 +138,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 			When("no compatible binary is found in the repo", func() {
 				BeforeEach(func() {
-					repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.0.0", "not-me-platform", true)
+					repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.0.0", "not-me-platform", true)
 					Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 				})
 
@@ -159,7 +159,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				When("the plugin is not already installed", func() {
 					When("the plugin checksum is valid", func() {
 						BeforeEach(func() {
-							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 						})
 
@@ -185,7 +185,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the plugin checksum is invalid", func() {
 						BeforeEach(func() {
-							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+							repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 
 						})
@@ -206,7 +206,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 				When("the plugin is already installed", func() {
 					BeforeEach(func() {
-						pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+						pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 							[]helpers.PluginCommand{
 								{Name: "some-command", Help: "some-command-help"},
 							},
@@ -216,7 +216,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the plugin checksum is valid", func() {
 						BeforeEach(func() {
-							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "2.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "2.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 						})
 
@@ -247,7 +247,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the plugin checksum is invalid", func() {
 						BeforeEach(func() {
-							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "2.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+							repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "2.0.0", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 						})
 
@@ -285,7 +285,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 				When("the plugin is not already installed", func() {
 					BeforeEach(func() {
-						repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 						Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 					})
 
@@ -339,7 +339,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 				When("the plugin is already installed", func() {
 					BeforeEach(func() {
-						pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.2.2",
+						pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.2.2",
 							[]helpers.PluginCommand{
 								{Name: "some-command", Help: "some-command-help"},
 							},
@@ -355,7 +355,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						When("the plugin checksum is valid", func() {
 							BeforeEach(func() {
-								repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+								repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 								Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 							})
 
@@ -387,7 +387,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						When("the plugin checksum is invalid", func() {
 							BeforeEach(func() {
-								repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+								repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 
 								Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 							})
@@ -417,7 +417,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the user chooses no", func() {
 						BeforeEach(func() {
-							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+							repoServer = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 
 							_, err := buffer.Write([]byte("n\n"))
@@ -528,10 +528,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					var repoServer2 *helpers.PluginRepositoryServerWithPlugin
 
 					BeforeEach(func() {
-						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 						Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
 
-						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 						Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
 					})
 
@@ -564,10 +564,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							var repoServer4 *helpers.PluginRepositoryServerWithPlugin
 
 							BeforeEach(func() {
-								repoServer3 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+								repoServer3 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 								Eventually(helpers.CF("add-plugin-repo", "kaka3", repoServer3.URL())).Should(Exit(0))
 
-								repoServer4 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+								repoServer4 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 								Eventually(helpers.CF("add-plugin-repo", "kaka4", repoServer4.URL())).Should(Exit(0))
 							})
 
@@ -597,7 +597,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					When("the plugin is already installed", func() {
 						When("the checksum is valid", func() {
 							BeforeEach(func() {
-								pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+								pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 									[]helpers.PluginCommand{
 										{Name: "some-command", Help: "some-command-help"},
 									},
@@ -624,10 +624,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					var repoServer2 *helpers.PluginRepositoryServerWithPlugin
 
 					BeforeEach(func() {
-						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", "solaris", false)
+						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", "solaris", false)
 						Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
 
-						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 						Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
 					})
 
@@ -655,10 +655,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 						var repoServer2 *helpers.PluginRepositoryServerWithPlugin
 
 						BeforeEach(func() {
-							repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 							Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
 
-							repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.4", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.4", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 							Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
 						})
 
@@ -689,10 +689,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 						var repoServer2 *helpers.PluginRepositoryServerWithPlugin
 
 						BeforeEach(func() {
-							repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 							Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
 
-							repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.4", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+							repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.4", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 							Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
 						})
 
@@ -732,10 +732,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					var repoServer2 *helpers.PluginRepositoryServerWithPlugin
 
 					BeforeEach(func() {
-						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 						Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
 
-						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
 						Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
 					})
 
@@ -775,10 +775,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 								var repoServer4 *helpers.PluginRepositoryServerWithPlugin
 
 								BeforeEach(func() {
-									repoServer3 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+									repoServer3 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 									Eventually(helpers.CF("add-plugin-repo", "kaka3", repoServer3.URL())).Should(Exit(0))
 
-									repoServer4 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+									repoServer4 = helpers.NewPluginRepositoryServerWithPlugin("configurable_plugin_v7", "some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 									Eventually(helpers.CF("add-plugin-repo", "kaka4", repoServer4.URL())).Should(Exit(0))
 								})
 
@@ -818,7 +818,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the plugin is already installed", func() {
 						BeforeEach(func() {
-							pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+							pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 								[]helpers.PluginCommand{
 									{Name: "some-command", Help: "some-command-help"},
 								},

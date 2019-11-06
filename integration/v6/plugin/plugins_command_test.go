@@ -69,15 +69,15 @@ var _ = Describe("plugins command", func() {
 	When("plugins are installed", func() {
 		When("there are multiple plugins", func() {
 			BeforeEach(func() {
-				helpers.InstallConfigurablePlugin("I-should-be-sorted-first", "1.2.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin", "I-should-be-sorted-first", "1.2.0", []helpers.PluginCommand{
 					{Name: "command-1", Help: "some-command-1"},
 					{Name: "Better-command", Help: "some-better-command"},
 					{Name: "command-2", Help: "some-command-2"},
 				})
-				helpers.InstallConfigurablePlugin("sorted-third", "2.0.1", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin", "sorted-third", "2.0.1", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
-				helpers.InstallConfigurablePlugin("i-should-be-sorted-second", "1.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin", "i-should-be-sorted-second", "1.0.0", []helpers.PluginCommand{
 					{Name: "some-command", Help: "some-command"},
 					{Name: "Some-other-command", Help: "some-other-command"},
 				})
@@ -102,7 +102,7 @@ var _ = Describe("plugins command", func() {
 
 		When("plugin version information is 0.0.0", func() {
 			BeforeEach(func() {
-				helpers.InstallConfigurablePlugin("some-plugin", "0.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin", "some-plugin", "0.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
 			})
@@ -116,7 +116,7 @@ var _ = Describe("plugins command", func() {
 
 		When("a plugin command has an alias", func() {
 			BeforeEach(func() {
-				helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Alias: "bc", Help: "banana-command"},
 				})
 			})
@@ -132,7 +132,7 @@ var _ = Describe("plugins command", func() {
 			var installedPluginPath string
 
 			BeforeEach(func() {
-				helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
 				installedPluginPath = generic.ExecutableFilename(filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
@@ -163,7 +163,7 @@ var _ = Describe("plugins command", func() {
 		When("the --outdated flag is provided", func() {
 			When("there are no repos", func() {
 				BeforeEach(func() {
-					helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+					helpers.InstallConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0", []helpers.PluginCommand{
 						{Name: "banana-command", Alias: "bc", Help: "banana-command"},
 					})
 				})
@@ -203,10 +203,10 @@ var _ = Describe("plugins command", func() {
 
 				When("nothing is outdated", func() {
 					BeforeEach(func() {
-						helpers.InstallConfigurablePlugin("plugin-1", "1.0.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-1", "1.0.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.InstallConfigurablePlugin("plugin-2", "2.0.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-2", "2.0.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
 					})
@@ -227,10 +227,10 @@ var _ = Describe("plugins command", func() {
 
 				When("the plugins are outdated", func() {
 					BeforeEach(func() {
-						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.InstallConfigurablePlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-2", "1.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
 					})
@@ -286,10 +286,10 @@ var _ = Describe("plugins command", func() {
 
 				When("plugins are outdated", func() {
 					BeforeEach(func() {
-						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.InstallConfigurablePlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-2", "1.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
 					})
@@ -308,13 +308,13 @@ var _ = Describe("plugins command", func() {
 
 				When("the same plugin is outdated from multiple repositories", func() {
 					BeforeEach(func() {
-						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.InstallConfigurablePlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-2", "1.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
-						helpers.InstallConfigurablePlugin("plugin-3", "2.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("configurable_plugin", "plugin-3", "2.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-3", Help: "banana-command"},
 						})
 					})

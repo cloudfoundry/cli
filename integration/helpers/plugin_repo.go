@@ -50,17 +50,17 @@ func NewPluginRepositoryServer(pluginRepo PluginRepository) *Server {
 
 // NewPluginRepositoryServerWithPlugin is used to create a server to provide a single configurable_plugin
 // with user provided name, version, and platform.
-func NewPluginRepositoryServerWithPlugin(pluginName string, version string, platform string, shouldCalculateChecksum bool) *PluginRepositoryServerWithPlugin {
+func NewPluginRepositoryServerWithPlugin(pluginType string, pluginName string, version string, platform string, shouldCalculateChecksum bool) *PluginRepositoryServerWithPlugin {
 	pluginRepoServer := PluginRepositoryServerWithPlugin{}
 
-	pluginRepoServer.Init(pluginName, version, platform, shouldCalculateChecksum)
+	pluginRepoServer.Init(pluginType, pluginName, version, platform, shouldCalculateChecksum)
 
 	return &pluginRepoServer
 }
 
 // Init initializes a server to provide a single configurable_plugin with user provided name, version, and platform.
-func (pluginRepoServer *PluginRepositoryServerWithPlugin) Init(pluginName string, version string, platform string, shouldCalculateChecksum bool) {
-	pluginPath := BuildConfigurablePlugin("configurable_plugin", pluginName, version,
+func (pluginRepoServer *PluginRepositoryServerWithPlugin) Init(pluginType string, pluginName string, version string, platform string, shouldCalculateChecksum bool) {
+	pluginPath := BuildConfigurablePlugin(pluginType, pluginName, version,
 		[]PluginCommand{
 			{Name: "some-command", Help: "some-command-help"},
 		},

@@ -58,7 +58,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	overrideTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_command_overrides")
 	Expect(err).ToNot(HaveOccurred())
 
-	panicTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_panic")
+	panicTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_panic_v7", "-tags=V7")
 	Expect(err).ToNot(HaveOccurred())
 })
 

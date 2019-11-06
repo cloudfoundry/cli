@@ -81,6 +81,7 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 	var tempPluginDir string
 	tempPluginDir, err = ioutil.TempDir(cmd.Config.PluginHome(), "temp")
 	log.WithField("tempPluginDir", tempPluginDir).Debug("making tempPluginDir dir")
+
 	defer func() {
 		removed := false
 		var removeErr error
@@ -159,6 +160,7 @@ func (cmd InstallPluginCommand) Execute([]string) (err error) {
 	}
 
 	log.Info("install plugin")
+
 	return cmd.installPlugin(plugin, executablePath)
 }
 
@@ -177,6 +179,7 @@ func (cmd InstallPluginCommand) installPlugin(plugin configv3.Plugin, pluginPath
 		"Name":    plugin.Name,
 		"Version": plugin.Version.String(),
 	})
+
 	return nil
 }
 

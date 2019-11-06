@@ -17,7 +17,7 @@ var _ = Describe("install-plugin command", func() {
 		var pluginPath string
 
 		BeforeEach(func() {
-			pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+			pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin_v7", "some-plugin", "1.0.0",
 				[]helpers.PluginCommand{
 					{Name: "some-command", Help: "some-command-help"},
 				},

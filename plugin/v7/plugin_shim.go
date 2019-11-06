@@ -22,8 +22,12 @@ func Start(cmd Plugin) {
 
 	cliConnection := NewCliConnection(os.Args[1])
 	cliConnection.pingCLI()
+
 	if isMetadataRequest(os.Args) {
-		cliConnection.sendPluginMetadataToCliServer(cmd.GetMetadata())
+		pluginMetadata := cmd.GetMetadata()
+		pluginMetadata.LibraryVersion.Major = 2
+
+		cliConnection.sendPluginMetadataToCliServer(pluginMetadata)
 	} else {
 		if version := MinCliVersionStr(cmd.GetMetadata().MinCliVersion); version != "" {
 			ok := cliConnection.isMinCliVersion(version)

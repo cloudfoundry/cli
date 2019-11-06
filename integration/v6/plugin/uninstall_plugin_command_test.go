@@ -38,10 +38,10 @@ var _ = Describe("uninstall-plugin command", func() {
 
 	When("the plugin is installed", func() {
 		BeforeEach(func() {
-			helpers.InstallConfigurablePlugin("banana-plugin-name-1", "2.0.1", []helpers.PluginCommand{
+			helpers.InstallConfigurablePlugin("configurable_plugin", "banana-plugin-name-1", "2.0.1", []helpers.PluginCommand{
 				{Name: "banana-command-1", Help: "banana-command-1"},
 			})
-			helpers.InstallConfigurablePlugin("banana-plugin-name-2", "1.4.3", []helpers.PluginCommand{
+			helpers.InstallConfigurablePlugin("configurable_plugin", "banana-plugin-name-2", "1.4.3", []helpers.PluginCommand{
 				{Name: "banana-command-2", Help: "banana-command-2"},
 			})
 		})
@@ -73,7 +73,7 @@ var _ = Describe("uninstall-plugin command", func() {
 
 		When("the plugin encounters an error during cleanup", func() {
 			BeforeEach(func() {
-				helpers.InstallConfigurablePluginFailsUninstall("failing-plugin", "2.0.1", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("configurable_plugin_fails_uninstall", "failing-plugin", "2.0.1", []helpers.PluginCommand{
 					{Name: "failing-command-1", Help: "failing-command-1"},
 				})
 			})
@@ -104,6 +104,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		When("the plugin binary has been deleted", func() {
 			BeforeEach(func() {
 				helpers.InstallConfigurablePlugin(
+					"configurable_plugin",
 					"banana-plugin-name-1",
 					"2.0.1",
 					[]helpers.PluginCommand{

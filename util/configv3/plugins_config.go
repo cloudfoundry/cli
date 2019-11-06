@@ -21,10 +21,11 @@ type PluginsConfig struct {
 
 // Plugin represents the plugin as a whole, not be confused with PluginCommand
 type Plugin struct {
-	Name     string
-	Location string          `json:"Location"`
-	Version  PluginVersion   `json:"Version"`
-	Commands []PluginCommand `json:"Commands"`
+	Name           string
+	Location       string          `json:"Location"`
+	Version        PluginVersion   `json:"Version"`
+	LibraryVersion PluginVersion   `json:"LibraryVersion"`
+	Commands       []PluginCommand `json:"Commands"`
 }
 
 // CalculateSHA1 returns the SHA1 value of the plugin executable. If an error

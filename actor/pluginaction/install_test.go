@@ -27,6 +27,7 @@ var _ = Describe("install actions", func() {
 
 	BeforeEach(func() {
 		fakeConfig = new(pluginactionfakes.FakeConfig)
+		fakeConfig.BinaryVersionReturns("6.0.0")
 		fakeClient = new(pluginactionfakes.FakePluginClient)
 		actor = NewActor(fakeConfig, fakeClient)
 
@@ -456,9 +457,8 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		When("the plugin is valid", func() {
+		Describe("Version checking", func() {
 			var pluginToBeInstalled configv3.Plugin
-
 			BeforeEach(func() {
 				pluginToBeInstalled = configv3.Plugin{
 					Name: "some-plugin",
@@ -478,7 +478,6 @@ var _ = Describe("install actions", func() {
 						},
 					},
 				}
-				fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
 				fakeConfig.PluginsReturns([]configv3.Plugin{
 					{
 						Name: "installed-plugin-1",
@@ -505,26 +504,114 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			It("returns the plugin and no errors", func() {
-				Expect(validateErr).ToNot(HaveOccurred())
-				Expect(plugin).To(Equal(pluginToBeInstalled))
+			Describe("CLI v 6", func() {
+				BeforeEach(func() {
+					fakeConfig.BinaryVersionReturns("6.0.0")
+				})
 
-				Expect(fakePluginMetadata.GetMetadataCallCount()).To(Equal(1))
-				Expect(fakePluginMetadata.GetMetadataArgsForCall(0)).To(Equal("some-plugin-path"))
+				When("the plugin is valid", func() {
+					BeforeEach(func() {
+						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					})
 
-				Expect(fakeCommandList.HasCommandCallCount()).To(Equal(4))
-				Expect(fakeCommandList.HasCommandArgsForCall(0)).To(Equal("some-command"))
-				Expect(fakeCommandList.HasCommandArgsForCall(1)).To(Equal("sc"))
-				Expect(fakeCommandList.HasCommandArgsForCall(2)).To(Equal("some-other-command"))
-				Expect(fakeCommandList.HasCommandArgsForCall(3)).To(Equal("soc"))
+					It("returns the plugin and no errors", func() {
+						Expect(validateErr).ToNot(HaveOccurred())
+						Expect(plugin).To(Equal(pluginToBeInstalled))
 
-				Expect(fakeCommandList.HasAliasCallCount()).To(Equal(4))
-				Expect(fakeCommandList.HasAliasArgsForCall(0)).To(Equal("some-command"))
-				Expect(fakeCommandList.HasAliasArgsForCall(1)).To(Equal("sc"))
-				Expect(fakeCommandList.HasAliasArgsForCall(2)).To(Equal("some-other-command"))
-				Expect(fakeCommandList.HasAliasArgsForCall(3)).To(Equal("soc"))
+						Expect(fakePluginMetadata.GetMetadataCallCount()).To(Equal(1))
+						Expect(fakePluginMetadata.GetMetadataArgsForCall(0)).To(Equal("some-plugin-path"))
 
-				Expect(fakeConfig.PluginsCallCount()).To(Equal(1))
+						Expect(fakeCommandList.HasCommandCallCount()).To(Equal(4))
+						Expect(fakeCommandList.HasCommandArgsForCall(0)).To(Equal("some-command"))
+						Expect(fakeCommandList.HasCommandArgsForCall(1)).To(Equal("sc"))
+						Expect(fakeCommandList.HasCommandArgsForCall(2)).To(Equal("some-other-command"))
+						Expect(fakeCommandList.HasCommandArgsForCall(3)).To(Equal("soc"))
+
+						Expect(fakeCommandList.HasAliasCallCount()).To(Equal(4))
+						Expect(fakeCommandList.HasAliasArgsForCall(0)).To(Equal("some-command"))
+						Expect(fakeCommandList.HasAliasArgsForCall(1)).To(Equal("sc"))
+						Expect(fakeCommandList.HasAliasArgsForCall(2)).To(Equal("some-other-command"))
+						Expect(fakeCommandList.HasAliasArgsForCall(3)).To(Equal("soc"))
+
+						Expect(fakeConfig.PluginsCallCount()).To(Equal(1))
+					})
+				})
+
+				When("the plugin is for a later version", func() {
+					BeforeEach(func() {
+						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
+							Major: 2,
+							Minor: 0,
+							Build: 0,
+						}
+						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					})
+					It("reports the plugin is invalid", func() {
+						Expect(validateErr).To(MatchError(actionerror.PluginInvalidLibraryVersionError{}))
+					})
+				})
+			})
+
+			Describe("CLI v 7", func() {
+				BeforeEach(func() {
+					fakeConfig.BinaryVersionReturns("7.0.0")
+				})
+
+				When("the plugin is valid", func() {
+					BeforeEach(func() {
+						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
+							Major: 2,
+							Minor: 0,
+							Build: 0,
+						}
+						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					})
+
+					It("returns the plugin and no errors", func() {
+						Expect(validateErr).ToNot(HaveOccurred())
+						Expect(plugin).To(Equal(pluginToBeInstalled))
+
+						Expect(fakePluginMetadata.GetMetadataCallCount()).To(Equal(1))
+						Expect(fakePluginMetadata.GetMetadataArgsForCall(0)).To(Equal("some-plugin-path"))
+
+						Expect(fakeCommandList.HasCommandCallCount()).To(Equal(4))
+						Expect(fakeCommandList.HasCommandArgsForCall(0)).To(Equal("some-command"))
+						Expect(fakeCommandList.HasCommandArgsForCall(1)).To(Equal("sc"))
+						Expect(fakeCommandList.HasCommandArgsForCall(2)).To(Equal("some-other-command"))
+						Expect(fakeCommandList.HasCommandArgsForCall(3)).To(Equal("soc"))
+
+						Expect(fakeCommandList.HasAliasCallCount()).To(Equal(4))
+						Expect(fakeCommandList.HasAliasArgsForCall(0)).To(Equal("some-command"))
+						Expect(fakeCommandList.HasAliasArgsForCall(1)).To(Equal("sc"))
+						Expect(fakeCommandList.HasAliasArgsForCall(2)).To(Equal("some-other-command"))
+						Expect(fakeCommandList.HasAliasArgsForCall(3)).To(Equal("soc"))
+
+						Expect(fakeConfig.PluginsCallCount()).To(Equal(1))
+					})
+				})
+
+				When("the plugin is for an older CLI", func() {
+					BeforeEach(func() {
+						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					})
+					It("reports the plugin is wrong", func() {
+						Expect(validateErr).To(MatchError(actionerror.PluginInvalidLibraryVersionError{}))
+					})
+				})
+
+				When("the plugin is for a newer CLI", func() {
+					BeforeEach(func() {
+						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
+							Major: 3,
+							Minor: 0,
+							Build: 0,
+						}
+						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
+					})
+					It("reports the plugin is wrong", func() {
+						Expect(validateErr).To(MatchError(actionerror.PluginInvalidLibraryVersionError{}))
+					})
+				})
 			})
 		})
 	})
