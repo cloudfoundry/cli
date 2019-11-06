@@ -34,6 +34,7 @@ var _ = Describe("help", func() {
 				"[-p PATH]",
 				"[-s STACK]",
 				"[-t HEALTH_TIMEOUT]",
+				"[--task TASK]",
 				"[-u (process | port | http)]",
 				"[--no-route | --random-route]",
 				"[--var KEY=VALUE]",
@@ -57,6 +58,7 @@ var _ = Describe("help", func() {
 				"[-p PATH]",
 				"[-s STACK]",
 				"[-t HEALTH_TIMEOUT]",
+				"[--task TASK]",
 				"[-u (process | port | http)]",
 				"[--no-route | --random-route ]",
 				"[--var KEY=VALUE]",
@@ -86,6 +88,7 @@ var _ = Describe("help", func() {
 			Eventually(session).Should(Say(`--stack, -s`))
 			Eventually(session).Should(Say(`--start-command, -c`))
 			Eventually(session).Should(Say(`--strategy`))
+			Eventually(session).Should(Say(`--task`))
 			Eventually(session).Should(Say(`--var`))
 			Eventually(session).Should(Say(`--vars-file`))
 			Eventually(session).Should(Say("ENVIRONMENT:"))
