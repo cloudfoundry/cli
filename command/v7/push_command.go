@@ -20,7 +20,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/progressbar"
 	"code.cloudfoundry.org/cli/util/pushmanifestparser"
-	logcache "code.cloudfoundry.org/log-cache-release/src/pkg/client"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
@@ -97,7 +96,7 @@ type PushCommand struct {
 
 	Config            command.Config
 	UI                command.UI
-	LogCacheClient    *logcache.Client
+	LogCacheClient    v7action.LogCacheClient
 	loggingCancelFunc context.CancelFunc
 	Actor             PushActor
 	VersionActor      V7ActorForPush
@@ -106,6 +105,8 @@ type PushCommand struct {
 	PWD               string
 	ManifestLocator   ManifestLocator
 	ManifestParser    PushManifestParser
+
+	stopStreamingFunc func()
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -137,6 +138,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd PushCommand) Execute(args []string) error {
+	cmd.stopStreamingFunc = nil
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -212,6 +214,11 @@ func (cmd PushCommand) Execute(args []string) error {
 	}
 
 	log.WithField("number of plans", len(pushPlans)).Debug("completed generating plan")
+	defer func() {
+		if cmd.stopStreamingFunc != nil {
+			cmd.stopStreamingFunc()
+		}
+	}()
 
 	for _, plan := range pushPlans {
 		log.WithField("app_name", plan.Application.Name).Info("actualizing")
@@ -498,7 +505,7 @@ func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 	return nil
 }
 
-func (cmd PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushEvent) error {
+func (cmd *PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushEvent) error {
 	for event := range eventStream {
 		cmd.UI.DisplayWarningsV7(event.Warnings)
 		if event.Err != nil {
@@ -512,7 +519,7 @@ func (cmd PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushE
 	return nil
 }
 
-func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) error {
+func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) error {
 	switch event {
 	case v7pushaction.CreatingArchive:
 		cmd.UI.DisplayText("Packaging files to upload...")
@@ -552,11 +559,15 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) er
 		if err != nil {
 			return err
 		}
-		cmd.loggingCancelFunc = cancelFunc
+		if cmd.stopStreamingFunc != nil {
+			cmd.stopStreamingFunc()
+		}
+		cmd.stopStreamingFunc = cancelFunc
 		go cmd.getLogs(logStream, errStream)
 	case v7pushaction.StagingComplete:
-		if cmd.loggingCancelFunc != nil {
-			cmd.loggingCancelFunc()
+		if cmd.stopStreamingFunc != nil {
+			cmd.stopStreamingFunc()
+			cmd.stopStreamingFunc = nil
 		}
 	case v7pushaction.RestartingApplication:
 		cmd.UI.DisplayNewline()
@@ -597,7 +608,7 @@ func (cmd PushCommand) getLogs(logStream <-chan v7action.LogMessage, errStream <
 			if !open {
 				return
 			}
-			_, ok := err.(actionerror.NOAATimeoutError)
+			_, ok := err.(actionerror.LogCacheTimeoutError)
 			if ok {
 				cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
 			}

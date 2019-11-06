@@ -87,7 +87,6 @@ func (cmd StageCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	stopLogStreamFunc()
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("Package staged")

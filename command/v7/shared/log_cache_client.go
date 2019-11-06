@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/command"
-	logcache "code.cloudfoundry.org/log-cache-release/src/pkg/client"
+	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
 
 type DebugPrinter struct {

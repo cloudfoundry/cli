@@ -177,6 +177,12 @@ var _ = Describe("start command", func() {
 					session := helpers.CF("start", appName)
 
 					Eventually(session).Should(Say(`Staging app and tracing logs`))
+
+					Eventually(session).Should(Say(`Downloading staticfile_buildpack\.\.\.`), "Error streaming logs")
+					Eventually(session).Should(Say(`Uploading droplet\.\.\.`), "Error streaming logs")
+					Eventually(session).Should(Say(`Uploaded droplet \([\d.]+M\)`), "Error streaming logs")
+					Eventually(session).Should(Say(`Uploading complete`), "Error streaming logs")
+
 					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
 					Eventually(session).Should(Say(`name:\s+%s`, appName))
 					Eventually(session).Should(Say(`requested state:\s+started`))
@@ -187,6 +193,7 @@ var _ = Describe("start command", func() {
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 					Eventually(session).Should(Exit(0))
+					Expect(session.Err).ToNot(Say(`timeout connecting to log server, no log will be shown`))
 
 					Expect(helpers.GetPackageFirstDroplet(packageGUID)).To(Equal(helpers.GetAppDroplet(helpers.AppGUID(appName))))
 				})

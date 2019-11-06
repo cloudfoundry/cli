@@ -4,16 +4,15 @@ import (
 	"context"
 	"errors"
 	"log"
-	"sort"
 	"strings"
-	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	logcache "code.cloudfoundry.org/log-cache-release/src/pkg/client"
+	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	"code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1"
 	"github.com/sirupsen/logrus"
+
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 )
 
 const StagingLog = "STG"
@@ -154,46 +153,31 @@ func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, 
 	return messages, logErrs, cancelFunc, allWarnings, err
 }
 
-func (actor Actor) blockOnConnect(ready <-chan bool) (chan *LogMessage, chan error) {
-	outgoingLogStream := make(chan *LogMessage)
-	outgoingErrStream := make(chan error, 1)
-
-	ticker := time.NewTicker(actor.Config.DialTimeout())
-
-dance:
-	for {
-		select {
-		case _, ok := <-ready:
-			if !ok {
-				break dance
-			}
-		case <-ticker.C:
-			outgoingErrStream <- actionerror.NOAATimeoutError{}
-			break dance
-		}
+func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client LogCacheClient) ([]LogMessage, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return nil, allWarnings, err
 	}
 
-	return outgoingLogStream, outgoingErrStream
-}
-
-func (Actor) flushLogs(logs LogMessages, messages chan<- *LogMessage) LogMessages {
-	sort.Stable(logs)
-	for _, l := range logs {
-		messages <- l
+	logCacheMessages, err := loggingaction.GetRecentLogs(app.GUID, client)
+	if err != nil {
+		return nil, allWarnings, err
 	}
-	return LogMessages{}
-}
 
-func (Actor) setOnConnectBlocker(client NOAAClient) <-chan bool {
-	ready := make(chan bool)
-	var onlyRunOnInitialConnect sync.Once
-	callOnConnectOrRetry := func() {
-		onlyRunOnInitialConnect.Do(func() {
-			close(ready)
+	//TODO: Messages need sorting for most recent?
+	// logCacheMessages = client.SortRecent(logCacheMessages)
+
+	var logMessages []LogMessage
+
+	for _, message := range logCacheMessages {
+		logMessages = append(logMessages, LogMessage{
+			message:        message.Message,
+			messageType:    message.MessageType,
+			timestamp:      message.Timestamp, // time.Unix(0, message.Timestamp),
+			sourceType:     message.SourceType,
+			sourceInstance: message.SourceInstance,
 		})
 	}
 
-	client.SetOnConnectCallback(callOnConnectOrRetry)
-
-	return ready
+	return logMessages, allWarnings, nil
 }

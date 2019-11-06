@@ -1,11 +1,10 @@
-package v7action
+package loggingaction
 
 import (
-	"context"
-	"time"
-
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
+	"context"
+	"time"
 )
 
 //go:generate counterfeiter . LogCacheClient

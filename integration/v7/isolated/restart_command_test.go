@@ -126,6 +126,7 @@ var _ = Describe("restart command", func() {
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 					Eventually(session).Should(Exit(0))
+					Expect(session.Err).ToNot(Say(`timeout connecting to log server, no log will be shown`))
 				})
 			})
 

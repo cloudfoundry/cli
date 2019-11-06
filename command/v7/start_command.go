@@ -111,8 +111,6 @@ func (cmd StartCommand) Execute(args []string) error {
 			return err
 		}
 
-		stopLogStreamFunc()
-
 		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
 		cmd.UI.DisplayWarningsV7(warnings)
 		if err != nil {

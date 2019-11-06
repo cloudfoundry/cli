@@ -16,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"context"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -23,12 +24,12 @@ import (
 
 var _ = Describe("start Command", func() {
 	var (
-		cmd             v7.StartCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeStartActor
-		fakeNOAAClient  *v7actionfakes.FakeNOAAClient
+		cmd                v7.StartCommand
+		testUI             *ui.UI
+		fakeConfig         *commandfakes.FakeConfig
+		fakeSharedActor    *commandfakes.FakeSharedActor
+		fakeActor          *v7fakes.FakeStartActor
+		fakeLogCacheClient *v7actionfakes.FakeLogCacheClient
 
 		binaryName  string
 		executeErr  error
@@ -41,7 +42,7 @@ var _ = Describe("start Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeStartActor)
-		fakeNOAAClient = new(v7actionfakes.FakeNOAAClient)
+		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -51,11 +52,11 @@ var _ = Describe("start Command", func() {
 		cmd = v7.StartCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			NOAAClient:  fakeNOAAClient,
+			UI:             testUI,
+			Config:         fakeConfig,
+			SharedActor:    fakeSharedActor,
+			Actor:          fakeActor,
+			LogCacheClient: fakeLogCacheClient,
 		}
 	})
 
@@ -283,21 +284,35 @@ var _ = Describe("start Command", func() {
 
 		When("the logging does not error", func() {
 			var allLogsWritten chan bool
+			var closedTheStreams bool
 
 			BeforeEach(func() {
 				allLogsWritten = make(chan bool)
-				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
-					logStream := make(chan *v7action.LogMessage)
+				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+					logStream := make(chan v7action.LogMessage)
 					errorStream := make(chan error)
+					closedTheStreams = false
 
+					cancelFunc := func() {
+						if closedTheStreams {
+							return
+						}
+						closedTheStreams = true
+						close(logStream)
+						close(errorStream)
+					}
 					go func() {
-						logStream <- v7action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v7action.StagingLog, "sourceInstance")
-						logStream <- v7action.NewLogMessage("Here are some other staging logs!", 1, time.Now(), v7action.StagingLog, "sourceInstance")
+						logStream <- *v7action.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
+						logStream <- *v7action.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
 						allLogsWritten <- true
 					}()
 
-					return logStream, errorStream, v7action.Warnings{"steve for all I care"}, nil
+					return logStream, errorStream, cancelFunc, v7action.Warnings{"steve for all I care"}, nil
 				}
+			})
+
+			JustAfterEach(func() {
+				Expect(closedTheStreams).To(BeTrue())
 			})
 
 			When("the staging is successful", func() {
@@ -345,7 +360,7 @@ var _ = Describe("start Command", func() {
 					appNameArg, spaceGUID, noaaClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
 					Expect(appNameArg).To(Equal(app))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(noaaClient).To(Equal(fakeNOAAClient))
+					Expect(noaaClient).To(Equal(fakeLogCacheClient))
 
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
 					guidArg, appNameArg, spaceGUIDArg := fakeActor.StagePackageArgsForCall(0)
@@ -418,27 +433,35 @@ var _ = Describe("start Command", func() {
 
 		When("the logging stream has errors", func() {
 			var (
-				expectedErr    error
-				allLogsWritten chan bool
+				expectedErr      error
+				allLogsWritten   chan bool
+				closedTheStreams bool
 			)
 
 			BeforeEach(func() {
 				allLogsWritten = make(chan bool)
 				expectedErr = errors.New("banana")
 
-				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
-					logStream := make(chan *v7action.LogMessage)
+				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+					logStream := make(chan v7action.LogMessage)
 					errorStream := make(chan error)
+					closedTheStreams = false
 
+					cancelFunc := func() {
+						if closedTheStreams {
+							return
+						}
+						closedTheStreams = true
+						close(logStream)
+						close(errorStream)
+					}
 					go func() {
-						defer close(logStream)
-						defer close(errorStream)
-						logStream <- v7action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v7action.StagingLog, "sourceInstance")
+						logStream <- *v7action.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
 						errorStream <- expectedErr
 						allLogsWritten <- true
 					}()
 
-					return logStream, errorStream, v7action.Warnings{"steve for all I care"}, nil
+					return logStream, errorStream, cancelFunc, v7action.Warnings{"steve for all I care"}, nil
 				}
 
 				fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
@@ -461,6 +484,10 @@ var _ = Describe("start Command", func() {
 
 					return dropletStream, warningsStream, errorStream
 				}
+			})
+
+			JustAfterEach(func() {
+				Expect(closedTheStreams).To(BeTrue())
 			})
 
 			It("displays the errors and continues staging", func() {

@@ -54,14 +54,14 @@ func (info Info) CloudControllerAPIVersion() string {
 	return info.Links.CCV3.Meta.Version
 }
 
-// Logging returns the HREF of the Loggregator Traffic Controller.
-func (info Info) Logging() string {
-	return info.Links.Logging.HREF
+// LogCache returns the HREF of the Loggregator Traffic Controller.
+func (info Info) LogCache() string {
+	return info.Links.LogCache.HREF
 }
 
 // Logging returns the HREF of the Loggregator Traffic Controller.
-func (info Info) LogCache() string {
-	return info.Links.LogCache.HREF
+func (info Info) Logging() string {
+	return info.Links.Logging.HREF
 }
 
 // NetworkPolicyV1 returns the HREF of the Container Networking v1 Policy API

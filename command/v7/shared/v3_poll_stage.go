@@ -37,7 +37,7 @@ func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7ac
 			}
 
 			switch logErr.(type) {
-			case actionerror.NOAATimeoutError:
+			case actionerror.LogCacheTimeoutError:
 				ui.DisplayWarning("timeout connecting to log server, no log will be shown")
 			default:
 				ui.DisplayWarning(logErr.Error())

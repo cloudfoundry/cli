@@ -108,6 +108,8 @@ var _ = Describe("stage command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Downloading staticfile_buildpack\.\.\.`), "Error streaming logs")
+				Eventually(session).Should(Say(`Uploading droplet\.\.\.`), "Error streaming logs")
 				Eventually(session).Should(Say("Package staged"))
 				Eventually(session).Should(Say(`droplet guid:\s+%s`, helpers.GUIDRegex))
 				Eventually(session).Should(Say(`state:\s+staged`))

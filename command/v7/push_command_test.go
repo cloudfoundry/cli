@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	"github.com/cloudfoundry/bosh-cli/director/template"
+	//"code.cloudfoundry.org/cli/actor/loggingaction"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -53,9 +55,9 @@ type LogEvent struct {
 	Error error
 }
 
-func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedError error) func(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
-	return func(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
-		logStream := make(chan *v7action.LogMessage)
+func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedError error) func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+	return func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+		logStream := make(chan v7action.LogMessage)
 		errStream := make(chan error)
 		go func() {
 			defer close(logStream)
@@ -63,7 +65,7 @@ func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedEr
 
 			for _, log := range logevents {
 				if log.Log != nil {
-					logStream <- log.Log
+					logStream <- *log.Log
 				}
 				if log.Error != nil {
 					errStream <- log.Error
@@ -71,7 +73,7 @@ func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedEr
 			}
 		}()
 
-		return logStream, errStream, passedWarnings, passedError
+		return logStream, errStream, func() {}, passedWarnings, passedError
 	}
 }
 
@@ -85,7 +87,7 @@ var _ = Describe("push Command", func() {
 		fakeActor           *v7fakes.FakePushActor
 		fakeVersionActor    *v7fakes.FakeV7ActorForPush
 		fakeProgressBar     *v6fakes.FakeProgressBar
-		fakeNOAAClient      *v7actionfakes.FakeNOAAClient
+		fakeLogCacheClient  *v7actionfakes.FakeLogCacheClient
 		fakeManifestLocator *v7fakes.FakeManifestLocator
 		binaryName          string
 		executeErr          error
@@ -107,7 +109,7 @@ var _ = Describe("push Command", func() {
 		fakeActor = new(v7fakes.FakePushActor)
 		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
 		fakeProgressBar = new(v6fakes.FakeProgressBar)
-		fakeNOAAClient = new(v7actionfakes.FakeNOAAClient)
+		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
 
 		appName1 = "first-app"
 		appName2 = "second-app"
@@ -129,7 +131,7 @@ var _ = Describe("push Command", func() {
 			VersionActor:    fakeVersionActor,
 			SharedActor:     fakeSharedActor,
 			ProgressBar:     fakeProgressBar,
-			NOAAClient:      fakeNOAAClient,
+			LogCacheClient:  fakeLogCacheClient,
 			PWD:             pwd,
 			ManifestLocator: fakeManifestLocator,
 			ManifestParser:  fakeManifestParser,
@@ -483,9 +485,9 @@ var _ = Describe("push Command", func() {
 													BeforeEach(func() {
 														fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 															[]LogEvent{
-																{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
-																{Log: v7action.NewLogMessage("log-message-2", 1, time.Now(), v7action.StagingLog, "source-instance")},
-																{Log: v7action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
+																{Log: v7action.NewLogMessage("log-message-1", "OUT", time.Now(), v7action.StagingLog, "source-instance")},
+																{Log: v7action.NewLogMessage("log-message-2", "OUT", time.Now(), v7action.StagingLog, "source-instance")},
+																{Log: v7action.NewLogMessage("log-message-3", "OUT", time.Now(), "potato", "source-instance")},
 															},
 															v7action.Warnings{"log-warning-1", "log-warning-2"},
 															nil,
@@ -518,8 +520,8 @@ var _ = Describe("push Command", func() {
 														fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 															[]LogEvent{
 																{Error: errors.New("some-random-err")},
-																{Error: actionerror.NOAATimeoutError{}},
-																{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
+																{Error: actionerror.LogCacheTimeoutError{}},
+																{Log: v7action.NewLogMessage("log-message-1", "OUT", time.Now(), v7action.StagingLog, "source-instance")},
 															},
 															v7action.Warnings{"log-warning-1", "log-warning-2"},
 															nil,
