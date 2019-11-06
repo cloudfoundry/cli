@@ -1,10 +1,11 @@
 package v7action_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
 	"context"
 	"errors"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"

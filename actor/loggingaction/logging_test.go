@@ -1,11 +1,12 @@
 package loggingaction_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"context"
 	"errors"
 	"fmt"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/loggingaction"
 
 	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"

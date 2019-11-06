@@ -94,17 +94,16 @@ type PushCommand struct {
 	envCFStagingTimeout     interface{}                         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	Config            command.Config
-	UI                command.UI
-	LogCacheClient    v7action.LogCacheClient
-	loggingCancelFunc context.CancelFunc
-	Actor             PushActor
-	VersionActor      V7ActorForPush
-	SharedActor       command.SharedActor
-	ProgressBar       ProgressBar
-	PWD               string
-	ManifestLocator   ManifestLocator
-	ManifestParser    PushManifestParser
+	Config          command.Config
+	UI              command.UI
+	LogCacheClient  v7action.LogCacheClient
+	Actor           PushActor
+	VersionActor    V7ActorForPush
+	SharedActor     command.SharedActor
+	ProgressBar     ProgressBar
+	PWD             string
+	ManifestLocator ManifestLocator
+	ManifestParser  PushManifestParser
 
 	stopStreamingFunc func()
 }

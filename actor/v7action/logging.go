@@ -17,8 +17,6 @@ import (
 
 const StagingLog = "STG"
 
-var flushInterval = 300 * time.Millisecond
-
 type LogMessage struct {
 	message        string
 	messageType    string

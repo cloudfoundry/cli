@@ -18,12 +18,10 @@ type DebugPrinter struct {
 
 func (p DebugPrinter) Print(title, dump string) {
 	for _, output := range p.outputs {
-		output.Start()
-
-		output.DisplayType(title, time.Now())
-		output.DisplayDump(dump)
-
-		output.Stop()
+		_ = output.Start()                        //nolint
+		_ = output.DisplayType(title, time.Now()) //nolint
+		_ = output.DisplayDump(dump)              //nolint
+		_ = output.Stop()                         //nolint
 	}
 }
 
@@ -84,7 +82,7 @@ func NewLogCacheClient(logCacheEndpoint string, config command.Config, ui comman
 		}).DialContext,
 	}
 
-	var client logcache.HTTPClient
+	var client logcache.HTTPClient //nolint
 	client = &http.Client{Transport: tr}
 
 	verbose, location := config.Verbose()
