@@ -20,7 +20,7 @@ run:
     # Print current directory & contents to make debugging easier, for we cannot hijack, but we can `cd`
     Get-ChildItem
 
-    Write-Host "TARGET_V7 is $TARGET_V7"
+    Write-Host "TARGET_V7 is $env:TARGET_V7"
 
     if ($TARGET_V7 -eq "true") {
       Set-Variable Suffix "7"
