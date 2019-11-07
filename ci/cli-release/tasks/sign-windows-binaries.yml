@@ -20,15 +20,11 @@ run:
     # Print current directory & contents to make debugging easier, for we cannot hijack, but we can `cd`
     Get-ChildItem
 
-    Write-Host "TARGET_V7 is $env:TARGET_V7"
-
-    if ($TARGET_V7 -eq "true") {
+    if ($env:TARGET_V7 -eq "true") {
       Set-Variable Suffix "7"
     } else {
       Set-Variable Suffix ""
     }
-
-    Write-Host "Set suffix to $Suffix"
 
     Expand-Archive -LiteralPath .\edge-windows-binary-32\cf${Suffix}-cli_edge_win32.zip
     Expand-Archive -LiteralPath .\edge-windows-binary-64\cf${Suffix}-cli_edge_winx64.zip

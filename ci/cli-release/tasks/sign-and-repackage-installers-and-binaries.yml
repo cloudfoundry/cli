@@ -20,7 +20,7 @@ run:
     # Print current directory & contents to make debugging easier, for we cannot hijack, but we can `cd`
     Get-ChildItem
 
-    if ($TARGET_V7 -eq "true") {
+    if ($env:TARGET_V7 -eq "true") {
       Set-Variable Suffix "7"
       type .\cli\BUILD_VERSION_V7 | Set-Variable Version
     } else {
