@@ -65,7 +65,7 @@ var _ = Describe("running plugins", func() {
 				})
 
 				It("can call a command by its alias", func() {
-					confirmTestPluginOutput("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFV7", "You called Test Plugin Command V7 With Alias!")
+					confirmTestPluginOutput("Cool-V7", "You called Test Plugin Command V7 With Alias!")
 				})
 			})
 		})

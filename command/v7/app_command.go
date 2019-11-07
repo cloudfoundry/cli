@@ -35,6 +35,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.SharedActor = sharedActor
 
 	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+
 	if err != nil {
 		return err
 	}

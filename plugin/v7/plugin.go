@@ -17,6 +17,7 @@ type Plugin interface {
 **/
 type CliConnection interface {
 	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
+	AccessToken() (string, error)
 }
 
 type VersionType struct {

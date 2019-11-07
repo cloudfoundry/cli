@@ -30,4 +30,10 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("AccessToken", func() {
+		It("returns the access token", func() {
+			confirmTestPluginOutput("AccessToken", `bearer [\w\d\.]+`)
+		})
+	})
+
 })

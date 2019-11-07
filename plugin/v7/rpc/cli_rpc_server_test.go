@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	. "code.cloudfoundry.org/cli/plugin/v7/rpc"
@@ -173,18 +172,18 @@ var _ = Describe("Server", func() {
 
 	Describe("Plugin API", func() {
 		var (
-			fakeAppActor *v7fakes.FakeAppActor
-			fakeConfig   *commandfakes.FakeConfig
-			summary      v7action.DetailedApplicationSummary
+			fakePluginActor *rpcfakes.FakePluginActor
+			fakeConfig      *commandfakes.FakeConfig
+			summary         v7action.DetailedApplicationSummary
 		)
 
 		BeforeEach(func() {
-			fakeAppActor = new(v7fakes.FakeAppActor)
+			fakePluginActor = new(rpcfakes.FakePluginActor)
 			fakeConfig = new(commandfakes.FakeConfig)
 			outputCapture := terminal.NewTeePrinter(os.Stdout)
 			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
 
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, rpc.DefaultServer, fakeConfig, fakeAppActor)
+			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -247,7 +246,7 @@ var _ = Describe("Server", func() {
 					},
 				},
 			}
-			fakeAppActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
+			fakePluginActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
 
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space",
@@ -265,15 +264,15 @@ var _ = Describe("Server", func() {
 			time.Sleep(50 * time.Millisecond)
 		})
 
-		Describe("GetApp", func() {
+		FDescribe("GetApp", func() {
 
 			It("retrieves the app summary", func() {
 				result := plugin_models.DetailedApplicationSummary{}
 				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeAppActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
-				appName, spaceGUID, withObfuscatedValues := fakeAppActor.GetDetailedAppSummaryArgsForCall(0)
+				Expect(fakePluginActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
+				appName, spaceGUID, withObfuscatedValues := fakePluginActor.GetDetailedAppSummaryArgsForCall(0)
 				Expect(appName).To(Equal("some-app"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(withObfuscatedValues).To(BeTrue())
@@ -290,7 +289,7 @@ var _ = Describe("Server", func() {
 
 			Context("when retrieving the app fails", func() {
 				BeforeEach(func() {
-					fakeAppActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, nil, errors.New("some-error"))
+					fakePluginActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, nil, errors.New("some-error"))
 				})
 				It("returns an error", func() {
 					result := plugin_models.DetailedApplicationSummary{}
@@ -302,7 +301,22 @@ var _ = Describe("Server", func() {
 
 			})
 		})
+		FDescribe("AccessToken", func() {
 
+			BeforeEach(func() {
+				fakePluginActor.RefreshAccessTokenReturns("token example", nil)
+			})
+			It("retrieves the access token", func() {
+
+				result := ""
+				err := client.Call("CliRpcCmd.AccessToken", "", &result)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakePluginActor.RefreshAccessTokenCallCount()).To(Equal(1))
+				Expect(result).To(Equal("token example"))
+
+			})
+
+		})
 	})
 
 })

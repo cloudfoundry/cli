@@ -16,8 +16,11 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	case "GetApp":
 		result, _ := cliConnection.GetApp(args[1])
 		fmt.Println("Done GetApp:", result)
-	case "TestPluginCommandWithAliasV7", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFV7":
+	case "TestPluginCommandWithAliasV7", "Cool-V7":
 		fmt.Println("You called Test Plugin Command V7 With Alias!")
+	case "AccessToken":
+		result, _ := cliConnection.AccessToken()
+		fmt.Println("Done AccessToken:", result)
 	case "CoolTest":
 		fmt.Println("I am a test plugin")
 	}
@@ -39,7 +42,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{Name: "GetApp"},
 			{
 				Name:     "TestPluginCommandWithAliasV7",
-				Alias:    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFV7",
+				Alias:    "Cool-V7",
 				HelpText: "This is my plugin help test. Banana.",
 				UsageDetails: plugin.Usage{
 					Usage: "I R Usage",
@@ -49,6 +52,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 			{Name: "CoolTest"},
+			{Name: "AccessToken"},
 		},
 	}
 }
