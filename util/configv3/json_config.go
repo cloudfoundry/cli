@@ -48,10 +48,7 @@ type Space struct {
 
 // User represents the user information provided by the JWT access token.
 type User struct {
-	Name     string
-	GUID     string
-	Origin   string
-	IsClient bool
+	Name string
 }
 
 // AccessToken returns the access token for making authenticated API calls.
@@ -273,23 +270,13 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 
 	claims := token.Claims()
 
-	var name, GUID, origin string
-	var isClient bool
+	var ID string
 	if claims.Has("user_name") {
-		name = claims.Get("user_name").(string)
-		GUID = claims.Get("user_id").(string)
-		origin = claims.Get("origin").(string)
-		isClient = false
+		ID = claims.Get("user_name").(string)
 	} else {
-		name = claims.Get("client_id").(string)
-		GUID = name
-		isClient = true
+		ID = claims.Get("client_id").(string)
 	}
-
 	return User{
-		Name:     name,
-		GUID:     GUID,
-		Origin:   origin,
-		IsClient: isClient,
+		Name: ID,
 	}, nil
 }

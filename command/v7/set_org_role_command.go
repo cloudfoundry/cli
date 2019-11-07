@@ -17,7 +17,8 @@ import (
 //go:generate counterfeiter . SetOrgRoleActor
 
 type SetOrgRoleActor interface {
-	CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
+	CreateOrgRoleByUserGUID(roleType constant.RoleType, userGUID string, orgGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateOrgRoleByUserName(roleType constant.RoleType, userName string, origin string, orgGUID string) (v7action.Role, v7action.Warnings, error)
 	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
 	GetUser(username, origin string) (v7action.User, error)
 }
@@ -82,14 +83,18 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-
 	origin := cmd.Origin
 	if cmd.Origin == "" {
 		origin = constant.DefaultOriginUaa
 	}
 
-	warnings, err = cmd.Actor.CreateOrgRole(roleType, org.GUID, cmd.Args.Username, origin, cmd.IsClient)
+	if cmd.IsClient {
+		_, warnings, err = cmd.Actor.CreateOrgRoleByUserGUID(roleType, cmd.Args.Username, org.GUID)
+	} else {
+		_, warnings, err = cmd.Actor.CreateOrgRoleByUserName(roleType, cmd.Args.Username, origin, org.GUID)
+	}
 	cmd.UI.DisplayWarningsV7(warnings)
+
 	if err != nil {
 		if _, ok := err.(ccerror.RoleAlreadyExistsError); ok {
 			cmd.UI.DisplayWarningV7("User '{{.TargetUserName}}' already has role '{{.RoleType}}' in org '{{.OrgName}}'.", map[string]interface{}{

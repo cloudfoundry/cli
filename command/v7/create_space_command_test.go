@@ -5,12 +5,14 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/util/configv3"
+
+	//"code.cloudfoundry.org/cli/actor/v7action"
+	//"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
-	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,7 +31,6 @@ var _ = Describe("create-space Command", func() {
 
 		spaceName string
 		orgName   string
-		userName  string
 	)
 
 	BeforeEach(func() {
@@ -42,7 +43,6 @@ var _ = Describe("create-space Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		spaceName = "some-space"
 		orgName = ""
-		userName = "some-user-name"
 	})
 
 	JustBeforeEach(func() {
@@ -75,28 +75,21 @@ var _ = Describe("create-space Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-				Name: "some-org-name",
+				Name: "some-org",
 				GUID: "some-org-guid",
 			})
-			fakeConfig.CurrentUserReturns(configv3.User{
-				Name:   userName,
-				Origin: "some-user-origin",
-			}, nil)
 		})
 
 		It("prints text indicating it is creating a space", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, "some-org-name", userName))
+			Expect(testUI.Out).To(Say(`Creating space %s in org %s as the-user\.\.\.`, spaceName, "some-org"))
 		})
 
 		When("creating the space errors", func() {
 			BeforeEach(func() {
-				fakeActor.CreateSpaceReturns(
-					v7action.Space{},
-					v7action.Warnings{"warnings-1", "warnings-2"},
-					errors.New("err-create-space"),
-				)
+				fakeActor.CreateSpaceReturns(v7action.Space{}, v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("err-create-space"))
 			})
 
 			It("returns an error and displays warnings", func() {
@@ -106,25 +99,12 @@ var _ = Describe("create-space Command", func() {
 			})
 		})
 
-		When("creating the space and setting roles is successful", func() {
+		When("creating the space is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateSpaceReturns(
-					v7action.Space{GUID: "some-space-guid"},
-					v7action.Warnings{"warnings-1", "warnings-2"},
-					nil,
-				)
-
-				fakeActor.CreateSpaceRoleReturnsOnCall(0,
-					v7action.Warnings{"create-space-manager-role-warning"},
-					nil,
-				)
-
-				fakeActor.CreateSpaceRoleReturnsOnCall(1,
-					v7action.Warnings{"create-space-developer-role-warning"},
-					nil,
-				)
+				fakeActor.CreateSpaceReturns(v7action.Space{}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
+			//TODO: modify or remove these tests upon set-space-role implementation. they are included in the tests commented out below
 			It("creates the space in the targeted organization", func() {
 				Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(0))
 				Expect(fakeActor.CreateSpaceCallCount()).To(Equal(1))
@@ -133,46 +113,93 @@ var _ = Describe("create-space Command", func() {
 				Expect(expectedOrgGUID).To(Equal("some-org-guid"))
 			})
 
-			It("sets the user as a space manager", func() {
-				Expect(fakeActor.CreateSpaceRoleCallCount()).To(Equal(2))
-				givenRoleType, givenOrgGuid, givenSpaceGUID, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateSpaceRoleArgsForCall(0)
-				Expect(givenRoleType).To(Equal(constant.SpaceManagerRole))
-				Expect(givenOrgGuid).To(Equal("some-org-guid"))
-				Expect(givenSpaceGUID).To(Equal("some-space-guid"))
-				Expect(givenUserName).To(Equal("some-user-name"))
-				Expect(givenOrigin).To(Equal("some-user-origin"))
-				Expect(givenIsClient).To(BeFalse())
-			})
-
-			It("sets the user as a space developer", func() {
-				Expect(fakeActor.CreateSpaceRoleCallCount()).To(Equal(2))
-				givenRoleType, givenOrgGuid, givenSpaceGUID, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateSpaceRoleArgsForCall(1)
-				Expect(givenRoleType).To(Equal(constant.SpaceDeveloperRole))
-				Expect(givenOrgGuid).To(Equal("some-org-guid"))
-				Expect(givenSpaceGUID).To(Equal("some-space-guid"))
-				Expect(givenUserName).To(Equal("some-user-name"))
-				Expect(givenOrigin).To(Equal("some-user-origin"))
-				Expect(givenIsClient).To(BeFalse())
-			})
-
 			It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Err).To(Say("warnings-1"))
 				Expect(testUI.Err).To(Say("warnings-2"))
-				Expect(testUI.Err).To(Say("create-space-manager-role-warning"))
-				Expect(testUI.Err).To(Say("create-space-developer-role-warning"))
-
-				Expect(testUI.Out).To(Say("Creating space some-space in org some-org-name as some-user-name..."))
 				Expect(testUI.Out).To(Say("OK"))
-
-				Expect(testUI.Out).To(Say("Assigning role SpaceManager to user some-user-name in org some-org-name / space some-space as some-user-name..."))
-				Expect(testUI.Out).To(Say("OK"))
-
-				Expect(testUI.Out).To(Say("Assigning role SpaceDeveloper to user some-user-name in org some-org-name / space some-space as some-user-name..."))
-				Expect(testUI.Out).To(Say("OK"))
-
-				Expect(testUI.Out).To(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, "some-org-name", spaceName))
+				Expect(testUI.Out).To(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, "some-org", spaceName))
 			})
+
+			//TODO: add these tests back once V7/V3 set-space-role is implemented and included in create-space
+			//When("setting the user as a space manager is successful", func() {
+			//	BeforeEach(func() {
+			//		fakeActor.GrantSpaceManagerByUsernameReturns(v2action.Warnings{"set-space-manager-warning"}, nil)
+			//	})
+			//
+			//	It("creates the space in the targeted organization", func() {
+			//		Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(0))
+			//		Expect(fakeActor.CreateSpaceCallCount()).To(Equal(1))
+			//		expectedSpaceName, expectedOrgGUID := fakeActor.CreateSpaceArgsForCall(0)
+			//		Expect(expectedSpaceName).To(Equal(spaceName))
+			//		Expect(expectedOrgGUID).To(Equal("some-org-guid"))
+			//	})
+			//
+			//	It("returns warnings for creating the space", func() {
+			//		Expect(testUI.Err).To(Say("warnings-1"))
+			//		Expect(testUI.Err).To(Say("warnings-2"))
+			//	})
+
+			//It("sets the user as a space manager", func() {
+			//	Expect(fakeActor.GrantSpaceManagerByUsernameCallCount()).To(Equal(1))
+			//	expectedOrgGUID, expectedSpaceGUID, userName := fakeActor.GrantSpaceManagerByUsernameArgsForCall(0)
+			//	Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
+			//	Expect(expectedOrgGUID).To(Equal("some-org-guid"))
+			//	Expect(userName).To(Equal("the-user"))
+			//})
+			//
+			//	When("setting the user as a space developer is successful", func() {
+			//		BeforeEach(func() {
+			//			fakeActor.GrantSpaceDeveloperByUsernameReturns(v2action.Warnings{"set-space-developer-warning"}, nil)
+			//		})
+			//
+			//		It("sets the user as a space developer", func() {
+			//			Expect(fakeActor.GrantSpaceDeveloperByUsernameCallCount()).To(Equal(1))
+			//			expectedSpaceGUID, userName := fakeActor.GrantSpaceDeveloperByUsernameArgsForCall(0)
+			//			Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
+			//			Expect(userName).To(Equal("the-user"))
+			//		})
+			//
+			//		It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
+			//			Expect(executeErr).ToNot(HaveOccurred())
+			//			Expect(testUI.Err).To(Say("set-space-manager-warning"))
+			//			Expect(testUI.Err).To(Say("set-space-developer-warning"))
+			//			Expect(testUI.Out).To(Say("OK"))
+			//			Expect(testUI.Out).To(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, "some-org", spaceName))
+			//		})
+			//	})
+			//	When("setting the user as a space developer fails", func() {
+			//		BeforeEach(func() {
+			//			fakeActor.GrantSpaceDeveloperByUsernameReturns(v2action.Warnings{"set-space-developer-warning"}, errors.New("set-space-developer-error"))
+			//		})
+			//
+			//		It("doesn't set the user as a space developer", func() {
+			//			Expect(fakeActor.GrantSpaceDeveloperByUsernameCallCount()).To(Equal(1))
+			//			expectedSpaceGUID, userName := fakeActor.GrantSpaceDeveloperByUsernameArgsForCall(0)
+			//			Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
+			//			Expect(userName).To(Equal("the-user"))
+			//			Expect(testUI.Err).To(Say("set-space-manager-warning"))
+			//			Expect(testUI.Err).To(Say("set-space-developer-warning"))
+			//			Expect(executeErr).To(MatchError(errors.New("set-space-developer-error")))
+			//		})
+			//	})
+			//})
+			//When("setting the user as a space manager fails", func() {
+			//	BeforeEach(func() {
+			//		fakeActor.GrantSpaceManagerByUsernameReturns(v2action.Warnings{"set-space-manager-warning"}, errors.New("set-space-manager-error"))
+			//	})
+			//
+			//	It("fails to set the user as a space manager", func() {
+			//		Expect(fakeActor.GrantSpaceManagerByUsernameCallCount()).To(Equal(1))
+			//		Expect(fakeActor.GrantSpaceDeveloperByUsernameCallCount()).To(Equal(0))
+			//		expectedOrgGUID, expectedSpaceGUID, userName := fakeActor.GrantSpaceManagerByUsernameArgsForCall(0)
+			//		Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
+			//		Expect(expectedOrgGUID).To(Equal("some-org-guid"))
+			//		Expect(userName).To(Equal("the-user"))
+			//		Expect(testUI.Err).To(Say("set-space-manager-warning"))
+			//		Expect(executeErr).To(MatchError(errors.New("set-space-manager-error")))
+			//	})
+			//})
 		})
 
 		When("passing in a organization", func() {
@@ -240,38 +267,11 @@ var _ = Describe("create-space Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, "some-org-name", userName))
+				Expect(testUI.Out).To(Say(`Creating space %s in org %s as the-user\.\.\.`, spaceName, "some-org"))
 				Expect(testUI.Out).To(Say(`Space '%s' already exists\.`, spaceName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
-
-		When("setting the space manager role fails", func() {
-			BeforeEach(func() {
-				fakeActor.CreateSpaceRoleReturnsOnCall(0,
-					v7action.Warnings{"create-space-manager-role-warning"},
-					errors.New("create-space-manager-role-error"),
-				)
-			})
-
-			It("displays warnings and returns the error", func() {
-				Expect(testUI.Err).To(Say("create-space-manager-role-warning"))
-				Expect(executeErr).To(MatchError("create-space-manager-role-error"))
-			})
-		})
-
-		When("setting the space developer role fails", func() {
-			BeforeEach(func() {
-				fakeActor.CreateSpaceRoleReturnsOnCall(1,
-					v7action.Warnings{"create-space-developer-role-warning"},
-					errors.New("create-space-developer-role-error"),
-				)
-			})
-
-			It("displays warnings and returns the error", func() {
-				Expect(testUI.Err).To(Say("create-space-developer-role-warning"))
-				Expect(executeErr).To(MatchError("create-space-developer-role-error"))
-			})
-		})
 	})
+
 })
