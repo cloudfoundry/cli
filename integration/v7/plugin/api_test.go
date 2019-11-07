@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("plugin API", func() {
+var _ = FDescribe("plugin API", func() {
 	BeforeEach(func() {
 		installTestPlugin()
 	})
@@ -27,6 +27,12 @@ var _ = Describe("plugin API", func() {
 
 		It("gets application information", func() {
 			confirmTestPluginOutputWithArg("GetApp", appName, appName)
+		})
+	})
+
+	Describe("AccessToken", func() {
+		It("returns the access token", func() {
+			confirmTestPluginOutput("AccessToken", `bearer [\w\d\.]+`)
 		})
 	})
 
