@@ -10,40 +10,22 @@ import (
 )
 
 type FakeSetOrgRoleActor struct {
-	CreateOrgRoleByUserGUIDStub        func(constant.RoleType, string, string) (v7action.Role, v7action.Warnings, error)
-	createOrgRoleByUserGUIDMutex       sync.RWMutex
-	createOrgRoleByUserGUIDArgsForCall []struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-	}
-	createOrgRoleByUserGUIDReturns struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	createOrgRoleByUserGUIDReturnsOnCall map[int]struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	CreateOrgRoleByUserNameStub        func(constant.RoleType, string, string, string) (v7action.Role, v7action.Warnings, error)
-	createOrgRoleByUserNameMutex       sync.RWMutex
-	createOrgRoleByUserNameArgsForCall []struct {
+	CreateOrgRoleStub        func(constant.RoleType, string, string, string, bool) (v7action.Warnings, error)
+	createOrgRoleMutex       sync.RWMutex
+	createOrgRoleArgsForCall []struct {
 		arg1 constant.RoleType
 		arg2 string
 		arg3 string
 		arg4 string
+		arg5 bool
 	}
-	createOrgRoleByUserNameReturns struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
+	createOrgRoleReturns struct {
+		result1 v7action.Warnings
+		result2 error
 	}
-	createOrgRoleByUserNameReturnsOnCall map[int]struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
+	createOrgRoleReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
 	}
 	GetOrganizationByNameStub        func(string) (v7action.Organization, v7action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
@@ -78,141 +60,71 @@ type FakeSetOrgRoleActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserGUID(arg1 constant.RoleType, arg2 string, arg3 string) (v7action.Role, v7action.Warnings, error) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	ret, specificReturn := fake.createOrgRoleByUserGUIDReturnsOnCall[len(fake.createOrgRoleByUserGUIDArgsForCall)]
-	fake.createOrgRoleByUserGUIDArgsForCall = append(fake.createOrgRoleByUserGUIDArgsForCall, struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("CreateOrgRoleByUserGUID", []interface{}{arg1, arg2, arg3})
-	fake.createOrgRoleByUserGUIDMutex.Unlock()
-	if fake.CreateOrgRoleByUserGUIDStub != nil {
-		return fake.CreateOrgRoleByUserGUIDStub(arg1, arg2, arg3)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.createOrgRoleByUserGUIDReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserGUIDCallCount() int {
-	fake.createOrgRoleByUserGUIDMutex.RLock()
-	defer fake.createOrgRoleByUserGUIDMutex.RUnlock()
-	return len(fake.createOrgRoleByUserGUIDArgsForCall)
-}
-
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserGUIDCalls(stub func(constant.RoleType, string, string) (v7action.Role, v7action.Warnings, error)) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	defer fake.createOrgRoleByUserGUIDMutex.Unlock()
-	fake.CreateOrgRoleByUserGUIDStub = stub
-}
-
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserGUIDArgsForCall(i int) (constant.RoleType, string, string) {
-	fake.createOrgRoleByUserGUIDMutex.RLock()
-	defer fake.createOrgRoleByUserGUIDMutex.RUnlock()
-	argsForCall := fake.createOrgRoleByUserGUIDArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
-}
-
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserGUIDReturns(result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	defer fake.createOrgRoleByUserGUIDMutex.Unlock()
-	fake.CreateOrgRoleByUserGUIDStub = nil
-	fake.createOrgRoleByUserGUIDReturns = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserGUIDReturnsOnCall(i int, result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	defer fake.createOrgRoleByUserGUIDMutex.Unlock()
-	fake.CreateOrgRoleByUserGUIDStub = nil
-	if fake.createOrgRoleByUserGUIDReturnsOnCall == nil {
-		fake.createOrgRoleByUserGUIDReturnsOnCall = make(map[int]struct {
-			result1 v7action.Role
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.createOrgRoleByUserGUIDReturnsOnCall[i] = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserName(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string) (v7action.Role, v7action.Warnings, error) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	ret, specificReturn := fake.createOrgRoleByUserNameReturnsOnCall[len(fake.createOrgRoleByUserNameArgsForCall)]
-	fake.createOrgRoleByUserNameArgsForCall = append(fake.createOrgRoleByUserNameArgsForCall, struct {
+func (fake *FakeSetOrgRoleActor) CreateOrgRole(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string, arg5 bool) (v7action.Warnings, error) {
+	fake.createOrgRoleMutex.Lock()
+	ret, specificReturn := fake.createOrgRoleReturnsOnCall[len(fake.createOrgRoleArgsForCall)]
+	fake.createOrgRoleArgsForCall = append(fake.createOrgRoleArgsForCall, struct {
 		arg1 constant.RoleType
 		arg2 string
 		arg3 string
 		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("CreateOrgRoleByUserName", []interface{}{arg1, arg2, arg3, arg4})
-	fake.createOrgRoleByUserNameMutex.Unlock()
-	if fake.CreateOrgRoleByUserNameStub != nil {
-		return fake.CreateOrgRoleByUserNameStub(arg1, arg2, arg3, arg4)
+		arg5 bool
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateOrgRole", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.createOrgRoleMutex.Unlock()
+	if fake.CreateOrgRoleStub != nil {
+		return fake.CreateOrgRoleStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createOrgRoleByUserNameReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	fakeReturns := fake.createOrgRoleReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserNameCallCount() int {
-	fake.createOrgRoleByUserNameMutex.RLock()
-	defer fake.createOrgRoleByUserNameMutex.RUnlock()
-	return len(fake.createOrgRoleByUserNameArgsForCall)
+func (fake *FakeSetOrgRoleActor) CreateOrgRoleCallCount() int {
+	fake.createOrgRoleMutex.RLock()
+	defer fake.createOrgRoleMutex.RUnlock()
+	return len(fake.createOrgRoleArgsForCall)
 }
 
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserNameCalls(stub func(constant.RoleType, string, string, string) (v7action.Role, v7action.Warnings, error)) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	defer fake.createOrgRoleByUserNameMutex.Unlock()
-	fake.CreateOrgRoleByUserNameStub = stub
+func (fake *FakeSetOrgRoleActor) CreateOrgRoleCalls(stub func(constant.RoleType, string, string, string, bool) (v7action.Warnings, error)) {
+	fake.createOrgRoleMutex.Lock()
+	defer fake.createOrgRoleMutex.Unlock()
+	fake.CreateOrgRoleStub = stub
 }
 
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserNameArgsForCall(i int) (constant.RoleType, string, string, string) {
-	fake.createOrgRoleByUserNameMutex.RLock()
-	defer fake.createOrgRoleByUserNameMutex.RUnlock()
-	argsForCall := fake.createOrgRoleByUserNameArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+func (fake *FakeSetOrgRoleActor) CreateOrgRoleArgsForCall(i int) (constant.RoleType, string, string, string, bool) {
+	fake.createOrgRoleMutex.RLock()
+	defer fake.createOrgRoleMutex.RUnlock()
+	argsForCall := fake.createOrgRoleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserNameReturns(result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	defer fake.createOrgRoleByUserNameMutex.Unlock()
-	fake.CreateOrgRoleByUserNameStub = nil
-	fake.createOrgRoleByUserNameReturns = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+func (fake *FakeSetOrgRoleActor) CreateOrgRoleReturns(result1 v7action.Warnings, result2 error) {
+	fake.createOrgRoleMutex.Lock()
+	defer fake.createOrgRoleMutex.Unlock()
+	fake.CreateOrgRoleStub = nil
+	fake.createOrgRoleReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeSetOrgRoleActor) CreateOrgRoleByUserNameReturnsOnCall(i int, result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	defer fake.createOrgRoleByUserNameMutex.Unlock()
-	fake.CreateOrgRoleByUserNameStub = nil
-	if fake.createOrgRoleByUserNameReturnsOnCall == nil {
-		fake.createOrgRoleByUserNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Role
-			result2 v7action.Warnings
-			result3 error
+func (fake *FakeSetOrgRoleActor) CreateOrgRoleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.createOrgRoleMutex.Lock()
+	defer fake.createOrgRoleMutex.Unlock()
+	fake.CreateOrgRoleStub = nil
+	if fake.createOrgRoleReturnsOnCall == nil {
+		fake.createOrgRoleReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
 		})
 	}
-	fake.createOrgRoleByUserNameReturnsOnCall[i] = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+	fake.createOrgRoleReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeSetOrgRoleActor) GetOrganizationByName(arg1 string) (v7action.Organization, v7action.Warnings, error) {
@@ -348,10 +260,8 @@ func (fake *FakeSetOrgRoleActor) GetUserReturnsOnCall(i int, result1 v7action.Us
 func (fake *FakeSetOrgRoleActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createOrgRoleByUserGUIDMutex.RLock()
-	defer fake.createOrgRoleByUserGUIDMutex.RUnlock()
-	fake.createOrgRoleByUserNameMutex.RLock()
-	defer fake.createOrgRoleByUserNameMutex.RUnlock()
+	fake.createOrgRoleMutex.RLock()
+	defer fake.createOrgRoleMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	fake.getUserMutex.RLock()

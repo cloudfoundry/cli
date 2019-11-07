@@ -74,13 +74,14 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Username = "target-user-name"
 		})
 
-		It("creates the org role by username", func() {
-			Expect(fakeActor.CreateOrgRoleByUserNameCallCount()).To(Equal(1))
-			givenRoleType, givenUserName, givenOrigin, givenOrgGUID := fakeActor.CreateOrgRoleByUserNameArgsForCall(0)
+		It("creates the org role", func() {
+			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
+			givenRoleType, givenOrgGUID, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateOrgRoleArgsForCall(0)
 			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
+			Expect(givenOrgGUID).To(Equal("some-org-guid"))
 			Expect(givenUserName).To(Equal("target-user-name"))
 			Expect(givenOrigin).To(Equal("uaa"))
-			Expect(givenOrgGUID).To(Equal("some-org-guid"))
+			Expect(givenIsClient).To(BeFalse())
 		})
 
 		It("displays flavor text and returns without error", func() {
@@ -99,12 +100,13 @@ var _ = Describe("set-org-role Command", func() {
 		})
 
 		It("creates the org role by username", func() {
-			Expect(fakeActor.CreateOrgRoleByUserNameCallCount()).To(Equal(1))
-			givenRoleType, givenUserName, givenOrigin, givenOrgGUID := fakeActor.CreateOrgRoleByUserNameArgsForCall(0)
+			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
+			givenRoleType, givenOrgGUID, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateOrgRoleArgsForCall(0)
 			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
+			Expect(givenOrgGUID).To(Equal("some-org-guid"))
 			Expect(givenUserName).To(Equal("target-user-name"))
 			Expect(givenOrigin).To(Equal("ldap"))
-			Expect(givenOrgGUID).To(Equal("some-org-guid"))
+			Expect(givenIsClient).To(BeFalse())
 		})
 
 		It("displays flavor text and returns without error", func() {
@@ -126,12 +128,14 @@ var _ = Describe("set-org-role Command", func() {
 			Expect(fakeActor.GetUserCallCount()).To(Equal(0))
 		})
 
-		It("creates the org role by user guid", func() {
-			Expect(fakeActor.CreateOrgRoleByUserGUIDCallCount()).To(Equal(1))
-			givenRoleType, givenUserGUID, givenOrgGUID := fakeActor.CreateOrgRoleByUserGUIDArgsForCall(0)
+		It("creates the org role correctly", func() {
+			Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
+			givenRoleType, givenOrgGUID, givenUserGUID, givenOrigin, givenIsClient := fakeActor.CreateOrgRoleArgsForCall(0)
 			Expect(givenRoleType).To(Equal(constant.OrgAuditorRole))
-			Expect(givenUserGUID).To(Equal("target-user-name"))
 			Expect(givenOrgGUID).To(Equal("some-org-guid"))
+			Expect(givenUserGUID).To(Equal("target-user-name"))
+			Expect(givenOrigin).To(Equal("uaa"))
+			Expect(givenIsClient).To(BeTrue())
 		})
 
 		It("displays flavor text and returns without error", func() {
@@ -163,8 +167,7 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
 			cmd.Args.Username = "target-user-name"
 
-			fakeActor.CreateOrgRoleByUserNameReturns(
-				v7action.Role{},
+			fakeActor.CreateOrgRoleReturns(
 				v7action.Warnings{"create-role-warning"},
 				ccerror.RoleAlreadyExistsError{},
 			)
@@ -211,8 +214,7 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
 			cmd.Args.Username = "target-user-name"
 
-			fakeActor.CreateOrgRoleByUserNameReturns(
-				v7action.Role{},
+			fakeActor.CreateOrgRoleReturns(
 				v7action.Warnings{"create-role-warning"},
 				errors.New("create-role-error"),
 			)

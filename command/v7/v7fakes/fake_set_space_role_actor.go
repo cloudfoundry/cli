@@ -10,75 +10,23 @@ import (
 )
 
 type FakeSetSpaceRoleActor struct {
-	CreateOrgRoleByUserGUIDStub        func(constant.RoleType, string, string) (v7action.Role, v7action.Warnings, error)
-	createOrgRoleByUserGUIDMutex       sync.RWMutex
-	createOrgRoleByUserGUIDArgsForCall []struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-	}
-	createOrgRoleByUserGUIDReturns struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	createOrgRoleByUserGUIDReturnsOnCall map[int]struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	CreateOrgRoleByUserNameStub        func(constant.RoleType, string, string, string) (v7action.Role, v7action.Warnings, error)
-	createOrgRoleByUserNameMutex       sync.RWMutex
-	createOrgRoleByUserNameArgsForCall []struct {
+	CreateSpaceRoleStub        func(constant.RoleType, string, string, string, string, bool) (v7action.Warnings, error)
+	createSpaceRoleMutex       sync.RWMutex
+	createSpaceRoleArgsForCall []struct {
 		arg1 constant.RoleType
 		arg2 string
 		arg3 string
 		arg4 string
+		arg5 string
+		arg6 bool
 	}
-	createOrgRoleByUserNameReturns struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
+	createSpaceRoleReturns struct {
+		result1 v7action.Warnings
+		result2 error
 	}
-	createOrgRoleByUserNameReturnsOnCall map[int]struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	CreateSpaceRoleByUserGUIDStub        func(constant.RoleType, string, string) (v7action.Role, v7action.Warnings, error)
-	createSpaceRoleByUserGUIDMutex       sync.RWMutex
-	createSpaceRoleByUserGUIDArgsForCall []struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-	}
-	createSpaceRoleByUserGUIDReturns struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	createSpaceRoleByUserGUIDReturnsOnCall map[int]struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	CreateSpaceRoleByUserNameStub        func(constant.RoleType, string, string, string) (v7action.Role, v7action.Warnings, error)
-	createSpaceRoleByUserNameMutex       sync.RWMutex
-	createSpaceRoleByUserNameArgsForCall []struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-		arg4 string
-	}
-	createSpaceRoleByUserNameReturns struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}
-	createSpaceRoleByUserNameReturnsOnCall map[int]struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
+	createSpaceRoleReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
 	}
 	GetOrganizationByNameStub        func(string) (v7action.Organization, v7action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
@@ -129,278 +77,72 @@ type FakeSetSpaceRoleActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserGUID(arg1 constant.RoleType, arg2 string, arg3 string) (v7action.Role, v7action.Warnings, error) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	ret, specificReturn := fake.createOrgRoleByUserGUIDReturnsOnCall[len(fake.createOrgRoleByUserGUIDArgsForCall)]
-	fake.createOrgRoleByUserGUIDArgsForCall = append(fake.createOrgRoleByUserGUIDArgsForCall, struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("CreateOrgRoleByUserGUID", []interface{}{arg1, arg2, arg3})
-	fake.createOrgRoleByUserGUIDMutex.Unlock()
-	if fake.CreateOrgRoleByUserGUIDStub != nil {
-		return fake.CreateOrgRoleByUserGUIDStub(arg1, arg2, arg3)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.createOrgRoleByUserGUIDReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserGUIDCallCount() int {
-	fake.createOrgRoleByUserGUIDMutex.RLock()
-	defer fake.createOrgRoleByUserGUIDMutex.RUnlock()
-	return len(fake.createOrgRoleByUserGUIDArgsForCall)
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserGUIDCalls(stub func(constant.RoleType, string, string) (v7action.Role, v7action.Warnings, error)) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	defer fake.createOrgRoleByUserGUIDMutex.Unlock()
-	fake.CreateOrgRoleByUserGUIDStub = stub
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserGUIDArgsForCall(i int) (constant.RoleType, string, string) {
-	fake.createOrgRoleByUserGUIDMutex.RLock()
-	defer fake.createOrgRoleByUserGUIDMutex.RUnlock()
-	argsForCall := fake.createOrgRoleByUserGUIDArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserGUIDReturns(result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	defer fake.createOrgRoleByUserGUIDMutex.Unlock()
-	fake.CreateOrgRoleByUserGUIDStub = nil
-	fake.createOrgRoleByUserGUIDReturns = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserGUIDReturnsOnCall(i int, result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserGUIDMutex.Lock()
-	defer fake.createOrgRoleByUserGUIDMutex.Unlock()
-	fake.CreateOrgRoleByUserGUIDStub = nil
-	if fake.createOrgRoleByUserGUIDReturnsOnCall == nil {
-		fake.createOrgRoleByUserGUIDReturnsOnCall = make(map[int]struct {
-			result1 v7action.Role
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.createOrgRoleByUserGUIDReturnsOnCall[i] = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserName(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string) (v7action.Role, v7action.Warnings, error) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	ret, specificReturn := fake.createOrgRoleByUserNameReturnsOnCall[len(fake.createOrgRoleByUserNameArgsForCall)]
-	fake.createOrgRoleByUserNameArgsForCall = append(fake.createOrgRoleByUserNameArgsForCall, struct {
+func (fake *FakeSetSpaceRoleActor) CreateSpaceRole(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string, arg5 string, arg6 bool) (v7action.Warnings, error) {
+	fake.createSpaceRoleMutex.Lock()
+	ret, specificReturn := fake.createSpaceRoleReturnsOnCall[len(fake.createSpaceRoleArgsForCall)]
+	fake.createSpaceRoleArgsForCall = append(fake.createSpaceRoleArgsForCall, struct {
 		arg1 constant.RoleType
 		arg2 string
 		arg3 string
 		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("CreateOrgRoleByUserName", []interface{}{arg1, arg2, arg3, arg4})
-	fake.createOrgRoleByUserNameMutex.Unlock()
-	if fake.CreateOrgRoleByUserNameStub != nil {
-		return fake.CreateOrgRoleByUserNameStub(arg1, arg2, arg3, arg4)
+		arg5 string
+		arg6 bool
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.recordInvocation("CreateSpaceRole", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.createSpaceRoleMutex.Unlock()
+	if fake.CreateSpaceRoleStub != nil {
+		return fake.CreateSpaceRoleStub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createOrgRoleByUserNameReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	fakeReturns := fake.createSpaceRoleReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserNameCallCount() int {
-	fake.createOrgRoleByUserNameMutex.RLock()
-	defer fake.createOrgRoleByUserNameMutex.RUnlock()
-	return len(fake.createOrgRoleByUserNameArgsForCall)
+func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleCallCount() int {
+	fake.createSpaceRoleMutex.RLock()
+	defer fake.createSpaceRoleMutex.RUnlock()
+	return len(fake.createSpaceRoleArgsForCall)
 }
 
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserNameCalls(stub func(constant.RoleType, string, string, string) (v7action.Role, v7action.Warnings, error)) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	defer fake.createOrgRoleByUserNameMutex.Unlock()
-	fake.CreateOrgRoleByUserNameStub = stub
+func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleCalls(stub func(constant.RoleType, string, string, string, string, bool) (v7action.Warnings, error)) {
+	fake.createSpaceRoleMutex.Lock()
+	defer fake.createSpaceRoleMutex.Unlock()
+	fake.CreateSpaceRoleStub = stub
 }
 
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserNameArgsForCall(i int) (constant.RoleType, string, string, string) {
-	fake.createOrgRoleByUserNameMutex.RLock()
-	defer fake.createOrgRoleByUserNameMutex.RUnlock()
-	argsForCall := fake.createOrgRoleByUserNameArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleArgsForCall(i int) (constant.RoleType, string, string, string, string, bool) {
+	fake.createSpaceRoleMutex.RLock()
+	defer fake.createSpaceRoleMutex.RUnlock()
+	argsForCall := fake.createSpaceRoleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserNameReturns(result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	defer fake.createOrgRoleByUserNameMutex.Unlock()
-	fake.CreateOrgRoleByUserNameStub = nil
-	fake.createOrgRoleByUserNameReturns = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleReturns(result1 v7action.Warnings, result2 error) {
+	fake.createSpaceRoleMutex.Lock()
+	defer fake.createSpaceRoleMutex.Unlock()
+	fake.CreateSpaceRoleStub = nil
+	fake.createSpaceRoleReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeSetSpaceRoleActor) CreateOrgRoleByUserNameReturnsOnCall(i int, result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createOrgRoleByUserNameMutex.Lock()
-	defer fake.createOrgRoleByUserNameMutex.Unlock()
-	fake.CreateOrgRoleByUserNameStub = nil
-	if fake.createOrgRoleByUserNameReturnsOnCall == nil {
-		fake.createOrgRoleByUserNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Role
-			result2 v7action.Warnings
-			result3 error
+func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.createSpaceRoleMutex.Lock()
+	defer fake.createSpaceRoleMutex.Unlock()
+	fake.CreateSpaceRoleStub = nil
+	if fake.createSpaceRoleReturnsOnCall == nil {
+		fake.createSpaceRoleReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
 		})
 	}
-	fake.createOrgRoleByUserNameReturnsOnCall[i] = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserGUID(arg1 constant.RoleType, arg2 string, arg3 string) (v7action.Role, v7action.Warnings, error) {
-	fake.createSpaceRoleByUserGUIDMutex.Lock()
-	ret, specificReturn := fake.createSpaceRoleByUserGUIDReturnsOnCall[len(fake.createSpaceRoleByUserGUIDArgsForCall)]
-	fake.createSpaceRoleByUserGUIDArgsForCall = append(fake.createSpaceRoleByUserGUIDArgsForCall, struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("CreateSpaceRoleByUserGUID", []interface{}{arg1, arg2, arg3})
-	fake.createSpaceRoleByUserGUIDMutex.Unlock()
-	if fake.CreateSpaceRoleByUserGUIDStub != nil {
-		return fake.CreateSpaceRoleByUserGUIDStub(arg1, arg2, arg3)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.createSpaceRoleByUserGUIDReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserGUIDCallCount() int {
-	fake.createSpaceRoleByUserGUIDMutex.RLock()
-	defer fake.createSpaceRoleByUserGUIDMutex.RUnlock()
-	return len(fake.createSpaceRoleByUserGUIDArgsForCall)
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserGUIDCalls(stub func(constant.RoleType, string, string) (v7action.Role, v7action.Warnings, error)) {
-	fake.createSpaceRoleByUserGUIDMutex.Lock()
-	defer fake.createSpaceRoleByUserGUIDMutex.Unlock()
-	fake.CreateSpaceRoleByUserGUIDStub = stub
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserGUIDArgsForCall(i int) (constant.RoleType, string, string) {
-	fake.createSpaceRoleByUserGUIDMutex.RLock()
-	defer fake.createSpaceRoleByUserGUIDMutex.RUnlock()
-	argsForCall := fake.createSpaceRoleByUserGUIDArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserGUIDReturns(result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createSpaceRoleByUserGUIDMutex.Lock()
-	defer fake.createSpaceRoleByUserGUIDMutex.Unlock()
-	fake.CreateSpaceRoleByUserGUIDStub = nil
-	fake.createSpaceRoleByUserGUIDReturns = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserGUIDReturnsOnCall(i int, result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createSpaceRoleByUserGUIDMutex.Lock()
-	defer fake.createSpaceRoleByUserGUIDMutex.Unlock()
-	fake.CreateSpaceRoleByUserGUIDStub = nil
-	if fake.createSpaceRoleByUserGUIDReturnsOnCall == nil {
-		fake.createSpaceRoleByUserGUIDReturnsOnCall = make(map[int]struct {
-			result1 v7action.Role
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.createSpaceRoleByUserGUIDReturnsOnCall[i] = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserName(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string) (v7action.Role, v7action.Warnings, error) {
-	fake.createSpaceRoleByUserNameMutex.Lock()
-	ret, specificReturn := fake.createSpaceRoleByUserNameReturnsOnCall[len(fake.createSpaceRoleByUserNameArgsForCall)]
-	fake.createSpaceRoleByUserNameArgsForCall = append(fake.createSpaceRoleByUserNameArgsForCall, struct {
-		arg1 constant.RoleType
-		arg2 string
-		arg3 string
-		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("CreateSpaceRoleByUserName", []interface{}{arg1, arg2, arg3, arg4})
-	fake.createSpaceRoleByUserNameMutex.Unlock()
-	if fake.CreateSpaceRoleByUserNameStub != nil {
-		return fake.CreateSpaceRoleByUserNameStub(arg1, arg2, arg3, arg4)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.createSpaceRoleByUserNameReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserNameCallCount() int {
-	fake.createSpaceRoleByUserNameMutex.RLock()
-	defer fake.createSpaceRoleByUserNameMutex.RUnlock()
-	return len(fake.createSpaceRoleByUserNameArgsForCall)
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserNameCalls(stub func(constant.RoleType, string, string, string) (v7action.Role, v7action.Warnings, error)) {
-	fake.createSpaceRoleByUserNameMutex.Lock()
-	defer fake.createSpaceRoleByUserNameMutex.Unlock()
-	fake.CreateSpaceRoleByUserNameStub = stub
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserNameArgsForCall(i int) (constant.RoleType, string, string, string) {
-	fake.createSpaceRoleByUserNameMutex.RLock()
-	defer fake.createSpaceRoleByUserNameMutex.RUnlock()
-	argsForCall := fake.createSpaceRoleByUserNameArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserNameReturns(result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createSpaceRoleByUserNameMutex.Lock()
-	defer fake.createSpaceRoleByUserNameMutex.Unlock()
-	fake.CreateSpaceRoleByUserNameStub = nil
-	fake.createSpaceRoleByUserNameReturns = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeSetSpaceRoleActor) CreateSpaceRoleByUserNameReturnsOnCall(i int, result1 v7action.Role, result2 v7action.Warnings, result3 error) {
-	fake.createSpaceRoleByUserNameMutex.Lock()
-	defer fake.createSpaceRoleByUserNameMutex.Unlock()
-	fake.CreateSpaceRoleByUserNameStub = nil
-	if fake.createSpaceRoleByUserNameReturnsOnCall == nil {
-		fake.createSpaceRoleByUserNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Role
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.createSpaceRoleByUserNameReturnsOnCall[i] = struct {
-		result1 v7action.Role
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+	fake.createSpaceRoleReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeSetSpaceRoleActor) GetOrganizationByName(arg1 string) (v7action.Organization, v7action.Warnings, error) {
@@ -603,14 +345,8 @@ func (fake *FakeSetSpaceRoleActor) GetUserReturnsOnCall(i int, result1 v7action.
 func (fake *FakeSetSpaceRoleActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createOrgRoleByUserGUIDMutex.RLock()
-	defer fake.createOrgRoleByUserGUIDMutex.RUnlock()
-	fake.createOrgRoleByUserNameMutex.RLock()
-	defer fake.createOrgRoleByUserNameMutex.RUnlock()
-	fake.createSpaceRoleByUserGUIDMutex.RLock()
-	defer fake.createSpaceRoleByUserGUIDMutex.RUnlock()
-	fake.createSpaceRoleByUserNameMutex.RLock()
-	defer fake.createSpaceRoleByUserNameMutex.RUnlock()
+	fake.createSpaceRoleMutex.RLock()
+	defer fake.createSpaceRoleMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	fake.getSpaceByNameAndOrganizationMutex.RLock()

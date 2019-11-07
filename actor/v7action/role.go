@@ -1,50 +1,53 @@
 package v7action
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type Role ccv3.Role
 
-func (actor Actor) CreateOrgRoleByUserGUID(roleType constant.RoleType, userGUID string, orgGUID string) (Role, Warnings, error) {
-	role, warnings, err := actor.CloudControllerClient.CreateRole(ccv3.Role{
-		Type:     roleType,
-		UserGUID: userGUID,
-		OrgGUID:  orgGUID,
-	})
+func (actor Actor) CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (Warnings, error) {
+	roleToCreate := ccv3.Role{
+		Type:    roleType,
+		OrgGUID: orgGUID,
+	}
 
-	return Role(role), Warnings(warnings), err
+	if isClient {
+		roleToCreate.UserGUID = userNameOrGUID
+	} else {
+		roleToCreate.UserName = userNameOrGUID
+		roleToCreate.Origin = userOrigin
+	}
+
+	_, warnings, err := actor.CloudControllerClient.CreateRole(roleToCreate)
+
+	return Warnings(warnings), err
 }
 
-func (actor Actor) CreateOrgRoleByUserName(roleType constant.RoleType, userName string, origin string, orgGUID string) (Role, Warnings, error) {
-	role, warnings, err := actor.CloudControllerClient.CreateRole(ccv3.Role{
-		Type:     roleType,
-		UserName: userName,
-		Origin:   origin,
-		OrgGUID:  orgGUID,
-	})
-
-	return Role(role), Warnings(warnings), err
-}
-
-func (actor Actor) CreateSpaceRoleByUserGUID(roleType constant.RoleType, userGUID string, spaceGUID string) (Role, Warnings, error) {
-	role, warnings, err := actor.CloudControllerClient.CreateRole(ccv3.Role{
+func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (Warnings, error) {
+	roleToCreate := ccv3.Role{
 		Type:      roleType,
-		UserGUID:  userGUID,
 		SpaceGUID: spaceGUID,
-	})
+	}
 
-	return Role(role), Warnings(warnings), err
-}
+	if isClient {
+		roleToCreate.UserGUID = userNameOrGUID
+	} else {
+		roleToCreate.UserName = userNameOrGUID
+		roleToCreate.Origin = userOrigin
+	}
 
-func (actor Actor) CreateSpaceRoleByUserName(roleType constant.RoleType, userName string, origin string, spaceGUID string) (Role, Warnings, error) {
-	role, warnings, err := actor.CloudControllerClient.CreateRole(ccv3.Role{
-		Type:      roleType,
-		UserName:  userName,
-		Origin:    origin,
-		SpaceGUID: spaceGUID,
-	})
+	warnings, err := actor.CreateOrgRole(constant.OrgUserRole, orgGUID, userNameOrGUID, userOrigin, isClient)
+	if err != nil {
+		if _, isIdempotentError := err.(ccerror.RoleAlreadyExistsError); !isIdempotentError {
+			return warnings, err
+		}
+	}
 
-	return Role(role), Warnings(warnings), err
+	_, ccv3Warnings, err := actor.CloudControllerClient.CreateRole(roleToCreate)
+	warnings = append(warnings, ccv3Warnings...)
+
+	return warnings, err
 }
