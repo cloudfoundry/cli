@@ -54,7 +54,7 @@ run:
       /td sha256 `
       /fd sha256 `
       /n "Cloudfoundry.org Foundation, Inc" `
-      .\cf${Suffix}-cli-installer_win32\cf_installer.exe
+      .\cf${Suffix}-cli-installer_win32\cf${Suffix}_installer.exe
 
     & 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe' `
       sign `
@@ -62,9 +62,9 @@ run:
       /td sha256 `
       /fd sha256 `
       /n "Cloudfoundry.org Foundation, Inc" `
-      .\cf${Suffix}-cli-installer_winx64\cf_installer.exe
+      .\cf${Suffix}-cli-installer_winx64\cf${Suffix}_installer.exe
 
-    Compress-Archive -Path .\LICENSE, .\NOTICE, .\cf${Suffix}-cli-installer_win32\cf_installer.exe `
+    Compress-Archive -Path .\LICENSE, .\NOTICE, .\cf${Suffix}-cli-installer_win32\cf${Suffix}_installer.exe `
       -DestinationPath .\signed-windows-zips\cf${Suffix}-cli-installer_${Version}_win32.zip
-    Compress-Archive -Path .\LICENSE, .\NOTICE, .\cf${Suffix}-cli-installer_winx64\cf_installer.exe `
+    Compress-Archive -Path .\LICENSE, .\NOTICE, .\cf${Suffix}-cli-installer_winx64\cf${Suffix}_installer.exe `
       -DestinationPath .\signed-windows-zips\cf${Suffix}-cli-installer_${Version}_winx64.zip
