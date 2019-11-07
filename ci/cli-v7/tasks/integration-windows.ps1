@@ -30,7 +30,8 @@ go get -v -u github.com/onsi/ginkgo/ginkgo
 $Env:RUN_ID=(openssl rand -hex 16)
 
 cd $Env:GOPATH\src\code.cloudfoundry.org\cli
-ginkgo.exe -r -nodes=16 -tags="V7" -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/isolated ./integration/v7/isolated ./integration/v7/plugin ./integration/shared/experimental ./integration/v7/experimental ./integration/v7/push
+$Env:GOFLAGS="-tags=V7"
+ginkgo.exe -r -nodes=16  -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/isolated ./integration/v7/isolated ./integration/v7/plugin ./integration/shared/experimental ./integration/v7/experimental ./integration/v7/push
 if ($LASTEXITCODE -gt 0)
 {
 	exit 1
