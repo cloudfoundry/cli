@@ -48,7 +48,8 @@ var _ = Describe("update-service-broker command", func() {
 			)
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				// Note, because we re-configure the broker we should make sure that we don't use the re-usable one
+				broker = fakeservicebroker.New().WithName(helpers.NewServiceBrokerName()).EnsureBrokerIsAvailable()
 				broker.EnableServiceAccess()
 
 				serviceInstance = helpers.NewServiceInstanceName()
@@ -58,6 +59,10 @@ var _ = Describe("update-service-broker command", func() {
 				broker.Services[0].Plans[0].Name = "different-plan-name"
 				broker.Services[0].Plans[0].ID = "different-plan-id"
 				broker.Configure()
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
 			})
 
 			It("should yield a warning", func() {
