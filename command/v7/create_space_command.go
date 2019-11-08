@@ -90,10 +90,9 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 	if err != nil {
 		if _, ok := err.(actionerror.SpaceAlreadyExistsError); ok {
 			cmd.UI.DisplayText(err.Error())
-			cmd.UI.DisplayOK()
-			return nil
+		} else {
+			return err
 		}
-		return err
 	}
 	cmd.UI.DisplayOK()
 

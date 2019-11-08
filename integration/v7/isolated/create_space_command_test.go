@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("create-space command", func() {
+var _ = FDescribe("create-space command", func() {
 	var (
 		orgName      string
 		otherOrgName string

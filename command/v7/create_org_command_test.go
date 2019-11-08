@@ -159,6 +159,9 @@ var _ = Describe("create-org Command", func() {
 				Expect(testUI.Out).To(Say(`Creating org %s as %s\.\.\.`, orgName, currentUsername))
 				Expect(testUI.Out).To(Say(`Organization '%s' already exists\.`, orgName))
 				Expect(testUI.Out).To(Say("OK"))
+
+				Expect(testUI.Out).To(Say(`Assigning role OrgManager to user %s in org %s as %s\.\.\.`, currentUsername, orgName, currentUsername))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 	})

@@ -16,6 +16,7 @@ import (
 type CreateOrgActor interface {
 	CreateOrganization(orgName string) (v7action.Organization, v7action.Warnings, error)
 	CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
+	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
 }
 
 type CreateOrgCommand struct {
@@ -68,10 +69,14 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 	if err != nil {
 		if _, ok := err.(ccerror.OrganizationNameTakenError); ok {
 			cmd.UI.DisplayText(err.Error())
-			cmd.UI.DisplayOK()
-			return nil
+			org, warnings, err = cmd.Actor.GetOrganizationByName(orgName)
+			cmd.UI.DisplayWarningsV7(warnings)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
 		}
-		return err
 	}
 	cmd.UI.DisplayOK()
 

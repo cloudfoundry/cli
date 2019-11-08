@@ -243,6 +243,12 @@ var _ = Describe("create-space Command", func() {
 				Expect(testUI.Out).To(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, "some-org-name", userName))
 				Expect(testUI.Out).To(Say(`Space '%s' already exists\.`, spaceName))
 				Expect(testUI.Out).To(Say("OK"))
+
+				Expect(testUI.Out).To(Say("Assigning role SpaceManager to user %s in org some-org-name / space %s as %s...", userName, spaceName, userName))
+				Expect(testUI.Out).To(Say("OK"))
+
+				Expect(testUI.Out).To(Say("Assigning role SpaceDeveloper to user %s in org some-org-name / space %s as %s...", userName, spaceName, userName))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 

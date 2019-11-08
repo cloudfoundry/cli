@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("create-org command", func() {
+var _ = FDescribe("create-org command", func() {
 	var (
 		orgName    string
 		orgNameNew string
