@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -14,6 +15,7 @@ import (
 
 type CreateOrgActor interface {
 	CreateOrganization(orgName string) (v7action.Organization, v7action.Warnings, error)
+	CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 }
 
 type CreateOrgCommand struct {
@@ -60,7 +62,7 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	_, warnings, err := cmd.Actor.CreateOrganization(orgName)
+	org, warnings, err := cmd.Actor.CreateOrganization(orgName)
 
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
@@ -71,7 +73,18 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 		}
 		return err
 	}
+	cmd.UI.DisplayOK()
 
+	cmd.UI.DisplayTextWithFlavor("Assigning role OrgManager to user {{.User}} in org {{.Organization}} as {{.User}}...",
+		map[string]interface{}{
+			"User":         user.Name,
+			"Organization": orgName,
+		})
+	warnings, err = cmd.Actor.CreateOrgRole(constant.OrgManagerRole, org.GUID, user.Name, user.Origin, user.IsClient)
+	cmd.UI.DisplayWarningsV7(warnings)
+	if err != nil {
+		return err
+	}
 	cmd.UI.DisplayOK()
 
 	cmd.UI.DisplayText(`TIP: Use 'cf target -o "{{.Organization}}"' to target new org`,

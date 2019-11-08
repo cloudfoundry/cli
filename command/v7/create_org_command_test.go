@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/util/configv3"
 
@@ -70,13 +71,16 @@ var _ = Describe("create-org Command", func() {
 	})
 
 	When("the environment is setup correctly", func() {
+		var currentUsername string
+
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
+			currentUsername = "bob"
+			fakeConfig.CurrentUserReturns(configv3.User{Name: currentUsername}, nil)
 		})
 
 		It("prints text indicating it is creating a org", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Creating org %s as the-user\.\.\.`, orgName))
+			Expect(testUI.Out).To(Say(`Creating org %s as %s\.\.\.`, orgName, currentUsername))
 		})
 
 		When("creating the org errors", func() {
@@ -93,14 +97,24 @@ var _ = Describe("create-org Command", func() {
 
 		When("creating the org is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateOrganizationReturns(v7action.Organization{Name: orgName}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
+				fakeActor.CreateOrganizationReturns(v7action.Organization{Name: orgName, GUID: "some-org-guid"}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
-			//TODO: modify or remove these tests upon set-org-role implementation. they are included in the tests commented out below
 			It("creates the org", func() {
 				Expect(fakeActor.CreateOrganizationCallCount()).To(Equal(1))
 				expectedOrgName := fakeActor.CreateOrganizationArgsForCall(0)
 				Expect(expectedOrgName).To(Equal(orgName))
+			})
+
+			It("assigns org manager to the admin", func() {
+				Expect(testUI.Out).To(Say(`Assigning role OrgManager to user %s in org %s as %s\.\.\.`, currentUsername, orgName, currentUsername))
+				Expect(fakeActor.CreateOrgRoleCallCount()).To(Equal(1))
+				givenRoleType, givenOrgGuid, givenUserName, givenOrigin, givenIsClient := fakeActor.CreateOrgRoleArgsForCall(0)
+				Expect(givenRoleType).To(Equal(constant.OrgManagerRole))
+				Expect(givenOrgGuid).To(Equal("some-org-guid"))
+				Expect(givenUserName).To(Equal(currentUsername))
+				Expect(givenOrigin).To(Equal(""))
+				Expect(givenIsClient).To(BeFalse())
 			})
 
 			It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
@@ -111,7 +125,18 @@ var _ = Describe("create-org Command", func() {
 				Expect(testUI.Out).To(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgName))
 			})
 
-			//TODO: add tests for setting org roles once V7/V3 set-org-role is implemented and included in create-org
+			When("creating the org manager role errors", func() {
+				BeforeEach(func() {
+					fakeActor.CreateOrgRoleReturns(
+						v7action.Warnings{"role-create-warning-1"},
+						errors.New("err-create-role"))
+				})
+
+				It("returns an error and displays warnings", func() {
+					Expect(executeErr).To(MatchError("err-create-role"))
+					Expect(testUI.Err).To(Say("role-create-warning-1"))
+				})
+			})
 		})
 
 		When("the org already exists", func() {
@@ -131,7 +156,7 @@ var _ = Describe("create-org Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Creating org %s as the-user\.\.\.`, orgName))
+				Expect(testUI.Out).To(Say(`Creating org %s as %s\.\.\.`, orgName, currentUsername))
 				Expect(testUI.Out).To(Say(`Organization '%s' already exists\.`, orgName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
