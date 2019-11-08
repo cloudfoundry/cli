@@ -36,7 +36,7 @@ if ($LASTEXITCODE -gt 0)
 {
 	exit 1
 }
-ginkgo.exe -r -tags="V7" -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/global ./integration/v7/global
+ginkgo.exe -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/global ./integration/v7/global
 if ($LASTEXITCODE -gt 0)
 {
 	exit 1
