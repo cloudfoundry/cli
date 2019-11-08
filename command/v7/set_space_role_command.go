@@ -17,10 +17,7 @@ import (
 //go:generate counterfeiter . SetSpaceRoleActor
 
 type SetSpaceRoleActor interface {
-	CreateOrgRoleByUserGUID(roleType constant.RoleType, userGUID string, orgGUID string) (v7action.Role, v7action.Warnings, error)
-	CreateOrgRoleByUserName(roleType constant.RoleType, userName string, origin string, orgGUID string) (v7action.Role, v7action.Warnings, error)
-	CreateSpaceRoleByUserGUID(roleType constant.RoleType, userGUID string, spaceGUID string) (v7action.Role, v7action.Warnings, error)
-	CreateSpaceRoleByUserName(roleType constant.RoleType, userName string, origin string, spaceGUID string) (v7action.Role, v7action.Warnings, error)
+	CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
 	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
 	GetUser(username, origin string) (v7action.User, error)
@@ -99,25 +96,8 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 		origin = "uaa"
 	}
 
-	if cmd.IsClient {
-		_, warnings, err = cmd.Actor.CreateOrgRoleByUserGUID(constant.OrgUserRole, cmd.Args.Username, org.GUID)
-	} else {
-		_, warnings, err = cmd.Actor.CreateOrgRoleByUserName(constant.OrgUserRole, cmd.Args.Username, origin, org.GUID)
-	}
+	warnings, err = cmd.Actor.CreateSpaceRole(roleType, org.GUID, space.GUID, cmd.Args.Username, origin, cmd.IsClient)
 	cmd.UI.DisplayWarningsV7(warnings)
-	if err != nil {
-		if _, isIdempotentError := err.(ccerror.RoleAlreadyExistsError); !isIdempotentError {
-			return err
-		}
-	}
-
-	if cmd.IsClient {
-		_, warnings, err = cmd.Actor.CreateSpaceRoleByUserGUID(roleType, cmd.Args.Username, space.GUID)
-	} else {
-		_, warnings, err = cmd.Actor.CreateSpaceRoleByUserName(roleType, cmd.Args.Username, origin, space.GUID)
-	}
-	cmd.UI.DisplayWarningsV7(warnings)
-
 	if err != nil {
 		if _, ok := err.(ccerror.RoleAlreadyExistsError); ok {
 			cmd.UI.DisplayWarningV7("User '{{.TargetUserName}}' already has role '{{.RoleType}}' in org '{{.OrgName}}' / space '{{.SpaceName}}'.", map[string]interface{}{

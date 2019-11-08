@@ -15,6 +15,8 @@ func BuildTokenString(expiration time.Time) string {
 	c := jws.Claims{}
 	c.SetExpiration(expiration)
 	c.Set("user_name", "some-user")
+	c.Set("user_id", "some-guid")
+	c.Set("origin", "uaa")
 	token := jws.NewJWT(c, crypto.Unsecured)
 	tokenBytes, err := token.Serialize(nil)
 	Expect(err).NotTo(HaveOccurred())

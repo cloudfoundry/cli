@@ -84,17 +84,48 @@ var _ = Describe("create-space command", func() {
 		})
 
 		When("the space does not exist", func() {
-			It("creates the space in the targeted org", func() {
-				session := helpers.CF("create-space", spaceNameNew)
-				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Creating space %s in org %s as %s...", spaceNameNew, orgName, userName))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, orgName, spaceNameNew))
-				Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("space", spaceNameNew)
-				Eventually(session).Should(Say(`name:\s+%s`, spaceNameNew))
-				Eventually(session).Should(Exit(0))
+			When("the actor is a user", func() {
+
+				It("creates the space in the targeted org", func() {
+					session := helpers.CF("create-space", spaceNameNew)
+					userName, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Creating space %s in org %s as %s...", spaceNameNew, orgName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, orgName, spaceNameNew))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("space", spaceNameNew)
+					Eventually(session).Should(Say(`name:\s+%s`, spaceNameNew))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the actor is a client", func() {
+				var clientID string
+
+				BeforeEach(func() {
+					clientID = helpers.LoginCFWithClientCredentials()
+					helpers.TargetOrg(orgName)
+				})
+
+				It("creates the space in the targeted org", func() {
+					session := helpers.CF("create-space", spaceNameNew)
+					Eventually(session).Should(Say("Creating space %s in org %s as %s...", spaceNameNew, orgName, clientID))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, orgName, spaceNameNew))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("space", spaceNameNew)
+					Eventually(session).Should(Say(`name:\s+%s`, spaceNameNew))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("space-users", orgName, spaceNameNew)
+					Eventually(session).Should(Say("SPACE MANAGER"))
+					Eventually(session).Should(Say(`\s+%s \(client\)`, clientID))
+					Eventually(session).Should(Say("SPACE DEVELOPER"))
+					Eventually(session).Should(Say(`\s+%s \(client\)`, clientID))
+				})
 			})
 
 			When("org is specified", func() {
@@ -105,19 +136,30 @@ var _ = Describe("create-space command", func() {
 				AfterEach(func() {
 					helpers.QuickDeleteOrg(otherOrgName)
 				})
-				It("creates the space in the specified org", func() {
+
+				It("creates the space in the specified org and assigns roles to the user", func() {
 					session := helpers.CF("create-space", spaceNameNew, "-o", otherOrgName)
+
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Creating space %s in org %s as %s...", spaceNameNew, otherOrgName, userName))
 					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(`Assigning role SpaceManager to user %s in org %s / space %s as %s\.\.\.`, userName, otherOrgName, spaceNameNew, userName))
+					Eventually(session).Should(Say(`OK\n`))
+					Eventually(session).Should(Say(`Assigning role SpaceDeveloper to user %s in org %s / space %s as %s\.\.\.`, userName, otherOrgName, spaceNameNew, userName))
+					Eventually(session).Should(Say(`OK\n\n`))
 					Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, otherOrgName, spaceNameNew))
 					Eventually(session).Should(Exit(0))
 
-					//TODO: use the cf target command here to be more explicit.
-					helpers.SetupCF(otherOrgName, spaceName)
+					helpers.TargetOrg(otherOrgName)
 					session = helpers.CF("space", spaceNameNew)
 					Eventually(session).Should(Say(`name:\s+%s`, spaceNameNew))
 					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("space-users", otherOrgName, spaceNameNew)
+					Eventually(session).Should(Say("SPACE MANAGER"))
+					Eventually(session).Should(Say(`\s+%s`, userName))
+					Eventually(session).Should(Say("SPACE DEVELOPER"))
+					Eventually(session).Should(Say(`\s+%s`, userName))
 				})
 			})
 		})

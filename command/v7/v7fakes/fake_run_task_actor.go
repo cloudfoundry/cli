@@ -5,15 +5,15 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/v7"
+	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
 type FakeRunTaskActor struct {
-	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
-		appName   string
-		spaceGUID string
+		arg1 string
+		arg2 string
 	}
 	getApplicationByNameAndSpaceReturns struct {
 		result1 v7action.Application
@@ -25,27 +25,11 @@ type FakeRunTaskActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	RunTaskStub        func(appGUID string, task v7action.Task) (v7action.Task, v7action.Warnings, error)
-	runTaskMutex       sync.RWMutex
-	runTaskArgsForCall []struct {
-		appGUID string
-		task    v7action.Task
-	}
-	runTaskReturns struct {
-		result1 v7action.Task
-		result2 v7action.Warnings
-		result3 error
-	}
-	runTaskReturnsOnCall map[int]struct {
-		result1 v7action.Task
-		result2 v7action.Warnings
-		result3 error
-	}
-	GetProcessByTypeAndApplicationStub        func(processType string, appGUID string) (v7action.Process, v7action.Warnings, error)
+	GetProcessByTypeAndApplicationStub        func(string, string) (v7action.Process, v7action.Warnings, error)
 	getProcessByTypeAndApplicationMutex       sync.RWMutex
 	getProcessByTypeAndApplicationArgsForCall []struct {
-		processType string
-		appGUID     string
+		arg1 string
+		arg2 string
 	}
 	getProcessByTypeAndApplicationReturns struct {
 		result1 v7action.Process
@@ -57,26 +41,43 @@ type FakeRunTaskActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	RunTaskStub        func(string, v7action.Task) (v7action.Task, v7action.Warnings, error)
+	runTaskMutex       sync.RWMutex
+	runTaskArgsForCall []struct {
+		arg1 string
+		arg2 v7action.Task
+	}
+	runTaskReturns struct {
+		result1 v7action.Task
+		result2 v7action.Warnings
+		result3 error
+	}
+	runTaskReturnsOnCall map[int]struct {
+		result1 v7action.Task
+		result2 v7action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRunTaskActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error) {
+func (fake *FakeRunTaskActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
-		appName   string
-		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{appName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(appName, spaceGUID)
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -85,13 +86,22 @@ func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceCallCount() int {
 	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v7action.Application, v7action.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
+}
+
 func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationByNameAndSpaceArgsForCall[i].appName, fake.getApplicationByNameAndSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
 		result1 v7action.Application
@@ -101,6 +111,8 @@ func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturns(result1 v7acti
 }
 
 func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -116,77 +128,23 @@ func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRunTaskActor) RunTask(appGUID string, task v7action.Task) (v7action.Task, v7action.Warnings, error) {
-	fake.runTaskMutex.Lock()
-	ret, specificReturn := fake.runTaskReturnsOnCall[len(fake.runTaskArgsForCall)]
-	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
-		appGUID string
-		task    v7action.Task
-	}{appGUID, task})
-	fake.recordInvocation("RunTask", []interface{}{appGUID, task})
-	fake.runTaskMutex.Unlock()
-	if fake.RunTaskStub != nil {
-		return fake.RunTaskStub(appGUID, task)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.runTaskReturns.result1, fake.runTaskReturns.result2, fake.runTaskReturns.result3
-}
-
-func (fake *FakeRunTaskActor) RunTaskCallCount() int {
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
-	return len(fake.runTaskArgsForCall)
-}
-
-func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, v7action.Task) {
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
-	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].task
-}
-
-func (fake *FakeRunTaskActor) RunTaskReturns(result1 v7action.Task, result2 v7action.Warnings, result3 error) {
-	fake.RunTaskStub = nil
-	fake.runTaskReturns = struct {
-		result1 v7action.Task
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeRunTaskActor) RunTaskReturnsOnCall(i int, result1 v7action.Task, result2 v7action.Warnings, result3 error) {
-	fake.RunTaskStub = nil
-	if fake.runTaskReturnsOnCall == nil {
-		fake.runTaskReturnsOnCall = make(map[int]struct {
-			result1 v7action.Task
-			result2 v7action.Warnings
-			result3 error
-		})
-	}
-	fake.runTaskReturnsOnCall[i] = struct {
-		result1 v7action.Task
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeRunTaskActor) GetProcessByTypeAndApplication(processType string, appGUID string) (v7action.Process, v7action.Warnings, error) {
+func (fake *FakeRunTaskActor) GetProcessByTypeAndApplication(arg1 string, arg2 string) (v7action.Process, v7action.Warnings, error) {
 	fake.getProcessByTypeAndApplicationMutex.Lock()
 	ret, specificReturn := fake.getProcessByTypeAndApplicationReturnsOnCall[len(fake.getProcessByTypeAndApplicationArgsForCall)]
 	fake.getProcessByTypeAndApplicationArgsForCall = append(fake.getProcessByTypeAndApplicationArgsForCall, struct {
-		processType string
-		appGUID     string
-	}{processType, appGUID})
-	fake.recordInvocation("GetProcessByTypeAndApplication", []interface{}{processType, appGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetProcessByTypeAndApplication", []interface{}{arg1, arg2})
 	fake.getProcessByTypeAndApplicationMutex.Unlock()
 	if fake.GetProcessByTypeAndApplicationStub != nil {
-		return fake.GetProcessByTypeAndApplicationStub(processType, appGUID)
+		return fake.GetProcessByTypeAndApplicationStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getProcessByTypeAndApplicationReturns.result1, fake.getProcessByTypeAndApplicationReturns.result2, fake.getProcessByTypeAndApplicationReturns.result3
+	fakeReturns := fake.getProcessByTypeAndApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationCallCount() int {
@@ -195,13 +153,22 @@ func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationCallCount() int {
 	return len(fake.getProcessByTypeAndApplicationArgsForCall)
 }
 
+func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationCalls(stub func(string, string) (v7action.Process, v7action.Warnings, error)) {
+	fake.getProcessByTypeAndApplicationMutex.Lock()
+	defer fake.getProcessByTypeAndApplicationMutex.Unlock()
+	fake.GetProcessByTypeAndApplicationStub = stub
+}
+
 func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationArgsForCall(i int) (string, string) {
 	fake.getProcessByTypeAndApplicationMutex.RLock()
 	defer fake.getProcessByTypeAndApplicationMutex.RUnlock()
-	return fake.getProcessByTypeAndApplicationArgsForCall[i].processType, fake.getProcessByTypeAndApplicationArgsForCall[i].appGUID
+	argsForCall := fake.getProcessByTypeAndApplicationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationReturns(result1 v7action.Process, result2 v7action.Warnings, result3 error) {
+	fake.getProcessByTypeAndApplicationMutex.Lock()
+	defer fake.getProcessByTypeAndApplicationMutex.Unlock()
 	fake.GetProcessByTypeAndApplicationStub = nil
 	fake.getProcessByTypeAndApplicationReturns = struct {
 		result1 v7action.Process
@@ -211,6 +178,8 @@ func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationReturns(result1 v7ac
 }
 
 func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationReturnsOnCall(i int, result1 v7action.Process, result2 v7action.Warnings, result3 error) {
+	fake.getProcessByTypeAndApplicationMutex.Lock()
+	defer fake.getProcessByTypeAndApplicationMutex.Unlock()
 	fake.GetProcessByTypeAndApplicationStub = nil
 	if fake.getProcessByTypeAndApplicationReturnsOnCall == nil {
 		fake.getProcessByTypeAndApplicationReturnsOnCall = make(map[int]struct {
@@ -226,16 +195,87 @@ func (fake *FakeRunTaskActor) GetProcessByTypeAndApplicationReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeRunTaskActor) RunTask(arg1 string, arg2 v7action.Task) (v7action.Task, v7action.Warnings, error) {
+	fake.runTaskMutex.Lock()
+	ret, specificReturn := fake.runTaskReturnsOnCall[len(fake.runTaskArgsForCall)]
+	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
+		arg1 string
+		arg2 v7action.Task
+	}{arg1, arg2})
+	fake.recordInvocation("RunTask", []interface{}{arg1, arg2})
+	fake.runTaskMutex.Unlock()
+	if fake.RunTaskStub != nil {
+		return fake.RunTaskStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.runTaskReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeRunTaskActor) RunTaskCallCount() int {
+	fake.runTaskMutex.RLock()
+	defer fake.runTaskMutex.RUnlock()
+	return len(fake.runTaskArgsForCall)
+}
+
+func (fake *FakeRunTaskActor) RunTaskCalls(stub func(string, v7action.Task) (v7action.Task, v7action.Warnings, error)) {
+	fake.runTaskMutex.Lock()
+	defer fake.runTaskMutex.Unlock()
+	fake.RunTaskStub = stub
+}
+
+func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, v7action.Task) {
+	fake.runTaskMutex.RLock()
+	defer fake.runTaskMutex.RUnlock()
+	argsForCall := fake.runTaskArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeRunTaskActor) RunTaskReturns(result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+	fake.runTaskMutex.Lock()
+	defer fake.runTaskMutex.Unlock()
+	fake.RunTaskStub = nil
+	fake.runTaskReturns = struct {
+		result1 v7action.Task
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRunTaskActor) RunTaskReturnsOnCall(i int, result1 v7action.Task, result2 v7action.Warnings, result3 error) {
+	fake.runTaskMutex.Lock()
+	defer fake.runTaskMutex.Unlock()
+	fake.RunTaskStub = nil
+	if fake.runTaskReturnsOnCall == nil {
+		fake.runTaskReturnsOnCall = make(map[int]struct {
+			result1 v7action.Task
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.runTaskReturnsOnCall[i] = struct {
+		result1 v7action.Task
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeRunTaskActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
 	fake.getProcessByTypeAndApplicationMutex.RLock()
 	defer fake.getProcessByTypeAndApplicationMutex.RUnlock()
-	return fake.invocations
+	fake.runTaskMutex.RLock()
+	defer fake.runTaskMutex.RUnlock()
+	copiedInvocations := map[string][][]interface{}{}
+	for key, value := range fake.invocations {
+		copiedInvocations[key] = value
+	}
+	return copiedInvocations
 }
 
 func (fake *FakeRunTaskActor) recordInvocation(key string, args []interface{}) {

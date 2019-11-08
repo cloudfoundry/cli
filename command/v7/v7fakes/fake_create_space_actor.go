@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
@@ -24,6 +25,24 @@ type FakeCreateSpaceActor struct {
 		result1 v7action.Space
 		result2 v7action.Warnings
 		result3 error
+	}
+	CreateSpaceRoleStub        func(constant.RoleType, string, string, string, string, bool) (v7action.Warnings, error)
+	createSpaceRoleMutex       sync.RWMutex
+	createSpaceRoleArgsForCall []struct {
+		arg1 constant.RoleType
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+		arg6 bool
+	}
+	createSpaceRoleReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	createSpaceRoleReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
 	}
 	GetOrganizationByNameStub        func(string) (v7action.Organization, v7action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
@@ -111,6 +130,74 @@ func (fake *FakeCreateSpaceActor) CreateSpaceReturnsOnCall(i int, result1 v7acti
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCreateSpaceActor) CreateSpaceRole(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string, arg5 string, arg6 bool) (v7action.Warnings, error) {
+	fake.createSpaceRoleMutex.Lock()
+	ret, specificReturn := fake.createSpaceRoleReturnsOnCall[len(fake.createSpaceRoleArgsForCall)]
+	fake.createSpaceRoleArgsForCall = append(fake.createSpaceRoleArgsForCall, struct {
+		arg1 constant.RoleType
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+		arg6 bool
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.recordInvocation("CreateSpaceRole", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.createSpaceRoleMutex.Unlock()
+	if fake.CreateSpaceRoleStub != nil {
+		return fake.CreateSpaceRoleStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createSpaceRoleReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateSpaceActor) CreateSpaceRoleCallCount() int {
+	fake.createSpaceRoleMutex.RLock()
+	defer fake.createSpaceRoleMutex.RUnlock()
+	return len(fake.createSpaceRoleArgsForCall)
+}
+
+func (fake *FakeCreateSpaceActor) CreateSpaceRoleCalls(stub func(constant.RoleType, string, string, string, string, bool) (v7action.Warnings, error)) {
+	fake.createSpaceRoleMutex.Lock()
+	defer fake.createSpaceRoleMutex.Unlock()
+	fake.CreateSpaceRoleStub = stub
+}
+
+func (fake *FakeCreateSpaceActor) CreateSpaceRoleArgsForCall(i int) (constant.RoleType, string, string, string, string, bool) {
+	fake.createSpaceRoleMutex.RLock()
+	defer fake.createSpaceRoleMutex.RUnlock()
+	argsForCall := fake.createSpaceRoleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+}
+
+func (fake *FakeCreateSpaceActor) CreateSpaceRoleReturns(result1 v7action.Warnings, result2 error) {
+	fake.createSpaceRoleMutex.Lock()
+	defer fake.createSpaceRoleMutex.Unlock()
+	fake.CreateSpaceRoleStub = nil
+	fake.createSpaceRoleReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateSpaceActor) CreateSpaceRoleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.createSpaceRoleMutex.Lock()
+	defer fake.createSpaceRoleMutex.Unlock()
+	fake.CreateSpaceRoleStub = nil
+	if fake.createSpaceRoleReturnsOnCall == nil {
+		fake.createSpaceRoleReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.createSpaceRoleReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCreateSpaceActor) GetOrganizationByName(arg1 string) (v7action.Organization, v7action.Warnings, error) {
 	fake.getOrganizationByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
@@ -182,6 +269,8 @@ func (fake *FakeCreateSpaceActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
+	fake.createSpaceRoleMutex.RLock()
+	defer fake.createSpaceRoleMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

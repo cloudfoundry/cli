@@ -57,11 +57,12 @@ var _ = Describe("JSONConfig", func() {
 						AccessToken: AccessTokenForClientUsers,
 					},
 				}
-
 				user, err := config.CurrentUser()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(user).To(Equal(User{
-					Name: "potato-face",
+					Name:     "potato-face",
+					GUID:     "potato-face",
+					IsClient: true,
 				}))
 			})
 		})
@@ -77,7 +78,10 @@ var _ = Describe("JSONConfig", func() {
 				user, err := config.CurrentUser()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(user).To(Equal(User{
-					Name: "admin",
+					Name:     "admin",
+					GUID:     "9519be3e-44d9-40d0-ab9a-f4ace11df159",
+					Origin:   "uaa",
+					IsClient: false,
 				}))
 			})
 		})

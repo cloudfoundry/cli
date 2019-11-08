@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -14,6 +15,7 @@ import (
 
 type CreateSpaceActor interface {
 	CreateSpace(spaceName, orgGUID string) (v7action.Space, v7action.Warnings, error)
+	CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
 }
 
@@ -83,9 +85,7 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 			"Space":        spaceName,
 			"Organization": orgName,
 		})
-
-	_, warnings, err := cmd.Actor.CreateSpace(spaceName, orgGUID)
-
+	space, warnings, err := cmd.Actor.CreateSpace(spaceName, orgGUID)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.SpaceAlreadyExistsError); ok {
@@ -95,7 +95,32 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 		}
 		return err
 	}
+	cmd.UI.DisplayOK()
 
+	cmd.UI.DisplayTextWithFlavor("Assigning role SpaceManager to user {{.User}} in org {{.Organization}} / space {{.Space}} as {{.User}}...",
+		map[string]interface{}{
+			"User":         user.Name,
+			"Space":        spaceName,
+			"Organization": orgName,
+		})
+	warnings, err = cmd.Actor.CreateSpaceRole(constant.SpaceManagerRole, orgGUID, space.GUID, user.Name, user.Origin, user.IsClient)
+	cmd.UI.DisplayWarningsV7(warnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayOK()
+
+	cmd.UI.DisplayTextWithFlavor("Assigning role SpaceDeveloper to user {{.User}} in org {{.Organization}} / space {{.Space}} as {{.User}}...",
+		map[string]interface{}{
+			"User":         user.Name,
+			"Space":        spaceName,
+			"Organization": orgName,
+		})
+	warnings, err = cmd.Actor.CreateSpaceRole(constant.SpaceDeveloperRole, orgGUID, space.GUID, user.Name, user.Origin, user.IsClient)
+	cmd.UI.DisplayWarningsV7(warnings)
+	if err != nil {
+		return err
+	}
 	cmd.UI.DisplayOK()
 
 	cmd.UI.DisplayText(`TIP: Use 'cf target -o "{{.Organization}}" -s "{{.Space}}"' to target new space`,
