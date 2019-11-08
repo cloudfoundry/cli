@@ -75,7 +75,7 @@ func SetupSynchronizedSuite(setup func()) {
 // DestroyHomeDir safely removes the given directory checking for errors.
 func DestroyHomeDir(homeDir string) {
 	if homeDir != "" {
-		Expect(os.RemoveAll(homeDir)).To(Succeed())
+		Eventually(func() error {return os.RemoveAll(homeDir)}).Should(Succeed())
 	}
 }
 
