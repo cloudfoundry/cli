@@ -5,10 +5,28 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
 type FakeCreateOrgActor struct {
+	CreateOrgRoleStub        func(constant.RoleType, string, string, string, bool) (v7action.Warnings, error)
+	createOrgRoleMutex       sync.RWMutex
+	createOrgRoleArgsForCall []struct {
+		arg1 constant.RoleType
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 bool
+	}
+	createOrgRoleReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	createOrgRoleReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	CreateOrganizationStub        func(string) (v7action.Organization, v7action.Warnings, error)
 	createOrganizationMutex       sync.RWMutex
 	createOrganizationArgsForCall []struct {
@@ -26,6 +44,73 @@ type FakeCreateOrgActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCreateOrgActor) CreateOrgRole(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string, arg5 bool) (v7action.Warnings, error) {
+	fake.createOrgRoleMutex.Lock()
+	ret, specificReturn := fake.createOrgRoleReturnsOnCall[len(fake.createOrgRoleArgsForCall)]
+	fake.createOrgRoleArgsForCall = append(fake.createOrgRoleArgsForCall, struct {
+		arg1 constant.RoleType
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 bool
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateOrgRole", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.createOrgRoleMutex.Unlock()
+	if fake.CreateOrgRoleStub != nil {
+		return fake.CreateOrgRoleStub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createOrgRoleReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateOrgActor) CreateOrgRoleCallCount() int {
+	fake.createOrgRoleMutex.RLock()
+	defer fake.createOrgRoleMutex.RUnlock()
+	return len(fake.createOrgRoleArgsForCall)
+}
+
+func (fake *FakeCreateOrgActor) CreateOrgRoleCalls(stub func(constant.RoleType, string, string, string, bool) (v7action.Warnings, error)) {
+	fake.createOrgRoleMutex.Lock()
+	defer fake.createOrgRoleMutex.Unlock()
+	fake.CreateOrgRoleStub = stub
+}
+
+func (fake *FakeCreateOrgActor) CreateOrgRoleArgsForCall(i int) (constant.RoleType, string, string, string, bool) {
+	fake.createOrgRoleMutex.RLock()
+	defer fake.createOrgRoleMutex.RUnlock()
+	argsForCall := fake.createOrgRoleArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeCreateOrgActor) CreateOrgRoleReturns(result1 v7action.Warnings, result2 error) {
+	fake.createOrgRoleMutex.Lock()
+	defer fake.createOrgRoleMutex.Unlock()
+	fake.CreateOrgRoleStub = nil
+	fake.createOrgRoleReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateOrgActor) CreateOrgRoleReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.createOrgRoleMutex.Lock()
+	defer fake.createOrgRoleMutex.Unlock()
+	fake.CreateOrgRoleStub = nil
+	if fake.createOrgRoleReturnsOnCall == nil {
+		fake.createOrgRoleReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.createOrgRoleReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCreateOrgActor) CreateOrganization(arg1 string) (v7action.Organization, v7action.Warnings, error) {
@@ -97,6 +182,8 @@ func (fake *FakeCreateOrgActor) CreateOrganizationReturnsOnCall(i int, result1 v
 func (fake *FakeCreateOrgActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.createOrgRoleMutex.RLock()
+	defer fake.createOrgRoleMutex.RUnlock()
 	fake.createOrganizationMutex.RLock()
 	defer fake.createOrganizationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

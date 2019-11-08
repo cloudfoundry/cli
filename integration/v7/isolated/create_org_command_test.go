@@ -76,6 +76,10 @@ var _ = Describe("create-org command", func() {
 				userName, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Creating org %s as %s...", orgNameNew, userName))
 				Eventually(session).Should(Say("OK"))
+
+				Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as %s...", userName, orgNameNew, userName))
+				Eventually(session).Should(Say("OK"))
+
 				Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgNameNew))
 				Eventually(session).Should(Exit(0))
 
