@@ -61,6 +61,7 @@ fixtures/plugins/empty_plugin
 fixtures/config/plugin-config/.cf/plugins/test_1
 fixtures/config/plugin-config/.cf/plugins/test_2
 fixtures/config/plugin-config/.cf/plugins/empty_plugin
+integration/assets/test_plugin_v7/test_plugin_v7
 
 ### VisualStudioCode ###
 .vscode

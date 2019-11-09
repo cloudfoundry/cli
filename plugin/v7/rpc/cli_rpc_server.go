@@ -4,7 +4,6 @@ package rpc
 
 import (
 	"code.cloudfoundry.org/cli/command"
-	v7command "code.cloudfoundry.org/cli/command/v7"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 
 	"fmt"
@@ -25,15 +24,14 @@ type CliRpcService struct {
 	RpcCmd   *CliRpcCmd
 	Server   *rpc.Server
 }
+type OutputCapture interface {
+	SetOutputBucket(io.Writer)
+}
 
 //go:generate counterfeiter . TerminalOutputSwitch
 
 type TerminalOutputSwitch interface {
 	DisableTerminalOutput(bool)
-}
-
-type OutputCapture interface {
-	SetOutputBucket(io.Writer)
 }
 
 func NewRpcService(
@@ -42,7 +40,7 @@ func NewRpcService(
 	w io.Writer,
 	rpcServer *rpc.Server,
 	config command.Config,
-	appActor v7command.AppActor,
+	pluginActor PluginActor,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		Server: rpcServer,
@@ -50,7 +48,7 @@ func NewRpcService(
 			PluginMetadata:       &plugin.PluginMetadata{},
 			MetadataMutex:        &sync.RWMutex{},
 			Config:               config,
-			AppActor:             appActor,
+			PluginActor:          pluginActor,
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
 			outputBucket:         &bytes.Buffer{},

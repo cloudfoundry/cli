@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/command"
-	v7command "code.cloudfoundry.org/cli/command/v7"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
@@ -21,7 +20,7 @@ type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
 	MetadataMutex        *sync.RWMutex
 	Config               command.Config
-	AppActor             v7command.AppActor
+	PluginActor          PluginActor
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
 	outputBucket         *bytes.Buffer
@@ -74,7 +73,8 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedApplicationSummary) error {
 	spaceGUID := cmd.Config.TargetedSpace().GUID
-	app, _, err := cmd.AppActor.GetDetailedAppSummary(appName, spaceGUID, true)
+	app, _, err := cmd.PluginActor.GetDetailedAppSummary(appName, spaceGUID, true)
+
 	if err != nil {
 		return err
 	}
@@ -92,5 +92,14 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 	if err != nil {
 		panic(err)
 	}
+	return nil
+}
+
+func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
+	accessToken, err := cmd.PluginActor.RefreshAccessToken()
+	if err != nil {
+		panic(err)
+	}
+	*retVal = accessToken
 	return nil
 }
