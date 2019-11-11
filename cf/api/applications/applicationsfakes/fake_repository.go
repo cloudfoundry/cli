@@ -57,6 +57,19 @@ type FakeRepository struct {
 		result1 models.Application
 		result2 error
 	}
+	GetAppRoutesStub        func(string) ([]models.Route, error)
+	getAppRoutesMutex       sync.RWMutex
+	getAppRoutesArgsForCall []struct {
+		arg1 string
+	}
+	getAppRoutesReturns struct {
+		result1 []models.Route
+		result2 error
+	}
+	getAppRoutesReturnsOnCall map[int]struct {
+		result1 []models.Route
+		result2 error
+	}
 	ReadStub        func(string) (models.Application, error)
 	readMutex       sync.RWMutex
 	readArgsForCall []struct {
@@ -361,6 +374,69 @@ func (fake *FakeRepository) GetAppReturnsOnCall(i int, result1 models.Applicatio
 	}{result1, result2}
 }
 
+func (fake *FakeRepository) GetAppRoutes(arg1 string) ([]models.Route, error) {
+	fake.getAppRoutesMutex.Lock()
+	ret, specificReturn := fake.getAppRoutesReturnsOnCall[len(fake.getAppRoutesArgsForCall)]
+	fake.getAppRoutesArgsForCall = append(fake.getAppRoutesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetAppRoutes", []interface{}{arg1})
+	fake.getAppRoutesMutex.Unlock()
+	if fake.GetAppRoutesStub != nil {
+		return fake.GetAppRoutesStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getAppRoutesReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeRepository) GetAppRoutesCallCount() int {
+	fake.getAppRoutesMutex.RLock()
+	defer fake.getAppRoutesMutex.RUnlock()
+	return len(fake.getAppRoutesArgsForCall)
+}
+
+func (fake *FakeRepository) GetAppRoutesCalls(stub func(string) ([]models.Route, error)) {
+	fake.getAppRoutesMutex.Lock()
+	defer fake.getAppRoutesMutex.Unlock()
+	fake.GetAppRoutesStub = stub
+}
+
+func (fake *FakeRepository) GetAppRoutesArgsForCall(i int) string {
+	fake.getAppRoutesMutex.RLock()
+	defer fake.getAppRoutesMutex.RUnlock()
+	argsForCall := fake.getAppRoutesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeRepository) GetAppRoutesReturns(result1 []models.Route, result2 error) {
+	fake.getAppRoutesMutex.Lock()
+	defer fake.getAppRoutesMutex.Unlock()
+	fake.GetAppRoutesStub = nil
+	fake.getAppRoutesReturns = struct {
+		result1 []models.Route
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeRepository) GetAppRoutesReturnsOnCall(i int, result1 []models.Route, result2 error) {
+	fake.getAppRoutesMutex.Lock()
+	defer fake.getAppRoutesMutex.Unlock()
+	fake.GetAppRoutesStub = nil
+	if fake.getAppRoutesReturnsOnCall == nil {
+		fake.getAppRoutesReturnsOnCall = make(map[int]struct {
+			result1 []models.Route
+			result2 error
+		})
+	}
+	fake.getAppRoutesReturnsOnCall[i] = struct {
+		result1 []models.Route
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeRepository) Read(arg1 string) (models.Application, error) {
 	fake.readMutex.Lock()
 	ret, specificReturn := fake.readReturnsOnCall[len(fake.readArgsForCall)]
@@ -626,6 +702,8 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.deleteMutex.RUnlock()
 	fake.getAppMutex.RLock()
 	defer fake.getAppMutex.RUnlock()
+	fake.getAppRoutesMutex.RLock()
+	defer fake.getAppRoutesMutex.RUnlock()
 	fake.readMutex.RLock()
 	defer fake.readMutex.RUnlock()
 	fake.readEnvMutex.RLock()

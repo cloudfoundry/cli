@@ -2,11 +2,15 @@ package applications_test
 
 import (
 	"encoding/json"
+	"fmt"
+
 	"net/http"
 	"net/http/httptest"
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
@@ -69,6 +73,113 @@ var _ = Describe("ApplicationsRepository", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(app.Name).To(Equal("My App"))
+		})
+	})
+
+	Describe(".GetAppRoutes", func() {
+		var (
+			testServer  *httptest.Server
+			testHandler *testnet.TestHandler
+			configRepo  coreconfig.ReadWriter
+			repo        Repository
+			appGUID     string
+		)
+
+		AfterEach(func() {
+			testServer.Close()
+		})
+
+		Context("when there are multiple pages of routes", func() {
+			BeforeEach(func() {
+				appGUID = "my-app-guid"
+
+				paginatedRouteRequest1 := testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/apps/%s/routes", appGUID),
+					Response: testnet.TestResponse{
+						Status: http.StatusOK,
+						Body: `{
+							"next_url": "/v2/apps/my-app-guid/routes?page=2",
+							"resources": [
+								{
+                  "metadata": {
+                     "guid": "route-1-guid"
+                  },
+                  "entity": {
+                     "host": "my-host",
+                     "path": "some-path",
+                     "port": null
+                  }
+								}
+							]
+						}`,
+					},
+				}
+
+				paginatedRouteRequest2 := testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/apps/%s/routes?page=2", appGUID),
+					Response: testnet.TestResponse{
+						Status: http.StatusOK,
+						Body: `{
+							"next_url": null,
+							"resources": [
+								{
+                  "metadata": {
+                     "guid": "route-2-guid"
+                  },
+                  "entity": {
+                     "host": "my-host",
+                     "path": "some-path",
+                     "port": null
+                  }
+								}
+							]
+						}`,
+					},
+				}
+
+				configRepo = testconfig.NewRepositoryWithDefaults()
+				testServer, testHandler = testnet.NewServer([]testnet.TestRequest{paginatedRouteRequest1, paginatedRouteRequest2})
+				configRepo.SetAPIEndpoint(testServer.URL)
+				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
+				repo = NewCloudControllerRepository(configRepo, gateway)
+			})
+
+			It("returns all of the routes", func() {
+				routes, err := repo.GetAppRoutes(appGUID)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(len(routes)).To(Equal(2))
+
+				var GUIDs []string
+				for _, route := range routes {
+					GUIDs = append(GUIDs, route.GUID)
+				}
+				Expect(GUIDs).To(ContainElement("route-1-guid"))
+				Expect(GUIDs).To(ContainElement("route-2-guid"))
+			})
+		})
+
+		Context("when an error occurs fetching the routes", func() {
+			BeforeEach(func() {
+				request := testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/apps/%s/routes", appGUID),
+					Response: testnet.TestResponse{
+						Status: http.StatusInternalServerError,
+						Body:   "{}",
+					},
+				}
+				testServer, testHandler, repo = createAppRepo([]testnet.TestRequest{request})
+			})
+
+			It("returns the error", func() {
+				routes, err := repo.GetAppRoutes(appGUID)
+				Expect(err).To(HaveOccurred())
+				Expect(testHandler).To(HaveAllRequestsCalled())
+				Expect(routes).To(BeEmpty())
+			})
 		})
 	})
 

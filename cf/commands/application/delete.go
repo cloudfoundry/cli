@@ -95,7 +95,12 @@ func (cmd *DeleteApp) Execute(c flags.FlagContext) error {
 	}
 
 	if c.Bool("r") {
-		for _, route := range app.Routes {
+		routes, err := cmd.appRepo.GetAppRoutes(app.GUID)
+		if err != nil {
+			return err
+		}
+
+		for _, route := range routes {
 			err = cmd.routeRepo.Delete(route.GUID)
 			if err != nil {
 				return err

@@ -20,6 +20,7 @@ import (
 
 type Repository interface {
 	Create(params models.AppParams) (createdApp models.Application, apiErr error)
+	GetAppRoutes(appGUID string) ([]models.Route, error)
 	GetApp(appGUID string) (models.Application, error)
 	Read(name string) (app models.Application, apiErr error)
 	ReadFromSpace(name string, spaceGUID string) (app models.Application, apiErr error)
@@ -133,4 +134,20 @@ func (repo CloudControllerRepository) ReadEnv(guid string) (*models.Environment,
 func (repo CloudControllerRepository) CreateRestageRequest(guid string) error {
 	path := fmt.Sprintf("/v2/apps/%s/restage", guid)
 	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, strings.NewReader(""), nil)
+}
+
+func (repo CloudControllerRepository) GetAppRoutes(appGUID string) (routes []models.Route, apiErr error) {
+	path := fmt.Sprintf("/v2/apps/%s/routes", appGUID)
+	apiErr = repo.gateway.ListPaginatedResources(
+		repo.config.APIEndpoint(),
+		path,
+		resources.RouteResource{},
+		func(resource interface{}) bool {
+			if route, ok := resource.(resources.RouteResource); ok {
+				routes = append(routes, route.ToModel())
+			}
+			return true
+		})
+
+	return
 }

@@ -79,7 +79,7 @@ var _ = Describe("delete app command", func() {
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		})
 
-		Context("When provided an app that exists", func() {
+		Context("when the given app exists", func() {
 			BeforeEach(func() {
 				appRepo.ReadReturns(app, nil)
 			})
@@ -114,42 +114,65 @@ var _ = Describe("delete app command", func() {
 			})
 
 			Describe("mapped routes", func() {
-				BeforeEach(func() {
-					route1 := models.RouteSummary{}
-					route1.GUID = "the-first-route-guid"
-					route1.Host = "my-app-is-good.com"
-
-					route2 := models.RouteSummary{}
-					route2.GUID = "the-second-route-guid"
-					route2.Host = "my-app-is-bad.com"
-
-					appRepo.ReadReturns(models.Application{
-						Routes: []models.RouteSummary{route1, route2},
-					}, nil)
-				})
-
 				Context("when the -r flag is provided", func() {
-					Context("when deleting routes succeeds", func() {
-						It("deletes the app's routes", func() {
-							runCommand("-f", "-r", "app-to-delete")
+					It("gets all the routes for an app", func() {
+						runCommand("-f", "-r", "app-to-delete")
+						Expect(appRepo.GetAppRoutesCallCount()).To(Equal(1))
 
-							Expect(routeRepo.DeleteCallCount()).To(Equal(2))
-							Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("the-first-route-guid"))
-							Expect(routeRepo.DeleteArgsForCall(1)).To(Equal("the-second-route-guid"))
+						appGUID := appRepo.GetAppRoutesArgsForCall(0)
+						Expect(appGUID).To(Equal(app.GUID))
+					})
+
+					Context("when getting the apps succeeds", func() {
+						BeforeEach(func() {
+							route1 := models.Route{}
+							route1.GUID = "the-first-route-guid"
+							route1.Host = "my-app-is-good.com"
+
+							route2 := models.Route{}
+							route2.GUID = "the-second-route-guid"
+							route2.Host = "my-app-is-bad.com"
+
+							appRepo.GetAppRoutesReturns([]models.Route{route1, route2}, nil)
+						})
+
+						Context("when deleting routes succeeds", func() {
+							It("deletes the app's routes", func() {
+								runCommand("-f", "-r", "app-to-delete")
+
+								Expect(routeRepo.DeleteCallCount()).To(Equal(2))
+								Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("the-first-route-guid"))
+								Expect(routeRepo.DeleteArgsForCall(1)).To(Equal("the-second-route-guid"))
+							})
+						})
+
+						Context("when deleting routes fails", func() {
+							BeforeEach(func() {
+								routeRepo.DeleteReturns(errors.New("an-error"))
+							})
+
+							It("fails with the api error message", func() {
+								runCommand("-f", "-r", "app-to-delete")
+
+								Expect(ui.Outputs()).To(ContainSubstrings(
+									[]string{"Deleting", "app-to-delete"},
+									[]string{"FAILED"},
+								))
+							})
 						})
 					})
 
-					Context("when deleting routes fails", func() {
+					Context("when getting the app routes fails", func() {
 						BeforeEach(func() {
-							routeRepo.DeleteReturns(errors.New("an-error"))
+							appRepo.GetAppRoutesReturns(nil, errors.New("get-app-routes-failed"))
 						})
 
-						It("fails with the api error message", func() {
+						It("returns that error", func() {
 							runCommand("-f", "-r", "app-to-delete")
-
 							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"Deleting", "app-to-delete"},
 								[]string{"FAILED"},
+								[]string{"get-app-routes-failed"},
 							))
 						})
 					})
