@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:5579d171c21fa6078ed325bc11b689d5ea406ad73e1428bbcc2f662cb1703969"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "d526c2cb3061d60f05dfff04f5e0ddc011344d1f"
+  version = "v6.47.2"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -87,14 +99,6 @@
   pruneopts = "NUT"
   revision = "73f7c04d741ab02f4471e6d2653c6d71ff6dbd49"
   version = "v2.3.1"
-
-[[projects]]
-  digest = "1:169d7c92e6f2bded9fee53f6d4a163750df3a8fc4d4e544268547cbc99813651"
-  name = "code.cloudfoundry.org/log-cache"
-  packages = ["src/pkg/client"]
-  pruneopts = "NUT"
-  revision = "c7e8f8c2a628cb13a17519f451edcd8efa35b240"
-  version = "v2.6.0"
 
 [[projects]]
   branch = "master"
@@ -194,7 +198,7 @@
   name = "github.com/cloudfoundry/cli-plugin-repo"
   packages = ["web"]
   pruneopts = "NUT"
-  revision = "e3bb94a32f8ffc29d1040354d8f081b07dc6e489"
+  revision = "cf29c9c1322136079d16bc9895c142d2eb848cf6"
 
 [[projects]]
   branch = "master"
@@ -717,7 +721,6 @@
     "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
     "code.cloudfoundry.org/gofileutils/fileutils",
     "code.cloudfoundry.org/lager/lagertest",
-    "code.cloudfoundry.org/log-cache/pkg/client",
     "code.cloudfoundry.org/log-cache/pkg/client",
     "code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1",
     "code.cloudfoundry.org/ykk",
