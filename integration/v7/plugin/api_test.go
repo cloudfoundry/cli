@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("plugin API", func() {
+var _ = Describe("plugin API", func() {
 	BeforeEach(func() {
 		installTestPlugin()
 	})

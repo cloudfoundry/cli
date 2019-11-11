@@ -6,10 +6,12 @@ import "time"
 
 type Config interface {
 	AccessToken() string
-	RefreshToken() string
 	DialTimeout() time.Duration
 	PollingInterval() time.Duration
+	RefreshToken() string
 	SSHOAuthClient() string
-	StartupTimeout() time.Duration
+	SetAccessToken(token string)
+	SetRefreshToken(token string)
 	StagingTimeout() time.Duration
+	StartupTimeout() time.Duration
 }

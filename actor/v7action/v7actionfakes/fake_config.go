@@ -59,6 +59,16 @@ type FakeConfig struct {
 	sSHOAuthClientReturnsOnCall map[int]struct {
 		result1 string
 	}
+	SetAccessTokenStub        func(string)
+	setAccessTokenMutex       sync.RWMutex
+	setAccessTokenArgsForCall []struct {
+		arg1 string
+	}
+	SetRefreshTokenStub        func(string)
+	setRefreshTokenMutex       sync.RWMutex
+	setRefreshTokenArgsForCall []struct {
+		arg1 string
+	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
 	stagingTimeoutArgsForCall []struct {
@@ -343,6 +353,68 @@ func (fake *FakeConfig) SSHOAuthClientReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeConfig) SetAccessToken(arg1 string) {
+	fake.setAccessTokenMutex.Lock()
+	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
+	fake.setAccessTokenMutex.Unlock()
+	if fake.SetAccessTokenStub != nil {
+		fake.SetAccessTokenStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetAccessTokenCallCount() int {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return len(fake.setAccessTokenArgsForCall)
+}
+
+func (fake *FakeConfig) SetAccessTokenCalls(stub func(string)) {
+	fake.setAccessTokenMutex.Lock()
+	defer fake.setAccessTokenMutex.Unlock()
+	fake.SetAccessTokenStub = stub
+}
+
+func (fake *FakeConfig) SetAccessTokenArgsForCall(i int) string {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	argsForCall := fake.setAccessTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) SetRefreshToken(arg1 string) {
+	fake.setRefreshTokenMutex.Lock()
+	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
+	fake.setRefreshTokenMutex.Unlock()
+	if fake.SetRefreshTokenStub != nil {
+		fake.SetRefreshTokenStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetRefreshTokenCallCount() int {
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	return len(fake.setRefreshTokenArgsForCall)
+}
+
+func (fake *FakeConfig) SetRefreshTokenCalls(stub func(string)) {
+	fake.setRefreshTokenMutex.Lock()
+	defer fake.setRefreshTokenMutex.Unlock()
+	fake.SetRefreshTokenStub = stub
+}
+
+func (fake *FakeConfig) SetRefreshTokenArgsForCall(i int) string {
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	argsForCall := fake.setRefreshTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConfig) StagingTimeout() time.Duration {
 	fake.stagingTimeoutMutex.Lock()
 	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
@@ -460,6 +532,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.refreshTokenMutex.RUnlock()
 	fake.sSHOAuthClientMutex.RLock()
 	defer fake.sSHOAuthClientMutex.RUnlock()
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
