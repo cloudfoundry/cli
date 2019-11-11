@@ -1331,7 +1331,7 @@ var _ = Describe("Services Repo", func() {
 
 				secondPaginatedRequest := testnet.TestRequest{
 					Method: "GET",
-					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services"),
+					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?page=2"),
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
 						Body: `{"next_url": null,
