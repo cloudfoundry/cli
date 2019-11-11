@@ -264,7 +264,7 @@ var _ = Describe("Server", func() {
 			time.Sleep(50 * time.Millisecond)
 		})
 
-		FDescribe("GetApp", func() {
+		Describe("GetApp", func() {
 
 			It("retrieves the app summary", func() {
 				result := plugin_models.DetailedApplicationSummary{}
@@ -301,7 +301,7 @@ var _ = Describe("Server", func() {
 
 			})
 		})
-		FDescribe("AccessToken", func() {
+		Describe("AccessToken", func() {
 
 			BeforeEach(func() {
 				fakePluginActor.RefreshAccessTokenReturns("token example", nil)
