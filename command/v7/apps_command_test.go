@@ -306,15 +306,4 @@ var _ = Describe("apps Command", func() {
 		})
 	})
 
-	Context("when a labels flag is set", func() {
-		BeforeEach(func() {
-			cmd.Labels = "fish=moose"
-		})
-
-		It("passes the flag to the API", func() {
-			Expect(fakeActor.GetAppSummariesForSpaceCallCount()).To(Equal(1))
-			_, labelSelector := fakeActor.GetAppSummariesForSpaceArgsForCall(0)
-			Expect(labelSelector).To(Equal("fish=moose"))
-		})
-	})
 })

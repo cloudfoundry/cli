@@ -74,8 +74,12 @@ func (actor Actor) DeleteDomain(domain Domain) (Warnings, error) {
 	return allWarnings, err
 }
 
-func (actor Actor) GetOrganizationDomains(orgGuid string) ([]Domain, Warnings, error) {
-	ccv3Domains, warnings, err := actor.CloudControllerClient.GetOrganizationDomains(orgGuid)
+func (actor Actor) GetOrganizationDomains(orgGuid string, labelSelector string) ([]Domain, Warnings, error) {
+	keys := []ccv3.Query{}
+	if labelSelector != "" {
+		keys = append(keys, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
+	ccv3Domains, warnings, err := actor.CloudControllerClient.GetOrganizationDomains(orgGuid, keys...)
 
 	if err != nil {
 		return nil, Warnings(warnings), err

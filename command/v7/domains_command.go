@@ -15,13 +15,14 @@ import (
 //go:generate counterfeiter . DomainsActor
 
 type DomainsActor interface {
-	GetOrganizationDomains(string) ([]v7action.Domain, v7action.Warnings, error)
+	GetOrganizationDomains(string, string) ([]v7action.Domain, v7action.Warnings, error)
 }
 
 type DomainsCommand struct {
-	usage           interface{} `usage:"CF_NAME domains"`
-	relatedCommands interface{} `related_commands:"create-route, routes, create-shared-domain, create-private-domain"`
+	usage           interface{} `usage:"CF_NAME domains\n\nEXAMPLES:\n   CF_NAME domains\n   CF_NAME domains --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME domains --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
+	relatedCommands interface{} `related_commands:"create-private-domain, create-route, create-shared-domain, routes, set-label"`
 
+	Labels      string `long:"labels" description:"Selector to filter domains by labels"`
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
@@ -59,7 +60,7 @@ func (cmd DomainsCommand) Execute(args []string) error {
 		"CurrentUser": currentUser.Name,
 	})
 
-	domains, warnings, err := cmd.Actor.GetOrganizationDomains(targetedOrg.GUID)
+	domains, warnings, err := cmd.Actor.GetOrganizationDomains(targetedOrg.GUID, cmd.Labels)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err

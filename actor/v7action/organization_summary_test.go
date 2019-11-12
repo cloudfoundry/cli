@@ -84,7 +84,9 @@ var _ = Describe("Organization Summary Actions", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)[0].Values).To(ConsistOf("some-org"))
 				Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)).To(Equal("some-org-guid"))
+				orgGuid, labelSelector := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
+				Expect(orgGuid).To(Equal("some-org-guid"))
+				Expect(labelSelector).To(Equal([]ccv3.Query{}))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)[0].Values).To(ConsistOf("some-org-guid"))
 

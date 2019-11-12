@@ -193,5 +193,16 @@ var _ = Describe("domains Command", func() {
 				Expect(testUI.Out).To(Say("Getting domains in org some-org as banana...\n\n"))
 			})
 		})
+		Context("when a labels flag is set", func() {
+			BeforeEach(func() {
+				cmd.Labels = "fish=moose"
+			})
+
+			It("passes the flag to the API", func() {
+				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
+				_, labelSelector := fakeActor.GetOrganizationDomainsArgsForCall(0)
+				Expect(labelSelector).To(Equal("fish=moose"))
+			})
+		})
 	})
 })

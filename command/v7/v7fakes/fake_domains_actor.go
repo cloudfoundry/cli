@@ -9,10 +9,11 @@ import (
 )
 
 type FakeDomainsActor struct {
-	GetOrganizationDomainsStub        func(string) ([]v7action.Domain, v7action.Warnings, error)
+	GetOrganizationDomainsStub        func(string, string) ([]v7action.Domain, v7action.Warnings, error)
 	getOrganizationDomainsMutex       sync.RWMutex
 	getOrganizationDomainsArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	getOrganizationDomainsReturns struct {
 		result1 []v7action.Domain
@@ -28,16 +29,17 @@ type FakeDomainsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomains(arg1 string) ([]v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeDomainsActor) GetOrganizationDomains(arg1 string, arg2 string) ([]v7action.Domain, v7action.Warnings, error) {
 	fake.getOrganizationDomainsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationDomainsReturnsOnCall[len(fake.getOrganizationDomainsArgsForCall)]
 	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1, arg2})
 	fake.getOrganizationDomainsMutex.Unlock()
 	if fake.GetOrganizationDomainsStub != nil {
-		return fake.GetOrganizationDomainsStub(arg1)
+		return fake.GetOrganizationDomainsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -52,17 +54,17 @@ func (fake *FakeDomainsActor) GetOrganizationDomainsCallCount() int {
 	return len(fake.getOrganizationDomainsArgsForCall)
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomainsCalls(stub func(string) ([]v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeDomainsActor) GetOrganizationDomainsCalls(stub func(string, string) ([]v7action.Domain, v7action.Warnings, error)) {
 	fake.getOrganizationDomainsMutex.Lock()
 	defer fake.getOrganizationDomainsMutex.Unlock()
 	fake.GetOrganizationDomainsStub = stub
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomainsArgsForCall(i int) string {
+func (fake *FakeDomainsActor) GetOrganizationDomainsArgsForCall(i int) (string, string) {
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
 	argsForCall := fake.getOrganizationDomainsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeDomainsActor) GetOrganizationDomainsReturns(result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {

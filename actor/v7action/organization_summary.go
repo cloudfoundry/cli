@@ -21,7 +21,7 @@ func (actor Actor) GetOrganizationSummaryByName(orgName string) (OrganizationSum
 		return OrganizationSummary{}, allWarnings, err
 	}
 
-	domains, warnings, err := actor.GetOrganizationDomains(org.GUID)
+	domains, warnings, err := actor.GetOrganizationDomains(org.GUID, "")
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return OrganizationSummary{}, allWarnings, err

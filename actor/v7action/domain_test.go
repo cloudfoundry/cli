@@ -222,6 +222,7 @@ var _ = Describe("Domain Actions", func() {
 			sharedFromOrgGuid = "another-org-guid"
 			warnings          Warnings
 			executeErr        error
+			labelSelector     string
 		)
 
 		BeforeEach(func() {
@@ -230,10 +231,11 @@ var _ = Describe("Domain Actions", func() {
 				{Name: domain2Name, GUID: domain2Guid, OrganizationGUID: org1Guid},
 				{Name: domain3Name, GUID: domain3Guid, OrganizationGUID: sharedFromOrgGuid},
 			}
+			labelSelector = "foo=bar"
 		})
 
 		JustBeforeEach(func() {
-			domains, warnings, executeErr = actor.GetOrganizationDomains(org1Guid)
+			domains, warnings, executeErr = actor.GetOrganizationDomains(org1Guid, labelSelector)
 		})
 
 		When("the API layer call is successful", func() {
@@ -251,9 +253,8 @@ var _ = Describe("Domain Actions", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
-				actualOrgGuid, actualQuery := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
+				actualOrgGuid, _ := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
 				Expect(actualOrgGuid).To(Equal(expectedOrgGUID))
-				Expect(actualQuery).To(BeNil())
 
 				Expect(domains).To(ConsistOf(
 					Domain{Name: domain1Name, GUID: domain1Guid, OrganizationGUID: org1Guid},
@@ -262,6 +263,25 @@ var _ = Describe("Domain Actions", func() {
 				))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
 
+			})
+
+			It("uses the label selector", func() {
+				_, actualQuery := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
+				Expect(actualQuery).To(ContainElement(ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{"foo=bar"}}))
+			})
+
+			When("the label selector isn't specified", func() {
+				BeforeEach(func() {
+					labelSelector = ""
+				})
+
+				It("calls the API with no label selectors", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
+					_, actualQuery := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
+					Expect(len(actualQuery)).To(Equal(0))
+				})
 			})
 		})
 
