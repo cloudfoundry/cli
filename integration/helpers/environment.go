@@ -86,7 +86,7 @@ func UnrefactoredCheckEnvironmentTargetedCorrectly(targetedOrganizationRequired 
 		By("errors if org is not targeted")
 		session := CF(command...)
 		Eventually(session).Should(Say("FAILED"))
-		Eventually(session).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
+		Eventually(session).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
 		Eventually(session).Should(Exit(1))
 
 		if targetedSpaceRequired {
@@ -94,7 +94,7 @@ func UnrefactoredCheckEnvironmentTargetedCorrectly(targetedOrganizationRequired 
 			TargetOrg(testOrg)
 			session := CF(command...)
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
+			Eventually(session).Should(Say("No space targeted, use 'cf target -s' to target a space\\."))
 			Eventually(session).Should(Exit(1))
 		}
 	}

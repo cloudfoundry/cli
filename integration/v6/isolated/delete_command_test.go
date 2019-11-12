@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = XDescribe("delete command", func() {
+var _ = Describe("delete command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -39,7 +39,7 @@ var _ = XDescribe("delete command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "delete", "app-name")
+			helpers.UnrefactoredCheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "delete", "app-name")
 		})
 	})
 
@@ -66,12 +66,9 @@ var _ = XDescribe("delete command", func() {
 		})
 
 		When("the app does not exist", func() {
-			It("prompts the user and displays app does not exist", func() {
-				buffer := NewBuffer()
-				buffer.Write([]byte("y\n"))
-				session := helpers.CFWithStdin(buffer, "delete")
+			It("displays that the app does not exist", func() {
+				session := helpers.CF("delete", appName, "-f")
 
-				Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
 				Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("App %s does not exist.", appName))
@@ -97,36 +94,6 @@ var _ = XDescribe("delete command", func() {
 					buffer = NewBuffer()
 				})
 
-				When("the user enters 'y'", func() {
-					BeforeEach(func() {
-						buffer.Write([]byte("y\n"))
-					})
-
-					It("deletes the app", func() {
-						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
-						Eventually(helpers.CF("app", appName)).Should(Exit(1))
-					})
-				})
-
-				When("the user enters 'n'", func() {
-					BeforeEach(func() {
-						buffer.Write([]byte("n\n"))
-					})
-
-					It("does not delete the app", func() {
-						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session).Should(Say("Delete cancelled"))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
-						Eventually(helpers.CF("app", appName)).Should(Exit(0))
-					})
-				})
-
 				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("\n"))
@@ -134,38 +101,19 @@ var _ = XDescribe("delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Really delete the app %s\\?", appName))
 						Eventually(session).Should(Say("Delete cancelled"))
-						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 						Eventually(helpers.CF("app", appName)).Should(Exit(0))
 					})
 				})
 
-				When("the user enters an invalid answer", func() {
-					BeforeEach(func() {
-						// The second '\n' is intentional. Otherwise the buffer will be
-						// closed while the interaction is still waiting for input; it gets
-						// an EOF and causes an error.
-						buffer.Write([]byte("wat\n\n"))
-					})
-
-					It("asks again", func() {
-						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session).Should(Exit(0))
-						Eventually(helpers.CF("app", appName)).Should(Exit(0))
-					})
-				})
 			})
 
 			When("the -f flag is provided", func() {
 				It("deletes the app without prompting", func() {
 					session := helpers.CF("delete", appName, "-f")
 					Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("app", appName)).Should(Exit(1))
