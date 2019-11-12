@@ -5,7 +5,8 @@ go_import_path: code.cloudfoundry.org/cli
 install:
 - go get -u github.com/onsi/ginkgo/ginkgo
 script:
-- go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version
+- curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.20.0
+- make lint
 - NODES=1 make units-full
 branches:
   only:

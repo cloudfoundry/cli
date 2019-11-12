@@ -38,6 +38,7 @@
     "enable-all": true,
     "disable": [
       "dupl",
+      "funlen",
       "gochecknoglobals",
       "gocyclo",
       "gofmt",
