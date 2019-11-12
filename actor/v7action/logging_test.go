@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
-
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -21,12 +19,12 @@ var _ = Describe("Logging Actions", func() {
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 		fakeConfig                *v7actionfakes.FakeConfig
-		fakeLogCacheClient        *loggingactionfakes.FakeLogCacheClient
+		fakeLogCacheClient        *v7actionfakes.FakeLogCacheClient
 	)
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
-		fakeLogCacheClient = new(loggingactionfakes.FakeLogCacheClient)
+		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
 

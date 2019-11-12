@@ -13,9 +13,12 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"code.cloudfoundry.org/cli/actor/loggingaction"
+	"github.com/SermoDigital/jose/jws"
 )
 
 const StagingLog = "STG"
+
+var flushInterval = 300 * time.Millisecond
 
 type LogMessage struct {
 	message        string
@@ -178,4 +181,48 @@ func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spa
 	}
 
 	return logMessages, allWarnings, nil
+}
+
+func (actor Actor) ScheduleTokenRefresh() (chan bool, error) {
+	accessTokenString, err := actor.RefreshAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	accessTokenString = strings.TrimPrefix(accessTokenString, "bearer ")
+	token, err := jws.ParseJWT([]byte(accessTokenString))
+	if err != nil {
+		return nil, err
+	}
+
+	var expiresIn time.Duration
+	expiration, ok := token.Claims().Expiration()
+	if ok {
+		expiresIn = time.Until(expiration)
+
+		// When we refresh exactly every EXPIRY_DURATION nanoseconds usually the auth token
+		// ends up expiring on the log-cache client. Better to refresh a little more often
+		// to avoid log outage
+		expiresIn = expiresIn * 9 / 10
+	} else {
+		return nil, errors.New("Failed to get an expiry time from the current access token")
+	}
+	quitNowChannel := make(chan bool, 1)
+
+	go func() {
+		ticker := time.NewTicker(expiresIn)
+		defer ticker.Stop()
+		for {
+			select {
+			case _, _ = <-ticker.C:
+				_, err := actor.RefreshAccessToken()
+				if err != nil {
+					panic(err)
+				}
+			case _, _ = <-quitNowChannel:
+				return
+			}
+		}
+	}()
+
+	return quitNowChannel, nil
 }

@@ -72,8 +72,8 @@ var _ = Describe("Verbose", func() {
 		},
 
 		Entry("CF_TRACE true: enables verbose", "true", "", false),
-		Entry("CF_Trace true, config trace false: enables verbose", "true", "false", false),
-		Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
+		Entry("CF_TRACE true, config trace false: enables verbose", "true", "false", false),
+		Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
 
 		Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
 		Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
@@ -148,7 +148,7 @@ var _ = Describe("Verbose", func() {
 			}
 		},
 
-		Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false, []string{"/foo"}),
+		Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false, []string{"/foo"}),
 
 		Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo", false, []string{"/foo"}),
 		Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true, []string{"/foo"}),
@@ -163,7 +163,7 @@ var _ = Describe("Verbose", func() {
 		Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo", "/bar", true, []string{"/foo", "/bar"}),
 	)
 
-	Describe("NOAA", func() {
+	Describe("Log cache", func() {
 		var orgName string
 
 		BeforeEach(func() {
@@ -215,15 +215,15 @@ var _ = Describe("Verbose", func() {
 				session := helpers.CFWithEnv(envMap, command...)
 
 				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say("GET /v2/info"))
-				Eventually(session).Should(Say("WEBSOCKET REQUEST:"))
+				Eventually(session).Should(Say(`GET /\s+`))
+				Eventually(session).Should(Say("HOST: https://log-cache"))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Eventually(session.Kill()).Should(Exit())
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
-			Entry("CF_Trace true, config trace false: enables verbose", "true", "false", false),
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
+			Entry("CF_TRACE true, config trace false: enables verbose", "true", "false", false),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
@@ -267,7 +267,7 @@ var _ = Describe("Verbose", func() {
 
 				session := helpers.CFWithEnv(envMap, "logs", "-v", appName)
 
-				Eventually(session).Should(Say("WEBSOCKET RESPONSE"))
+				Eventually(session).Should(Say("HTTP RESPONSE"))
 				Eventually(session.Kill()).Should(Exit())
 
 				for _, filePath := range location {
@@ -275,8 +275,8 @@ var _ = Describe("Verbose", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp("GET /v2/info"))
-					Expect(string(contents)).To(MatchRegexp("WEBSOCKET REQUEST:"))
+					Expect(string(contents)).To(MatchRegexp(`GET /\s+`))
+					Expect(string(contents)).To(MatchRegexp("HOST: https://log-cache"))
 					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 
 					stat, err := os.Stat(tmpDir + filePath)
@@ -290,7 +290,7 @@ var _ = Describe("Verbose", func() {
 				}
 			},
 
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", []string{"/foo"}),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", []string{"/foo"}),
 
 			Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo", []string{"/foo"}),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", []string{"/foo"}),
