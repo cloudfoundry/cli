@@ -5,7 +5,6 @@ go_import_path: code.cloudfoundry.org/cli
 install:
 - go get -u github.com/onsi/ginkgo/ginkgo
 script:
-- go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version
 - NODES=1 make units-full
 branches:
   only:
