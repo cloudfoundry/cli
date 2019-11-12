@@ -286,4 +286,59 @@ var _ = Describe("Role Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetRolesByOrg", func() {
+		var (
+			actualRoles []Role
+			actualErr   error
+			warnings    Warnings
+		)
+
+		JustBeforeEach(func() {
+			actualRoles, warnings, actualErr = actor.GetRolesByOrg("some-org-guid")
+		})
+
+		When("when the API returns a success response", func() {
+			When("the API returns one user", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRolesReturns(
+						[]ccv3.Role{},
+						ccv3.Warnings{"some-api-warning"},
+						nil,
+					)
+				})
+
+				It("returns the single user", func() {
+					Expect(actualErr).NotTo(HaveOccurred())
+					Expect(actualRoles).To(Equal([]Role{{GUID: "user-id"}}))
+					Expect(warnings).To(ConsistOf("some-api-warning"))
+
+					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetRolesArgsForCall(0)
+					Expect(query).To(Equal("organization=some-org-guid"))
+				})
+			})
+		})
+
+		When("the API returns an error", func() {
+			var apiError error
+
+			BeforeEach(func() {
+				apiError = errors.New("api-get-roles-error")
+				fakeCloudControllerClient.GetRolesReturns(
+					[]ccv3.Role{},
+					ccv3.Warnings{"some-warning"},
+					apiError,
+				)
+			})
+
+			It("returns error coming from the API", func() {
+				Expect(actualRoles).To(Equal([]Role{}))
+				Expect(actualErr).To(MatchError("api-get-roles-error"))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+			})
+		})
+	})
 })

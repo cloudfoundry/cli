@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -124,4 +125,30 @@ func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return responseRole, response.Warnings, err
+}
+
+// GetRoles lists roles with optional filters & includes.
+func (client *Client) GetRoles(query ...Query) ([]Role, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRolesRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var rolesList []Role
+	warnings, err := client.paginate(request, Role{}, func(item interface{}) error {
+		if role, ok := item.(Role); ok {
+			rolesList = append(rolesList, role)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Role{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return rolesList, warnings, err
 }

@@ -59,6 +59,7 @@ const (
 	GetProcessRequest                                           = "GetProcess"
 	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetProcessSidecarsRequest                                   = "GetProcessSidecars"
+	GetRolesRequest                                             = "GetRoles"
 	GetRouteDestinationsRequest                                 = "GetRouteDestinations"
 	GetRoutesRequest                                            = "GetRoutes"
 	GetServiceBrokersRequest                                    = "GetServiceBrokers"
@@ -196,6 +197,7 @@ var APIRoutes = []Route{
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/sidecars", Method: http.MethodGet, Name: GetProcessSidecarsRequest},
 	{Resource: ResourceMatches, Path: "/", Method: http.MethodPost, Name: PostResourceMatchesRequest},
+	{Resource: RolesResource, Path: "/", Method: http.MethodGet, Name: GetRolesRequest},
 	{Resource: RolesResource, Path: "/", Method: http.MethodPost, Name: PostRoleRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Resource: RoutesResource, Path: "/", Method: http.MethodPost, Name: PostRouteRequest},

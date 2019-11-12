@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -372,6 +373,126 @@ var _ = Describe("Role", func() {
 							SpaceGUID: "space-guid",
 						}))
 					})
+				})
+			})
+		})
+	})
+
+	Describe("GetRoles", func() {
+		var (
+			roles      []Role
+			warnings   Warnings
+			executeErr error
+			query      Query
+		)
+
+		BeforeEach(func() {
+			query = Query{
+				Key:    OrganizationGUIDFilter,
+				Values: []string{"some-org-name"},
+			}
+		})
+		JustBeforeEach(func() {
+			roles, warnings, executeErr = client.GetRoles(query)
+		})
+
+		Describe("listing roles", func() {
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					response1 := fmt.Sprintf(`{
+	"pagination": {
+		"next": {
+			"href": "%s/v3/roles?organization_guids=some-org-name&page=2&per_page=1"
+		}
+	},
+  "resources": [
+    {
+      "guid": "role-guid-1",
+      "type": "organization_user"
+    }
+  ]
+}`, server.URL())
+					response2 := `{
+							"pagination": {
+								"next": null
+							},
+						 "resources": [
+						   {
+						     "guid": "role-guid-2",
+						     "type": "organization_manager"
+						   }
+						 ]
+						}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "organization_guids=some-org-name&page=2&per_page=1"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("returns the given route and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(roles).To(Equal([]Role{{
+						GUID: "role-guid-1",
+						Type: constant.OrgUserRole,
+					}, {
+						GUID: "role-guid-2",
+						Type: constant.OrgManagerRole,
+					}}))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Org not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Org not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
 		})
