@@ -13,6 +13,8 @@ import (
 )
 
 var _ = Describe("random route", func() {
+	const randomRouteRegexp = `(?m)routes:\s+%s-[\w]+-[\w]+\.%s$`
+
 	var (
 		appName string
 	)
@@ -26,13 +28,13 @@ var _ = Describe("random route", func() {
 			It("generates a random route for the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-manifest", "--no-start")
-					Eventually(session).Should(Say(`(?m)routes:\s+%s-[\w]+-[\w]+.%s$`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(randomRouteRegexp, appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Exit(0))
 				})
 
 				appSession := helpers.CF("app", appName)
 				Eventually(appSession).Should(Say(`name:\s+%s`, appName))
-				Eventually(appSession).Should(Say(`(?m)routes:\s+%s-[\w]+-[\w]+.%s$`, appName, helpers.DefaultSharedDomain()))
+				Eventually(appSession).Should(Say(randomRouteRegexp, appName, helpers.DefaultSharedDomain()))
 				Eventually(appSession).Should(Exit(0))
 			})
 		})
@@ -48,7 +50,7 @@ var _ = Describe("random route", func() {
 			It("does not generate a random route for the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-manifest", "--no-start")
-					Eventually(session).Should(Say(`(?m)routes:\s+%s.%s$`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`(?m)routes:\s+%s\.%s$`, appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -70,7 +72,7 @@ var _ = Describe("random route", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(path.Join(dir, "manifest.yml"), manifest)
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
-				Eventually(session).Should(Say(`(?m)routes:\s+%s-[\w]+-[\w]+.%s$`, appName, helpers.DefaultSharedDomain()))
+				Eventually(session).Should(Say(randomRouteRegexp, appName, helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -78,7 +80,7 @@ var _ = Describe("random route", func() {
 		It("generates a random route for the app", func() {
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say(`name:\s+%s`, appName))
-			Eventually(session).Should(Say(`(?m)routes:\s+%s-[\w]+-[\w]+.%s$`, appName, helpers.DefaultSharedDomain()))
+			Eventually(session).Should(Say(randomRouteRegexp, appName, helpers.DefaultSharedDomain()))
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -111,7 +113,7 @@ var _ = Describe("random route", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(path.Join(dir, "manifest.yml"), manifest)
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--random-route")
-				Eventually(session).Should(Say(`(?m)routes:\s+%s-[\w]+-[\w]+.%s$`, appName, helpers.DefaultSharedDomain()))
+				Eventually(session).Should(Say(randomRouteRegexp, appName, helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -119,7 +121,7 @@ var _ = Describe("random route", func() {
 		It("generates a random route for the app", func() {
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say(`name:\s+%s`, appName))
-			Eventually(session).Should(Say(`(?m)routes:\s+%s-[\w]+-[\w]+.%s$`, appName, helpers.DefaultSharedDomain()))
+			Eventually(session).Should(Say(randomRouteRegexp, appName, helpers.DefaultSharedDomain()))
 			Eventually(session).Should(Exit(0))
 		})
 	})
