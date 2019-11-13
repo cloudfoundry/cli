@@ -23,6 +23,7 @@ const (
 	Buildpack ResourceType = "buildpack"
 	Domain    ResourceType = "domain"
 	Org       ResourceType = "org"
+	Route     ResourceType = "route"
 	Space     ResourceType = "space"
 	Stack     ResourceType = "stack"
 )
