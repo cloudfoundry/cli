@@ -21,6 +21,7 @@ type SetLabelActor interface {
 	UpdateBuildpackLabelsByBuildpackNameAndStack(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateDomainLabelsByDomainName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateOrganizationLabelsByOrganizationName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateRouteLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
 }
@@ -79,6 +80,8 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		err = cmd.executeDomain(username, labels)
 	case Org:
 		err = cmd.executeOrg(username, labels)
+	case Route:
+		err = cmd.executeRoute(username, labels)
 	case Space:
 		err = cmd.executeSpace(username, labels)
 	case Stack:
@@ -167,6 +170,33 @@ func (cmd SetLabelCommand) executeOrg(username string, labels map[string]types.N
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName,
 		labels)
+	cmd.UI.DisplayWarningsV7(warnings)
+
+	return err
+}
+
+func (cmd SetLabelCommand) executeRoute(username string, labels map[string]types.NullString) error {
+	err := cmd.SharedActor.CheckTarget(true, true)
+	if err != nil {
+		return err
+	}
+
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"OrgName":      cmd.Config.TargetedOrganization().Name,
+			"SpaceName":    cmd.Config.TargetedSpace().Name,
+			"User":         username,
+		},
+	)
+
+	warnings, err := cmd.Actor.UpdateRouteLabels(
+		cmd.RequiredArgs.ResourceName,
+		cmd.Config.TargetedSpace().GUID,
+		labels,
+	)
 	cmd.UI.DisplayWarningsV7(warnings)
 
 	return err

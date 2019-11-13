@@ -120,6 +120,77 @@ func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error)
 	return ret, actor_warnings, err
 }
 
+func (actor Actor) parseRoutePath(routePath string) (string, string, string, string, Warnings, error) {
+	var warnings Warnings
+	var hostPart = ""
+	var pathPart = ""
+	routeParts := strings.SplitN(routePath, "/", 2)
+	domainName := routeParts[0]
+	if len(routeParts) > 1 {
+		pathPart = "/" + routeParts[1]
+	}
+	domainParts := strings.SplitN(domainName, ".", 2)
+	domainHasMultipleParts := len(domainParts) > 1
+
+	domain, allWarnings, err := actor.GetDomainByName(domainName)
+
+	_, domainNotFound := err.(actionerror.DomainNotFoundError)
+
+	needToCheckForHost := domainNotFound && domainHasMultipleParts
+	if err != nil && !needToCheckForHost {
+		return "", "", "", "", allWarnings, err
+	}
+
+	if needToCheckForHost {
+		domainName = domainParts[1]
+		hostPart = domainParts[0]
+		domain, warnings, err = actor.GetDomainByName(domainName)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return "", "", "", "", allWarnings, err
+		}
+	}
+
+	return hostPart, pathPart, domainName, domain.GUID, allWarnings, nil
+}
+
+func (actor Actor) GetRouteGUID(routePath string, spaceGUID string) (string, Warnings, error) {
+	filters := []ccv3.Query{
+		ccv3.Query{
+			Key:    ccv3.SpaceGUIDFilter,
+			Values: []string{spaceGUID},
+		},
+	}
+	hostPart, pathPart, domainName, domainGUID, allWarnings, err := actor.parseRoutePath(routePath)
+	if err != nil {
+		return "", allWarnings, err
+	}
+	filters = append(filters, ccv3.Query{
+		Key:    ccv3.DomainGUIDFilter,
+		Values: []string{domainGUID},
+	})
+	filters = append(filters, ccv3.Query{Key: ccv3.HostsFilter,
+		Values: []string{hostPart},
+	})
+	filters = append(filters, ccv3.Query{Key: ccv3.PathsFilter,
+		Values: []string{pathPart},
+	})
+	routes, warnings, err := actor.CloudControllerClient.GetRoutes(filters...)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return "", allWarnings, err
+	}
+	if len(routes) == 0 {
+		return "", allWarnings, actionerror.RouteNotFoundError{
+			Host:       hostPart,
+			DomainName: domainName,
+			Path:       pathPart,
+		}
+	}
+
+	return routes[0].GUID, allWarnings, nil
+}
+
 func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
 	allWarnings := Warnings{}
 
