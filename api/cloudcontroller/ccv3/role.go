@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -124,4 +125,44 @@ func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return responseRole, response.Warnings, err
+}
+
+func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteRoleRequest,
+		URIParams:   internal.Params{"role_guid": roleGUID},
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
+func (client *Client) GetRoles(query ...Query) ([]Role, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRolesRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullRolesList []Role
+	warnings, err := client.paginate(request, Role{}, func(item interface{}) error {
+		if role, ok := item.(Role); ok {
+			fullRolesList = append(fullRolesList, role)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Role{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullRolesList, warnings, err
 }

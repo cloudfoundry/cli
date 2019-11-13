@@ -41,8 +41,12 @@ const (
 	PathFilter QueryKey = "path"
 	// StackFilter is a query parameter for listing objects by stack name
 	StackFilter QueryKey = "stacks"
+	// TypeFilter is a query parameter for filtering roles by type
+	TypeFilter QueryKey = "types"
 	// Unmapped filter is a query parameter specifying unmapped routes
 	UnmappedFilter QueryKey = "unmapped"
+	// UserGUIDFilter is a query parameter for filtering resources by user GUID
+	UserGUIDFilter QueryKey = "user_guids"
 	// States filter is a query parameter when getting a package's droplets by state
 	StatesFilter QueryKey = "states"
 

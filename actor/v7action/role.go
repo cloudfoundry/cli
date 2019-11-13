@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -50,4 +51,40 @@ func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, s
 	warnings = append(warnings, ccv3Warnings...)
 
 	return warnings, err
+}
+
+func (actor Actor) GetOrgRole(roleType constant.RoleType, orgGUID string, userGUID string) (Role, Warnings, error) {
+	roles, warnings, err := actor.CloudControllerClient.GetRoles(
+		ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+		ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+	)
+
+	if err != nil {
+		return Role{}, Warnings(warnings), err
+	}
+
+	if len(roles) == 0 {
+		return Role{}, Warnings(warnings), actionerror.RoleNotFoundError{}
+	}
+
+	return Role(roles[0]), Warnings(warnings), err
+}
+
+func (actor Actor) GetSpaceRole(roleType constant.RoleType, spaceGUID string, userGUID string) (Role, Warnings, error) {
+	roles, warnings, err := actor.CloudControllerClient.GetRoles(
+		ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+		ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+	)
+
+	if err != nil {
+		return Role{}, Warnings(warnings), err
+	}
+
+	if len(roles) == 0 {
+		return Role{}, Warnings(warnings), actionerror.RoleNotFoundError{}
+	}
+
+	return Role(roles[0]), Warnings(warnings), err
 }

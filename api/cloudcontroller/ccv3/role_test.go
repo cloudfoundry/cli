@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -96,7 +97,7 @@ var _ = Describe("Role", func() {
 						)
 					})
 
-					It("returns the given route and all warnings", func() {
+					It("returns the given role and all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
@@ -199,7 +200,7 @@ var _ = Describe("Role", func() {
 						)
 					})
 
-					It("returns the given route and all warnings", func() {
+					It("returns the given role and all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
@@ -258,7 +259,7 @@ var _ = Describe("Role", func() {
 						)
 					})
 
-					It("returns the given route and all warnings", func() {
+					It("returns the given role and all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
@@ -361,7 +362,7 @@ var _ = Describe("Role", func() {
 						)
 					})
 
-					It("returns the given route and all warnings", func() {
+					It("returns the given role and all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
@@ -373,6 +374,263 @@ var _ = Describe("Role", func() {
 						}))
 					})
 				})
+			})
+		})
+	})
+
+	Describe("DeleteRole", func() {
+		var (
+			roleGUID string
+
+			jobURL     JobURL
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			roleGUID = "role-guid"
+		})
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteRole(roleGUID)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/roles/role-guid"),
+						RespondWith(http.StatusAccepted, "{}", http.Header{
+							"X-CF-Warnings": {"warning-1"},
+							"Location":      {"/v3/jobs/some-job-guid"},
+						}),
+					),
+				)
+			})
+
+			It("returns the given role and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1"))
+
+				Expect(jobURL).To(Equal(JobURL("/v3/jobs/some-job-guid")))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Isolation segment not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/roles/role-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("DeleteRole", func() {
+		var (
+			query Query
+
+			roles      []Role
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			query = Query{}
+		})
+
+		JustBeforeEach(func() {
+			roles, warnings, executeErr = client.GetRoles(query)
+		})
+
+		When("the request succeeds", func() {
+			var (
+				response1 string
+				response2 string
+			)
+
+			BeforeEach(func() {
+				response1 = fmt.Sprintf(`
+				{
+					"pagination": {
+						"next": {
+							"href": "%s/v3/roles?page=2"
+						}
+					},
+					"resources": [
+						{
+							"guid": "role-1-guid"
+						},
+						{
+							"guid": "role-2-guid"
+						}
+					]
+				}`, server.URL())
+
+				response2 = `
+				{
+					"pagination": {
+						"next": null
+					},
+					"resources": [
+						{
+							"guid": "role-3-guid"
+						}
+					]
+				}`
+			})
+
+			When("not passing any filters", func() {
+				BeforeEach(func() {
+					query = Query{}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "page=2"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("returns the given role and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(roles).To(Equal([]Role{
+						{
+							GUID: "role-1-guid",
+						},
+						{
+							GUID: "role-2-guid",
+						},
+						{
+							GUID: "role-3-guid",
+						},
+					}))
+				})
+			})
+
+			When("passing in a query", func() {
+				BeforeEach(func() {
+					query = Query{Key: "space_guids", Values: []string{"guid1", "guid2"}}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "space_guids=guid1,guid2"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/roles", "page=2", "space_guids=guid1,guid2"),
+							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+						),
+					)
+				})
+
+				It("passes query params", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(roles).To(Equal([]Role{
+						{
+							GUID: "role-1-guid",
+						},
+						{
+							GUID: "role-2-guid",
+						},
+						{
+							GUID: "role-3-guid",
+						},
+					}))
+				})
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Isolation segment not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/roles"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 	})

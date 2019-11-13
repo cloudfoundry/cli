@@ -1,6 +1,7 @@
 package v7action_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"errors"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -283,6 +284,170 @@ var _ = Describe("Role Actions", func() {
 				Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(2))
 				Expect(warnings).To(ConsistOf("create-space-role-warning"))
 				Expect(executeErr).To(MatchError("create-space-role-error"))
+			})
+		})
+	})
+
+	Describe("GetOrgRole", func() {
+		var (
+			roleType = constant.OrgAuditorRole
+			orgGUID  = "org-guid"
+			userGUID = "user-guid"
+
+			executeErr error
+			warnings   Warnings
+			role       Role
+		)
+
+		JustBeforeEach(func() {
+			role, warnings, executeErr = actor.GetOrgRole(roleType, orgGUID, userGUID)
+		})
+
+		When("the cc client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRolesReturns(
+					nil,
+					ccv3.Warnings{"get-roles-warning"},
+					errors.New("get-roles-error"),
+				)
+			})
+
+			It("returns warnings and the error", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRolesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
+				Expect(executeErr).To(MatchError(errors.New("get-roles-error")))
+			})
+		})
+
+		When("the cc client succeeds and a route is found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRolesReturns(
+					[]ccv3.Role{{GUID: "role-guid"}},
+					ccv3.Warnings{"get-roles-warning"},
+					nil,
+				)
+			})
+
+			It("returns the route and the warnings", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRolesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(role).To(Equal(Role{GUID: "role-guid"}))
+			})
+		})
+
+		When("the cc client succeeds and a route is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRolesReturns([]ccv3.Role{}, ccv3.Warnings{"get-roles-warning"}, nil)
+			})
+
+			It("returns the role and the warnings", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRolesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
+				Expect(executeErr).To(MatchError(actionerror.RoleNotFoundError{}))
+			})
+		})
+	})
+
+	Describe("GetSpaceRole", func() {
+		var (
+			roleType  = constant.SpaceAuditorRole
+			spaceGUID = "space-guid"
+			userGUID  = "user-guid"
+
+			executeErr error
+			warnings   Warnings
+			role       Role
+		)
+
+		JustBeforeEach(func() {
+			role, warnings, executeErr = actor.GetSpaceRole(roleType, spaceGUID, userGUID)
+		})
+
+		When("the cc client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRolesReturns(
+					nil,
+					ccv3.Warnings{"get-roles-warning"},
+					errors.New("get-roles-error"),
+				)
+			})
+
+			It("returns warnings and the error", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRolesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
+				Expect(executeErr).To(MatchError(errors.New("get-roles-error")))
+			})
+		})
+
+		When("the cc client succeeds and a route is found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRolesReturns(
+					[]ccv3.Role{{GUID: "role-guid"}},
+					ccv3.Warnings{"get-roles-warning"},
+					nil,
+				)
+			})
+
+			It("returns the route and the warnings", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRolesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(role).To(Equal(Role{GUID: "role-guid"}))
+			})
+		})
+
+		When("the cc client succeeds and a route is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRolesReturns([]ccv3.Role{}, ccv3.Warnings{"get-roles-warning"}, nil)
+			})
+
+			It("returns the role and the warnings", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				actualQueries := fakeCloudControllerClient.GetRolesArgsForCall(0)
+				Expect(actualQueries).To(ConsistOf(
+					ccv3.Query{Key: ccv3.TypeFilter, Values: []string{string(roleType)}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					ccv3.Query{Key: ccv3.UserGUIDFilter, Values: []string{userGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
+				Expect(executeErr).To(MatchError(actionerror.RoleNotFoundError{}))
 			})
 		})
 	})
