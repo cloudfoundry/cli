@@ -2,7 +2,6 @@ package experimental
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -30,13 +29,7 @@ var (
 
 func TestExperimental(t *testing.T) {
 	RegisterFailHandler(Fail)
-	reporters := []Reporter{}
-
-	prBuilderReporter := helpers.GetPRBuilderReporter()
-	if prBuilderReporter != nil {
-		reporters = append(reporters, prBuilderReporter)
-	}
-	RunSpecsWithDefaultAndCustomReporters(t, "Experimental Integration Suite", reporters)
+	RunSpecs(t, "Experimental Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -79,12 +72,7 @@ var _ = SynchronizedAfterSuite(func() {
 	helpers.QuickDeleteOrg(ReadOnlyOrg)
 	helpers.DestroyHomeDir(homeDir)
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
-}, func() {
-	outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
-	if outputRoot != "" {
-		helpers.WriteFailureSummary(outputRoot, "summary_ise.txt")
-	}
-})
+}, func() {})
 
 var _ = BeforeEach(func() {
 	GinkgoWriter.Write([]byte("==============================Global Before Each=============================="))

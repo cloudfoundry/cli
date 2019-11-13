@@ -2,7 +2,6 @@ package global
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -28,14 +27,7 @@ var (
 
 func TestGlobal(t *testing.T) {
 	RegisterFailHandler(Fail)
-	reporters := []Reporter{}
-
-	prBuilderReporter := helpers.GetPRBuilderReporter()
-	if prBuilderReporter != nil {
-		reporters = append(reporters, prBuilderReporter)
-	}
-
-	RunSpecsWithDefaultAndCustomReporters(t, "Global Suite", reporters)
+	RunSpecs(t, "Global Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -65,13 +57,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		Fail("Test suite cannot run in parallel")
 	}
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
-})
-
-var _ = AfterSuite(func() {
-	outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
-	if outputRoot != "" {
-		helpers.WriteFailureSummary(outputRoot, "summary_ivg.txt")
-	}
 })
 
 var _ = BeforeEach(func() {

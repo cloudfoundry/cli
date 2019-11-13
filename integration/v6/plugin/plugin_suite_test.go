@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -31,14 +30,7 @@ var (
 
 func TestPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	reporters := []Reporter{}
-
-	prBuilderReporter := helpers.GetPRBuilderReporter()
-	if prBuilderReporter != nil {
-		reporters = append(reporters, prBuilderReporter)
-	}
-
-	RunSpecsWithDefaultAndCustomReporters(t, "Plugin Suite", reporters)
+	RunSpecs(t, "Plugin Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -65,12 +57,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 var _ = SynchronizedAfterSuite(func() {
 	CleanupBuildArtifacts()
 },
-	func() {
-		outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
-		if outputRoot != "" {
-			helpers.WriteFailureSummary(outputRoot, "summary_isplugins.txt")
-		}
-	},
+	func() {},
 )
 
 var _ = BeforeEach(func() {

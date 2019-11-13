@@ -2,7 +2,6 @@ package commonisolated
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -22,14 +21,7 @@ const (
 
 func CommonTestIsolated(t *testing.T) {
 	RegisterFailHandler(Fail)
-	var reporters []Reporter
-
-	prBuilderReporter := helpers.GetPRBuilderReporter()
-	if prBuilderReporter != nil {
-		reporters = append(reporters, prBuilderReporter)
-	}
-
-	RunSpecsWithDefaultAndCustomReporters(t, "Isolated Integration Suite", reporters)
+	RunSpecs(t, "Isolated Integration Suite")
 }
 
 func CommonGinkgoSetup(
@@ -83,12 +75,7 @@ func CommonGinkgoSetup(
 		helpers.QuickDeleteOrg(*readOnlyOrg)
 		helpers.DestroyHomeDir(*homeDir)
 		_, _ = GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
-	}, func() {
-		outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
-		if outputRoot != "" {
-			helpers.WriteFailureSummary(outputRoot, failureSummaryFilename)
-		}
-	})
+	}, func() {})
 
 	var _ = BeforeEach(func() {
 		_, _ = GinkgoWriter.Write([]byte("==============================Global Before Each=============================="))
