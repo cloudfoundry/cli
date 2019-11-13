@@ -52,14 +52,25 @@ func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, s
 	return warnings, err
 }
 
-func (actor Actor) GetRolesByOrg(orgGuid string) ([]Role, Warnings, error) {
-	_, ccWarnings, err := actor.CloudControllerClient.GetRoles(ccv3.Query{
-		Key:    ccv3.OrganizationGUIDFilter,
-		Values: []string{orgGuid},
-	})
+func (actor Actor) GetRolesByOrgWithUsers(orgGuid string) ([]Role, Warnings, error) {
+	ccv3Roles, ccWarnings, err := actor.CloudControllerClient.GetRoles(
+		ccv3.Query{
+			Key:    ccv3.OrganizationGUIDFilter,
+			Values: []string{orgGuid},
+		},
+		ccv3.Query{
+			Key:    ccv3.Include,
+			Values: []string{"user"},
+		},
+	)
 	if err != nil {
 		return []Role{}, Warnings(ccWarnings), err
 	}
 
-	return []Role{}, Warnings{}, nil
+	roles := make([]Role, len(ccv3Roles))
+	for i, ccv3role := range ccv3Roles {
+		roles[i] = Role(ccv3role)
+	}
+
+	return roles, Warnings(ccWarnings), nil
 }

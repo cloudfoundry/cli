@@ -287,7 +287,7 @@ var _ = Describe("Role Actions", func() {
 		})
 	})
 
-	Describe("GetRolesByOrg", func() {
+	Describe("GetRolesByOrgWithUsers", func() {
 		var (
 			actualRoles []Role
 			actualErr   error
@@ -295,14 +295,16 @@ var _ = Describe("Role Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			actualRoles, warnings, actualErr = actor.GetRolesByOrg("some-org-guid")
+			actualRoles, warnings, actualErr = actor.GetRolesByOrgWithUsers("some-org-guid")
 		})
 
 		When("when the API returns a success response", func() {
 			When("the API returns one user", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRolesReturns(
-						[]ccv3.Role{},
+						[]ccv3.Role{{
+							GUID: "some-role-guid",
+						}},
 						ccv3.Warnings{"some-api-warning"},
 						nil,
 					)
@@ -310,12 +312,15 @@ var _ = Describe("Role Actions", func() {
 
 				It("returns the single user", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
-					Expect(actualRoles).To(Equal([]Role{{GUID: "user-id"}}))
+					Expect(actualRoles).To(Equal([]Role{{GUID: "some-role-guid"}}))
 					Expect(warnings).To(ConsistOf("some-api-warning"))
 
 					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
 					query := fakeCloudControllerClient.GetRolesArgsForCall(0)
-					Expect(query).To(Equal("organization=some-org-guid"))
+					Expect(query[0]).To(Equal(ccv3.Query{
+						Key: ccv3.OrganizationGUIDFilter,
+						Values: []string{"some-org-guid"},
+					}))
 				})
 			})
 		})
