@@ -174,7 +174,7 @@ var _ = Describe("Verbose", func() {
 				}
 			},
 
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false, []string{"/foo"}),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false, []string{"/foo"}),
 
 			Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo", false, []string{"/foo"}),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true, []string{"/foo"}),
@@ -244,8 +244,8 @@ var _ = Describe("Verbose", func() {
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
-			Entry("CF_Trace true, config trace false: enables verbose", "true", "false", false),
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
+			Entry("CF_TRACE true, config trace false: enables verbose", "true", "false", false),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
@@ -320,7 +320,7 @@ var _ = Describe("Verbose", func() {
 				}
 			},
 
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false, []string{"/foo"}),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false, []string{"/foo"}),
 
 			Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo", false, []string{"/foo"}),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true, []string{"/foo"}),
@@ -395,8 +395,8 @@ var _ = Describe("Verbose", func() {
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
-			Entry("CF_Trace true, config trace false: enables verbose", "true", "false", false),
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
+			Entry("CF_TRACE true, config trace false: enables verbose", "true", "false", false),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
@@ -463,7 +463,7 @@ var _ = Describe("Verbose", func() {
 				}
 			},
 
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", []string{"/foo"}),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", []string{"/foo"}),
 
 			Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo", []string{"/foo"}),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", []string{"/foo"}),
