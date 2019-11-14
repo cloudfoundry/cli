@@ -31,7 +31,7 @@ func NewActor(v2Actor V2Actor, v3Actor V3Actor, sharedActor SharedActor) *Actor 
 		SharedActor:   sharedActor,
 		V2Actor:       v2Actor,
 		V3Actor:       v3Actor,
-		WordGenerator: new(randomword.Generator),
+		WordGenerator: randomword.NewGenerator(),
 
 		startWithProtocol: regexp.MustCompile(ProtocolRegexp),
 		urlValidator:      regexp.MustCompile(URLRegexp),

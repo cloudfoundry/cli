@@ -25,7 +25,7 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 func (m Manifest) Applications() ([]models.AppParams, error) {
-	rawData, err := expandProperties(m.Data, randomword.Generator{})
+	rawData, err := expandProperties(m.Data, randomword.NewGenerator())
 	if err != nil {
 		return []models.AppParams{}, err
 	}

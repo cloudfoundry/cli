@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("Generator", func() {
-	var gen Generator
+	var gen Generator = NewGenerator()
 
 	Describe("RandomAdjective", func() {
 		It("generates a random adjective each time it is called", func() {

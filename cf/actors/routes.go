@@ -213,7 +213,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 	}
 
 	if appParamsFromContext.UseRandomRoute && domain.RouterGroupType != tcp {
-		hostname = randomword.Generator{}.Babble()
+		hostname = randomword.NewGenerator().Babble()
 	}
 
 	replaceHostname(domain.RouterGroupType, appParamsFromContext.Hosts, &hostname)

@@ -195,6 +195,11 @@ zebra`
 
 type Generator struct{}
 
+func NewGenerator() Generator {
+	rand.Seed(time.Now().UnixNano())
+	return Generator{}
+}
+
 func (gen Generator) Babble() string {
 	return fmt.Sprintf("%s-%s", gen.RandomAdjective(), gen.RandomNoun())
 }
@@ -208,7 +213,6 @@ func (Generator) RandomNoun() string {
 }
 
 func (Generator) RandomTwoLetters() string {
-	rand.Seed(time.Now().UnixNano())
 	var asciiLetterA = 97
 	letterOne := string(rand.Intn(26) + asciiLetterA)
 	letterTwo := string(rand.Intn(26) + asciiLetterA)
@@ -216,7 +220,6 @@ func (Generator) RandomTwoLetters() string {
 }
 
 func randomElement(fullList string) string {
-	rand.Seed(time.Now().UnixNano())
 	wordList := strings.Split(fullList, "\n")
 	randomWordIndex := rand.Int() % len(wordList)
 
