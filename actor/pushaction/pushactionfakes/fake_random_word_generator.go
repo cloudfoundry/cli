@@ -28,6 +28,16 @@ type FakeRandomWordGenerator struct {
 	randomNounReturnsOnCall map[int]struct {
 		result1 string
 	}
+	RandomTwoLettersStub        func() string
+	randomTwoLettersMutex       sync.RWMutex
+	randomTwoLettersArgsForCall []struct {
+	}
+	randomTwoLettersReturns struct {
+		result1 string
+	}
+	randomTwoLettersReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -136,6 +146,58 @@ func (fake *FakeRandomWordGenerator) RandomNounReturnsOnCall(i int, result1 stri
 	}{result1}
 }
 
+func (fake *FakeRandomWordGenerator) RandomTwoLetters() string {
+	fake.randomTwoLettersMutex.Lock()
+	ret, specificReturn := fake.randomTwoLettersReturnsOnCall[len(fake.randomTwoLettersArgsForCall)]
+	fake.randomTwoLettersArgsForCall = append(fake.randomTwoLettersArgsForCall, struct {
+	}{})
+	fake.recordInvocation("RandomTwoLetters", []interface{}{})
+	fake.randomTwoLettersMutex.Unlock()
+	if fake.RandomTwoLettersStub != nil {
+		return fake.RandomTwoLettersStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.randomTwoLettersReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRandomWordGenerator) RandomTwoLettersCallCount() int {
+	fake.randomTwoLettersMutex.RLock()
+	defer fake.randomTwoLettersMutex.RUnlock()
+	return len(fake.randomTwoLettersArgsForCall)
+}
+
+func (fake *FakeRandomWordGenerator) RandomTwoLettersCalls(stub func() string) {
+	fake.randomTwoLettersMutex.Lock()
+	defer fake.randomTwoLettersMutex.Unlock()
+	fake.RandomTwoLettersStub = stub
+}
+
+func (fake *FakeRandomWordGenerator) RandomTwoLettersReturns(result1 string) {
+	fake.randomTwoLettersMutex.Lock()
+	defer fake.randomTwoLettersMutex.Unlock()
+	fake.RandomTwoLettersStub = nil
+	fake.randomTwoLettersReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRandomWordGenerator) RandomTwoLettersReturnsOnCall(i int, result1 string) {
+	fake.randomTwoLettersMutex.Lock()
+	defer fake.randomTwoLettersMutex.Unlock()
+	fake.RandomTwoLettersStub = nil
+	if fake.randomTwoLettersReturnsOnCall == nil {
+		fake.randomTwoLettersReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.randomTwoLettersReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeRandomWordGenerator) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -143,6 +205,8 @@ func (fake *FakeRandomWordGenerator) Invocations() map[string][][]interface{} {
 	defer fake.randomAdjectiveMutex.RUnlock()
 	fake.randomNounMutex.RLock()
 	defer fake.randomNounMutex.RUnlock()
+	fake.randomTwoLettersMutex.RLock()
+	defer fake.randomTwoLettersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

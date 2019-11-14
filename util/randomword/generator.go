@@ -207,6 +207,14 @@ func (Generator) RandomNoun() string {
 	return randomElement(nouns)
 }
 
+func (Generator) RandomTwoLetters() string {
+	rand.Seed(time.Now().UnixNano())
+	var asciiLetterA = 97
+	letterOne := string(rand.Intn(26) + asciiLetterA)
+	letterTwo := string(rand.Intn(26) + asciiLetterA)
+	return letterOne + letterTwo
+}
+
 func randomElement(fullList string) string {
 	rand.Seed(time.Now().UnixNano())
 	wordList := strings.Split(fullList, "\n")

@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("HTTP random route", func() {
 
-	const randomRouteRegexp = `\+\s+%s-[\w]+-[\w]+\.%s`
+	const randomRouteRegexp = `\+\s+%s-[\w]+-[\w]+-[a-z]{2}\.%s`
 
 	var (
 		appName string
@@ -34,7 +34,7 @@ var _ = Describe("HTTP random route", func() {
 
 				appSession := helpers.CF("app", appName)
 				Eventually(appSession).Should(Say(`name:\s+%s`, appName))
-				Eventually(appSession).Should(Say(`routes:\s+%s-[\w]+-[\w]+\.%s`, appName, helpers.DefaultSharedDomain()))
+				Eventually(appSession).Should(Say(`routes:\s+%s-[\w]+-[\w]+-[a-z]{2}\.%s`, appName, helpers.DefaultSharedDomain()))
 				Eventually(appSession).Should(Exit(0))
 			})
 		})
@@ -117,7 +117,7 @@ var _ = Describe("HTTP random route", func() {
 		It("generates a random route for the app", func() {
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say(`name:\s+%s`, appName))
-			Eventually(session).Should(Say(`routes:\s+%s-[\w]+-[\w]+\.%s`, appName, helpers.DefaultSharedDomain()))
+			Eventually(session).Should(Say(`routes:\s+%s-[\w]+-[\w]+-[a-z]{2}\.%s`, appName, helpers.DefaultSharedDomain()))
 			Eventually(session).Should(Exit(0))
 		})
 

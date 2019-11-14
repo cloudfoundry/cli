@@ -918,6 +918,7 @@ var _ = Describe("Routes", func() {
 				domain.Name = "some-domain"
 				fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
 				fakeRandomWordGenerator.RandomNounReturns("apple")
+				fakeRandomWordGenerator.RandomTwoLettersReturns("ab")
 
 				fakeV2Actor.GetDomainsByNameAndOrganizationReturns(
 					[]v2action.Domain{domain},
@@ -930,7 +931,7 @@ var _ = Describe("Routes", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(randomRoute).To(Equal(v2action.Route{
 					Domain:    domain,
-					Host:      "some-app-name-striped-apple",
+					Host:      "some-app-name-striped-apple-ab",
 					SpaceGUID: spaceGUID,
 				}))
 				Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
@@ -976,6 +977,7 @@ var _ = Describe("Routes", func() {
 					)
 					fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
 					fakeRandomWordGenerator.RandomNounReturns("apple")
+					fakeRandomWordGenerator.RandomTwoLettersReturns("ab")
 				})
 
 				When("the app name is partially sanitized", func() {
@@ -988,7 +990,7 @@ var _ = Describe("Routes", func() {
 						Expect(randomRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							SpaceGUID: spaceGUID,
-							Host:      "a--b-striped-apple",
+							Host:      "a--b-striped-apple-ab",
 						}))
 						Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 					})
@@ -1004,7 +1006,7 @@ var _ = Describe("Routes", func() {
 						Expect(randomRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							SpaceGUID: spaceGUID,
-							Host:      "striped-apple",
+							Host:      "striped-apple-ab",
 						}))
 						Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 					})

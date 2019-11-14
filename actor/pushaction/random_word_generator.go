@@ -6,4 +6,5 @@ package pushaction
 type RandomWordGenerator interface {
 	RandomAdjective() string
 	RandomNoun() string
+	RandomTwoLetters() string
 }

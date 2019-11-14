@@ -22,6 +22,15 @@ var _ = Describe("Generator", func() {
 		})
 	})
 
+	Describe("RandomTwoLetters", func() {
+		It("generates a random string each time it is called", func() {
+			Eventually(gen.RandomTwoLetters).ShouldNot(Equal(gen.RandomTwoLetters()))
+		})
+		It("generates a two letter string", func() {
+			Expect(gen.RandomTwoLetters()).To(MatchRegexp(`^[a-z]{2}$`))
+		})
+	})
+
 	Describe("Babble", func() {
 		It("generates a random adjective noun pair each time it is called", func() {
 			wordPair := gen.Babble()
