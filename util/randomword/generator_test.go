@@ -34,7 +34,7 @@ var _ = Describe("Generator", func() {
 	Describe("Babble", func() {
 		It("generates a random adjective noun pair each time it is called", func() {
 			wordPair := gen.Babble()
-			Expect(wordPair).To(MatchRegexp(`^\w+-\w+$`))
+			Expect(wordPair).To(MatchRegexp(`^\w+-\w+-[a-z]{2}$`))
 		})
 	})
 })

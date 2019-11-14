@@ -201,7 +201,7 @@ func NewGenerator() Generator {
 }
 
 func (gen Generator) Babble() string {
-	return fmt.Sprintf("%s-%s", gen.RandomAdjective(), gen.RandomNoun())
+	return fmt.Sprintf("%s-%s-%s", gen.RandomAdjective(), gen.RandomNoun(), gen.RandomTwoLetters())
 }
 
 func (Generator) RandomAdjective() string {
