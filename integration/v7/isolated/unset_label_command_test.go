@@ -318,6 +318,57 @@ var _ = Describe("unset-label command", func() {
 			})
 		})
 
+		When("unsetting labels from a route", func() {
+			var (
+				orgGUID    string
+				routeName  string
+				domainName string
+				domain     helpers.Domain
+			)
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				orgGUID = helpers.GetOrgGUID(orgName)
+				domainName = helpers.NewDomainName()
+				domain = helpers.NewDomain(orgName, domainName)
+				domain.Create()
+				Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
+				routeName = domainName
+
+				session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
+				Expect(session).Should(Say("OK"))
+			})
+
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-route", domainName, "-f")).Should(Exit(0))
+				domain.Delete()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("unsets the specified labels on the route", func() {
+				session := helpers.CF("unset-label", "route", routeName, "some-key")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for route %s as %s...`), routeName, username))
+				Expect(session).Should(Say("OK"))
+
+				session = helpers.CF("curl", fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID))
+				Eventually(session).Should(Exit(0))
+
+				routeJSON := session.Out.Contents()
+				var routes resourceCollection
+
+				Expect(json.Unmarshal(routeJSON, &routes)).To(Succeed())
+				Expect(len(routes.Resources)).To(Equal(1))
+				Expect(len(routes.Resources[0].Metadata.Labels)).To(Equal(1))
+				Expect(routes.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
+
+			})
+		})
+
 		When("unsetting labels from a space", func() {
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
@@ -377,57 +428,5 @@ var _ = Describe("unset-label command", func() {
 				Expect(stack.Metadata.Labels["pci"]).To(Equal("true"))
 			})
 		})
-
-		When("unsetting labels from a route", func() {
-			var (
-				orgGUID    string
-				routeName  string
-				domainName string
-				domain     helpers.Domain
-			)
-			BeforeEach(func() {
-				orgName = helpers.NewOrgName()
-				spaceName = helpers.NewSpaceName()
-				helpers.SetupCF(orgName, spaceName)
-
-				orgGUID = helpers.GetOrgGUID(orgName)
-				domainName = helpers.NewDomainName()
-				domain = helpers.NewDomain(orgName, domainName)
-				domain.Create()
-				Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
-				routeName = domainName
-
-				session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
-				Eventually(session).Should(Exit(0))
-				Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
-				Expect(session).Should(Say("OK"))
-			})
-
-			AfterEach(func() {
-				Eventually(helpers.CF("delete-route", domainName, "-f")).Should(Exit(0))
-				domain.Delete()
-				helpers.QuickDeleteOrg(orgName)
-			})
-
-			It("unsets the specified labels on the route", func() {
-				session := helpers.CF("unset-label", "route", routeName, "some-key")
-				Eventually(session).Should(Exit(0))
-				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for route %s as %s...`), routeName, username))
-				Expect(session).Should(Say("OK"))
-
-				session = helpers.CF("curl", fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID))
-				Eventually(session).Should(Exit(0))
-
-				routeJSON := session.Out.Contents()
-				var routes resourceCollection
-
-				Expect(json.Unmarshal(routeJSON, &routes)).To(Succeed())
-				Expect(len(routes.Resources)).To(Equal(1))
-				Expect(len(routes.Resources[0].Metadata.Labels)).To(Equal(1))
-				Expect(routes.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
-
-			})
-		})
-
 	})
 })
