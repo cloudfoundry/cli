@@ -42,6 +42,16 @@ func (c *cliConnection) GetApp(appName string) (plugin_models.DetailedApplicatio
 	return result, err
 }
 
+func (c *cliConnection) GetCurrentSpace() (plugin_models.Space, error) {
+	var result plugin_models.Space
+
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
+	})
+
+	return result, err
+}
+
 func (c *cliConnection) isMinCliVersion(version string) bool {
 	var result bool
 

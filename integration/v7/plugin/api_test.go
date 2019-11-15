@@ -36,4 +36,11 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("GetCurrentSpace", func() {
+		It("gets the current targeted Space", func() {
+			_, space := createTargetedOrgAndSpace()
+			confirmTestPluginOutput("GetCurrentSpace", space)
+		})
+	})
+
 })

@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
-	. "code.cloudfoundry.org/cli/plugin/v7/rpc"
+	cmdRunner "code.cloudfoundry.org/cli/plugin/v7/rpc"
 	"code.cloudfoundry.org/cli/plugin/v7/rpc/rpcfakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -28,7 +28,7 @@ var _ = Describe("Server", func() {
 	var (
 		err        error
 		client     *rpc.Client
-		rpcService *CliRpcService
+		rpcService *cmdRunner.CliRpcService
 	)
 
 	AfterEach(func() {
@@ -43,19 +43,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			_, err := cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -77,7 +77,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -105,7 +105,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -147,7 +147,7 @@ var _ = Describe("Server", func() {
 
 		BeforeEach(func() {
 			terminalOutputSwitch = new(rpcfakes.FakeTerminalOutputSwitch)
-			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, terminalOutputSwitch, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -174,7 +174,6 @@ var _ = Describe("Server", func() {
 		var (
 			fakePluginActor *rpcfakes.FakePluginActor
 			fakeConfig      *commandfakes.FakeConfig
-			summary         v7action.DetailedApplicationSummary
 		)
 
 		BeforeEach(func() {
@@ -183,76 +182,13 @@ var _ = Describe("Server", func() {
 			outputCapture := terminal.NewTeePrinter(os.Stdout)
 			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
 
-			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
+			rpcService, err = cmdRunner.NewRpcService(outputCapture, terminalOutputSwitch, nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
 			Expect(err).ToNot(HaveOccurred())
 
 			pingCli(rpcService.Port())
-
-			summary = v7action.DetailedApplicationSummary{
-				ApplicationSummary: v7action.ApplicationSummary{
-					Application: v7action.Application{
-						GUID:      "some-app-guid",
-						Name:      "some-app",
-						StackName: "some-stack",
-						State:     constant.ApplicationStarted,
-					},
-					ProcessSummaries: v7action.ProcessSummaries{
-						{
-							Process: v7action.Process{
-								Type:               constant.ProcessTypeWeb,
-								Command:            *types.NewFilteredString("some-command-1"),
-								MemoryInMB:         types.NullUint64{IsSet: true, Value: 512},
-								DiskInMB:           types.NullUint64{IsSet: true, Value: 64},
-								HealthCheckTimeout: 60,
-								Instances:          types.NullInt{IsSet: true, Value: 5},
-							},
-							InstanceDetails: []v7action.ProcessInstance{
-								{State: constant.ProcessInstanceRunning},
-								{State: constant.ProcessInstanceRunning},
-								{State: constant.ProcessInstanceCrashed},
-								{State: constant.ProcessInstanceRunning},
-								{State: constant.ProcessInstanceRunning},
-							},
-						},
-						{
-							Process: v7action.Process{
-								Type:               "console",
-								Command:            *types.NewFilteredString("some-command-2"),
-								MemoryInMB:         types.NullUint64{IsSet: true, Value: 256},
-								DiskInMB:           types.NullUint64{IsSet: true, Value: 16},
-								HealthCheckTimeout: 120,
-								Instances:          types.NullInt{IsSet: true, Value: 1},
-							},
-							InstanceDetails: []v7action.ProcessInstance{
-								{State: constant.ProcessInstanceRunning},
-							},
-						},
-					},
-				},
-				CurrentDroplet: v7action.Droplet{
-					Stack: "cflinuxfs2",
-					Buildpacks: []v7action.DropletBuildpack{
-						{
-							Name:         "ruby_buildpack",
-							DetectOutput: "some-detect-output",
-						},
-						{
-							Name:         "some-buildpack",
-							DetectOutput: "",
-						},
-					},
-				},
-			}
-			fakePluginActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
-
-			fakeConfig.TargetedSpaceReturns(configv3.Space{
-				Name: "some-space",
-				GUID: "some-space-guid",
-			})
-
 			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -265,6 +201,73 @@ var _ = Describe("Server", func() {
 		})
 
 		Describe("GetApp", func() {
+			var (
+				summary v7action.DetailedApplicationSummary
+			)
+			BeforeEach(func() {
+				summary = v7action.DetailedApplicationSummary{
+					ApplicationSummary: v7action.ApplicationSummary{
+						Application: v7action.Application{
+							GUID:      "some-app-guid",
+							Name:      "some-app",
+							StackName: "some-stack",
+							State:     constant.ApplicationStarted,
+						},
+						ProcessSummaries: v7action.ProcessSummaries{
+							{
+								Process: v7action.Process{
+									Type:               constant.ProcessTypeWeb,
+									Command:            *types.NewFilteredString("some-command-1"),
+									MemoryInMB:         types.NullUint64{IsSet: true, Value: 512},
+									DiskInMB:           types.NullUint64{IsSet: true, Value: 64},
+									HealthCheckTimeout: 60,
+									Instances:          types.NullInt{IsSet: true, Value: 5},
+								},
+								InstanceDetails: []v7action.ProcessInstance{
+									{State: constant.ProcessInstanceRunning},
+									{State: constant.ProcessInstanceRunning},
+									{State: constant.ProcessInstanceCrashed},
+									{State: constant.ProcessInstanceRunning},
+									{State: constant.ProcessInstanceRunning},
+								},
+							},
+							{
+								Process: v7action.Process{
+									Type:               "console",
+									Command:            *types.NewFilteredString("some-command-2"),
+									MemoryInMB:         types.NullUint64{IsSet: true, Value: 256},
+									DiskInMB:           types.NullUint64{IsSet: true, Value: 16},
+									HealthCheckTimeout: 120,
+									Instances:          types.NullInt{IsSet: true, Value: 1},
+								},
+								InstanceDetails: []v7action.ProcessInstance{
+									{State: constant.ProcessInstanceRunning},
+								},
+							},
+						},
+					},
+					CurrentDroplet: v7action.Droplet{
+						Stack: "cflinuxfs2",
+						Buildpacks: []v7action.DropletBuildpack{
+							{
+								Name:         "ruby_buildpack",
+								DetectOutput: "some-detect-output",
+							},
+							{
+								Name:         "some-buildpack",
+								DetectOutput: "",
+							},
+						},
+					},
+				}
+				fakePluginActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
+
+				fakeConfig.TargetedSpaceReturns(configv3.Space{
+					Name: "some-space",
+					GUID: "some-space-guid",
+				})
+
+			})
 
 			It("retrieves the app summary", func() {
 				result := plugin_models.DetailedApplicationSummary{}
@@ -301,6 +304,55 @@ var _ = Describe("Server", func() {
 
 			})
 		})
+
+		Describe("GetCurrentSpace", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetedSpaceReturns(configv3.Space{
+					Name: "the-charlatans",
+					GUID: "united-travel-service",
+				})
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+					Name: "the-actress",
+					GUID: "family",
+				})
+				expectedSpace := v7action.Space{
+					GUID: "united-travel-service",
+					Name: "the-charlatans",
+				}
+				fakePluginActor.GetSpaceByNameAndOrganizationReturns(expectedSpace, v7action.Warnings{}, nil)
+			})
+
+			It("populates the plugin Space object with the current space settings in config", func() {
+				var space plugin_models.Space
+				err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				result := plugin_models.DetailedApplicationSummary{}
+				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(1))
+				spaceName, orgGUID := fakePluginActor.GetSpaceByNameAndOrganizationArgsForCall(0)
+				Expect(spaceName).To(Equal("the-charlatans"))
+				Expect(orgGUID).To(Equal("family"))
+
+				Expect(space.Name).To(Equal("the-charlatans"))
+				Expect(space.GUID).To(Equal("united-travel-service"))
+			})
+
+			Context("when retrieving the current space fails", func() {
+				BeforeEach(func() {
+					fakePluginActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, nil, errors.New("some-error"))
+				})
+				It("returns an error", func() {
+					result := plugin_models.DetailedApplicationSummary{}
+					err := client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
+					Expect(err).To(MatchError("some-error"))
+				})
+			})
+		})
+
 		Describe("AccessToken", func() {
 
 			BeforeEach(func() {

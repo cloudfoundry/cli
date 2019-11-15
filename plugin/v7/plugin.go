@@ -17,6 +17,7 @@ type Plugin interface {
 **/
 type CliConnection interface {
 	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
+	GetCurrentSpace() (plugin_models.Space, error)
 	AccessToken() (string, error)
 }
 
