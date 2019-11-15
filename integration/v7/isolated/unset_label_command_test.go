@@ -38,6 +38,7 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say(`\s+buildpack`))
 			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
+			Eventually(session).Should(Say(`\s+route`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("OPTIONS:"))
@@ -92,10 +93,9 @@ var _ = Describe("unset-label command", func() {
 
 			It("unsets the specified labels on the app", func() {
 				session := helpers.CF("unset-label", "app", appName, "some-other-key", "some-third-key")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
-				Consistently(session).ShouldNot(Say("\n\nOK"))
-				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
+				Expect(session).Should(Say("OK"))
 
 				appGuid := helpers.AppGUID(appName)
 				session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGuid))
@@ -138,10 +138,9 @@ var _ = Describe("unset-label command", func() {
 
 				It("unsets the specified labels on the buildpack", func() {
 					session := helpers.CF("unset-label", "buildpack", buildpackName, "public-facing", "pci")
-					Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as %s...`), buildpackName, username))
-					Consistently(session).ShouldNot(Say("\n\nOK"))
-					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as %s...`), buildpackName, username))
+					Expect(session).Should(Say("OK"))
 
 					// verify the labels are deleted
 					session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
@@ -157,9 +156,9 @@ var _ = Describe("unset-label command", func() {
 			When("the buildpack is unknown", func() {
 				It("displays an error", func() {
 					session := helpers.CF("unset-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
-					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
+					Expect(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
+					Expect(session).Should(Say("FAILED"))
 				})
 			})
 
@@ -190,9 +189,9 @@ var _ = Describe("unset-label command", func() {
 				When("stack is not specified", func() {
 					It("displays an error", func() {
 						session := helpers.CF("unset-label", "buildpack", buildpackName, "pci1")
-						Eventually(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
-						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
+						Expect(session.Err).Should(Say(fmt.Sprintf("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName)))
+						Expect(session).Should(Say("FAILED"))
 					})
 				})
 
@@ -201,10 +200,10 @@ var _ = Describe("unset-label command", func() {
 						It("gives an error message", func() {
 							badLabel := "^^snorky"
 							session := helpers.CF("unset-label", "buildpack", buildpackName, badLabel, "--stack", stacks[0])
-							Eventually(session).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Removing label(s) for buildpack %s with stack %s as %s...", buildpackName, stacks[0], username))))
-							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Metadata label key error: '%s' contains invalid characters", badLabel))))
-							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
+							Expect(session).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Removing label(s) for buildpack %s with stack %s as %s...", buildpackName, stacks[0], username))))
+							Expect(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Metadata label key error: '%s' contains invalid characters", badLabel))))
+							Expect(session).Should(Say("FAILED"))
 						})
 					})
 
@@ -212,9 +211,9 @@ var _ = Describe("unset-label command", func() {
 						var buildpack commonResource
 
 						session := helpers.CF("unset-label", "buildpack", buildpackName, "pci0", "--stack", stacks[0])
-						Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[0], username))
-						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
+						Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[0], username))
+						Expect(session).Should(Say("OK"))
 
 						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[0]))
 						Eventually(session).Should(Exit(0))
@@ -233,9 +232,9 @@ var _ = Describe("unset-label command", func() {
 						Expect(buildpack.Metadata.Labels["public-facing1"]).To(Equal("false"))
 
 						session = helpers.CF("unset-label", "buildpack", buildpackName, "pci1", "--stack", stacks[1])
-						Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[1], username))
-						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
+						Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as %s...`), buildpackName, stacks[1], username))
+						Expect(session).Should(Say("OK"))
 
 						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]))
 						Eventually(session).Should(Exit(0))
@@ -276,10 +275,9 @@ var _ = Describe("unset-label command", func() {
 			It("unsets the specified labels on the domain", func() {
 				session := helpers.CF("unset-label", "domain", domainName,
 					"some-other-key", "some-third-key")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for domain %s as %s...`), domainName, username))
-				Consistently(session).ShouldNot(Say("\n\nOK"))
-				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for domain %s as %s...`), domainName, username))
+				Expect(session).Should(Say("OK"))
 
 				session = helpers.CF("curl", fmt.Sprintf("/v3/domains?names=%s", domainName))
 				Eventually(session).Should(Exit(0))
@@ -304,10 +302,9 @@ var _ = Describe("unset-label command", func() {
 
 			It("unsets the specified labels on the org", func() {
 				session := helpers.CF("unset-label", "org", orgName, "public-facing")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for org %s as %s...`), orgName, username))
-				Consistently(session).ShouldNot(Say("\n\nOK"))
-				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for org %s as %s...`), orgName, username))
+				Expect(session).Should(Say("OK"))
 
 				orgGUID := helpers.GetOrgGUID(orgName)
 				session = helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s", orgGUID))
@@ -334,10 +331,9 @@ var _ = Describe("unset-label command", func() {
 
 			It("unsets the specified labels on the space", func() {
 				session := helpers.CF("unset-label", "space", spaceName, "public-facing")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
-				Consistently(session).ShouldNot(Say("\n\nOK"))
-				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
+				Expect(session).Should(Say("OK"))
 
 				spaceGUID := helpers.GetSpaceGUID(spaceName)
 				session = helpers.CF("curl", fmt.Sprintf("/v3/spaces/%s", spaceGUID))
@@ -367,10 +363,9 @@ var _ = Describe("unset-label command", func() {
 
 			It("unsets the specified labels on the stack", func() {
 				session := helpers.CF("unset-label", "stack", stackName, "public-facing")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for stack %s as %s...`), stackName, username))
-				Consistently(session).ShouldNot(Say("\n\nOK"))
-				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for stack %s as %s...`), stackName, username))
+				Expect(session).Should(Say("OK"))
 
 				session = helpers.CF("curl", fmt.Sprintf("/v3/stacks/%s", stackGUID))
 				Eventually(session).Should(Exit(0))
@@ -380,6 +375,57 @@ var _ = Describe("unset-label command", func() {
 				Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
 				Expect(len(stack.Metadata.Labels)).To(Equal(1))
 				Expect(stack.Metadata.Labels["pci"]).To(Equal("true"))
+			})
+		})
+
+		When("unsetting labels from a route", func() {
+			var (
+				orgGUID    string
+				routeName  string
+				domainName string
+				domain     helpers.Domain
+			)
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				orgGUID = helpers.GetOrgGUID(orgName)
+				domainName = helpers.NewDomainName()
+				domain = helpers.NewDomain(orgName, domainName)
+				domain.Create()
+				Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
+				routeName = domainName
+
+				session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
+				Expect(session).Should(Say("OK"))
+			})
+
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-route", domainName, "-f")).Should(Exit(0))
+				domain.Delete()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("unsets the specified labels on the route", func() {
+				session := helpers.CF("unset-label", "route", routeName, "some-key")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for route %s as %s...`), routeName, username))
+				Expect(session).Should(Say("OK"))
+
+				session = helpers.CF("curl", fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID))
+				Eventually(session).Should(Exit(0))
+
+				routeJSON := session.Out.Contents()
+				var routes resourceCollection
+
+				Expect(json.Unmarshal(routeJSON, &routes)).To(Succeed())
+				Expect(len(routes.Resources)).To(Equal(1))
+				Expect(len(routes.Resources[0].Metadata.Labels)).To(Equal(1))
+				Expect(routes.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
+
 			})
 		})
 

@@ -28,7 +28,7 @@ type SetLabelActor interface {
 
 type SetLabelCommand struct {
 	RequiredArgs    flag.SetLabelArgs `positional-args:"yes"`
-	usage           interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   space\n   stack"`
+	usage           interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   space\n   stack"`
 	relatedCommands interface{}       `related_commands:"labels, unset-label"`
 	BuildpackStack  string            `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 

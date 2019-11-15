@@ -39,6 +39,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+buildpack`))
 				Eventually(session).Should(Say(`\s+domain`))
 				Eventually(session).Should(Say(`\s+org`))
+				Eventually(session).Should(Say(`\s+route`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("OPTIONS:"))
