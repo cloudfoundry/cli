@@ -9,6 +9,7 @@ import (
 	"io"
 	"sync"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
@@ -78,7 +79,6 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 	if err != nil {
 		return err
 	}
-
 	var b bytes.Buffer
 	enc := gob.NewEncoder(&b)
 	dec := gob.NewDecoder(&b)
@@ -88,7 +88,37 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 		panic(err)
 	}
 
-	err = dec.Decode(&retVal)
+	err = dec.Decode(retVal)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
+
+func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
+	orgGUID := cmd.Config.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return actionerror.NoOrganizationTargetedError{}
+	}
+	spaceName := cmd.Config.TargetedSpace().Name
+	if spaceName == "" {
+		return actionerror.NoSpaceTargetedError{}
+	}
+	space, _, err := cmd.PluginActor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+
+	if err != nil {
+		return err
+	}
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(space)
+	if err != nil {
+		panic(err)
+	}
+
+	err = dec.Decode(retVal)
 	if err != nil {
 		panic(err)
 	}
