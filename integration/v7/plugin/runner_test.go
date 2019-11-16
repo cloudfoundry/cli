@@ -42,8 +42,12 @@ var _ = Describe("running plugins", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				It("is able to run an installed plugin command", func() {
+				It("is able to run the CoolTest plugin command", func() { // v7 only
 					confirmTestPluginOutput("CoolTest", "I am a test plugin")
+				})
+
+				It("is able to run an installed plugin command", func() {
+					confirmTestPluginOutput("ApiEndpoint", helpers.GetAPI())
 				})
 			})
 		})

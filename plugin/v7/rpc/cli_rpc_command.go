@@ -28,6 +28,12 @@ type CliRpcCmd struct {
 	stdout               io.Writer
 }
 
+func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
+	*retVal = cmd.Config.Target()
+
+	return nil
+}
+
 func (cmd *CliRpcCmd) IsMinCliVersion(passedVersion string, retVal *bool) error {
 	if version.VersionString() == version.DefaultVersion {
 		*retVal = true

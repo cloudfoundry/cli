@@ -32,6 +32,16 @@ func (c *cliConnection) AccessToken() (string, error) {
 	return result, err
 }
 
+func (c *cliConnection) ApiEndpoint() (string, error) {
+	var result string
+
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.ApiEndpoint", "", &result)
+	})
+
+	return result, err
+}
+
 func (c *cliConnection) GetApp(appName string) (plugin_models.DetailedApplicationSummary, error) {
 	var result plugin_models.DetailedApplicationSummary
 

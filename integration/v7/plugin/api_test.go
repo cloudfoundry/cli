@@ -15,6 +15,19 @@ var _ = Describe("plugin API", func() {
 	AfterEach(func() {
 		uninstallTestPlugin()
 	})
+
+	Describe("AccessToken", func() {
+		It("returns the access token", func() {
+			confirmTestPluginOutput("AccessToken", `bearer [\w\d\.]+`)
+		})
+	})
+
+	Describe("ApiEndpoint", func() {
+		It("returns the API endpoint", func() {
+			confirmTestPluginOutput("ApiEndpoint", apiURL)
+		})
+	})
+
 	Describe("GetApp", func() {
 		var appName string
 		BeforeEach(func() {
@@ -27,12 +40,6 @@ var _ = Describe("plugin API", func() {
 
 		It("gets application information", func() {
 			confirmTestPluginOutputWithArg("GetApp", appName, appName)
-		})
-	})
-
-	Describe("AccessToken", func() {
-		It("returns the access token", func() {
-			confirmTestPluginOutput("AccessToken", `bearer [\w\d\.]+`)
 		})
 	})
 

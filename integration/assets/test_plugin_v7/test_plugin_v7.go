@@ -13,6 +13,9 @@ type Test1 struct {
 
 func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	switch args[0] {
+	case "ApiEndpoint":
+		result, _ := cliConnection.ApiEndpoint()
+		fmt.Println("Done ApiEndpoint:", result)
 	case "GetApp":
 		result, _ := cliConnection.GetApp(args[1])
 		fmt.Println("Done GetApp:", result)
@@ -42,6 +45,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			Build: 0,
 		},
 		Commands: []plugin.Command{
+			{Name: "ApiEndpoint"},
 			{Name: "GetApp"},
 			{Name: "GetCurrentSpace"},
 			{

@@ -16,9 +16,10 @@ type Plugin interface {
 	List of commands available to CliConnection variable passed into run
 **/
 type CliConnection interface {
+	AccessToken() (string, error)
+	ApiEndpoint() (string, error)
 	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
 	GetCurrentSpace() (plugin_models.Space, error)
-	AccessToken() (string, error)
 }
 
 type VersionType struct {
