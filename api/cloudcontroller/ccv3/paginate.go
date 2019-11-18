@@ -47,9 +47,7 @@ func (client Client) paginateWithIncludes(request *cloudcontroller.Request, obj 
 			return IncludedResources{}, fullWarningsList, err
 		}
 
-		for _, user := range wrapper.IncludedResources.UserResource {
-			includes.Users = append(includes.Users, user)
-		}
+		includes.Users = append(includes.Users, wrapper.IncludedResources.UserResource...)
 
 		if wrapper.NextPage() == "" {
 			break

@@ -117,11 +117,11 @@ func sortUsers(usersWithRole []v7action.User) {
 	sort.Slice(usersWithRole, func(i, j int) bool {
 		if usersWithRole[i].PresentationName == usersWithRole[j].PresentationName {
 
-			if usersWithRole[i].Origin == "uaa" || usersWithRole[j].Origin == "" {
+			if usersWithRole[i].Origin == constant.DefaultOriginUaa || usersWithRole[j].Origin == "" {
 				return true
 			}
 
-			if usersWithRole[j].Origin == "uaa" || usersWithRole[i].Origin == "" {
+			if usersWithRole[j].Origin == constant.DefaultOriginUaa || usersWithRole[i].Origin == "" {
 				return false
 			}
 
