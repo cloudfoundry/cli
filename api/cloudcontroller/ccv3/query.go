@@ -50,6 +50,9 @@ const (
 	OrderBy QueryKey = "order_by"
 	// PerPage is a query parameter for specifying the number of results per page.
 	PerPage QueryKey = "per_page"
+	// Include is a query parameter for specifying other resources associated with the
+	// resource returned by the endpoint
+	Include QueryKey = "include"
 
 	// NameOrder is a query value for ordering by name. This value is used in
 	// conjunction with the OrderBy QueryKey.

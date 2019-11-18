@@ -97,7 +97,7 @@ var _ = Describe("Role Actions", func() {
 					Expect(passedRole).To(Equal(
 						ccv3.Role{
 							Type:     roleType,
-							UserName: "user-name",
+							Username: "user-name",
 							Origin:   "user-origin",
 							OrgGUID:  "org-guid",
 						},
@@ -219,7 +219,7 @@ var _ = Describe("Role Actions", func() {
 					Expect(passedOrgRole).To(Equal(
 						ccv3.Role{
 							Type:     constant.OrgUserRole,
-							UserName: "user-name",
+							Username: "user-name",
 							Origin:   "user-origin",
 							OrgGUID:  "org-guid",
 						},
@@ -229,7 +229,7 @@ var _ = Describe("Role Actions", func() {
 					Expect(passedSpaceRole).To(Equal(
 						ccv3.Role{
 							Type:      roleType,
-							UserName:  "user-name",
+							Username:  "user-name",
 							Origin:    "user-origin",
 							SpaceGUID: "space-guid",
 						},
@@ -286,4 +286,121 @@ var _ = Describe("Role Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetOrgUsersByRoleType", func() {
+		var (
+			usersByType map[constant.RoleType][]User
+			actualErr   error
+			warnings    Warnings
+		)
+
+		JustBeforeEach(func() {
+			usersByType, warnings, actualErr = actor.GetOrgUsersByRoleType("some-org-guid")
+		})
+
+		When("when the API returns a success response", func() {
+			When("the API returns 2 users", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRolesReturns(
+						[]ccv3.Role{
+							{
+								GUID:     "multiple-user-roleGUID",
+								OrgGUID:  "some-org-guid",
+								UserGUID: "multi-role-userGUID",
+								Type:     constant.OrgUserRole,
+							},
+							{
+								GUID:     "multiple-user-manager-roleGUID",
+								OrgGUID:  "some-org-guid",
+								UserGUID: "multi-role-userGUID",
+								Type:     constant.OrgManagerRole,
+							},
+							{
+								GUID:     "single-user-roleGUID",
+								OrgGUID:  "some-org-guid",
+								UserGUID: "single-role-userGUID",
+								Type:     constant.OrgUserRole,
+							},
+						},
+						ccv3.IncludedResources{
+							Users: []ccv3.User{
+								{
+									Origin:   "uaa",
+									Username: "i-have-many-roles",
+									GUID:     "multi-role-userGUID",
+								},
+								{
+									Origin:   "uaa",
+									Username: "i-have-one-role",
+									GUID:     "single-role-userGUID",
+								},
+							},
+						},
+						ccv3.Warnings{"some-api-warning"},
+						nil,
+					)
+				})
+
+				It("returns the 2 users", func() {
+					Expect(actualErr).NotTo(HaveOccurred())
+					Expect(usersByType[constant.OrgUserRole]).To(Equal([]User{
+						{
+							Origin:   "uaa",
+							Username: "i-have-many-roles",
+							GUID:     "multi-role-userGUID",
+						},
+						{
+							Origin:   "uaa",
+							Username: "i-have-one-role",
+							GUID:     "single-role-userGUID",
+						},
+					}))
+
+					Expect(usersByType[constant.OrgManagerRole]).To(Equal([]User{
+						{
+							Origin:   "uaa",
+							Username: "i-have-many-roles",
+							GUID:     "multi-role-userGUID",
+						},
+					}))
+
+					Expect(warnings).To(ConsistOf("some-api-warning"))
+
+					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetRolesArgsForCall(0)
+					Expect(query[0]).To(Equal(ccv3.Query{
+						Key:    ccv3.OrganizationGUIDFilter,
+						Values: []string{"some-org-guid"},
+					}))
+					Expect(query[1]).To(Equal(ccv3.Query{
+						Key:    ccv3.Include,
+						Values: []string{"user"},
+					}))
+				})
+			})
+		})
+
+		When("the API returns an error", func() {
+			var apiError error
+
+			BeforeEach(func() {
+				apiError = errors.New("api-get-roles-error")
+				fakeCloudControllerClient.GetRolesReturns(
+					[]ccv3.Role{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-warning"},
+					apiError,
+				)
+			})
+
+			It("returns error coming from the API", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+
+				Expect(actualErr).To(MatchError("api-get-roles-error"))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+			})
+		})
+	})
+
 })

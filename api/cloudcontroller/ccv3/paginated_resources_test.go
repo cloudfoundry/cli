@@ -149,4 +149,47 @@ var _ = Describe("Paginated Resources", func() {
 			))
 		})
 	})
+
+	Describe("IncludedResources", func() {
+		var raw []byte
+
+		BeforeEach(func() {
+			raw = []byte(`{
+				"pagination": {
+					"next": {
+						"href":"https://fake.com/v3/banana?page=2&per_page=50"
+					}
+				},
+				"resources": [
+					{
+						"metadata": {
+							"guid": "app-guid-2",
+							"updated_at": null
+						},
+						"entity": {
+							"name": "app-name-2"
+						}
+					}
+				],
+				"included": {
+      				"users": [
+						{
+							"guid": "user-guid-1",
+							"username": "user-name-1",
+							"origin": "uaa"
+						}
+					]
+				}
+			}`)
+
+			err := json.Unmarshal(raw, &page)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("can unmarshal the list of included resources into an appropriate struct", func() {
+			Expect(page.IncludedResources.UserResource).To(ConsistOf(
+				User{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
+			))
+		})
+	})
 })
