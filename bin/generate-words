@@ -1,6 +1,0 @@
-#!/bin/bash
-
-set -e
-go install github.com/shuLhan/go-bindata
-go-bindata -pkg=words -o util/words/words.go util/words/dict
-go fmt ./util/words/...
