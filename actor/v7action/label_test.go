@@ -30,6 +30,9 @@ var _ = Describe("Labels", func() {
 		fakeSharedActor = new(v7actionfakes.FakeSharedActor)
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil, nil)
+		resourceName = "some-resource"
+		orgGUID = "some-org-guid"
+		spaceGUID = "some-space-guid"
 	})
 
 	Context("UpdateApplicationLabelsByApplicationName", func() {
@@ -49,6 +52,14 @@ var _ = Describe("Labels", func() {
 					ccv3.Warnings{"set-app-labels-warnings"},
 					nil,
 				)
+			})
+
+			It("gets the application", func() {
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+				))
 			})
 
 			It("sets the app labels", func() {
@@ -125,6 +136,13 @@ var _ = Describe("Labels", func() {
 				)
 			})
 
+			It("gets the domain", func() {
+				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+				))
+			})
+
 			It("sets the domain labels", func() {
 				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
 				resourceType, domainGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
@@ -195,6 +213,13 @@ var _ = Describe("Labels", func() {
 					ccv3.Warnings{"set-org"},
 					nil,
 				)
+			})
+
+			It("gets the organization", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+				))
 			})
 
 			It("sets the org labels", func() {
@@ -280,6 +305,23 @@ var _ = Describe("Labels", func() {
 				)
 			})
 
+			It("gets the domain", func() {
+				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"sub.example.com"}},
+				))
+			})
+
+			It("gets the route", func() {
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/my-route/path"}},
+				))
+			})
+
 			It("sets the route labels", func() {
 				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
 				resourceType, routeGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
@@ -363,6 +405,14 @@ var _ = Describe("Labels", func() {
 				)
 			})
 
+			It("gets the space", func() {
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+				))
+			})
+
 			It("sets the space labels", func() {
 				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
 				resourceType, spaceGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
@@ -435,6 +485,13 @@ var _ = Describe("Labels", func() {
 				)
 			})
 
+			It("gets the stack", func() {
+				Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetStacksArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+				))
+			})
+
 			It("sets the stack labels", func() {
 				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
 				resourceType, stackGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
@@ -502,6 +559,13 @@ var _ = Describe("Labels", func() {
 				)
 			})
 
+			It("gets the domain", func() {
+				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetDomainsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+				))
+			})
+
 			When("there are no labels on a domain", func() {
 				It("returns an empty map", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
@@ -563,6 +627,13 @@ var _ = Describe("Labels", func() {
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
+			})
+
+			It("gets the stack", func() {
+				Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetStacksArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+				))
 			})
 
 			When("there are no labels on a stack", func() {
