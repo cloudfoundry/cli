@@ -20,6 +20,11 @@ func (actor *Actor) GetOrganizationLabels(orgName string) (map[string]types.Null
 	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
 }
 
+func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
+	resource, warnings, err := actor.GetRoute(routeName, spaceGUID)
+	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+}
+
 func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
 	return actor.getLabels(resource.Metadata, warnings, err)
@@ -80,11 +85,11 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 }
 
 func (actor *Actor) UpdateRouteLabels(routeName string, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
-	routeGUID, warnings, err := actor.GetRouteGUID(routeName, spaceGUID)
+	route, warnings, err := actor.GetRoute(routeName, spaceGUID)
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("route", routeGUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("route", route.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID string, labels map[string]types.NullString) (Warnings, error) {

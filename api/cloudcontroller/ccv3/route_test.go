@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -277,7 +278,12 @@ var _ = Describe("Route", func() {
 					"resources": [
 						{
 							"guid": "route-1-guid",
-							"url": "hello"
+							"url": "hello",
+							"metadata": {
+								"labels": {
+									"key1": "value1"
+								}
+							}
 						},
 						{
 							"guid": "route-2-guid",
@@ -325,6 +331,11 @@ var _ = Describe("Route", func() {
 						Route{
 							GUID: "route-1-guid",
 							URL:  "hello",
+							Metadata: &Metadata{
+								Labels: map[string]types.NullString{
+									"key1": types.NewNullString("value1"),
+								},
+							},
 						},
 						Route{
 							GUID: "route-2-guid",
@@ -363,6 +374,11 @@ var _ = Describe("Route", func() {
 						Route{
 							GUID: "route-1-guid",
 							URL:  "hello",
+							Metadata: &Metadata{
+								Labels: map[string]types.NullString{
+									"key1": types.NewNullString("value1"),
+								},
+							},
 						},
 						Route{
 							GUID: "route-2-guid",

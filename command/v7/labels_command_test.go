@@ -410,6 +410,125 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
+		Describe("for routes", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
+				cmd.RequiredArgs = flag.LabelsArgs{
+					ResourceType: "route",
+					ResourceName: "foo.example.com/the-path",
+				}
+				fakeLabelsActor.GetRouteLabelsReturns(
+					map[string]types.NullString{
+						"some-other-label": types.NewNullString("some-other-value"),
+						"some-label":       types.NewNullString("some-value"),
+					},
+					v7action.Warnings{},
+					nil)
+			})
+
+			It("doesn't error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("checks that the user is logged in", func() {
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+				Expect(checkOrg).To(BeTrue())
+				Expect(checkSpace).To(BeTrue())
+			})
+
+			It("displays a message that it is retrieving the labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for route foo.example.com/the-path in org fake-org / space fake-space as some-user...`)))
+			})
+
+			It("retrieves the labels associated with the route", func() {
+				Expect(fakeLabelsActor.GetRouteLabelsCallCount()).To(Equal(1))
+				routeName, spaceGUID := fakeLabelsActor.GetRouteLabelsArgsForCall(0)
+				Expect(routeName).To(Equal("foo.example.com/the-path"))
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+			})
+
+			It("displays the labels that are associated with the route, alphabetically", func() {
+				Expect(testUI.Out).To(Say(`key\s+value`))
+				Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+				Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+			})
+
+			When("CAPI returns warnings", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetRouteLabelsReturns(
+						map[string]types.NullString{
+							"some-other-label": types.NewNullString("some-other-value"),
+							"some-label":       types.NewNullString("some-value"),
+						},
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						nil)
+				})
+
+				It("prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+			})
+
+			When("there is an error retrieving the route", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetRouteLabelsReturns(
+						map[string]types.NullString{},
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						errors.New("boom"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+
+				It("still prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+
+				It("doesn't say ok", func() {
+					Expect(testUI.Out).ToNot(Say("OK"))
+				})
+			})
+
+			When("checking the user is logged-in fails", func() {
+				BeforeEach(func() {
+					fakeSharedActor.CheckTargetReturns(errors.New("nope"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("nope"))
+				})
+			})
+
+			When("fetching the current user's name fails", func() {
+				BeforeEach(func() { fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom")) })
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("boom"))
+				})
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "RoUtE",
+						ResourceName: "example.com",
+					}
+				})
+
+				It("retrieves the labels associated with the route", func() {
+					Expect(fakeLabelsActor.GetRouteLabelsCallCount()).To(Equal(1))
+					routeName, _ := fakeLabelsActor.GetRouteLabelsArgsForCall(0)
+					Expect(routeName).To(Equal("example.com"))
+				})
+			})
+		})
+
 		Describe("for spaces", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserNameReturns("some-user", nil)

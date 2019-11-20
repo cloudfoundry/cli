@@ -27,6 +27,7 @@ type Route struct {
 	DomainName string
 	SpaceName  string
 	URL        string
+	Metadata   *Metadata
 }
 
 type RouteSummary struct {
@@ -154,7 +155,7 @@ func (actor Actor) parseRoutePath(routePath string) (string, string, string, str
 	return hostPart, pathPart, domainName, domain.GUID, allWarnings, nil
 }
 
-func (actor Actor) GetRouteGUID(routePath string, spaceGUID string) (string, Warnings, error) {
+func (actor Actor) GetRoute(routePath string, spaceGUID string) (Route, Warnings, error) {
 	filters := []ccv3.Query{
 		ccv3.Query{
 			Key:    ccv3.SpaceGUIDFilter,
@@ -163,7 +164,7 @@ func (actor Actor) GetRouteGUID(routePath string, spaceGUID string) (string, War
 	}
 	hostPart, pathPart, domainName, domainGUID, allWarnings, err := actor.parseRoutePath(routePath)
 	if err != nil {
-		return "", allWarnings, err
+		return Route{}, allWarnings, err
 	}
 	filters = append(filters, ccv3.Query{
 		Key:    ccv3.DomainGUIDFilter,
@@ -178,17 +179,21 @@ func (actor Actor) GetRouteGUID(routePath string, spaceGUID string) (string, War
 	routes, warnings, err := actor.CloudControllerClient.GetRoutes(filters...)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return "", allWarnings, err
+		return Route{}, allWarnings, err
 	}
 	if len(routes) == 0 {
-		return "", allWarnings, actionerror.RouteNotFoundError{
+		return Route{}, allWarnings, actionerror.RouteNotFoundError{
 			Host:       hostPart,
 			DomainName: domainName,
 			Path:       pathPart,
 		}
 	}
 
-	return routes[0].GUID, allWarnings, nil
+	actionRoutes, allWarnings, err := actor.createActionRoutes(routes, allWarnings)
+	if err != nil {
+		return Route{}, allWarnings, err
+	}
+	return actionRoutes[0], allWarnings, nil
 }
 
 func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
@@ -410,7 +415,7 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 
 	actorRoutes := []Route{}
 	for _, route := range routes {
-		actorRoutes = append(actorRoutes, Route{
+		actorRoute := Route{
 			GUID:       route.GUID,
 			Host:       route.Host,
 			Path:       route.Path,
@@ -419,7 +424,12 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 			URL:        route.URL,
 			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
 			DomainName: getDomainName(route.URL, route.Host, route.Path),
-		})
+		}
+		if route.Metadata != nil {
+			metadata := Metadata(*route.Metadata)
+			actorRoute.Metadata = &metadata
+		}
+		actorRoutes = append(actorRoutes, actorRoute)
 	}
 
 	return actorRoutes, allWarnings, nil

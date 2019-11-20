@@ -365,6 +365,7 @@ var _ = Describe("labels command", func() {
 				})
 			})
 		})
+
 		Describe("org labels", func() {
 			BeforeEach(func() {
 				helpers.SetupCFWithOrgOnly(orgName)
@@ -405,6 +406,68 @@ var _ = Describe("labels command", func() {
 					Eventually(session.Err).Should(Say("Organization 'non-existent-org' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		Describe("route labels", func() {
+			var (
+				routeName  string
+				domainName string
+				domain     helpers.Domain
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				domainName = helpers.NewDomainName()
+				domain = helpers.NewDomain(orgName, domainName)
+				domain.Create()
+				Eventually(helpers.CF("create-route", domainName)).Should(Exit(0))
+				routeName = domainName
+			})
+
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-route", domainName, "-f")).Should(Exit(0))
+				domain.Delete()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			When("there are labels set on the route", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "route", routeName, "some-other-key=some-other-value", "some-key=some-value")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("lists the labels", func() {
+					session := helpers.CF("labels", "route", routeName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for route %s in org %s / space %s as %s...\n\n"), routeName, orgName, spaceName, username))
+					Expect(session).To(Say(`key\s+value`))
+					Expect(session).To(Say(`some-key\s+some-value`))
+					Expect(session).To(Say(`some-other-key\s+some-other-value`))
+				})
+			})
+
+			When("there are no labels set on the route", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "route", routeName)
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for route %s in org %s / space %s as %s...\n\n"), routeName, orgName, spaceName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Expect(session).Should(Say("No labels found."))
+				})
+			})
+
+			When("the route does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "route", "non-existent-route.example.com")
+					Eventually(session).Should(Exit(1))
+					Expect(session).Should(Say(regexp.QuoteMeta("Getting labels for route non-existent-route.example.com in org %s / space %s as %s...\n\n"), orgName, spaceName, username))
+					Expect(session.Err).To(Say("Domain 'example.com' not found"))
+					Expect(session).To(Say("FAILED"))
 				})
 			})
 		})

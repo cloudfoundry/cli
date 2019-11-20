@@ -72,6 +72,22 @@ type FakeLabelsActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetRouteLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
+	getRouteLabelsMutex       sync.RWMutex
+	getRouteLabelsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getRouteLabelsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRouteLabelsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetSpaceLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
 	getSpaceLabelsMutex       sync.RWMutex
 	getSpaceLabelsArgsForCall []struct {
@@ -373,6 +389,73 @@ func (fake *FakeLabelsActor) GetOrganizationLabelsReturnsOnCall(i int, result1 m
 	}{result1, result2, result3}
 }
 
+func (fake *FakeLabelsActor) GetRouteLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getRouteLabelsMutex.Lock()
+	ret, specificReturn := fake.getRouteLabelsReturnsOnCall[len(fake.getRouteLabelsArgsForCall)]
+	fake.getRouteLabelsArgsForCall = append(fake.getRouteLabelsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetRouteLabels", []interface{}{arg1, arg2})
+	fake.getRouteLabelsMutex.Unlock()
+	if fake.GetRouteLabelsStub != nil {
+		return fake.GetRouteLabelsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRouteLabelsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeLabelsActor) GetRouteLabelsCallCount() int {
+	fake.getRouteLabelsMutex.RLock()
+	defer fake.getRouteLabelsMutex.RUnlock()
+	return len(fake.getRouteLabelsArgsForCall)
+}
+
+func (fake *FakeLabelsActor) GetRouteLabelsCalls(stub func(string, string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getRouteLabelsMutex.Lock()
+	defer fake.getRouteLabelsMutex.Unlock()
+	fake.GetRouteLabelsStub = stub
+}
+
+func (fake *FakeLabelsActor) GetRouteLabelsArgsForCall(i int) (string, string) {
+	fake.getRouteLabelsMutex.RLock()
+	defer fake.getRouteLabelsMutex.RUnlock()
+	argsForCall := fake.getRouteLabelsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeLabelsActor) GetRouteLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getRouteLabelsMutex.Lock()
+	defer fake.getRouteLabelsMutex.Unlock()
+	fake.GetRouteLabelsStub = nil
+	fake.getRouteLabelsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetRouteLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getRouteLabelsMutex.Lock()
+	defer fake.getRouteLabelsMutex.Unlock()
+	fake.GetRouteLabelsStub = nil
+	if fake.getRouteLabelsReturnsOnCall == nil {
+		fake.getRouteLabelsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRouteLabelsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeLabelsActor) GetSpaceLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
 	fake.getSpaceLabelsMutex.Lock()
 	ret, specificReturn := fake.getSpaceLabelsReturnsOnCall[len(fake.getSpaceLabelsArgsForCall)]
@@ -517,6 +600,8 @@ func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	defer fake.getDomainLabelsMutex.RUnlock()
 	fake.getOrganizationLabelsMutex.RLock()
 	defer fake.getOrganizationLabelsMutex.RUnlock()
+	fake.getRouteLabelsMutex.RLock()
+	defer fake.getRouteLabelsMutex.RUnlock()
 	fake.getSpaceLabelsMutex.RLock()
 	defer fake.getSpaceLabelsMutex.RUnlock()
 	fake.getStackLabelsMutex.RLock()

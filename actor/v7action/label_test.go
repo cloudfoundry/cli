@@ -615,6 +615,96 @@ var _ = Describe("Labels", func() {
 		})
 	})
 
+	Context("GetRouteLabels", func() {
+		JustBeforeEach(func() {
+			labels, warnings, executeErr = actor.GetRouteLabels("sub.example.com/my-route/path", spaceGUID)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{
+						{Name: "domain-name", GUID: "domain-guid"},
+					},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]ccv3.Route{
+						{GUID: "route-guid", SpaceGUID: "some-space-guid", DomainGUID: "domain-guid", Host: "hostname", URL: "hostname.domain-name", Path: "/the-path"},
+					},
+					ccv3.Warnings([]string{"warning-1", "warning-2"}),
+					nil,
+				)
+			})
+
+			It("gets the route", func() {
+				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
+					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/my-route/path"}},
+				))
+			})
+
+			When("there are no labels on a route", func() {
+				It("returns an empty map", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-domains-warning", "warning-1", "warning-2"))
+					Expect(labels).To(BeEmpty())
+				})
+			})
+
+			When("there are labels", func() {
+				var expectedLabels map[string]types.NullString
+
+				BeforeEach(func() {
+					expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
+					fakeCloudControllerClient.GetRoutesReturns(
+						[]ccv3.Route{ccv3.Route{
+							GUID: "some-guid",
+							Metadata: &ccv3.Metadata{
+								Labels: expectedLabels,
+							}}},
+						ccv3.Warnings([]string{"warning-1", "warning-2"}),
+						nil,
+					)
+				})
+				It("returns the labels", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-domains-warning", "warning-1", "warning-2"))
+					Expect(labels).To(Equal(expectedLabels))
+				})
+			})
+		})
+
+		When("there is a client error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetDomainsReturns(
+					[]ccv3.Domain{
+						{Name: "domain-name", GUID: "domain-guid"},
+					},
+					ccv3.Warnings{"get-domains-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]ccv3.Route{ccv3.Route{GUID: "some-guid"}},
+					ccv3.Warnings([]string{"warning-1", "warning-2"}),
+					errors.New("get-routes-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-domains-warning", "warning-1", "warning-2"))
+				Expect(executeErr).To(MatchError("get-routes-error"))
+			})
+		})
+	})
+
 	Context("GetStackLabels", func() {
 		JustBeforeEach(func() {
 			labels, warnings, executeErr = actor.GetStackLabels(resourceName)

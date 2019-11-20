@@ -34,6 +34,7 @@ type LabelsActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetDomainLabels(domainName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
+	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 	GetStackLabels(stackName string) (map[string]types.NullString, v7action.Warnings, error)
@@ -86,6 +87,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchDomainLabels(username)
 	case Org:
 		labels, warnings, err = cmd.fetchOrgLabels(username)
+	case Route:
+		labels, warnings, err = cmd.fetchRouteLabels(username)
 	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
 	case Stack:
@@ -148,6 +151,24 @@ func (cmd LabelsCommand) fetchOrgLabels(username string) (map[string]types.NullS
 
 	cmd.UI.DisplayNewline()
 	return cmd.Actor.GetOrganizationLabels(cmd.RequiredArgs.ResourceName)
+}
+
+func (cmd LabelsCommand) fetchRouteLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	err := cmd.SharedActor.CheckTarget(true, true)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Getting labels for route {{.RouteName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"RouteName": cmd.RequiredArgs.ResourceName,
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  username,
+	})
+
+	cmd.UI.DisplayNewline()
+
+	return cmd.Actor.GetRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 }
 
 func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
