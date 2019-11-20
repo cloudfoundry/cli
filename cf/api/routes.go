@@ -204,5 +204,5 @@ func (repo CloudControllerRouteRepository) Unbind(routeGUID, appGUID string) (ap
 
 func (repo CloudControllerRouteRepository) Delete(routeGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/routes/%s", routeGUID)
-	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
+	return repo.gateway.DeleteResourceSynchronously(repo.config.APIEndpoint(), path)
 }
