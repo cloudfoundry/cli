@@ -1,9 +1,12 @@
 package v7action
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // User represents a CLI user.
@@ -65,4 +68,31 @@ func (actor Actor) DeleteUser(userGuid string) (Warnings, error) {
 	_, err = actor.UAAClient.DeleteUser(userGuid)
 
 	return Warnings(ccWarnings), err
+}
+
+func SortUsers(users []User) {
+	sort.Slice(users, func(i, j int) bool {
+		if users[i].PresentationName == users[j].PresentationName {
+
+			if users[i].Origin == constant.DefaultOriginUaa || users[j].Origin == "" {
+				return true
+			}
+
+			if users[j].Origin == constant.DefaultOriginUaa || users[i].Origin == "" {
+				return false
+			}
+
+			return users[i].Origin < users[j].Origin
+		}
+
+		return users[i].PresentationName < users[j].PresentationName
+	})
+}
+
+func GetHumanReadableOrigin(user User) string {
+	if user.Origin == "" {
+		return "client"
+	}
+
+	return user.Origin
 }

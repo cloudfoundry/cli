@@ -10,25 +10,26 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . OrgUsersActor
+//go:generate counterfeiter . SpaceUsersActor
 
-type OrgUsersActor interface {
+type SpaceUsersActor interface {
 	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
-	GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
+	GetSpaceUsersByRoleType(spaceGuid string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
 }
-type OrgUsersCommand struct {
-	RequiredArgs    flag.Organization `positional-args:"yes"`
-	AllUsers        bool              `long:"all-users" short:"a" description:"List all users in the org, including org users"`
-	usage           interface{}       `usage:"CF_NAME org-users ORG"`
-	relatedCommands interface{}       `related_commands:"orgs, set-org-role"`
+
+type SpaceUsersCommand struct {
+	RequiredArgs    flag.SpaceUsersArgs `positional-args:"yes"`
+	usage           interface{}         `usage:"CF_NAME space-users ORG SPACE"`
+	relatedCommands interface{}         `related_commands:"org-users, orgs, set-space-role, spaces, unset-space-role"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       OrgUsersActor
+	Actor       SpaceUsersActor
 }
 
-func (cmd *OrgUsersCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *SpaceUsersCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
@@ -42,7 +43,7 @@ func (cmd *OrgUsersCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd *OrgUsersCommand) Execute(args []string) error {
+func (cmd *SpaceUsersCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
@@ -53,8 +54,9 @@ func (cmd *OrgUsersCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Getting users in org {{.Org}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting users in org {{.Org}} / space {{.Space}} as {{.CurrentUser}}...", map[string]interface{}{
 		"Org":         cmd.RequiredArgs.Organization,
+		"Space":       cmd.RequiredArgs.Space,
 		"CurrentUser": user.Name,
 	})
 	cmd.UI.DisplayNewline()
@@ -64,34 +66,30 @@ func (cmd *OrgUsersCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-
-	orgUsersByRoleType, warnings, err := cmd.Actor.GetOrgUsersByRoleType(org.GUID)
+	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.RequiredArgs.Space, org.GUID)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err
 	}
 
-	cmd.displayOrgUsers(orgUsersByRoleType)
+	spaceUsersByRoleType, warnings, err := cmd.Actor.GetSpaceUsersByRoleType(space.GUID)
+	cmd.UI.DisplayWarningsV7(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.displaySpaceUsers(spaceUsersByRoleType)
 
 	return nil
 }
 
-func (cmd OrgUsersCommand) displayOrgUsers(orgUsersByRoleType map[constant.RoleType][]v7action.User) {
-	if cmd.AllUsers {
-		var allUsers []v7action.User
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgUserRole]...)
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgManagerRole]...)
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgBillingManagerRole]...)
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgAuditorRole]...)
-		cmd.displayRoleGroup(allUsers, "ORG USERS")
-	} else {
-		cmd.displayRoleGroup(orgUsersByRoleType[constant.OrgManagerRole], "ORG MANAGER")
-		cmd.displayRoleGroup(orgUsersByRoleType[constant.OrgBillingManagerRole], "BILLING MANAGER")
-		cmd.displayRoleGroup(orgUsersByRoleType[constant.OrgAuditorRole], "ORG AUDITOR")
-	}
+func (cmd SpaceUsersCommand) displaySpaceUsers(orgUsersByRoleType map[constant.RoleType][]v7action.User) {
+	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceManagerRole], "SPACE MANAGER")
+	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceDeveloperRole], "SPACE DEVELOPER")
+	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceAuditorRole], "SPACE AUDITOR")
 }
 
-func (cmd OrgUsersCommand) displayRoleGroup(usersWithRole []v7action.User, roleLabel string) {
+func (cmd SpaceUsersCommand) displayRoleGroup(usersWithRole []v7action.User, roleLabel string) {
 	v7action.SortUsers(usersWithRole)
 
 	cmd.UI.DisplayHeader(roleLabel)

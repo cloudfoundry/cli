@@ -315,4 +315,66 @@ var _ = Describe("User Actions", func() {
 			})
 		})
 	})
+
+	Describe("SortUsers", func() {
+		var (
+			users []User
+		)
+		When("The PresentationNames are different", func() {
+			BeforeEach(func() {
+				users = []User{
+					{PresentationName: "c", Origin: "uaa"},
+					{PresentationName: "a", Origin: "uaa"},
+					{PresentationName: "b", Origin: "ldap"},
+				}
+			})
+			It("sorts by PresentationName", func() {
+				SortUsers(users)
+				Expect(users[0].PresentationName).To(Equal("a"))
+				Expect(users[1].PresentationName).To(Equal("b"))
+				Expect(users[2].PresentationName).To(Equal("c"))
+			})
+		})
+		When("The PresentationNames are identical", func() {
+			BeforeEach(func() {
+				users = []User{
+					{PresentationName: "a", Origin: "cc"},
+					{PresentationName: "a", Origin: "aa"},
+					{PresentationName: "a", Origin: "bb"},
+					{PresentationName: "a", Origin: "uaa"},
+					{PresentationName: "a", Origin: "zz"},
+					{PresentationName: "a", Origin: ""},
+				}
+			})
+			It("sorts by PresentationName, uaa first, clients (origin == '') last and alphabetically otherwise", func() {
+				SortUsers(users)
+				Expect(users[0].Origin).To(Equal("uaa"))
+				Expect(users[1].Origin).To(Equal("aa"))
+				Expect(users[2].Origin).To(Equal("bb"))
+				Expect(users[3].Origin).To(Equal("cc"))
+				Expect(users[4].Origin).To(Equal("zz"))
+				Expect(users[5].Origin).To(Equal(""))
+			})
+		})
+	})
+
+	Describe("GetHumanReadableOrigin", func() {
+		var user User
+		When("The user has an origin", func() {
+			BeforeEach(func() {
+				user = User{Origin: "some-origin"}
+			})
+			It("displays the origin", func() {
+				Expect(GetHumanReadableOrigin(user)).To(Equal("some-origin"))
+			})
+		})
+		When("The user has an empty origin", func() {
+			BeforeEach(func() {
+				user = User{Origin: ""}
+			})
+			It("displays 'client'", func() {
+				Expect(GetHumanReadableOrigin(user)).To(Equal("client"))
+			})
+		})
+	})
 })

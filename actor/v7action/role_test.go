@@ -403,4 +403,116 @@ var _ = Describe("Role Actions", func() {
 		})
 	})
 
+	Describe("GetSpaceUsersByRoleType", func() {
+		var (
+			usersByType map[constant.RoleType][]User
+			actualErr   error
+			warnings    Warnings
+		)
+
+		JustBeforeEach(func() {
+			usersByType, warnings, actualErr = actor.GetSpaceUsersByRoleType("some-space-guid")
+		})
+
+		When("when the API returns a success response", func() {
+			When("the API returns 2 users", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRolesReturns(
+						[]ccv3.Role{
+							{
+								GUID:     "multiple-user-roleGUID",
+								UserGUID: "multi-role-userGUID",
+								Type:     constant.SpaceDeveloperRole,
+							},
+							{
+								GUID:     "multiple-user-manager-roleGUID",
+								UserGUID: "multi-role-userGUID",
+								Type:     constant.SpaceManagerRole,
+							},
+							{
+								GUID:     "single-user-roleGUID",
+								UserGUID: "single-role-userGUID",
+								Type:     constant.SpaceDeveloperRole,
+							},
+						},
+						ccv3.IncludedResources{
+							Users: []ccv3.User{
+								{
+									Origin:   "uaa",
+									Username: "i-have-many-roles",
+									GUID:     "multi-role-userGUID",
+								},
+								{
+									Origin:   "uaa",
+									Username: "i-have-one-role",
+									GUID:     "single-role-userGUID",
+								},
+							},
+						},
+						ccv3.Warnings{"some-api-warning"},
+						nil,
+					)
+				})
+
+				It("returns the 2 users", func() {
+					Expect(actualErr).NotTo(HaveOccurred())
+					Expect(usersByType[constant.SpaceDeveloperRole]).To(Equal([]User{
+						{
+							Origin:   "uaa",
+							Username: "i-have-many-roles",
+							GUID:     "multi-role-userGUID",
+						},
+						{
+							Origin:   "uaa",
+							Username: "i-have-one-role",
+							GUID:     "single-role-userGUID",
+						},
+					}))
+
+					Expect(usersByType[constant.SpaceManagerRole]).To(Equal([]User{
+						{
+							Origin:   "uaa",
+							Username: "i-have-many-roles",
+							GUID:     "multi-role-userGUID",
+						},
+					}))
+
+					Expect(warnings).To(ConsistOf("some-api-warning"))
+
+					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetRolesArgsForCall(0)
+					Expect(query[0]).To(Equal(ccv3.Query{
+						Key:    ccv3.SpaceGUIDFilter,
+						Values: []string{"some-space-guid"},
+					}))
+					Expect(query[1]).To(Equal(ccv3.Query{
+						Key:    ccv3.Include,
+						Values: []string{"user"},
+					}))
+				})
+			})
+		})
+
+		When("the API returns an error", func() {
+			var apiError error
+
+			BeforeEach(func() {
+				apiError = errors.New("api-get-roles-error")
+				fakeCloudControllerClient.GetRolesReturns(
+					[]ccv3.Role{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"some-warning"},
+					apiError,
+				)
+			})
+
+			It("returns error coming from the API", func() {
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+
+				Expect(actualErr).To(MatchError("api-get-roles-error"))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+			})
+		})
+	})
 })

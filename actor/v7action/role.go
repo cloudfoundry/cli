@@ -53,10 +53,18 @@ func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, s
 }
 
 func (actor Actor) GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType][]User, Warnings, error) {
+	return actor.getUsersByRoleType(orgGuid, ccv3.OrganizationGUIDFilter)
+}
+
+func (actor Actor) GetSpaceUsersByRoleType(spaceGuid string) (map[constant.RoleType][]User, Warnings, error) {
+	return actor.getUsersByRoleType(spaceGuid, ccv3.SpaceGUIDFilter)
+}
+
+func (actor Actor) getUsersByRoleType(guid string, filterKey ccv3.QueryKey) (map[constant.RoleType][]User, Warnings, error) {
 	ccv3Roles, includes, ccWarnings, err := actor.CloudControllerClient.GetRoles(
 		ccv3.Query{
-			Key:    ccv3.OrganizationGUIDFilter,
-			Values: []string{orgGuid},
+			Key:    filterKey,
+			Values: []string{guid},
 		},
 		ccv3.Query{
 			Key:    ccv3.Include,
@@ -66,17 +74,14 @@ func (actor Actor) GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType]
 	if err != nil {
 		return nil, Warnings(ccWarnings), err
 	}
-
 	usersByGuids := make(map[string]ccv3.User)
 	for _, user := range includes.Users {
 		usersByGuids[user.GUID] = user
 	}
-
 	usersByRoleType := make(map[constant.RoleType][]User)
 	for _, role := range ccv3Roles {
 		user := User(usersByGuids[role.UserGUID])
 		usersByRoleType[role.Type] = append(usersByRoleType[role.Type], user)
 	}
-
 	return usersByRoleType, Warnings(ccWarnings), nil
 }

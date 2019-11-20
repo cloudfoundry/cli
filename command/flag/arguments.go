@@ -272,6 +272,11 @@ type SetSpaceRoleArgs struct {
 	Role         SpaceRole `positional-arg-name:"ROLE" required:"true" description:"The space role"`
 }
 
+type SpaceUsersArgs struct {
+	Organization string `positional-arg-name:"ORG" required:"true" description:"The organization"`
+	Space        string `positional-arg-name:"SPACE" required:"true" description:"The space"`
+}
+
 type ServiceAuthTokenArgs struct {
 	Label    string `positional-arg-name:"LABEL" required:"true" description:"The token label"`
 	Provider string `positional-arg-name:"PROVIDER" required:"true" description:"The token provider"`
