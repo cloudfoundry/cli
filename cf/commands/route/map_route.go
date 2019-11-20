@@ -3,6 +3,7 @@ package route
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -108,7 +109,7 @@ func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall b
 }
 
 func (cmd *MapRoute) Execute(c flags.FlagContext) error {
-	hostName := c.String("n")
+	hostName := strings.ToLower(c.String("n"))
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
