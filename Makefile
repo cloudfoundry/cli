@@ -47,6 +47,8 @@ endif
 clean: ## Remove all files from the `out` directory
 	rm -f $(wildcard out/cf*)
 
+clear: clean  ## Make everyone happy
+
 custom-lint: ## Run our custom linters
 	@echo "style linting files:" # this list will grow as we cleanup all the code
 	@bash -c "go run bin/style/main.go api util"
