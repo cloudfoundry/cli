@@ -83,7 +83,7 @@ var _ = Describe("Role", func() {
 									"data": { "guid": "org-guid" }
 								},
 								"user": {
-									"data": { "name": "user-name", "origin": "uaa" }
+									"data": { "username": "user-name", "origin": "uaa" }
 								}
 							}
 						}`
@@ -186,7 +186,7 @@ var _ = Describe("Role", func() {
 									"data": { "guid": "space-guid" }
 								},
 								"user": {
-									"data": { "name": "user-name", "origin": "uaa" }
+									"data": { "username": "user-name", "origin": "uaa" }
 								}
 							}
 						}`

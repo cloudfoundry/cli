@@ -46,9 +46,9 @@ func (r Role) MarshalJSON() ([]byte, error) {
 			Space        *orgOrSpaceJSON `json:"space,omitempty"`
 			User         struct {
 				Data struct {
-					GUID   string `json:"guid,omitempty"`
-					Name   string `json:"name,omitempty"`
-					Origin string `json:"origin,omitempty"`
+					GUID     string `json:"guid,omitempty"`
+					Username string `json:"username,omitempty"`
+					Origin   string `json:"origin,omitempty"`
 				} `json:"data"`
 			} `json:"user"`
 		} `json:"relationships"`
@@ -67,7 +67,7 @@ func (r Role) MarshalJSON() ([]byte, error) {
 		}
 	}
 	if r.Username != "" {
-		ccRole.Relationships.User.Data.Name = r.Username
+		ccRole.Relationships.User.Data.Username = r.Username
 		ccRole.Relationships.User.Data.Origin = r.Origin
 	} else {
 		ccRole.Relationships.User.Data.GUID = r.UserGUID
