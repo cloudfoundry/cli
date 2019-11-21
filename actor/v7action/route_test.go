@@ -152,6 +152,7 @@ var _ = Describe("Route Actions", func() {
 		)
 
 		BeforeEach(func() {
+			labels = ""
 			fakeCloudControllerClient.GetDomainsReturns(
 				[]ccv3.Domain{
 					{Name: "domain1-name", GUID: "domain1-guid"},
@@ -479,6 +480,7 @@ var _ = Describe("Route Actions", func() {
 		)
 
 		BeforeEach(func() {
+			labels = ""
 			fakeCloudControllerClient.GetDomainsReturns(
 				[]ccv3.Domain{
 					{Name: "domain1-name", GUID: "domain1-guid"},
