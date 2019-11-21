@@ -20,8 +20,12 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		result, _ := cliConnection.GetApp(args[1])
 		fmt.Println("Done GetApp:", result)
 	case "GetCurrentSpace":
-		result, _ := cliConnection.GetCurrentSpace()
-		fmt.Printf("Done GetCurrentSpace:, result:%v, name: %s, guid: %s\n", result, result.Name, result.GUID)
+		result, err := cliConnection.GetCurrentSpace()
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+		} else {
+			fmt.Printf("Done GetCurrentSpace:, result:%v, name: %s, guid: %s\n", result, result.Name, result.GUID)
+		}
 	case "TestPluginCommandWithAliasV7", "Cool-V7":
 		fmt.Println("You called Test Plugin Command V7 With Alias!")
 	case "AccessToken":
