@@ -209,5 +209,24 @@ var _ = Describe("routes Command", func() {
 				Expect(testUI.Out).ToNot(Say(tableHeaders))
 			})
 		})
+
+		When("--labels is passed in", func() {
+			BeforeEach(func() {
+				cmd.Labels = "some_label=fun"
+			})
+			It("passes the labels to the actor", func() {
+				_, labels := fakeActor.GetRoutesBySpaceArgsForCall(0)
+				Expect(labels).To(Equal("some_label=fun"))
+			})
+			When("--org-level is passed in", func() {
+				BeforeEach(func() {
+					cmd.Orglevel = true
+				})
+				It("passes the labels to the actor", func() {
+					_, labels := fakeActor.GetRoutesByOrgArgsForCall(0)
+					Expect(labels).To(Equal("some_label=fun"))
+				})
+			})
+		})
 	})
 })

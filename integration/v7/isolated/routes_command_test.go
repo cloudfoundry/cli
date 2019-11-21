@@ -84,6 +84,9 @@ var _ = Describe("routes command", func() {
 				Eventually(helpers.CF("create-app", appName1)).Should(Exit(0))
 				domain.CreatePrivate()
 				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1")).Should(Exit(0))
+				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1a")).Should(Exit(0))
+				Eventually(helpers.CF("map-route", appName1, domainName, "--hostname", "route1b")).Should(Exit(0))
+				Eventually(helpers.CF("set-label", "route", "route1b."+domainName, "env=prod")).Should(Exit(0))
 
 				helpers.SetupCF(orgName, otherSpaceName)
 				appName2 = helpers.NewAppName()
@@ -100,10 +103,26 @@ var _ = Describe("routes command", func() {
 
 			It("lists all the routes", func() {
 				session := helpers.CF("routes")
-				Eventually(session).Should(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`space\s+host\s+domain\s+path\s+apps`))
-				Eventually(session).Should(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
 				Eventually(session).Should(Exit(0))
+
+				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Expect(session).To(Say(`space\s+host\s+domain\s+path\s+apps`))
+				Expect(session).To(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
+				Expect(session).To(Say(`%s\s+route1a\s+%s\s+%s`, spaceName, domainName, appName1))
+				Expect(session).To(Say(`%s\s+route1b\s+%s\s+%s`, spaceName, domainName, appName1))
+				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+%s`, spaceName, domainName, appName2))
+			})
+
+			// This is blocked on CAPI error https://www.pivotaltracker.com/story/show/169884201
+			XIt("lists all the routes by label", func() {
+				session := helpers.CF("routes", "--labels", "env in (prod)")
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Expect(session).To(Say(`space\s+host\s+domain\s+path\s+apps`))
+				Expect(session).ToNot(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
+				Expect(session).ToNot(Say(`%s\s+route1a\s+%s\s+%s`, spaceName, domainName, appName1))
+				Expect(session).To(Say(`%s\s+route1b\s+%s\s+%s`, spaceName, domainName, appName1))
+				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+%s`, spaceName, domainName, appName2))
 			})
 
 			When("fetching routes by org", func() {

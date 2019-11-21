@@ -14,8 +14,8 @@ import (
 //go:generate counterfeiter . RoutesActor
 
 type RoutesActor interface {
-	GetRoutesBySpace(string) ([]v7action.Route, v7action.Warnings, error)
-	GetRoutesByOrg(string) ([]v7action.Route, v7action.Warnings, error)
+	GetRoutesBySpace(spaceGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)
+	GetRoutesByOrg(orgGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)
 	GetRouteSummaries([]v7action.Route) ([]v7action.RouteSummary, v7action.Warnings, error)
 }
 
@@ -23,6 +23,7 @@ type RoutesCommand struct {
 	usage           interface{} `usage:"CF_NAME routes [--orglevel]"`
 	relatedCommands interface{} `related_commands:"check-route, domains, map-route, unmap-route"`
 	Orglevel        bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
+	Labels          string      `long:"labels" description:"Selector to filter routes by labels"`
 
 	UI          command.UI
 	Config      command.Config
@@ -69,14 +70,14 @@ func (cmd RoutesCommand) Execute(args []string) error {
 			"CurrentOrg":  targetedOrg.Name,
 			"CurrentUser": currentUser.Name,
 		})
-		routes, warnings, err = cmd.Actor.GetRoutesByOrg(targetedOrg.GUID)
+		routes, warnings, err = cmd.Actor.GetRoutesByOrg(targetedOrg.GUID, cmd.Labels)
 	} else {
 		cmd.UI.DisplayTextWithFlavor("Getting routes for org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...\n", map[string]interface{}{
 			"CurrentOrg":   targetedOrg.Name,
 			"CurrentSpace": targetedSpace.Name,
 			"CurrentUser":  currentUser.Name,
 		})
-		routes, warnings, err = cmd.Actor.GetRoutesBySpace(targetedSpace.GUID)
+		routes, warnings, err = cmd.Actor.GetRoutesBySpace(targetedSpace.GUID, cmd.Labels)
 	}
 
 	cmd.UI.DisplayWarningsV7(warnings)

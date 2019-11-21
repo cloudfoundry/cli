@@ -102,15 +102,16 @@ func (actor Actor) GetRouteDestinationByAppGUID(routeGUID string, appGUID string
 	}
 }
 
-func (actor Actor) GetRoutesBySpace(spaceGUID string) ([]Route, Warnings, error) {
+func (actor Actor) GetRoutesBySpace(spaceGUID string, labelSelector string) ([]Route, Warnings, error) {
 	allWarnings := Warnings{}
+	queries := []ccv3.Query{
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	}
+	if len(labelSelector) > 0 {
+		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
 
-	routes, warnings, err := actor.CloudControllerClient.GetRoutes(
-		ccv3.Query{
-			Key:    ccv3.SpaceGUIDFilter,
-			Values: []string{spaceGUID},
-		},
-	)
+	routes, warnings, err := actor.CloudControllerClient.GetRoutes(queries...)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
@@ -196,13 +197,16 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (Route, Warnings
 	return actionRoutes[0], allWarnings, nil
 }
 
-func (actor Actor) GetRoutesByOrg(orgGUID string) ([]Route, Warnings, error) {
+func (actor Actor) GetRoutesByOrg(orgGUID string, labelSelector string) ([]Route, Warnings, error) {
 	allWarnings := Warnings{}
+	queries := []ccv3.Query{
+		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+	}
+	if len(labelSelector) > 0 {
+		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
+	}
 
-	routes, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
-		Key:    ccv3.OrganizationGUIDFilter,
-		Values: []string{orgGUID},
-	})
+	routes, warnings, err := actor.CloudControllerClient.GetRoutes(queries...)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err

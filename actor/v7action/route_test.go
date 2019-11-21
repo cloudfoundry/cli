@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -12,6 +11,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -147,6 +147,7 @@ var _ = Describe("Route Actions", func() {
 		var (
 			routes     []Route
 			warnings   Warnings
+			labels     string
 			executeErr error
 		)
 
@@ -180,7 +181,7 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			routes, warnings, executeErr = actor.GetRoutesBySpace("space-guid")
+			routes, warnings, executeErr = actor.GetRoutesBySpace("space-guid", labels)
 		})
 
 		When("the API layer calls are successful", func() {
@@ -204,6 +205,24 @@ var _ = Describe("Route Actions", func() {
 				Expect(query).To(HaveLen(1))
 				Expect(query[0].Key).To(Equal(ccv3.SpaceGUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("space-guid"))
+			})
+
+			When("a label selector is provided", func() {
+				BeforeEach(func() {
+					labels = "ink=blink"
+				})
+
+				It("passes a label selector query", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					expectedQuery := []ccv3.Query{
+						{Key: ccv3.SpaceGUIDFilter, Values: []string{"space-guid"}},
+						{Key: ccv3.LabelSelectorFilter, Values: []string{"ink=blink"}},
+					}
+					actualQuery := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQuery).To(Equal(expectedQuery))
+				})
 			})
 		})
 
@@ -456,6 +475,7 @@ var _ = Describe("Route Actions", func() {
 			routes     []Route
 			warnings   Warnings
 			executeErr error
+			labels     string
 		)
 
 		BeforeEach(func() {
@@ -489,7 +509,7 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			routes, warnings, executeErr = actor.GetRoutesByOrg("org-guid")
+			routes, warnings, executeErr = actor.GetRoutesByOrg("org-guid", labels)
 		})
 
 		When("the API layer calls are successful", func() {
@@ -536,6 +556,24 @@ var _ = Describe("Route Actions", func() {
 				Expect(query).To(HaveLen(1))
 				Expect(query[0].Key).To(Equal(ccv3.GUIDFilter))
 				Expect(query[0].Values).To(ConsistOf("space1-guid", "space2-guid"))
+			})
+
+			When("a label selector is provided", func() {
+				BeforeEach(func() {
+					labels = "env=prod"
+				})
+
+				It("converts it into a query key", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					expectedQuery := []ccv3.Query{
+						{Key: ccv3.OrganizationGUIDFilter, Values: []string{"org-guid"}},
+						{Key: ccv3.LabelSelectorFilter, Values: []string{"env=prod"}},
+					}
+					actualQuery := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQuery).To(Equal(expectedQuery))
+				})
 			})
 		})
 

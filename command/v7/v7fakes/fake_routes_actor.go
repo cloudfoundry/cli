@@ -24,10 +24,11 @@ type FakeRoutesActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRoutesByOrgStub        func(string) ([]v7action.Route, v7action.Warnings, error)
+	GetRoutesByOrgStub        func(string, string) ([]v7action.Route, v7action.Warnings, error)
 	getRoutesByOrgMutex       sync.RWMutex
 	getRoutesByOrgArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	getRoutesByOrgReturns struct {
 		result1 []v7action.Route
@@ -39,10 +40,11 @@ type FakeRoutesActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRoutesBySpaceStub        func(string) ([]v7action.Route, v7action.Warnings, error)
+	GetRoutesBySpaceStub        func(string, string) ([]v7action.Route, v7action.Warnings, error)
 	getRoutesBySpaceMutex       sync.RWMutex
 	getRoutesBySpaceArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	getRoutesBySpaceReturns struct {
 		result1 []v7action.Route
@@ -129,16 +131,17 @@ func (fake *FakeRoutesActor) GetRouteSummariesReturnsOnCall(i int, result1 []v7a
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRoutesActor) GetRoutesByOrg(arg1 string) ([]v7action.Route, v7action.Warnings, error) {
+func (fake *FakeRoutesActor) GetRoutesByOrg(arg1 string, arg2 string) ([]v7action.Route, v7action.Warnings, error) {
 	fake.getRoutesByOrgMutex.Lock()
 	ret, specificReturn := fake.getRoutesByOrgReturnsOnCall[len(fake.getRoutesByOrgArgsForCall)]
 	fake.getRoutesByOrgArgsForCall = append(fake.getRoutesByOrgArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetRoutesByOrg", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetRoutesByOrg", []interface{}{arg1, arg2})
 	fake.getRoutesByOrgMutex.Unlock()
 	if fake.GetRoutesByOrgStub != nil {
-		return fake.GetRoutesByOrgStub(arg1)
+		return fake.GetRoutesByOrgStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -153,17 +156,17 @@ func (fake *FakeRoutesActor) GetRoutesByOrgCallCount() int {
 	return len(fake.getRoutesByOrgArgsForCall)
 }
 
-func (fake *FakeRoutesActor) GetRoutesByOrgCalls(stub func(string) ([]v7action.Route, v7action.Warnings, error)) {
+func (fake *FakeRoutesActor) GetRoutesByOrgCalls(stub func(string, string) ([]v7action.Route, v7action.Warnings, error)) {
 	fake.getRoutesByOrgMutex.Lock()
 	defer fake.getRoutesByOrgMutex.Unlock()
 	fake.GetRoutesByOrgStub = stub
 }
 
-func (fake *FakeRoutesActor) GetRoutesByOrgArgsForCall(i int) string {
+func (fake *FakeRoutesActor) GetRoutesByOrgArgsForCall(i int) (string, string) {
 	fake.getRoutesByOrgMutex.RLock()
 	defer fake.getRoutesByOrgMutex.RUnlock()
 	argsForCall := fake.getRoutesByOrgArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeRoutesActor) GetRoutesByOrgReturns(result1 []v7action.Route, result2 v7action.Warnings, result3 error) {
@@ -195,16 +198,17 @@ func (fake *FakeRoutesActor) GetRoutesByOrgReturnsOnCall(i int, result1 []v7acti
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRoutesActor) GetRoutesBySpace(arg1 string) ([]v7action.Route, v7action.Warnings, error) {
+func (fake *FakeRoutesActor) GetRoutesBySpace(arg1 string, arg2 string) ([]v7action.Route, v7action.Warnings, error) {
 	fake.getRoutesBySpaceMutex.Lock()
 	ret, specificReturn := fake.getRoutesBySpaceReturnsOnCall[len(fake.getRoutesBySpaceArgsForCall)]
 	fake.getRoutesBySpaceArgsForCall = append(fake.getRoutesBySpaceArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetRoutesBySpace", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetRoutesBySpace", []interface{}{arg1, arg2})
 	fake.getRoutesBySpaceMutex.Unlock()
 	if fake.GetRoutesBySpaceStub != nil {
-		return fake.GetRoutesBySpaceStub(arg1)
+		return fake.GetRoutesBySpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -219,17 +223,17 @@ func (fake *FakeRoutesActor) GetRoutesBySpaceCallCount() int {
 	return len(fake.getRoutesBySpaceArgsForCall)
 }
 
-func (fake *FakeRoutesActor) GetRoutesBySpaceCalls(stub func(string) ([]v7action.Route, v7action.Warnings, error)) {
+func (fake *FakeRoutesActor) GetRoutesBySpaceCalls(stub func(string, string) ([]v7action.Route, v7action.Warnings, error)) {
 	fake.getRoutesBySpaceMutex.Lock()
 	defer fake.getRoutesBySpaceMutex.Unlock()
 	fake.GetRoutesBySpaceStub = stub
 }
 
-func (fake *FakeRoutesActor) GetRoutesBySpaceArgsForCall(i int) string {
+func (fake *FakeRoutesActor) GetRoutesBySpaceArgsForCall(i int) (string, string) {
 	fake.getRoutesBySpaceMutex.RLock()
 	defer fake.getRoutesBySpaceMutex.RUnlock()
 	argsForCall := fake.getRoutesBySpaceArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeRoutesActor) GetRoutesBySpaceReturns(result1 []v7action.Route, result2 v7action.Warnings, result3 error) {
