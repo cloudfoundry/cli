@@ -96,7 +96,7 @@ var _ = Describe("set-space-role command", func() {
 					It("prints an appropriate error and exits 1", func() {
 						session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+						Eventually(session.Err).Should(Say("Users cannot be assigned roles in a space if they do not have a role in that space's organization."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -185,7 +185,7 @@ var _ = Describe("set-space-role command", func() {
 		})
 	})
 
-	When("the logged in user has insufficient permissions to see the user", func() {
+	When("the logged in user does not have permission to write to the space", func() {
 		var username string
 
 		BeforeEach(func() {
@@ -197,6 +197,22 @@ var _ = Describe("set-space-role command", func() {
 			session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	When("the logged in user has insufficient permissions to see the user", func() {
+		var username string
+
+		BeforeEach(func() {
+			username, _ = helpers.CreateUser()
+			helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceManager")
+		})
+
+		It("prints out the error message from CC API and exits 1", func() {
+			session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor", "-v")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say("Users cannot be assigned roles in a space if they do not have a role in that space's organization."))
 			Eventually(session).Should(Exit(1))
 		})
 	})

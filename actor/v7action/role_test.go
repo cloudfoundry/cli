@@ -255,20 +255,44 @@ var _ = Describe("Role Actions", func() {
 		})
 
 		When("the API call to create the org role returns an error", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
-					ccv3.Role{},
-					ccv3.Warnings{"create-org-role-warning"},
-					errors.New("create-org-role-error"),
-				)
+			Context("and it is not a forbidden", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
+						ccv3.Role{},
+						ccv3.Warnings{"create-org-role-warning"},
+						errors.New("create-org-role-error"),
+					)
+				})
+
+				It("it returns an error and warnings", func() {
+					Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(1))
+					Expect(warnings).To(ConsistOf("create-org-role-warning"))
+					Expect(executeErr).To(MatchError("create-org-role-error"))
+				})
 			})
 
-			It("it returns an error and warnings", func() {
-				Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(1))
-				Expect(warnings).To(ConsistOf("create-org-role-warning"))
-				Expect(executeErr).To(MatchError("create-org-role-error"))
+			Context("and it is a forbidden", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
+						ccv3.Role{},
+						ccv3.Warnings{"create-org-role-warning"},
+						ccerror.ForbiddenError{Message: "create-org-role-forbidden-error"},
+					)
+					fakeCloudControllerClient.CreateRoleReturnsOnCall(1,
+						ccv3.Role{},
+						ccv3.Warnings{"create-space-role-warning"},
+						ccerror.ForbiddenError{Message: "create-space-role-forbidden-error"},
+					)
+				})
+
+				It("it continues to make the call to API create space and returns the more helpful errors and warnings", func() {
+					Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(2))
+					Expect(warnings).To(ConsistOf("create-space-role-warning", "create-org-role-warning"))
+					Expect(executeErr).To(MatchError("create-space-role-forbidden-error"))
+				})
 			})
 		})
+
 
 		When("the API call to create the space role returns an error", func() {
 			BeforeEach(func() {

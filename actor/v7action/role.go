@@ -41,7 +41,10 @@ func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, s
 
 	warnings, err := actor.CreateOrgRole(constant.OrgUserRole, orgGUID, userNameOrGUID, userOrigin, isClient)
 	if err != nil {
-		if _, isIdempotentError := err.(ccerror.RoleAlreadyExistsError); !isIdempotentError {
+		_, isIdempotentError := err.(ccerror.RoleAlreadyExistsError)
+		_, isForbiddenError := err.(ccerror.ForbiddenError)
+
+		if !isIdempotentError && !isForbiddenError {
 			return warnings, err
 		}
 	}
