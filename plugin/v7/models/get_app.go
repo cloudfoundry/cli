@@ -81,6 +81,7 @@ type Route struct {
 	DomainName string
 	SpaceName  string
 	URL        string
+	Metadata   *Metadata
 }
 
 type ApplicationSummary struct {
