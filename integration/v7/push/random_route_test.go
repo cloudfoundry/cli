@@ -13,7 +13,7 @@ import (
 )
 
 var _ = Describe("random route", func() {
-	const randomRouteRegexp = `(?m)routes:\s+%s-[\w]+-[\w]+\.%s$`
+	const randomRouteRegexp = `(?m)routes:\s+%s-[\w]+-[\w]+(-[\w]+)?\.%s$`
 
 	var (
 		appName string
