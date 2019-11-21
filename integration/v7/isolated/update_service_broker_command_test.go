@@ -65,7 +65,7 @@ var _ = Describe("update-service-broker command", func() {
 				broker.Destroy()
 			})
 
-			XIt("should yield a warning", func() {
+			It("should yield a warning", func() {
 				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL())
 
 				Eventually(session.Wait().Out).Should(SatisfyAll(
