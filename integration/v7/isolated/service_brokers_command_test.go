@@ -94,5 +94,33 @@ var _ = Describe("service-brokers command", func() {
 				})
 			})
 		})
+
+		When("the broker was created via the V2 API", func() {
+			var (
+				orgName   string
+				spaceName string
+				broker    *fakeservicebroker.FakeServiceBroker
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New()
+				broker.EnsureRegisteredViaV2()
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("shows as 'available'", func() {
+				Eventually(session).Should(Say("Getting service brokers as %s...", username))
+				Eventually(session).Should(Say(`name\s+url\s+status`))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker.Name(), broker.URL(), "available"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
