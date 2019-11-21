@@ -9,7 +9,6 @@ import (
 	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
@@ -104,11 +103,11 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
 	orgGUID := cmd.Config.TargetedOrganization().GUID
 	if orgGUID == "" {
-		return actionerror.NoOrganizationTargetedError{}
+		return errors.New("no organization targeted")
 	}
 	spaceName := cmd.Config.TargetedSpace().Name
 	if spaceName == "" {
-		return actionerror.NoSpaceTargetedError{}
+		return errors.New("no space targeted")
 	}
 	space, _, err := cmd.PluginActor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
 
