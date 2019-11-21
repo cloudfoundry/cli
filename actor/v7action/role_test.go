@@ -293,7 +293,6 @@ var _ = Describe("Role Actions", func() {
 			})
 		})
 
-
 		When("the API call to create the space role returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRoleReturnsOnCall(1,
