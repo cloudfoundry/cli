@@ -71,6 +71,26 @@ var _ = Describe("running plugins", func() {
 				It("can call a command by its alias", func() {
 					confirmTestPluginOutput("Cool-V7", "You called Test Plugin Command V7 With Alias!")
 				})
+
+				When("API is unset", func() {
+					var (
+						apiURL string
+					)
+
+					BeforeEach(func() {
+						apiURL = helpers.GetAPI()
+						Expect(apiURL).ToNot(BeEmpty())
+						helpers.UnsetAPI()
+					})
+
+					It("doesn't panic when trying to call a plugin", func() {
+						session := helpers.CF("CoolTest")
+						Eventually(session).Should(Exit(1))
+
+						Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+						Expect(session).To(Say("FAILED"))
+					})
+				})
 			})
 		})
 	})

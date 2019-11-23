@@ -16,29 +16,22 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-func RunPlugin(plugin configv3.Plugin) {
+func RunPlugin(plugin configv3.Plugin) error {
 	config, err := configv3.LoadConfig(configv3.FlagOverride{
 		Verbose: common.Commands.VerboseOrVersion,
 	})
 
 	if err != nil {
 		if _, ok := err.(translatableerror.EmptyConfigError); !ok {
-			panic(err)
+			return err
 		}
 	}
 
 	sharedActor := sharedaction.NewActor(config)
 
-	//UI for the actor is used for logging. This is probably unnecessay for plugin's use of an actor
-	// ui, err := ui.NewUI(config)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer ui.FlushDeferred()
-
 	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, nil, "")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	v7Actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
@@ -47,8 +40,9 @@ func RunPlugin(plugin configv3.Plugin) {
 	rpcService, err := rpc.NewRpcService(nil, nil, nil, server, config, v7Actor)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	rpc.RunMethod(rpcService, os.Args[1:], plugin)
+	return nil
 }

@@ -147,7 +147,17 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 			}
 
 			if plugin, ok := isPluginCommand(originalArgs[0], config.Plugins()); ok {
-				plugin_transition.RunPlugin(plugin)
+				pluginErr := plugin_transition.RunPlugin(plugin)
+				if pluginErr != nil {
+					_, commandUI, err := getCFConfigAndCommandUIObjects()
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "%s\n", pluginErr.Error())
+						return 1
+					}
+					defer commandUI.FlushDeferred()
+					handleError(pluginErr, commandUI) //nolint: errcheck
+					return 1
+				}
 			} else {
 				// TODO Extract handling of unknown commands/suggested  commands out of legacy
 				cmd.Main(os.Getenv("CF_TRACE"), os.Args)
@@ -167,6 +177,19 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 	}
 	return 0
+}
+
+func getCFConfigAndCommandUIObjects() (*configv3.Config, *ui.UI, error) {
+	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
+		Verbose: common.Commands.VerboseOrVersion,
+	})
+	if configErr != nil {
+		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
+			return nil, nil, configErr
+		}
+	}
+	commandUI, err := ui.NewUI(cfConfig)
+	return cfConfig, commandUI, err
 }
 
 func isPluginCommand(command string, plugins []configv3.Plugin) (configv3.Plugin, bool) {
@@ -205,16 +228,7 @@ func isOption(s string) bool {
 }
 
 func executionWrapper(cmd flags.Commander, args []string) error {
-	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
-	})
-	if configErr != nil {
-		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
-			return configErr
-		}
-	}
-
-	commandUI, err := ui.NewUI(cfConfig)
+	cfConfig, commandUI, err := getCFConfigAndCommandUIObjects()
 	if err != nil {
 		return err
 	}
