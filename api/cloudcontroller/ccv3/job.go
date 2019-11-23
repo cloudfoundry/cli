@@ -27,8 +27,8 @@ func (job Job) Errors() []error {
 		switch errDetails.Code {
 		case constant.JobErrorCodeBuildpackAlreadyExistsForStack:
 			errs = append(errs, ccerror.BuildpackAlreadyExistsForStackError{Message: errDetails.Detail})
-		case constant.JobErrorCodeBuildpackAlreadyExistsWithoutStack:
-			errs = append(errs, ccerror.BuildpackAlreadyExistsWithoutStackError{Message: errDetails.Detail})
+		case constant.JobErrorCodeBuildpackInvalid:
+			errs = append(errs, ccerror.BuildpackInvalidError{Message: errDetails.Detail})
 		case constant.JobErrorCodeBuildpackStacksDontMatch:
 			errs = append(errs, ccerror.BuildpackStacksDontMatchError{Message: errDetails.Detail})
 		case constant.JobErrorCodeBuildpackStackDoesNotExist:
