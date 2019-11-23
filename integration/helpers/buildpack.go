@@ -84,7 +84,7 @@ type BuildpackFields struct {
 // by the current test run is <= 2.80.0. Before this version, some entities
 // would receive and invalid next_url in paginated requests. Since our test run
 // now generally creates more than 50 buildpacks, we need to delete test buildpacks
-// after use if we are targeting and older CC API.
+// after use if we are targeting an older CC API.
 // see https://github.com/cloudfoundry/capi-release/releases/tag/1.45.0
 func DeleteBuildpackIfOnOldCCAPI(buildpackName string) {
 	minVersion := "2.99.0"

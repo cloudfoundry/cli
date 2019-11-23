@@ -89,10 +89,17 @@ var _ = Describe("update-buildpack command", func() {
 
 			Describe("stack association", func() {
 				var stacks []string
+				var stacksBefore []string
 
 				BeforeEach(func() {
+					stacksBefore = helpers.FetchStacks()
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					stacks = helpers.EnsureMinimumNumberOfStacks(2)
+				})
+				AfterEach(func() {
+					for i := len(stacksBefore); i < len(stacks); i++ {
+						helpers.DeleteStack(stacks[i])
+					}
 				})
 
 				When("multiple buildpacks with the same name exist in enabled and unlocked state, and one has nil stack", func() {
@@ -112,6 +119,10 @@ var _ = Describe("update-buildpack command", func() {
 							Name: buildpackName, Stack: stacks[0]})))
 						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 						Eventually(listSession).Should(Exit(0))
+					})
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")).Should(Exit(0))
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 					})
 
 					When("no stack association is specified", func() {
@@ -146,6 +157,62 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(session).Should(Exit(0))
 						})
 					})
+
+					When("the user creates a new buildpack with the same name and a different stack and tries to update to it", func() {
+						AfterEach(func() {
+							Eventually(helpers.CF("delete-buildpack", buildpackName, "-s", stacks[1], "-f")).Should(Exit(0))
+						})
+
+						It("complains that the stack on the new archive differs from the current buildpacks", func() {
+							helpers.BuildpackWithStack(func(buildpackArchive string) {
+								createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+								Eventually(createSession).Should(Exit(0))
+
+								session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0], "-p", buildpackArchive)
+								Eventually(session).Should(Say("Updating buildpack %s with stack %s as %s...",
+									buildpackName, stacks[0], username))
+								Eventually(session.Err).Should(Say("Uploaded buildpack stack \\(%s\\) does not match cflinuxfs3", stacks[1]))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							}, stacks[1])
+						})
+					})
+
+					When("the initial buildpack has no stack", func() {
+
+						When("and the user creates a new stackful buildpack, an update is ok", func() {
+							var (
+								stacklessBuildpackName string
+								stacks                 []string
+								stacksBefore           []string
+							)
+
+							BeforeEach(func() {
+								stacklessBuildpackName = helpers.NewBuildpackName()
+								stacksBefore = helpers.FetchStacks()
+								stacks = helpers.EnsureMinimumNumberOfStacks(2)
+							})
+							AfterEach(func() {
+								Eventually(helpers.CF("delete-buildpack", stacklessBuildpackName, "-f")).Should(Exit(0))
+								for i := len(stacksBefore); i < len(stacks); i++ {
+									helpers.DeleteStack(stacks[i])
+								}
+								helpers.DeleteBuildpackIfOnOldCCAPI(stacklessBuildpackName)
+							})
+
+							It("updates the buildpack with the new stack", func() {
+								helpers.BuildpackWithoutStack(func(buildpackPath string) {
+									session := helpers.CF("create-buildpack", stacklessBuildpackName, buildpackPath, "1")
+									Eventually(session).Should(Exit(0))
+
+									helpers.BuildpackWithStack(func(newBuildpackPath string) {
+										session = helpers.CF("update-buildpack", stacklessBuildpackName, "-p", newBuildpackPath)
+										Eventually(session).Should(Exit(0))
+									}, stacks[1])
+								})
+							})
+						})
+					})
 				})
 
 				When("multiple buildpacks with the same name exist in enabled and unlocked state, and all have stacks", func() {
@@ -166,6 +233,10 @@ var _ = Describe("update-buildpack command", func() {
 						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
 							Name: buildpackName, Stack: stacks[1]})))
 						Eventually(listSession).Should(Exit(0))
+					})
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[0])).Should(Exit(0))
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[1])).Should(Exit(0))
 					})
 
 					When("no stack association is specified", func() {
@@ -225,6 +296,9 @@ var _ = Describe("update-buildpack command", func() {
 							Name: buildpackName, Stack: stacks[0]})))
 						Eventually(listSession).Should(Exit(0))
 					})
+					AfterEach(func() {
+						Eventually(helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[0])).Should(Exit(0))
+					})
 
 					When("no stack association is specified", func() {
 						It("updates the only buildpack with that name", func() {
@@ -271,6 +345,9 @@ var _ = Describe("update-buildpack command", func() {
 					listSession := helpers.CF("buildpacks")
 					Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 					Eventually(listSession).Should(Exit(0))
+				})
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-buildpack", buildpackName, "-f")).Should(Exit(0))
 				})
 
 				When("only a name is provided", func() {

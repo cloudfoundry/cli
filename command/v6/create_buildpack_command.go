@@ -1,8 +1,10 @@
 package v6
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -97,7 +99,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
-		return cmd.displayIfNameCollisionError(err)
+		return cmd.displayIfKnownBuildpackError(err)
 	}
 
 	cmd.UI.DisplayOK()
@@ -140,10 +142,15 @@ func (cmd CreateBuildpackCommand) displayNameAndStackCollisionError(err error) {
 		})
 }
 
-func (cmd CreateBuildpackCommand) displayIfNameCollisionError(err error) error {
-	if _, ok := err.(actionerror.BuildpackAlreadyExistsWithoutStackError); ok {
-		cmd.displayAlreadyExistingBuildpackWithoutStack(err)
-		return nil
+func (cmd CreateBuildpackCommand) displayIfKnownBuildpackError(err error) error {
+	if _, ok := err.(actionerror.BuildpackInvalidError); ok {
+		if strings.Index(err.Error(), "stack unique") != -1 {
+			cmd.displayAlreadyExistingBuildpackWithoutStack(err)
+			return nil
+		} else if strings.Index(err.Error(), "can only contain alphanumeric characters") != -1 {
+			cmd.displayInvalidBuildpackName(err)
+			return nil
+		}
 	} else if _, ok := err.(actionerror.BuildpackNameTakenError); ok {
 		cmd.displayAlreadyExistingBuildpack(err)
 		return nil
@@ -151,9 +158,14 @@ func (cmd CreateBuildpackCommand) displayIfNameCollisionError(err error) error {
 	return err
 }
 
-func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithoutStack(err error) {
+func (cmd CreateBuildpackCommand) displayInvalidBuildpackName(err error) {
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayWarning(err.Error())
+}
+
+func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithoutStack(err error) {
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(fmt.Sprintf("Buildpack %s already exists without a stack", cmd.RequiredArgs.Buildpack))
 	cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfBuildpacksCommand}}' and '{{.CfDeleteBuildpackCommand}}' to delete buildpack {{.BuildpackName}} without a stack",
 		map[string]interface{}{
 			"CfBuildpacksCommand":      cmd.Config.BinaryName() + " buildpacks",

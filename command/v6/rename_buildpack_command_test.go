@@ -172,16 +172,46 @@ var _ = Describe("rename buildpack command", func() {
 				})
 
 				When("the actor returns an error", func() {
-					BeforeEach(func() {
-						fakeActor.RenameBuildpackReturns(
-							v2action.Warnings{"warning1", "warning2"},
-							actionerror.BuildpackNameTakenError{Name: newName})
+					When("BuildpackNameTakenError", func() {
+						BeforeEach(func() {
+							fakeActor.RenameBuildpackReturns(
+								v2action.Warnings{"warning1", "warning2"},
+								actionerror.BuildpackNameTakenError{Name: newName})
+						})
+
+						It("returns an error and prints warnings", func() {
+							Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError{Name: newName}))
+							Expect(testUI.Err).To(Say("warning1"))
+							Expect(testUI.Err).To(Say("warning2"))
+						})
 					})
 
-					It("returns an error and prints warnings", func() {
-						Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError{Name: newName}))
-						Expect(testUI.Err).To(Say("warning1"))
-						Expect(testUI.Err).To(Say("warning2"))
+					When("BuildpackInvalidError: name has invalid characters", func() {
+						BeforeEach(func() {
+							fakeActor.RenameBuildpackReturns(
+								v2action.Warnings{"warning1", "warning2"},
+								actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"})
+						})
+
+						It("returns an error and prints warnings", func() {
+							Expect(executeErr).To(MatchError(actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"}))
+							Expect(testUI.Err).To(Say("warning1"))
+							Expect(testUI.Err).To(Say("warning2"))
+						})
+					})
+
+					When("BuildpackInvalidError: stack non-unique", func() {
+						BeforeEach(func() {
+							fakeActor.RenameBuildpackReturns(
+								v2action.Warnings{"warning1", "warning2"},
+								actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: stack unique"})
+						})
+
+						It("returns an error and prints warnings", func() {
+							Expect(executeErr).To(MatchError("Buildpack some-new-name already exists without a stack"))
+							Expect(testUI.Err).To(Say("warning1"))
+							Expect(testUI.Err).To(Say("warning2"))
+						})
 					})
 				})
 			})

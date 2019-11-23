@@ -47,6 +47,10 @@ var _ = Describe("rename buildpack command", func() {
 
 			username, _ = helpers.GetCredentials()
 		})
+		AfterEach(func() {
+			helpers.DeleteBuildpackIfOnOldCCAPI(oldBuildpackName)
+			helpers.DeleteBuildpackIfOnOldCCAPI(newBuildpackName)
+		})
 
 		When("the user provides a stack in an unsupported version", func() {
 			BeforeEach(func() {
@@ -145,6 +149,18 @@ var _ = Describe("rename buildpack command", func() {
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
 							})
+						})
+					})
+
+					When("the new name is invalid", func() {
+						BeforeEach(func() {
+							newBuildpackName += ".dots!"
+						})
+						It("returns an invalid-name error", func() {
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session.Err).Should(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
+							Eventually(session).Should(Exit(1))
 						})
 					})
 				})
@@ -246,6 +262,18 @@ var _ = Describe("rename buildpack command", func() {
 						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("renaming to an invalid name", func() {
+					BeforeEach(func() {
+						newBuildpackName += ",hey.dots!"
+					})
+					It("complains about the new name", func() {
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
+						Eventually(session.Err).Should(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 

@@ -1,12 +1,15 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
+	"fmt"
+	"strings"
 )
 
 //go:generate counterfeiter . RenameBuildpackActor
@@ -74,12 +77,22 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.RenameBuildpack(cmd.RequiredArgs.OldBuildpackName, cmd.RequiredArgs.NewBuildpackName, cmd.Stack)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		return filterError(cmd.RequiredArgs.NewBuildpackName, err)
 	}
 
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+func filterError(newBuildpackName string, err error) error {
+	if _, ok := err.(actionerror.BuildpackInvalidError); !ok {
+		return err
+	}
+	if strings.Index(err.Error(), "stack unique") == -1 {
+		return err
+	}
+	return fmt.Errorf("Buildpack %s already exists without a stack", newBuildpackName)
 }
 
 func (cmd RenameBuildpackCommand) stackSpecified() bool {

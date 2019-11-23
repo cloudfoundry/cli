@@ -91,12 +91,12 @@ var _ = Describe("Buildpack", func() {
 
 		When("the buildpack already exists with nil stack", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, ccerror.BuildpackAlreadyExistsWithoutStackError{Message: ""})
+				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, ccerror.BuildpackInvalidError{Message: "some failure message"})
 			})
 
-			It("returns a BuildpackAlreadyExistsWithoutStackError error and all warnings", func() {
+			It("returns a BuildpackInvalidError error and all warnings", func() {
 				Expect(warnings).To(ConsistOf("some-create-warning"))
-				Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: "some-bp-name"}))
+				Expect(executeErr).To(MatchError(actionerror.BuildpackInvalidError{Message: "some failure message"}))
 			})
 		})
 
@@ -105,7 +105,7 @@ var _ = Describe("Buildpack", func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, ccerror.BuildpackNameTakenError{Message: ""})
 			})
 
-			It("returns a BuildpackAlreadyExistsWithoutStackError error and all warnings", func() {
+			It("returns a BuildpackNameTaken error and all warnings", func() {
 				Expect(warnings).To(ConsistOf("some-create-warning"))
 				Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError{Name: "some-bp-name"}))
 			})
@@ -440,11 +440,11 @@ var _ = Describe("Buildpack", func() {
 
 			When("the buildpack already exists without a stack association", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.BuildpackAlreadyExistsWithoutStackError{})
+					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.BuildpackInvalidError{Message: "some failure message"})
 				})
 
 				It("returns a buildpack already exists without stack error", func() {
-					Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: "some-bp-name"}))
+					Expect(executeErr).To(MatchError(actionerror.BuildpackInvalidError{Message: "some failure message"}))
 					Expect(warnings).To(ConsistOf(Warnings{"some-warning"}))
 					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
 				})
