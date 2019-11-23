@@ -106,17 +106,33 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			When("creating the buildpack fails because a buildpack with the nil stack already exists", func() {
-				BeforeEach(func() {
-					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: "bp-name"})
-					cmd.RequiredArgs.Buildpack = "bp-name"
+			When("creating the buildpack fails with a buildpack-invalid error", func() {
+				When("the buildpack has an invalid name", func() {
+					BeforeEach(func() {
+						fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"})
+						cmd.RequiredArgs.Buildpack = "bp.name.oops.periods"
+					})
+
+					It("prints the error message as a warning but does not return it", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("some-create-bp-warning"))
+						Expect(testUI.Err).To(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
+						Expect(testUI.Out).ToNot(Say("TIP:"))
+					})
 				})
 
-				It("prints the error message as a warning but does not return it", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Err).To(Say("some-create-bp-warning"))
-					Expect(testUI.Err).To(Say("Buildpack bp-name already exists without a stack"))
-					Expect(testUI.Out).To(Say("TIP: use 'faceman buildpacks' and 'faceman delete-buildpack' to delete buildpack bp-name without a stack"))
+				When("the buildpack with the nil stack already exists", func() {
+					BeforeEach(func() {
+						fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: stack unique"})
+						cmd.RequiredArgs.Buildpack = "bp-name"
+					})
+
+					It("prints the error message as a warning but does not return it", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("some-create-bp-warning"))
+						Expect(testUI.Err).To(Say("Buildpack bp-name already exists without a stack"))
+						Expect(testUI.Out).To(Say("TIP: use 'faceman buildpacks' and 'faceman delete-buildpack' to delete buildpack bp-name without a stack"))
+					})
 				})
 			})
 

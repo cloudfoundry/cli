@@ -78,8 +78,8 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	}
 
 	ccBuildpack, warnings, err := actor.CloudControllerClient.CreateBuildpack(buildpack)
-	if _, ok := err.(ccerror.BuildpackAlreadyExistsWithoutStackError); ok {
-		return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: name}
+	if _, ok := err.(ccerror.BuildpackInvalidError); ok {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackInvalidError{Message: err.Error()}
 	}
 
 	if _, ok := err.(ccerror.BuildpackNameTakenError); ok {
@@ -184,7 +184,7 @@ func (actor *Actor) RenameBuildpack(oldName string, newName string, stackName st
 		allWarnings Warnings
 
 		foundBuildpacks []Buildpack
-		oldBp           Buildpack
+		oldBuildpack    Buildpack
 		err             error
 		found           bool
 	)
@@ -196,12 +196,12 @@ func (actor *Actor) RenameBuildpack(oldName string, newName string, stackName st
 	}
 
 	if len(foundBuildpacks) == 1 {
-		oldBp = foundBuildpacks[0]
+		oldBuildpack = foundBuildpacks[0]
 	} else {
 		if stackName == "" {
-			for _, bp := range foundBuildpacks {
-				if bp.NoStack() {
-					oldBp = bp
+			for _, buildpack := range foundBuildpacks {
+				if buildpack.NoStack() {
+					oldBuildpack = buildpack
 					found = true
 					break
 				}
@@ -212,14 +212,9 @@ func (actor *Actor) RenameBuildpack(oldName string, newName string, stackName st
 			return allWarnings, actionerror.MultipleBuildpacksFoundError{BuildpackName: oldName}
 		}
 	}
+	oldBuildpack.Name = newName
 
-	if err != nil {
-		return Warnings(allWarnings), err
-	}
-
-	oldBp.Name = newName
-
-	_, updateWarnings, err := actor.UpdateBuildpack(oldBp)
+	_, updateWarnings, err := actor.UpdateBuildpack(oldBuildpack)
 	allWarnings = append(allWarnings, updateWarnings...)
 	if err != nil {
 		return Warnings(allWarnings), err
@@ -234,8 +229,8 @@ func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, e
 		switch err.(type) {
 		case ccerror.ResourceNotFoundError:
 			return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpack.Name}
-		case ccerror.BuildpackAlreadyExistsWithoutStackError:
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: buildpack.Name}
+		case ccerror.BuildpackInvalidError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackInvalidError{Message: err.Error()}
 		case ccerror.BuildpackAlreadyExistsForStackError:
 			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
 		default:

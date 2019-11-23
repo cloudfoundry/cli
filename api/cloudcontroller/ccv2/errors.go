@@ -99,7 +99,7 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 	case "CF-AppStoppedStatsError":
 		return ccerror.ApplicationStoppedStatsError{Message: errorResponse.Description}
 	case "CF-BuildpackInvalid":
-		return ccerror.BuildpackAlreadyExistsWithoutStackError{Message: errorResponse.Description}
+		return ccerror.BuildpackInvalidError{Message: errorResponse.Description}
 	case "CF-BuildpackNameTaken":
 		return ccerror.BuildpackNameTakenError{Message: errorResponse.Description}
 	case "CF-InstancesError":
