@@ -160,18 +160,18 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					When("creating an invalid buildpack", func() {
+					When("creating a buildpack with nil stack that already exists", func() {
 						BeforeEach(func() {
 							serverResponse = `{
-							 "description": "Buildpack is invalid: goofy is a dog",
+							 "description": "Buildpack is invalid: stack unique",
 							 "error_code": "CF-BuildpackInvalid",
 							 "code": 290003
 						}`
 						})
 
-						It("returns an BuildpackInvalidError", func() {
-							Expect(executeErr).To(MatchError(ccerror.BuildpackInvalidError{
-								Message: "Buildpack is invalid: goofy is a dog",
+						It("returns an BuildpackAlreadyExistsWithoutStackError", func() {
+							Expect(executeErr).To(MatchError(ccerror.BuildpackAlreadyExistsWithoutStackError{
+								Message: "Buildpack is invalid: stack unique",
 							}))
 						})
 					})

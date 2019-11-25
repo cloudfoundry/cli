@@ -129,25 +129,7 @@ var _ = Describe("create buildpack command", func() {
 			})
 
 			When("specifying a valid path", func() {
-
 				When("the new buildpack is unique", func() {
-
-					When("the buildpack has an invalid name", func() {
-						var badBuildpackName string
-						BeforeEach(func() {
-							badBuildpackName = "periods.are.invalid"
-						})
-
-						It("complains that the name is invalid", func() {
-							helpers.BuildpackWithoutStack(func(buildpackPath string) {
-								session := helpers.CF("create-buildpack", badBuildpackName, buildpackPath, "1")
-								Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, badBuildpackName, username))
-								Eventually(session.Err).Should(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
-								Eventually(session).Should(Exit(0))
-							})
-						})
-					})
-
 					When("the new buildpack has a nil stack", func() {
 						It("successfully uploads a buildpack", func() {
 							helpers.BuildpackWithoutStack(func(buildpackPath string) {

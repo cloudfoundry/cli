@@ -59,7 +59,7 @@ var _ = Describe("Job", func() {
 			},
 
 			Entry("BuildpackNameStackTaken", 290000, ccerror.BuildpackAlreadyExistsForStackError{Message: "code 290000"}),
-			Entry("BuildpackInvalid", 290003, ccerror.BuildpackInvalidError{Message: "code 290003"}),
+			Entry("BuildpackInvalid", 290003, ccerror.BuildpackAlreadyExistsWithoutStackError{Message: "code 290003"}),
 			Entry("BuildpackStacksDontMatch", 390011, ccerror.BuildpackStacksDontMatchError{Message: "code 390011"}),
 			Entry("BuildpackStackDoesNotExist", 390012, ccerror.BuildpackStackDoesNotExistError{Message: "code 390012"}),
 			Entry("BuildpackZipError", 390013, ccerror.BuildpackZipInvalidError{Message: "code 390013"}),

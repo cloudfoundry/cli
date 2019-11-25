@@ -78,8 +78,8 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	}
 
 	ccBuildpack, warnings, err := actor.CloudControllerClient.CreateBuildpack(buildpack)
-	if _, ok := err.(ccerror.BuildpackInvalidError); ok {
-		return Buildpack{}, Warnings(warnings), actionerror.BuildpackInvalidError{Message: err.Error()}
+	if _, ok := err.(ccerror.BuildpackAlreadyExistsWithoutStackError); ok {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: name}
 	}
 
 	if _, ok := err.(ccerror.BuildpackNameTakenError); ok {
@@ -234,8 +234,8 @@ func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, e
 		switch err.(type) {
 		case ccerror.ResourceNotFoundError:
 			return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpack.Name}
-		case ccerror.BuildpackInvalidError:
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackInvalidError{Message: err.Error()}
+		case ccerror.BuildpackAlreadyExistsWithoutStackError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: buildpack.Name}
 		case ccerror.BuildpackAlreadyExistsForStackError:
 			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
 		default:
