@@ -145,7 +145,7 @@ var _ = Describe("create buildpack command", func() {
 							helpers.BuildpackWithoutStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", badBuildpackName, buildpackPath, "1")
 								Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, badBuildpackName, username))
-								Eventually(session.Err).Should(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
+								Eventually(session.Err).Should(Say("Buildpack is invalid: (?:name ){1,2}can only contain alphanumeric characters"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
