@@ -152,7 +152,7 @@ var _ = Describe("org-users Command", func() {
 
 						orgUsersByRole := map[constant.RoleType][]v7action.User{
 							constant.OrgManagerRole:        {uaaAdmin, ldapAdmin, abbyUser, client},
-							constant.OrgBillingManagerRole: {billingManager},
+							constant.OrgBillingManagerRole: {billingManager, uaaAdmin},
 							constant.OrgAuditorRole:        {orgAuditor},
 							constant.OrgUserRole:           {orgUser},
 						}
@@ -198,6 +198,8 @@ var _ = Describe("org-users Command", func() {
 							Expect(testUI.Out).To(Say("USERS"))
 							Expect(testUI.Out).To(Say(`abby \(ldap\)`))
 							Expect(testUI.Out).To(Say(`admin \(uaa\)`))
+							// Ensure that admin (uaa) does not appear twice, even though it has two roles
+							Expect(testUI.Out).NotTo(Say(`admin \(uaa\)`))
 							Expect(testUI.Out).To(Say(`admin \(ldap\)`))
 							Expect(testUI.Out).To(Say(`admin \(client\)`))
 							Expect(testUI.Out).To(Say(`billing-manager \(uaa\)`))

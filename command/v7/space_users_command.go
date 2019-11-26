@@ -101,7 +101,7 @@ func (cmd SpaceUsersCommand) displayRoleGroup(usersWithRole []v7action.User, rol
 			})
 		}
 	} else {
-		cmd.UI.DisplayTextWithFlavor("  No {{.RoleLabel}} found", map[string]interface{}{
+		cmd.UI.DisplayText("  No {{.RoleLabel}} found", map[string]interface{}{
 			"RoleLabel": roleLabel,
 		})
 	}

@@ -14,8 +14,9 @@ import (
 
 type OrgUsersActor interface {
 	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
-	GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
+	GetOrgUsersByRoleType(orgGUID string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
 }
+
 type OrgUsersCommand struct {
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	AllUsers        bool              `long:"all-users" short:"a" description:"List all users in the org, including org users"`
@@ -78,12 +79,7 @@ func (cmd *OrgUsersCommand) Execute(args []string) error {
 
 func (cmd OrgUsersCommand) displayOrgUsers(orgUsersByRoleType map[constant.RoleType][]v7action.User) {
 	if cmd.AllUsers {
-		var allUsers []v7action.User
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgUserRole]...)
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgManagerRole]...)
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgBillingManagerRole]...)
-		allUsers = append(allUsers, orgUsersByRoleType[constant.OrgAuditorRole]...)
-		cmd.displayRoleGroup(allUsers, "ORG USERS")
+		cmd.displayRoleGroup(getUniqueUsers(orgUsersByRoleType), "ORG USERS")
 	} else {
 		cmd.displayRoleGroup(orgUsersByRoleType[constant.OrgManagerRole], "ORG MANAGER")
 		cmd.displayRoleGroup(orgUsersByRoleType[constant.OrgBillingManagerRole], "BILLING MANAGER")
@@ -103,10 +99,32 @@ func (cmd OrgUsersCommand) displayRoleGroup(usersWithRole []v7action.User, roleL
 			})
 		}
 	} else {
-		cmd.UI.DisplayTextWithFlavor("  No {{.RoleLabel}} found", map[string]interface{}{
+		cmd.UI.DisplayText("  No {{.RoleLabel}} found", map[string]interface{}{
 			"RoleLabel": roleLabel,
 		})
 	}
 
 	cmd.UI.DisplayNewline()
+}
+
+func getUniqueUsers(orgUsersByRoleType map[constant.RoleType][]v7action.User) []v7action.User {
+	var allUsers []v7action.User
+
+	usersSet := make(map[string]bool)
+	addUsersWithType := func(roleType constant.RoleType) {
+		for _, user := range orgUsersByRoleType[roleType] {
+			if _, ok := usersSet[user.GUID]; !ok {
+				allUsers = append(allUsers, user)
+			}
+
+			usersSet[user.GUID] = true
+		}
+	}
+
+	addUsersWithType(constant.OrgUserRole)
+	addUsersWithType(constant.OrgManagerRole)
+	addUsersWithType(constant.OrgBillingManagerRole)
+	addUsersWithType(constant.OrgAuditorRole)
+
+	return allUsers
 }
