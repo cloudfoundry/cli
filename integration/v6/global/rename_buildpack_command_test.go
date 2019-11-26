@@ -159,7 +159,7 @@ var _ = Describe("rename buildpack command", func() {
 						It("returns an invalid-name error", func() {
 							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
+							Eventually(session.Err).Should(Say("Buildpack is invalid: (?:name ){1,2}can only contain alphanumeric characters"))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -271,7 +271,7 @@ var _ = Describe("rename buildpack command", func() {
 					})
 					It("complains about the new name", func() {
 						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-						Eventually(session.Err).Should(Say("Buildpack is invalid: name can only contain alphanumeric characters"))
+						Eventually(session.Err).Should(Say("Buildpack is invalid: (?:name ){1,2}can only contain alphanumeric characters"))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
