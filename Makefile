@@ -45,7 +45,7 @@ ifndef CF_INT_PASSWORD
 endif
 
 clean: ## Remove all files from the `out` directory
-	rm -f $(wildcard out/cf*)
+	rm -f $(wildcard out/cf)
 
 clear: clean  ## Make everyone happy
 
