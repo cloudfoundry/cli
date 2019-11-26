@@ -249,7 +249,7 @@ var _ = Describe("Buildpacks repo", func() {
 					Status: http.StatusBadRequest,
 					Body: `{
 					"code":290003,
-					"description":"Buildpack is invalid: [\"name name can only contain alphanumeric characters\"]",
+					"description":"Buildpack is invalid: [\"name can only contain alphanumeric characters\"]",
 					"error_code":"CF-BuildpackInvalid"
 				}`,
 				}})
