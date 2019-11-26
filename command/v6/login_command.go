@@ -573,28 +573,13 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 		err    error
 	)
 
-	if len(choices) < 50 {
-		for {
-			cmd.UI.DisplayText(text)
-			choice, err = cmd.UI.DisplayTextMenu(choices, prompt)
-			if err == ui.ErrInvalidIndex {
-				continue
-			} else {
-				break
-			}
-		}
-	} else {
+	for {
 		cmd.UI.DisplayText(text)
-		cmd.UI.DisplayText("There are too many options to display; please type in the name.")
-		cmd.UI.DisplayNewline()
-		defaultChoice := "enter to skip"
-		choice, err = cmd.UI.DisplayOptionalTextPrompt(defaultChoice, prompt)
-
-		switch {
-		case choice == defaultChoice:
-			return "", nil
-		case !contains(choices, choice):
-			return "", ui.InvalidChoiceError{Choice: choice}
+		choice, err = cmd.UI.DisplayTextMenu(choices, prompt)
+		if err == ui.ErrInvalidIndex {
+			continue
+		} else {
+			break
 		}
 	}
 

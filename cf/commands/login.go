@@ -21,7 +21,6 @@ import (
 )
 
 const maxLoginTries = 3
-const maxChoices = 50
 
 type Login struct {
 	ui            terminal.UI
@@ -281,7 +280,7 @@ func (cmd Login) setOrganization(c flags.FlagContext) (bool, error) {
 	orgName := c.String("o")
 
 	if orgName == "" {
-		orgs, err := cmd.orgRepo.ListOrgs(maxChoices)
+		orgs, err := cmd.orgRepo.ListOrgs(0)
 		if err != nil {
 			return false, errors.New(T("Error finding available orgs\n{{.APIErr}}",
 				map[string]interface{}{"APIErr": err.Error()}))
@@ -334,7 +333,7 @@ func (cmd Login) setSpace(c flags.FlagContext) error {
 		var availableSpaces []models.Space
 		err := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
 			availableSpaces = append(availableSpaces, space)
-			return (len(availableSpaces) < maxChoices)
+			return true
 		})
 		if err != nil {
 			return errors.New(T("Error finding available spaces\n{{.Err}}",
@@ -389,13 +388,8 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 		// list header
 		cmd.ui.Say(listPrompt)
 
-		// only display list if it is shorter than maxChoices
-		if len(names) < maxChoices {
-			for i, name := range names {
-				cmd.ui.Say("%d. %s", i+1, name)
-			}
-		} else {
-			cmd.ui.Say(T("There are too many options to display, please type in the name."))
+		for i, name := range names {
+			cmd.ui.Say("%d. %s", i+1, name)
 		}
 
 		nameString = cmd.ui.Ask(itemPrompt)
