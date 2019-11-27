@@ -52,9 +52,9 @@ cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf delete-org -f temp-org
 
 if [[ $(cf version) == *"version 6"* ]]; then
-  cf buildpacks | awk '/^INTEGRATION-BUILDPACK/ { if(NF == 6) { printf("cf delete-buildpack -f %s -s %s\n", $1, $6); } else { printf("cf delete-buildpack -f %s\n", $1); }}'
+  cf buildpacks | awk '/INTEGRATION-BUILDPACK/ { if(NF >= 6) { printf("cf delete-buildpack -f %s -s %s\n", $1, $6); } else { printf("cf delete-buildpack -f %s\n", $1); }}'
 else
-  cf buildpacks | awk '/^INTEGRATION-BUILDPACK/ { if(NF == 6) { printf("cf delete-buildpack -f %s -s %s\n", $2, $3); } else { printf("cf delete-buildpack -f %s\n", $2); }}'
+  cf buildpacks | awk '/INTEGRATION-BUILDPACK/ { if(NF >= 6) { printf("cf delete-buildpack -f %s -s %s\n", $2, $3); } else { printf("cf delete-buildpack -f %s\n", $2); }}'
 fi | bash
 for stack in $(cf stacks | awk '/INTEGRATION-STACK/ { print $1 }'); do
   echo Deleting $stack
