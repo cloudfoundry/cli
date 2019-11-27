@@ -171,7 +171,7 @@ var _ = Describe("update-buildpack command", func() {
 								session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0], "-p", buildpackArchive)
 								Eventually(session).Should(Say("Updating buildpack %s with stack %s as %s...",
 									buildpackName, stacks[0], username))
-								Eventually(session.Err).Should(Say("Uploaded buildpack stack \\(%s\\) does not match cflinuxfs3", stacks[1]))
+								Eventually(session.Err).Should(Say("Uploaded buildpack stack \\(%s\\) does not match %s", stacks[1], stacks[0]))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							}, stacks[1])
