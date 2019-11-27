@@ -18,6 +18,7 @@ const (
 	DeleteOrganizationRequest                                   = "DeleteOrganization"
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
 	DeleteRouteRequest                                          = "DeleteRouteRequest"
+	DeleteRoleRequest                                           = "DeleteRoleRequest"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
@@ -207,6 +208,7 @@ var APIRoutes = []Route{
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodGet, Name: GetRouteDestinationsRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations", Method: http.MethodPost, Name: MapRouteRequest},
 	{Resource: RoutesResource, Path: "/:route_guid/destinations/:destination_guid", Method: http.MethodDelete, Name: UnmapRouteRequest},
+	{Resource: RolesResource, Path: "/:role_guid", Method: http.MethodDelete, Name: DeleteRoleRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodDelete, Name: DeleteServiceBrokerRequest},

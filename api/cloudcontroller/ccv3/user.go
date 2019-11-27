@@ -49,6 +49,10 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 	return user, response.Warnings, err
 }
 
+func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
+	return nil, nil, nil
+}
+
 func (client *Client) DeleteUser(uaaUserID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteUserRequest,

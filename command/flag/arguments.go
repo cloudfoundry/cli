@@ -265,7 +265,7 @@ type SetOrgRoleArgs struct {
 	Role         OrgRole `positional-arg-name:"ROLE" required:"true" description:"The organization role"`
 }
 
-type SetSpaceRoleArgs struct {
+type SpaceRoleArgs struct {
 	Username     string    `positional-arg-name:"USERNAME" required:"true" description:"The user"`
 	Organization string    `positional-arg-name:"ORG" required:"true" description:"The organization"`
 	Space        string    `positional-arg-name:"SPACE" required:"true" description:"The space"`
