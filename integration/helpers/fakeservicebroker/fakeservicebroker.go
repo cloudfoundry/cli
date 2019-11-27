@@ -81,6 +81,7 @@ func (f *FakeServiceBroker) WithName(name string) *FakeServiceBroker {
 	return f
 }
 
+// WithAsyncBehaviour makes service instance and binding operations async on the broker side
 func (f *FakeServiceBroker) WithAsyncBehaviour() *FakeServiceBroker {
 	f.behaviors.Provision["default"] = asyncResponse()
 	f.behaviors.Update["default"] = asyncResponse()
@@ -105,16 +106,26 @@ func (f *FakeServiceBroker) EnsureBrokerIsAvailable() *FakeServiceBroker {
 	return f
 }
 
+// EnsureRegisteredViaV2 uses POST /v2/service_brokers to register the broker. Used to test what happens with old brokers when switching to V7/V3
+func (f *FakeServiceBroker) EnsureRegisteredViaV2() *FakeServiceBroker {
+	f.EnsureAppIsDeployed()
+	f.registerViaV2()
+	return f
+}
+
+// EnableServiceAccess enables access to all service offerings in all orgs for this service broker
 func (f *FakeServiceBroker) EnableServiceAccess() {
 	session := helpers.CF("enable-service-access", f.ServiceName())
 	Eventually(session).Should(Exit(0))
 }
 
+// Configure updates the config of a fake service broker app
 func (f *FakeServiceBroker) Configure() *FakeServiceBroker {
 	f.configure()
 	return f
 }
 
+// Update updates the config of a fake service broker app and kicks off catalog synchronization
 func (f *FakeServiceBroker) Update() *FakeServiceBroker {
 	f.configure()
 	f.update()
