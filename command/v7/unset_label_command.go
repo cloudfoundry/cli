@@ -116,8 +116,10 @@ func (cmd UnsetLabelCommand) executeDomain(username string, labels map[string]ty
 }
 
 func (cmd UnsetLabelCommand) executeRoute(username string, labels map[string]types.NullString) error {
-	cmd.UI.DisplayTextWithFlavor("Removing label(s) for route {{.ResourceName}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for route {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"OrgName":      cmd.Config.TargetedOrganization().Name,
+		"SpaceName":    cmd.Config.TargetedSpace().Name,
 		"User":         username,
 	})
 

@@ -352,7 +352,7 @@ var _ = Describe("unset-label command", func() {
 			It("unsets the specified labels on the route", func() {
 				session := helpers.CF("unset-label", "route", routeName, "some-key")
 				Eventually(session).Should(Exit(0))
-				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for route %s as %s...`), routeName, username))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
 				Expect(session).Should(Say("OK"))
 
 				session = helpers.CF("curl", fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID))

@@ -574,7 +574,7 @@ var _ = Describe("unset-label command", func() {
 	When("unsetting labels on routes", func() {
 		var resourceName string
 		BeforeEach(func() {
-			resourceName = "a-real-wensite.i-swear.com"
+			resourceName = "some-route.example.com"
 			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "route",
 				ResourceName: resourceName,
@@ -582,7 +582,8 @@ var _ = Describe("unset-label command", func() {
 			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
-			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: "space-guid"})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "space-guid"})
 			fakeActor.UpdateRouteLabelsReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
 				nil)
 		})
@@ -596,7 +597,7 @@ var _ = Describe("unset-label command", func() {
 		})
 
 		It("informs the user that labels are being removed", func() {
-			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for route %s as some-user...`), resourceName))
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for route %s in org fake-org / space fake-space as some-user...`), resourceName))
 		})
 
 		It("removes the provided labels from the route", func() {
