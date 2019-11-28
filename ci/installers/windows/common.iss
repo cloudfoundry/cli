@@ -57,12 +57,17 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   if CurPageID = OptionPage.ID then
   begin
-    if OptionPage.Values[1] then
+    if (WizardDirValue <> ExpandConstant('{userappdata}\Cloud Foundry')) AND
+      (WizardDirValue <> ExpandConstant('{pf}\Cloud Foundry')) then
+    begin
+      Log('User has selected a custom install path. Will not override.')
+    end
+    else if OptionPage.Values[1] then
     begin
       // override the default installation to program files ({pf})
       WizardForm.DirEdit.Text := ExpandConstant('{userappdata}\Cloud Foundry')
     end
-      else
+    else
     begin
       WizardForm.DirEdit.Text := ExpandConstant('{pf}\Cloud Foundry');
     end;
