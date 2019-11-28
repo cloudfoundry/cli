@@ -43,7 +43,7 @@ type LabelsActor interface {
 type LabelsCommand struct {
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   space\n   stack"`
+	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   space\n   stack"`
 	relatedCommands interface{}     `related_commands:"set-label, unset-label"`
 	UI              command.UI
 	Config          command.Config
