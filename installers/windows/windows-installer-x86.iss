@@ -1,11 +1,12 @@
 [Setup]
 ChangesEnvironment=yes
+AlwaysShowDirOnReadyPage=yes
 AppName=Cloud Foundry CLI
 AppVersion=VERSION
 AppVerName=Cloud Foundry CLI version VERSION
 AppPublisher=Cloud Foundry Foundation
 PrivilegesRequired=none
-DefaultDirName={pf}\CloudFoundry
+DefaultDirName={pf}\Cloud Foundry
 SetupIconFile=cf.ico
 UninstallDisplayIcon={app}\cf.ico
 
