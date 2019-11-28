@@ -56,9 +56,15 @@ if [[ $(cf version) == *"version 6"* ]]; then
 else
   cf buildpacks | awk '/INTEGRATION-BUILDPACK/ { if(NF >= 6) { printf("cf delete-buildpack -f %s -s %s\n", $2, $3); } else { printf("cf delete-buildpack -f %s\n", $2); }}'
 fi | bash
+
+if [[ $(cf version) == *"version 6"* ]]; then
+  stack_version=2
+else
+  stack_version=3
+fi
 for stack in $(cf stacks | awk '/INTEGRATION-STACK/ { print $1 }'); do
   echo Deleting $stack
-  cf curl -X DELETE /v2/stacks/$(cf stack --guid $stack)
+  cf curl -X DELETE "/v${stack_version}/stacks/$(cf stack --guid $stack)"
 done
 
 CF_USERS=$(cf curl /v2/users | grep total_results | grep -o '[0-9]\+')
