@@ -102,12 +102,23 @@ var _ = Describe("handle path in manifest and flag override", func() {
 
 	When("manifest does not specify a path and there is no flag override", func() {
 		When("no droplet or docker specified", func() {
+			var workingDir string
+
+			BeforeEach(func() {
+				var err error
+
+				workingDir, err = os.Getwd()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				err := os.Chdir(workingDir)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
 			It("defaults to the current working directory", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
-					workingDir, err := os.Getwd()
-					Expect(err).ToNot(HaveOccurred())
-
-					err = os.Chdir(dir)
+					err := os.Chdir(dir)
 					Expect(err).ToNot(HaveOccurred())
 
 					nestedDir := filepath.Join(dir, "nested")
@@ -140,9 +151,6 @@ var _ = Describe("handle path in manifest and flag override", func() {
 						Eventually(session.Err).Should(helpers.SayPath(`msg="creating archive"\s+Path="?%s"?`, dir))
 					}
 					Eventually(session).Should(Exit(0))
-
-					err = os.Chdir(workingDir)
-					Expect(err).ToNot(HaveOccurred())
 				})
 			})
 		})
@@ -198,6 +206,20 @@ var _ = Describe("handle path in manifest and flag override", func() {
 				})
 
 				When("The manifest is in a different directory than the app's source", func() {
+					var workingDir string
+
+					BeforeEach(func() {
+						var err error
+
+						workingDir, err = os.Getwd()
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						err := os.Chdir(workingDir)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
 					It("pushes the app with a relative path to the app directory", func() {
 						manifestDir := helpers.TempDirAbsolutePath("", "manifest-dir")
 						defer os.RemoveAll(manifestDir)
