@@ -8,6 +8,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -16,7 +17,7 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-func RunPlugin(plugin configv3.Plugin) error {
+func RunPlugin(plugin configv3.Plugin, ui command.UI) error {
 	config, err := configv3.LoadConfig(configv3.FlagOverride{
 		Verbose: common.Commands.VerboseOrVersion,
 	})
@@ -29,7 +30,7 @@ func RunPlugin(plugin configv3.Plugin) error {
 
 	sharedActor := sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, nil, "")
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
