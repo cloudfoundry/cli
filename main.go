@@ -147,14 +147,14 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 			}
 
 			if plugin, ok := isPluginCommand(originalArgs[0], config.Plugins()); ok {
-				pluginErr := plugin_transition.RunPlugin(plugin)
+				_, commandUI, err := getCFConfigAndCommandUIObjects()
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+					return 1
+				}
+				defer commandUI.FlushDeferred()
+				pluginErr := plugin_transition.RunPlugin(plugin, commandUI)
 				if pluginErr != nil {
-					_, commandUI, err := getCFConfigAndCommandUIObjects()
-					if err != nil {
-						fmt.Fprintf(os.Stderr, "%s\n", pluginErr.Error())
-						return 1
-					}
-					defer commandUI.FlushDeferred()
 					handleError(pluginErr, commandUI) //nolint: errcheck
 					return 1
 				}

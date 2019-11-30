@@ -21,6 +21,24 @@ var _ = Describe("running plugins", func() {
 		})
 	})
 
+	Describe("CF_TRACE", func() {
+		BeforeEach(func() {
+			installTestPlugin()
+		})
+
+		AfterEach(func() {
+			uninstallTestPlugin()
+		})
+
+		When("the plugin is run with CF_TRACE=true", func() {
+			It("does not error", func() {
+				Eventually(helpers.CustomCF(helpers.CFEnv{
+					EnvVars: map[string]string{"CF_TRACE": "true"},
+				}, "CoolTest")).Should(Exit(0))
+			})
+		})
+	})
+
 	Describe("when running plugin commands while CF_HOME is set", func() {
 		When("CF_PLUGIN_HOME is unset", func() {
 			BeforeEach(func() {
