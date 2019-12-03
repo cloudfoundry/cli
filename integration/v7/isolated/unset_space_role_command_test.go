@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("unset-space-role command", func() {
+var _ = Describe("unset-space-role command", func() {
 	var (
 		privilegedUsername string
 		orgName            string
@@ -129,7 +129,7 @@ var _ = FDescribe("unset-space-role command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			FWhen("the passed role is lowercase", func() {
+			When("the passed role is lowercase", func() {
 				It("unsets the space role for the user", func() {
 					session := helpers.CF("unset-space-role", "-v", username, orgName, spaceName, "spaceauditor")
 					Eventually(session).Should(Say("Removing role SpaceAuditor from user %s in org %s / space %s as %s...", username, orgName, spaceName, privilegedUsername))

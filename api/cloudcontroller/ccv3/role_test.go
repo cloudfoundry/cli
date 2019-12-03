@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("Role", func() {
+var _ = Describe("Role", func() {
 	var client *Client
 
 	BeforeEach(func() {

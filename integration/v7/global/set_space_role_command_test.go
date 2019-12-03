@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 )
 
-var _ = FDescribe("set-space-role command", func() {
+var _ = Describe("set-space-role command", func() {
 	var (
 		orgName   string
 		spaceName string

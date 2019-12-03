@@ -248,27 +248,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					When("a role is not found", func() {
-						BeforeEach(func() {
-							serverResponse = `
-							{
-							  "errors": [
-								{
-								  "code": 10010,
-								  "detail": "Role not found",
-								  "title": "CF-ResourceNotFound"
-								}
-							  ]
-							}`
-						})
-
-						It("returns a RoleNotFoundError", func() {
-							Expect(makeError).To(MatchError(ccerror.RoleNotFoundError{}))
-						})
-					})
-
 					Context("generic not found", func() {
-
 						It("returns a ResourceNotFoundError", func() {
 							Expect(makeError).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 						})

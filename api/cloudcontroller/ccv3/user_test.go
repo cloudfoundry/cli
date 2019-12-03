@@ -3,15 +3,16 @@ package ccv3_test
 import (
 	"net/http"
 
+	"fmt"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
-	"fmt"
 )
 
-var _ = FDescribe("User", func() {
+var _ = Describe("User", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -209,7 +210,7 @@ var _ = FDescribe("User", func() {
 					response1 := fmt.Sprintf(`{
 	"pagination": {
 		"next": {
-			"href": "%s/v3/users?origins=uaa&page=2&per_page=1&usernames=some-user-name"
+			"href": null
 		}
 	},
   "resources": [
@@ -219,7 +220,8 @@ var _ = FDescribe("User", func() {
       "origin": "uaa"
     }
   ]
-}`, server.URL())
+}`)
+
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodGet, "/v3/users", "usernames=some-user-name&origins=uaa"),
@@ -233,9 +235,9 @@ var _ = FDescribe("User", func() {
 					Expect(warnings).To(ConsistOf("warning-1"))
 
 					Expect(users).To(Equal([]User{{
-						GUID: "user-guid-1",
+						GUID:     "user-guid-1",
 						Username: "some-user-name",
-						Origin: "uaa",
+						Origin:   "uaa",
 					},
 					}))
 				})

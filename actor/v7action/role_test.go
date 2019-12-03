@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Role Actions", func() {
+var _ = Describe("Role Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -335,7 +335,7 @@ var _ = FDescribe("Role Actions", func() {
 		When("deleting a role succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{ {Username: userNameOrGUID, GUID: "user-guid"} },
+					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
@@ -379,7 +379,6 @@ var _ = FDescribe("Role Actions", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(0))
-
 
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
@@ -426,7 +425,7 @@ var _ = FDescribe("Role Actions", func() {
 								Values: []string{userNameOrGUID},
 							},
 							{
-									Key:    ccv3.OriginsFilter,
+								Key:    ccv3.OriginsFilter,
 								Values: []string{userOrigin},
 							},
 						},
@@ -462,7 +461,7 @@ var _ = FDescribe("Role Actions", func() {
 		When("the user does not have the space role to delete", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{ {Username: userNameOrGUID, GUID: "user-guid"} },
+					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
@@ -523,7 +522,7 @@ var _ = FDescribe("Role Actions", func() {
 		When("the API call to delete the space role returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{ {Username: userNameOrGUID, GUID: "user-guid"} },
+					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)

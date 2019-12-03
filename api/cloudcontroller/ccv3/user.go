@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
 // User represents a Cloud Controller User.
@@ -52,7 +52,7 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 }
 
 func (client *Client) DeleteUser(uaaUserID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions          {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteUserRequest,
 		URIParams: internal.Params{
 			"user_guid": uaaUserID,

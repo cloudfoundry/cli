@@ -2,7 +2,6 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/clock"
@@ -98,9 +97,7 @@ func (cmd *UnsetSpaceRoleCommand) Execute(args []string) error {
 	warnings, err = cmd.Actor.DeleteSpaceRole(roleType, space.GUID, cmd.Args.Username, origin, cmd.IsClient)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
-		if _, ok := err.(ccerror.RoleNotFoundError); !ok {
-			return err
-		}
+		return err
 	}
 
 	cmd.UI.DisplayOK()

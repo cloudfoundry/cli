@@ -2,7 +2,7 @@ package ccerror
 
 import "fmt"
 
-// RoleNotFoundError is returned when a role does not exist.
+// UserNotFoundError is returned when a role does not exist.
 type UserNotFoundError struct {
 	Username string
 	Origin   string

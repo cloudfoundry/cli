@@ -2,7 +2,6 @@ package v7_test
 
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -178,7 +177,7 @@ var _ = Describe("unset-space-role Command", func() {
 
 			fakeActor.DeleteSpaceRoleReturns(
 				v7action.Warnings{"delete-role-warning"},
-				ccerror.RoleNotFoundError{},
+				nil,
 			)
 		})
 

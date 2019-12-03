@@ -123,8 +123,6 @@ func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Requ
 		return ccerror.InstanceNotFoundError{}
 	case "Process not found":
 		return ccerror.ProcessNotFoundError{}
-	case "Role not found":
-		return ccerror.RoleNotFoundError{}
 	case "Unknown request":
 		return ccerror.APINotFoundError{URL: request.URL.String()}
 	default:

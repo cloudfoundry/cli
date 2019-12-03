@@ -79,7 +79,6 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 		}
 		if len(ccv3Users) == 0 {
 			print("No users from CC\n")
-			// ("warnings from CC: " + strings.Join(warnings)
 			return allWarnings, ccerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}
 		}
 		userGUID = ccv3Users[0].GUID
