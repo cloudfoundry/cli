@@ -87,6 +87,19 @@ var _ = Describe("set-space-role command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
+
+				When("the active user lacks permissions to look up clients", func() {
+					BeforeEach(func() {
+						helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceManager")
+					})
+
+					It("prints an appropriate error and exits 1", func() {
+						session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Users cannot be assigned roles in a space if they do not have a role in that space's organization."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
 			})
 
 			When("the targeted client does not exist", func() {
