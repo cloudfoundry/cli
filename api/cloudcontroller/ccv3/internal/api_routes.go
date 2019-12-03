@@ -69,6 +69,7 @@ const (
 	GetSpacesRequest                                            = "GetSpaces"
 	GetSSHEnabled                                               = "GetSSHEnabled"
 	GetStacksRequest                                            = "GetStacks"
+	GetUsersRequest                                             = "GetUsers"
 	MapRouteRequest                                             = "MapRoute"
 	PatchApplicationCurrentDropletRequest                       = "PatchApplicationCurrentDroplet"
 	PatchApplicationEnvironmentVariablesRequest                 = "PatchApplicationEnvironmentVariables"
@@ -227,6 +228,7 @@ var APIRoutes = []Route{
 	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: StacksResource, Path: "/:stack_guid", Method: http.MethodPatch, Name: PatchStackRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
+	{Resource: UsersResource, Path: "/", Method: http.MethodGet, Name: GetUsersRequest},
 	{Resource: UsersResource, Path: "/", Method: http.MethodPost, Name: PostUserRequest},
 	{Resource: UsersResource, Path: "/:user_guid", Method: http.MethodDelete, Name: DeleteUserRequest},
 }

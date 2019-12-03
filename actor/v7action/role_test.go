@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Role Actions", func() {
+var _ = FDescribe("Role Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -310,7 +310,7 @@ var _ = Describe("Role Actions", func() {
 		})
 	})
 
-	FDescribe("DeleteSpaceRole", func() {
+	Describe("DeleteSpaceRole", func() {
 		var (
 			roleType       constant.RoleType
 			userNameOrGUID string
@@ -343,9 +343,9 @@ var _ = Describe("Role Actions", func() {
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
 					[]ccv3.Role{
 						{
-							GUID: "role-guid",
-							Type: roleType,
-							UserGUID: "user-guid",
+							GUID:      "role-guid",
+							Type:      roleType,
+							UserGUID:  "user-guid",
 							SpaceGUID: spaceGUID,
 						},
 					},
@@ -515,7 +515,6 @@ var _ = Describe("Role Actions", func() {
 					Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
 
-					Expect(warnings).To(ConsistOf("get-users-warning"))
 					Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}))
 				})
 			})
@@ -532,9 +531,9 @@ var _ = Describe("Role Actions", func() {
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
 					[]ccv3.Role{
 						{
-							GUID: "role-guid",
-							Type: roleType,
-							UserGUID: "user-guid",
+							GUID:      "role-guid",
+							Type:      roleType,
+							UserGUID:  "user-guid",
 							SpaceGUID: spaceGUID,
 						},
 					},
@@ -558,12 +557,12 @@ var _ = Describe("Role Actions", func() {
 		})
 	})
 
-	Describe("GetRoleBySpaceGuidUserGuidRoleType", func() {
+	Describe("GetRoleGUID", func() {
 		var (
-			roleType       constant.RoleType
-			userGUID string
-			spaceGUID      string
-			roleGUID		string
+			roleType  constant.RoleType
+			userGUID  string
+			spaceGUID string
+			roleGUID  string
 
 			warnings   Warnings
 			executeErr error
@@ -572,11 +571,11 @@ var _ = Describe("Role Actions", func() {
 		BeforeEach(func() {
 			roleType = constant.SpaceDeveloperRole
 			spaceGUID = "space-guid"
-
+			userGUID = "user-guid"
 		})
 
 		JustBeforeEach(func() {
-			roleGUID, warnings, executeErr = actor.GetRoleBySpaceGuidUserGuidRoleType(spaceGUID, userGUID, roleType)
+			roleGUID, warnings, executeErr = actor.GetRoleGUID(spaceGUID, userGUID, roleType)
 		})
 		When("the role exists and no errors occur", func() {
 			BeforeEach(func() {
@@ -612,7 +611,7 @@ var _ = Describe("Role Actions", func() {
 						},
 					},
 				))
-				Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning"))
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(roleGUID).To(Equal("role-guid"))
 			})
@@ -645,7 +644,7 @@ var _ = Describe("Role Actions", func() {
 						},
 					},
 				))
-				Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning"))
+				Expect(warnings).To(ConsistOf("get-roles-warning"))
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(roleGUID).To(Equal(""))
 			})

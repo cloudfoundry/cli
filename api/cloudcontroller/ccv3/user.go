@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
 // User represents a Cloud Controller User.
@@ -27,6 +28,7 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 	bodyBytes, err := json.Marshal(userRequestBody{
 		GUID: uaaUserID,
 	})
+
 	if err != nil {
 		return User{}, nil, err
 	}
@@ -49,12 +51,8 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 	return user, response.Warnings, err
 }
 
-func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
-	return nil, nil, nil
-}
-
 func (client *Client) DeleteUser(uaaUserID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.newHTTPRequest(requestOptions          {
 		RequestName: internal.DeleteUserRequest,
 		URIParams: internal.Params{
 			"user_guid": uaaUserID,
@@ -70,4 +68,29 @@ func (client *Client) DeleteUser(uaaUserID string) (Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return response.Warnings, err
+}
+
+func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetUsersRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var usersList []User
+	warnings, err := client.paginate(request, User{}, func(item interface{}) error {
+		if user, ok := item.(User); ok {
+			usersList = append(usersList, user)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   User{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return usersList, warnings, err
 }

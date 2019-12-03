@@ -4,8 +4,8 @@ import "fmt"
 
 // RoleNotFoundError is returned when a role does not exist.
 type UserNotFoundError struct {
-	Username	string
-	Origin		string
+	Username string
+	Origin   string
 }
 
 func (e UserNotFoundError) Error() string {

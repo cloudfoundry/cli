@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("set-space-role command", func() {
+var _ = FDescribe("set-space-role command", func() {
 	var (
 		privilegedUsername string
 		orgName            string
@@ -39,7 +39,7 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say(`--client\s+Assign a space role to a client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Say(`--origin\s+Indicates the identity provider to be used for authentication`))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("space-users"))
+				Eventually(session).Should(Say("space-users, unset-space-role"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

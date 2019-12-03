@@ -28,7 +28,7 @@ type SetSpaceRoleCommand struct {
 	IsClient        bool               `long:"client" description:"Assign a space role to a client-id of a (non-user) service account"`
 	Origin          string             `long:"origin" description:"Indicates the identity provider to be used for authentication"`
 	usage           interface{}        `usage:"CF_NAME set-space-role USERNAME ORG SPACE ROLE\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME set-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space"`
-	relatedCommands interface{}        `related_commands:"space-users"`
+	relatedCommands interface{}        `related_commands:"space-users, unset-space-role"`
 
 	UI          command.UI
 	Config      command.Config

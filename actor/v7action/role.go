@@ -61,6 +61,7 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 	if isClient {
 		userGUID = userNameOrGUID
 	} else {
+		print("\n\n!!! in the user \n\n\n")
 		ccv3Users, warnings, err := actor.CloudControllerClient.GetUsers(
 			ccv3.Query{
 				Key:    ccv3.UsernamesFilter,
@@ -73,17 +74,21 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 		)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
-			return Warnings(warnings), nil
+			print("Error getting users from CC " + err.Error() + "\n")
+			return Warnings(allWarnings), err
 		}
 		if len(ccv3Users) == 0 {
+			print("No users from CC\n")
+			// ("warnings from CC: " + strings.Join(warnings)
 			return allWarnings, ccerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}
 		}
 		userGUID = ccv3Users[0].GUID
 	}
 
-	roleGUID, warnings, err := actor.GetRoleBySpaceGuidUserGuidRoleType(spaceGUID, userGUID, roleType)
+	roleGUID, warnings, err := actor.GetRoleGUID(spaceGUID, userGUID, roleType)
+	print("Error getting role guid from CC\n")
 	allWarnings = append(allWarnings, warnings...)
-	if roleGUID == "" {
+	if err != nil || roleGUID == "" {
 		return allWarnings, err
 	}
 
@@ -102,7 +107,7 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 	return allWarnings, nil
 }
 
-func (actor Actor) GetRoleBySpaceGuidUserGuidRoleType(spaceGUID string, userGUID string, roleType constant.RoleType) (string, Warnings, error) {
+func (actor Actor) GetRoleGUID(spaceGUID string, userGUID string, roleType constant.RoleType) (string, Warnings, error) {
 	ccv3Roles, _, warnings, err := actor.CloudControllerClient.GetRoles(
 		ccv3.Query{
 			Key:    ccv3.UserGUIDFilter,

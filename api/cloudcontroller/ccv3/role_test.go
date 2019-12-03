@@ -599,11 +599,11 @@ var _ = FDescribe("Role", func() {
 
 	Describe("DeleteRoles", func() {
 		var (
-			roleGUID string
-			jobURL 	JobURL
-			jobURLString	 string
-			warnings	Warnings
-			executeErr 	error
+			roleGUID     string
+			jobURL       JobURL
+			jobURLString string
+			warnings     Warnings
+			executeErr   error
 		)
 
 		BeforeEach(func() {
@@ -638,8 +638,8 @@ var _ = FDescribe("Role", func() {
 		})
 
 		When("the cloud controller returns errors and warnings", func() {
-				BeforeEach(func() {
-					response := `{
+			BeforeEach(func() {
+				response := `{
 								  "errors": [
 										{
 										  "code": 10008,
@@ -653,32 +653,32 @@ var _ = FDescribe("Role", func() {
 										}
 									  ]
 									}`
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodDelete, "/v3/roles/role-guid"),
-							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-						),
-					)
-				})
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/roles/role-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
 
-				It("returns the error and all warnings", func() {
-					Expect(executeErr).To(MatchError(ccerror.MultiError{
-						ResponseCode: http.StatusTeapot,
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "Isolation segment not found",
-								Title:  "CF-ResourceNotFound",
-							},
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
 						},
-					}))
-					Expect(warnings).To(ConsistOf("this is a warning"))
-				})
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
+	})
 })
