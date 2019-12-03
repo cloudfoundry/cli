@@ -104,12 +104,13 @@ var _ = Describe("User", func() {
 
 	Describe("DeleteUser", func() {
 		var (
+			jobUrl     JobURL
 			warnings   Warnings
 			executeErr error
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.DeleteUser("some-uaa-guid")
+			jobUrl, warnings, executeErr = client.DeleteUser("some-uaa-guid")
 		})
 
 		When("no error occurs", func() {
@@ -118,7 +119,7 @@ var _ = Describe("User", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v3/users/some-uaa-guid"),
-						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}, "Location": []string{"job-url"}}),
 					),
 				)
 			})
@@ -126,6 +127,7 @@ var _ = Describe("User", func() {
 			It("deletes and returns all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
+				Expect(jobUrl).To(Equal(JobURL("job-url")))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})

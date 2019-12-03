@@ -58,16 +58,24 @@ func (actor Actor) GetUser(username, origin string) (User, error) {
 
 // DeleteUser
 func (actor Actor) DeleteUser(userGuid string) (Warnings, error) {
-	ccWarnings, err := actor.CloudControllerClient.DeleteUser(userGuid)
+	var allWarnings Warnings
+	jobURL, ccWarningsDelete, err := actor.CloudControllerClient.DeleteUser(userGuid)
+	allWarnings = Warnings(ccWarningsDelete)
 
 	// If there is an error that is not a ResourceNotFoundError
 	if _, ok := err.(ccerror.ResourceNotFoundError); !ok && err != nil {
-		return nil, err
+		return allWarnings, err
+	}
+
+	ccWarningsPoll, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, Warnings(ccWarningsPoll)...)
+	if err != nil {
+		return allWarnings, err
 	}
 
 	_, err = actor.UAAClient.DeleteUser(userGuid)
 
-	return Warnings(ccWarnings), err
+	return allWarnings, err
 }
 
 func SortUsers(users []User) {

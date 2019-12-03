@@ -229,38 +229,6 @@ var _ = Describe("User Actions", func() {
 			actualWarnings, actualErr = actor.DeleteUser("some-user-guid")
 		})
 
-		When("no API errors occur", func() {
-			BeforeEach(func() {
-				fakeUAAClient.DeleteUserReturns(
-					uaa.User{
-						ID: "some-user-guid",
-					},
-					nil,
-				)
-				fakeCloudControllerClient.DeleteUserReturns(
-					ccv3.Warnings{
-						"warning-1",
-						"warning-2",
-					},
-					nil,
-				)
-			})
-
-			It("Deletes user and returns all warnings", func() {
-				Expect(actualErr).NotTo(HaveOccurred())
-
-				Expect(actualWarnings).To(ConsistOf("warning-1", "warning-2"))
-
-				Expect(fakeUAAClient.DeleteUserCallCount()).To(Equal(1))
-				userGuid := fakeUAAClient.DeleteUserArgsForCall(0)
-				Expect(userGuid).To(Equal("some-user-guid"))
-
-				Expect(fakeCloudControllerClient.DeleteUserCallCount()).To(Equal(1))
-				uaaUserID := fakeCloudControllerClient.DeleteUserArgsForCall(0)
-				Expect(uaaUserID).To(Equal("some-user-guid"))
-			})
-		})
-
 		When("the UAA API returns an error", func() {
 			var returnedErr error
 
@@ -287,6 +255,7 @@ var _ = Describe("User Actions", func() {
 					nil,
 				)
 				fakeCloudControllerClient.DeleteUserReturns(
+					"",
 					ccv3.Warnings{},
 					returnedErr,
 				)
@@ -304,6 +273,7 @@ var _ = Describe("User Actions", func() {
 						nil,
 					)
 					fakeCloudControllerClient.DeleteUserReturns(
+						"",
 						ccv3.Warnings{},
 						returnedErr,
 					)
@@ -314,6 +284,48 @@ var _ = Describe("User Actions", func() {
 				})
 			})
 		})
+
+		When("the CC API returns a job", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteUserReturns(
+					"some-url",
+					ccv3.Warnings{"warning-5", "warning-6"},
+					nil,
+				)
+			})
+
+			When("polling errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("Never expected, by anyone")
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"warning-7", "warning-8"}, expectedErr)
+				})
+
+				It("returns the error", func() {
+					Expect(actualErr).To(Equal(expectedErr))
+					Expect(actualWarnings).To(ConsistOf("warning-5", "warning-6", "warning-7", "warning-8"))
+				})
+			})
+
+			When("the job is successful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"warning-7", "warning-8"}, nil)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(actualErr).ToNot(HaveOccurred())
+					Expect(actualWarnings).To(ConsistOf("warning-5", "warning-6", "warning-7", "warning-8"))
+
+					Expect(fakeCloudControllerClient.DeleteUserCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.DeleteUserArgsForCall(0)).To(Equal("some-user-guid"))
+
+					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv3.JobURL("some-url")))
+				})
+			})
+		})
+
 	})
 
 	Describe("SortUsers", func() {
