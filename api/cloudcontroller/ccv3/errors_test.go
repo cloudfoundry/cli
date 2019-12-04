@@ -248,7 +248,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					FWhen("a user is not found", func() {
+					When("a user is not found", func() {
 						BeforeEach(func() {
 							serverResponse = `
 							{

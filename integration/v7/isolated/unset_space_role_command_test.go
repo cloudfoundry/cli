@@ -114,7 +114,7 @@ var _ = FDescribe("unset-space-role command", func() {
 				It("fails with an appropriate error message", func() {
 					session := helpers.CF("unset-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
+					Eventually(session.Err).Should(Say("User 'nonexistent-client' does not exist."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -176,8 +176,8 @@ var _ = FDescribe("unset-space-role command", func() {
 			It("prints an appropriate error and exits 1", func() {
 				session := helpers.CF("unset-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
 				Eventually(session).Should(Say("Removing role SpaceAuditor from user not-exists in org %s / space %s as %s...", orgName, spaceName, privilegedUsername))
+			Eventually(session.Err).Should(Say("User 'not-exists' does not exist."))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No user exists with the username not-exists and origin uaa"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -194,7 +194,7 @@ var _ = FDescribe("unset-space-role command", func() {
 		It("prints out the error message from CC API and exits 1", func() {
 			session := helpers.CF("unset-space-role", username, orgName, spaceName, "SpaceAuditor")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("No user exists with the username %s and origin uaa", username))
+			Eventually(session.Err).Should(Say("User '%s' does not exist.", username))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -210,7 +210,7 @@ var _ = FDescribe("unset-space-role command", func() {
 		It("prints out the error message from CC API and exits 1", func() {
 			session := helpers.CF("unset-space-role", username, orgName, spaceName, "SpaceAuditor", "-v")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("No user exists with the username %s and origin uaa", username))
+			Eventually(session.Err).Should(Say("User '%s' does not exist.", username))
 			Eventually(session).Should(Exit(1))
 		})
 	})

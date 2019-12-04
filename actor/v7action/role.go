@@ -62,9 +62,8 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 		user, warnings, err := actor.CloudControllerClient.GetUser(userNameOrGUID)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
-			_, ok := err.(ccerror.UserNotFoundError)
-			if ok {
-				err = ccerror.UserNotFoundError{Username: userNameOrGUID, IsClient: isClient}
+			if _, ok := err.(ccerror.UserNotFoundError); ok {
+				err = ccerror.UserNotFoundError{Username: userNameOrGUID}
 			}
 			return Warnings(allWarnings), err
 		}
@@ -91,7 +90,6 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 	}
 
 	roleGUID, warnings, err := actor.GetRoleGUID(spaceGUID, userGUID, roleType)
-	print("ROLE GUID: ", roleGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil || roleGUID == "" {
 		return allWarnings, err

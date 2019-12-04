@@ -325,7 +325,7 @@ var _ = Describe("Role Actions", func() {
 		BeforeEach(func() {
 			roleType = constant.SpaceDeveloperRole
 			spaceGUID = "space-guid"
-
+			isClient = false
 		})
 
 		JustBeforeEach(func() {
@@ -337,6 +337,12 @@ var _ = Describe("Role Actions", func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
 					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetUserReturnsOnCall(0,
+					ccv3.User{GUID: "user-guid"},
+					ccv3.Warnings{"get-user-warning"},
 					nil,
 				)
 
@@ -375,10 +381,13 @@ var _ = Describe("Role Actions", func() {
 				})
 
 				It("delete the role and returns any warnings", func() {
-					Expect(warnings).To(ConsistOf("get-roles-warning", "delete-role-warning", "poll-job-warning"))
+					Expect(warnings).To(ConsistOf("get-user-warning", "get-roles-warning", "delete-role-warning", "poll-job-warning"))
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetUserCallCount()).To(Equal(1))
+
+					passedGuid := fakeCloudControllerClient.GetUserArgsForCall(0)
+					Expect(passedGuid).To(Equal(userNameOrGUID))
 
 					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
 					Expect(passedRolesQuery).To(Equal(
@@ -538,7 +547,7 @@ var _ = Describe("Role Actions", func() {
 					Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
 
-					Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{Username: userNameOrGUID, IsClient: isClient}))
+					Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{Username: userNameOrGUID}))
 				})
 			})
 		})
@@ -574,8 +583,8 @@ var _ = Describe("Role Actions", func() {
 
 			It("it returns an error and warnings", func() {
 				Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(1))
-				Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning", "delete-space-role-warning"))
 				Expect(executeErr).To(MatchError("delete-space-role-error"))
+				Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning", "delete-space-role-warning"))
 			})
 		})
 	})
