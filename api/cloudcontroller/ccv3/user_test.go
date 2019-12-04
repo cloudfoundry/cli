@@ -288,7 +288,8 @@ var _ = Describe("User", func() {
 			})
 		})
 	})
-	Describe("Getuser", func() {
+
+	Describe("GetUser", func() {
 		var (
 			user       User
 			warnings   Warnings
@@ -304,7 +305,7 @@ var _ = Describe("User", func() {
 				response := `{
 					"guid": "some-guid",
 					"username": "some-user-name",
-					"origin": "some-origin",
+					"origin": "some-origin"
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -333,7 +334,7 @@ var _ = Describe("User", func() {
 						{
 							"code": 10010,
 							"detail": "User not found",
-							"title": "CF-ResourceNotFound"
+							"title": "CF-ResourceNotFound"	
 						}
 					]
 				}`

@@ -517,6 +517,30 @@ var _ = Describe("Role Actions", func() {
 					Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}))
 				})
 			})
+
+			When("The user is a client", func() {
+				BeforeEach(func() {
+					userNameOrGUID = "user-guid"
+					userOrigin = ""
+					isClient = true
+					fakeCloudControllerClient.GetUserReturnsOnCall(0,
+						ccv3.User{},
+						ccv3.Warnings{"get-users-warning"},
+						ccerror.UserNotFoundError{},
+					)
+				})
+
+				It("returns a user not found error and warnings", func() {
+					Expect(fakeCloudControllerClient.GetUserCallCount()).To(Equal(1))
+					guid := fakeCloudControllerClient.GetUserArgsForCall(0)
+					Expect(guid).To(Equal(userNameOrGUID))
+					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
+
+					Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{Username: userNameOrGUID, IsClient: isClient}))
+				})
+			})
 		})
 
 		When("the API call to delete the space role returns an error", func() {

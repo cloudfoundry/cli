@@ -59,8 +59,16 @@ func (actor Actor) DeleteSpaceRole(roleType constant.RoleType, spaceGUID string,
 	var userGUID string
 	var allWarnings Warnings
 	if isClient {
-
-		userGUID = userNameOrGUID
+		user, warnings, err := actor.CloudControllerClient.GetUser(userNameOrGUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			_, ok := err.(ccerror.UserNotFoundError)
+			if ok {
+				err = ccerror.UserNotFoundError{Username: userNameOrGUID, IsClient: isClient}
+			}
+			return Warnings(allWarnings), err
+		}
+		userGUID = user.GUID
 	} else {
 		ccv3Users, warnings, err := actor.CloudControllerClient.GetUsers(
 			ccv3.Query{

@@ -6,12 +6,23 @@ import "fmt"
 type UserNotFoundError struct {
 	Username string
 	Origin   string
+	IsClient   bool
 }
 
 func (e UserNotFoundError) Error() string {
-	originString := "."
+	// return "Invalid user. Ensure User exists and you have access to it."
+	var baseString, originString, nameString string
+	if e.IsClient {
+		baseString = "Client not found"
+	} else {
+		baseString = "User not found"
+	}
+	originString = "."
 	if e.Origin != "" {
 		originString = fmt.Sprintf(" and origin %s", e.Origin)
 	}
-	return fmt.Sprintf("No user exists with the username %s%s", e.Username, originString)
+	if e.Username != "" {
+		nameString = fmt.Sprintf(" with name %s", e.Username)
+	}
+	return fmt.Sprintf("%s%s%s", baseString, nameString, originString)
 }
