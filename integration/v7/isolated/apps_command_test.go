@@ -127,7 +127,7 @@ var _ = Describe("apps command", func() {
 				})
 			})
 
-			When("the --labels flag is given", func() {
+			PWhen("the --labels flag is given", func() {
 
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-label", "app", appName1, "environment=production", "tier=backend")).Should(Exit(0))
