@@ -1,0 +1,70 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli
+- name: cli-integration
+  path: go/src/code.cloudfoundry.org/cli
+- name: cf-cli-binaries
+- name: bosh-lite-env-info
+
+params:
+  CF_CLI_EXPERIMENTAL: false
+  CF_INT_CLIENT_ID:
+  CF_INT_CLIENT_SECRET:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
+  CF_INT_IGNORE_API_VERSION_CHECK:
+  FLAKE_ATTEMPTS: 2
+  TAGS: 'V7'
+  NODES: 8
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    ENV=$(cat bosh-lite-env-info/name | cut -d "." -f 1)
+
+    source bosh-lite-env-info/metadata
+    credhub login --skip-tls-validation
+    export CF_INT_PASSWORD=$(credhub get -n /bosh-lite/cf/cf_admin_password | bosh interpolate --path /value -)
+
+    export CF_INT_OIDC_USERNAME="admin-oidc"
+    export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+    credhub get --name /bosh-lite/cf/router_ca | bosh interpolate - --path /value/certificate > $SSL_CERT_DIR/$ENV.router.ca
+    bosh interpolate vars-store/ci/infrastructure/$ENV/bbl-state.json --path /lb/cert > $SSL_CERT_DIR/$ENV.lb.cert
+
+    export SKIP_SSL_VALIDATION=false
+
+    set -x
+
+    domain="$(cat bosh-lite-env-info/name).lite.cli.fun"
+    export CF_INT_API="https://api.${domain}"
+    export CF_DIAL_TIMEOUT=15
+
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
+    pushd cf-cli-binaries
+      tar xvzf cf-cli-binaries.tgz
+      chmod +x cf7-cli_linux_x86-64
+      mkdir -p $GOPATH/bin
+      mv cf7-cli_linux_x86-64 $GOPATH/bin/cf
+    popd
+
+    cd $GOPATH/src/code.cloudfoundry.org/cli
+
+    go get -u github.com/onsi/ginkgo/ginkgo
+
+    export GOFLAGS="-tags=$TAGS"
+    ginkgo -r -nodes="$NODES"  -flakeAttempts="$FLAKE_ATTEMPTS" -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v7/isolated integration/v7/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
+    ginkgo -r -flakeAttempts="$FLAKE_ATTEMPTS" -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v7/global
