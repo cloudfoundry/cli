@@ -33,6 +33,8 @@ run:
     set -e
 
     ENV=$(cat bosh-lite-env-info/name | cut -d "." -f 1)
+    export SSL_CERT_DIR=/tmp/cert_dir
+    mkdir -p $SSL_CERT_DIR
 
     source bosh-lite-env-info/metadata
     credhub login --skip-tls-validation
