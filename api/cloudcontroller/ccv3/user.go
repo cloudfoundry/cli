@@ -70,6 +70,24 @@ func (client *Client) DeleteUser(uaaUserID string) (Warnings, error) {
 	return response.Warnings, err
 }
 
+func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetUserRequest,
+		URIParams:   map[string]string{"user_guid": userGUID},
+	})
+	if err != nil {
+		return User{}, nil, err
+	}
+
+	var responseUser User
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseUser,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseUser, response.Warnings, err
+}
+
 func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetUsersRequest,

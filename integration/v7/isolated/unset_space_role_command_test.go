@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("unset-space-role command", func() {
+var _ = FDescribe("unset-space-role command", func() {
 	var (
 		privilegedUsername string
 		orgName            string

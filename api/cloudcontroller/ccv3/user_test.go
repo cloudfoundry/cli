@@ -288,4 +288,67 @@ var _ = Describe("User", func() {
 			})
 		})
 	})
+	Describe("Getuser", func() {
+		var (
+			user       User
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			user, warnings, executeErr = client.GetUser("some-guid")
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-guid",
+					"username": "some-user-name",
+					"origin": "some-origin",
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/users/some-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the given user and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(user).To(Equal(User{
+					GUID:     "some-guid",
+					Username: "some-user-name",
+					Origin:   "some-origin",
+				}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "User not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/users/some-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
 })

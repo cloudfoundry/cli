@@ -92,6 +92,7 @@ type CloudControllerClient interface {
 	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, ccv3.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, ccv3.Warnings, error)
 	GetStacks(query ...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)
+	GetUser(userGUID string) (ccv3.User, ccv3.Warnings, error)
 	GetUsers(query ...ccv3.Query) ([]ccv3.User, ccv3.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
