@@ -18,8 +18,6 @@ import (
 
 const StagingLog = "STG"
 
-var flushInterval = 300 * time.Millisecond
-
 type LogMessage struct {
 	message        string
 	messageType    string
@@ -213,12 +211,12 @@ func (actor Actor) ScheduleTokenRefresh() (chan bool, error) {
 		defer ticker.Stop()
 		for {
 			select {
-			case _, _ = <-ticker.C:
+			case _ = <-ticker.C:
 				_, err := actor.RefreshAccessToken()
 				if err != nil {
 					panic(err)
 				}
-			case _, _ = <-quitNowChannel:
+			case _ = <-quitNowChannel:
 				return
 			}
 		}
