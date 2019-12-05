@@ -23,7 +23,7 @@ params:
   CF_INT_IGNORE_API_VERSION_CHECK:
   FLAKE_ATTEMPTS: 2
   TAGS: 'V7'
-  NODES: 8
+  NODES: 16
 
 run:
   path: bash
