@@ -32,6 +32,7 @@ type RequestLoggerOutput interface {
 type RequestLogger struct {
 	connection cloudcontroller.Connection
 	output     RequestLoggerOutput
+	startTime  time.Time
 }
 
 // NewRequestLogger returns a pointer to a RequestLogger wrapper
@@ -72,6 +73,8 @@ func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) er
 		return err
 	}
 	defer logger.output.Stop()
+	//err = logger.output.DisplayMessage(fmt.Sprintf("QQQ Time before request: [%s]\n", time.Now()))
+	logger.startTime = time.Now()
 
 	err = logger.output.DisplayType("REQUEST", time.Now())
 	if err != nil {
@@ -125,6 +128,16 @@ func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Res
 	}
 	defer logger.output.Stop()
 
+	endTime := time.Now()
+	duration := endTime.Sub(logger.startTime)
+	//err = logger.output.DisplayMessage(fmt.Sprintf("QQQ Time after request: [%s]\n", time.Now()))
+	//if err != nil {
+	//	return err
+	//}
+	err = logger.output.DisplayMessage(fmt.Sprintf("QQQ time for the request: %3.2f msec\n", float64(duration.Microseconds()) / 1000.0))
+	if err != nil {
+		return err
+	}
 	err = logger.output.DisplayType("RESPONSE", time.Now())
 	if err != nil {
 		return err
