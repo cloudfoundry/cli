@@ -211,12 +211,12 @@ func (actor Actor) ScheduleTokenRefresh() (chan bool, error) {
 		defer ticker.Stop()
 		for {
 			select {
-			case _ = <-ticker.C:
+			case <-ticker.C:
 				_, err := actor.RefreshAccessToken()
 				if err != nil {
 					panic(err)
 				}
-			case _ = <-quitNowChannel:
+			case <-quitNowChannel:
 				return
 			}
 		}
