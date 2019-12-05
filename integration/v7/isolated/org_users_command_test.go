@@ -20,7 +20,7 @@ var _ = Describe("org-users command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(regexp.QuoteMeta("cf org-users ORG")))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say(`--all-users, -a \s+List all users in the org, including org users`))
+				Eventually(session).Should(Say(`--all-users, -a \s+List all users with roles in the org or in spaces within the org`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("orgs, set-org-role"))
 				Eventually(session).Should(Exit(0))

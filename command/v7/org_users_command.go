@@ -19,7 +19,7 @@ type OrgUsersActor interface {
 
 type OrgUsersCommand struct {
 	RequiredArgs    flag.Organization `positional-args:"yes"`
-	AllUsers        bool              `long:"all-users" short:"a" description:"List all users in the org, including org users"`
+	AllUsers        bool              `long:"all-users" short:"a" description:"List all users with roles in the org or in spaces within the org"`
 	usage           interface{}       `usage:"CF_NAME org-users ORG"`
 	relatedCommands interface{}       `related_commands:"orgs, set-org-role"`
 
