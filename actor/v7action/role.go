@@ -137,6 +137,92 @@ func (actor Actor) GetRoleGUID(spaceGUID string, userGUID string, roleType const
 	return ccv3Roles[0].GUID, Warnings(warnings), nil
 }
 
+//TODO: Need unit tests for this
+func (actor Actor) GetOrgRoleGUID(orgGUID string, userGUID string, roleType constant.RoleType) (string, Warnings, error) {
+	ccv3Roles, _, warnings, err := actor.CloudControllerClient.GetRoles(
+		ccv3.Query{
+			Key:    ccv3.UserGUIDFilter,
+			Values: []string{userGUID},
+		},
+		ccv3.Query{
+			Key:    ccv3.RoleTypesFilter,
+			Values: []string{string(roleType)},
+		},
+		ccv3.Query{
+			Key:    ccv3.OrganizationGUIDFilter,
+			Values: []string{orgGUID},
+		},
+	)
+
+	if err != nil {
+		return "", Warnings(warnings), err
+	}
+
+	if len(ccv3Roles) == 0 {
+		return "", Warnings(warnings), nil
+	}
+
+	return ccv3Roles[0].GUID, Warnings(warnings), nil
+}
+
+// Can we collapse DeleteOrgRole & DeleteSpaceRole?
+func(actor Actor) DeleteOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (Warnings, error) {
+	var userGUID string
+	var allWarnings Warnings
+	if isClient {
+		user, warnings, err := actor.CloudControllerClient.GetUser(userNameOrGUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			if _, ok := err.(ccerror.UserNotFoundError); ok {
+				err = ccerror.UserNotFoundError{Username: userNameOrGUID}
+			}
+			return Warnings(allWarnings), err
+		}
+		userGUID = user.GUID
+	} else {
+		ccv3Users, warnings, err := actor.CloudControllerClient.GetUsers(
+			ccv3.Query{
+				Key:    ccv3.UsernamesFilter,
+				Values: []string{userNameOrGUID},
+			},
+			ccv3.Query{
+				Key:    ccv3.OriginsFilter,
+				Values: []string{userOrigin},
+			},
+		)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return Warnings(allWarnings), err
+		}
+		if len(ccv3Users) == 0 {
+			return allWarnings, ccerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}
+		}
+
+		userGUID = ccv3Users[0].GUID
+	}
+
+
+	roleGUID, warnings, err := actor.GetOrgRoleGUID(orgGUID, userGUID, roleType)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil || roleGUID == "" {
+		return allWarnings, err
+	}
+
+	jobURL, deleteRoleWarnings, err := actor.CloudControllerClient.DeleteRole(roleGUID)
+	allWarnings = append(allWarnings, deleteRoleWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	pollJobWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, pollJobWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	return allWarnings, nil
+}
+
 func (actor Actor) GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType][]User, Warnings, error) {
 	return actor.getUsersByRoleType(orgGuid, ccv3.OrganizationGUIDFilter)
 }

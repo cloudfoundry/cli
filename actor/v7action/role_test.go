@@ -700,6 +700,260 @@ var _ = Describe("Role Actions", func() {
 		})
 	})
 
+	//TODO: Can we collapse DeleteSpaceRole and DeleteOrgRole into DeleteRole somehow?
+	// They have a lot of code in common, aside from getting the RoleGUID by
+	// Role.OrgGUID v. Role.SpaceGUID
+	Describe("DeleteOrgRole", func() {
+		var (
+			roleType       constant.RoleType
+			userNameOrGUID string
+			userOrigin     string
+			orgGUID        string
+			isClient       bool
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			roleType = constant.OrgBillingManagerRole
+			orgGUID = "org-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DeleteOrgRole(roleType, orgGUID, userNameOrGUID, userOrigin, isClient)
+		})
+
+		When("deleting a role succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
+					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					ccv3.Warnings{"get-users-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetUserReturnsOnCall(0,
+					ccv3.User{GUID: "user-guid"},
+					ccv3.Warnings{"get-user-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
+					[]ccv3.Role{
+						{
+							GUID:     "role-guid",
+							Type:     roleType,
+							UserGUID: "user-guid",
+							OrgGUID:  orgGUID,
+						},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-roles-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteRoleReturnsOnCall(0,
+					ccv3.JobURL("https://jobs/job_guid"),
+					ccv3.Warnings{"delete-role-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturnsOnCall(0,
+					ccv3.Warnings{"poll-job-warning"},
+					nil,
+				)
+
+			})
+
+			When("deleting an org role for a client", func() {
+				BeforeEach(func() {
+					userNameOrGUID = "user-guid"
+					userOrigin = ""
+					isClient = true
+				})
+
+				FIt("deletes the role and returns any warnings", func() {
+					Expect(warnings).To(ConsistOf("get-user-warning", "get-roles-warning", "delete-role-warning", "poll-job-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(0))
+
+					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
+					Expect(passedRolesQuery).To(Equal(
+						[]ccv3.Query{
+							{
+								Key:    ccv3.UserGUIDFilter,
+								Values: []string{userNameOrGUID},
+							},
+							{
+								Key:    ccv3.RoleTypesFilter,
+								Values: []string{string(constant.OrgBillingManagerRole)},
+							},
+							{
+								Key:    ccv3.OrganizationGUIDFilter,
+								Values: []string{orgGUID},
+							},
+						},
+					))
+					passedRoleGUID := fakeCloudControllerClient.DeleteRoleArgsForCall(0)
+					Expect(passedRoleGUID).To(Equal("role-guid"))
+
+					passedJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+					Expect(passedJobURL).To(Equal(ccv3.JobURL("https://jobs/job_guid")))
+				})
+
+			})
+
+			When("deleting an org role for a non-client user", func() {
+				BeforeEach(func() {
+					userNameOrGUID = "user-name"
+					userOrigin = "user-origin"
+					isClient = false
+				})
+
+				It("deletes the role and returns any warnings", func() {
+					Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning", "delete-role-warning", "poll-job-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					passedQuery := fakeCloudControllerClient.GetUsersArgsForCall(0)
+					Expect(passedQuery).To(Equal(
+						[]ccv3.Query{
+							{
+								Key:    ccv3.UsernamesFilter,
+								Values: []string{userNameOrGUID},
+							},
+							{
+								Key:    ccv3.OriginsFilter,
+								Values: []string{userOrigin},
+							},
+						},
+					))
+
+					passedRolesQuery := fakeCloudControllerClient.GetRolesArgsForCall(0)
+					Expect(passedRolesQuery).To(Equal(
+						[]ccv3.Query{
+							{
+								Key:    ccv3.UserGUIDFilter,
+								Values: []string{"user-guid"},
+							},
+							{
+								Key:    ccv3.RoleTypesFilter,
+								Values: []string{string(constant.OrgBillingManagerRole)},
+							},
+							{
+								Key:    ccv3.OrganizationGUIDFilter,
+								Values: []string{orgGUID},
+							},
+						},
+					))
+
+					passedRoleGUID := fakeCloudControllerClient.DeleteRoleArgsForCall(0)
+					Expect(passedRoleGUID).To(Equal("role-guid"))
+
+					passedJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+					Expect(passedJobURL).To(Equal(ccv3.JobURL("https://jobs/job_guid")))
+				})
+			})
+		})
+
+		When("the user does not have the space role to delete", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
+					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					ccv3.Warnings{"get-users-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
+					[]ccv3.Role{},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-roles-warning"},
+					nil,
+				)
+
+			})
+
+			It("it gets an empty list of roles and exits after the request", func() {
+				Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
+
+				Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning"))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("the user is not found", func() {
+			When("The user is not a client", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetUsersReturnsOnCall(0,
+						[]ccv3.User{},
+						ccv3.Warnings{"get-users-warning"},
+						nil,
+					)
+				})
+				It("returns a user not found error and warnings", func() {
+					Expect(fakeCloudControllerClient.GetUsersCallCount()).To(Equal(1))
+					passedQuery := fakeCloudControllerClient.GetUsersArgsForCall(0)
+					Expect(passedQuery).To(Equal(
+						[]ccv3.Query{
+							{
+								Key:    ccv3.UsernamesFilter,
+								Values: []string{userNameOrGUID},
+							},
+							{
+								Key:    ccv3.OriginsFilter,
+								Values: []string{userOrigin},
+							},
+						},
+					))
+					Expect(fakeCloudControllerClient.GetRolesCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(0))
+
+					Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{Username: userNameOrGUID, Origin: userOrigin}))
+				})
+			})
+		})
+
+		When("the API call to delete the space role returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
+					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					ccv3.Warnings{"get-users-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
+					[]ccv3.Role{
+						{
+							GUID:     "role-guid",
+							Type:     roleType,
+							UserGUID: "user-guid",
+							OrgGUID:  orgGUID,
+						},
+					},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-roles-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteRoleReturnsOnCall(0,
+					ccv3.JobURL(""),
+					ccv3.Warnings{"delete-space-role-warning"},
+					errors.New("delete-space-role-error"),
+				)
+			})
+
+			It("it returns an error and warnings", func() {
+				Expect(fakeCloudControllerClient.DeleteRoleCallCount()).To(Equal(1))
+				Expect(warnings).To(ConsistOf("get-users-warning", "get-roles-warning", "delete-space-role-warning"))
+				Expect(executeErr).To(MatchError("delete-space-role-error"))
+			})
+		})
+	})
+
 	Describe("GetOrgUsersByRoleType", func() {
 		var (
 			usersByType map[constant.RoleType][]User
