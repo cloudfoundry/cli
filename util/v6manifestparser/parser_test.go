@@ -1,4 +1,4 @@
-package manifestparser_test
+package v6manifestparser_test
 
 import (
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/util/manifestparser"
+	. "code.cloudfoundry.org/cli/util/v6manifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"

@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	"code.cloudfoundry.org/clock"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
@@ -52,8 +52,8 @@ func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
-	cmd.ManifestLocator = manifestparser.NewLocator()
-	cmd.Parser = manifestparser.NewParser()
+	cmd.ManifestLocator = v6manifestparser.NewLocator()
+	cmd.Parser = v6manifestparser.NewParser()
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir

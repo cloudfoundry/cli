@@ -1,4 +1,4 @@
-package manifestparser
+package v6manifestparser
 
 import (
 	"os"

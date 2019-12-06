@@ -1,4 +1,4 @@
-package manifestparser_test
+package v6manifestparser_test
 
 import (
 	. "github.com/onsi/ginkgo"

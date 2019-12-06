@@ -1,4 +1,4 @@
-package manifestparser
+package v6manifestparser
 
 // ApplicationModel can be accessed through the top level Application struct To
 // add a field for the CLI to extract from the manifest, just add it to this
