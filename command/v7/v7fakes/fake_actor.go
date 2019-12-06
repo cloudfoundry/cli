@@ -2578,6 +2578,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	PollTaskStub        func(resources.Task) (resources.Task, v7action.Warnings, error)
+	pollTaskMutex       sync.RWMutex
+	pollTaskArgsForCall []struct {
+		arg1 resources.Task
+	}
+	pollTaskReturns struct {
+		result1 resources.Task
+		result2 v7action.Warnings
+		result3 error
+	}
+	pollTaskReturnsOnCall map[int]struct {
+		result1 resources.Task
+		result2 v7action.Warnings
+		result3 error
+	}
 	PollUploadBuildpackJobStub        func(ccv3.JobURL) (v7action.Warnings, error)
 	pollUploadBuildpackJobMutex       sync.RWMutex
 	pollUploadBuildpackJobArgsForCall []struct {
@@ -14601,6 +14616,72 @@ func (fake *FakeActor) PollStartForRollingReturnsOnCall(i int, result1 v7action.
 	}{result1, result2}
 }
 
+func (fake *FakeActor) PollTask(arg1 resources.Task) (resources.Task, v7action.Warnings, error) {
+	fake.pollTaskMutex.Lock()
+	ret, specificReturn := fake.pollTaskReturnsOnCall[len(fake.pollTaskArgsForCall)]
+	fake.pollTaskArgsForCall = append(fake.pollTaskArgsForCall, struct {
+		arg1 resources.Task
+	}{arg1})
+	fake.recordInvocation("PollTask", []interface{}{arg1})
+	fake.pollTaskMutex.Unlock()
+	if fake.PollTaskStub != nil {
+		return fake.PollTaskStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.pollTaskReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) PollTaskCallCount() int {
+	fake.pollTaskMutex.RLock()
+	defer fake.pollTaskMutex.RUnlock()
+	return len(fake.pollTaskArgsForCall)
+}
+
+func (fake *FakeActor) PollTaskCalls(stub func(resources.Task) (resources.Task, v7action.Warnings, error)) {
+	fake.pollTaskMutex.Lock()
+	defer fake.pollTaskMutex.Unlock()
+	fake.PollTaskStub = stub
+}
+
+func (fake *FakeActor) PollTaskArgsForCall(i int) resources.Task {
+	fake.pollTaskMutex.RLock()
+	defer fake.pollTaskMutex.RUnlock()
+	argsForCall := fake.pollTaskArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) PollTaskReturns(result1 resources.Task, result2 v7action.Warnings, result3 error) {
+	fake.pollTaskMutex.Lock()
+	defer fake.pollTaskMutex.Unlock()
+	fake.PollTaskStub = nil
+	fake.pollTaskReturns = struct {
+		result1 resources.Task
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) PollTaskReturnsOnCall(i int, result1 resources.Task, result2 v7action.Warnings, result3 error) {
+	fake.pollTaskMutex.Lock()
+	defer fake.pollTaskMutex.Unlock()
+	fake.PollTaskStub = nil
+	if fake.pollTaskReturnsOnCall == nil {
+		fake.pollTaskReturnsOnCall = make(map[int]struct {
+			result1 resources.Task
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.pollTaskReturnsOnCall[i] = struct {
+		result1 resources.Task
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) PollUploadBuildpackJob(arg1 ccv3.JobURL) (v7action.Warnings, error) {
 	fake.pollUploadBuildpackJobMutex.Lock()
 	ret, specificReturn := fake.pollUploadBuildpackJobReturnsOnCall[len(fake.pollUploadBuildpackJobArgsForCall)]
@@ -19499,6 +19580,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.pollStartMutex.RUnlock()
 	fake.pollStartForRollingMutex.RLock()
 	defer fake.pollStartForRollingMutex.RUnlock()
+	fake.pollTaskMutex.RLock()
+	defer fake.pollTaskMutex.RUnlock()
 	fake.pollUploadBuildpackJobMutex.RLock()
 	defer fake.pollUploadBuildpackJobMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
