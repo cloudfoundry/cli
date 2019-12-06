@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
 type FakePushActor struct {
@@ -23,12 +23,12 @@ type FakePushActor struct {
 	actualizeReturnsOnCall map[int]struct {
 		result1 <-chan *v7pushaction.PushEvent
 	}
-	CreatePushPlansStub        func(string, string, pushmanifestparser.Manifest, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
+	CreatePushPlansStub        func(string, string, manifestparser.Manifest, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
 	createPushPlansMutex       sync.RWMutex
 	createPushPlansArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 pushmanifestparser.Manifest
+		arg3 manifestparser.Manifest
 		arg4 v7pushaction.FlagOverrides
 	}
 	createPushPlansReturns struct {
@@ -41,18 +41,18 @@ type FakePushActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	HandleFlagOverridesStub        func(pushmanifestparser.Manifest, v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error)
+	HandleFlagOverridesStub        func(manifestparser.Manifest, v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
 	handleFlagOverridesMutex       sync.RWMutex
 	handleFlagOverridesArgsForCall []struct {
-		arg1 pushmanifestparser.Manifest
+		arg1 manifestparser.Manifest
 		arg2 v7pushaction.FlagOverrides
 	}
 	handleFlagOverridesReturns struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}
 	handleFlagOverridesReturnsOnCall map[int]struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -120,13 +120,13 @@ func (fake *FakePushActor) ActualizeReturnsOnCall(i int, result1 <-chan *v7pusha
 	}{result1}
 }
 
-func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 string, arg3 pushmanifestparser.Manifest, arg4 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error) {
+func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 string, arg3 manifestparser.Manifest, arg4 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error) {
 	fake.createPushPlansMutex.Lock()
 	ret, specificReturn := fake.createPushPlansReturnsOnCall[len(fake.createPushPlansArgsForCall)]
 	fake.createPushPlansArgsForCall = append(fake.createPushPlansArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 pushmanifestparser.Manifest
+		arg3 manifestparser.Manifest
 		arg4 v7pushaction.FlagOverrides
 	}{arg1, arg2, arg3, arg4})
 	fake.recordInvocation("CreatePushPlans", []interface{}{arg1, arg2, arg3, arg4})
@@ -147,13 +147,13 @@ func (fake *FakePushActor) CreatePushPlansCallCount() int {
 	return len(fake.createPushPlansArgsForCall)
 }
 
-func (fake *FakePushActor) CreatePushPlansCalls(stub func(string, string, pushmanifestparser.Manifest, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)) {
+func (fake *FakePushActor) CreatePushPlansCalls(stub func(string, string, manifestparser.Manifest, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)) {
 	fake.createPushPlansMutex.Lock()
 	defer fake.createPushPlansMutex.Unlock()
 	fake.CreatePushPlansStub = stub
 }
 
-func (fake *FakePushActor) CreatePushPlansArgsForCall(i int) (string, string, pushmanifestparser.Manifest, v7pushaction.FlagOverrides) {
+func (fake *FakePushActor) CreatePushPlansArgsForCall(i int) (string, string, manifestparser.Manifest, v7pushaction.FlagOverrides) {
 	fake.createPushPlansMutex.RLock()
 	defer fake.createPushPlansMutex.RUnlock()
 	argsForCall := fake.createPushPlansArgsForCall[i]
@@ -189,11 +189,11 @@ func (fake *FakePushActor) CreatePushPlansReturnsOnCall(i int, result1 []v7pusha
 	}{result1, result2, result3}
 }
 
-func (fake *FakePushActor) HandleFlagOverrides(arg1 pushmanifestparser.Manifest, arg2 v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error) {
+func (fake *FakePushActor) HandleFlagOverrides(arg1 manifestparser.Manifest, arg2 v7pushaction.FlagOverrides) (manifestparser.Manifest, error) {
 	fake.handleFlagOverridesMutex.Lock()
 	ret, specificReturn := fake.handleFlagOverridesReturnsOnCall[len(fake.handleFlagOverridesArgsForCall)]
 	fake.handleFlagOverridesArgsForCall = append(fake.handleFlagOverridesArgsForCall, struct {
-		arg1 pushmanifestparser.Manifest
+		arg1 manifestparser.Manifest
 		arg2 v7pushaction.FlagOverrides
 	}{arg1, arg2})
 	fake.recordInvocation("HandleFlagOverrides", []interface{}{arg1, arg2})
@@ -214,41 +214,41 @@ func (fake *FakePushActor) HandleFlagOverridesCallCount() int {
 	return len(fake.handleFlagOverridesArgsForCall)
 }
 
-func (fake *FakePushActor) HandleFlagOverridesCalls(stub func(pushmanifestparser.Manifest, v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error)) {
+func (fake *FakePushActor) HandleFlagOverridesCalls(stub func(manifestparser.Manifest, v7pushaction.FlagOverrides) (manifestparser.Manifest, error)) {
 	fake.handleFlagOverridesMutex.Lock()
 	defer fake.handleFlagOverridesMutex.Unlock()
 	fake.HandleFlagOverridesStub = stub
 }
 
-func (fake *FakePushActor) HandleFlagOverridesArgsForCall(i int) (pushmanifestparser.Manifest, v7pushaction.FlagOverrides) {
+func (fake *FakePushActor) HandleFlagOverridesArgsForCall(i int) (manifestparser.Manifest, v7pushaction.FlagOverrides) {
 	fake.handleFlagOverridesMutex.RLock()
 	defer fake.handleFlagOverridesMutex.RUnlock()
 	argsForCall := fake.handleFlagOverridesArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakePushActor) HandleFlagOverridesReturns(result1 pushmanifestparser.Manifest, result2 error) {
+func (fake *FakePushActor) HandleFlagOverridesReturns(result1 manifestparser.Manifest, result2 error) {
 	fake.handleFlagOverridesMutex.Lock()
 	defer fake.handleFlagOverridesMutex.Unlock()
 	fake.HandleFlagOverridesStub = nil
 	fake.handleFlagOverridesReturns = struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakePushActor) HandleFlagOverridesReturnsOnCall(i int, result1 pushmanifestparser.Manifest, result2 error) {
+func (fake *FakePushActor) HandleFlagOverridesReturnsOnCall(i int, result1 manifestparser.Manifest, result2 error) {
 	fake.handleFlagOverridesMutex.Lock()
 	defer fake.handleFlagOverridesMutex.Unlock()
 	fake.HandleFlagOverridesStub = nil
 	if fake.handleFlagOverridesReturnsOnCall == nil {
 		fake.handleFlagOverridesReturnsOnCall = make(map[int]struct {
-			result1 pushmanifestparser.Manifest
+			result1 manifestparser.Manifest
 			result2 error
 		})
 	}
 	fake.handleFlagOverridesReturnsOnCall[i] = struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}{result1, result2}
 }

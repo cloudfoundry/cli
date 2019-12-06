@@ -1,4 +1,4 @@
-package pushmanifestparser_test
+package manifestparser_test
 
 import (
 	"testing"

@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleAppNameOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest.Applications = []pushmanifestparser.Application{
+		originalManifest.Applications = []manifestparser.Application{
 			{
 				Name: "app-1",
 			},
@@ -38,10 +38,10 @@ var _ = Describe("HandleAppNameOverride", func() {
 		It("does not change the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					Name: "app-1",
 				},
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					Name: "app-2",
 				},
 			))
@@ -58,7 +58,7 @@ var _ = Describe("HandleAppNameOverride", func() {
 			numApps := len(transformedManifest.Applications)
 			Expect(numApps).To(Equal(1))
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					Name: "app-2",
 				},
 			))
@@ -67,7 +67,7 @@ var _ = Describe("HandleAppNameOverride", func() {
 
 	When("there is only one app, with no name, and a name is given as a manifest override", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 			}
 
@@ -79,7 +79,7 @@ var _ = Describe("HandleAppNameOverride", func() {
 			numApps := len(transformedManifest.Applications)
 			Expect(numApps).To(Equal(1))
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					Name: "app-2",
 				},
 			))
@@ -88,7 +88,7 @@ var _ = Describe("HandleAppNameOverride", func() {
 
 	When("there are multiple apps and one does not have a name", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
 					Name: "app-1",
 				},
@@ -109,13 +109,13 @@ var _ = Describe("HandleAppNameOverride", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(pushmanifestparser.AppNotInManifestError{Name: "unknown-app"}))
+			Expect(executeErr).To(MatchError(manifestparser.AppNotInManifestError{Name: "unknown-app"}))
 		})
 	})
 
 	When("the manifest has no name and no appName arg is given", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 			}
 		})

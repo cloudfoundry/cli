@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
 // Overrides the path if path is given. Changes empty paths to pwd. Validates paths
-func HandleAppPathOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
+func HandleAppPathOverride(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
 	if overrides.ProvidedAppPath != "" {
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}
@@ -41,7 +41,7 @@ func HandleAppPathOverride(manifest pushmanifestparser.Manifest, overrides FlagO
 
 		if err != nil {
 			if os.IsNotExist(err) {
-				return manifest, pushmanifestparser.InvalidManifestApplicationPathError{
+				return manifest, manifestparser.InvalidManifestApplicationPathError{
 					Path: finalPath,
 				}
 			}

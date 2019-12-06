@@ -8,7 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,17 +16,17 @@ import (
 
 var _ = Describe("HandleAppPathOverride", func() {
 	var (
-		transformedManifest pushmanifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		executeErr          error
 
-		parsedManifest pushmanifestparser.Manifest
+		parsedManifest manifestparser.Manifest
 		flagOverrides  FlagOverrides
 		err            error
 	)
 
 	BeforeEach(func() {
 		flagOverrides = FlagOverrides{}
-		parsedManifest = pushmanifestparser.Manifest{}
+		parsedManifest = manifestparser.Manifest{}
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -58,8 +58,8 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 		When("there are multiple apps in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 						{},
 					},
@@ -73,8 +73,8 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 		When("there is a single app in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{
 							Path: "some-path",
 						},
@@ -120,8 +120,8 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 	When("the path flag override is not set", func() {
 		BeforeEach(func() {
-			parsedManifest = pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{
+			parsedManifest = manifestparser.Manifest{
+				Applications: []manifestparser.Application{
 					{},
 				},
 			}
@@ -135,8 +135,8 @@ var _ = Describe("HandleAppPathOverride", func() {
 
 	When("the manifest contains an invalid path", func() {
 		BeforeEach(func() {
-			parsedManifest = pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{
+			parsedManifest = manifestparser.Manifest{
+				Applications: []manifestparser.Application{
 					{
 						Path: "some-non-existent-path",
 					},
@@ -145,7 +145,7 @@ var _ = Describe("HandleAppPathOverride", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(pushmanifestparser.InvalidManifestApplicationPathError{
+			Expect(executeErr).To(MatchError(manifestparser.InvalidManifestApplicationPathError{
 				Path: "some-non-existent-path",
 			}))
 		})
@@ -155,10 +155,10 @@ var _ = Describe("HandleAppPathOverride", func() {
 		BeforeEach(func() {
 			flagOverrides.ProvidedAppPath = "/some/path"
 
-			parsedManifest.Applications = []pushmanifestparser.Application{
+			parsedManifest.Applications = []manifestparser.Application{
 				{
 					Name:   "some-app",
-					Docker: &pushmanifestparser.Docker{},
+					Docker: &manifestparser.Docker{},
 				},
 			}
 		})

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -225,8 +225,8 @@ var _ = Describe("push Command", func() {
 						// essentially fakes GetBaseManifest
 						fakeManifestLocator.PathReturns("", true, nil)
 						fakeManifestParser.InterpolateAndParseReturns(
-							pushmanifestparser.Manifest{
-								Applications: []pushmanifestparser.Application{
+							manifestparser.Manifest{
+								Applications: []manifestparser.Application{
 									{
 										Name: "some-app-name",
 									},
@@ -240,8 +240,8 @@ var _ = Describe("push Command", func() {
 						Expect(fakeActor.HandleFlagOverridesCallCount()).To(Equal(1))
 						actualManifest, actualFlagOverrides := fakeActor.HandleFlagOverridesArgsForCall(0)
 						Expect(actualManifest).To(Equal(
-							pushmanifestparser.Manifest{
-								Applications: []pushmanifestparser.Application{
+							manifestparser.Manifest{
+								Applications: []manifestparser.Application{
 									{Name: "some-app-name"},
 								},
 							},
@@ -251,7 +251,7 @@ var _ = Describe("push Command", func() {
 
 					When("handling the flag overrides fails", func() {
 						BeforeEach(func() {
-							fakeActor.HandleFlagOverridesReturns(pushmanifestparser.Manifest{}, errors.New("override-handler-error"))
+							fakeActor.HandleFlagOverridesReturns(manifestparser.Manifest{}, errors.New("override-handler-error"))
 						})
 
 						It("returns the error", func() {
@@ -262,8 +262,8 @@ var _ = Describe("push Command", func() {
 					When("handling the flag overrides succeeds", func() {
 						BeforeEach(func() {
 							fakeActor.HandleFlagOverridesReturns(
-								pushmanifestparser.Manifest{
-									Applications: []pushmanifestparser.Application{
+								manifestparser.Manifest{
+									Applications: []manifestparser.Application{
 										{Name: "some-app-name"},
 									},
 								},
@@ -275,11 +275,11 @@ var _ = Describe("push Command", func() {
 							// TODO remove this in favor of a fake manifest
 							BeforeEach(func() {
 								fakeActor.HandleFlagOverridesReturns(
-									pushmanifestparser.Manifest{
-										Applications: []pushmanifestparser.Application{
+									manifestparser.Manifest{
+										Applications: []manifestparser.Application{
 											{
 												Name:   "some-app-name",
-												Docker: &pushmanifestparser.Docker{Username: "username", Image: "image"},
+												Docker: &manifestparser.Docker{Username: "username", Image: "image"},
 											},
 										},
 									},
@@ -295,8 +295,8 @@ var _ = Describe("push Command", func() {
 						It("delegates to the manifest parser", func() {
 							Expect(fakeManifestParser.MarshalManifestCallCount()).To(Equal(1))
 							Expect(fakeManifestParser.MarshalManifestArgsForCall(0)).To(Equal(
-								pushmanifestparser.Manifest{
-									Applications: []pushmanifestparser.Application{
+								manifestparser.Manifest{
+									Applications: []manifestparser.Application{
 										{Name: "some-app-name"},
 									},
 								},
@@ -348,8 +348,8 @@ var _ = Describe("push Command", func() {
 									Expect(spaceGUID).To(Equal("some-space-guid"))
 									Expect(orgGUID).To(Equal("some-org-guid"))
 									Expect(manifest).To(Equal(
-										pushmanifestparser.Manifest{
-											Applications: []pushmanifestparser.Application{
+										manifestparser.Manifest{
+											Applications: []manifestparser.Application{
 												{Name: "some-app-name"},
 											},
 										},
@@ -787,7 +787,7 @@ var _ = Describe("push Command", func() {
 		var (
 			somePath      string
 			flagOverrides v7pushaction.FlagOverrides
-			manifest      pushmanifestparser.Manifest
+			manifest      manifestparser.Manifest
 			executeErr    error
 		)
 
@@ -804,8 +804,8 @@ var _ = Describe("push Command", func() {
 				BeforeEach(func() {
 					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 					fakeManifestParser.InterpolateAndParseReturns(
-						pushmanifestparser.Manifest{
-							Applications: []pushmanifestparser.Application{
+						manifestparser.Manifest{
+							Applications: []manifestparser.Application{
 								{Name: "new-app"},
 							},
 						},
@@ -816,8 +816,8 @@ var _ = Describe("push Command", func() {
 				It("uses the manifest in the current directory", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(manifest).To(Equal(
-						pushmanifestparser.Manifest{
-							Applications: []pushmanifestparser.Application{
+						manifestparser.Manifest{
+							Applications: []manifestparser.Application{
 								{Name: "new-app"},
 							},
 						}),
@@ -845,8 +845,8 @@ var _ = Describe("push Command", func() {
 
 				It("returns a default empty manifest", func() {
 					Expect(manifest).To(Equal(
-						pushmanifestparser.Manifest{
-							Applications: []pushmanifestparser.Application{
+						manifestparser.Manifest{
+							Applications: []manifestparser.Application{
 								{Name: "new-app"},
 							},
 						}),
@@ -869,7 +869,7 @@ var _ = Describe("push Command", func() {
 				BeforeEach(func() {
 					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 					fakeManifestParser.InterpolateAndParseReturns(
-						pushmanifestparser.Manifest{},
+						manifestparser.Manifest{},
 						errors.New("bad yaml"),
 					)
 				})
@@ -887,8 +887,8 @@ var _ = Describe("push Command", func() {
 				flagOverrides.ManifestPath = somePath
 				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 				fakeManifestParser.InterpolateAndParseReturns(
-					pushmanifestparser.Manifest{
-						Applications: []pushmanifestparser.Application{
+					manifestparser.Manifest{
+						Applications: []manifestparser.Application{
 							{Name: "new-app"},
 						},
 					},
@@ -906,8 +906,8 @@ var _ = Describe("push Command", func() {
 				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 				Expect(actualManifestPath).To(Equal("/manifest/path"))
 				Expect(manifest).To(Equal(
-					pushmanifestparser.Manifest{
-						Applications: []pushmanifestparser.Application{
+					manifestparser.Manifest{
+						Applications: []manifestparser.Application{
 							{Name: "new-app"},
 						},
 					}),

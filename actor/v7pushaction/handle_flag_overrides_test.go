@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -10,21 +10,21 @@ import (
 var _ = Describe("HandleFlagOverrides", func() {
 	var (
 		pushActor           *Actor
-		baseManifest        pushmanifestparser.Manifest
+		baseManifest        manifestparser.Manifest
 		flagOverrides       FlagOverrides
-		transformedManifest pushmanifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		executeErr          error
 
 		testFuncCallCount int
 	)
 
-	testTransformManifestFunc := func(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
+	testTransformManifestFunc := func(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
 		testFuncCallCount += 1
 		return manifest, nil
 	}
 
 	BeforeEach(func() {
-		baseManifest = pushmanifestparser.Manifest{}
+		baseManifest = manifestparser.Manifest{}
 		flagOverrides = FlagOverrides{}
 		testFuncCallCount = 0
 

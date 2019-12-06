@@ -1,4 +1,4 @@
-package pushmanifestparser_test
+package manifestparser_test
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/util/pushmanifestparser"
+	. "code.cloudfoundry.org/cli/util/manifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"

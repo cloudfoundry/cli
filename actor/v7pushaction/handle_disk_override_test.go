@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleDiskOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -29,9 +29,9 @@ var _ = Describe("HandleDiskOverride", func() {
 
 	When("manifest web process does not specify disk", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "web"},
 					},
 				},
@@ -42,8 +42,8 @@ var _ = Describe("HandleDiskOverride", func() {
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{Type: "web"},
 						},
 					},
@@ -59,8 +59,8 @@ var _ = Describe("HandleDiskOverride", func() {
 			It("changes the disk of the web process in the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{
 								Type:      "web",
 								DiskQuota: "5MB",
@@ -76,9 +76,9 @@ var _ = Describe("HandleDiskOverride", func() {
 		BeforeEach(func() {
 			overrides.Disk = "5MB"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 					},
 				},
@@ -88,9 +88,9 @@ var _ = Describe("HandleDiskOverride", func() {
 		It("changes the disk of the app in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					DiskQuota: "5MB",
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{
 							Type: "worker",
 						},
@@ -104,9 +104,9 @@ var _ = Describe("HandleDiskOverride", func() {
 		BeforeEach(func() {
 			overrides.Disk = "5MB"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker", DiskQuota: "2MB"},
 						{Type: "web", DiskQuota: "3MB"},
 					},
@@ -118,8 +118,8 @@ var _ = Describe("HandleDiskOverride", func() {
 		It("changes the disk of the web process in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
-					Processes: []pushmanifestparser.Process{
+				manifestparser.Application{
+					Processes: []manifestparser.Process{
 						{Type: "worker", DiskQuota: "2MB"},
 						{Type: "web", DiskQuota: "5MB"},
 					},
@@ -133,7 +133,7 @@ var _ = Describe("HandleDiskOverride", func() {
 		BeforeEach(func() {
 			overrides.Disk = "5MB"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 				{},
 			}

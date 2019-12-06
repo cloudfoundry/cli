@@ -3,7 +3,7 @@ package v7pushaction_test
 import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,10 +11,10 @@ import (
 
 var _ = Describe("HandleDropletPathOverride", func() {
 	var (
-		transformedManifest pushmanifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		executeErr          error
 
-		parsedManifest pushmanifestparser.Manifest
+		parsedManifest manifestparser.Manifest
 		flagOverrides  FlagOverrides
 	)
 
@@ -32,8 +32,8 @@ var _ = Describe("HandleDropletPathOverride", func() {
 
 		When("there are multiple apps in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 						{},
 					},
@@ -47,8 +47,8 @@ var _ = Describe("HandleDropletPathOverride", func() {
 
 		When("there is a single app in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 					},
 				}
@@ -57,18 +57,18 @@ var _ = Describe("HandleDropletPathOverride", func() {
 			It("returns the unchanged manifest", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{},
+					manifestparser.Application{},
 				))
 			})
 		})
 
 		When("when docker is set in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{
 							Name: "some-app",
-							Docker: &pushmanifestparser.Docker{
+							Docker: &manifestparser.Docker{
 								Image: "nginx:latest",
 							},
 						},
@@ -86,8 +86,8 @@ var _ = Describe("HandleDropletPathOverride", func() {
 
 		When("when buildpacks is set in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{
 							Name:                    "some-app",
 							RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"ruby_buildpack"}},
@@ -106,8 +106,8 @@ var _ = Describe("HandleDropletPathOverride", func() {
 
 		When("when path is set in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{
 							Name: "some-app",
 							Path: "~",
@@ -132,8 +132,8 @@ var _ = Describe("HandleDropletPathOverride", func() {
 
 		When("there are multiple apps in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 						{},
 					},

@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleStackOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -32,7 +32,7 @@ var _ = Describe("HandleStackOverride", func() {
 			BeforeEach(func() {
 				overrides.Stack = "cflinuxfs2"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						Stack: "cflinuxfs3",
 					},
@@ -42,7 +42,7 @@ var _ = Describe("HandleStackOverride", func() {
 			It("will override the stack in the manifest with the provided flag value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
+					manifestparser.Application{
 						Stack: "cflinuxfs2",
 					},
 				))
@@ -53,7 +53,7 @@ var _ = Describe("HandleStackOverride", func() {
 			BeforeEach(func() {
 				overrides.Stack = "cflinuxfs2"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{},
 					{},
 				}

@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleDockerImageOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -32,7 +32,7 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerImage = "some-docker-image"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{},
 				}
 			})
@@ -40,8 +40,8 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			It("will populate the docker image in the manifest with the provided flag value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Docker: &pushmanifestparser.Docker{
+					manifestparser.Application{
+						Docker: &manifestparser.Docker{
 							Image: "some-docker-image",
 						},
 					},
@@ -53,9 +53,9 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerImage = "some-docker-image"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
-						Docker: &pushmanifestparser.Docker{Image: "old-docker-image"},
+						Docker: &manifestparser.Docker{Image: "old-docker-image"},
 					},
 				}
 			})
@@ -63,8 +63,8 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			It("will override the docker image in the manifest with the provided flag value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Docker: &pushmanifestparser.Docker{
+					manifestparser.Application{
+						Docker: &manifestparser.Docker{
 							Image: "some-docker-image",
 						},
 					},
@@ -76,7 +76,7 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerImage = "some-docker-image"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						Name:                    "some-app",
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"buildpack-1"}},
@@ -96,7 +96,7 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerImage = "some-docker-image"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						Name: "some-app",
 						Path: "/some/path",
@@ -116,7 +116,7 @@ var _ = Describe("HandleDockerImageOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerImage = "some-docker-image"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{},
 					{},
 				}

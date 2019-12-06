@@ -3,10 +3,10 @@ package v7pushaction
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func HandleHealthCheckTypeOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
+func HandleHealthCheckTypeOverride(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
 	if overrides.HealthCheckType != "" {
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}

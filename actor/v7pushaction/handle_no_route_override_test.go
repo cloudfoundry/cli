@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleNoRouteOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -29,7 +29,7 @@ var _ = Describe("HandleNoRouteOverride", func() {
 
 	When("manifest app does not specify no-route", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 			}
 		})
@@ -38,7 +38,7 @@ var _ = Describe("HandleNoRouteOverride", func() {
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{},
+					manifestparser.Application{},
 				))
 			})
 		})
@@ -51,7 +51,7 @@ var _ = Describe("HandleNoRouteOverride", func() {
 			It("changes the no-route of the only app in the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
+					manifestparser.Application{
 						NoRoute: true,
 					},
 				))
@@ -63,7 +63,7 @@ var _ = Describe("HandleNoRouteOverride", func() {
 		BeforeEach(func() {
 			overrides.NoRoute = true
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 				{},
 			}

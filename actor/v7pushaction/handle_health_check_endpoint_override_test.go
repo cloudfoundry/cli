@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -29,9 +29,9 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 
 	When("manifest web process does not specify health check type", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "web"},
 					},
 				},
@@ -42,8 +42,8 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{Type: "web"},
 						},
 					},
@@ -59,8 +59,8 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 			It("changes the health check type of the web process in the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{Type: "web", HealthCheckEndpoint: "/health"},
 						},
 					},
@@ -73,9 +73,9 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		BeforeEach(func() {
 			overrides.HealthCheckEndpoint = "/health"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker", HealthCheckEndpoint: "/health2"},
 					},
 				},
@@ -85,9 +85,9 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		It("changes the health check type in the app level only", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					HealthCheckEndpoint: "/health",
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker", HealthCheckEndpoint: "/health2"},
 					},
 				},
@@ -99,9 +99,9 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		BeforeEach(func() {
 			overrides.HealthCheckEndpoint = "/health"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker", HealthCheckEndpoint: "/health2"},
 						{Type: "web", HealthCheckEndpoint: "/health3"},
 					},
@@ -113,9 +113,9 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		It("changes the health check type of the web process in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					HealthCheckEndpoint: "/health2",
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker", HealthCheckEndpoint: "/health2"},
 						{Type: "web", HealthCheckEndpoint: "/health"},
 					},
@@ -128,7 +128,7 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		BeforeEach(func() {
 			overrides.HealthCheckEndpoint = "/health"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 				{},
 			}
@@ -143,7 +143,7 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		BeforeEach(func() {
 			overrides.HealthCheckEndpoint = "/health"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
 					HealthCheckType: "port",
 				},
@@ -163,9 +163,9 @@ var _ = Describe("HandleHealthCheckEndpointOverride", func() {
 		BeforeEach(func() {
 			overrides.HealthCheckEndpoint = "/health"
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "web", HealthCheckType: "port"},
 					},
 				},

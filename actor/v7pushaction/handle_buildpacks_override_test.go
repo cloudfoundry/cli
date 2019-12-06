@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleBuildpacksOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -32,7 +32,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			BeforeEach(func() {
 				overrides.Buildpacks = []string{"buildpack-1", "buildpack-2"}
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"buildpack-3"}},
 					},
@@ -42,7 +42,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			It("will override the buildpacks in the manifest with the provided flag value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
+					manifestparser.Application{
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"buildpack-1", "buildpack-2"}},
 					},
 				))
@@ -53,7 +53,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			BeforeEach(func() {
 				overrides.Buildpacks = []string{"default"}
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"buildpack-3"}},
 					},
@@ -63,7 +63,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			It("sets the buildpacks list in the manifest to be an empty array", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
+					manifestparser.Application{
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{}},
 					},
 				))
@@ -74,7 +74,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			BeforeEach(func() {
 				overrides.Buildpacks = []string{"null"}
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{"buildpack-3"}},
 					},
@@ -84,7 +84,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			It("sets the buildpacks list in the manifest to be an empty array", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
+					manifestparser.Application{
 						RemainingManifestFields: map[string]interface{}{"buildpacks": []string{}},
 					},
 				))
@@ -95,7 +95,7 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			BeforeEach(func() {
 				overrides.Buildpacks = []string{"buildpack-1", "buildpack-2"}
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{},
 					{},
 				}
@@ -110,10 +110,10 @@ var _ = Describe("HandleBuildpacksOverride", func() {
 			BeforeEach(func() {
 				overrides.Buildpacks = []string{"buildpack-1", "buildpack-2"}
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
 						Name: "some-app",
-						Docker: &pushmanifestparser.Docker{
+						Docker: &manifestparser.Docker{
 							Image: "nginx:latest",
 						},
 					},

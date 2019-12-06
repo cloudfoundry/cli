@@ -4,17 +4,17 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("HandleStrategyOverride", func() {
 	var (
-		transformedManifest pushmanifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		executeErr          error
 
-		parsedManifest pushmanifestparser.Manifest
+		parsedManifest manifestparser.Manifest
 		flagOverrides  FlagOverrides
 	)
 
@@ -32,8 +32,8 @@ var _ = Describe("HandleStrategyOverride", func() {
 
 		When("there are multiple apps in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 						{},
 					},
@@ -47,8 +47,8 @@ var _ = Describe("HandleStrategyOverride", func() {
 
 		When("there is a single app in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 					},
 				}
@@ -57,7 +57,7 @@ var _ = Describe("HandleStrategyOverride", func() {
 			It("returns the unchanged manifest", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{},
+					manifestparser.Application{},
 				))
 			})
 		})
@@ -70,8 +70,8 @@ var _ = Describe("HandleStrategyOverride", func() {
 
 		When("there are multiple apps in the manifest", func() {
 			BeforeEach(func() {
-				parsedManifest = pushmanifestparser.Manifest{
-					Applications: []pushmanifestparser.Application{
+				parsedManifest = manifestparser.Manifest{
+					Applications: []manifestparser.Application{
 						{},
 						{},
 					},
