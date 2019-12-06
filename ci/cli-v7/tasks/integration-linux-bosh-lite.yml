@@ -46,8 +46,6 @@ run:
 
     export SKIP_SSL_VALIDATION=false
 
-    set -x
-
     domain="$(cat bosh-lite-env-info/name).lite.cli.fun"
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
@@ -61,6 +59,13 @@ run:
       mkdir -p $GOPATH/bin
       mv cf7-cli_linux_x86-64 $GOPATH/bin/cf
     popd
+
+    cf api "$CF_INT_API"
+    cf auth "$CF_INT_CLIENT_ID" "$CF_INT_CLIENT_SECRET" --client-credentials
+    cf orgs
+    cf logout
+
+    set -x
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
 
