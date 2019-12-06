@@ -214,8 +214,8 @@ func (Generator) RandomNoun() string {
 
 func (Generator) RandomTwoLetters() string {
 	var asciiLetterA = 97
-	letterOne := string(rand.Intn(26) + asciiLetterA)
-	letterTwo := string(rand.Intn(26) + asciiLetterA)
+	letterOne := string(rune(rand.Intn(26) + asciiLetterA))
+	letterTwo := string(rune(rand.Intn(26) + asciiLetterA))
 	return letterOne + letterTwo
 }
 

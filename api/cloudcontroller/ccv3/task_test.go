@@ -443,4 +443,89 @@ var _ = Describe("Task", func() {
 			})
 		})
 	})
+
+	Describe("GetTask", func() {
+		When("the task exists", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "the-task-guid",
+					"sequence_id": 1,
+					"name": "task-1",
+					"command": "some-command",
+					"state": "SUCCEEDED",
+					"created_at": "2016-11-07T05:59:01Z"
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/tasks/the-task-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+					),
+				)
+			})
+
+			It("returns the task and all warnings", func() {
+				task, warnings, err := client.GetTask("the-task-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				expectedTask := resources.Task{
+					GUID:       "the-task-guid",
+					SequenceID: 1,
+					Name:       "task-1",
+					State:      constant.TaskSucceeded,
+					CreatedAt:  "2016-11-07T05:59:01Z",
+					Command:    "some-command",
+				}
+
+				Expect(task).To(Equal(expectedTask))
+				Expect(warnings).To(ConsistOf("warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Task not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/tasks/the-task-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+					),
+				)
+			})
+
+			It("returns the errors and all warnings", func() {
+				_, warnings, err := client.GetTask("the-task-guid")
+
+				Expect(err).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Task not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning"))
+			})
+		})
+	})
 })

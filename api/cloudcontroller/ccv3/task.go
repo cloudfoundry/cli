@@ -53,3 +53,17 @@ func (client *Client) UpdateTaskCancel(taskGUID string) (resources.Task, Warning
 
 	return responseBody, warnings, err
 }
+
+func (client *Client) GetTask(guid string) (resources.Task, Warnings, error) {
+	var responseBody resources.Task
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.GetTaskRequest,
+		URIParams: internal.Params{
+			"task_guid": guid,
+		},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
+}

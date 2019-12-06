@@ -2,13 +2,16 @@ package v7action
 
 import (
 	"strconv"
+	"time"
 
 	"sort"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
+	log "github.com/sirupsen/logrus"
 )
 
 // Run resources.Task runs the provided command in the application environment associated
@@ -66,4 +69,33 @@ func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID str
 func (actor Actor) TerminateTask(taskGUID string) (resources.Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.UpdateTaskCancel(taskGUID)
 	return resources.Task(task), Warnings(warnings), err
+}
+
+func (actor Actor) PollTask(task resources.Task) (resources.Task, Warnings, error) {
+	var allWarnings Warnings
+
+	for task.State != constant.TaskSucceeded && task.State != constant.TaskFailed {
+
+		time.Sleep(actor.Config.PollingInterval())
+
+		ccTask, warnings, err := actor.CloudControllerClient.GetTask(task.GUID)
+		log.WithFields(log.Fields{
+			"task_guid": task.GUID,
+			"state":     task.State,
+		}).Debug("polling task state")
+
+		allWarnings = append(allWarnings, warnings...)
+
+		if err != nil {
+			return resources.Task{}, allWarnings, err
+		}
+
+		task = resources.Task(ccTask)
+	}
+
+	if task.State == constant.TaskFailed {
+		return task, allWarnings, actionerror.TaskFailedError{}
+	}
+
+	return task, allWarnings, nil
 }

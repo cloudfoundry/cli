@@ -92,6 +92,7 @@ const (
 	GetSpaceStagingSecurityGroupsRequest                        = "GetSpaceStagingSecurityGroups"
 	GetSSHEnabled                                               = "GetSSHEnabled"
 	GetStacksRequest                                            = "GetStacks"
+	GetTaskRequest                                              = "GetTask"
 	GetUserRequest                                              = "GetUser"
 	GetUsersRequest                                             = "GetUsers"
 	MapRouteRequest                                             = "MapRoute"
@@ -303,6 +304,7 @@ var APIRoutes = []Route{
 	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: StacksResource, Path: "/:stack_guid", Method: http.MethodPatch, Name: PatchStackRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
+	{Resource: TasksResource, Path: "/:task_guid", Method: http.MethodGet, Name: GetTaskRequest},
 	{Resource: UsersResource, Path: "/", Method: http.MethodGet, Name: GetUsersRequest},
 	{Resource: UsersResource, Path: "/:user_guid", Method: http.MethodGet, Name: GetUserRequest},
 	{Resource: UsersResource, Path: "/", Method: http.MethodPost, Name: PostUserRequest},
