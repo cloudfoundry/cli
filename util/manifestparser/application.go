@@ -1,4 +1,4 @@
-package pushmanifestparser
+package manifestparser
 
 import (
 	"reflect"

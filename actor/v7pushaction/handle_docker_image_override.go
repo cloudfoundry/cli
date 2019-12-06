@@ -2,10 +2,10 @@ package v7pushaction
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func HandleDockerImageOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
+func HandleDockerImageOverride(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
 	if overrides.DockerImage != "" {
 		if manifest.ContainsMultipleApps() {
 			return manifest, translatableerror.CommandLineArgsWithMultipleAppsError{}
@@ -28,7 +28,7 @@ func HandleDockerImageOverride(manifest pushmanifestparser.Manifest, overrides F
 		}
 
 		if app.Docker == nil {
-			emptyDockerInfo := pushmanifestparser.Docker{}
+			emptyDockerInfo := manifestparser.Docker{}
 			app.Docker = &emptyDockerInfo
 		}
 

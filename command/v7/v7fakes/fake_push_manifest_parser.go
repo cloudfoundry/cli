@@ -5,12 +5,12 @@ import (
 	"sync"
 
 	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 type FakePushManifestParser struct {
-	InterpolateAndParseStub        func(string, []string, []template.VarKV) (pushmanifestparser.Manifest, error)
+	InterpolateAndParseStub        func(string, []string, []template.VarKV) (manifestparser.Manifest, error)
 	interpolateAndParseMutex       sync.RWMutex
 	interpolateAndParseArgsForCall []struct {
 		arg1 string
@@ -18,17 +18,17 @@ type FakePushManifestParser struct {
 		arg3 []template.VarKV
 	}
 	interpolateAndParseReturns struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}
 	interpolateAndParseReturnsOnCall map[int]struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}
-	MarshalManifestStub        func(pushmanifestparser.Manifest) ([]byte, error)
+	MarshalManifestStub        func(manifestparser.Manifest) ([]byte, error)
 	marshalManifestMutex       sync.RWMutex
 	marshalManifestArgsForCall []struct {
-		arg1 pushmanifestparser.Manifest
+		arg1 manifestparser.Manifest
 	}
 	marshalManifestReturns struct {
 		result1 []byte
@@ -42,7 +42,7 @@ type FakePushManifestParser struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePushManifestParser) InterpolateAndParse(arg1 string, arg2 []string, arg3 []template.VarKV) (pushmanifestparser.Manifest, error) {
+func (fake *FakePushManifestParser) InterpolateAndParse(arg1 string, arg2 []string, arg3 []template.VarKV) (manifestparser.Manifest, error) {
 	var arg2Copy []string
 	if arg2 != nil {
 		arg2Copy = make([]string, len(arg2))
@@ -78,7 +78,7 @@ func (fake *FakePushManifestParser) InterpolateAndParseCallCount() int {
 	return len(fake.interpolateAndParseArgsForCall)
 }
 
-func (fake *FakePushManifestParser) InterpolateAndParseCalls(stub func(string, []string, []template.VarKV) (pushmanifestparser.Manifest, error)) {
+func (fake *FakePushManifestParser) InterpolateAndParseCalls(stub func(string, []string, []template.VarKV) (manifestparser.Manifest, error)) {
 	fake.interpolateAndParseMutex.Lock()
 	defer fake.interpolateAndParseMutex.Unlock()
 	fake.InterpolateAndParseStub = stub
@@ -91,37 +91,37 @@ func (fake *FakePushManifestParser) InterpolateAndParseArgsForCall(i int) (strin
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakePushManifestParser) InterpolateAndParseReturns(result1 pushmanifestparser.Manifest, result2 error) {
+func (fake *FakePushManifestParser) InterpolateAndParseReturns(result1 manifestparser.Manifest, result2 error) {
 	fake.interpolateAndParseMutex.Lock()
 	defer fake.interpolateAndParseMutex.Unlock()
 	fake.InterpolateAndParseStub = nil
 	fake.interpolateAndParseReturns = struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakePushManifestParser) InterpolateAndParseReturnsOnCall(i int, result1 pushmanifestparser.Manifest, result2 error) {
+func (fake *FakePushManifestParser) InterpolateAndParseReturnsOnCall(i int, result1 manifestparser.Manifest, result2 error) {
 	fake.interpolateAndParseMutex.Lock()
 	defer fake.interpolateAndParseMutex.Unlock()
 	fake.InterpolateAndParseStub = nil
 	if fake.interpolateAndParseReturnsOnCall == nil {
 		fake.interpolateAndParseReturnsOnCall = make(map[int]struct {
-			result1 pushmanifestparser.Manifest
+			result1 manifestparser.Manifest
 			result2 error
 		})
 	}
 	fake.interpolateAndParseReturnsOnCall[i] = struct {
-		result1 pushmanifestparser.Manifest
+		result1 manifestparser.Manifest
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakePushManifestParser) MarshalManifest(arg1 pushmanifestparser.Manifest) ([]byte, error) {
+func (fake *FakePushManifestParser) MarshalManifest(arg1 manifestparser.Manifest) ([]byte, error) {
 	fake.marshalManifestMutex.Lock()
 	ret, specificReturn := fake.marshalManifestReturnsOnCall[len(fake.marshalManifestArgsForCall)]
 	fake.marshalManifestArgsForCall = append(fake.marshalManifestArgsForCall, struct {
-		arg1 pushmanifestparser.Manifest
+		arg1 manifestparser.Manifest
 	}{arg1})
 	fake.recordInvocation("MarshalManifest", []interface{}{arg1})
 	fake.marshalManifestMutex.Unlock()
@@ -141,13 +141,13 @@ func (fake *FakePushManifestParser) MarshalManifestCallCount() int {
 	return len(fake.marshalManifestArgsForCall)
 }
 
-func (fake *FakePushManifestParser) MarshalManifestCalls(stub func(pushmanifestparser.Manifest) ([]byte, error)) {
+func (fake *FakePushManifestParser) MarshalManifestCalls(stub func(manifestparser.Manifest) ([]byte, error)) {
 	fake.marshalManifestMutex.Lock()
 	defer fake.marshalManifestMutex.Unlock()
 	fake.MarshalManifestStub = stub
 }
 
-func (fake *FakePushManifestParser) MarshalManifestArgsForCall(i int) pushmanifestparser.Manifest {
+func (fake *FakePushManifestParser) MarshalManifestArgsForCall(i int) manifestparser.Manifest {
 	fake.marshalManifestMutex.RLock()
 	defer fake.marshalManifestMutex.RUnlock()
 	argsForCall := fake.marshalManifestArgsForCall[i]

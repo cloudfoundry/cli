@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,15 +12,15 @@ import (
 
 var _ = Describe("HandleTaskOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{
-			Applications: []pushmanifestparser.Application{{}},
+		originalManifest = manifestparser.Manifest{
+			Applications: []manifestparser.Application{{}},
 		}
 		overrides = FlagOverrides{}
 	})
@@ -37,7 +37,7 @@ var _ = Describe("HandleTaskOverride", func() {
 		It("changes the no-route of the only app in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					NoRoute: true,
 				},
 			))
@@ -48,7 +48,7 @@ var _ = Describe("HandleTaskOverride", func() {
 		BeforeEach(func() {
 			overrides.Task = true
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 				{},
 			}

@@ -1,4 +1,4 @@
-package pushmanifestparser
+package manifestparser
 
 type Manifest struct {
 	Applications   []Application `yaml:"applications"`

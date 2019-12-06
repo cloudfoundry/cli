@@ -3,16 +3,16 @@ package v7pushaction
 import (
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func HandleAppNameOverride(manifest pushmanifestparser.Manifest, overrides FlagOverrides) (pushmanifestparser.Manifest, error) {
+func HandleAppNameOverride(manifest manifestparser.Manifest, overrides FlagOverrides) (manifestparser.Manifest, error) {
 	if manifest.ContainsMultipleApps() && manifest.HasAppWithNoName() {
 		return manifest, errors.New("Found an application with no name specified.")
 	}
 
 	if overrides.AppName != "" {
-		newApps := make([]pushmanifestparser.Application, 1)
+		newApps := make([]manifestparser.Application, 1)
 
 		foundApp := false
 		for _, app := range manifest.Applications {
@@ -29,7 +29,7 @@ func HandleAppNameOverride(manifest pushmanifestparser.Manifest, overrides FlagO
 				return manifest, nil
 			}
 
-			return manifest, pushmanifestparser.AppNotInManifestError{Name: overrides.AppName}
+			return manifest, manifestparser.AppNotInManifestError{Name: overrides.AppName}
 		}
 
 		manifest.Applications = newApps

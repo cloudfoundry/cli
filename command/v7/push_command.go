@@ -19,7 +19,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/progressbar"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
@@ -36,8 +36,8 @@ type ProgressBar interface {
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
-	HandleFlagOverrides(baseManifest pushmanifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error)
-	CreatePushPlans(spaceGUID string, orgGUID string, manifest pushmanifestparser.Manifest, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
+	HandleFlagOverrides(baseManifest manifestparser.Manifest, flagOverrides v7pushaction.FlagOverrides) (manifestparser.Manifest, error)
+	CreatePushPlans(spaceGUID string, orgGUID string, manifest manifestparser.Manifest, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
 }
@@ -54,8 +54,8 @@ type V7ActorForPush interface {
 //go:generate counterfeiter . PushManifestParser
 
 type PushManifestParser interface {
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (pushmanifestparser.Manifest, error)
-	MarshalManifest(manifest pushmanifestparser.Manifest) ([]byte, error)
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (manifestparser.Manifest, error)
+	MarshalManifest(manifest manifestparser.Manifest) ([]byte, error)
 }
 
 //go:generate counterfeiter . ManifestLocator
@@ -130,8 +130,8 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
 
-	cmd.ManifestLocator = pushmanifestparser.NewLocator()
-	cmd.ManifestParser = pushmanifestparser.ManifestParser{}
+	cmd.ManifestLocator = manifestparser.NewLocator()
+	cmd.ManifestParser = manifestparser.ManifestParser{}
 
 	return err
 }
@@ -238,9 +238,9 @@ func (cmd PushCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides) (pushmanifestparser.Manifest, error) {
-	defaultManifest := pushmanifestparser.Manifest{
-		Applications: []pushmanifestparser.Application{
+func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides) (manifestparser.Manifest, error) {
+	defaultManifest := manifestparser.Manifest{
+		Applications: []manifestparser.Application{
 			{Name: flagOverrides.AppName},
 		},
 	}
@@ -261,7 +261,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 
 	pathToManifest, exists, err := cmd.ManifestLocator.Path(readPath)
 	if err != nil {
-		return pushmanifestparser.Manifest{}, err
+		return manifestparser.Manifest{}, err
 	}
 
 	if !exists {
@@ -273,7 +273,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, flagOverrides.Vars)
 	if err != nil {
 		log.Errorln("reading manifest:", err)
-		return pushmanifestparser.Manifest{}, err
+		return manifestparser.Manifest{}, err
 	}
 
 	return manifest, nil

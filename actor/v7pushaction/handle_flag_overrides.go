@@ -1,20 +1,20 @@
 package v7pushaction
 
 import (
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
 func (actor Actor) HandleFlagOverrides(
-	baseManifest pushmanifestparser.Manifest,
+	baseManifest manifestparser.Manifest,
 	flagOverrides FlagOverrides,
-) (pushmanifestparser.Manifest, error) {
+) (manifestparser.Manifest, error) {
 	newManifest := baseManifest
 
 	for _, transformPlan := range actor.TransformManifestSequence {
 		var err error
 		newManifest, err = transformPlan(newManifest, flagOverrides)
 		if err != nil {
-			return pushmanifestparser.Manifest{}, err
+			return manifestparser.Manifest{}, err
 		}
 	}
 

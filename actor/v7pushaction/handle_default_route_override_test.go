@@ -1,7 +1,7 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -11,14 +11,14 @@ import (
 
 var _ = Describe("HandleDefualtRouteOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -28,14 +28,14 @@ var _ = Describe("HandleDefualtRouteOverride", func() {
 
 	When("the manifest has the no-route field", func() {
 		BeforeEach(func() {
-			originalManifest = pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{{NoRoute: true}},
+			originalManifest = manifestparser.Manifest{
+				Applications: []manifestparser.Application{{NoRoute: true}},
 			}
 		})
 		It("does not add default route", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(transformedManifest).To(Equal(pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{{NoRoute: true}},
+			Expect(transformedManifest).To(Equal(manifestparser.Manifest{
+				Applications: []manifestparser.Application{{NoRoute: true}},
 			}))
 		})
 
@@ -43,14 +43,14 @@ var _ = Describe("HandleDefualtRouteOverride", func() {
 
 	When("the manifest has the random-route field", func() {
 		BeforeEach(func() {
-			originalManifest = pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{{RandomRoute: true}},
+			originalManifest = manifestparser.Manifest{
+				Applications: []manifestparser.Application{{RandomRoute: true}},
 			}
 		})
 		It("does not add default route", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(transformedManifest).To(Equal(pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{{RandomRoute: true}},
+			Expect(transformedManifest).To(Equal(manifestparser.Manifest{
+				Applications: []manifestparser.Application{{RandomRoute: true}},
 			}))
 
 		})
@@ -62,14 +62,14 @@ var _ = Describe("HandleDefualtRouteOverride", func() {
 
 	When("the manifest has no routing fields", func() {
 		BeforeEach(func() {
-			originalManifest = pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{{}},
+			originalManifest = manifestparser.Manifest{
+				Applications: []manifestparser.Application{{}},
 			}
 		})
 		It("does add default route", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(transformedManifest).To(Equal(pushmanifestparser.Manifest{
-				Applications: []pushmanifestparser.Application{{DefaultRoute: true}},
+			Expect(transformedManifest).To(Equal(manifestparser.Manifest{
+				Applications: []manifestparser.Application{{DefaultRoute: true}},
 			}))
 
 		})

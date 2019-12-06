@@ -1,4 +1,4 @@
-package pushmanifestparser_test
+package manifestparser_test
 
 import (
 	"io/ioutil"
@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/util/pushmanifestparser"
+	. "code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

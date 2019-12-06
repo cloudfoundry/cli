@@ -2,7 +2,7 @@ package v7pushaction_test
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("HandleDockerUsernameOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -32,7 +32,7 @@ var _ = Describe("HandleDockerUsernameOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerUsername = "some-docker-username"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{},
 				}
 			})
@@ -40,8 +40,8 @@ var _ = Describe("HandleDockerUsernameOverride", func() {
 			It("will populate the docker username in the manifest with the provided flag value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Docker: &pushmanifestparser.Docker{
+					manifestparser.Application{
+						Docker: &manifestparser.Docker{
 							Username: "some-docker-username",
 						},
 					},
@@ -53,9 +53,9 @@ var _ = Describe("HandleDockerUsernameOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerUsername = "some-docker-username"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{
-						Docker: &pushmanifestparser.Docker{Username: "old-docker-username"},
+						Docker: &manifestparser.Docker{Username: "old-docker-username"},
 					},
 				}
 			})
@@ -63,8 +63,8 @@ var _ = Describe("HandleDockerUsernameOverride", func() {
 			It("will override the docker username in the manifest with the provided flag value", func() {
 				Expect(executeErr).To(Not(HaveOccurred()))
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Docker: &pushmanifestparser.Docker{
+					manifestparser.Application{
+						Docker: &manifestparser.Docker{
 							Username: "some-docker-username",
 						},
 					},
@@ -76,7 +76,7 @@ var _ = Describe("HandleDockerUsernameOverride", func() {
 			BeforeEach(func() {
 				overrides.DockerUsername = "some-docker-username"
 
-				originalManifest.Applications = []pushmanifestparser.Application{
+				originalManifest.Applications = []manifestparser.Application{
 					{},
 					{},
 				}

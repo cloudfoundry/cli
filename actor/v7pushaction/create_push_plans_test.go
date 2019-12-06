@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -17,7 +17,7 @@ var _ = Describe("CreatePushPlans", func() {
 		pushActor   *Actor
 		fakeV7Actor *v7pushactionfakes.FakeV7Actor
 
-		manifest      pushmanifestparser.Manifest
+		manifest      manifestparser.Manifest
 		spaceGUID     string
 		orgGUID       string
 		flagOverrides FlagOverrides
@@ -38,10 +38,10 @@ var _ = Describe("CreatePushPlans", func() {
 		pushActor, fakeV7Actor, _ = getTestPushActor()
 		pushActor.PreparePushPlanSequence = []UpdatePushPlanFunc{testUpdatePlan, testUpdatePlan}
 
-		manifest = pushmanifestparser.Manifest{
-			Applications: []pushmanifestparser.Application{
+		manifest = manifestparser.Manifest{
+			Applications: []manifestparser.Application{
 				{Name: "name-1", Path: "path1"},
-				{Name: "name-2", Path: "path2", Docker: &pushmanifestparser.Docker{Image: "image", Username: "uname"}},
+				{Name: "name-2", Path: "path2", Docker: &manifestparser.Docker{Image: "image", Username: "uname"}},
 			},
 		}
 		orgGUID = "org"

@@ -3,7 +3,7 @@ package v7pushaction_test
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -13,14 +13,14 @@ import (
 
 var _ = Describe("HandleInstancesOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -30,9 +30,9 @@ var _ = Describe("HandleInstancesOverride", func() {
 
 	When("manifest web process does not specify instances", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "web"},
 					},
 				},
@@ -54,8 +54,8 @@ var _ = Describe("HandleInstancesOverride", func() {
 			It("changes the instances of the web process in the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{Type: "web", Instances: &overrides.Instances.Value},
 						},
 					},
@@ -68,9 +68,9 @@ var _ = Describe("HandleInstancesOverride", func() {
 		BeforeEach(func() {
 			overrides.Instances = types.NullInt{IsSet: true, Value: 4}
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 					},
 				},
@@ -80,9 +80,9 @@ var _ = Describe("HandleInstancesOverride", func() {
 		It("changes the instances of the app in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					Instances: &overrides.Instances.Value,
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 					},
 				},
@@ -96,9 +96,9 @@ var _ = Describe("HandleInstancesOverride", func() {
 		BeforeEach(func() {
 			overrides.Instances = types.NullInt{IsSet: true, Value: 4}
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 						{Type: "web"},
 					},
@@ -110,8 +110,8 @@ var _ = Describe("HandleInstancesOverride", func() {
 		It("changes the instances of the web process in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
-					Processes: []pushmanifestparser.Process{
+				manifestparser.Application{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 						{Type: "web", Instances: &overrides.Instances.Value},
 					},
@@ -125,7 +125,7 @@ var _ = Describe("HandleInstancesOverride", func() {
 		BeforeEach(func() {
 			overrides.Instances = types.NullInt{IsSet: true, Value: 4}
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 				{},
 			}

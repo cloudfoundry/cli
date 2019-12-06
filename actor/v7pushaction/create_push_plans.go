@@ -2,7 +2,7 @@ package v7pushaction
 
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
 // CreatePushPlans returns a set of PushPlan objects based off the inputs
@@ -11,7 +11,7 @@ import (
 func (actor Actor) CreatePushPlans(
 	spaceGUID string,
 	orgGUID string,
-	manifest pushmanifestparser.Manifest,
+	manifest manifestparser.Manifest,
 	overrides FlagOverrides,
 ) ([]PushPlan, v7action.Warnings, error) {
 	var pushPlans []PushPlan

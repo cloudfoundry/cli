@@ -3,7 +3,7 @@ package v7pushaction_test
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/pushmanifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 
@@ -13,14 +13,14 @@ import (
 
 var _ = Describe("HandleStartCommandOverride", func() {
 	var (
-		originalManifest    pushmanifestparser.Manifest
-		transformedManifest pushmanifestparser.Manifest
+		originalManifest    manifestparser.Manifest
+		transformedManifest manifestparser.Manifest
 		overrides           FlagOverrides
 		executeErr          error
 	)
 
 	BeforeEach(func() {
-		originalManifest = pushmanifestparser.Manifest{}
+		originalManifest = manifestparser.Manifest{}
 		overrides = FlagOverrides{}
 	})
 
@@ -30,9 +30,9 @@ var _ = Describe("HandleStartCommandOverride", func() {
 
 	When("manifest web process does not specify start command", func() {
 		BeforeEach(func() {
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "web"},
 					},
 				},
@@ -43,8 +43,8 @@ var _ = Describe("HandleStartCommandOverride", func() {
 			It("does not change the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{Type: "web"},
 						},
 					},
@@ -60,8 +60,8 @@ var _ = Describe("HandleStartCommandOverride", func() {
 			It("changes the start command of the web process in the manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(transformedManifest.Applications).To(ConsistOf(
-					pushmanifestparser.Application{
-						Processes: []pushmanifestparser.Process{
+					manifestparser.Application{
+						Processes: []manifestparser.Process{
 							{Type: "web", RemainingManifestFields: map[string]interface{}{"command": "./start.sh"}},
 						},
 					},
@@ -74,9 +74,9 @@ var _ = Describe("HandleStartCommandOverride", func() {
 		BeforeEach(func() {
 			overrides.StartCommand = types.FilteredString{Value: "./start.sh", IsSet: true}
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 					},
 				},
@@ -86,9 +86,9 @@ var _ = Describe("HandleStartCommandOverride", func() {
 		It("changes the start command in the app level only", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
+				manifestparser.Application{
 					RemainingManifestFields: map[string]interface{}{"command": "./start.sh"},
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 					},
 				},
@@ -100,9 +100,9 @@ var _ = Describe("HandleStartCommandOverride", func() {
 		BeforeEach(func() {
 			overrides.StartCommand = types.FilteredString{Value: "./start.sh", IsSet: true}
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{
-					Processes: []pushmanifestparser.Process{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 						{Type: "web"},
 					},
@@ -113,8 +113,8 @@ var _ = Describe("HandleStartCommandOverride", func() {
 		It("changes the start command of the web process in the manifest", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(transformedManifest.Applications).To(ConsistOf(
-				pushmanifestparser.Application{
-					Processes: []pushmanifestparser.Process{
+				manifestparser.Application{
+					Processes: []manifestparser.Process{
 						{Type: "worker"},
 						{Type: "web", RemainingManifestFields: map[string]interface{}{"command": "./start.sh"}},
 					},
@@ -127,7 +127,7 @@ var _ = Describe("HandleStartCommandOverride", func() {
 		BeforeEach(func() {
 			overrides.StartCommand = types.FilteredString{Value: "./start.sh", IsSet: true}
 
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 				{},
 			}
@@ -141,7 +141,7 @@ var _ = Describe("HandleStartCommandOverride", func() {
 	When("start command set on the flag overrides but is default", func() {
 		BeforeEach(func() {
 			overrides.StartCommand = types.FilteredString{Value: "", IsSet: true}
-			originalManifest.Applications = []pushmanifestparser.Application{
+			originalManifest.Applications = []manifestparser.Application{
 				{},
 			}
 		})
