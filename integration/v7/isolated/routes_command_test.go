@@ -113,8 +113,7 @@ var _ = Describe("routes command", func() {
 				Expect(session).ToNot(Say(`%s\s+route2\s+%s\s+%s`, spaceName, domainName, appName2))
 			})
 
-			// This is blocked on CAPI error https://www.pivotaltracker.com/story/show/169884201
-			XIt("lists all the routes by label", func() {
+			It("lists all the routes by label", func() {
 				session := helpers.CF("routes", "--labels", "env in (prod)")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
