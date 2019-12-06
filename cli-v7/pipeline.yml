@@ -6,7 +6,49 @@ resource_types:
     repository: cfcommunity/slack-notification-resource
     tag: latest
 
+- name: terraform
+  type: docker-image
+  source:
+    repository: ljfranklin/terraform-resource
+    tag: latest
+
+- name: bosh-deployment
+  type: docker-image
+  source:
+    repository: cloudfoundry/bosh-deployment-resource
+
 resources:
+- name: terraform
+  type: terraform
+  source:
+    backend_type: gcs
+    backend_config:
+      bucket: ((bosh-lite-storage-bucket))
+      prefix: on_demand_terraform_state_files/
+      credentials: ((bosh-lite-gcp-json-key))
+- name: capi-ci
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/capi-ci
+
+- name: bosh-deployment
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/bosh-deployment
+
+- name: cf-deploy
+  type: bosh-deployment
+  source:
+    skip_check: true
+
+- name: cf-deployment
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment
+    tag_filter: v*
+
 - name: cli
   type: git
   icon: console
@@ -49,6 +91,12 @@ resources:
     access_key_id: ((cli-team-aws-s3-access-key-id))
     secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: "v7/cf-cli-binaries.tgz"
+
+- name: edge-capi-release
+  type: s3
+  source:
+    bucket: capi-releases
+    regexp: capi-(.*)-.*-.*.tgz
 
 - name: edge-linux-binary-32
   type: s3
@@ -311,6 +359,127 @@ jobs:
     params:
       release: bosh-lock
 
+- name: integration-linux-bosh-lite
+  plan:
+  - in_parallel:
+    - get: bosh-deployment
+    - get: capi-ci
+    - get: cf-deployment
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: edge-capi-release
+    - get: vars-store
+  - do:
+    - put: terraform
+      params:
+        generate_random_name: true
+        delete_on_failure: true
+        terraform_source: capi-ci/terraform/bosh-lite/
+        vars:
+          project_id: ((bosh-lite-project-id))
+          json_key: ((bosh-lite-gcp-json-key))
+          dns_project_id: ((bosh-lite-project-id))
+          dns_json_key: ((bosh-lite-gcp-json-key))
+          system_domain_suffix: ((bosh-lite-system-domain-suffix))
+          dns_zone_name: ((bosh-lite-dns-zone-name))
+    - do:
+        - task: create-bosh-lite
+          file: capi-ci/ci/bosh-lite/create-bosh-lite.yml
+          params:
+            GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+            GCP_INSTANCE_TYPE: n1-highmem-16
+        - do:
+            - task: create-env-vars-file
+              file: capi-ci/ci/bosh-lite/create-env-vars-file.yml
+            - task: upload-cf-assets
+              file: capi-ci/ci/bosh-lite/upload-cf-assets.yml
+            - task: write-bosh-target-file
+              file: capi-ci/ci/bosh-lite/write-bosh-target-file.yml
+            - put: cf-deploy
+              params:
+                source_file: bosh-target/target.yml
+                manifest: cf-deployment/cf-deployment.yml
+                vars_files:
+                - bosh-target/vars.yml
+                var_files:
+                  edge_capi_url: edge-capi-release/url
+                vars:
+                  client-secret: ((client-secret))
+                ops_files:
+                - capi-ci/cf-deployment-operations/skip-cert-verify.yml
+                - capi-ci/cf-deployment-operations/use-latest-stemcell.yml
+                - cf-deployment/operations/bosh-lite.yml
+                - cf-deployment/operations/use-compiled-releases.yml
+                - cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml
+                - cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell-bosh-lite.yml
+                - cf-deployment/operations/use-internal-lookup-for-route-services.yml
+                - capi-ci/cf-deployment-operations/seed-credhub-asg.yml
+                - cli/ci/infrastructure/operations/default-app-memory.yml
+                - cli/ci/infrastructure/operations/add-oidc-provider.yml
+                - cli/ci/infrastructure/operations/add-uaa-client-cf-custom.yml
+                - cli/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml
+                - cli-ci/ci/infrastructure/operations/use-edge-capi.yml
+                - cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml
+            - task: upload-to-gcs
+              file: capi-ci/ci/gcs/upload-to-gcs.yml
+              input_mapping:
+                environment: terraform
+                source-directory: director-state
+              params:
+                GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+                GCP_BUCKET: ((bosh-lite-storage-bucket))
+                GCP_PATH: director-state
+                USE_ENV_NAMED_SUBDIR: true
+          on_failure:
+            task: delete-bosh-lite
+            file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+      on_failure:
+        put: terraform
+        params:
+          action: destroy
+          env_name_file: terraform/name
+          terraform_source: capi-ci/terraform/bosh-lite/
+          vars:
+            project_id: ((bosh-lite-project-id))
+            json_key: ((bosh-lite-gcp-json-key))
+            dns_project_id: ((bosh-lite-project-id))
+            dns_json_key: ((bosh-lite-gcp-json-key))
+            system_domain_suffix: ((bosh-lite-system-domain-suffix))
+            dns_zone_name: ((bosh-lite-dns-zone-name))
+        get_params:
+          action: destroy
+  - do:
+    - task: integration
+      file: cli-ci/ci/cli-v7/tasks/integration-linux-bosh-lite.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: *slack_notification_text
+      params: *integration_params
+    ensure:
+      do:
+        - task: delete-bosh-lite
+          file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+        - put: terraform
+          params:
+            action: destroy
+            env_name_file: terraform/name
+            terraform_source: capi-ci/terraform/bosh-lite/
+            vars:
+              project_id: ((bosh-lite-project-id))
+              json_key: ((bosh-lite-gcp-json-key))
+              dns_project_id: ((bosh-lite-project-id))
+              dns_json_key: ((bosh-lite-gcp-json-key))
+              system_domain_suffix: ((bosh-lite-system-domain-suffix))
+              dns_zone_name: ((bosh-lite-dns-zone-name))
+          get_params:
+            action: destroy
 - name: integration-linux-client-creds
   serial: true
   plan:
