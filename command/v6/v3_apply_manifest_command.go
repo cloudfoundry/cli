@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
-	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/util/v6manifestparser"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
@@ -44,7 +44,7 @@ func (cmd *V3ApplyManifestCommand) Setup(config command.Config, ui command.UI) e
 		return err
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
-	cmd.Parser = manifestparser.NewParser()
+	cmd.Parser = v6manifestparser.NewParser()
 
 	return nil
 }
