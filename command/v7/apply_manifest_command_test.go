@@ -12,7 +12,9 @@ import (
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/ui"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,7 +49,7 @@ var _ = Describe("apply-manifest Command", func() {
 			Config:          fakeConfig,
 			SharedActor:     fakeSharedActor,
 			Actor:           fakeActor,
-			Parser:          fakeParser,
+			ManifestParser:  fakeParser,
 			ManifestLocator: fakeLocator,
 			CWD:             "fake-directory",
 		}
@@ -107,8 +109,9 @@ var _ = Describe("apply-manifest Command", func() {
 				cmd.PathToManifest = flag.ManifestPathWithExistenceCheck(providedPath)
 			})
 
-			It("does not try to locate the manifest file", func() {
-				Expect(fakeLocator.PathCallCount()).To(Equal(0))
+			It("tries locate the manifest file at the given path", func() {
+				Expect(fakeLocator.PathCallCount()).To(Equal(1))
+				Expect(fakeLocator.PathArgsForCall(0)).To(Equal(providedPath))
 			})
 		})
 
@@ -117,6 +120,7 @@ var _ = Describe("apply-manifest Command", func() {
 				BeforeEach(func() {
 					fakeLocator.PathReturns("", false, errors.New("some-error"))
 				})
+
 				It("returns the error", func() {
 					Expect(fakeLocator.PathCallCount()).To(Equal(1))
 					Expect(fakeLocator.PathArgsForCall(0)).To(Equal(cmd.CWD))
@@ -140,6 +144,8 @@ var _ = Describe("apply-manifest Command", func() {
 				var resolvedPath = "/fake/manifest.yml"
 
 				BeforeEach(func() {
+					cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{"vars.yml"}
+					cmd.Vars = []template.VarKV{{Name: "o", Value: "nice"}}
 					fakeLocator.PathReturns(resolvedPath, true, nil)
 				})
 
@@ -149,7 +155,7 @@ var _ = Describe("apply-manifest Command", func() {
 							v7action.Warnings{"some-manifest-warning"},
 							nil,
 						)
-						fakeParser.FullRawManifestReturns([]byte("manifesto"))
+						fakeParser.MarshalManifestReturns([]byte("manifesto"), nil)
 					})
 
 					It("displays the success text", func() {
@@ -159,9 +165,10 @@ var _ = Describe("apply-manifest Command", func() {
 						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
-						path, _, _, appName := fakeParser.InterpolateAndParseArgsForCall(0)
+						path, varsFiles, vars := fakeParser.InterpolateAndParseArgsForCall(0)
 						Expect(path).To(Equal(resolvedPath))
-						Expect(appName).To(Equal(""))
+						Expect(varsFiles).To(Equal([]string{"vars.yml"}))
+						Expect(vars).To(Equal([]template.VarKV{{Name: "o", Value: "nice"}}))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(1))
 						spaceGUIDArg, actualBytes := fakeActor.SetSpaceManifestArgsForCall(0)
@@ -175,7 +182,7 @@ var _ = Describe("apply-manifest Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("oooooh nooooos")
-						fakeParser.InterpolateAndParseReturns(expectedErr)
+						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, expectedErr)
 					})
 
 					It("returns back the parse error", func() {

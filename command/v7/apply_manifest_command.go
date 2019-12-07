@@ -9,34 +9,30 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/v6manifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/clock"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 //go:generate counterfeiter . ApplyManifestActor
+
 type ApplyManifestActor interface {
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
 }
 
-//go:generate counterfeiter . ManifestParser
-
-type ManifestParser interface {
-	FullRawManifest() []byte
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV, appName string) error
-}
-
 type ApplyManifestCommand struct {
-	PathToManifest  flag.ManifestPathWithExistenceCheck `short:"f" description:"Path to app manifest"`
-	usage           interface{}                         `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
-	relatedCommands interface{}                         `related_commands:"create-app, create-app-manifest, push"`
+	PathToManifest   flag.ManifestPathWithExistenceCheck `short:"f" description:"Path to app manifest"`
+	Vars             []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
+	PathsToVarsFiles []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
+	usage            interface{}                         `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
+	relatedCommands  interface{}                         `related_commands:"create-app, create-app-manifest, push"`
 
 	UI              command.UI
 	Config          command.Config
 	SharedActor     command.SharedActor
-	ManifestLocator ManifestLocator
 	Actor           ApplyManifestActor
-	Parser          ManifestParser
+	ManifestLocator ManifestLocator
+	ManifestParser  ManifestParser
 	CWD             string
 }
 
@@ -52,8 +48,8 @@ func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
-	cmd.ManifestLocator = v6manifestparser.NewLocator()
-	cmd.Parser = v6manifestparser.NewParser()
+	cmd.ManifestLocator = manifestparser.NewLocator()
+	cmd.ManifestParser = manifestparser.ManifestParser{}
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir
@@ -72,36 +68,43 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	var manifestReadPath = string(cmd.PathToManifest)
+	readPath := cmd.CWD
+	if cmd.PathToManifest != "" {
+		readPath = string(cmd.PathToManifest)
+	}
 
-	if manifestReadPath == "" {
-		locatorPath := cmd.CWD
-		resolvedPath, exists, err := cmd.ManifestLocator.Path(locatorPath)
+	pathToManifest, exists, err := cmd.ManifestLocator.Path(readPath)
+	if err != nil {
+		return err
+	}
 
-		if err != nil {
-			return err
-		}
-
-		if !exists {
-			return translatableerror.ManifestFileNotFoundInDirectoryError{PathToManifest: locatorPath}
-		}
-
-		manifestReadPath = resolvedPath
+	if !exists {
+		return translatableerror.ManifestFileNotFoundInDirectoryError{PathToManifest: readPath}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Applying manifest {{.ManifestPath}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"ManifestPath": manifestReadPath,
+		"ManifestPath": pathToManifest,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
 		"Username":     user.Name,
 	})
 
-	err = cmd.Parser.InterpolateAndParse(manifestReadPath, nil, nil, "")
+	var pathsToVarsFiles []string
+	for _, varFilePath := range cmd.PathsToVarsFiles {
+		pathsToVarsFiles = append(pathsToVarsFiles, string(varFilePath))
+	}
+
+	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
 	if err != nil {
 		return err
 	}
 
-	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, cmd.Parser.FullRawManifest())
+	rawManifest, err := cmd.ManifestParser.MarshalManifest(manifest)
+	if err != nil {
+		return err
+	}
+
+	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, rawManifest)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
 		return err

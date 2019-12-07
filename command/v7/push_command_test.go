@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/util/manifestparser"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -20,10 +18,9 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/ui"
 	"github.com/cloudfoundry/bosh-cli/director/template"
-
-	//"code.cloudfoundry.org/cli/actor/loggingaction"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -90,16 +87,16 @@ var _ = Describe("push Command", func() {
 		fakeProgressBar     *v6fakes.FakeProgressBar
 		fakeLogCacheClient  *v7actionfakes.FakeLogCacheClient
 		fakeManifestLocator *v7fakes.FakeManifestLocator
+		fakeManifestParser  *v7fakes.FakeManifestParser
 		binaryName          string
 		executeErr          error
 
-		appName1           string
-		appName2           string
-		userName           string
-		spaceName          string
-		orgName            string
-		pwd                string
-		fakeManifestParser *v7fakes.FakePushManifestParser
+		appName1  string
+		appName2  string
+		userName  string
+		spaceName string
+		orgName   string
+		pwd       string
 	)
 
 	BeforeEach(func() {
@@ -119,11 +116,10 @@ var _ = Describe("push Command", func() {
 		orgName = "some-org"
 		pwd = "/push/cmd/test"
 		fakeManifestLocator = new(v7fakes.FakeManifestLocator)
-		fakeManifestParser = new(v7fakes.FakePushManifestParser)
+		fakeManifestParser = new(v7fakes.FakeManifestParser)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = PushCommand{
 			UI:              testUI,
@@ -133,7 +129,7 @@ var _ = Describe("push Command", func() {
 			SharedActor:     fakeSharedActor,
 			ProgressBar:     fakeProgressBar,
 			LogCacheClient:  fakeLogCacheClient,
-			PWD:             pwd,
+			CWD:             pwd,
 			ManifestLocator: fakeManifestLocator,
 			ManifestParser:  fakeManifestParser,
 		}
@@ -797,7 +793,7 @@ var _ = Describe("push Command", func() {
 
 		When("no flags are specified", func() {
 			BeforeEach(func() {
-				cmd.PWD = somePath
+				cmd.CWD = somePath
 			})
 
 			When("a manifest exists in the current dir", func() {
@@ -824,7 +820,7 @@ var _ = Describe("push Command", func() {
 					)
 
 					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
-					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.PWD))
+					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.CWD))
 
 					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
