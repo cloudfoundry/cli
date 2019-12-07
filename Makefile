@@ -1,6 +1,5 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 10
-FLAKE_ATTEMPTS ?= 1
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
@@ -26,11 +25,11 @@ UNAME_S := $(shell uname -s)
 ifndef TARGET_V7
 TARGET = v6
 export GOFLAGS =
-ginkgo_int = ginkgo -r -randomizeAllSpecs -flakeAttempts $(FLAKE_ATTEMPTS) -slowSpecThreshold 60
+ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
 else
 TARGET = v7
 export GOFLAGS = -tags=V7
-ginkgo_int = ginkgo -r -randomizeAllSpecs -flakeAttempts $(FLAKE_ATTEMPTS) -slowSpecThreshold 120
+ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120
 endif
 
 all: lint test build
