@@ -38,19 +38,26 @@
     "enable-all": true,
     "disable": [
       "dupl",
+      "funlen",
       "gochecknoglobals",
+      "gocognit",
       "gocyclo",
+      "godox",
       "gofmt",
       "golint",
       "gosec",
+      "gosimple",
       "lll",
       "maligned",
       "misspell",
       "nakedret",
       "prealloc",
       "scopelint",
+      "staticcheck",
       "stylecheck",
-      "unparam"
+      "unparam",
+      "whitespace",
+      "wsl"
     ]
   },
   "linters-settings": {
