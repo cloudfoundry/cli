@@ -27,7 +27,7 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say(`--client\s+Assign a space role to a client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Say(`--origin\s+Indicates the identity provider to be used for authentication`))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("space-users"))
+				Eventually(session).Should(Say("space-users, unset-space-role"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -100,7 +100,7 @@ var _ = Describe("set-space-role command", func() {
 						})
 
 						It("prints an appropriate error and exits 1", func() {
-							session := helpers.CF("set-space-role", "cf_smoke_tests", orgName, spaceName, "SpaceAuditor", "--client")
+							session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Users cannot be assigned roles in a space if they do not have a role in that space's organization."))
 							Eventually(session).Should(Exit(1))

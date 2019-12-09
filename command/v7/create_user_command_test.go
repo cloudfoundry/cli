@@ -105,7 +105,7 @@ var _ = Describe("create-user Command", func() {
 					cmd.Origin = "some-origin"
 					fakeActor.GetUserReturns(
 						v7action.User{},
-						actionerror.UAAUserNotFoundError{})
+						actionerror.UserNotFoundError{})
 				})
 
 				It("creates the user and displays all warnings", func() {
@@ -162,7 +162,7 @@ var _ = Describe("create-user Command", func() {
 							nil)
 						fakeActor.GetUserReturns(
 							v7action.User{},
-							actionerror.UAAUserNotFoundError{})
+							actionerror.UserNotFoundError{})
 					})
 
 					It("prompts for a password", func() {
@@ -215,7 +215,7 @@ var _ = Describe("create-user Command", func() {
 						returnedErr)
 					fakeActor.GetUserReturns(
 						v7action.User{},
-						actionerror.UAAUserNotFoundError{})
+						actionerror.UserNotFoundError{})
 				})
 
 				It("returns the same error and all warnings", func() {
@@ -236,7 +236,7 @@ var _ = Describe("create-user Command", func() {
 						returnedErr)
 					fakeActor.GetUserReturns(
 						v7action.User{},
-						actionerror.UAAUserNotFoundError{})
+						actionerror.UserNotFoundError{})
 				})
 
 				It("displays the error and all warnings", func() {

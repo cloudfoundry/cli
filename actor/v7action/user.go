@@ -36,7 +36,7 @@ func (actor Actor) GetUser(username, origin string) (User, error) {
 	}
 
 	if len(uaaUsers) == 0 {
-		return User{}, actionerror.UAAUserNotFoundError{Username: username, Origin: origin}
+		return User{}, actionerror.UserNotFoundError{Username: username, Origin: origin}
 	}
 
 	if len(uaaUsers) > 1 {

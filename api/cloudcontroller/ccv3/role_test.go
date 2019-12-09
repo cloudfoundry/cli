@@ -97,7 +97,7 @@ var _ = Describe("Role", func() {
 						)
 					})
 
-					It("returns the given route and all warnings", func() {
+					It("returns the given role and all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
@@ -279,12 +279,12 @@ var _ = Describe("Role", func() {
 		"errors": [
 			{
 				"code": 10008,
-				"detail": "The request is semantically invalid: command presence",
+				"detail": "Something was not processable",
 				"title": "CF-UnprocessableEntity"
 			},
 			{
 				"code": 10010,
-				"detail": "Isolation segment not found",
+				"detail": "Something was not found",
 				"title": "CF-ResourceNotFound"
 			}
 		]
@@ -303,12 +303,12 @@ var _ = Describe("Role", func() {
 						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
+								Detail: "Something was not processable",
 								Title:  "CF-UnprocessableEntity",
 							},
 							{
 								Code:   10010,
-								Detail: "Isolation segment not found",
+								Detail: "Something was not found",
 								Title:  "CF-ResourceNotFound",
 							},
 						},
@@ -593,6 +593,91 @@ var _ = Describe("Role", func() {
 					}))
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
+			})
+		})
+	})
+
+	Describe("DeleteRoles", func() {
+		var (
+			roleGUID     string
+			jobURL       JobURL
+			jobURLString string
+			warnings     Warnings
+			executeErr   error
+		)
+
+		BeforeEach(func() {
+			roleGUID = "role-guid"
+		})
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteRole(roleGUID)
+		})
+
+		When("role exists", func() {
+			roleGUID = "role-guid"
+			jobURLString = "https://api.test.com/v3/jobs/job-guid"
+
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/roles/role-guid"),
+						RespondWith(http.StatusAccepted, nil, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {jobURLString},
+						}),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(jobURL).To(Equal(JobURL(jobURLString)))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+								  "errors": [
+										{
+										  "code": 10008,
+										  "detail": "The request is semantically invalid: command presence",
+										  "title": "CF-UnprocessableEntity"
+										},
+										{
+										  "code": 10010,
+										  "detail": "Isolation segment not found",
+										  "title": "CF-ResourceNotFound"
+										}
+									  ]
+									}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/roles/role-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 	})

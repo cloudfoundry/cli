@@ -182,7 +182,7 @@ var _ = Describe("delete-user Command", func() {
 					var returnedErr error
 
 					BeforeEach(func() {
-						returnedErr = actionerror.UAAUserNotFoundError{Username: "some-user"}
+						returnedErr = actionerror.UserNotFoundError{Username: "some-user"}
 						fakeActor.GetUserReturns(
 							v7action.User{},
 							returnedErr)

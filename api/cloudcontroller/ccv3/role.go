@@ -131,6 +131,23 @@ func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
 	return responseRole, response.Warnings, err
 }
 
+func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams: map[string]string{
+			"role_guid": roleGUID,
+		},
+		RequestName: internal.DeleteRoleRequest,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
 // GetRoles lists roles with optional filters & includes.
 func (client *Client) GetRoles(query ...Query) ([]Role, IncludedResources, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

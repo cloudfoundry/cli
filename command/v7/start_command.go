@@ -131,7 +131,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
-		if _, ok := err.(actionerror.UAAUserNotFoundError); ok {
+		if _, ok := err.(actionerror.UserNotFoundError); ok {
 			cmd.UI.DisplayTextWithFlavor(err.Error())
 			cmd.UI.DisplayOK()
 			return nil
