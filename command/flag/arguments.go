@@ -259,13 +259,13 @@ type UnsetLabelArgs struct {
 	ResourceName string   `positional-arg-name:"RESOURCE_NAME" required:"true" description:"The name of the resource"`
 	LabelKeys    []string `positional-arg-name:"KEY" required:"true" description:"A label to unset on the resource"`
 }
-type SetOrgRoleArgs struct {
+type OrgRoleArgs struct {
 	Username     string  `positional-arg-name:"USERNAME" required:"true" description:"The user"`
 	Organization string  `positional-arg-name:"ORG" required:"true" description:"The organization"`
 	Role         OrgRole `positional-arg-name:"ROLE" required:"true" description:"The organization role"`
 }
 
-type SetSpaceRoleArgs struct {
+type SpaceRoleArgs struct {
 	Username     string    `positional-arg-name:"USERNAME" required:"true" description:"The user"`
 	Organization string    `positional-arg-name:"ORG" required:"true" description:"The organization"`
 	Space        string    `positional-arg-name:"SPACE" required:"true" description:"The space"`

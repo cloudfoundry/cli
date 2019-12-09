@@ -3,6 +3,8 @@ package ccv3_test
 import (
 	"net/http"
 
+	"fmt"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -176,6 +178,179 @@ var _ = Describe("User", func() {
 					}))
 					Expect(warnings).To(ConsistOf("this is a delete warning"))
 				})
+			})
+		})
+	})
+
+	Describe("GetUsers", func() {
+		var (
+			users      []User
+			warnings   Warnings
+			executeErr error
+			query      []Query
+		)
+
+		BeforeEach(func() {
+			query = []Query{
+				{
+					Key:    UsernamesFilter,
+					Values: []string{"some-user-name"},
+				},
+				{
+					Key:    OriginsFilter,
+					Values: []string{"uaa"},
+				},
+			}
+		})
+		JustBeforeEach(func() {
+			users, warnings, executeErr = client.GetUsers(query...)
+		})
+
+		Describe("listing users", func() {
+			When("the request succeeds", func() {
+				BeforeEach(func() {
+					response1 := fmt.Sprintf(`{
+	"pagination": {
+		"next": {
+			"href": null
+		}
+	},
+  "resources": [
+    {
+      "guid": "user-guid-1",
+      "username": "some-user-name",
+      "origin": "uaa"
+    }
+  ]
+}`)
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/users", "usernames=some-user-name&origins=uaa"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+				})
+
+				It("returns the given user and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1"))
+
+					Expect(users).To(Equal([]User{{
+						GUID:     "user-guid-1",
+						Username: "some-user-name",
+						Origin:   "uaa",
+					},
+					}))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Org not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/users"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Org not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+	})
+
+	Describe("GetUser", func() {
+		var (
+			user       User
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			user, warnings, executeErr = client.GetUser("some-guid")
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-guid",
+					"username": "some-user-name",
+					"origin": "some-origin"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/users/some-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the given user and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(user).To(Equal(User{
+					GUID:     "some-guid",
+					Username: "some-user-name",
+					Origin:   "some-origin",
+				}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "User not found",
+							"title": "CF-ResourceNotFound"	
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/users/some-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.UserNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})
 	})

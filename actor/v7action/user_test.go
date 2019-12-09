@@ -169,7 +169,7 @@ var _ = Describe("User Actions", func() {
 
 				It("returns an error indicating user was not found in UAA", func() {
 					Expect(actualUser).To(Equal(User{}))
-					Expect(actualErr).To(Equal(actionerror.UAAUserNotFoundError{
+					Expect(actualErr).To(Equal(actionerror.UserNotFoundError{
 						Username: "some-user",
 						Origin:   "some-origin",
 					}))

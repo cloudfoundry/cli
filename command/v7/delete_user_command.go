@@ -79,7 +79,7 @@ func (cmd *DeleteUserCommand) Execute(args []string) error {
 	user, err := cmd.Actor.GetUser(cmd.RequiredArgs.Username, cmd.Origin)
 	if err != nil {
 		// User never existed
-		if _, ok := err.(actionerror.UAAUserNotFoundError); ok {
+		if _, ok := err.(actionerror.UserNotFoundError); ok {
 			cmd.UI.DisplayTextWithFlavor(err.Error())
 			cmd.UI.DisplayOK()
 			return nil

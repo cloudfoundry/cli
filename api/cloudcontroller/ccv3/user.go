@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -66,4 +67,47 @@ func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
+func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetUserRequest,
+		URIParams:   map[string]string{"user_guid": userGUID},
+	})
+	if err != nil {
+		return User{}, nil, err
+	}
+
+	var responseUser User
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseUser,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseUser, response.Warnings, err
+}
+
+func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetUsersRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var usersList []User
+	warnings, err := client.paginate(request, User{}, func(item interface{}) error {
+		if user, ok := item.(User); ok {
+			usersList = append(usersList, user)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   User{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return usersList, warnings, err
 }

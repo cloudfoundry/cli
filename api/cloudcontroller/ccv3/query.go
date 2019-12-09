@@ -35,14 +35,22 @@ const (
 	HostsFilter QueryKey = "hosts"
 	// HostFilter is a query param for getting an object with the given host
 	HostFilter QueryKey = "host"
+	// Origins filter is a query parameter when getting a user by origin (Note: CAPI will return an error if usernames filter is not also provided)
+	OriginsFilter QueryKey = "origins"
 	// PathsFilter is a query param for listing objects by path
 	PathsFilter QueryKey = "paths"
 	// PathFilter is a query param for getting an object with the given host
 	PathFilter QueryKey = "path"
+	// RoleTypesFilter is a query param for getting a role by type
+	RoleTypesFilter QueryKey = "types"
 	// StackFilter is a query parameter for listing objects by stack name
 	StackFilter QueryKey = "stacks"
 	// Unmapped filter is a query parameter specifying unmapped routes
 	UnmappedFilter QueryKey = "unmapped"
+	// UserGUIDFilter filter is a query parameter when getting a user by GUID
+	UserGUIDFilter QueryKey = "user_guids"
+	// Usernames filter is a query parameter when getting a user by username
+	UsernamesFilter QueryKey = "usernames"
 	// States filter is a query parameter when getting a package's droplets by state
 	StatesFilter QueryKey = "states"
 
