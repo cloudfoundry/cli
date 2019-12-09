@@ -117,11 +117,20 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	When("too many arguments are provided", func() {
+	When("extra input is given", func() {
 		It("displays an 'unknown flag' error message", func() {
 			session := helpers.CF("auth", "some-username", "some-password", "-a", "api.bosh-lite.com")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: unknown flag `a'"))
+			Eventually(session).Should(Say("NAME:"))
+
+			Eventually(session).Should(Exit(1))
+		})
+
+		It("displays an 'extra argument' error message", func() {
+			session := helpers.CF("auth", "some-username", "some-password", "garbage")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: unexpected argument \"garbage\""))
 			Eventually(session).Should(Say("NAME:"))
 
 			Eventually(session).Should(Exit(1))
