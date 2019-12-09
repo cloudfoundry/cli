@@ -92,4 +92,8 @@ lola_pipeline=$pipelines_path/infrastructure/lola-pipeline.yml
 configure_infrastructure_pipeline inf-lola lola-pipeline kloesse $lola_pipeline
 configure_infrastructure_pipeline inf-chipotle chipotle-pipeline kloesse $lola_pipeline
 
+legacy_pipeline=$pipelines_path/infrastructure/legacy-pipeline.yml
+configure_infrastructure_pipeline inf-aster aster-pipeline kloesse $legacy_pipeline
+configure_infrastructure_pipeline inf-solstice solstice-pipeline kloesse $legacy_pipeline
+
 configure_bosh_lite_pool_pipeline bosh-lites
