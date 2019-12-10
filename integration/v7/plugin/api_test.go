@@ -50,4 +50,11 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("Username", func() {
+		It("gets the current user's name", func() {
+			username := getUsername()
+			confirmTestPluginOutput("Username", username)
+		})
+	})
+
 })

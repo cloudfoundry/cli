@@ -138,3 +138,13 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 	*retVal = accessToken
 	return nil
 }
+
+func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
+	username, err := cmd.Config.CurrentUserName()
+	if err != nil {
+		panic(err)
+	}
+	*retVal = username
+
+	return nil
+}

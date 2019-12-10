@@ -94,6 +94,12 @@ func createTargetedOrgAndSpace() (string, string) {
 	return org, space
 }
 
+func getUsername() string {
+	username, err := helpers.GetConfig().CurrentUserName()
+	Expect(err).ToNot(HaveOccurred())
+	return username
+}
+
 func confirmTestPluginOutput(command string, output ...string) {
 	session := helpers.CF(command)
 	for _, val := range output {

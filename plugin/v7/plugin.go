@@ -20,6 +20,7 @@ type CliConnection interface {
 	ApiEndpoint() (string, error)
 	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
 	GetCurrentSpace() (plugin_models.Space, error)
+	Username() (string, error)
 }
 
 type VersionType struct {
