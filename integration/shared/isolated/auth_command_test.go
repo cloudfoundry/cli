@@ -126,15 +126,6 @@ var _ = Describe("auth command", func() {
 
 			Eventually(session).Should(Exit(1))
 		})
-
-		It("displays an 'extra argument' error message", func() {
-			session := helpers.CF("auth", "some-username", "some-password", "garbage")
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: unexpected argument \"garbage\""))
-			Eventually(session).Should(Say("NAME:"))
-
-			Eventually(session).Should(Exit(1))
-		})
 	})
 
 	When("the API endpoint is not set", func() {
