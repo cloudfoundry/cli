@@ -14,6 +14,7 @@ import (
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
+	"fmt"
 )
 
 type CliRpcCmd struct {
@@ -142,7 +143,7 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
 	username, err := cmd.Config.CurrentUserName()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("error processing config: %s", err.Error())
 	}
 	*retVal = username
 
