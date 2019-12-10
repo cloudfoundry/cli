@@ -763,6 +763,7 @@ var _ = Describe("Role Actions", func() {
 		BeforeEach(func() {
 			roleType = constant.OrgBillingManagerRole
 			orgGUID = "org-guid"
+			isClient = false
 		})
 
 		JustBeforeEach(func() {
