@@ -84,7 +84,9 @@ func (w *CodeWriter) WriteVersionedGoFile(filename, pkg string) {
 // writes it as a Go file to the given writer with the given package name.
 func (w *CodeWriter) WriteGo(out io.Writer, pkg, tags string) (n int, err error) {
 	sz := w.Size
-	w.WriteComment("Total table size %d bytes (%dKiB); checksum: %X\n", sz, sz/1024, w.Hash.Sum32())
+	if sz > 0 {
+		w.WriteComment("Total table size %d bytes (%dKiB); checksum: %X\n", sz, sz/1024, w.Hash.Sum32())
+	}
 	defer w.buf.Reset()
 	return WriteGo(out, pkg, tags, w.buf.Bytes())
 }

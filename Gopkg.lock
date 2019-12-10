@@ -89,14 +89,6 @@
   version = "v2.3.1"
 
 [[projects]]
-  digest = "1:169d7c92e6f2bded9fee53f6d4a163750df3a8fc4d4e544268547cbc99813651"
-  name = "code.cloudfoundry.org/log-cache"
-  packages = ["src/pkg/client"]
-  pruneopts = "NUT"
-  revision = "c7e8f8c2a628cb13a17519f451edcd8efa35b240"
-  version = "v2.6.0"
-
-[[projects]]
   branch = "master"
   digest = "1:d884ec0e4fd80c9fd201d158ac3ff45a38ff0cb13acbf2041da8818915f854de"
   name = "code.cloudfoundry.org/rfc5424"
@@ -525,24 +517,24 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:90d51692e0c17ce68b8d2e4dbb36a21d7e7ff72230af4dad8a4eb0ad7a0eb8e5"
+  digest = "1:c9e88e22b9a5074663a75bea1d2d1bc5124b08e565eccd293ff2143aace953ba"
   name = "golang.org/x/crypto"
   packages = [
+    "chacha20",
     "curve25519",
     "ed25519",
     "ed25519/internal/edwards25519",
-    "internal/chacha20",
     "internal/subtle",
     "poly1305",
     "ssh",
     "ssh/terminal",
   ]
   pruneopts = "NUT"
-  revision = "5c40567a22f818bd14a1ea7245dad9f8ef0691aa"
+  revision = "e9b2fee46413994441b28dfca259d911d963dfed"
 
 [[projects]]
   branch = "master"
-  digest = "1:968e3c0bed1c4aa30a3c8e088e4d38cb9543367facb68d843a61a7fa3f0a745e"
+  digest = "1:f700dcf8319612c1ff156ea66d794489293309e0a2a8e70fdbf05754632a8d01"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -560,11 +552,11 @@
     "websocket",
   ]
   pruneopts = "NUT"
-  revision = "15845e8f865bdabdefb6e7da65b4d9e8de5e94ef"
+  revision = "c0dbc17a35534bf2e581d7a942408dc936316da4"
 
 [[projects]]
   branch = "master"
-  digest = "1:f9e20bced7052ba08f1a25aeba19dc82b8f83fc4a6d4ffc1d793adb4f85cefe7"
+  digest = "1:c5b1f2a8e46e1d9d2a3dc42c42fd278b0845094b4fae69845a6f399429601b5e"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -572,11 +564,11 @@
     "windows",
   ]
   pruneopts = "NUT"
-  revision = "b05ddf57801d2239d6ab0ee35f9d981e0420f4ac"
+  revision = "ac6580df4449443a05718fd7858c1f91ad5f8d20"
 
 [[projects]]
   branch = "master"
-  digest = "1:e2ad569a7931fbb2b1bda8fa8dffc61c67555822f4fc95e619f0270d7a7eaee3"
+  digest = "1:e2661bc5bc1bd07b6eea3fa9424f26d08223cb700399ed3f8e689e3bd554fb01"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -609,7 +601,7 @@
     "unicode/rangetable",
   ]
   pruneopts = "NUT"
-  revision = "fe223c5a2583471b2791ca99e716c65b4a76117e"
+  revision = "cbf43d21aaebfdfeb81d91a5f444d13a3046e686"
 
 [[projects]]
   branch = "master"
@@ -718,7 +710,6 @@
     "code.cloudfoundry.org/gofileutils/fileutils",
     "code.cloudfoundry.org/lager/lagertest",
     "code.cloudfoundry.org/log-cache/pkg/client",
-    "code.cloudfoundry.org/log-cache/pkg/client",
     "code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1",
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",
@@ -745,9 +736,7 @@
     "github.com/moby/moby/pkg/term",
     "github.com/nu7hatch/gouuid",
     "github.com/onsi/ginkgo",
-    "github.com/onsi/ginkgo/config",
     "github.com/onsi/ginkgo/extensions/table",
-    "github.com/onsi/ginkgo/types",
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/format",
     "github.com/onsi/gomega/gbytes",
