@@ -26,6 +26,36 @@ type FakePluginActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetOrganizationByNameStub        func(string) (v7action.Organization, v7action.Warnings, error)
+	getOrganizationByNameMutex       sync.RWMutex
+	getOrganizationByNameArgsForCall []struct {
+		arg1 string
+	}
+	getOrganizationByNameReturns struct {
+		result1 v7action.Organization
+		result2 v7action.Warnings
+		result3 error
+	}
+	getOrganizationByNameReturnsOnCall map[int]struct {
+		result1 v7action.Organization
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetOrganizationSpacesStub        func(string) ([]v7action.Space, v7action.Warnings, error)
+	getOrganizationSpacesMutex       sync.RWMutex
+	getOrganizationSpacesArgsForCall []struct {
+		arg1 string
+	}
+	getOrganizationSpacesReturns struct {
+		result1 []v7action.Space
+		result2 v7action.Warnings
+		result3 error
+	}
+	getOrganizationSpacesReturnsOnCall map[int]struct {
+		result1 []v7action.Space
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetSpaceByNameAndOrganizationStub        func(string, string) (v7action.Space, v7action.Warnings, error)
 	getSpaceByNameAndOrganizationMutex       sync.RWMutex
 	getSpaceByNameAndOrganizationArgsForCall []struct {
@@ -121,6 +151,138 @@ func (fake *FakePluginActor) GetDetailedAppSummaryReturnsOnCall(i int, result1 v
 	}
 	fake.getDetailedAppSummaryReturnsOnCall[i] = struct {
 		result1 v7action.DetailedApplicationSummary
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePluginActor) GetOrganizationByName(arg1 string) (v7action.Organization, v7action.Warnings, error) {
+	fake.getOrganizationByNameMutex.Lock()
+	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
+	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationByName", []interface{}{arg1})
+	fake.getOrganizationByNameMutex.Unlock()
+	if fake.GetOrganizationByNameStub != nil {
+		return fake.GetOrganizationByNameStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getOrganizationByNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakePluginActor) GetOrganizationByNameCallCount() int {
+	fake.getOrganizationByNameMutex.RLock()
+	defer fake.getOrganizationByNameMutex.RUnlock()
+	return len(fake.getOrganizationByNameArgsForCall)
+}
+
+func (fake *FakePluginActor) GetOrganizationByNameCalls(stub func(string) (v7action.Organization, v7action.Warnings, error)) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
+	fake.GetOrganizationByNameStub = stub
+}
+
+func (fake *FakePluginActor) GetOrganizationByNameArgsForCall(i int) string {
+	fake.getOrganizationByNameMutex.RLock()
+	defer fake.getOrganizationByNameMutex.RUnlock()
+	argsForCall := fake.getOrganizationByNameArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakePluginActor) GetOrganizationByNameReturns(result1 v7action.Organization, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
+	fake.GetOrganizationByNameStub = nil
+	fake.getOrganizationByNameReturns = struct {
+		result1 v7action.Organization
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePluginActor) GetOrganizationByNameReturnsOnCall(i int, result1 v7action.Organization, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
+	fake.GetOrganizationByNameStub = nil
+	if fake.getOrganizationByNameReturnsOnCall == nil {
+		fake.getOrganizationByNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Organization
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationByNameReturnsOnCall[i] = struct {
+		result1 v7action.Organization
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePluginActor) GetOrganizationSpaces(arg1 string) ([]v7action.Space, v7action.Warnings, error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
+	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationSpaces", []interface{}{arg1})
+	fake.getOrganizationSpacesMutex.Unlock()
+	if fake.GetOrganizationSpacesStub != nil {
+		return fake.GetOrganizationSpacesStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getOrganizationSpacesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakePluginActor) GetOrganizationSpacesCallCount() int {
+	fake.getOrganizationSpacesMutex.RLock()
+	defer fake.getOrganizationSpacesMutex.RUnlock()
+	return len(fake.getOrganizationSpacesArgsForCall)
+}
+
+func (fake *FakePluginActor) GetOrganizationSpacesCalls(stub func(string) ([]v7action.Space, v7action.Warnings, error)) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = stub
+}
+
+func (fake *FakePluginActor) GetOrganizationSpacesArgsForCall(i int) string {
+	fake.getOrganizationSpacesMutex.RLock()
+	defer fake.getOrganizationSpacesMutex.RUnlock()
+	argsForCall := fake.getOrganizationSpacesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakePluginActor) GetOrganizationSpacesReturns(result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = nil
+	fake.getOrganizationSpacesReturns = struct {
+		result1 []v7action.Space
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePluginActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []v7action.Space, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = nil
+	if fake.getOrganizationSpacesReturnsOnCall == nil {
+		fake.getOrganizationSpacesReturnsOnCall = make(map[int]struct {
+			result1 []v7action.Space
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationSpacesReturnsOnCall[i] = struct {
+		result1 []v7action.Space
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -253,6 +415,10 @@ func (fake *FakePluginActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.getDetailedAppSummaryMutex.RLock()
 	defer fake.getDetailedAppSummaryMutex.RUnlock()
+	fake.getOrganizationByNameMutex.RLock()
+	defer fake.getOrganizationByNameMutex.RUnlock()
+	fake.getOrganizationSpacesMutex.RLock()
+	defer fake.getOrganizationSpacesMutex.RUnlock()
 	fake.getSpaceByNameAndOrganizationMutex.RLock()
 	defer fake.getSpaceByNameAndOrganizationMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()

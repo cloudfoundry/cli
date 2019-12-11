@@ -33,13 +33,19 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		} else {
 			fmt.Printf("Done GetCurrentSpace:, result:%v, name: %s, guid: %s\n", result, result.Name, result.GUID)
 		}
+	case "GetOrg":
+		result, err := cliConnection.GetOrg(args[1])
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+		} else {
+			fmt.Printf("Done GetOrg: name: %s, guid: %s\n", result.Name, result.GUID)
+		}
 	case "Username":
 		result, err := cliConnection.Username()
 		if err != nil {
 			fmt.Printf("Username: Error: %s\n", err)
 		} else {
 			fmt.Println("Done Username:", result)
-		}
 	case "TestPluginCommandWithAliasV7", "Cool-V7":
 		fmt.Println("You called Test Plugin Command V7 With Alias!")
 	case "AccessToken":
@@ -67,6 +73,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{Name: "GetApp"},
 			{Name: "GetCurrentOrg"},
 			{Name: "GetCurrentSpace"},
+			{Name: "GetOrg"},
 			{Name: "Username"},
 			{
 				Name:     "TestPluginCommandWithAliasV7",

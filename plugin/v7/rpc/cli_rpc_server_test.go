@@ -300,8 +300,86 @@ var _ = Describe("Server", func() {
 					Expect(err).To(MatchError("some-error"))
 				})
 			})
-			PContext("when there are warnings returned", func() {
+		})
 
+		Describe("GetOrg", func() {
+			var (
+				org    v7action.Organization
+				spaces []v7action.Space
+			)
+
+			BeforeEach(func() {
+				org = v7action.Organization{
+					Name: "org-name",
+					GUID: "org-guid",
+				}
+				spaces = []v7action.Space{
+					v7action.Space{
+						Name: "space-name-1",
+						GUID: "space-guid-1",
+					},
+					v7action.Space{
+						Name: "space-name-2",
+						GUID: "space-guid-2",
+					},
+				}
+				fakePluginActor.GetOrganizationByNameReturns(org, nil, nil)
+				fakePluginActor.GetOrganizationSpacesReturns(spaces, nil, nil)
+			})
+
+			It("retrives the organization", func() {
+				result := plugin_models.Organization{}
+				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginActor.GetOrganizationByNameCallCount()).To(Equal(1))
+				orgName := fakePluginActor.GetOrganizationByNameArgsForCall(0)
+				Expect(orgName).To(Equal(org.Name))
+			})
+
+			It("retrives the spaces for the organization", func() {
+				result := plugin_models.Organization{}
+				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginActor.GetOrganizationSpacesCallCount()).To(Equal(1))
+				orgGUID := fakePluginActor.GetOrganizationSpacesArgsForCall(0)
+				Expect(orgGUID).To(Equal(org.GUID))
+			})
+
+			It("populates the plugin model with the retrieved org and space information", func() {
+				result := plugin_models.Organization{}
+				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(result.Name).To(Equal(org.Name))
+				Expect(result.GUID).To(Equal(org.GUID))
+				Expect(len(result.Spaces)).To(Equal(2))
+				Expect(result.Spaces[1].Name).To(Equal(spaces[1].Name))
+			})
+
+			Context("when retrieving the org fails", func() {
+				BeforeEach(func() {
+					fakePluginActor.GetOrganizationByNameReturns(v7action.Organization{}, nil, errors.New("org-error"))
+				})
+
+				It("returns an error", func() {
+					result := plugin_models.Organization{}
+					err := client.Call("CliRpcCmd.GetOrg", "some-org", &result)
+					Expect(err).To(MatchError("org-error"))
+				})
+			})
+
+			Context("when retrieving the space fails", func() {
+				BeforeEach(func() {
+					fakePluginActor.GetOrganizationSpacesReturns([]v7action.Space{}, nil, errors.New("space-error"))
+				})
+
+				It("returns an error", func() {
+					result := plugin_models.Organization{}
+					err := client.Call("CliRpcCmd.GetOrg", "some-org", &result)
+					Expect(err).To(MatchError("space-error"))
+				})
 			})
 		})
 
