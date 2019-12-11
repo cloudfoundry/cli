@@ -1,7 +1,7 @@
 {
   "run": {
     "concurrency": 4,
-    "deadline": "4m",
+    "timeout": "10m",
     "build-tags": [
       "V7"
     ],
