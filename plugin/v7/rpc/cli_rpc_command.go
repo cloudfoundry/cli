@@ -130,6 +130,30 @@ func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) 
 	return nil
 }
 
+func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization) error {
+	org, _, err := cmd.PluginActor.GetOrganizationByName(orgName)
+	if err != nil {
+		return err
+	}
+
+	spaces, _, err := cmd.PluginActor.GetOrganizationSpaces(org.GUID)
+	if err != nil {
+		return err
+	}
+
+	for _, space := range spaces {
+		newSpace := plugin_models.Space{
+			GUID: space.GUID,
+			Name: space.Name,
+		}
+		retVal.Spaces = append(retVal.Spaces, newSpace)
+	}
+
+	retVal.Name = org.Name
+	retVal.GUID = org.GUID
+	return nil
+}
+
 func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 	accessToken, err := cmd.PluginActor.RefreshAccessToken()
 	if err != nil {

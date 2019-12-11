@@ -43,6 +43,20 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	FDescribe("GetOrg", func() {
+		var orgName string
+		var orgGUID string
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			helpers.CreateOrg(orgName)
+			orgGUID = helpers.GetOrgGUID(orgName)
+		})
+
+		It("gets the organization information", func() {
+			confirmTestPluginOutputWithArg("GetOrg", orgName, orgGUID, orgName)
+		})
+	})
+
 	Describe("GetCurrentSpace", func() {
 		It("gets the current targeted Space", func() {
 			_, space := createTargetedOrgAndSpace()
