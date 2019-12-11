@@ -1150,7 +1150,7 @@ var _ = Describe("Application Actions", func() {
 			When("the deployment never deploys", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDeploymentReturns(
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueDeploying},
+						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueActive},
 						ccv3.Warnings{"get-deployment-warning"},
 						nil,
 					)
@@ -1224,7 +1224,7 @@ var _ = Describe("Application Actions", func() {
 					// Always return deploying as a way to check we respect no wait
 					fakeCloudControllerClient.GetDeploymentReturns(
 						ccv3.Deployment{
-							StatusValue:  constant.DeploymentStatusValueDeploying,
+							StatusValue:  constant.DeploymentStatusValueActive,
 							NewProcesses: []ccv3.Process{{GUID: "new-deployment-process"}},
 						},
 						ccv3.Warnings{"get-deployment-warning"},
@@ -1289,7 +1289,7 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					// in total three loops 1: deployment still deploying 2: deployment deployed processes starting 3: processes started
 					fakeCloudControllerClient.GetDeploymentReturnsOnCall(0,
-						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueDeploying},
+						ccv3.Deployment{StatusValue: constant.DeploymentStatusValueActive},
 						ccv3.Warnings{"get-deployment-warning-1"},
 						nil,
 					)

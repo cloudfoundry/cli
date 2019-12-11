@@ -45,9 +45,9 @@ const (
 type DeploymentStatusValue string
 
 const (
-	// DeploymentStatusValueDeploying means the deployment's status.value is
-	// 'DEPLOYING'
-	DeploymentStatusValueDeploying DeploymentStatusValue = "DEPLOYING"
+	// DeploymentStatusValueActive means the deployment's status.value is
+	// 'ACTIVE'
+	DeploymentStatusValueActive DeploymentStatusValue = "ACTIVE"
 
 	// DeploymentStatusValueFinalized means the deployment's status.value is
 	// 'FINALIZED'

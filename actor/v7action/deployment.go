@@ -17,7 +17,7 @@ func (actor Actor) CreateDeployment(appGUID string, dropletGUID string) (string,
 func (actor Actor) GetLatestActiveDeploymentForApp(appGUID string) (Deployment, Warnings, error) {
 	ccDeployments, warnings, err := actor.CloudControllerClient.GetDeployments(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
-		ccv3.Query{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueDeploying)}},
+		ccv3.Query{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueActive)}},
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
 		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
 	)

@@ -62,7 +62,7 @@ var _ = Describe("Deployment Actions", func() {
 			Expect(fakeCloudControllerClient.GetDeploymentsArgsForCall(0)).To(Equal(
 				[]ccv3.Query{
 					{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
-					{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueDeploying)}},
+					{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueActive)}},
 					{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
 					{Key: ccv3.PerPage, Values: []string{"1"}},
 				},
