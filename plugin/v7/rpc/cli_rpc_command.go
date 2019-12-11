@@ -13,8 +13,8 @@ import (
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/version"
-	"github.com/blang/semver"
 	"fmt"
+	"github.com/blang/semver"
 )
 
 type CliRpcCmd struct {
