@@ -58,7 +58,7 @@ that conveys the intent of your change.
 
 # Development Environment Setup
 
-## Install Golang 1.12
+## Install Golang 1.13
 
 Documentation on installing GoLang can be found [here](https://golang.org/doc/install). While
 the CF CLI might be compatible with other versions of GoLang, this is the only
