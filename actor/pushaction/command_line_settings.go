@@ -47,6 +47,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 	if settings.DefaultRouteHostname != "" {
 		app.Hostname = settings.DefaultRouteHostname
+		app.RandomRoute = false
 	}
 
 	if settings.DiskQuota != 0 {

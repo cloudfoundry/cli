@@ -81,6 +81,39 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				},
 			))
 		})
+
+		When("hostname is specified on the command-line and random-route in the manifest", func() {
+			BeforeEach(func() {
+				cmdSettings = CommandLineSettings{
+					CurrentDirectory:     currentDirectory,
+					DefaultRouteDomain:   "shopforstuff.com",
+					DefaultRouteHostname: "scott",
+					Name:                 "spork6",
+				}
+
+				apps = []manifest.Application{
+					{
+						Name:        "spork6",
+						RandomRoute: true,
+					},
+				}
+			})
+
+			It("the random-route part is ignored", func() {
+
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(mergedApps).To(ConsistOf(
+					manifest.Application{
+						Name:        "spork6",
+						Path:        currentDirectory,
+						Domain:      "shopforstuff.com",
+						Hostname:    "scott",
+						RandomRoute: false,
+					},
+				))
+			})
+		})
 	})
 
 	When("passed command line settings and multiple manifest applications", func() {
