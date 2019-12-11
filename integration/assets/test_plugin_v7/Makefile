@@ -16,3 +16,6 @@ out/test_plugin_v7: $(GOSRC)
 	  $(REQUIRED_FOR_STATIC_BINARY_V7) \
 	  -ldflags "$(LD_FLAGS_LINUX_V7)" -o out/test_plugin_v7 .
 
+install: build
+	cf install-plugin -f out/test_plugin_v7
+	cf plugins
