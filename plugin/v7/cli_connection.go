@@ -52,6 +52,16 @@ func (c *cliConnection) GetApp(appName string) (plugin_models.DetailedApplicatio
 	return result, err
 }
 
+func (c *cliConnection) GetApps() ([]plugin_models.Application, error) {
+	var result []plugin_models.Application
+
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.GetApps", "", &result)
+	})
+
+	return result, err
+}
+
 func (c *cliConnection) GetCurrentOrg() (plugin_models.Org, error) {
 	var result plugin_models.Org
 

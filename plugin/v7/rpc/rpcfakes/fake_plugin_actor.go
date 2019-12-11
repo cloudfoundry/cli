@@ -9,6 +9,21 @@ import (
 )
 
 type FakePluginActor struct {
+	GetApplicationsBySpaceStub        func(string) ([]v7action.Application, v7action.Warnings, error)
+	getApplicationsBySpaceMutex       sync.RWMutex
+	getApplicationsBySpaceArgsForCall []struct {
+		arg1 string
+	}
+	getApplicationsBySpaceReturns struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationsBySpaceReturnsOnCall map[int]struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetDetailedAppSummaryStub        func(string, string, bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	getDetailedAppSummaryMutex       sync.RWMutex
 	getDetailedAppSummaryArgsForCall []struct {
@@ -86,6 +101,72 @@ type FakePluginActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakePluginActor) GetApplicationsBySpace(arg1 string) ([]v7action.Application, v7action.Warnings, error) {
+	fake.getApplicationsBySpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationsBySpaceReturnsOnCall[len(fake.getApplicationsBySpaceArgsForCall)]
+	fake.getApplicationsBySpaceArgsForCall = append(fake.getApplicationsBySpaceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationsBySpace", []interface{}{arg1})
+	fake.getApplicationsBySpaceMutex.Unlock()
+	if fake.GetApplicationsBySpaceStub != nil {
+		return fake.GetApplicationsBySpaceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationsBySpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakePluginActor) GetApplicationsBySpaceCallCount() int {
+	fake.getApplicationsBySpaceMutex.RLock()
+	defer fake.getApplicationsBySpaceMutex.RUnlock()
+	return len(fake.getApplicationsBySpaceArgsForCall)
+}
+
+func (fake *FakePluginActor) GetApplicationsBySpaceCalls(stub func(string) ([]v7action.Application, v7action.Warnings, error)) {
+	fake.getApplicationsBySpaceMutex.Lock()
+	defer fake.getApplicationsBySpaceMutex.Unlock()
+	fake.GetApplicationsBySpaceStub = stub
+}
+
+func (fake *FakePluginActor) GetApplicationsBySpaceArgsForCall(i int) string {
+	fake.getApplicationsBySpaceMutex.RLock()
+	defer fake.getApplicationsBySpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationsBySpaceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakePluginActor) GetApplicationsBySpaceReturns(result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationsBySpaceMutex.Lock()
+	defer fake.getApplicationsBySpaceMutex.Unlock()
+	fake.GetApplicationsBySpaceStub = nil
+	fake.getApplicationsBySpaceReturns = struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePluginActor) GetApplicationsBySpaceReturnsOnCall(i int, result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationsBySpaceMutex.Lock()
+	defer fake.getApplicationsBySpaceMutex.Unlock()
+	fake.GetApplicationsBySpaceStub = nil
+	if fake.getApplicationsBySpaceReturnsOnCall == nil {
+		fake.getApplicationsBySpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.Application
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationsBySpaceReturnsOnCall[i] = struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakePluginActor) GetDetailedAppSummary(arg1 string, arg2 string, arg3 bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error) {
@@ -413,6 +494,8 @@ func (fake *FakePluginActor) RefreshAccessTokenReturnsOnCall(i int, result1 stri
 func (fake *FakePluginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.getApplicationsBySpaceMutex.RLock()
+	defer fake.getApplicationsBySpaceMutex.RUnlock()
 	fake.getDetailedAppSummaryMutex.RLock()
 	defer fake.getDetailedAppSummaryMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()

@@ -45,6 +45,26 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("GetApps", func() {
+		var appName [2]string
+		BeforeEach(func() {
+			createTargetedOrgAndSpace()
+			// Verify apps come back in order of creation, not alphabetically
+			appName[0] = "Z" + helpers.PrefixedRandomName("APP")
+			appName[1] = "A" + helpers.PrefixedRandomName("APP")
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appName[0], "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appName[1], "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+		})
+
+		It("gets application information", func() {
+			confirmTestPluginOutputWithArg("GetApps", appName[0], appName[1])
+		})
+	})
+
 	Describe("GetOrg", func() {
 		var orgName string
 		var orgGUID string

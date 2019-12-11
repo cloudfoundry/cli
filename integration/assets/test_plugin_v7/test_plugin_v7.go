@@ -19,6 +19,16 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	case "GetApp":
 		result, _ := cliConnection.GetApp(args[1])
 		fmt.Println("Done GetApp:", result)
+	case "GetApps":
+		apps, err := cliConnection.GetApps()
+		if err != nil {
+			fmt.Printf("Error in GetApps:: %s", err)
+		} else {
+			fmt.Println("Current Apps:\n")
+			for _, app := range(apps) {
+				fmt.Printf("result: %v, name: %s, guid: %s\n", app, app.Name, app.GUID)
+			}
+		}
 	case "GetCurrentOrg":
 		result, err := cliConnection.GetCurrentOrg()
 		if err != nil {
@@ -72,6 +82,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 		Commands: []plugin.Command{
 			{Name: "ApiEndpoint"},
 			{Name: "GetApp"},
+			{Name: "GetApps"},
 			{Name: "GetCurrentOrg"},
 			{Name: "GetCurrentSpace"},
 			{Name: "GetOrg"},

@@ -101,6 +101,34 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 	return nil
 }
 
+func (cmd *CliRpcCmd) GetApps(appName string, retVal *[]plugin_models.Application) error {
+	spaceGUID := cmd.Config.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return errors.New("no space targeted")
+	}
+	applications, warnings, err := cmd.PluginActor.GetApplicationsBySpace(spaceGUID)
+	if err != nil {
+		return err
+	}
+	for _, warning := range warnings {
+		fmt.Printf("GetApps warning: %s\n", warning)
+	}
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(applications)
+	if err != nil {
+		panic(err)
+	}
+
+	err = dec.Decode(retVal)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
+
 func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Org) error {
 	org := cmd.Config.TargetedOrganization()
 	if org.Name == "" {
