@@ -101,6 +101,28 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedAppli
 	return nil
 }
 
+func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Org) error {
+	org := cmd.Config.TargetedOrganization()
+	if org.Name == "" {
+		return errors.New("no organization targeted")
+	}
+
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err := enc.Encode(org)
+	if err != nil {
+		panic(err)
+	}
+
+	err = dec.Decode(retVal)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
+
 func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
 	orgGUID := cmd.Config.TargetedOrganization().GUID
 	if orgGUID == "" {

@@ -52,6 +52,13 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("GetCurrentOrg", func() {
+		It("gets the current targeted Org", func() {
+			org, _ := createTargetedOrgAndSpace()
+			confirmTestPluginOutput("GetCurrentOrg", org)
+		})
+	})
+
 	Describe("Username", func() {
 		It("gets the current user's name", func() {
 			username := getUsername()
@@ -59,26 +66,26 @@ var _ = Describe("plugin API", func() {
 		})
 
 		When("the token is invalid", func() {
-				var accessToken string
+			var accessToken string
 
-				BeforeEach(func() {
-					helpers.SetConfig(func(config *configv3.Config) {
-						accessToken = config.ConfigFile.AccessToken
-						config.ConfigFile.AccessToken = accessToken + "***"
-					})
+			BeforeEach(func() {
+				helpers.SetConfig(func(config *configv3.Config) {
+					accessToken = config.ConfigFile.AccessToken
+					config.ConfigFile.AccessToken = accessToken + "***"
 				})
-				AfterEach(func() {
-					helpers.SetConfig(func(config *configv3.Config) {
-						config.ConfigFile.AccessToken = accessToken
-					})
+			})
+			AfterEach(func() {
+				helpers.SetConfig(func(config *configv3.Config) {
+					config.ConfigFile.AccessToken = accessToken
 				})
+			})
 
-				When("running a v7 plugin command", func() {
-					It("complains about the token", func() {
-						session := helpers.CF("Username")
-						Eventually(session).Should(Say("illegal base64 data at input byte 342"))
-					})
+			When("running a v7 plugin command", func() {
+				It("complains about the token", func() {
+					session := helpers.CF("Username")
+					Eventually(session).Should(Say("illegal base64 data at input byte 342"))
 				})
+			})
 		})
 	})
 

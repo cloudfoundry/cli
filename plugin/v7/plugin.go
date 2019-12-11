@@ -19,6 +19,7 @@ type CliConnection interface {
 	AccessToken() (string, error)
 	ApiEndpoint() (string, error)
 	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
+	GetCurrentOrg() (plugin_models.Org, error)
 	GetCurrentSpace() (plugin_models.Space, error)
 	Username() (string, error)
 }
