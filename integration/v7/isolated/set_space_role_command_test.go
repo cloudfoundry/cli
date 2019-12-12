@@ -109,17 +109,17 @@ var _ = Describe("set-space-role command", func() {
 				})
 
 				When("the targeted client does not exist", func() {
-					var badClientID string
+					var newClientID string
 
 					BeforeEach(func() {
-						badClientID = "nonexistent-client"
+						newClientID = helpers.NewUsername()
 					})
 
-					It("fails with an appropriate error message", func() {
-						session := helpers.CF("set-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
-						Eventually(session).Should(Exit(1))
+					It("creates the user and sets the space role for it", func() {
+						session := helpers.CF("set-space-role", newClientID, orgName, "SpaceAuditor", "--client")
+						Eventually(session).Should(Say("Assigning role SpaceAuditor to user %s in org %s as %s...", newClientID, orgName, privilegedUsername))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 			})

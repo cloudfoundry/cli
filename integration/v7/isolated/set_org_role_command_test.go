@@ -78,33 +78,20 @@ var _ = Describe("set-org-role command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
-
-				When("the active user lacks permissions to look up clients", func() {
-					BeforeEach(func() {
-						helpers.SwitchToOrgRole(orgName, "OrgManager")
-					})
-
-					It("prints an appropriate error and exits 1", func() {
-						session := helpers.CF("set-org-role", "notaclient", orgName, "OrgManager", "--client")
-						Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
-					})
-				})
 			})
 
 			When("the targeted client does not exist", func() {
-				var badClientID string
+				var newClientID string
 
 				BeforeEach(func() {
-					badClientID = "nonexistent-client"
+					newClientID = helpers.NewUsername()
 				})
 
-				It("fails with an appropriate error message", func() {
-					session := helpers.CF("set-org-role", badClientID, orgName, "OrgManager", "--client")
-					Eventually(session.Err).Should(Say("Invalid user. Ensure that the user exists and you have access to it."))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				It("creates the user and sets the org role for it", func() {
+					session := helpers.CF("set-org-role", newClientID, orgName, "OrgManager", "--client")
+					Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as %s...", newClientID, orgName, currentUsername))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})

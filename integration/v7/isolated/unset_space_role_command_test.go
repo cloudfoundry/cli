@@ -125,11 +125,10 @@ var _ = Describe("unset-space-role command", func() {
 					badClientID = "nonexistent-client"
 				})
 
-				It("fails with an appropriate error message", func() {
+				It("succeeds (idempotent case) and exits 0", func() {
 					session := helpers.CF("unset-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("User 'nonexistent-client' does not exist."))
-					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})

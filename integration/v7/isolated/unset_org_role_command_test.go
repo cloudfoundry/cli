@@ -154,12 +154,11 @@ var _ = Describe("unset-org-role command", func() {
 		})
 
 		When("the user does not exist", func() {
-			It("prints an appropriate error and exits 1", func() {
+			It("succeeds (idempotent case) and exits 0", func() {
 				session := helpers.CF("unset-org-role", "not-exists", orgName, "OrgAuditor")
 				Eventually(session).Should(Say("Removing role OrgAuditor from user not-exists in org %s as %s...", orgName, privilegedUsername))
-				Eventually(session.Err).Should(Say("User 'not-exists' does not exist."))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
