@@ -328,7 +328,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("retrives the organization", func() {
-				result := plugin_models.Organization{}
+				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -338,7 +338,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("retrives the spaces for the organization", func() {
-				result := plugin_models.Organization{}
+				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -348,7 +348,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("populates the plugin model with the retrieved org and space information", func() {
-				result := plugin_models.Organization{}
+				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -364,7 +364,7 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns an error", func() {
-					result := plugin_models.Organization{}
+					result := plugin_models.OrgSummary{}
 					err := client.Call("CliRpcCmd.GetOrg", "some-org", &result)
 					Expect(err).To(MatchError("org-error"))
 				})
@@ -376,7 +376,7 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns an error", func() {
-					result := plugin_models.Organization{}
+					result := plugin_models.OrgSummary{}
 					err := client.Call("CliRpcCmd.GetOrg", "some-org", &result)
 					Expect(err).To(MatchError("space-error"))
 				})

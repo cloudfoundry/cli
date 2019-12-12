@@ -153,7 +153,7 @@ func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) 
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.Organization) error {
+func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrgSummary) error {
 	org, _, err := cmd.PluginActor.GetOrganizationByName(orgName)
 	if err != nil {
 		return err
