@@ -15,4 +15,5 @@ type UAAClient interface {
 	GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error)
 	ListUsers(userName, origin string) ([]uaa.User, error)
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
+	ValidateClientUser(clientID string) error
 }

@@ -17,10 +17,11 @@ var _ = Describe("Role Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		fakeUAAClient             *v7actionfakes.FakeUAAClient
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, fakeUAAClient, _ = NewTestActor()
 	})
 
 	Describe("CreateOrgRole", func() {
@@ -78,6 +79,17 @@ var _ = Describe("Role Actions", func() {
 							OrgGUID:  "org-guid",
 						},
 					))
+				})
+
+				When("the client does not exist in UAA", func() {
+					BeforeEach(func() {
+						fakeUAAClient.ValidateClientUserReturns(actionerror.UserNotFoundError{Username: "bad-client"})
+					})
+
+					It("returns the error", func() {
+						Expect(warnings).To(BeEmpty())
+						Expect(executeErr).To(MatchError(actionerror.UserNotFoundError{Username: "bad-client"}))
+					})
 				})
 			})
 
@@ -251,6 +263,17 @@ var _ = Describe("Role Actions", func() {
 			It("it ignores the error and creates the space role", func() {
 				Expect(fakeCloudControllerClient.CreateRoleCallCount()).To(Equal(2))
 				Expect(warnings).To(ConsistOf("create-org-role-warning"))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		When("the client does not exist in UAA", func() {
+			BeforeEach(func() {
+				fakeUAAClient.ValidateClientUserReturns(actionerror.UserNotFoundError{Username: "bad-client"})
+			})
+
+			It("returns the error", func() {
+				Expect(warnings).To(BeEmpty())
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
 		})

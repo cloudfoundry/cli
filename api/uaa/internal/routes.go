@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	GetClientUser         = "GetClientUser"
 	GetSSHPasscodeRequest = "GetSSHPasscode"
 	PostOAuthTokenRequest = "PostOAuthToken"
 	PostUserRequest       = "PostUser"
@@ -18,5 +19,6 @@ var APIRoutes = []Route{
 	{Path: "/Users", Method: http.MethodGet, Name: ListUsersRequest, Resource: UAAResource},
 	{Path: "/Users/:user_guid", Method: http.MethodDelete, Name: DeleteUserRequest, Resource: UAAResource},
 	{Path: "/oauth/authorize", Method: http.MethodGet, Name: GetSSHPasscodeRequest, Resource: UAAResource},
+	{Path: "/oauth/clients/:client_id", Method: http.MethodGet, Name: GetClientUser, Resource: UAAResource},
 	{Path: "/oauth/token", Method: http.MethodPost, Name: PostOAuthTokenRequest, Resource: AuthorizationResource},
 }

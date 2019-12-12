@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = PDescribe("set-space-role command", func() {
+var _ = Describe("set-space-role command", func() {
 	Describe("help text and argument validation", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -32,7 +32,7 @@ var _ = PDescribe("set-space-role command", func() {
 			})
 		})
 
-		When("the role does not exist", func() {
+		When("the role type is invalid", func() {
 			It("prints a useful error, prints help text, and exits 1", func() {
 				session := helpers.CF("set-space-role", "some-user", "some-org", "some-space", "NotARealRole")
 				Eventually(session.Err).Should(Say(`Incorrect Usage: ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`))
@@ -94,32 +94,32 @@ var _ = PDescribe("set-space-role command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					When("the client is not affiliated with the current user's org or space", func() {
+					When("the client is not authorized to look up clients in UAA", func() {
 						BeforeEach(func() {
 							helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceManager")
 						})
 
 						It("prints an appropriate error and exits 1", func() {
-							session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
+							session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client", "-v")
 							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("Users cannot be assigned roles in a space if they do not have a role in that space's organization."))
+							Eventually(session.Err).Should(Say("You are not authorized to perform the requested action."))
 							Eventually(session).Should(Exit(1))
 						})
 					})
 				})
 
 				When("the targeted client does not exist", func() {
-					var newClientID string
+					var badClientID string
 
 					BeforeEach(func() {
-						newClientID = helpers.NewUsername()
+						badClientID = "nonexistent-client"
 					})
 
-					It("creates the user and sets the space role for it", func() {
-						session := helpers.CF("set-space-role", newClientID, orgName, "SpaceAuditor", "--client")
-						Eventually(session).Should(Say("Assigning role SpaceAuditor to user %s in org %s as %s...", newClientID, orgName, privilegedUsername))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
+					It("fails with an appropriate error message", func() {
+						session := helpers.CF("set-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
+						Eventually(session.Err).Should(Say("Users cannot be assigned roles in a space if they do not have a role in that space's organization."))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 			})

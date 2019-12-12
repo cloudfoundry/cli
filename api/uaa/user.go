@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/uaa/internal"
 )
 
@@ -159,4 +160,29 @@ func (client Client) ListUsers(userName, origin string) ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (client Client) ValidateClientUser(clientID string) error {
+	request, err := client.newRequest(requestOptions{
+		RequestName: internal.GetClientUser,
+		Header: http.Header{
+			"Content-Type": {"application/json"},
+		},
+		URIParams: map[string]string{"client_id": clientID},
+	})
+	if err != nil {
+		return err
+	}
+	err = client.connection.Make(request, &Response{})
+
+	if errType, ok := err.(RawHTTPStatusError); ok {
+		switch errType.StatusCode {
+		case http.StatusNotFound:
+			return actionerror.UserNotFoundError{Username: clientID}
+		case http.StatusForbidden:
+			return InsufficientScopeError{}
+		}
+	}
+
+	return err
 }

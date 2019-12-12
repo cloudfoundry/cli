@@ -106,6 +106,17 @@ type FakeUAAClient struct {
 		result1 uaa.RefreshedTokens
 		result2 error
 	}
+	ValidateClientUserStub        func(string) error
+	validateClientUserMutex       sync.RWMutex
+	validateClientUserArgsForCall []struct {
+		arg1 string
+	}
+	validateClientUserReturns struct {
+		result1 error
+	}
+	validateClientUserReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -549,6 +560,66 @@ func (fake *FakeUAAClient) RefreshAccessTokenReturnsOnCall(i int, result1 uaa.Re
 	}{result1, result2}
 }
 
+func (fake *FakeUAAClient) ValidateClientUser(arg1 string) error {
+	fake.validateClientUserMutex.Lock()
+	ret, specificReturn := fake.validateClientUserReturnsOnCall[len(fake.validateClientUserArgsForCall)]
+	fake.validateClientUserArgsForCall = append(fake.validateClientUserArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ValidateClientUser", []interface{}{arg1})
+	fake.validateClientUserMutex.Unlock()
+	if fake.ValidateClientUserStub != nil {
+		return fake.ValidateClientUserStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.validateClientUserReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeUAAClient) ValidateClientUserCallCount() int {
+	fake.validateClientUserMutex.RLock()
+	defer fake.validateClientUserMutex.RUnlock()
+	return len(fake.validateClientUserArgsForCall)
+}
+
+func (fake *FakeUAAClient) ValidateClientUserCalls(stub func(string) error) {
+	fake.validateClientUserMutex.Lock()
+	defer fake.validateClientUserMutex.Unlock()
+	fake.ValidateClientUserStub = stub
+}
+
+func (fake *FakeUAAClient) ValidateClientUserArgsForCall(i int) string {
+	fake.validateClientUserMutex.RLock()
+	defer fake.validateClientUserMutex.RUnlock()
+	argsForCall := fake.validateClientUserArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeUAAClient) ValidateClientUserReturns(result1 error) {
+	fake.validateClientUserMutex.Lock()
+	defer fake.validateClientUserMutex.Unlock()
+	fake.ValidateClientUserStub = nil
+	fake.validateClientUserReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUAAClient) ValidateClientUserReturnsOnCall(i int, result1 error) {
+	fake.validateClientUserMutex.Lock()
+	defer fake.validateClientUserMutex.Unlock()
+	fake.ValidateClientUserStub = nil
+	if fake.validateClientUserReturnsOnCall == nil {
+		fake.validateClientUserReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.validateClientUserReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -566,6 +637,8 @@ func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	defer fake.listUsersMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
+	fake.validateClientUserMutex.RLock()
+	defer fake.validateClientUserMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

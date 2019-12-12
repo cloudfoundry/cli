@@ -1,6 +1,7 @@
 package uaa_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
@@ -262,6 +263,113 @@ var _ = Describe("User", func() {
 						RawResponse: []byte(response),
 					}))
 				})
+			})
+		})
+	})
+
+	Describe("ValidateClientUser", func() {
+		var (
+			clientID  string
+			err      error
+		)
+
+		BeforeEach(func() {
+			clientID = "client-id"
+			err = nil
+		})
+
+		JustBeforeEach(func() {
+			err = client.ValidateClientUser(clientID)
+		})
+
+		When("no errors occur", func() {
+				BeforeEach(func() {
+					uaaServer.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
+							VerifyRequest(http.MethodGet, "/oauth/clients/client-id"),
+							VerifyHeaderKV("Content-Type", "application/json"),
+							RespondWith(http.StatusOK, "Response{}"),
+						))
+
+				It("gets users by username", func() {
+					Expect(err).NotTo(HaveOccurred())
+				})
+			})
+		})
+
+		When("a generic error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				clientID = "client-id"
+
+				response = `{
+					"error_description": "Invalid filter expression"
+				}`
+
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodGet, "/oauth/clients/client-id"),
+						VerifyHeaderKV("Content-Type", "application/json"),
+						RespondWith(http.StatusBadRequest, response),
+					))
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError(RawHTTPStatusError{
+					StatusCode:  400,
+					RawResponse: []byte(response),
+				}))
+			})
+		})
+
+		When("a user-not-found error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				clientID = "client-id"
+
+				response = `{
+					"error_description": "User not found"
+				}`
+
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodGet, "/oauth/clients/client-id"),
+						VerifyHeaderKV("Content-Type", "application/json"),
+						RespondWith(http.StatusNotFound, response),
+					))
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError(actionerror.UserNotFoundError{Username: "client-id"}))
+			})
+		})
+
+		When("a forbidden error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				clientID = "client-id"
+
+				response = `{
+					"error_description": "Not authorized"
+				}`
+
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodGet, "/oauth/clients/client-id"),
+						VerifyHeaderKV("Content-Type", "application/json"),
+						RespondWith(http.StatusForbidden, response),
+					))
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError(InsufficientScopeError{}))
 			})
 		})
 	})

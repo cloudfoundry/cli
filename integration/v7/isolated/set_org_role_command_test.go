@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = PDescribe("set-org-role command", func() {
+var _ = Describe("set-org-role command", func() {
 	Context("Help", func() {
 		When("--help flag is set", func() {
 			It("appears in cf help -a", func() {
@@ -81,17 +81,17 @@ var _ = PDescribe("set-org-role command", func() {
 			})
 
 			When("the targeted client does not exist", func() {
-				var newClientID string
+				var badClientID string
 
 				BeforeEach(func() {
-					newClientID = helpers.NewUsername()
+					badClientID = "nonexistent-client"
 				})
 
-				It("creates the user and sets the org role for it", func() {
-					session := helpers.CF("set-org-role", newClientID, orgName, "OrgManager", "--client")
-					Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as %s...", newClientID, orgName, currentUsername))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Exit(0))
+				It("fails with an appropriate error message", func() {
+					session := helpers.CF("set-org-role", badClientID, orgName, "OrgManager", "--client")
+					Eventually(session.Err).Should(Say("User '%s' does not exist.", badClientID))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

@@ -16,6 +16,11 @@ func (actor Actor) CreateOrgRole(roleType constant.RoleType, orgGUID string, use
 	}
 
 	if isClient {
+		err := actor.UAAClient.ValidateClientUser(userNameOrGUID)
+		if err != nil {
+			return Warnings{}, err
+		}
+
 		roleToCreate.UserGUID = userNameOrGUID
 	} else {
 		roleToCreate.Username = userNameOrGUID
@@ -44,8 +49,9 @@ func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, s
 	if err != nil {
 		_, isIdempotentError := err.(ccerror.RoleAlreadyExistsError)
 		_, isForbiddenError := err.(ccerror.ForbiddenError)
+		_, isUserNotFoundError := err.(actionerror.UserNotFoundError)
 
-		if !isIdempotentError && !isForbiddenError {
+		if !isIdempotentError && !isForbiddenError && !isUserNotFoundError {
 			return warnings, err
 		}
 	}
