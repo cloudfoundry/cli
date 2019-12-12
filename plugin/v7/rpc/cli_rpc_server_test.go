@@ -304,15 +304,28 @@ var _ = Describe("Server", func() {
 
 		Describe("GetOrg", func() {
 			var (
-				org    v7action.Organization
-				spaces []v7action.Space
+				labels   map[string]types.NullString
+				metadata v7action.Metadata
+				org      v7action.Organization
+				spaces   []v7action.Space
 			)
 
 			BeforeEach(func() {
-				org = v7action.Organization{
-					Name: "org-name",
-					GUID: "org-guid",
+				labels = map[string]types.NullString{
+					"k1": types.NewNullString("v1"),
+					"k2": types.NewNullString("v2"),
 				}
+
+				metadata = v7action.Metadata{
+					Labels: labels,
+				}
+
+				org = v7action.Organization{
+					Name:     "org-name",
+					GUID:     "org-guid",
+					Metadata: &metadata,
+				}
+
 				spaces = []v7action.Space{
 					v7action.Space{
 						Name: "space-name-1",
@@ -323,12 +336,13 @@ var _ = Describe("Server", func() {
 						GUID: "space-guid-2",
 					},
 				}
+
 				fakePluginActor.GetOrganizationByNameReturns(org, nil, nil)
 				fakePluginActor.GetOrganizationSpacesReturns(spaces, nil, nil)
 			})
 
 			It("retrives the organization", func() {
-				result := plugin_models.Organization{}
+				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -338,7 +352,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("retrives the spaces for the organization", func() {
-				result := plugin_models.Organization{}
+				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -348,7 +362,7 @@ var _ = Describe("Server", func() {
 			})
 
 			It("populates the plugin model with the retrieved org and space information", func() {
-				result := plugin_models.Organization{}
+				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -358,13 +372,22 @@ var _ = Describe("Server", func() {
 				Expect(result.Spaces[1].Name).To(Equal(spaces[1].Name))
 			})
 
+			It("populates the plugin model with Metadata", func() {
+				result := plugin_models.OrgSummary{}
+				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(result.Metadata).ToNot(BeNil())
+				Expect(result.Metadata.Labels).To(BeEquivalentTo(labels))
+			})
+
 			Context("when retrieving the org fails", func() {
 				BeforeEach(func() {
 					fakePluginActor.GetOrganizationByNameReturns(v7action.Organization{}, nil, errors.New("org-error"))
 				})
 
 				It("returns an error", func() {
-					result := plugin_models.Organization{}
+					result := plugin_models.OrgSummary{}
 					err := client.Call("CliRpcCmd.GetOrg", "some-org", &result)
 					Expect(err).To(MatchError("org-error"))
 				})
@@ -376,7 +399,7 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns an error", func() {
-					result := plugin_models.Organization{}
+					result := plugin_models.OrgSummary{}
 					err := client.Call("CliRpcCmd.GetOrg", "some-org", &result)
 					Expect(err).To(MatchError("space-error"))
 				})
@@ -423,6 +446,7 @@ var _ = Describe("Server", func() {
 				BeforeEach(func() {
 					fakePluginActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, nil, errors.New("some-error"))
 				})
+
 				It("returns an error", func() {
 					result := plugin_models.DetailedApplicationSummary{}
 					err := client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
@@ -445,7 +469,6 @@ var _ = Describe("Server", func() {
 				Expect(result).To(Equal("token example"))
 
 			})
-
 		})
 	})
 
@@ -494,7 +517,6 @@ var _ = Describe("Server", func() {
 			})
 		})
 	})
-
 })
 
 func pingCli(port string) {
