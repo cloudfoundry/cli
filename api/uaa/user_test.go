@@ -1,9 +1,9 @@
 package uaa_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 	. "github.com/onsi/ginkgo"
