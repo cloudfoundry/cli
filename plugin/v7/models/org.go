@@ -7,3 +7,11 @@ type Org struct {
 	Name string
 	GUID string
 }
+
+type OrgSummary struct {
+	Org
+
+	Metadata *Metadata
+
+	Spaces []Space
+}

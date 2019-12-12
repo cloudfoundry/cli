@@ -172,8 +172,26 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrgSummary) e
 		retVal.Spaces = append(retVal.Spaces, newSpace)
 	}
 
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(org.Metadata)
+	if err != nil {
+		panic(err)
+	}
+
+	var m plugin_models.Metadata
+
+	err = dec.Decode(&m)
+	if err != nil {
+		panic(err)
+	}
+
 	retVal.Name = org.Name
 	retVal.GUID = org.GUID
+	retVal.Metadata = &m
+
 	return nil
 }
 
