@@ -25,7 +25,7 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 			fmt.Printf("Error in GetApps:: %s", err)
 		} else {
 			fmt.Println("Current Apps:\n")
-			for _, app := range(apps) {
+			for _, app := range apps {
 				fmt.Printf("result: %v, name: %s, guid: %s\n", app, app.Name, app.GUID)
 			}
 		}
