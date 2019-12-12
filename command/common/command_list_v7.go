@@ -32,7 +32,7 @@ type commandList struct {
 	App                                v7.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	ApplyManifest                      v7.ApplyManifestCommand                      `command:"apply-manifest" description:"Apply manifest properties to a space"`
 	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
-	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
+	Auth                               v7.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
 	BindRunningSecurityGroup           v6.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
 	BindSecurityGroup                  v6.BindSecurityGroupCommand                  `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`

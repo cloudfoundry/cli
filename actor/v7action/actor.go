@@ -1,4 +1,4 @@
-// Package v7action contains the business logic for the commands/v3 package
+// Package v7action contains the business logic for the commands/v7 package
 package v7action
 
 import (
@@ -16,7 +16,7 @@ const (
 // Warnings is a list of warnings returned back from the cloud controller
 type Warnings []string
 
-// Actor represents a V3 actor.
+// Actor represents a V7 actor.
 type Actor struct {
 	CloudControllerClient CloudControllerClient
 	Config                Config
@@ -25,7 +25,7 @@ type Actor struct {
 	Clock                 clock.Clock
 }
 
-// NewActor returns a new V3 actor.
+// NewActor returns a new V7 actor.
 func NewActor(client CloudControllerClient, config Config, sharedActor SharedActor, uaaClient UAAClient, clk clock.Clock) *Actor {
 	return &Actor{
 		CloudControllerClient: client,

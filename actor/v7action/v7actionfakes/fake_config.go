@@ -69,6 +69,24 @@ type FakeConfig struct {
 	setRefreshTokenArgsForCall []struct {
 		arg1 string
 	}
+	SetTokenInformationStub        func(string, string, string)
+	setTokenInformationMutex       sync.RWMutex
+	setTokenInformationArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	SetUAAClientCredentialsStub        func(string, string)
+	setUAAClientCredentialsMutex       sync.RWMutex
+	setUAAClientCredentialsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	SetUAAGrantTypeStub        func(string)
+	setUAAGrantTypeMutex       sync.RWMutex
+	setUAAGrantTypeArgsForCall []struct {
+		arg1 string
+	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
 	stagingTimeoutArgsForCall []struct {
@@ -88,6 +106,20 @@ type FakeConfig struct {
 	}
 	startupTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
+	}
+	UAAGrantTypeStub        func() string
+	uAAGrantTypeMutex       sync.RWMutex
+	uAAGrantTypeArgsForCall []struct {
+	}
+	uAAGrantTypeReturns struct {
+		result1 string
+	}
+	uAAGrantTypeReturnsOnCall map[int]struct {
+		result1 string
+	}
+	UnsetOrganizationAndSpaceInformationStub        func()
+	unsetOrganizationAndSpaceInformationMutex       sync.RWMutex
+	unsetOrganizationAndSpaceInformationArgsForCall []struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -415,6 +447,102 @@ func (fake *FakeConfig) SetRefreshTokenArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
+func (fake *FakeConfig) SetTokenInformation(arg1 string, arg2 string, arg3 string) {
+	fake.setTokenInformationMutex.Lock()
+	fake.setTokenInformationArgsForCall = append(fake.setTokenInformationArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SetTokenInformation", []interface{}{arg1, arg2, arg3})
+	fake.setTokenInformationMutex.Unlock()
+	if fake.SetTokenInformationStub != nil {
+		fake.SetTokenInformationStub(arg1, arg2, arg3)
+	}
+}
+
+func (fake *FakeConfig) SetTokenInformationCallCount() int {
+	fake.setTokenInformationMutex.RLock()
+	defer fake.setTokenInformationMutex.RUnlock()
+	return len(fake.setTokenInformationArgsForCall)
+}
+
+func (fake *FakeConfig) SetTokenInformationCalls(stub func(string, string, string)) {
+	fake.setTokenInformationMutex.Lock()
+	defer fake.setTokenInformationMutex.Unlock()
+	fake.SetTokenInformationStub = stub
+}
+
+func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, string) {
+	fake.setTokenInformationMutex.RLock()
+	defer fake.setTokenInformationMutex.RUnlock()
+	argsForCall := fake.setTokenInformationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeConfig) SetUAAClientCredentials(arg1 string, arg2 string) {
+	fake.setUAAClientCredentialsMutex.Lock()
+	fake.setUAAClientCredentialsArgsForCall = append(fake.setUAAClientCredentialsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("SetUAAClientCredentials", []interface{}{arg1, arg2})
+	fake.setUAAClientCredentialsMutex.Unlock()
+	if fake.SetUAAClientCredentialsStub != nil {
+		fake.SetUAAClientCredentialsStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeConfig) SetUAAClientCredentialsCallCount() int {
+	fake.setUAAClientCredentialsMutex.RLock()
+	defer fake.setUAAClientCredentialsMutex.RUnlock()
+	return len(fake.setUAAClientCredentialsArgsForCall)
+}
+
+func (fake *FakeConfig) SetUAAClientCredentialsCalls(stub func(string, string)) {
+	fake.setUAAClientCredentialsMutex.Lock()
+	defer fake.setUAAClientCredentialsMutex.Unlock()
+	fake.SetUAAClientCredentialsStub = stub
+}
+
+func (fake *FakeConfig) SetUAAClientCredentialsArgsForCall(i int) (string, string) {
+	fake.setUAAClientCredentialsMutex.RLock()
+	defer fake.setUAAClientCredentialsMutex.RUnlock()
+	argsForCall := fake.setUAAClientCredentialsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeConfig) SetUAAGrantType(arg1 string) {
+	fake.setUAAGrantTypeMutex.Lock()
+	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetUAAGrantType", []interface{}{arg1})
+	fake.setUAAGrantTypeMutex.Unlock()
+	if fake.SetUAAGrantTypeStub != nil {
+		fake.SetUAAGrantTypeStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeCallCount() int {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return len(fake.setUAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeCalls(stub func(string)) {
+	fake.setUAAGrantTypeMutex.Lock()
+	defer fake.setUAAGrantTypeMutex.Unlock()
+	fake.SetUAAGrantTypeStub = stub
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeArgsForCall(i int) string {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	argsForCall := fake.setUAAGrantTypeArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConfig) StagingTimeout() time.Duration {
 	fake.stagingTimeoutMutex.Lock()
 	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
@@ -519,6 +647,81 @@ func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration
 	}{result1}
 }
 
+func (fake *FakeConfig) UAAGrantType() string {
+	fake.uAAGrantTypeMutex.Lock()
+	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
+	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UAAGrantType", []interface{}{})
+	fake.uAAGrantTypeMutex.Unlock()
+	if fake.UAAGrantTypeStub != nil {
+		return fake.UAAGrantTypeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.uAAGrantTypeReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) UAAGrantTypeCallCount() int {
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	return len(fake.uAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) UAAGrantTypeCalls(stub func() string) {
+	fake.uAAGrantTypeMutex.Lock()
+	defer fake.uAAGrantTypeMutex.Unlock()
+	fake.UAAGrantTypeStub = stub
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
+	fake.uAAGrantTypeMutex.Lock()
+	defer fake.uAAGrantTypeMutex.Unlock()
+	fake.UAAGrantTypeStub = nil
+	fake.uAAGrantTypeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
+	fake.uAAGrantTypeMutex.Lock()
+	defer fake.uAAGrantTypeMutex.Unlock()
+	fake.UAAGrantTypeStub = nil
+	if fake.uAAGrantTypeReturnsOnCall == nil {
+		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAGrantTypeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UnsetOrganizationAndSpaceInformation() {
+	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
+	fake.unsetOrganizationAndSpaceInformationArgsForCall = append(fake.unsetOrganizationAndSpaceInformationArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UnsetOrganizationAndSpaceInformation", []interface{}{})
+	fake.unsetOrganizationAndSpaceInformationMutex.Unlock()
+	if fake.UnsetOrganizationAndSpaceInformationStub != nil {
+		fake.UnsetOrganizationAndSpaceInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetOrganizationAndSpaceInformationCallCount() int {
+	fake.unsetOrganizationAndSpaceInformationMutex.RLock()
+	defer fake.unsetOrganizationAndSpaceInformationMutex.RUnlock()
+	return len(fake.unsetOrganizationAndSpaceInformationArgsForCall)
+}
+
+func (fake *FakeConfig) UnsetOrganizationAndSpaceInformationCalls(stub func()) {
+	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
+	defer fake.unsetOrganizationAndSpaceInformationMutex.Unlock()
+	fake.UnsetOrganizationAndSpaceInformationStub = stub
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -536,10 +739,20 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()
 	defer fake.setRefreshTokenMutex.RUnlock()
+	fake.setTokenInformationMutex.RLock()
+	defer fake.setTokenInformationMutex.RUnlock()
+	fake.setUAAClientCredentialsMutex.RLock()
+	defer fake.setUAAClientCredentialsMutex.RUnlock()
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
 	defer fake.startupTimeoutMutex.RUnlock()
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	fake.unsetOrganizationAndSpaceInformationMutex.RLock()
+	defer fake.unsetOrganizationAndSpaceInformationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
