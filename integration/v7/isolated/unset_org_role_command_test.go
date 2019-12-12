@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("unset-org-role command", func() {
+var _ = PDescribe("unset-org-role command", func() {
 	var (
 		privilegedUsername string
 		orgName            string

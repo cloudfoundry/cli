@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("set-org-role command", func() {
+var _ = PDescribe("set-org-role command", func() {
 	Context("Help", func() {
 		When("--help flag is set", func() {
 			It("appears in cf help -a", func() {

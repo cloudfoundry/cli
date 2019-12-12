@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("set-space-role command", func() {
+var _ = PDescribe("set-space-role command", func() {
 	Describe("help text and argument validation", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
