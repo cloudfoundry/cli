@@ -2,7 +2,7 @@
 
 package models
 
-type Organization struct {
+type OrgSummary struct {
 	// GUID is the unique organization identifier.
 	GUID string
 	// Name is the name of the organization.

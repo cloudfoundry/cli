@@ -22,7 +22,7 @@ type CliConnection interface {
 	GetApps() ([]plugin_models.Application, error)
 	GetCurrentOrg() (plugin_models.Org, error)
 	GetCurrentSpace() (plugin_models.Space, error)
-	GetOrg(string) (plugin_models.Organization, error)
+	GetOrg(string) (plugin_models.OrgSummary, error)
 	Username() (string, error)
 }
 
