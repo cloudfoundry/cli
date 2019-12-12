@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = PDescribe("unset-space-role command", func() {
+var _ = Describe("unset-space-role command", func() {
 	var (
 		privilegedUsername string
 		orgName            string
@@ -122,13 +122,15 @@ var _ = PDescribe("unset-space-role command", func() {
 				var badClientID string
 
 				BeforeEach(func() {
-					badClientID = "nonexistent-client"
+					badClientID = helpers.NewUsername()
 				})
 
-				It("succeeds (idempotent case) and exits 0", func() {
-					session := helpers.CF("unset-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Exit(0))
+				It("prints an appropriate error and exits 1", func() {
+					session := helpers.CF("unset-space-role", badClientID, orgName, spaceName, "SpaceAuditor")
+					Eventually(session).Should(Say("Removing role SpaceAuditor from user %s in org %s / space %s as %s...", badClientID, orgName, spaceName, privilegedUsername))
+					Eventually(session.Err).Should(Say("User '%s' does not exist.", badClientID))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

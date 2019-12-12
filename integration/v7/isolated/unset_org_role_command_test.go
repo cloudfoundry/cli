@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = PDescribe("unset-org-role command", func() {
+var _ = Describe("unset-org-role command", func() {
 	var (
 		privilegedUsername string
 		orgName            string
@@ -154,11 +154,18 @@ var _ = PDescribe("unset-org-role command", func() {
 		})
 
 		When("the user does not exist", func() {
-			It("succeeds (idempotent case) and exits 0", func() {
-				session := helpers.CF("unset-org-role", "not-exists", orgName, "OrgAuditor")
-				Eventually(session).Should(Say("Removing role OrgAuditor from user not-exists in org %s as %s...", orgName, privilegedUsername))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Exit(0))
+			var badUsername string
+
+			BeforeEach(func() {
+				badUsername = helpers.NewUsername()
+			})
+
+			It("prints an appropriate error and exits 1", func() {
+				session := helpers.CF("unset-org-role", badUsername, orgName, "OrgAuditor")
+				Eventually(session).Should(Say("Removing role OrgAuditor from user %s in org %s as %s...", badUsername, orgName, privilegedUsername))
+				Eventually(session.Err).Should(Say("User '%s' does not exist.", badUsername))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})
