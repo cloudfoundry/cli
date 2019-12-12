@@ -269,7 +269,7 @@ var _ = Describe("User", func() {
 
 	Describe("ValidateClientUser", func() {
 		var (
-			clientID  string
+			clientID string
 			err      error
 		)
 
@@ -283,14 +283,14 @@ var _ = Describe("User", func() {
 		})
 
 		When("no errors occur", func() {
-				BeforeEach(func() {
-					uaaServer.AppendHandlers(
-						CombineHandlers(
-							verifyRequestHost(TestUAAResource),
-							VerifyRequest(http.MethodGet, "/oauth/clients/client-id"),
-							VerifyHeaderKV("Content-Type", "application/json"),
-							RespondWith(http.StatusOK, "Response{}"),
-						))
+			BeforeEach(func() {
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodGet, "/oauth/clients/client-id"),
+						VerifyHeaderKV("Content-Type", "application/json"),
+						RespondWith(http.StatusOK, "Response{}"),
+					))
 
 				It("gets users by username", func() {
 					Expect(err).NotTo(HaveOccurred())
