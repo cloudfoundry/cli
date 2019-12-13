@@ -66,7 +66,7 @@ func (cmd DropletsCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	droplets, warnings, err := cmd.Actor.GetApplicationDroplets(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

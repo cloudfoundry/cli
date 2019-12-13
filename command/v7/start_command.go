@@ -67,7 +67,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	}
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	packageGuid, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("Staging app and tracing logs")
 
 		logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
-		cmd.UI.DisplayWarningsV7(logWarnings)
+		cmd.UI.DisplayWarnings(logWarnings)
 		if logErr != nil {
 			return logErr
 		}
@@ -112,7 +112,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		}
 
 		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
-		cmd.UI.DisplayWarningsV7(warnings)
+		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
 		}
@@ -121,7 +121,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("\nWaiting for app to start...")
 
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.UserNotFoundError); ok {
 			cmd.UI.DisplayTextWithFlavor(err.Error())
@@ -145,7 +145,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		false,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

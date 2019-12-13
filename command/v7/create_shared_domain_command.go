@@ -61,7 +61,7 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

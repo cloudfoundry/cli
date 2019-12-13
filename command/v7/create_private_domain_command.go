@@ -62,7 +62,7 @@ func (cmd CreatePrivateDomainCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.CreatePrivateDomain(domain, orgName)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

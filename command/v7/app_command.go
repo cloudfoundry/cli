@@ -70,7 +70,7 @@ func (cmd AppCommand) Execute(args []string) error {
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
 	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (cmd AppCommand) Execute(args []string) error {
 
 func (cmd AppCommand) displayAppGUID() error {
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

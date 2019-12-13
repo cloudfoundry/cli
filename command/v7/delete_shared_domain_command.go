@@ -80,11 +80,11 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 	})
 
 	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
 		if _, ok := err.(actionerror.DomainNotFoundError); ok {
-			cmd.UI.DisplayWarningV7("Domain '{{.DomainName}}' does not exist.", map[string]interface{}{
+			cmd.UI.DisplayWarning("Domain '{{.DomainName}}' does not exist.", map[string]interface{}{
 				"DomainName": cmd.RequiredArgs.Domain,
 			})
 			cmd.UI.DisplayOK()
@@ -99,7 +99,7 @@ func (cmd DeleteSharedDomainCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.DeleteDomain(domain)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

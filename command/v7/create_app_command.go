@@ -68,7 +68,7 @@ func (cmd CreateAppCommand) Execute(args []string) error {
 		},
 		cmd.Config.TargetedSpace().GUID,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
 		case ccerror.NameNotUniqueInSpaceError:

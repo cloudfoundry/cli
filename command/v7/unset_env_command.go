@@ -67,7 +67,7 @@ func (cmd UnsetEnvCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		cmd.RequiredArgs.EnvironmentVariableName,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch errVal := err.(type) {
 		case actionerror.EnvironmentVariableNotSetError:

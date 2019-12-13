@@ -76,17 +76,17 @@ func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 		})
 	}
 	warnings, err := cmd.Actor.DeleteBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.Stack)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
 		switch err.(type) {
 		case actionerror.BuildpackNotFoundError:
 			if cmd.Stack == "" {
-				cmd.UI.DisplayWarningV7("Buildpack '{{.BuildpackName}}' does not exist.", map[string]interface{}{
+				cmd.UI.DisplayWarning("Buildpack '{{.BuildpackName}}' does not exist.", map[string]interface{}{
 					"BuildpackName": cmd.RequiredArgs.Buildpack,
 				})
 			} else {
-				cmd.UI.DisplayWarningV7("Buildpack '{{.BuildpackName}}' with stack '{{.Stack}}' not found.", map[string]interface{}{
+				cmd.UI.DisplayWarning("Buildpack '{{.BuildpackName}}' with stack '{{.Stack}}' not found.", map[string]interface{}{
 					"BuildpackName": cmd.RequiredArgs.Buildpack,
 					"Stack":         cmd.Stack,
 				})

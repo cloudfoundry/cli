@@ -61,7 +61,7 @@ func (cmd AppsCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	summaries, warnings, err := cmd.Actor.GetAppSummariesForSpace(cmd.Config.TargetedSpace().GUID, cmd.Labels)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

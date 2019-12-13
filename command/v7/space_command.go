@@ -72,7 +72,7 @@ func (cmd SpaceCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByNameAndOrganization(spaceName, targetedOrg.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (cmd SpaceCommand) Execute(args []string) error {
 
 func (cmd SpaceCommand) displaySpaceGUID(spaceName string, orgGUID string) error {
 	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

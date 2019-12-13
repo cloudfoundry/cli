@@ -89,7 +89,7 @@ func (cmd SSHCommand) Execute(args []string) error {
 		cmd.ProcessType,
 		cmd.ProcessIndex,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

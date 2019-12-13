@@ -64,7 +64,7 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 
 	org, warnings, err := cmd.Actor.CreateOrganization(orgName)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.OrganizationNameTakenError); ok {
 			cmd.UI.DisplayText(err.Error())
@@ -81,7 +81,7 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 	warnings, err = cmd.Actor.CreateOrgRole(constant.OrgManagerRole, org.GUID, user.Name, user.Origin, user.IsClient)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

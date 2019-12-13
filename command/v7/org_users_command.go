@@ -61,13 +61,13 @@ func (cmd *OrgUsersCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.Organization)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	orgUsersByRoleType, warnings, err := cmd.Actor.GetOrgUsersByRoleType(org.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

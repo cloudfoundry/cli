@@ -72,7 +72,7 @@ func (cmd SetRunningEnvironmentVariableGroupCommand) Execute(args []string) erro
 		constant.RunningEnvironmentVariableGroup,
 		envVars,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

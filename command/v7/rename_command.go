@@ -62,7 +62,7 @@ func (cmd RenameCommand) Execute(args []string) error {
 	)
 
 	_, warnings, err := cmd.Actor.RenameApplicationByNameAndSpaceGUID(oldName, newName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

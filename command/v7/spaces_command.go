@@ -59,7 +59,7 @@ func (cmd SpacesCommand) Execute([]string) error {
 	cmd.UI.DisplayNewline()
 
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpacesWithLabelSelector(cmd.Config.TargetedOrganization().GUID, cmd.Labels)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

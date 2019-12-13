@@ -74,7 +74,7 @@ func (cmd CreateAppManifestCommand) Execute(args []string) error {
 
 	spaceGUID := cmd.Config.TargetedSpace().GUID
 	manifestBytes, warnings, err := cmd.Actor.GetRawApplicationManifestByNameAndSpace(appName, spaceGUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

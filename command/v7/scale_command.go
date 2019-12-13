@@ -66,7 +66,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 	}
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	showErr := cmd.showCurrentScale(user.Name, err)
 	if showErr != nil {
@@ -142,7 +142,7 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 		MemoryInMB: cmd.MemoryLimit.NullUint64,
 		DiskInMB:   cmd.DiskLimit.NullUint64,
 	})
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return false, err
 	}
@@ -167,7 +167,7 @@ func (cmd ScaleCommand) restartApplication(appGUID string, username string) erro
 	cmd.UI.DisplayNewline()
 
 	warnings, err := cmd.Actor.StopApplication(appGUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -181,7 +181,7 @@ func (cmd ScaleCommand) restartApplication(appGUID string, username string) erro
 	cmd.UI.DisplayNewline()
 
 	warnings, err = cmd.Actor.StartApplication(appGUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func (cmd ScaleCommand) showCurrentScale(userName string, runningErr error) erro
 	})
 
 	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

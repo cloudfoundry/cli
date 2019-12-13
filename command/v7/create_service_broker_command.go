@@ -85,7 +85,7 @@ func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {
 			SpaceGUID: space.GUID,
 		},
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

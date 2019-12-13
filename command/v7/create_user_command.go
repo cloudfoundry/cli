@@ -77,7 +77,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 			"TargetUser": cmd.Args.Username,
 		})
 
-		cmd.UI.DisplayWarningV7("User '{{.User}}' already exists.", map[string]interface{}{
+		cmd.UI.DisplayWarning("User '{{.User}}' already exists.", map[string]interface{}{
 			"User": cmd.Args.Username,
 		})
 
@@ -103,11 +103,11 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	})
 
 	_, warnings, err := cmd.Actor.CreateUser(cmd.Args.Username, password, cmd.Origin)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
 		if _, ok := err.(uaa.ConflictError); ok {
-			cmd.UI.DisplayWarningV7("User '{{.User}}' already exists.", map[string]interface{}{
+			cmd.UI.DisplayWarning("User '{{.User}}' already exists.", map[string]interface{}{
 				"User": cmd.Args.Username,
 			})
 			cmd.UI.DisplayOK()

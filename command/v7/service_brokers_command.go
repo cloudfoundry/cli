@@ -53,7 +53,7 @@ func (cmd *ServiceBrokersCommand) Execute(args []string) error {
 	cmd.UI.DisplayTextWithFlavor("Getting service brokers as {{.Username}}...", map[string]interface{}{"Username": currentUser.Name})
 
 	serviceBrokers, warnings, err := cmd.Actor.GetServiceBrokers()
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

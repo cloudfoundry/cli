@@ -88,7 +88,7 @@ func (cmd UnsharePrivateDomainCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.UnsharePrivateDomain(domain, orgName)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

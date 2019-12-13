@@ -68,7 +68,7 @@ func (cmd SetEnvCommand) Execute(args []string) error {
 			Key:   cmd.RequiredArgs.EnvironmentVariableName,
 			Value: string(cmd.RequiredArgs.EnvironmentVariableValue),
 		})
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

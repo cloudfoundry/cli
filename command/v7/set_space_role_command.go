@@ -80,13 +80,13 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 	}
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Args.Organization)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Args.Space, org.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -97,10 +97,10 @@ func (cmd *SetSpaceRoleCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.CreateSpaceRole(roleType, org.GUID, space.GUID, cmd.Args.Username, origin, cmd.IsClient)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.RoleAlreadyExistsError); ok {
-			cmd.UI.DisplayWarningV7("User '{{.TargetUserName}}' already has role '{{.RoleType}}' in org '{{.OrgName}}' / space '{{.SpaceName}}'.", map[string]interface{}{
+			cmd.UI.DisplayWarning("User '{{.TargetUserName}}' already has role '{{.RoleType}}' in org '{{.OrgName}}' / space '{{.SpaceName}}'.", map[string]interface{}{
 				"RoleType":       cmd.Args.Role.Role,
 				"TargetUserName": cmd.Args.Username,
 				"OrgName":        cmd.Args.Organization,

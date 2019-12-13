@@ -97,7 +97,7 @@ func (cmd UnsetLabelCommand) executeApp(username string, labels map[string]types
 
 	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -110,7 +110,7 @@ func (cmd UnsetLabelCommand) executeDomain(username string, labels map[string]ty
 
 	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -125,7 +125,7 @@ func (cmd UnsetLabelCommand) executeRoute(username string, labels map[string]typ
 
 	warnings, err := cmd.Actor.UpdateRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -150,7 +150,7 @@ func (cmd UnsetLabelCommand) executeBuildpack(username string, labels map[string
 
 	warnings, err := cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -168,7 +168,7 @@ func (cmd UnsetLabelCommand) executeOrg(username string, labels map[string]types
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -187,7 +187,7 @@ func (cmd UnsetLabelCommand) executeSpace(username string, labels map[string]typ
 
 	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
@@ -205,7 +205,7 @@ func (cmd UnsetLabelCommand) executeStack(username string, labels map[string]typ
 
 	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }

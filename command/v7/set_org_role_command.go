@@ -78,7 +78,7 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 	}
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Args.Organization)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -89,10 +89,10 @@ func (cmd *SetOrgRoleCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.CreateOrgRole(roleType, org.GUID, cmd.Args.Username, origin, cmd.IsClient)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.RoleAlreadyExistsError); ok {
-			cmd.UI.DisplayWarningV7("User '{{.TargetUserName}}' already has role '{{.RoleType}}' in org '{{.OrgName}}'.", map[string]interface{}{
+			cmd.UI.DisplayWarning("User '{{.TargetUserName}}' already has role '{{.RoleType}}' in org '{{.OrgName}}'.", map[string]interface{}{
 				"RoleType":       cmd.Args.Role.Role,
 				"TargetUserName": cmd.Args.Username,
 				"OrgName":        cmd.Args.Organization,

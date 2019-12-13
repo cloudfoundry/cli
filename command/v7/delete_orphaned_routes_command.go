@@ -74,7 +74,7 @@ func (cmd DeleteOrphanedRoutesCommand) Execute(args []string) error {
 
 	warnings, err := cmd.Actor.DeleteOrphanedRoutes(cmd.Config.TargetedSpace().GUID)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

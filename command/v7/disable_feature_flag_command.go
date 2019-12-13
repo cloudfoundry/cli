@@ -58,7 +58,7 @@ func (cmd DisableFeatureFlagCommand) Execute(args []string) error {
 	})
 
 	warnings, err := cmd.Actor.DisableFeatureFlag(cmd.RequiredArgs.Feature)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

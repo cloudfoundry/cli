@@ -105,7 +105,7 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 	}
 
 	warnings, err := cmd.Actor.SetSpaceManifest(cmd.Config.TargetedSpace().GUID, rawManifest)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

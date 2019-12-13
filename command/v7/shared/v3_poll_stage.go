@@ -30,7 +30,7 @@ func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7ac
 				closedWarningsStream = true
 				break
 			}
-			ui.DisplayWarningsV7(warnings)
+			ui.DisplayWarnings(warnings)
 		case logErr, ok := <-logErrStream:
 			if !ok {
 				break

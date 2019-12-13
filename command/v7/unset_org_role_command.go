@@ -76,7 +76,7 @@ func (cmd *UnsetOrgRoleCommand) Execute(args []string) error {
 	}
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Args.Organization)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (cmd *UnsetOrgRoleCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.DeleteOrgRole(roleType, org.GUID, cmd.Args.Username, origin, cmd.IsClient)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

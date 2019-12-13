@@ -53,7 +53,7 @@ func (cmd StopCommand) Execute(args []string) error {
 	}
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (cmd StopCommand) Execute(args []string) error {
 	})
 	warnings, err = cmd.Actor.StopApplication(app.GUID)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

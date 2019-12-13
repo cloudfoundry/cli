@@ -62,18 +62,18 @@ func (cmd *SpaceUsersCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.Organization)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.RequiredArgs.Space, org.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	spaceUsersByRoleType, warnings, err := cmd.Actor.GetSpaceUsersByRoleType(space.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

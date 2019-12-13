@@ -64,7 +64,7 @@ func (cmd RenameOrgCommand) Execute(args []string) error {
 		cmd.RequiredArgs.OldOrgName,
 		cmd.RequiredArgs.NewOrgName,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

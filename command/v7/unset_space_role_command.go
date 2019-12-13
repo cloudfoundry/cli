@@ -78,13 +78,13 @@ func (cmd *UnsetSpaceRoleCommand) Execute(args []string) error {
 	}
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Args.Organization)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Args.Space, org.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (cmd *UnsetSpaceRoleCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.DeleteSpaceRole(roleType, space.GUID, cmd.Args.Username, origin, cmd.IsClient)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

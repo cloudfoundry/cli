@@ -58,7 +58,7 @@ func (cmd StagingEnvironmentVariableGroupCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	envVars, warnings, err := cmd.Actor.GetEnvironmentVariableGroup(constant.StagingEnvironmentVariableGroup)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

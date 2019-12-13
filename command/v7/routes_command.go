@@ -80,13 +80,13 @@ func (cmd RoutesCommand) Execute(args []string) error {
 		routes, warnings, err = cmd.Actor.GetRoutesBySpace(targetedSpace.GUID, cmd.Labels)
 	}
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	routeSummaries, warnings, err := cmd.Actor.GetRouteSummaries(routes)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

@@ -190,7 +190,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		transformedRawManifest,
 	)
 
-	cmd.UI.DisplayWarningsV7(v7ActionWarnings)
+	cmd.UI.DisplayWarnings(v7ActionWarnings)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		transformedManifest,
 		flagOverrides,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -488,7 +488,7 @@ func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 		cmd.Config.TargetedSpace().GUID,
 		true,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -500,7 +500,7 @@ func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 
 func (cmd *PushCommand) eventStreamHandler(eventStream <-chan *v7pushaction.PushEvent) error {
 	for event := range eventStream {
-		cmd.UI.DisplayWarningsV7(event.Warnings)
+		cmd.UI.DisplayWarnings(event.Warnings)
 		if event.Err != nil {
 			return event.Err
 		}
@@ -548,7 +548,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Staging app and tracing logs...")
 		logStream, errStream, cancelFunc, warnings, err := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
-		cmd.UI.DisplayWarningsV7(warnings)
+		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
 		}

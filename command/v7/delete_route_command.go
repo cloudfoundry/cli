@@ -87,7 +87,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 
 	warnings, err := cmd.Actor.DeleteRoute(domain, hostname, pathName)
 
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); ok {
 			cmd.UI.DisplayText(`Unable to delete. ` + err.Error())

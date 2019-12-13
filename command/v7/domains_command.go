@@ -61,7 +61,7 @@ func (cmd DomainsCommand) Execute(args []string) error {
 	})
 
 	domains, warnings, err := cmd.Actor.GetOrganizationDomains(targetedOrg.GUID, cmd.Labels)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}

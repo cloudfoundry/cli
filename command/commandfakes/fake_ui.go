@@ -188,20 +188,9 @@ type FakeUI struct {
 		arg1 string
 		arg2 []map[string]interface{}
 	}
-	DisplayWarningV7Stub        func(string, ...map[string]interface{})
-	displayWarningV7Mutex       sync.RWMutex
-	displayWarningV7ArgsForCall []struct {
-		arg1 string
-		arg2 []map[string]interface{}
-	}
 	DisplayWarningsStub        func([]string)
 	displayWarningsMutex       sync.RWMutex
 	displayWarningsArgsForCall []struct {
-		arg1 []string
-	}
-	DisplayWarningsV7Stub        func([]string)
-	displayWarningsV7Mutex       sync.RWMutex
-	displayWarningsV7ArgsForCall []struct {
 		arg1 []string
 	}
 	GetErrStub        func() io.Writer
@@ -1217,38 +1206,6 @@ func (fake *FakeUI) DisplayWarningArgsForCall(i int) (string, []map[string]inter
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeUI) DisplayWarningV7(arg1 string, arg2 ...map[string]interface{}) {
-	fake.displayWarningV7Mutex.Lock()
-	fake.displayWarningV7ArgsForCall = append(fake.displayWarningV7ArgsForCall, struct {
-		arg1 string
-		arg2 []map[string]interface{}
-	}{arg1, arg2})
-	fake.recordInvocation("DisplayWarningV7", []interface{}{arg1, arg2})
-	fake.displayWarningV7Mutex.Unlock()
-	if fake.DisplayWarningV7Stub != nil {
-		fake.DisplayWarningV7Stub(arg1, arg2...)
-	}
-}
-
-func (fake *FakeUI) DisplayWarningV7CallCount() int {
-	fake.displayWarningV7Mutex.RLock()
-	defer fake.displayWarningV7Mutex.RUnlock()
-	return len(fake.displayWarningV7ArgsForCall)
-}
-
-func (fake *FakeUI) DisplayWarningV7Calls(stub func(string, ...map[string]interface{})) {
-	fake.displayWarningV7Mutex.Lock()
-	defer fake.displayWarningV7Mutex.Unlock()
-	fake.DisplayWarningV7Stub = stub
-}
-
-func (fake *FakeUI) DisplayWarningV7ArgsForCall(i int) (string, []map[string]interface{}) {
-	fake.displayWarningV7Mutex.RLock()
-	defer fake.displayWarningV7Mutex.RUnlock()
-	argsForCall := fake.displayWarningV7ArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
 func (fake *FakeUI) DisplayWarnings(arg1 []string) {
 	var arg1Copy []string
 	if arg1 != nil {
@@ -1282,42 +1239,6 @@ func (fake *FakeUI) DisplayWarningsArgsForCall(i int) []string {
 	fake.displayWarningsMutex.RLock()
 	defer fake.displayWarningsMutex.RUnlock()
 	argsForCall := fake.displayWarningsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeUI) DisplayWarningsV7(arg1 []string) {
-	var arg1Copy []string
-	if arg1 != nil {
-		arg1Copy = make([]string, len(arg1))
-		copy(arg1Copy, arg1)
-	}
-	fake.displayWarningsV7Mutex.Lock()
-	fake.displayWarningsV7ArgsForCall = append(fake.displayWarningsV7ArgsForCall, struct {
-		arg1 []string
-	}{arg1Copy})
-	fake.recordInvocation("DisplayWarningsV7", []interface{}{arg1Copy})
-	fake.displayWarningsV7Mutex.Unlock()
-	if fake.DisplayWarningsV7Stub != nil {
-		fake.DisplayWarningsV7Stub(arg1)
-	}
-}
-
-func (fake *FakeUI) DisplayWarningsV7CallCount() int {
-	fake.displayWarningsV7Mutex.RLock()
-	defer fake.displayWarningsV7Mutex.RUnlock()
-	return len(fake.displayWarningsV7ArgsForCall)
-}
-
-func (fake *FakeUI) DisplayWarningsV7Calls(stub func([]string)) {
-	fake.displayWarningsV7Mutex.Lock()
-	defer fake.displayWarningsV7Mutex.Unlock()
-	fake.DisplayWarningsV7Stub = stub
-}
-
-func (fake *FakeUI) DisplayWarningsV7ArgsForCall(i int) []string {
-	fake.displayWarningsV7Mutex.RLock()
-	defer fake.displayWarningsV7Mutex.RUnlock()
-	argsForCall := fake.displayWarningsV7ArgsForCall[i]
 	return argsForCall.arg1
 }
 
@@ -1816,12 +1737,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayTextWithFlavorMutex.RUnlock()
 	fake.displayWarningMutex.RLock()
 	defer fake.displayWarningMutex.RUnlock()
-	fake.displayWarningV7Mutex.RLock()
-	defer fake.displayWarningV7Mutex.RUnlock()
 	fake.displayWarningsMutex.RLock()
 	defer fake.displayWarningsMutex.RUnlock()
-	fake.displayWarningsV7Mutex.RLock()
-	defer fake.displayWarningsV7Mutex.RUnlock()
 	fake.getErrMutex.RLock()
 	defer fake.getErrMutex.RUnlock()
 	fake.getInMutex.RLock()

@@ -90,11 +90,11 @@ func (cmd DeleteCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		cmd.DeleteMappedRoutes,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
 		case actionerror.ApplicationNotFoundError:
-			cmd.UI.DisplayWarningV7("App '{{.AppName}}' does not exist.", map[string]interface{}{
+			cmd.UI.DisplayWarning("App '{{.AppName}}' does not exist.", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
 		case actionerror.RouteBoundToMultipleAppsError:

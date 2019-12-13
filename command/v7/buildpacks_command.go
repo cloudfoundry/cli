@@ -60,7 +60,7 @@ func (cmd BuildpacksCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	buildpacks, warnings, err := cmd.Actor.GetBuildpacks(cmd.Labels)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
