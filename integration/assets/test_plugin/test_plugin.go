@@ -75,7 +75,8 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Done GetApp:", result)
 	case "GetApps":
 		result, _ := cliConnection.GetApps()
-		fmt.Println("Done GetApps:", result)
+		fmt.Println("Done GetApps:")
+		fmt.Printf("%+v", result)
 	case "GetOrg":
 		result, _ := cliConnection.GetOrg(args[1])
 		fmt.Println("Done GetOrg:", result)

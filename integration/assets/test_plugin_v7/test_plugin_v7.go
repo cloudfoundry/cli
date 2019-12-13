@@ -23,10 +23,13 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		apps, err := cliConnection.GetApps()
 		if err != nil {
 			fmt.Printf("Error in GetApps:: %s", err)
+		} else if len(apps) == 0 {
+			fmt.Println("No apps in the current space")
 		} else {
 			fmt.Println("Current Apps:\n")
 			for _, app := range apps {
-				fmt.Printf("result: %v, name: %s, guid: %s\n", app, app.Name, app.GUID)
+				fmt.Printf("result: %+v, name: %s, guid: %s, ", app, app.Name, app.GUID)
+				fmt.Printf("metadata: %+v\n", *app.Metadata)
 			}
 		}
 	case "GetCurrentOrg":
