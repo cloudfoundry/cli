@@ -23,6 +23,7 @@ type CliConnection interface {
 	GetCurrentOrg() (plugin_models.Org, error)
 	GetCurrentSpace() (plugin_models.Space, error)
 	GetOrg(string) (plugin_models.OrgSummary, error)
+	IsLoggedIn() (bool, error)
 	Username() (string, error)
 }
 

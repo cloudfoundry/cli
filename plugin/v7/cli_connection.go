@@ -92,6 +92,14 @@ func (c *cliConnection) GetOrg(orgName string) (plugin_models.OrgSummary, error)
 	return result, err
 }
 
+func (c *cliConnection) IsLoggedIn() (bool, error) {
+	var result bool
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.IsLoggedIn", "", &result)
+	})
+	return result, err
+}
+
 func (c *cliConnection) Username() (string, error) {
 	var result string
 

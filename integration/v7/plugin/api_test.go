@@ -93,6 +93,22 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("IsLoggedIn", func() {
+		When("logged in", func() {
+			It("returns true", func() {
+				confirmTestPluginOutput("IsLoggedIn", "true")
+			})
+		})
+		When("logged out", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
+			It("returns false", func() {
+				confirmTestPluginOutput("IsLoggedIn", "false")
+			})
+		})
+	})
+
 	Describe("Username", func() {
 		It("gets the current user's name", func() {
 			username := getUsername()
