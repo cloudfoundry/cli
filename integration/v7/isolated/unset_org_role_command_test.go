@@ -98,13 +98,13 @@ var _ = Describe("unset-org-role command", func() {
 				var badClientID string
 
 				BeforeEach(func() {
-					badClientID = "nonexistent-client"
+					badClientID = helpers.NewUsername()
 				})
 
 				It("fails with an appropriate error message", func() {
 					session := helpers.CF("unset-org-role", badClientID, orgName, "OrgAuditor", "--client")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("User 'nonexistent-client' does not exist."))
+					Eventually(session.Err).Should(Say("User '%s' does not exist.", badClientID))
 					Eventually(session).Should(Exit(1))
 				})
 			})
