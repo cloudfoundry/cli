@@ -5,22 +5,19 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/clock"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/progressbar"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
-
+	"code.cloudfoundry.org/cli/util/progressbar"
+	"code.cloudfoundry.org/clock"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 )
@@ -51,9 +48,9 @@ type V7ActorForPush interface {
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
-//go:generate counterfeiter . PushManifestParser
+//go:generate counterfeiter . ManifestParser
 
-type PushManifestParser interface {
+type ManifestParser interface {
 	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) (manifestparser.Manifest, error)
 	MarshalManifest(manifest manifestparser.Manifest) ([]byte, error)
 }
@@ -101,9 +98,9 @@ type PushCommand struct {
 	VersionActor    V7ActorForPush
 	SharedActor     command.SharedActor
 	ProgressBar     ProgressBar
-	PWD             string
+	CWD             string
 	ManifestLocator ManifestLocator
-	ManifestParser  PushManifestParser
+	ManifestParser  ManifestParser
 
 	stopStreamingFunc func()
 }
@@ -128,7 +125,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	currentDir, err := os.Getwd()
-	cmd.PWD = currentDir
+	cmd.CWD = currentDir
 
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
@@ -250,10 +247,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	}
 
 	log.Info("reading manifest if exists")
-	var pathsToVarsFiles []string
-	pathsToVarsFiles = append(pathsToVarsFiles, flagOverrides.PathsToVarsFiles...)
-
-	readPath := cmd.PWD
+	readPath := cmd.CWD
 	if flagOverrides.ManifestPath != "" {
 		log.WithField("manifestPath", flagOverrides.ManifestPath).Debug("reading '-f' provided manifest")
 		readPath = flagOverrides.ManifestPath
@@ -270,7 +264,7 @@ func (cmd PushCommand) GetBaseManifest(flagOverrides v7pushaction.FlagOverrides)
 	}
 
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, flagOverrides.Vars)
+	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, flagOverrides.PathsToVarsFiles, flagOverrides.Vars)
 	if err != nil {
 		log.Errorln("reading manifest:", err)
 		return manifestparser.Manifest{}, err

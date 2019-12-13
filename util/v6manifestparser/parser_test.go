@@ -1,15 +1,14 @@
 package v6manifestparser_test
 
 import (
-	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	. "code.cloudfoundry.org/cli/util/v6manifestparser"
-
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -452,8 +451,7 @@ applications:
 					app1FullPath = filepath.Join(manifestDir, "app1")
 					app2FullPath = filepath.Join(manifestDir, "app2")
 
-					var err error
-					err = os.MkdirAll(app1FullPath, 0777)
+					err := os.MkdirAll(app1FullPath, 0777)
 					Expect(err).ToNot(HaveOccurred())
 					err = os.MkdirAll(app2FullPath, 0777)
 					Expect(err).ToNot(HaveOccurred())

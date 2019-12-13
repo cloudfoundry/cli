@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -90,7 +91,7 @@ var _ = Describe("apply-manifest command", func() {
 
 			It("reports an error", func() {
 				session := helpers.CF("apply-manifest", "-f", manifestPath)
-				Eventually(session.Err).Should(Say("Found an application with no name specified"))
+				Eventually(session.Err).Should(Say("For application at index 0: Name must not be empty"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -217,6 +218,43 @@ var _ = Describe("apply-manifest command", func() {
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
+			})
+		})
+
+		When("--vars are provided", func() {
+			var (
+				tempDir        string
+				pathToManifest string
+			)
+
+			BeforeEach(func() {
+				var err error
+				tempDir, err = ioutil.TempDir("", "simple-manifest-test")
+				Expect(err).ToNot(HaveOccurred())
+				pathToManifest = filepath.Join(tempDir, "manifest.yml")
+				helpers.WriteManifest(pathToManifest, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+							"env": map[string]interface{}{
+								"key1": "((var1))",
+								"key4": "((var2))",
+							},
+						},
+					},
+				})
+			})
+
+			It("uses the manifest with substituted variables", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					session := helpers.CF("apply-manifest", "-f", pathToManifest, "--var=var1=secret-key", "--var=var2=foobar")
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("env", appName)
+				Eventually(session).Should(Say(`key1:\s+secret-key`))
+				Eventually(session).Should(Say(`key4:\s+foobar`))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
