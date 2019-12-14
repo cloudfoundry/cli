@@ -1,10 +1,12 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
 	"context"
@@ -100,7 +102,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 
 	droplet, err := shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
-		return err
+		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
 	}
 
 	// attach droplet to app
@@ -122,7 +124,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
 	cmd.UI.DisplayWarningsV7(warnings)
 	if err != nil {
-		return err
+		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
 	}
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
@@ -138,4 +140,25 @@ func (cmd RestageCommand) Execute(args []string) error {
 	appSummaryDisplayer.AppDisplay(summary, false)
 
 	return nil
+}
+
+func (cmd RestageCommand) mapErr(appName string, err error) error {
+	switch err.(type) {
+	case actionerror.AllInstancesCrashedError:
+		return translatableerror.ApplicationUnableToStartError{
+			AppName:    appName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	case actionerror.StartupTimeoutError:
+		return translatableerror.StartupTimeoutError{
+			AppName:    appName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	case actionerror.StagingFailedNoAppDetectedError:
+		return translatableerror.StagingFailedNoAppDetectedError{
+			Message:    err.Error(),
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	}
+	return err
 }
