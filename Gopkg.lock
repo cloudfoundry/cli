@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:5579d171c21fa6078ed325bc11b689d5ea406ad73e1428bbcc2f662cb1703969"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "ca3deaa94ad8790dcf9b44190bad91d23b9fd889"
+  version = "v6.48.0"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -403,7 +415,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:9c88c09de47a47bbc7e7d1cad7dbe963edc6b2f27b89ac8591ea7cc60cd376d3"
+  digest = "1:fd5eac6206bb67b8624459e1b9acc5acf20c64a0e940ae50224e4b89fbcf00e7"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -427,8 +439,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "2e1be8f7d90e9d3e3e58b0ce470f2f14d075406f"
-  version = "v1.7.0"
+  revision = "ce5d301e555bb672c693c099ba6ca5087b06c0b4"
+  version = "v1.10.3"
 
 [[projects]]
   digest = "1:20237a6d616a2a70a29fcc2ac93e7039a39eed0d040ef4a818479fcd953f9466"
