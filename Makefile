@@ -228,10 +228,7 @@ rsrc.syso:
 
 test: units ## (synonym for units)
 
-units: build ## Ensure the code looks good, compiles, and passes unit tests
-	ginkgo -r -p -randomizeAllSpecs -randomizeSuites -keepGoing \
-		$(PACKAGES)
-	@echo "\nSWEET SUITE SUCCESS"
+units: units-full ## (synonym for units-full)
 
 units-plugin:
 ifeq ($(TARGET),v6)
