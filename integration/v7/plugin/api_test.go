@@ -148,4 +148,25 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("IsSkipSSLValidation", func() {
+		When("--skip-ssl-validation is not specified", func() {
+			BeforeEach(func() {
+				if helpers.SkipSSLValidation() {
+					Skip("Test is being run with skip ssl validation")
+				}
+			})
+			It("returns false", func() {
+				confirmTestPluginOutput("IsSkipSSLValidation", "false")
+			})
+		})
+		When("--skip-ssl-validation is specified", func() {
+			BeforeEach(func() {
+				Eventually(helpers.CF("api", apiURL, "--skip-ssl-validation")).Should(Exit(0))
+			})
+			It("returns true", func() {
+				confirmTestPluginOutput("IsSkipSSLValidation", "true")
+			})
+		})
+	})
+
 })

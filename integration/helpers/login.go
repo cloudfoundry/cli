@@ -18,7 +18,7 @@ import (
 // URL and a boolean indicating if SSL validation was skipped.
 func SetAPI() (string, bool) {
 	apiURL := GetAPI()
-	skipSSLValidation := skipSSLValidation()
+	skipSSLValidation := SkipSSLValidation()
 	if skipSSLValidation {
 		Eventually(CF("api", apiURL, "--skip-ssl-validation")).Should(Exit(0))
 	} else {
@@ -32,7 +32,7 @@ func UnsetAPI() {
 	Eventually(CF("api", "--unset")).Should(Exit(0))
 }
 
-func skipSSLValidation() bool {
+func SkipSSLValidation() bool {
 	if skip, err := strconv.ParseBool(os.Getenv("SKIP_SSL_VALIDATION")); err == nil && !skip {
 		return false
 	}

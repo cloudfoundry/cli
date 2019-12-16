@@ -110,6 +110,16 @@ func (c *cliConnection) Username() (string, error) {
 	return result, err
 }
 
+func (c *cliConnection) IsSkipSSLValidation() (bool, error) {
+	var result bool
+
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.IsSkipSSLValidation", "", &result)
+	})
+
+	return result, err
+}
+
 func (c *cliConnection) isMinCliVersion(version string) bool {
 	var result bool
 

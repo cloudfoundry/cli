@@ -506,6 +506,35 @@ var _ = Describe("Server", func() {
 
 			})
 		})
+
+		Describe("IsSkipSSLValidation", func() {
+			When("skip ssl validation is false", func() {
+				BeforeEach(func() {
+					fakeConfig.SkipSSLValidationReturns(false)
+				})
+
+				It("returns false", func() {
+					var result bool
+					err = client.Call("CliRpcCmd.IsSkipSSLValidation", "", &result)
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(BeFalse())
+				})
+			})
+			When("skip ssl validation is true", func() {
+				BeforeEach(func() {
+					fakeConfig.SkipSSLValidationReturns(true)
+				})
+
+				It("returns false", func() {
+					var result bool
+					err = client.Call("CliRpcCmd.IsSkipSSLValidation", "", &result)
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(result).To(BeTrue())
+				})
+			})
+		})
 	})
 
 	Describe(".CallCoreCommand", func() {

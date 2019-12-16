@@ -24,6 +24,7 @@ type CliConnection interface {
 	GetCurrentSpace() (plugin_models.Space, error)
 	GetOrg(string) (plugin_models.OrgSummary, error)
 	IsLoggedIn() (bool, error)
+	IsSkipSSLValidation() (bool, error)
 	Username() (string, error)
 }
 

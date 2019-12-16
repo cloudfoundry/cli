@@ -13,6 +13,9 @@ type Test1 struct {
 
 func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	switch args[0] {
+	case "AccessToken":
+		result, _ := cliConnection.AccessToken()
+		fmt.Println("Done AccessToken:", result)
 	case "ApiEndpoint":
 		result, _ := cliConnection.ApiEndpoint()
 		fmt.Println("Done ApiEndpoint:", result)
@@ -56,6 +59,9 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	case "IsLoggedIn":
 		result, _ := cliConnection.IsLoggedIn()
 		fmt.Printf("IsLoggedIn: %v", result)
+	case "IsSkipSSLValidation":
+		result, _ := cliConnection.IsSkipSSLValidation()
+		fmt.Println("Done IsSkipSSLValidation:", result)
 	case "Username":
 		result, err := cliConnection.Username()
 		if err != nil {
@@ -65,9 +71,6 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		}
 	case "TestPluginCommandWithAliasV7", "Cool-V7":
 		fmt.Println("You called Test Plugin Command V7 With Alias!")
-	case "AccessToken":
-		result, _ := cliConnection.AccessToken()
-		fmt.Println("Done AccessToken:", result)
 	case "CoolTest":
 		fmt.Println("I am a test plugin")
 	}
@@ -86,6 +89,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			Build: 0,
 		},
 		Commands: []plugin.Command{
+			{Name: "AccessToken"},
 			{Name: "ApiEndpoint"},
 			{Name: "GetApp"},
 			{Name: "GetApps"},
@@ -93,6 +97,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{Name: "GetCurrentSpace"},
 			{Name: "GetOrg"},
 			{Name: "IsLoggedIn"},
+			{Name: "IsSkipSSLValidation"},
 			{Name: "Username"},
 			{
 				Name:     "TestPluginCommandWithAliasV7",
@@ -106,7 +111,6 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 				},
 			},
 			{Name: "CoolTest"},
-			{Name: "AccessToken"},
 		},
 	}
 }

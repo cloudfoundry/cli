@@ -6,10 +6,9 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"io"
 	"sync"
-
-	"fmt"
 
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
@@ -226,7 +225,11 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrgSummary) e
 
 func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
 	*retVal = cmd.Config.AccessToken() != ""
+	return nil
+}
 
+func (cmd *CliRpcCmd) IsSkipSSLValidation(args string, retVal *bool) error {
+	*retVal = cmd.Config.SkipSSLValidation()
 	return nil
 }
 
