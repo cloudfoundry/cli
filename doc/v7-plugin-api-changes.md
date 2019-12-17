@@ -256,7 +256,15 @@ v6: Returns error: `No org and space targeted, use 'cf target -o ORG -s SPACE' t
 
 v7: Returns error: `no space targeted`
 
+### Username
 
+No interface changes
+
+#### Not logged in behaviour
+
+v6: Returns empty string with no error
+
+v7: Returns empty string with error `not logged in`
 
 ## Methods that have not changed
 
