@@ -115,6 +115,15 @@ var _ = Describe("plugin API", func() {
 			confirmTestPluginOutput("Username", username)
 		})
 
+		When("not logged in", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
+			It("returns an error", func() {
+				confirmTestPluginOutput("Username", "not logged in")
+			})
+		})
+
 		When("the token is invalid", func() {
 			var accessToken string
 

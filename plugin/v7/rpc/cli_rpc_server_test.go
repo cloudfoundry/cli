@@ -455,6 +455,42 @@ var _ = Describe("Server", func() {
 			})
 		})
 
+		Describe("Username", func() {
+			When("logged in", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("Yodie", nil)
+				})
+				It("returns the logged in username", func() {
+					result := ""
+					err := client.Call("CliRpcCmd.Username", "", &result)
+					Expect(err).To(BeNil())
+					Expect(result).To(Equal("Yodie"))
+				})
+			})
+
+			When("not logged in", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("", nil)
+				})
+				It("returns the logged in username", func() {
+					result := ""
+					err := client.Call("CliRpcCmd.Username", "", &result)
+					Expect(result).To(Equal(""))
+					Expect(err).To(MatchError("not logged in"))
+				})
+			})
+			When("config errors", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("", errors.New("config failed.."))
+				})
+				It("returns error", func() {
+					result := ""
+					err := client.Call("CliRpcCmd.Username", "", &result)
+					Expect(result).To(Equal(""))
+					Expect(err).To(MatchError("error processing config: config failed.."))
+				})
+			})
+		})
 		Describe("AccessToken", func() {
 
 			BeforeEach(func() {

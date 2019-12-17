@@ -244,6 +244,9 @@ func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
 	if err != nil {
 		return fmt.Errorf("error processing config: %s", err.Error())
 	}
+	if username == "" {
+		return errors.New("not logged in")
+	}
 	*retVal = username
 
 	return nil
