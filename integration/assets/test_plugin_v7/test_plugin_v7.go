@@ -12,24 +12,38 @@ type Test1 struct {
 }
 
 func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
-	switch args[0] {
+	commandName := args[0]
+
+	switch commandName {
 	case "AccessToken":
-		result, _ := cliConnection.AccessToken()
-		fmt.Println("Done AccessToken:", result)
+		result, err := cliConnection.AccessToken()
+		if err != nil {
+			fmt.Printf("Error %s: %s\n", commandName, err)
+		} else {
+			fmt.Println("Done AccessToken:", result)
+		}
 	case "ApiEndpoint":
-		result, _ := cliConnection.ApiEndpoint()
-		fmt.Println("Done ApiEndpoint:", result)
+		result, err := cliConnection.ApiEndpoint()
+		if err != nil {
+			fmt.Printf("Error %s: %s\n", commandName, err)
+		} else {
+			fmt.Println("Done ApiEndpoint:", result)
+		}
 	case "GetApp":
 		result, err := cliConnection.GetApp(args[1])
-		fmt.Printf("Done GetApp: %+v, error: %v\n", result, err)
+		if err != nil {
+			fmt.Printf("Error %s: %s\n", commandName, err)
+		} else {
+			fmt.Println("Done GetApp:", result)
+		}
 	case "GetApps":
 		apps, err := cliConnection.GetApps()
 		if err != nil {
-			fmt.Printf("Error in GetApps:: %s", err)
+			fmt.Printf("Error %s: %s\n", commandName, err)
 		} else if len(apps) == 0 {
 			fmt.Println("No apps in the current space")
 		} else {
-			fmt.Println("Current Apps:\n")
+			fmt.Println("Current Apps:")
 			for _, app := range apps {
 				fmt.Printf("result: %+v, name: %s, guid: %s, ", app, app.Name, app.GUID)
 				fmt.Printf("metadata: %+v\n", *app.Metadata)
@@ -38,34 +52,42 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	case "GetCurrentOrg":
 		result, err := cliConnection.GetCurrentOrg()
 		if err != nil {
-			fmt.Printf("Error: %s", err)
+			fmt.Printf("Error %s: %s\n", commandName, err)
 		} else {
 			fmt.Printf("Done GetCurrentOrg:, result:%+v, name: %s, guid: %s\n", result, result.Name, result.GUID)
 		}
 	case "GetCurrentSpace":
 		result, err := cliConnection.GetCurrentSpace()
 		if err != nil {
-			fmt.Printf("Error: %s", err)
+			fmt.Printf("Error %s: %s\n", commandName, err)
 		} else {
 			fmt.Printf("Done GetCurrentSpace:, result:%+v, name: %s, guid: %s\n", result, result.Name, result.GUID)
 		}
 	case "GetOrg":
 		result, err := cliConnection.GetOrg(args[1])
 		if err != nil {
-			fmt.Printf("Error: %s", err)
+			fmt.Printf("Error %s: %s\n", commandName, err)
 		} else {
 			fmt.Printf("Done GetOrg: name: %s, guid: %s\n", result.Name, result.GUID)
 		}
 	case "IsLoggedIn":
-		result, _ := cliConnection.IsLoggedIn()
-		fmt.Printf("IsLoggedIn: %v", result)
+		result, err := cliConnection.IsLoggedIn()
+		if err != nil {
+			fmt.Printf("Error %s: %s\n", commandName, err)
+		} else {
+			fmt.Printf("Done IsLoggedIn: %v", result)
+		}
 	case "IsSkipSSLValidation":
-		result, _ := cliConnection.IsSkipSSLValidation()
-		fmt.Println("Done IsSkipSSLValidation:", result)
+		result, err := cliConnection.IsSkipSSLValidation()
+		if err != nil {
+			fmt.Printf("Error %s: %s\n", commandName, err)
+		} else {
+			fmt.Println("Done IsSkipSSLValidation:", result)
+		}
 	case "Username":
 		result, err := cliConnection.Username()
 		if err != nil {
-			fmt.Printf("Username: Error: %s\n", err)
+			fmt.Printf("Error %s: %s\n", commandName, err)
 		} else {
 			fmt.Println("Done Username:", result)
 		}
