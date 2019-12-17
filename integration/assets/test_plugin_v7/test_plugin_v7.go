@@ -17,8 +17,8 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		result, _ := cliConnection.ApiEndpoint()
 		fmt.Println("Done ApiEndpoint:", result)
 	case "GetApp":
-		result, _ := cliConnection.GetApp(args[1])
-		fmt.Println("Done GetApp:", result)
+		result, err := cliConnection.GetApp(args[1])
+		fmt.Printf("Done GetApp: %+v, error: %v\n", result, err)
 	case "GetApps":
 		apps, err := cliConnection.GetApps()
 		if err != nil {
@@ -37,14 +37,14 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		if err != nil {
 			fmt.Printf("Error: %s", err)
 		} else {
-			fmt.Printf("Done GetCurrentOrg:, result:%v, name: %s, guid: %s\n", result, result.Name, result.GUID)
+			fmt.Printf("Done GetCurrentOrg:, result:%+v, name: %s, guid: %s\n", result, result.Name, result.GUID)
 		}
 	case "GetCurrentSpace":
 		result, err := cliConnection.GetCurrentSpace()
 		if err != nil {
 			fmt.Printf("Error: %s", err)
 		} else {
-			fmt.Printf("Done GetCurrentSpace:, result:%v, name: %s, guid: %s\n", result, result.Name, result.GUID)
+			fmt.Printf("Done GetCurrentSpace:, result:%+v, name: %s, guid: %s\n", result, result.Name, result.GUID)
 		}
 	case "GetOrg":
 		result, err := cliConnection.GetOrg(args[1])
