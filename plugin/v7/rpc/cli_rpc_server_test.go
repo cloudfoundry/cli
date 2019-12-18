@@ -308,6 +308,7 @@ var _ = Describe("Server", func() {
 				metadata v7action.Metadata
 				org      v7action.Organization
 				spaces   []v7action.Space
+				domains  []v7action.Domain
 			)
 
 			BeforeEach(func() {
@@ -337,8 +338,17 @@ var _ = Describe("Server", func() {
 					},
 				}
 
+				domains = []v7action.Domain{
+					v7action.Domain{
+						Name:             "yodie.com",
+						GUID:             "yoodie.com-guid",
+						OrganizationGUID: org.GUID,
+					},
+				}
+
 				fakePluginActor.GetOrganizationByNameReturns(org, nil, nil)
 				fakePluginActor.GetOrganizationSpacesReturns(spaces, nil, nil)
+				fakePluginActor.GetOrganizationDomainsReturns(domains, nil, nil)
 			})
 
 			It("retrives the organization", func() {
@@ -361,15 +371,30 @@ var _ = Describe("Server", func() {
 				Expect(orgGUID).To(Equal(org.GUID))
 			})
 
-			It("populates the plugin model with the retrieved org and space information", func() {
+			It("retrives the domains for the organization", func() {
+				result := plugin_models.OrgSummary{}
+				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginActor.GetOrganizationDomainsCallCount()).To(Equal(1))
+				orgGUID, labelSelector := fakePluginActor.GetOrganizationDomainsArgsForCall(0)
+				Expect(orgGUID).To(Equal(org.GUID))
+				Expect(labelSelector).To(Equal(""))
+			})
+
+			It("populates the plugin model with the retrieved org, space, and domain information", func() {
 				result := plugin_models.OrgSummary{}
 				err := client.Call("CliRpcCmd.GetOrg", "org-name", &result)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(result.Name).To(Equal(org.Name))
 				Expect(result.GUID).To(Equal(org.GUID))
+
 				Expect(len(result.Spaces)).To(Equal(2))
 				Expect(result.Spaces[1].Name).To(Equal(spaces[1].Name))
+
+				Expect(len(result.Domains)).To(Equal(1))
+				Expect(result.Domains[0].Name).To(Equal(domains[0].Name))
 			})
 
 			It("populates the plugin model with Metadata", func() {

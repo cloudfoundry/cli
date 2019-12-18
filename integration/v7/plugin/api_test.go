@@ -68,14 +68,21 @@ var _ = Describe("plugin API", func() {
 	Describe("GetOrg", func() {
 		var orgName string
 		var orgGUID string
+		var domainName string
+
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			helpers.CreateOrg(orgName)
+			helpers.TargetOrg(orgName)
 			orgGUID = helpers.GetOrgGUID(orgName)
+
+			domainName = "test.com"
+			domain := helpers.NewDomain(orgName, domainName)
+			domain.Create()
 		})
 
 		It("gets the organization information", func() {
-			confirmTestPluginOutputWithArg("GetOrg", orgName, orgName, orgGUID)
+			confirmTestPluginOutputWithArg("GetOrg", orgName, orgName, orgGUID, domainName)
 		})
 	})
 

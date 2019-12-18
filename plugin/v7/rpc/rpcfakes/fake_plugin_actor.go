@@ -56,6 +56,22 @@ type FakePluginActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetOrganizationDomainsStub        func(string, string) ([]v7action.Domain, v7action.Warnings, error)
+	getOrganizationDomainsMutex       sync.RWMutex
+	getOrganizationDomainsArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getOrganizationDomainsReturns struct {
+		result1 []v7action.Domain
+		result2 v7action.Warnings
+		result3 error
+	}
+	getOrganizationDomainsReturnsOnCall map[int]struct {
+		result1 []v7action.Domain
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetOrganizationSpacesStub        func(string) ([]v7action.Space, v7action.Warnings, error)
 	getOrganizationSpacesMutex       sync.RWMutex
 	getOrganizationSpacesArgsForCall []struct {
@@ -303,6 +319,73 @@ func (fake *FakePluginActor) GetOrganizationByNameReturnsOnCall(i int, result1 v
 	}{result1, result2, result3}
 }
 
+func (fake *FakePluginActor) GetOrganizationDomains(arg1 string, arg2 string) ([]v7action.Domain, v7action.Warnings, error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	ret, specificReturn := fake.getOrganizationDomainsReturnsOnCall[len(fake.getOrganizationDomainsArgsForCall)]
+	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1, arg2})
+	fake.getOrganizationDomainsMutex.Unlock()
+	if fake.GetOrganizationDomainsStub != nil {
+		return fake.GetOrganizationDomainsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getOrganizationDomainsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakePluginActor) GetOrganizationDomainsCallCount() int {
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
+	return len(fake.getOrganizationDomainsArgsForCall)
+}
+
+func (fake *FakePluginActor) GetOrganizationDomainsCalls(stub func(string, string) ([]v7action.Domain, v7action.Warnings, error)) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = stub
+}
+
+func (fake *FakePluginActor) GetOrganizationDomainsArgsForCall(i int) (string, string) {
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
+	argsForCall := fake.getOrganizationDomainsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakePluginActor) GetOrganizationDomainsReturns(result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = nil
+	fake.getOrganizationDomainsReturns = struct {
+		result1 []v7action.Domain
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePluginActor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = nil
+	if fake.getOrganizationDomainsReturnsOnCall == nil {
+		fake.getOrganizationDomainsReturnsOnCall = make(map[int]struct {
+			result1 []v7action.Domain
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationDomainsReturnsOnCall[i] = struct {
+		result1 []v7action.Domain
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakePluginActor) GetOrganizationSpaces(arg1 string) ([]v7action.Space, v7action.Warnings, error) {
 	fake.getOrganizationSpacesMutex.Lock()
 	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
@@ -500,6 +583,8 @@ func (fake *FakePluginActor) Invocations() map[string][][]interface{} {
 	defer fake.getDetailedAppSummaryMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
 	fake.getOrganizationSpacesMutex.RLock()
 	defer fake.getOrganizationSpacesMutex.RUnlock()
 	fake.getSpaceByNameAndOrganizationMutex.RLock()

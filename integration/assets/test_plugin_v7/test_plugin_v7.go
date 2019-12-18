@@ -68,7 +68,7 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		if err != nil {
 			fmt.Printf("Error %s: %s\n", commandName, err)
 		} else {
-			fmt.Printf("Done GetOrg: name: %s, guid: %s\n", result.Name, result.GUID)
+			fmt.Printf("Done GetOrg: name: %s, guid: %s, everything: %+v\n", result.Name, result.GUID, result)
 		}
 	case "IsLoggedIn":
 		result, err := cliConnection.IsLoggedIn()

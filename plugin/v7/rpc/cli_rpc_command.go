@@ -192,12 +192,22 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrgSummary) e
 		return err
 	}
 
+	domains, _, err := cmd.PluginActor.GetOrganizationDomains(org.GUID, "")
+	if err != nil {
+		return err
+	}
+
 	for _, space := range spaces {
 		newSpace := plugin_models.Space{
 			GUID: space.GUID,
 			Name: space.Name,
 		}
 		retVal.Spaces = append(retVal.Spaces, newSpace)
+	}
+
+	for _, domain := range domains {
+		newDomain := plugin_models.Domain{GUID: domain.GUID, Name: domain.Name}
+		retVal.Domains = append(retVal.Domains, newDomain)
 	}
 
 	var b bytes.Buffer
