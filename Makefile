@@ -44,8 +44,8 @@ ifndef CF_INT_PASSWORD
 	$(error CF_INT_PASSWORD is undefined)
 endif
 
-clean: ## Remove all files from the `out` directory
-	rm -f $(wildcard out/cf)
+clean: ## Just remove all cf* files from the `out` directory
+	rm -f $(wildcard out/cf*)
 
 clear: clean  ## Make everyone happy
 
