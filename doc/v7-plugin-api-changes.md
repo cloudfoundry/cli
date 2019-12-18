@@ -266,6 +266,11 @@ v6: Returns empty string with no error
 
 v7: Returns empty string with error `not logged in`
 
+### IsSSLDisabled (Renamed to IsSkipSSLValidation in v7)
+
+The only difference in this method is that it was renamed from the v6
+`IsSSLDisabled` to the v7 `IsSkipSSLValidation`
+
 ## Methods that have not changed
 
 AccessToken
