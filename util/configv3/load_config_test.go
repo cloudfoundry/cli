@@ -169,10 +169,11 @@ var _ = Describe("Config", func() {
 
 			When("UAAOAuthClient is empty", func() {
 				BeforeEach(func() {
-					rawConfig := `
+					rawConfig := fmt.Sprintf(`
 					{
-						"UAAOAuthClient": ""
-					}`
+						"UAAOAuthClient": "",
+						"ConfigVersion": %d
+					}`, configv3.CurrentConfigVersion+1)
 					setConfig(homeDir, rawConfig)
 				})
 
