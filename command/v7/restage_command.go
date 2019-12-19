@@ -22,6 +22,7 @@ type RestageActor interface {
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
+	StopApplication(appGUID string) (v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
@@ -103,6 +104,12 @@ func (cmd RestageCommand) Execute(args []string) error {
 	droplet, err := shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
 		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
+	}
+
+	warnings, err = cmd.Actor.StopApplication(app.GUID)
+	cmd.UI.DisplayWarningsV7(warnings)
+	if err != nil {
+		return err
 	}
 
 	// attach droplet to app

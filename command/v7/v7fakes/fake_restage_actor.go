@@ -137,6 +137,19 @@ type FakeRestageActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	StopApplicationStub        func(string) (v7action.Warnings, error)
+	stopApplicationMutex       sync.RWMutex
+	stopApplicationArgsForCall []struct {
+		arg1 string
+	}
+	stopApplicationReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	stopApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -675,6 +688,69 @@ func (fake *FakeRestageActor) StartApplicationReturnsOnCall(i int, result1 v7act
 	}{result1, result2}
 }
 
+func (fake *FakeRestageActor) StopApplication(arg1 string) (v7action.Warnings, error) {
+	fake.stopApplicationMutex.Lock()
+	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
+	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("StopApplication", []interface{}{arg1})
+	fake.stopApplicationMutex.Unlock()
+	if fake.StopApplicationStub != nil {
+		return fake.StopApplicationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.stopApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeRestageActor) StopApplicationCallCount() int {
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
+	return len(fake.stopApplicationArgsForCall)
+}
+
+func (fake *FakeRestageActor) StopApplicationCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = stub
+}
+
+func (fake *FakeRestageActor) StopApplicationArgsForCall(i int) string {
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
+	argsForCall := fake.stopApplicationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeRestageActor) StopApplicationReturns(result1 v7action.Warnings, result2 error) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = nil
+	fake.stopApplicationReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeRestageActor) StopApplicationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = nil
+	if fake.stopApplicationReturnsOnCall == nil {
+		fake.stopApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.stopApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeRestageActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -694,6 +770,8 @@ func (fake *FakeRestageActor) Invocations() map[string][][]interface{} {
 	defer fake.stagePackageMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
