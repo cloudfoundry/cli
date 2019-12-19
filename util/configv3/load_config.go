@@ -62,7 +62,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	config := Config{
 		ConfigFile: JSONConfig{
-			ConfigVersion: 3,
+			ConfigVersion: CurrentConfigVersion,
 			Target:        DefaultTarget,
 			ColorEnabled:  DefaultColorEnabled,
 			PluginRepositories: []PluginRepository{{
@@ -90,7 +90,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 			if err != nil {
 				return nil, err
 			}
-			config.ConfigFile = configFile
+			if configFile.ConfigVersion == CurrentConfigVersion {
+				config.ConfigFile = configFile
+			}
 		}
 	}
 

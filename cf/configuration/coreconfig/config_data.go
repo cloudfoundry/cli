@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type AuthPromptType string
@@ -54,7 +55,7 @@ func NewData() *Data {
 }
 
 func (d *Data) JSONMarshalV3() ([]byte, error) {
-	d.ConfigVersion = 3
+	d.ConfigVersion = configv3.CurrentConfigVersion
 	return json.MarshalIndent(d, "", "  ")
 }
 
@@ -64,7 +65,7 @@ func (d *Data) JSONUnmarshalV3(input []byte) error {
 		return err
 	}
 
-	if d.ConfigVersion != 3 {
+	if d.ConfigVersion != configv3.CurrentConfigVersion {
 		*d = Data{}
 		return nil
 	}
