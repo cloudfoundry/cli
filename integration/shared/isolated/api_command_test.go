@@ -51,6 +51,7 @@ var _ = Describe("api command", func() {
 							TargetedSpace: configv3.Space{
 								Name: space,
 							},
+							ConfigVersion: configv3.CurrentConfigVersion,
 						},
 					}
 					err := userConfig.WriteConfig()
@@ -83,7 +84,7 @@ var _ = Describe("api command", func() {
 
 				userConfig := configv3.Config{
 					ConfigFile: configv3.JSONConfig{
-						ConfigVersion: 3,
+						ConfigVersion: configv3.CurrentConfigVersion,
 						Target:        "https://api.fake.com",
 						APIVersion:    "2.59.0",
 						AccessToken:   "bearer tokenstuff",
