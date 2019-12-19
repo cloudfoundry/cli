@@ -3,9 +3,6 @@ package configv3
 import "time"
 
 const (
-	// CurrentConfigVersion is the version field for the main config file
-	CurrentConfigVersion = 3
-
 	// DefaultDialTimeout is the default timeout for the dail.
 	DefaultDialTimeout = 6 * time.Second
 
