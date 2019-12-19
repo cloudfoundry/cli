@@ -24,7 +24,8 @@ var _ = Describe("Config", func() {
 
 	DescribeTable("Locale",
 		func(langVal string, lcAllVall string, configVal string, expected string) {
-			rawConfig := fmt.Sprintf(`{"Locale":"%s"}`, configVal)
+
+			rawConfig := fmt.Sprintf(`{"Locale":"%s", "ConfigVersion": %d }`, configVal, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			defer os.Unsetenv("LANG")

@@ -1,6 +1,7 @@
 package configv3_test
 
 import (
+	"fmt"
 	"time"
 
 	. "code.cloudfoundry.org/cli/util/configv3"
@@ -23,7 +24,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("AccessToken", func() {
 		BeforeEach(func() {
-			rawConfig := `{ "AccessToken":"some-token" }`
+			rawConfig := fmt.Sprintf(`{ "AccessToken":"some-token", "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -184,7 +185,7 @@ var _ = Describe("JSONConfig", func() {
 	Describe("OverallPollingTimeout", func() {
 		When("AsyncTimeout is set in config", func() {
 			BeforeEach(func() {
-				rawConfig := `{ "AsyncTimeout":5 }`
+				rawConfig := fmt.Sprintf(`{ "AsyncTimeout":5, "ConfigVersion": %d }`, CurrentConfigVersion)
 				setConfig(homeDir, rawConfig)
 
 				var err error
@@ -201,7 +202,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("RefreshToken", func() {
 		BeforeEach(func() {
-			rawConfig := `{ "RefreshToken":"some-token" }`
+			rawConfig := fmt.Sprintf(`{ "RefreshToken":"some-token", "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -331,7 +332,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SkipSSLValidation", func() {
 		BeforeEach(func() {
-			rawConfig := `{ "SSLDisabled":true }`
+			rawConfig := fmt.Sprintf(`{ "SSLDisabled":true, "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -347,7 +348,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SSHOAuthClient", func() {
 		BeforeEach(func() {
-			rawConfig := `{ "SSHOAuthClient":"some-ssh-client" }`
+			rawConfig := fmt.Sprintf(`{ "SSHOAuthClient":"some-ssh-client", "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -363,7 +364,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("Target", func() {
 		BeforeEach(func() {
-			rawConfig := `{ "Target":"https://api.foo.com" }`
+			rawConfig := fmt.Sprintf(`{ "Target":"https://api.foo.com", "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -427,7 +428,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("UAAGrantType", func() {
 		BeforeEach(func() {
-			rawConfig := ` { "UAAGrantType": "some-grant-type" }`
+			rawConfig := fmt.Sprintf(`{ "UAAGrantType":"some-grant-type", "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -443,7 +444,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("UAAOAuthClient", func() {
 		BeforeEach(func() {
-			rawConfig := `{ "UAAOAuthClient":"some-client" }`
+			rawConfig := fmt.Sprintf(`{ "UAAOAuthClient":"some-client", "ConfigVersion": %d }`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error
@@ -459,11 +460,12 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("UAAOAuthClientSecret", func() {
 		BeforeEach(func() {
-			rawConfig := `
+			rawConfig := fmt.Sprintf(`
 					{
 						"UAAOAuthClient": "some-client-id",
-						"UAAOAuthClientSecret": "some-client-secret"
-					}`
+						"UAAOAuthClientSecret": "some-client-secret",
+						"ConfigVersion": %d
+					}`, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			var err error

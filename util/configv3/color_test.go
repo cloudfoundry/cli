@@ -23,7 +23,7 @@ var _ = Describe("Config", func() {
 
 	DescribeTable("ColorEnabled",
 		func(configVal string, envVal string, expected ColorSetting) {
-			rawConfig := fmt.Sprintf(`{"ColorEnabled":"%s"}`, configVal)
+			rawConfig := fmt.Sprintf(`{"ColorEnabled":"%s", "ConfigVersion": %d }`, configVal, CurrentConfigVersion)
 			setConfig(homeDir, rawConfig)
 
 			defer os.Unsetenv("CF_COLOR")
