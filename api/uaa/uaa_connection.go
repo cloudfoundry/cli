@@ -2,7 +2,6 @@ package uaa
 
 import (
 	"bytes"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
@@ -10,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"code.cloudfoundry.org/cli/util"
 )
 
 // UAAConnection represents the connection to UAA
@@ -26,9 +27,7 @@ func NewConnection(skipSSLValidation bool, disableKeepAlives bool, dialTimeout t
 		}).DialContext,
 		DisableKeepAlives: disableKeepAlives,
 		Proxy:             http.ProxyFromEnvironment,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: skipSSLValidation,
-		},
+		TLSClientConfig:   util.NewTLSConfig(nil, skipSSLValidation),
 	}
 
 	return &UAAConnection{

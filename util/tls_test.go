@@ -24,6 +24,10 @@ var _ = Describe("TLS", func() {
 			Expect(tlsConfig.MinVersion).To(BeEquivalentTo(tls.VersionTLS10))
 		})
 
+		It("sets maximum version of TLS to 1.2", func() {
+			Expect(tlsConfig.MaxVersion).To(BeEquivalentTo(tls.VersionTLS12))
+		})
+
 		It("does not have any trusted CAs", func() {
 			Expect(tlsConfig.RootCAs).To(BeNil())
 		})

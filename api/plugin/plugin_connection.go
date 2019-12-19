@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"bytes"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"io"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/util"
 )
 
 // PluginConnection represents a connection to a plugin repo.
@@ -24,10 +24,8 @@ type PluginConnection struct {
 // NewConnection returns a new PluginConnection
 func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *PluginConnection {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: skipSSLValidation,
-		},
-		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: util.NewTLSConfig(nil, skipSSLValidation),
+		Proxy:           http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   dialTimeout,

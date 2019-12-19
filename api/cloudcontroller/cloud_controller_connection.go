@@ -1,7 +1,6 @@
 package cloudcontroller
 
 import (
-	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
 	"net"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/util"
 )
 
 // Config is for configuring a CloudControllerConnection.
@@ -30,10 +30,8 @@ type CloudControllerConnection struct {
 // configuration.
 func NewConnection(config Config) *CloudControllerConnection {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: config.SkipSSLValidation,
-		},
-		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: util.NewTLSConfig(nil, config.SkipSSLValidation),
+		Proxy:           http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   config.DialTimeout,

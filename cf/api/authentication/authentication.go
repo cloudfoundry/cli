@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"net/http"
@@ -15,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/util"
 )
 
 //go:generate counterfeiter . TokenRefresher
@@ -61,10 +61,8 @@ func (uaa UAARepository) Authorize(token string) (string, error) {
 		},
 		Timeout: 30 * time.Second,
 		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: uaa.config.IsSSLDisabled(),
-			},
+			DisableKeepAlives:   true,
+			TLSClientConfig:     util.NewTLSConfig(nil, uaa.config.IsSSLDisabled()),
 			Proxy:               http.ProxyFromEnvironment,
 			TLSHandshakeTimeout: 10 * time.Second,
 		},

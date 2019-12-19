@@ -1,7 +1,6 @@
 package api
 
 import (
-	"crypto/tls"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,6 +30,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
+	"code.cloudfoundry.org/cli/util"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
@@ -100,7 +100,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.endpointRepo = NewEndpointRepository(cloudControllerGateway)
 
-	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
+	tlsConfig := util.NewTLSConfig(nil, config.IsSSLDisabled())
 
 	var noaaRetryTimeout time.Duration
 	convertedTime, err := strconv.Atoi(envDialTimeout)

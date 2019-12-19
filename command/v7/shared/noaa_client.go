@@ -1,12 +1,12 @@
 package shared
 
 import (
-	"crypto/tls"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/util"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
@@ -14,9 +14,7 @@ import (
 func NewNOAAClient(apiURL string, config command.Config, uaaClient *uaa.Client, ui command.UI) *consumer.Consumer {
 	client := consumer.New(
 		apiURL,
-		&tls.Config{
-			InsecureSkipVerify: config.SkipSSLValidation(),
-		},
+		util.NewTLSConfig(nil, config.SkipSSLValidation()),
 		http.ProxyFromEnvironment,
 	)
 	client.RefreshTokenFrom(noaabridge.NewTokenRefresher(uaaClient, config))

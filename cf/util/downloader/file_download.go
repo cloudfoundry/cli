@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"code.cloudfoundry.org/cli/util"
 	"fmt"
 	"io"
 	"net/http"
@@ -31,6 +32,9 @@ func NewDownloader(saveDir string) Downloader {
 //this func returns byte written, filename and error
 func (d *downloader) DownloadFile(url string) (int64, string, error) {
 	c := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: util.NewTLSConfig(nil, false),
+		},
 		CheckRedirect: func(r *http.Request, via []*http.Request) error {
 			r.URL.Opaque = r.URL.Path
 

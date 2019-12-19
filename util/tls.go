@@ -8,6 +8,7 @@ import (
 func NewTLSConfig(trustedCerts []*x509.Certificate, skipTLSValidation bool) *tls.Config {
 	config := &tls.Config{
 		MinVersion: tls.VersionTLS10,
+		MaxVersion: tls.VersionTLS12,
 	}
 
 	if len(trustedCerts) > 0 {

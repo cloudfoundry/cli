@@ -3,6 +3,7 @@ package net
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,6 +22,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
+	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/version"
 )
 
@@ -436,13 +438,23 @@ func (gateway Gateway) doRequest(request *http.Request) (*http.Response, error) 
 }
 
 func makeHTTPTransport(gateway *Gateway) {
+
+	var x509TrustedCerts []*x509.Certificate
+
+	if len(gateway.trustedCerts) > 0 {
+		for _, tlsCert := range gateway.trustedCerts {
+			x509Cert, _ := x509.ParseCertificate(tlsCert.Certificate[0])
+			x509TrustedCerts = append(x509TrustedCerts, x509Cert)
+		}
+	}
+
 	gateway.transport = &http.Transport{
 		DisableKeepAlives: true,
 		Dial: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   gateway.DialTimeout,
 		}).Dial,
-		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
+		TLSClientConfig: util.NewTLSConfig(x509TrustedCerts, gateway.config.IsSSLDisabled()),
 		Proxy:           http.ProxyFromEnvironment,
 	}
 }

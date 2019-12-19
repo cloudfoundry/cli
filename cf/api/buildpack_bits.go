@@ -22,6 +22,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
@@ -216,12 +217,12 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 			return
 		}
 
-		var certPool *x509.CertPool
+		var x509TrustedCerts []*x509.Certificate
+
 		if len(repo.TrustedCerts) > 0 {
-			certPool = x509.NewCertPool()
 			for _, tlsCert := range repo.TrustedCerts {
 				cert, _ := x509.ParseCertificate(tlsCert.Certificate[0])
-				certPool.AddCert(cert)
+				x509TrustedCerts = append(x509TrustedCerts, cert)
 			}
 		}
 
@@ -229,7 +230,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 			Transport: &http.Transport{
 				DisableKeepAlives: true,
 				Dial:              (&gonet.Dialer{Timeout: 5 * time.Second}).Dial,
-				TLSClientConfig:   &tls.Config{RootCAs: certPool},
+				TLSClientConfig:   util.NewTLSConfig(x509TrustedCerts, false),
 				Proxy:             http.ProxyFromEnvironment,
 			},
 		}

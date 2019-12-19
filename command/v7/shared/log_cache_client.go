@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/util"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
 
@@ -72,10 +72,8 @@ func (c *httpDebugClient) Do(req *http.Request) (*http.Response, error) {
 // NewLogCacheClient returns back a configured Log Cache Client.
 func NewLogCacheClient(logCacheEndpoint string, config command.Config, ui command.UI) *logcache.Client {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: config.SkipSSLValidation(),
-		},
-		Proxy: http.ProxyFromEnvironment,
+		Proxy:           http.ProxyFromEnvironment,
+		TLSClientConfig: util.NewTLSConfig(nil, config.SkipSSLValidation()),
 		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   config.DialTimeout(),

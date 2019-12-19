@@ -2,7 +2,6 @@ package router
 
 import (
 	"bytes"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
@@ -13,6 +12,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/router/routererror"
+	"code.cloudfoundry.org/cli/util"
 )
 
 // ConnectionConfig is for configuring the RouterConnection
@@ -29,10 +29,8 @@ type RouterConnection struct {
 // NewConnection returns a pointer to a new RouterConnection with the provided configuration
 func NewConnection(config ConnectionConfig) *RouterConnection {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: config.SkipSSLValidation,
-		},
-		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: util.NewTLSConfig(nil, config.SkipSSLValidation),
+		Proxy:           http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   config.DialTimeout,
