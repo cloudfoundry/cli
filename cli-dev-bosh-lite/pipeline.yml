@@ -46,6 +46,11 @@ resources:
       branch: master
       uri: git@github.com:cloudfoundry/bosh-deployment.git
       private_key: ((bosh-lite-pools-github-private-key))
+  - name: edge-capi-release
+    type: s3
+    source:
+      bucket: capi-releases
+      regexp: capi-(.*)-.*-.*.tgz
   - name: ready-pool
     type: pool
     source:
@@ -118,6 +123,7 @@ jobs:
         - get: cli
         - get: create-bosh-lite-trigger
           trigger: true
+        - get: edge-capi-release
       - task: generate-fake-env-for-building-pool
         file: capi-ci/ci/bosh-lite/generate-fake-env-for-building-pool.yml
       - put: building-pool
@@ -152,6 +158,8 @@ jobs:
                 params:
                   source_file: bosh-target/target.yml
                   manifest: cf-deployment/cf-deployment.yml
+                  var_files:
+                    edge_capi_url: edge-capi-release/url
                   vars_files:
                   - bosh-target/vars.yml
                   ops_files:
@@ -167,6 +175,7 @@ jobs:
                   - cli/ci/infrastructure/operations/add-oidc-provider.yml
                   - cli/ci/infrastructure/operations/add-uaa-client-cf-custom.yml
                   - cli/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml
+                  - cli/ci/infrastructure/operations/use-edge-capi.yml
               - task: upload-to-gcs
                 file: capi-ci/ci/gcs/upload-to-gcs.yml
                 input_mapping:
