@@ -9,14 +9,18 @@ import (
 
 var _ = Describe("Config", func() {
 	Describe("Version Management", func() {
-		var oldConfig *configv3.Config
+		var oldTarget string
+		var oldVersion int
 
 		BeforeEach(func() {
-			oldConfig = helpers.GetConfig()
+			config := helpers.GetConfig()
+			oldTarget = config.Target()
+			oldVersion = config.ConfigFile.ConfigVersion
 		})
 		AfterEach(func() {
 			helpers.SetConfig(func(config *configv3.Config) {
-				config.ConfigFile = oldConfig.ConfigFile
+				config.ConfigFile.ConfigVersion = oldVersion
+				config.ConfigFile.Target = oldTarget
 			})
 		})
 
