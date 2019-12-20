@@ -68,7 +68,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayWarningV7("This action will cause app downtime.")
+	cmd.UI.DisplayWarning("This action will cause app downtime.")
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTextWithFlavor("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
@@ -79,19 +79,19 @@ func (cmd RestageCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
-	cmd.UI.DisplayWarningsV7(logWarnings)
+	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return logErr
 	}
@@ -110,14 +110,14 @@ func (cmd RestageCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.StopApplication(app.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	// attach droplet to app
 	warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (cmd RestageCommand) Execute(args []string) error {
 
 	// start the application
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	warnings, err = cmd.Actor.PollStart(app.GUID, false)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
 	}
@@ -145,7 +145,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		false,
 	)
-	cmd.UI.DisplayWarningsV7(warnings)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
