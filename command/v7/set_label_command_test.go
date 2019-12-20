@@ -16,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 	uuid "github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
@@ -32,19 +33,75 @@ var _ = Describe("set-label command", func() {
 		executeErr error
 	)
 
-	verifyStackArgNotAllowed := func() {
+	Context("shared validations", func() {
 		BeforeEach(func() {
-			cmd.BuildpackStack = "cflinuxfs3"
-		})
-
-		It("displays an argument combination error", func() {
-			argumentCombinationError := translatableerror.ArgumentCombinationError{
-				Args: []string{strings.ToLower(cmd.RequiredArgs.ResourceType), "--stack, -s"},
+			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+			fakeActor = new(v7fakes.FakeSetLabelActor)
+			fakeConfig = new(commandfakes.FakeConfig)
+			fakeSharedActor = new(commandfakes.FakeSharedActor)
+			cmd = SetLabelCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
 			}
-
-			Expect(executeErr).To(MatchError(argumentCombinationError))
 		})
-	}
+
+		DescribeTable(
+			"Combination of --stack with resource type",
+			func(resourceType string) {
+				cmd.BuildpackStack = "cflinuxfs3"
+				cmd.RequiredArgs = flag.SetLabelArgs{
+					ResourceType: resourceType,
+				}
+
+				err := cmd.Execute(nil)
+
+				argumentCombinationError := translatableerror.ArgumentCombinationError{
+					Args: []string{strings.ToLower(resourceType), "--stack, -s"},
+				}
+				Expect(err).To(MatchError(argumentCombinationError))
+			},
+			Entry("app", "app"),
+			Entry("domains", "domain"),
+			Entry("orgs", "org"),
+			Entry("routes", "route"),
+			Entry("spaces", "space"),
+			Entry("stacks", "stack"),
+			Entry("service brokers", "service-broker"),
+		)
+
+		When("some provided labels do not have a value part", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs = flag.SetLabelArgs{
+					ResourceType: "anything",
+					ResourceName: resourceName,
+					Labels:       []string{"FOO=BAR", "MISSING_EQUALS", "ENV=FAKE"},
+				}
+			})
+
+			It("complains about the missing equal sign", func() {
+				err := cmd.Execute(nil)
+				Expect(err).To(MatchError("Metadata error: no value provided for label 'MISSING_EQUALS'"))
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		When("fetching the current user's name fails", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs = flag.SetLabelArgs{
+					ResourceType: "anything",
+					ResourceName: resourceName,
+				}
+				fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+			})
+
+			It("returns an error", func() {
+				err := cmd.Execute(nil)
+				Expect(err).To(MatchError("boom"))
+			})
+		})
+	})
 
 	When("setting labels on apps", func() {
 
@@ -212,21 +269,6 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.SetLabelArgs{
-						ResourceType: "app",
-						ResourceName: resourceName,
-						Labels:       []string{"FOO=BAR", "ENV=FAKE"},
-					}
-					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
-				})
-			})
 		})
 
 		When("checking targeted org and space fails", func() {
@@ -237,10 +279,6 @@ var _ = Describe("set-label command", func() {
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
-		})
-
-		When("when the --stack flag is specified", func() {
-			verifyStackArgNotAllowed()
 		})
 	})
 
@@ -351,17 +389,6 @@ var _ = Describe("set-label command", func() {
 				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as some-user...`), resourceName))
 			})
 		})
-
-		When("fetching the current user's name fails", func() {
-			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError("boom"))
-			})
-		})
-
 	})
 
 	When("setting labels on orgs", func() {
@@ -525,20 +552,6 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.SetLabelArgs{
-						ResourceType: "org",
-						ResourceName: resourceName,
-					}
-					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
-				})
-			})
 		})
 
 		When("checking targeted org and space fails", func() {
@@ -549,10 +562,6 @@ var _ = Describe("set-label command", func() {
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
-		})
-
-		When("when the --stack flag is specified", func() {
-			verifyStackArgNotAllowed()
 		})
 	})
 
@@ -722,21 +731,6 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.SetLabelArgs{
-						ResourceType: "app",
-						ResourceName: resourceName,
-						Labels:       []string{"FOO=BAR", "ENV=FAKE"},
-					}
-					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
-				})
-			})
 		})
 
 		When("checking targeted org and space fails", func() {
@@ -747,10 +741,6 @@ var _ = Describe("set-label command", func() {
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError("nope"))
 			})
-		})
-
-		When("when the --stack flag is specified", func() {
-			verifyStackArgNotAllowed()
 		})
 	})
 
@@ -963,20 +953,6 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.SetLabelArgs{
-						ResourceType: "buildpack",
-						ResourceName: resourceName,
-					}
-					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
-				})
-			})
 		})
 
 		When("checking targeted org and space fails", func() {
@@ -1118,10 +1094,6 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 
-				When("when the --stack flag is specified", func() {
-					verifyStackArgNotAllowed()
-				})
-
 				When("the resource type argument is not lowercase", func() {
 					BeforeEach(func() {
 						cmd.RequiredArgs = flag.SetLabelArgs{
@@ -1148,20 +1120,6 @@ var _ = Describe("set-label command", func() {
 					It("prints the flavor text in lowercase", func() {
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for space %s`), resourceName))
 					})
-				})
-			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.SetLabelArgs{
-						ResourceType: "org",
-						ResourceName: resourceName,
-					}
-					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
 				})
 			})
 		})
@@ -1292,10 +1250,6 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 
-				When("when the --stack flag is specified", func() {
-					verifyStackArgNotAllowed()
-				})
-
 				When("the resource type argument is not lowercase", func() {
 					BeforeEach(func() {
 						cmd.RequiredArgs = flag.SetLabelArgs{
@@ -1323,18 +1277,145 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 			})
+		})
 
-			When("fetching the current user's name fails", func() {
+		When("checking targeted org and stack fails", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(errors.New("nope"))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("nope"))
+			})
+		})
+	})
+
+	When("setting labels on service-brokers", func() {
+		BeforeEach(func() {
+			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+			fakeActor = new(v7fakes.FakeSetLabelActor)
+			fakeConfig = new(commandfakes.FakeConfig)
+			//fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
+
+			fakeSharedActor = new(commandfakes.FakeSharedActor)
+			resourceName = "some-service-broker"
+			cmd = SetLabelCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			}
+			cmd.RequiredArgs = flag.SetLabelArgs{
+				ResourceType: "service-broker",
+				ResourceName: resourceName,
+			}
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("checks that the user is logged in but not necessarily targeted to an org", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(checkOrg).To(BeFalse())
+			Expect(checkSpace).To(BeFalse())
+		})
+
+		When("checking target succeeds", func() {
+			BeforeEach(func() {
+				fakeSharedActor.CheckTargetReturns(nil)
+			})
+
+			When("fetching current user's name succeeds", func() {
 				BeforeEach(func() {
-					cmd.RequiredArgs = flag.SetLabelArgs{
-						ResourceType: "org",
-						ResourceName: resourceName,
-					}
-					fakeConfig.CurrentUserNameReturns("some-user", errors.New("boom"))
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
 				})
 
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
+				When("all the provided labels are valid", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "service-broker",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					When("updating the service-broker labels succeeds", func() {
+						It("sets the provided labels on the service-broker", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameCallCount()).To(Equal(1))
+							serviceBroker, labels := fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameArgsForCall(0)
+							Expect(serviceBroker).To(Equal(resourceName))
+							Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+								"FOO": types.NewNullString("BAR"),
+								"ENV": types.NewNullString("FAKE"),
+							}))
+						})
+
+						It("displays a message", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s as some-user...`), resourceName))
+							Expect(testUI.Out).To(Say("OK"))
+						})
+
+						It("prints all warnings", func() {
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
+					})
+				})
+
+				When("updating the service-broker labels fail", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "service-broker",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							errors.New("some-updating-error"),
+						)
+					})
+
+					It("displays warnings and an error message", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+						Expect(executeErr).To(MatchError("some-updating-error"))
+					})
+				})
+
+				When("the resource type argument is not lowercase", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs = flag.SetLabelArgs{
+							ResourceType: "sErvicE-BrokEr",
+							ResourceName: resourceName,
+							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+						}
+						fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameReturns(
+							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+							nil,
+						)
+					})
+
+					It("sets the provided labels on the service-broker", func() {
+						name, labels := fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass stack name")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString("BAR"),
+							"ENV": types.NewNullString("FAKE"),
+						}))
+					})
+
+					It("prints the flavor text in lowercase", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s`), resourceName))
+					})
 				})
 			})
 		})
@@ -1377,5 +1458,4 @@ var _ = Describe("set-label command", func() {
 			Expect(executeErr).To(MatchError("Unsupported resource type of 'unrecognized-resource'"))
 		})
 	})
-
 })

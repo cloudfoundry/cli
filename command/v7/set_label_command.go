@@ -24,11 +24,12 @@ type SetLabelActor interface {
 	UpdateRouteLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateServiceBrokerLabelsByServiceBrokerName(string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type SetLabelCommand struct {
 	RequiredArgs    flag.SetLabelArgs `positional-args:"yes"`
-	usage           interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   space\n   stack"`
+	usage           interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   space\n   stack"`
 	relatedCommands interface{}       `related_commands:"labels, unset-label"`
 	BuildpackStack  string            `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 
@@ -51,7 +52,6 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd SetLabelCommand) Execute(args []string) error {
-
 	labels := make(map[string]types.NullString)
 	for _, label := range cmd.RequiredArgs.Labels {
 		parts := strings.SplitN(label, "=", 2)
@@ -66,8 +66,7 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.validateFlags()
-	if err != nil {
+	if err = cmd.validateFlags(); err != nil {
 		return err
 	}
 
@@ -86,6 +85,8 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		err = cmd.executeSpace(username, labels)
 	case Stack:
 		err = cmd.executeStack(username, labels)
+	case ServiceBroker:
+		err = cmd.executeServiceBroker(username, labels)
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
@@ -261,6 +262,25 @@ func (cmd SetLabelCommand) executeDomain(username string, labels map[string]type
 	)
 
 	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, labels)
+	cmd.UI.DisplayWarnings(warnings)
+	return err
+}
+
+func (cmd SetLabelCommand) executeServiceBroker(username string, labels map[string]types.NullString) error {
+	if err := cmd.SharedActor.CheckTarget(false, false); err != nil {
+		return err
+	}
+
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"User":         username,
+		},
+	)
+
+	warnings, err := cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.RequiredArgs.ResourceName, labels)
 	cmd.UI.DisplayWarnings(warnings)
 	return err
 }

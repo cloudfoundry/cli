@@ -545,6 +545,117 @@ var _ = Describe("Labels", func() {
 		})
 	})
 
+	Context("UpdateServiceBrokerLabelsByServiceBrokerName", func() {
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateServiceBrokerLabelsByServiceBrokerName(resourceName, labels)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ccv3.ServiceBroker{{GUID: "some-broker-guid", Name: resourceName}},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+
+				fakeCloudControllerClient.UpdateResourceMetadataAsyncReturns(
+					ccv3.JobURL("fake-job-url"),
+					ccv3.Warnings{"set-service-broker-metadata"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"poll-job-warning"}, nil)
+			})
+
+			It("gets the service broker", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+			})
+
+			It("sets the service-broker labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataAsyncCallCount()).To(Equal(1))
+				resourceType, serviceBrokerGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataAsyncArgsForCall(0)
+				Expect(resourceType).To(BeEquivalentTo("service-broker"))
+				Expect(serviceBrokerGUID).To(BeEquivalentTo("some-broker-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("polls the job", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(BeEquivalentTo("fake-job-url"))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-broker-metadata", "poll-job-warning"))
+			})
+		})
+
+		When("there are client errors", func() {
+			When("fetching the service-broker fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns(
+						[]ccv3.ServiceBroker{},
+						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
+						errors.New("get-service-broker-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-failure-1", "warning-failure-2"))
+					Expect(executeErr).To(MatchError("get-service-broker-error"))
+				})
+			})
+
+			When("updating the service-broker fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns(
+						[]ccv3.ServiceBroker{ccv3.ServiceBroker{GUID: "some-guid", Name: resourceName}},
+						ccv3.Warnings([]string{"warning-1", "warning-2"}),
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataAsyncReturns(
+						ccv3.JobURL(""),
+						ccv3.Warnings{"set-service-broker"},
+						errors.New("update-service-broker-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-broker"))
+					Expect(executeErr).To(MatchError("update-service-broker-error"))
+				})
+			})
+
+			When("polling the job fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns(
+						[]ccv3.ServiceBroker{ccv3.ServiceBroker{GUID: "some-guid", Name: resourceName}},
+						ccv3.Warnings([]string{"warning-1", "warning-2"}),
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataAsyncReturns(
+						ccv3.JobURL("fake-job-url"),
+						ccv3.Warnings{"set-service-broker-metadata"},
+						nil,
+					)
+
+					fakeCloudControllerClient.PollJobReturns(
+						ccv3.Warnings{"another-poll-job-warning"},
+						errors.New("polling-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-broker-metadata", "another-poll-job-warning"))
+					Expect(executeErr).To(MatchError("polling-error"))
+				})
+			})
+		})
+	})
+
 	Context("GetDomainLabels", func() {
 		JustBeforeEach(func() {
 			labels, warnings, executeErr = actor.GetDomainLabels(resourceName)
