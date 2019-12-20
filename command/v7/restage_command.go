@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
-	"context"
 )
 
 //go:generate counterfeiter . RestageActor
@@ -67,13 +68,15 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayWarningV7("This action will cause app downtime.\n")
-	cmd.UI.DisplayTextWithFlavor("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n", map[string]interface{}{
+	cmd.UI.DisplayWarningV7("This action will cause app downtime.")
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayTextWithFlavor("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
+	cmd.UI.DisplayNewline()
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarningsV7(warnings)
@@ -119,7 +122,9 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText("Waiting for app to start...\n")
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Waiting for app to start...")
+	cmd.UI.DisplayNewline()
 
 	// start the application
 	warnings, err = cmd.Actor.StartApplication(app.GUID)

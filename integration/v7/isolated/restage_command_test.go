@@ -155,11 +155,11 @@ applications:
 					Eventually(session).Should(Say(`stack:\s+cflinuxfs`))
 					Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`sidecars:`))
 					Eventually(session).Should(Say(`instances:\s+\d/2`))
 					Eventually(session).Should(Say(`memory usage:\s+128M`))
 					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
-
 					Eventually(session).Should(Exit(0))
 				})
 
