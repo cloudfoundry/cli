@@ -117,7 +117,6 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Detailed
 		display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
 		if len(process.InstanceDetails) == 0 {
-			display.UI.DisplayNewline()
 			display.UI.DisplayText("There are no running instances of this process.")
 			continue
 		}
