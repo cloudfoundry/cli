@@ -2,7 +2,6 @@ package v7action
 
 import (
 	"errors"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -80,11 +79,7 @@ func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan 
 
 				switch build.State {
 				case constant.BuildFailed:
-					if strings.Contains(build.Error,"NoAppDetectedError") {
-						errorStream <- actionerror.StagingFailedNoAppDetectedError{Reason: build.Error}
-					} else {
-						errorStream <- actionerror.StagingFailedError{Reason: build.Error}
-					}
+					errorStream <- errors.New(build.Error)
 					return
 				case constant.BuildStaging:
 					timer.Reset(actor.Config.PollingInterval())

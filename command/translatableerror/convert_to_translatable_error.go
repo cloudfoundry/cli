@@ -144,6 +144,8 @@ func ConvertToTranslatableError(err error) error {
 		return StackNotFoundError(e)
 	case actionerror.StagingFailedError:
 		return StagingFailedError{Message: e.Reason}
+	case actionerror.StagingFailedNoAppDetectedError:
+		return StagingFailedNoAppDetectedError{Message: e.Reason}
 	case actionerror.StagingTimeoutError:
 		return StagingTimeoutError(e)
 	case actionerror.TaskWorkersUnavailableError:
