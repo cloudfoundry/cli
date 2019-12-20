@@ -122,9 +122,7 @@ func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (Job
 
 	response := cloudcontroller.Response{}
 	err = client.connection.Make(request, &response)
-	jobURL := response.HTTPResponse.Header.Get("Location")
-
-	return JobURL(jobURL), response.Warnings, err
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // DeleteServiceBroker deletes a named service broker
@@ -142,9 +140,7 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, War
 
 	response := cloudcontroller.Response{}
 	err = client.connection.Make(request, &response)
-	jobURL := response.HTTPResponse.Header.Get("Location")
-
-	return JobURL(jobURL), response.Warnings, err
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // GetServiceBrokers lists service brokers.
@@ -174,7 +170,6 @@ func (client *Client) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 
 // UpdateServiceBroker updates an existing service broker.
 func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
-
 	brokerUpdateRequest, err := newUpdateServiceBroker(serviceBroker)
 	if err != nil {
 		return "", nil, err
@@ -198,8 +193,7 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 
 	response := cloudcontroller.Response{}
 	err = client.connection.Make(request, &response)
-	jobURL := response.HTTPResponse.Header.Get("Location")
-	return JobURL(jobURL), response.Warnings, err
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 func newServiceBroker(serviceBroker ServiceBrokerModel) serviceBrokerRequest {

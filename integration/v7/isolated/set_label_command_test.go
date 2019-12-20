@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -40,6 +41,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+domain`))
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+route`))
+				Eventually(session).Should(Say(`\s+service-broker`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -60,6 +62,7 @@ var _ = Describe("set-label command", func() {
 			username           string
 			stackNameBase      string
 			testWithStackCount int
+			broker             *fakeservicebroker.FakeServiceBroker
 		)
 
 		type commonResource struct {
@@ -801,6 +804,78 @@ var _ = Describe("set-label command", func() {
 					Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
 					Expect(len(stack.Metadata.Labels)).To(Equal(1))
 					Expect(stack.Metadata.Labels["owner"]).To(Equal("beth"))
+				})
+			})
+		})
+
+		When("assigning label to service-broker", func() {
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("sets the specified labels on the service-broker", func() {
+				session := helpers.CF("set-label", "service-broker", broker.Name(), "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s as %s...`), broker.Name(), username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+				session = helpers.CF("curl", fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()))
+				Eventually(session).Should(Exit(0))
+				brokerJSON := session.Out.Contents()
+				var updatedBroker resourceCollection
+				Expect(json.Unmarshal(brokerJSON, &updatedBroker)).To(Succeed())
+				Expect(updatedBroker.Resources).To(HaveLen(1))
+				Expect(updatedBroker.Resources[0].Metadata.Labels).To(HaveLen(2))
+				Expect(updatedBroker.Resources[0].Metadata.Labels["some-key"]).To(Equal("some-value"))
+				Expect(updatedBroker.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
+			})
+
+			When("the service broker is unknown", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "service-broker", "non-existent-broker", "some-key=some-value")
+					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label has an empty key and an invalid value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "service-broker", broker.Name(), "=test", "sha2=108&eb90d734")
+					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label does not include a '=' to separate the key and value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "service-broker", broker.Name(), "test-label")
+					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "service-broker", broker.Name(), "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("curl", fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()))
+					Eventually(session).Should(Exit(0))
+					appJSON := session.Out.Contents()
+					var updatedBroker resourceCollection
+					Expect(json.Unmarshal(appJSON, &updatedBroker)).To(Succeed())
+					Expect(updatedBroker.Resources).To(HaveLen(1))
+					Expect(updatedBroker.Resources[0].Metadata.Labels).To(HaveLen(1))
+					Expect(updatedBroker.Resources[0].Metadata.Labels["owner"]).To(Equal("beth"))
 				})
 			})
 		})

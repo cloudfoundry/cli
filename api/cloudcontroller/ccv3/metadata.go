@@ -83,9 +83,33 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 		DecodeJSONResponseInto: &responseMetadata,
 	}
 	err = client.connection.Make(request, &response)
+	return responseMetadata, response.Warnings, err
+}
+
+func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata Metadata) (JobURL, Warnings, error) {
+	metadataBytes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
+	if err != nil {
+		return "", nil, err
+	}
+
+	var request *cloudcontroller.Request
+
+	switch resource {
+	case "service-broker":
+		request, _ = client.newHTTPRequest(requestOptions{
+			RequestName: internal.PatchServiceBrokerRequest,
+			Body:        bytes.NewReader(metadataBytes),
+			URIParams:   map[string]string{"service_broker_guid": resourceGUID},
+		})
+	default:
+		return "", nil, fmt.Errorf("unknown async resource type (%s) requested", resource)
+	}
 
 	if err != nil {
-		return ResourceMetadata{}, nil, err
+		return "", nil, err
 	}
-	return responseMetadata, nil, err
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
