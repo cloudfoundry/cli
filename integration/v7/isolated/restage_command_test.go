@@ -138,6 +138,7 @@ applications:
 
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
 					})
+
 				})
 
 				It("uses the multiprocess display", func() {

@@ -145,12 +145,6 @@ var _ = Describe("restage Command", func() {
 			Expect(spaceGUID).To(Equal("some-space-guid"))
 		})
 
-		It("stops the app", func() {
-			Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
-			appGUID := fakeActor.StopApplicationArgsForCall(0)
-			Expect(appGUID).To(Equal("app-guid"))
-		})
-
 		It("assigns the droplet and starts the application", func() {
 			Expect(fakeActor.SetApplicationDropletCallCount()).To(Equal(1))
 			appGUID, dropletGUID := fakeActor.SetApplicationDropletArgsForCall(0)
@@ -170,6 +164,8 @@ var _ = Describe("restage Command", func() {
 			Expect(testUI.Out).To(Say(`Restaging app some-app in org some-org / space some-space as steve...`))
 
 			Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+			Expect(testUI.Out).ToNot(Say("Waiting for app to start..."))
+
 			Expect(testUI.Err).To(Say("get-app-warning"))
 			Expect(testUI.Err).To(Say("get-package-warning"))
 			Expect(testUI.Err).To(Say("get-logs-warning"))
@@ -279,18 +275,6 @@ var _ = Describe("restage Command", func() {
 
 			Expect(testUI.Err).To(Say("some-package-warning"))
 			Expect(testUI.Err).To(Say("some-other-package-warning"))
-		})
-	})
-
-	When("stopping the app fails", func() {
-		BeforeEach(func() {
-			fakeActor.StopApplicationReturns(
-				v7action.Warnings{"stop-app-warning"}, errors.New("stop-app-error"))
-		})
-
-		It("displays all warnings and returns an error", func() {
-			Expect(executeErr).To(MatchError("stop-app-error"))
-			Expect(testUI.Err).To(Say("stop-app-warning"))
 		})
 	})
 
