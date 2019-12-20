@@ -54,6 +54,10 @@ var _ = Describe("restart Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
+	It("displays the experimental warning", func() {
+		Expect(testUI.Err).NotTo(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+	})
+
 	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})

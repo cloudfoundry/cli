@@ -130,28 +130,6 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	return updatedPackage, append(allWarnings, updatedWarnings...), err
 }
 
-func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package, Warnings, error) {
-	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
-		ccv3.Query{
-			Key:    ccv3.AppGUIDFilter,
-			Values: []string{appGUID},
-		},
-		ccv3.Query{
-			Key:    ccv3.StatesFilter,
-			Values: []string{string(constant.PackageReady)},
-		},
-		ccv3.Query{
-			Key:    ccv3.OrderBy,
-			Values: []string{"updated_at"},
-		},
-	)
-	if err != nil {
-		return Package{}, Warnings(warnings), err
-	}
-
-	return Package(ccv3Packages[0]), Warnings(warnings), nil
-}
-
 // GetApplicationPackages returns a list of package of an app.
 func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]Package, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)

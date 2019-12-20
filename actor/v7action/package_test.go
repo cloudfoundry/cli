@@ -146,68 +146,6 @@ var _ = Describe("Package Actions", func() {
 		})
 	})
 
-	Describe("GetNewestReadyPackageForApplication", func() {
-		BeforeEach(func() {
-			fakeCloudControllerClient.GetPackagesReturns(
-				[]ccv3.Package{
-					{
-						GUID:      "some-package-guid-1",
-						State:     constant.PackageReady,
-						CreatedAt: "2017-08-14T21:16:42Z",
-					},
-					{
-						GUID:      "some-package-guid-2",
-						State:     constant.PackageReady,
-						CreatedAt: "2017-08-16T00:18:24Z",
-					},
-				},
-				ccv3.Warnings{"get-application-packages-warning"},
-				nil,
-			)
-		})
-
-		It("gets the most recent package for the given app guid that has a ready state", func() {
-			expectedPackage, warnings, err := actor.GetNewestReadyPackageForApplication("my-app-guid")
-
-			Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
-			Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
-				ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"my-app-guid"}},
-				ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"READY"}},
-				ccv3.Query{Key: ccv3.OrderBy, Values: []string{"updated_at"}},
-			))
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(warnings).To(ConsistOf("get-application-packages-warning"))
-			Expect(expectedPackage).To(Equal(Package{
-				GUID:      "some-package-guid-1",
-				State:     constant.PackageReady,
-				CreatedAt: "2017-08-14T21:16:42Z",
-			},
-			))
-		})
-
-		When("getting the application packages fails", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("get-packages-error")
-
-				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{},
-					ccv3.Warnings{"get-packages-warning"},
-					expectedErr,
-				)
-			})
-
-			It("returns the error", func() {
-				_, warnings, err := actor.GetNewestReadyPackageForApplication("my-app-guid")
-
-				Expect(err).To(Equal(expectedErr))
-				Expect(warnings).To(ConsistOf("get-packages-warning"))
-			})
-		})
-	})
-
 	Describe("CreateDockerPackageByApplicationNameAndSpace", func() {
 		var (
 			dockerPackage Package
