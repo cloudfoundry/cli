@@ -24,6 +24,18 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:5579d171c21fa6078ed325bc11b689d5ea406ad73e1428bbcc2f662cb1703969"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+  ]
+  pruneopts = "NUT"
+  revision = "ca3deaa94ad8790dcf9b44190bad91d23b9fd889"
+  version = "v6.48.0"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -431,7 +443,7 @@
   version = "v1.7.0"
 
 [[projects]]
-  digest = "1:20237a6d616a2a70a29fcc2ac93e7039a39eed0d040ef4a818479fcd953f9466"
+  digest = "1:0ab4ee4d542a6326f1e333ff70cae703d460402f78ac8da5461ed04cff3c6e71"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -453,8 +465,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "27d50ea6455b212cf516609fa58b2b5dce1abc81"
-  version = "v1.6.0"
+  revision = "22a9feb22fe99439870ed2e013401725a9d495df"
+  version = "v1.8.1"
 
 [[projects]]
   digest = "1:e0cc8395ea893c898ff5eb0850f4d9851c1f57c78c232304a026379a47a552d0"
@@ -602,6 +614,17 @@
   ]
   pruneopts = "NUT"
   revision = "cbf43d21aaebfdfeb81d91a5f444d13a3046e686"
+
+[[projects]]
+  branch = "master"
+  digest = "1:325a1b73817aa79fc85f10376ed41ea607f7dd7f6c6bfa46df6a28ef2857941f"
+  name = "golang.org/x/xerrors"
+  packages = [
+    ".",
+    "internal",
+  ]
+  pruneopts = "NUT"
+  revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
   branch = "master"
