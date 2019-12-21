@@ -62,14 +62,17 @@ func LoginAs(username, password string) {
 		"CF_PASSWORD": password,
 	}
 
+	var session *Session
+
 	for i := 0; i < 3; i++ {
-		session := CFWithEnv(env, "auth")
+		session = CFWithEnv(env, "auth")
 		Eventually(session).Should(Exit())
 		if session.ExitCode() == 0 {
-			break
+			return
 		}
 		time.Sleep(3 * time.Second)
 	}
+	Expect(session.ExitCode()).To(Equal(0))
 }
 
 // LoginCF logs in to the CLI using the username and password from the CF_INT_USERNAME
