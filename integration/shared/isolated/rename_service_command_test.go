@@ -47,6 +47,7 @@ var _ = Describe("rename-service command", func() {
 
 				var password string
 				unprivilegedUsername, password = helpers.CreateUserInSpaceRole(orgName, spaceName, "SpaceDeveloper")
+				helpers.LogoutCF()
 				helpers.LoginAs(unprivilegedUsername, password)
 				helpers.TargetOrgAndSpace(orgName, spaceName)
 			})
