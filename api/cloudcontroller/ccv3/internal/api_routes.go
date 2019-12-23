@@ -83,7 +83,7 @@ const (
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
 	PatchOrganizationRequest                                    = "PatchOrganization"
 	PatchProcessRequest                                         = "PatchProcess"
-	PatchRouteRequest                                           = "PatchRouten"
+	PatchRouteRequest                                           = "PatchRoute"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
 	PatchSpaceRequest                                           = "PatchSpace"

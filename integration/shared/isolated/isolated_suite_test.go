@@ -6,10 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers/commonisolated"
 )
 
-const (
-	RealIsolationSegment = commonisolated.RealIsolationSegment
-)
-
 var (
 	// Suite Level
 	apiURL            string
