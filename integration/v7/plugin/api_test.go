@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -69,6 +71,7 @@ var _ = Describe("plugin API", func() {
 		var orgName string
 		var orgGUID string
 		var domainName string
+		var domain helpers.Domain
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
@@ -76,13 +79,32 @@ var _ = Describe("plugin API", func() {
 			helpers.TargetOrg(orgName)
 			orgGUID = helpers.GetOrgGUID(orgName)
 
-			domainName = "test.com"
-			domain := helpers.NewDomain(orgName, domainName)
+			domainName = helpers.DomainName("get-org-test")
+			domain = helpers.NewDomain(orgName, domainName)
 			domain.Create()
+		})
+
+		AfterEach(func() {
+			domain.Delete()
 		})
 
 		It("gets the organization information", func() {
 			confirmTestPluginOutputWithArg("GetOrg", orgName, orgName, orgGUID, domainName)
+		})
+
+		When("the org has metadata", func() {
+			BeforeEach(func() {
+				Eventually(helpers.CF("set-label", "org", orgName, "orgType=production")).Should(Exit(0))
+			})
+			It("Displays the metadata correctly", func() {
+				confirmTestPluginOutputWithArg("GetOrg", orgName, regexp.QuoteMeta("Labels:map[orgType:{Value:production"))
+			})
+		})
+
+		When("the org does not exist", func() {
+			It("Displays a useful error message", func() {
+				confirmTestPluginOutputWithArg("GetOrg", "blahblahblah", "Error GetOrg: Organization 'blahblahblah' not found")
+			})
 		})
 	})
 

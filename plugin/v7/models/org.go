@@ -16,7 +16,7 @@ type Domain struct {
 type OrgSummary struct {
 	Org
 
-	Metadata *Metadata
+	Metadata Metadata
 
 	Spaces []Space
 

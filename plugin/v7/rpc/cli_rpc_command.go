@@ -219,16 +219,16 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrgSummary) e
 		panic(err)
 	}
 
-	var m plugin_models.Metadata
+	var metadata plugin_models.Metadata
 
-	err = dec.Decode(&m)
+	err = dec.Decode(&metadata)
 	if err != nil {
 		panic(err)
 	}
 
 	retVal.Name = org.Name
 	retVal.GUID = org.GUID
-	retVal.Metadata = &m
+	retVal.Metadata = metadata
 
 	return nil
 }
