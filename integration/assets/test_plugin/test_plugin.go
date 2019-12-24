@@ -80,7 +80,7 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Printf("error: [%s], apps: [%+v]\n", err, result)
 	case "GetOrg":
 		result, err := cliConnection.GetOrg(args[1])
-		fmt.Println("Done GetOrg:", result)
+		fmt.Printf("Done GetOrg: %+v\n", result)
 		fmt.Println("err:", err)
 	case "GetOrgs":
 		result, _ := cliConnection.GetOrgs()

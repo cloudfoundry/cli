@@ -1,4 +1,4 @@
-# Updates to the v7 Plugin API Interface
+# Updates to the V7 Plugin API Interface
 
 This document lists the differences in the objects the V7 Plugin API returns compared to V6.
 
@@ -138,7 +138,7 @@ cf7: `Application 'APP' not found.`
 
 ### GetCurrentSpace
 
-v6
+V6
 ```
 {SpaceFields:
   {Guid:a53cf02c-4d18-4955-b321-b8c45e33df1e 
@@ -147,7 +147,7 @@ v6
 }
 ```
 
-v7
+V7
 ```
 {Name:space GUID:a53cf02c-4d18-4955-b321-b8c45e33df1e}
 ```
@@ -156,20 +156,20 @@ v7
 
 When an org isn't targeted:
 
-v6 : Doesn't report an error, and returns an empty space object (error)
+V6 : Doesn't report an error, and returns an empty space object (error)
 
-v7 : Error: no organization targeted
+V7 : Error: no organization targeted
 
 When a space isn't targeted:
 
-v6 : Doesn't report an error, and returns an empty space object (error)
+V6 : Doesn't report an error, and returns an empty space object (error)
 
-v7 : Error: no space targeted
+V7 : Error: no space targeted
 
 ### GetCurrentOrg
 Model Changes
 
-v6
+V6
 ```
 {
     OrganizationFields:{
@@ -186,20 +186,76 @@ v6
 }
 ```
 
-v7
+V7
 ```
 {
     Name:org 
     GUID:2e2eb386-34a9-4b29-ad49-365a57bdca6c
 }
 ```
-Error Changes?
+#### Error Changes
 
 When an org isn't targeted:
 
-v6 : Doesn't report an error, and returns an empty org object (error)
+V6 : Doesn't report an error, and returns an empty org object (error)
 
-v7 : Error: no organization targeted
+V7 : Error: no organization targeted
+
+### GetOrg
+
+#### Model changes
+The main difference here is the removal of Quota information from GetOrg, in our
+User research we found no uses of this, we also added Metadata to the V7 object
+
+V6
+```
+  Guid:1a873322-a1cb-47aa-ad81-5b7460941910 Name:system 
+  QuotaDefinition:{
+    Guid:
+    Name:default
+    MemoryLimit:102400 
+    InstanceMemoryLimit:-1
+    RoutesLimit:1000
+    ServicesLimit:-1
+    NonBasicServicesAllowed:true
+  }
+  Spaces:[{
+    Guid:00954f6d-fd0f-47f7-80e8-a597a47df9df Name:test-org
+    }
+  ]
+  Domains:[{
+    Guid:e672e331-def1-418b-ad4c-428177de353d
+    Name:frost-dagger.lite.cli.fun OwningOrganizationGuid: Shared:true
+  }]
+  SpaceQuotas:[{SpaceQuoteObject}]}
+```
+V7
+
+```
+{
+   Org: {
+     Name: system GUID: 1a873322-a1cb-47aa-ad81-5b7460941910
+   }
+   Metadata: {
+     Labels: map[
+        label: { Value: test IsSet: true }
+        fun: { Value: true IsSet: true }
+      ]
+   }
+   Spaces: [
+     {
+       Name: test-org GUID: 00954f6d-fd0f-47f7-80e8-a597a47df9df
+     }
+   ]
+   Domains: [
+     {
+       Name: frost-dagger.lite.cli.fun
+       GUID: e672e331-def1-418b-ad4c-428177de353d
+     }
+   ]
+}
+
+```
 
 ### GetApps
 #### Model Changes
@@ -252,9 +308,9 @@ V7
 
 When no space is targeted:
 
-v6: Returns error: `No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space`
+V6: Returns error: `No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space`
 
-v7: Returns error: `no space targeted`
+V7: Returns error: `no space targeted`
 
 ### Username
 
@@ -262,14 +318,14 @@ No interface changes
 
 #### Not logged in behaviour
 
-v6: Returns empty string with no error
+V6: Returns empty string with no error
 
-v7: Returns empty string with error `not logged in`
+V7: Returns empty string with error `not logged in`
 
-### IsSSLDisabled (Renamed to IsSkipSSLValidation in v7)
+### IsSSLDisabled (Renamed to IsSkipSSLValidation in V7)
 
-The only difference in this method is that it was renamed from the v6
-`IsSSLDisabled` to the v7 `IsSkipSSLValidation`
+The only difference in this method is that it was renamed from the V6
+`IsSSLDisabled` to the V7 `IsSkipSSLValidation`
 
 ## Methods that have not changed
 
@@ -279,7 +335,7 @@ IsLoggedIn
 
 
 ## Other changes
-When the CLI is not targeted at an API in v6, plugin methods will just return null objects with an error attatched, in v7 the plugin command will error in the CLI code without executing any of the plugin specific code. This will display the error in stderr like other CLI commands do.
+When the CLI is not targeted at an API in V6, plugin methods will just return null objects with an error attatched, in V7 the plugin command will error in the CLI code without executing any of the plugin specific code. This will display the error in stderr like other CLI commands do.
 
 
 Not logged in errors? (TODO)
