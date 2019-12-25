@@ -87,7 +87,14 @@ func (cmd RestageCommand) Execute(args []string) error {
 	pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		if _, ok := err.(actionerror.PackageNotFoundInAppError); ok {
+			return actionerror.PackageNotFoundInAppError{
+				AppName: cmd.RequiredArgs.AppName,
+				BinaryName: cmd.Config.BinaryName(),
+			}
+		} else {
+			return err
+		}
 	}
 
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
