@@ -95,6 +95,8 @@ func ConvertToTranslatableError(err error) error {
 		return OrganizationNotFoundError(e)
 	case actionerror.OrganizationQuotaNotFoundForNameError:
 		return OrganizationQuotaNotFoundForNameError(e)
+	case actionerror.PackageNotFoundInAppError:
+		return PackageNotFoundInAppError{AppName: e.AppName, BinaryName: e.BinaryName}
 	case actionerror.PasswordGrantTypeLogoutRequiredError:
 		return PasswordGrantTypeLogoutRequiredError(e)
 	case actionerror.PluginCommandsConflictError:
