@@ -147,8 +147,8 @@ var _ = Describe("Package Actions", func() {
 	})
 
 	Describe("GetNewestReadyPackageForApplication", func() {
-		var	(
-			appGUID string
+		var (
+			appGUID    string
 			executeErr error
 
 			warnings Warnings
@@ -208,11 +208,11 @@ var _ = Describe("Package Actions", func() {
 					)
 				})
 
-				JustBeforeEach(func(){
+				JustBeforeEach(func() {
 					_, warnings, executeErr = actor.GetNewestReadyPackageForApplication(appGUID)
 				})
 
-				It( "returns an error and warnings", func(){
+				It("returns an error and warnings", func() {
 					Expect(executeErr).To(MatchError(actionerror.PackageNotFoundInAppError{}))
 					Expect(warnings).To(ConsistOf("get-application-packages-warning"))
 				})

@@ -1,7 +1,7 @@
 package translatableerror
 
 type PackageNotFoundInAppError struct {
-	AppName string
+	AppName    string
 	BinaryName string
 }
 
@@ -11,7 +11,7 @@ func (PackageNotFoundInAppError) Error() string {
 
 func (e PackageNotFoundInAppError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"AppName": e.AppName,
+		"AppName":    e.AppName,
 		"BinaryName": e.BinaryName,
 	})
 }

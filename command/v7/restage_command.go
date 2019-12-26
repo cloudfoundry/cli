@@ -89,7 +89,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 	if err != nil {
 		if _, ok := err.(actionerror.PackageNotFoundInAppError); ok {
 			return actionerror.PackageNotFoundInAppError{
-				AppName: cmd.RequiredArgs.AppName,
+				AppName:    cmd.RequiredArgs.AppName,
 				BinaryName: cmd.Config.BinaryName(),
 			}
 		} else {

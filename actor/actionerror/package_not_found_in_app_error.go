@@ -3,8 +3,8 @@ package actionerror
 import "fmt"
 
 type PackageNotFoundInAppError struct {
-	GUID    string
-	AppName string
+	GUID       string
+	AppName    string
 	BinaryName string
 }
 
