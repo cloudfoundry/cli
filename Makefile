@@ -240,7 +240,7 @@ endif
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
+	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
 	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
 
