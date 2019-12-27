@@ -87,7 +87,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 	pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
 	}
 
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
@@ -169,6 +169,11 @@ func (cmd RestageCommand) mapErr(appName string, err error) error {
 	case actionerror.StagingFailedNoAppDetectedError:
 		return translatableerror.StagingFailedNoAppDetectedError{
 			Message:    err.Error(),
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	case actionerror.PackageNotFoundInAppError:
+		return translatableerror.PackageNotFoundInAppError{
+			AppName:    cmd.RequiredArgs.AppName,
 			BinaryName: cmd.Config.BinaryName(),
 		}
 	}

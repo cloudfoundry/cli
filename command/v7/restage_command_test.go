@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"context"
 	"errors"
 	"time"
@@ -30,22 +31,23 @@ var _ = Describe("restage Command", func() {
 		fakeLogCacheClient *v7actionfakes.FakeLogCacheClient
 
 		executeErr       error
-		app              string
+		appName          string
 		allLogsWritten   chan bool
 		closedTheStreams bool
 	)
 	const dropletCreateTime = "2017-08-14T21:16:42Z"
 
 	BeforeEach(func() {
-		app = "some-app"
+		appName = "some-app"
 
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeConfig.BinaryNameReturns("some-binary-name")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeRestageActor)
 		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
 		cmd = v7.RestageCommand{
-			RequiredArgs: flag.AppName{AppName: app},
+			RequiredArgs: flag.AppName{AppName: appName},
 
 			UI:             testUI,
 			Config:         fakeConfig,
@@ -238,6 +240,22 @@ var _ = Describe("restage Command", func() {
 		})
 	})
 
+	When("there are no packages available to stage", func() {
+		BeforeEach(func() {
+			fakeActor.GetNewestReadyPackageForApplicationReturns(
+				v7action.Package{},
+				v7action.Warnings{"get-package-warning"},
+				actionerror.PackageNotFoundInAppError{},
+			)
+		})
+
+		It("displays all warnings and returns an error", func() {
+			Expect(executeErr).To(MatchError(translatableerror.PackageNotFoundInAppError{
+				AppName: appName, BinaryName: "some-binary-name"}))
+			Expect(testUI.Err).To(Say("get-package-warning"))
+		})
+
+	})
 	When("getting logs for the app fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(
@@ -324,12 +342,12 @@ var _ = Describe("restage Command", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = actionerror.ApplicationNotFoundError{Name: app}
+				expectedErr = actionerror.ApplicationNotFoundError{Name: appName}
 				fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"application-summary-warning-1", "application-summary-warning-2"}, expectedErr)
 			})
 
 			It("displays all warnings and returns an error", func() {
-				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
+				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: appName}))
 
 				Expect(testUI.Err).To(Say("application-summary-warning-1"))
 				Expect(testUI.Err).To(Say("application-summary-warning-2"))

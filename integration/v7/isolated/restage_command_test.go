@@ -74,6 +74,22 @@ var _ = Describe("restage command", func() {
 				domainName string
 				appName    string
 			)
+			When("there are no packages for the app to restage", func() {
+				BeforeEach(func() {
+					appName = helpers.PrefixedRandomName("app")
+					Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
+				})
+
+				It("fails and displays the package not found failure message", func() {
+					userName, _ := helpers.GetCredentials()
+					session := helpers.CF("restage", appName)
+					Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+
+					Eventually(session.Err).Should(Say(`Package not found in app '%s'\.`, appName))
+					Eventually(session.Err).Should(Say(`TIP: Use 'cf packages %s' to list packages in your app. Use 'cf create-package' to create one\.`, appName))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 
 			When("there is an error in staging the app", func() {
 				BeforeEach(func() {
