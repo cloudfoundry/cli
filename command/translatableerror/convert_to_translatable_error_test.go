@@ -181,10 +181,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.OrganizationQuotaNotFoundForNameError{Name: "some-quota"},
 			OrganizationQuotaNotFoundForNameError{Name: "some-quota"}),
 
-		Entry("actionerror.PackageNotFoundInAppError -> PackageNotFoundInAppError",
-			actionerror.PackageNotFoundInAppError{},
-			PackageNotFoundInAppError{}),
-
 		Entry("actionerror.PasswordGrantTypeLogoutRequiredError -> PasswordGrantTypeLogoutRequiredError",
 			actionerror.PasswordGrantTypeLogoutRequiredError{},
 			PasswordGrantTypeLogoutRequiredError{}),

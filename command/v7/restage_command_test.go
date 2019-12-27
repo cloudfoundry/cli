@@ -30,14 +30,14 @@ var _ = Describe("restage Command", func() {
 		fakeLogCacheClient *v7actionfakes.FakeLogCacheClient
 
 		executeErr       error
-		appName          string
+		app              string
 		allLogsWritten   chan bool
 		closedTheStreams bool
 	)
 	const dropletCreateTime = "2017-08-14T21:16:42Z"
 
 	BeforeEach(func() {
-		appName = "some-app"
+		app = "some-app"
 
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
@@ -45,7 +45,7 @@ var _ = Describe("restage Command", func() {
 		fakeActor = new(v7fakes.FakeRestageActor)
 		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
 		cmd = v7.RestageCommand{
-			RequiredArgs: flag.AppName{AppName: appName},
+			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:             testUI,
 			Config:         fakeConfig,
@@ -238,21 +238,6 @@ var _ = Describe("restage Command", func() {
 		})
 	})
 
-	When("there are no packages available to stage", func() {
-		BeforeEach(func() {
-			fakeActor.GetNewestReadyPackageForApplicationReturns(
-				v7action.Package{},
-				v7action.Warnings{"get-package-warning"},
-				actionerror.PackageNotFoundInAppError{},
-			)
-		})
-
-		It("displays all warnings and returns an error", func() {
-			Expect(executeErr).To(MatchError(actionerror.PackageNotFoundInAppError{AppName: appName}))
-			Expect(testUI.Err).To(Say("get-package-warning"))
-		})
-
-	})
 	When("getting logs for the app fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(
@@ -339,12 +324,12 @@ var _ = Describe("restage Command", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = actionerror.ApplicationNotFoundError{Name: appName}
+				expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 				fakeActor.GetDetailedAppSummaryReturns(v7action.DetailedApplicationSummary{}, v7action.Warnings{"application-summary-warning-1", "application-summary-warning-2"}, expectedErr)
 			})
 
 			It("displays all warnings and returns an error", func() {
-				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: appName}))
+				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
 				Expect(testUI.Err).To(Say("application-summary-warning-1"))
 				Expect(testUI.Err).To(Say("application-summary-warning-2"))

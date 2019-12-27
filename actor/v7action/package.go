@@ -149,10 +149,6 @@ func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package,
 		return Package{}, Warnings(warnings), err
 	}
 
-	if len(ccv3Packages) == 0 {
-		return Package{}, Warnings(warnings), actionerror.PackageNotFoundInAppError{}
-	}
-
 	return Package(ccv3Packages[0]), Warnings(warnings), nil
 }
 
