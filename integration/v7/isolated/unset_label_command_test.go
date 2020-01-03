@@ -39,6 +39,7 @@ var _ = Describe("unset-label command", func() {
 			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+route`))
+			Eventually(session).Should(Say(`\s+service-broker`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("OPTIONS:"))
@@ -97,15 +98,9 @@ var _ = Describe("unset-label command", func() {
 				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
 				Expect(session).Should(Say("OK"))
 
-				appGuid := helpers.AppGUID(appName)
-				session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGuid))
-				Eventually(session).Should(Exit(0))
-				appJSON := session.Out.Contents()
-
-				var app commonResource
-				Expect(json.Unmarshal(appJSON, &app)).To(Succeed())
-				Expect(len(app.Metadata.Labels)).To(Equal(1))
-				Expect(app.Metadata.Labels["some-key"]).To(Equal("some-value"))
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, helpers.MetadataLabels{
+					"some-key": "some-value",
+				})
 			})
 		})
 

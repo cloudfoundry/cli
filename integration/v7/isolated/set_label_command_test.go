@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -62,18 +61,6 @@ var _ = Describe("set-label command", func() {
 			stackNameBase string
 		)
 
-		type labels map[string]string
-
-		type commonResource struct {
-			Metadata struct {
-				Labels labels
-			}
-		}
-
-		type resourceCollection struct {
-			Resources []commonResource
-		}
-
 		testExpectedBehaviors := func(resourceType, resourceTypeFormatted, resourceName string) {
 			By("checking the behavior when the resource does not exist", func() {
 				unknownResourceName := "non-existent-" + resourceType
@@ -96,27 +83,6 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
-		}
-
-		checkExpectedMetadata := func(url string, list bool, expected labels) {
-			session := helpers.CF("curl", url)
-			Eventually(session).Should(Exit(0))
-			resourceJSON := session.Out.Contents()
-			var resource commonResource
-
-			if list {
-				var resourceList resourceCollection
-				Expect(json.Unmarshal(resourceJSON, &resourceList)).To(Succeed())
-				Expect(resourceList.Resources).To(HaveLen(1))
-				resource = resourceList.Resources[0]
-			} else {
-				Expect(json.Unmarshal(resourceJSON, &resource)).To(Succeed())
-			}
-
-			Expect(resource.Metadata.Labels).To(HaveLen(len(expected)))
-			for k, v := range expected {
-				Expect(resource.Metadata.Labels).To(HaveKeyWithValue(k, v))
-			}
 		}
 
 		BeforeEach(func() {
@@ -152,7 +118,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, helpers.MetadataLabels{
 					"some-key":       "some-value",
 					"some-other-key": "some-other-value",
 				})
@@ -163,7 +129,7 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "app", appName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -199,7 +165,7 @@ var _ = Describe("set-label command", func() {
 				Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as %s...`), domainName, username))
 				Expect(session).Should(Say("OK"))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/domains?names=%s", domainName), true, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/domains?names=%s", domainName), true, helpers.MetadataLabels{
 					"some-key":       "some-value",
 					"some-other-key": "some-other-value",
 				})
@@ -212,7 +178,7 @@ var _ = Describe("set-label command", func() {
 					Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as %s...`), domainName, username))
 					Expect(session).Should(Say("OK"))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/domains?names=%s", domainName), true, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/domains?names=%s", domainName), true, helpers.MetadataLabels{
 						"some-key": "some-other-value",
 					})
 				})
@@ -239,7 +205,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/spaces/%s", helpers.GetSpaceGUID(spaceName)), false, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/spaces/%s", helpers.GetSpaceGUID(spaceName)), false, helpers.MetadataLabels{
 					"some-key":       "some-value",
 					"some-other-key": "some-other-value",
 				})
@@ -250,7 +216,7 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "space", spaceName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/spaces/%s", helpers.GetSpaceGUID(spaceName)), false, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/spaces/%s", helpers.GetSpaceGUID(spaceName)), false, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -276,7 +242,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/organizations/%s", helpers.GetOrgGUID(orgName)), false, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/organizations/%s", helpers.GetOrgGUID(orgName)), false, helpers.MetadataLabels{
 					"pci":           "true",
 					"public-facing": "false",
 				})
@@ -287,7 +253,7 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "org", orgName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/organizations/%s", helpers.GetOrgGUID(orgName)), false, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/organizations/%s", helpers.GetOrgGUID(orgName)), false, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -342,7 +308,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID), true, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID), true, helpers.MetadataLabels{
 					"some-key":       "some-value",
 					"some-other-key": "some-other-value",
 				})
@@ -353,7 +319,7 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "route", routeName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID), true, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID), true, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -398,7 +364,7 @@ var _ = Describe("set-label command", func() {
 					Eventually(session).Should(Exit(0))
 
 					buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, currentStack)
-					checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, helpers.MetadataLabels{
 						"pci":           "true",
 						"public-facing": "false",
 					})
@@ -437,7 +403,7 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Exit(0))
 
 							buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[1])
-							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, labels{
+							helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, helpers.MetadataLabels{
 								"pci":           "true",
 								"public-facing": "false",
 							})
@@ -460,7 +426,7 @@ var _ = Describe("set-label command", func() {
 						Eventually(session).Should(Exit(0))
 
 						buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, currentStack)
-						checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, labels{
+						helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, helpers.MetadataLabels{
 							"owner": "beth",
 						})
 					})
@@ -523,7 +489,7 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[0]), false, labels{
+							helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[0]), false, helpers.MetadataLabels{
 								"peach":  "5",
 								"quince": "6",
 							})
@@ -550,7 +516,7 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[2]), false, labels{
+							helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[2]), false, helpers.MetadataLabels{
 								"mango": "1",
 								"figs":  "2",
 							})
@@ -564,7 +530,7 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]), false, labels{
+							helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]), false, helpers.MetadataLabels{
 								"tangelo": "3",
 								"lemon":   "4",
 							})
@@ -609,7 +575,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/stacks/%s", stackGUID), false, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/stacks/%s", stackGUID), false, helpers.MetadataLabels{
 					"pci":           "true",
 					"public-facing": "false",
 				})
@@ -620,7 +586,7 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "stack", stackName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/stacks/%s", stackGUID), false, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/stacks/%s", stackGUID), false, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -652,7 +618,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				checkExpectedMetadata(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, labels{
+				helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
 					"some-key":       "some-value",
 					"some-other-key": "some-other-value",
 				})
@@ -663,7 +629,7 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "service-broker", broker.Name(), "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					checkExpectedMetadata(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, labels{
+					helpers.CheckExpectedMetadata(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
