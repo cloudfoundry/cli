@@ -228,7 +228,7 @@ func newUpdateServiceBroker(serviceBroker ServiceBrokerModel) (serviceBrokerRequ
 	password := serviceBroker.Password
 	brokerURL := serviceBroker.URL
 	if (username == "" && password != "") || (username != "" && password == "") {
-		return serviceBrokerRequest{}, errors.New("boom!") // TODO: fix this
+		return serviceBrokerRequest{}, errors.New("Incorrect usage: both username and password must be defined in order to do an update")
 	}
 	request := serviceBrokerRequest{
 		Name: name,
