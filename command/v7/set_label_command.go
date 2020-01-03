@@ -37,6 +37,9 @@ type SetLabelCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       SetLabelActor
+
+	username string
+	labels   map[string]types.NullString
 }
 
 func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
@@ -52,16 +55,17 @@ func (cmd *SetLabelCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd SetLabelCommand) Execute(args []string) error {
-	labels := make(map[string]types.NullString)
+	cmd.labels = make(map[string]types.NullString)
 	for _, label := range cmd.RequiredArgs.Labels {
 		parts := strings.SplitN(label, "=", 2)
 		if len(parts) < 2 {
 			return fmt.Errorf("Metadata error: no value provided for label '%s'", label)
 		}
-		labels[parts[0]] = types.NewNullString(parts[1])
+		cmd.labels[parts[0]] = types.NewNullString(parts[1])
 	}
 
-	username, err := cmd.Config.CurrentUserName()
+	var err error
+	cmd.username, err = cmd.Config.CurrentUserName()
 	if err != nil {
 		return err
 	}
@@ -72,21 +76,21 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 
 	switch cmd.canonicalResourceTypeForName() {
 	case App:
-		err = cmd.executeApp(username, labels)
+		err = cmd.executeApp()
 	case Buildpack:
-		err = cmd.executeBuildpack(username, labels)
+		err = cmd.executeBuildpack()
 	case Domain:
-		err = cmd.executeDomain(username, labels)
+		err = cmd.executeDomain()
 	case Org:
-		err = cmd.executeOrg(username, labels)
+		err = cmd.executeOrg()
 	case Route:
-		err = cmd.executeRoute(username, labels)
+		err = cmd.executeRoute()
 	case Space:
-		err = cmd.executeSpace(username, labels)
+		err = cmd.executeSpace()
 	case Stack:
-		err = cmd.executeStack(username, labels)
+		err = cmd.executeStack()
 	case ServiceBroker:
-		err = cmd.executeServiceBroker(username, labels)
+		err = cmd.executeServiceBroker()
 	default:
 		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
@@ -99,35 +103,26 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd SetLabelCommand) executeApp(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeApp() error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
 
-	appName := cmd.RequiredArgs.ResourceName
+	cmd.displayMessageWithOrgAndSpace()
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
-	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
-		map[string]interface{}{
-			"ResourceName": appName,
-			"OrgName":      cmd.Config.TargetedOrganization().Name,
-			"SpaceName":    cmd.Config.TargetedSpace().Name,
-			"User":         username,
-		},
-	)
-
-	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(appName,
+	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(
+		cmd.RequiredArgs.ResourceName,
 		cmd.Config.TargetedSpace().GUID,
-		labels)
+		cmd.labels,
+	)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd SetLabelCommand) executeBuildpack(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeBuildpack() error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
@@ -143,67 +138,52 @@ func (cmd SetLabelCommand) executeBuildpack(username string, labels map[string]t
 		map[string]interface{}{
 			"ResourceName": cmd.RequiredArgs.ResourceName,
 			"StackName":    cmd.BuildpackStack,
-			"User":         username,
+			"User":         cmd.username,
 		},
 	)
 
-	warnings, err := cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, labels)
+	warnings, err := cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, cmd.labels)
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd SetLabelCommand) executeOrg(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeOrg() error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
-	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
-		map[string]interface{}{
-			"ResourceName": cmd.RequiredArgs.ResourceName,
-			"OrgName":      cmd.Config.TargetedOrganization().Name,
-			"User":         username,
-		},
-	)
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName,
-		labels)
+	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(
+		cmd.RequiredArgs.ResourceName,
+		cmd.labels,
+	)
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd SetLabelCommand) executeRoute(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeRoute() error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
-	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
-		map[string]interface{}{
-			"ResourceName": cmd.RequiredArgs.ResourceName,
-			"OrgName":      cmd.Config.TargetedOrganization().Name,
-			"SpaceName":    cmd.Config.TargetedSpace().Name,
-			"User":         username,
-		},
-	)
+	cmd.displayMessageWithOrgAndSpace()
 
 	warnings, err := cmd.Actor.UpdateRouteLabels(
 		cmd.RequiredArgs.ResourceName,
 		cmd.Config.TargetedSpace().GUID,
-		labels,
+		cmd.labels,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeSpace() error {
 	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
@@ -217,70 +197,49 @@ func (cmd SetLabelCommand) executeSpace(username string, labels map[string]types
 		map[string]interface{}{
 			"ResourceName": spaceName,
 			"OrgName":      cmd.Config.TargetedOrganization().Name,
-			"User":         username,
+			"User":         cmd.username,
 		},
 	)
 
 	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(spaceName,
 		cmd.Config.TargetedOrganization().GUID,
-		labels)
+		cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd SetLabelCommand) executeStack(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeStack() error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
-	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
-		map[string]interface{}{
-			"ResourceName": cmd.RequiredArgs.ResourceName,
-			"User":         username,
-		},
-	)
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
+	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, cmd.labels)
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd SetLabelCommand) executeDomain(username string, labels map[string]types.NullString) error {
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
-	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
-		map[string]interface{}{
-			"ResourceName": cmd.RequiredArgs.ResourceName,
-			"User":         username,
-		},
-	)
+func (cmd SetLabelCommand) executeDomain() error {
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, labels)
+	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, cmd.labels)
 	cmd.UI.DisplayWarnings(warnings)
 	return err
 }
 
-func (cmd SetLabelCommand) executeServiceBroker(username string, labels map[string]types.NullString) error {
+func (cmd SetLabelCommand) executeServiceBroker() error {
 	if err := cmd.SharedActor.CheckTarget(false, false); err != nil {
 		return err
 	}
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
-	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
-		map[string]interface{}{
-			"ResourceName": cmd.RequiredArgs.ResourceName,
-			"User":         username,
-		},
-	)
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.RequiredArgs.ResourceName, labels)
+	warnings, err := cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.RequiredArgs.ResourceName, cmd.labels)
 	cmd.UI.DisplayWarnings(warnings)
 	return err
 }
@@ -298,4 +257,28 @@ func (cmd SetLabelCommand) validateFlags() error {
 		}
 	}
 	return nil
+}
+
+func (cmd SetLabelCommand) displayMessage() {
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"User":         cmd.username,
+		},
+	)
+}
+
+func (cmd SetLabelCommand) displayMessageWithOrgAndSpace() {
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	cmd.UI.DisplayTextWithFlavor(
+		preFlavoringText,
+		map[string]interface{}{
+			"ResourceName": cmd.RequiredArgs.ResourceName,
+			"OrgName":      cmd.Config.TargetedOrganization().Name,
+			"SpaceName":    cmd.Config.TargetedSpace().Name,
+			"User":         cmd.username,
+		},
+	)
 }
