@@ -56,23 +56,67 @@ var _ = Describe("set-label command", func() {
 
 	When("the environment is set up correctly", func() {
 		var (
-			orgName            string
-			spaceName          string
-			appName            string
-			username           string
-			stackNameBase      string
-			testWithStackCount int
-			broker             *fakeservicebroker.FakeServiceBroker
+			orgName       string
+			spaceName     string
+			username      string
+			stackNameBase string
 		)
+
+		type labels map[string]string
 
 		type commonResource struct {
 			Metadata struct {
-				Labels map[string]string
+				Labels labels
 			}
 		}
 
 		type resourceCollection struct {
 			Resources []commonResource
+		}
+
+		testExpectedBehaviors := func(resourceType, resourceTypeFormatted, resourceName string) {
+			By("checking the behavior when the resource does not exist", func() {
+				unknownResourceName := "non-existent-" + resourceType
+				session := helpers.CF("set-label", resourceType, unknownResourceName, "some-key=some-value")
+				Eventually(session.Err).Should(Say("%s '%s' not found", resourceTypeFormatted, unknownResourceName))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+
+			By("checking the behavior when the label has an empty key and an invalid value", func() {
+				session := helpers.CF("set-label", resourceType, resourceName, "=test", "sha2=108&eb90d734")
+				Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+
+			By("checking the behavior when the label does not include a '=' to separate the key and value", func() {
+				session := helpers.CF("set-label", resourceType, resourceName, "test-label")
+				Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		}
+
+		checkExpectedMetadata := func(url string, list bool, expected labels) {
+			session := helpers.CF("curl", url)
+			Eventually(session).Should(Exit(0))
+			resourceJSON := session.Out.Contents()
+			var resource commonResource
+
+			if list {
+				var resourceList resourceCollection
+				Expect(json.Unmarshal(resourceJSON, &resourceList)).To(Succeed())
+				Expect(resourceList.Resources).To(HaveLen(1))
+				resource = resourceList.Resources[0]
+			} else {
+				Expect(json.Unmarshal(resourceJSON, &resource)).To(Succeed())
+			}
+
+			Expect(resource.Metadata.Labels).To(HaveLen(len(expected)))
+			for k, v := range expected {
+				Expect(resource.Metadata.Labels).To(HaveKeyWithValue(k, v))
+			}
 		}
 
 		BeforeEach(func() {
@@ -82,6 +126,8 @@ var _ = Describe("set-label command", func() {
 		})
 
 		When("assigning label to app", func() {
+			var appName string
+
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				appName = helpers.PrefixedRandomName("app")
@@ -91,8 +137,13 @@ var _ = Describe("set-label command", func() {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 				})
 			})
+
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("app", "App", appName)
 			})
 
 			It("sets the specified labels on the app", func() {
@@ -100,41 +151,10 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
-				appGUID := helpers.AppGUID(appName)
-				session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGUID))
-				Eventually(session).Should(Exit(0))
-				appJSON := session.Out.Contents()
-				var app commonResource
-				Expect(json.Unmarshal(appJSON, &app)).To(Succeed())
-				Expect(len(app.Metadata.Labels)).To(Equal(2))
-				Expect(app.Metadata.Labels["some-key"]).To(Equal("some-value"))
-				Expect(app.Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
-			})
 
-			When("the app is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "app", "non-existent-app", "some-key=some-value")
-					Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "app", appName, "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "app", appName, "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				checkExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, labels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
 				})
 			})
 
@@ -142,20 +162,15 @@ var _ = Describe("set-label command", func() {
 				It("uses the last value", func() {
 					session := helpers.CF("set-label", "app", appName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
-					appGUID := helpers.AppGUID(appName)
-					session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGUID))
-					Eventually(session).Should(Exit(0))
-					appJSON := session.Out.Contents()
-					var app commonResource
-					Expect(json.Unmarshal(appJSON, &app)).To(Succeed())
-					Expect(len(app.Metadata.Labels)).To(Equal(1))
-					Expect(app.Metadata.Labels["owner"]).To(Equal("beth"))
+
+					checkExpectedMetadata(fmt.Sprintf("/v3/apps/%s", helpers.AppGUID(appName)), false, labels{
+						"owner": "beth",
+					})
 				})
 			})
 		})
 
 		When("assigning label to domain", func() {
-
 			var (
 				domainName string
 				domain     helpers.Domain
@@ -174,47 +189,19 @@ var _ = Describe("set-label command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("domain", "Domain", domainName)
+			})
+
 			It("sets the specified labels on the domain", func() {
 				session := helpers.CF("set-label", "domain", domainName, "some-key=some-value", "some-other-key=some-other-value")
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as %s...`), domainName, username))
 				Expect(session).Should(Say("OK"))
 
-				session = helpers.CF("curl", fmt.Sprintf("/v3/domains?names=%s", domainName))
-				Eventually(session).Should(Exit(0))
-				domainJSON := session.Out.Contents()
-				var domains resourceCollection
-				Expect(json.Unmarshal(domainJSON, &domains)).To(Succeed())
-				Expect(len(domains.Resources)).To(Equal(1))
-				Expect(len(domains.Resources[0].Metadata.Labels)).To(Equal(2))
-				Expect(domains.Resources[0].Metadata.Labels["some-key"]).To(Equal("some-value"))
-				Expect(domains.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
-			})
-
-			When("the domain is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "domain", "non-existent-domain.example.com", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Domain 'non-existent-domain.example.com' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "domain", domainName, "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "domain", domainName, "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				checkExpectedMetadata(fmt.Sprintf("/v3/domains?names=%s", domainName), true, labels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
 				})
 			})
 
@@ -225,14 +212,9 @@ var _ = Describe("set-label command", func() {
 					Expect(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for domain %s as %s...`), domainName, username))
 					Expect(session).Should(Say("OK"))
 
-					session = helpers.CF("curl", fmt.Sprintf("/v3/domains?names=%s", domainName))
-					Eventually(session).Should(Exit(0))
-					domainJSON := session.Out.Contents()
-					var domains resourceCollection
-					Expect(json.Unmarshal(domainJSON, &domains)).To(Succeed())
-					Expect(len(domains.Resources)).To(Equal(1))
-					Expect(len(domains.Resources[0].Metadata.Labels)).To(Equal(1))
-					Expect(domains.Resources[0].Metadata.Labels["some-key"]).To(Equal("some-other-value"))
+					checkExpectedMetadata(fmt.Sprintf("/v3/domains?names=%s", domainName), true, labels{
+						"some-key": "some-other-value",
+					})
 				})
 			})
 		})
@@ -242,8 +224,13 @@ var _ = Describe("set-label command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 			})
+
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("space", "Space", spaceName)
 			})
 
 			It("sets the specified labels on the space", func() {
@@ -251,41 +238,10 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for space %s in org %s as %s...`), spaceName, orgName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
-				spaceGUID := helpers.GetSpaceGUID(spaceName)
-				session = helpers.CF("curl", fmt.Sprintf("/v3/spaces/%s", spaceGUID))
-				Eventually(session).Should(Exit(0))
-				spaceJSON := session.Out.Contents()
-				var space commonResource
-				Expect(json.Unmarshal(spaceJSON, &space)).To(Succeed())
-				Expect(len(space.Metadata.Labels)).To(Equal(2))
-				Expect(space.Metadata.Labels["some-key"]).To(Equal("some-value"))
-				Expect(space.Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
-			})
 
-			When("the space is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "space", "non-existent-space", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "space", spaceName, "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "space", spaceName, "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				checkExpectedMetadata(fmt.Sprintf("/v3/spaces/%s", helpers.GetSpaceGUID(spaceName)), false, labels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
 				})
 			})
 
@@ -293,14 +249,10 @@ var _ = Describe("set-label command", func() {
 				It("uses the last value", func() {
 					session := helpers.CF("set-label", "space", spaceName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
-					spaceGUID := helpers.GetSpaceGUID(spaceName)
-					session = helpers.CF("curl", fmt.Sprintf("/v3/spaces/%s", spaceGUID))
-					Eventually(session).Should(Exit(0))
-					spaceJSON := session.Out.Contents()
-					var space commonResource
-					Expect(json.Unmarshal(spaceJSON, &space)).To(Succeed())
-					Expect(len(space.Metadata.Labels)).To(Equal(1))
-					Expect(space.Metadata.Labels["owner"]).To(Equal("beth"))
+
+					checkExpectedMetadata(fmt.Sprintf("/v3/spaces/%s", helpers.GetSpaceGUID(spaceName)), false, labels{
+						"owner": "beth",
+					})
 				})
 			})
 		})
@@ -309,50 +261,24 @@ var _ = Describe("set-label command", func() {
 			BeforeEach(func() {
 				helpers.SetupCFWithOrgOnly(orgName)
 			})
+
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("org", "Organization", orgName)
+			})
+
 			It("sets the specified labels on the org", func() {
 				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for org %s as %s...`), orgName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				orgGUID := helpers.GetOrgGUID(orgName)
-				session = helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s", orgGUID))
-				Eventually(session).Should(Exit(0))
-				orgJSON := session.Out.Contents()
-				var org commonResource
-				Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
-				Expect(len(org.Metadata.Labels)).To(Equal(2))
-				Expect(org.Metadata.Labels["pci"]).To(Equal("true"))
-				Expect(org.Metadata.Labels["public-facing"]).To(Equal("false"))
-			})
-
-			When("the org is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "org", "non-existent-org", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Organization 'non-existent-org' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "org", orgName, "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "org", orgName, "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				checkExpectedMetadata(fmt.Sprintf("/v3/organizations/%s", helpers.GetOrgGUID(orgName)), false, labels{
+					"pci":           "true",
+					"public-facing": "false",
 				})
 			})
 
@@ -360,14 +286,10 @@ var _ = Describe("set-label command", func() {
 				It("uses the last value", func() {
 					session := helpers.CF("set-label", "org", orgName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
-					orgGUID := helpers.GetOrgGUID(orgName)
-					session = helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s", orgGUID))
-					Eventually(session).Should(Exit(0))
-					orgJSON := session.Out.Contents()
-					var org commonResource
-					Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
-					Expect(len(org.Metadata.Labels)).To(Equal(1))
-					Expect(org.Metadata.Labels["owner"]).To(Equal("beth"))
+
+					checkExpectedMetadata(fmt.Sprintf("/v3/organizations/%s", helpers.GetOrgGUID(orgName)), false, labels{
+						"owner": "beth",
+					})
 				})
 			})
 		})
@@ -398,30 +320,9 @@ var _ = Describe("set-label command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			It("sets the specified labels on the route", func() {
-				session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
-
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Exit(0))
-				session = helpers.CF("curl", fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID))
-				Eventually(session).Should(Exit(0))
-				routeJSON := session.Out.Contents()
-				var routes resourceCollection
-				Expect(json.Unmarshal(routeJSON, &routes)).To(Succeed())
-				Expect(len(routes.Resources)).To(Equal(1))
-				Expect(len(routes.Resources[0].Metadata.Labels)).To(Equal(2))
-				Expect(routes.Resources[0].Metadata.Labels["some-key"]).To(Equal("some-value"))
-				Expect(routes.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
-			})
-
-			When("the domain is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "route", "non-existent-domain", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Domain 'non-existent-domain' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
+			It("has the expected shared behaviors", func() {
+				// The Domain is checked first, hence why the error message says 'Domain' and not 'Route'
+				testExpectedBehaviors("route", "Domain", routeName)
 			})
 
 			When("the route is unknown", func() {
@@ -434,21 +335,16 @@ var _ = Describe("set-label command", func() {
 				})
 			})
 
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "route", routeName, "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
+			It("sets the specified labels on the route", func() {
+				session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
 
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "route", routeName, "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				checkExpectedMetadata(fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID), true, labels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
 				})
 			})
 
@@ -457,14 +353,9 @@ var _ = Describe("set-label command", func() {
 					session := helpers.CF("set-label", "route", routeName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("curl", fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID))
-					Eventually(session).Should(Exit(0))
-					routeJSON := session.Out.Contents()
-					var routes resourceCollection
-					Expect(json.Unmarshal(routeJSON, &routes)).To(Succeed())
-					Expect(len(routes.Resources)).To(Equal(1))
-					Expect(len(routes.Resources[0].Metadata.Labels)).To(Equal(1))
-					Expect(routes.Resources[0].Metadata.Labels["owner"]).To(Equal("beth"))
+					checkExpectedMetadata(fmt.Sprintf("/v3/routes?organization_guids=%s", orgGUID), true, labels{
+						"owner": "beth",
+					})
 				})
 			})
 		})
@@ -491,8 +382,13 @@ var _ = Describe("set-label command", func() {
 						Eventually(session).Should(Exit(0))
 					}, currentStack)
 				})
+
 				AfterEach(func() {
 					helpers.CF("delete-buildpack", buildpackName, "-f", "-s", currentStack)
+				})
+
+				It("has the expected shared behaviors", func() {
+					testExpectedBehaviors("buildpack", "Buildpack", buildpackName)
 				})
 
 				It("sets the specified labels on the buildpack", func() {
@@ -502,22 +398,9 @@ var _ = Describe("set-label command", func() {
 					Eventually(session).Should(Exit(0))
 
 					buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, currentStack)
-					session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
-					Eventually(session).Should(Exit(0))
-					buildpackJSON := session.Out.Contents()
-					var buildpack commonResource
-					Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
-					Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
-					Expect(buildpack.Metadata.Labels["pci"]).To(Equal("true"))
-					Expect(buildpack.Metadata.Labels["public-facing"]).To(Equal("false"))
-				})
-
-				When("the buildpack is unknown", func() {
-					It("displays an error", func() {
-						session := helpers.CF("set-label", "buildpack", "non-existent-buildpack", "some-key=some-value")
-						Eventually(session.Err).Should(Say("Buildpack non-existent-buildpack not found"))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
+					checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, labels{
+						"pci":           "true",
+						"public-facing": "false",
 					})
 				})
 
@@ -554,14 +437,10 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Exit(0))
 
 							buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, stacks[1])
-							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
-							Eventually(session).Should(Exit(0))
-							buildpackJSON := session.Out.Contents()
-							var buildpack commonResource
-							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
-							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
-							Expect(buildpack.Metadata.Labels["pci"]).To(Equal("true"))
-							Expect(buildpack.Metadata.Labels["public-facing"]).To(Equal("false"))
+							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, labels{
+								"pci":           "true",
+								"public-facing": "false",
+							})
 						})
 					})
 				})
@@ -569,25 +448,7 @@ var _ = Describe("set-label command", func() {
 				When("the buildpack exists in general but does NOT exist for the specified stack", func() {
 					It("displays an error", func() {
 						session := helpers.CF("set-label", "buildpack", buildpackName, "some-key=some-value", "--stack", "FAKE")
-						Eventually(session.Err).Should(Say(fmt.Sprintf("Buildpack %s with stack FAKE not found", buildpackName)))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
-					})
-				})
-
-				When("the label has an empty key and an invalid value", func() {
-					It("displays an error", func() {
-						session := helpers.CF("set-label", "buildpack", buildpackName, "=test", "sha2=108&eb90d734")
-						Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
-					})
-				})
-
-				When("the label does not include a '=' to separate the key and value", func() {
-					It("displays an error", func() {
-						session := helpers.CF("set-label", "buildpack", buildpackName, "test-label")
-						Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+						Eventually(session.Err).Should(Say(fmt.Sprintf("Buildpack '%s' with stack 'FAKE' not found", buildpackName)))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
@@ -597,22 +458,20 @@ var _ = Describe("set-label command", func() {
 					It("uses the last value", func() {
 						session := helpers.CF("set-label", "buildpack", buildpackName, "owner=sue", "owner=beth")
 						Eventually(session).Should(Exit(0))
+
 						buildpackGUID := helpers.BuildpackGUIDByNameAndStack(buildpackName, currentStack)
-						session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID))
-						Eventually(session).Should(Exit(0))
-						buildpackJSON := session.Out.Contents()
-						var buildpack commonResource
-						Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
-						Expect(len(buildpack.Metadata.Labels)).To(Equal(1))
-						Expect(buildpack.Metadata.Labels["owner"]).To(Equal("beth"))
+						checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUID), false, labels{
+							"owner": "beth",
+						})
 					})
 				})
 			})
 
 			When("the buildpack exists for multiple stacks", func() {
 				var (
-					stacks         [3]string
-					buildpackGUIDs [3]string
+					stacks             [3]string
+					buildpackGUIDs     [3]string
+					testWithStackCount int
 				)
 
 				BeforeEach(func() {
@@ -630,6 +489,7 @@ var _ = Describe("set-label command", func() {
 					}
 					helpers.CF("curl", "/v3/buildpacks?names="+buildpackName)
 				})
+
 				AfterEach(func() {
 					helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[0])
 					helpers.CF("delete-buildpack", buildpackName, "-f", "-s", stacks[1])
@@ -650,7 +510,7 @@ var _ = Describe("set-label command", func() {
 						It("displays an error", func() {
 							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
 							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
-							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Buildpack %s with stack %s not found", buildpackName, bogusStackName))))
+							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Buildpack '%s' with stack '%s' not found", buildpackName, bogusStackName))))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -663,14 +523,10 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[0]))
-							Eventually(session).Should(Exit(0))
-							buildpackJSON := session.Out.Contents()
-							var buildpack commonResource
-							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
-							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
-							Expect(buildpack.Metadata.Labels["peach"]).To(Equal("5"))
-							Expect(buildpack.Metadata.Labels["quince"]).To(Equal("6"))
+							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[0]), false, labels{
+								"peach":  "5",
+								"quince": "6",
+							})
 						})
 					})
 				})
@@ -694,14 +550,10 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[2]))
-							Eventually(session).Should(Exit(0))
-							buildpackJSON := session.Out.Contents()
-							var buildpack commonResource
-							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
-							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
-							Expect(buildpack.Metadata.Labels["mango"]).To(Equal("1"))
-							Expect(buildpack.Metadata.Labels["figs"]).To(Equal("2"))
+							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[2]), false, labels{
+								"mango": "1",
+								"figs":  "2",
+							})
 						})
 					})
 
@@ -712,14 +564,10 @@ var _ = Describe("set-label command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							session = helpers.CF("curl", fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]))
-							Eventually(session).Should(Exit(0))
-							buildpackJSON := session.Out.Contents()
-							var buildpack commonResource
-							Expect(json.Unmarshal(buildpackJSON, &buildpack)).To(Succeed())
-							Expect(len(buildpack.Metadata.Labels)).To(Equal(2))
-							Expect(buildpack.Metadata.Labels["tangelo"]).To(Equal("3"))
-							Expect(buildpack.Metadata.Labels["lemon"]).To(Equal("4"))
+							checkExpectedMetadata(fmt.Sprintf("/v3/buildpacks/%s", buildpackGUIDs[1]), false, labels{
+								"tangelo": "3",
+								"lemon":   "4",
+							})
 						})
 					})
 
@@ -727,7 +575,7 @@ var _ = Describe("set-label command", func() {
 						It("displays an error", func() {
 							bogusStackName := stacks[0] + "-bogus-" + stacks[1]
 							session := helpers.CF("set-label", "buildpack", buildpackName, "olive=3", "mangosteen=4", "--stack", bogusStackName)
-							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Buildpack %s with stack %s not found", buildpackName, bogusStackName))))
+							Eventually(session.Err).Should(Say(regexp.QuoteMeta(fmt.Sprintf("Buildpack '%s' with stack '%s' not found", buildpackName, bogusStackName))))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -746,8 +594,13 @@ var _ = Describe("set-label command", func() {
 				helpers.LoginCF()
 				stackName, stackGUID = helpers.CreateStackWithGUID()
 			})
+
 			AfterEach(func() {
 				deleteResourceByGUID(stackGUID, "stacks")
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("stack", "Stack", stackName)
 			})
 
 			It("sets the specified labels on the stack", func() {
@@ -756,40 +609,9 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("curl", fmt.Sprintf("/v3/stacks/%s", stackGUID))
-				Eventually(session).Should(Exit(0))
-				stackJSON := session.Out.Contents()
-				var stack commonResource
-				Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
-				Expect(len(stack.Metadata.Labels)).To(Equal(2))
-				Expect(stack.Metadata.Labels["pci"]).To(Equal("true"))
-				Expect(stack.Metadata.Labels["public-facing"]).To(Equal("false"))
-			})
-
-			When("the stack is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "stack", "non-existent-stack", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Stack 'non-existent-stack' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "stack", stackName, "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "stack", stackName, "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				checkExpectedMetadata(fmt.Sprintf("/v3/stacks/%s", stackGUID), false, labels{
+					"pci":           "true",
+					"public-facing": "false",
 				})
 			})
 
@@ -797,18 +619,17 @@ var _ = Describe("set-label command", func() {
 				It("uses the last value", func() {
 					session := helpers.CF("set-label", "stack", stackName, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
-					session = helpers.CF("curl", fmt.Sprintf("/v3/stacks/%s", stackGUID))
-					Eventually(session).Should(Exit(0))
-					stackJSON := session.Out.Contents()
-					var stack commonResource
-					Expect(json.Unmarshal(stackJSON, &stack)).To(Succeed())
-					Expect(len(stack.Metadata.Labels)).To(Equal(1))
-					Expect(stack.Metadata.Labels["owner"]).To(Equal("beth"))
+
+					checkExpectedMetadata(fmt.Sprintf("/v3/stacks/%s", stackGUID), false, labels{
+						"owner": "beth",
+					})
 				})
 			})
 		})
 
 		When("assigning label to service-broker", func() {
+			var broker *fakeservicebroker.FakeServiceBroker
+
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
@@ -821,46 +642,19 @@ var _ = Describe("set-label command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("service-broker", "Service broker", broker.Name())
+			})
+
 			It("sets the specified labels on the service-broker", func() {
 				session := helpers.CF("set-label", "service-broker", broker.Name(), "some-key=some-value", "some-other-key=some-other-value")
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s as %s...`), broker.Name(), username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
-				session = helpers.CF("curl", fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()))
-				Eventually(session).Should(Exit(0))
-				brokerJSON := session.Out.Contents()
-				var updatedBroker resourceCollection
-				Expect(json.Unmarshal(brokerJSON, &updatedBroker)).To(Succeed())
-				Expect(updatedBroker.Resources).To(HaveLen(1))
-				Expect(updatedBroker.Resources[0].Metadata.Labels).To(HaveLen(2))
-				Expect(updatedBroker.Resources[0].Metadata.Labels["some-key"]).To(Equal("some-value"))
-				Expect(updatedBroker.Resources[0].Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
-			})
 
-			When("the service broker is unknown", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "service-broker", "non-existent-broker", "some-key=some-value")
-					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label has an empty key and an invalid value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "service-broker", broker.Name(), "=test", "sha2=108&eb90d734")
-					Eventually(session.Err).Should(Say("Metadata label key error: key cannot be empty string, Metadata label value error: '108&eb90d734' contains invalid characters"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			When("the label does not include a '=' to separate the key and value", func() {
-				It("displays an error", func() {
-					session := helpers.CF("set-label", "service-broker", broker.Name(), "test-label")
-					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+				checkExpectedMetadata(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, labels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
 				})
 			})
 
@@ -868,14 +662,10 @@ var _ = Describe("set-label command", func() {
 				It("uses the last value", func() {
 					session := helpers.CF("set-label", "service-broker", broker.Name(), "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
-					session = helpers.CF("curl", fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()))
-					Eventually(session).Should(Exit(0))
-					appJSON := session.Out.Contents()
-					var updatedBroker resourceCollection
-					Expect(json.Unmarshal(appJSON, &updatedBroker)).To(Succeed())
-					Expect(updatedBroker.Resources).To(HaveLen(1))
-					Expect(updatedBroker.Resources[0].Metadata.Labels).To(HaveLen(1))
-					Expect(updatedBroker.Resources[0].Metadata.Labels["owner"]).To(Equal("beth"))
+
+					checkExpectedMetadata(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, labels{
+						"owner": "beth",
+					})
 				})
 			})
 		})
