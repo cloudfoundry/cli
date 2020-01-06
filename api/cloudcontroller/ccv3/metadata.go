@@ -96,11 +96,14 @@ func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID 
 
 	switch resource {
 	case "service-broker":
-		request, _ = client.newHTTPRequest(requestOptions{
+		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchServiceBrokerRequest,
 			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"service_broker_guid": resourceGUID},
 		})
+		if err != nil {
+			return "", nil, err
+		}
 	default:
 		return "", nil, fmt.Errorf("unknown async resource type (%s) requested", resource)
 	}
