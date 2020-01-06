@@ -1727,7 +1727,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			When("all the isntances of all processes are stable", func() {
+			When("all the instances of all processes are stable", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
 						[]ccv3.ProcessInstance{

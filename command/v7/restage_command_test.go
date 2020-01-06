@@ -181,6 +181,69 @@ var _ = Describe("restage Command", func() {
 			Expect(spaceGUID).To(Equal("some-space-guid"))
 			Expect(withObfuscatedValues).To(BeFalse())
 		})
+
+		When("a rolling strategy is specified", func() {
+			BeforeEach(func() {
+				cmd.Strategy.Name = constant.DeploymentStrategyRolling
+
+				fakeActor.CreateDeploymentReturns(
+					"deployment-guid",
+					v7action.Warnings{"create-deployment-warning"},
+					nil,
+				)
+				fakeActor.PollStartForRollingReturns(
+					v7action.Warnings{"poll-deployment-warning"},
+					nil,
+				)
+
+			})
+			It("creates a deployment", func() {
+				Expect(fakeActor.CreateDeploymentCallCount()).To(Equal(1))
+				appGUID, dropletGUID := fakeActor.CreateDeploymentArgsForCall(0)
+				Expect(appGUID).To(Equal("app-guid"))
+				Expect(dropletGUID).To(Equal("some-droplet-guid"))
+
+				Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+				appGUID, deploymentGUID, noWait := fakeActor.PollStartForRollingArgsForCall(0)
+				Expect(appGUID).To(Equal("app-guid"))
+				Expect(deploymentGUID).To(Equal("deployment-guid"))
+				Expect(noWait).To(BeFalse())
+			})
+
+			It("print deployment output and the app summary", func() {
+				Expect(testUI.Out).To(Say(`Restaging app some-app in org some-org / space some-space as steve...`))
+				Expect(testUI.Out).To(Say("Waiting for app to deploy..."))
+				Expect(testUI.Err).To(Say("create-deployment-warning"))
+				Expect(testUI.Err).To(Say("poll-deployment-warning"))
+
+				Expect(fakeActor.GetDetailedAppSummaryCallCount()).To(Equal(1))
+				appName, spaceGUID, withObfuscatedValues := fakeActor.GetDetailedAppSummaryArgsForCall(0)
+				Expect(appName).To(Equal("some-app"))
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(withObfuscatedValues).To(BeFalse())
+			})
+		})
+
+		When("--no-wait is specified", func() {
+			BeforeEach(func() {
+				cmd.NoWait = true
+			})
+
+			It("respects the no-wait value and polls appropriately", func() {
+				// deployment strategy is null
+				Expect(fakeActor.PollStartCallCount()).To(Equal(1))
+				_, noWait := fakeActor.PollStartArgsForCall(0)
+				Expect(noWait).To(BeTrue())
+
+				// deployment strategy is rolling
+				cmd.Strategy.Name = constant.DeploymentStrategyRolling
+				executeErr = cmd.Execute(nil)
+
+				Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
+				_, _, noWait = fakeActor.PollStartForRollingArgsForCall(0)
+				Expect(noWait).To(BeTrue())
+			})
+		})
 	})
 
 	When("checking target fails", func() {
@@ -257,6 +320,7 @@ var _ = Describe("restage Command", func() {
 		})
 
 	})
+
 	When("getting logs for the app fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(
@@ -355,4 +419,55 @@ var _ = Describe("restage Command", func() {
 			})
 		})
 	})
+
+	When("creating a deployment fails for a rolling restage", func() {
+		BeforeEach(func() {
+			cmd.Strategy.Name = constant.DeploymentStrategyRolling
+			fakeActor.CreateDeploymentReturns(
+				"",
+				v7action.Warnings{"create-deployment-warning"},
+				errors.New("create-deployment-error"),
+			)
+		})
+
+		It("displays all warnings and returns an error", func() {
+			Expect(testUI.Err).To(Say("create-deployment-warning"))
+			Expect(executeErr).To(MatchError("create-deployment-error"))
+		})
+	})
+
+	When("polling fails for a rolling restage", func() {
+		BeforeEach(func() {
+			cmd.Strategy.Name = constant.DeploymentStrategyRolling
+			fakeActor.CreateDeploymentReturns(
+				"some-deployment",
+				v7action.Warnings{},
+				nil,
+			)
+			fakeActor.PollStartForRollingReturns(
+				v7action.Warnings{"poll-start-warning"},
+				errors.New("poll-start-error"),
+			)
+		})
+
+		It("displays all warnings and returns an error", func() {
+			Expect(testUI.Err).To(Say("poll-start-warning"))
+			Expect(executeErr).To(MatchError("poll-start-error"))
+		})
+	})
+
+	When("starting the application fails", func() {
+		BeforeEach(func() {
+			fakeActor.StartApplicationReturns(
+				v7action.Warnings{"start-app-warning"},
+				errors.New("start-app-error"),
+			)
+		})
+
+		It("displays all warnings and returns an error", func() {
+			Expect(testUI.Err).To(Say("start-app-warning"))
+			Expect(executeErr).To(MatchError("start-app-error"))
+		})
+	})
+
 })

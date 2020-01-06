@@ -10,6 +10,22 @@ import (
 )
 
 type FakeRestageActor struct {
+	CreateDeploymentStub        func(string, string) (string, v7action.Warnings, error)
+	createDeploymentMutex       sync.RWMutex
+	createDeploymentArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	createDeploymentReturns struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
+	createDeploymentReturnsOnCall map[int]struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
@@ -93,6 +109,21 @@ type FakeRestageActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	PollStartForRollingStub        func(string, string, bool) (v7action.Warnings, error)
+	pollStartForRollingMutex       sync.RWMutex
+	pollStartForRollingArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 bool
+	}
+	pollStartForRollingReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	pollStartForRollingReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	SetApplicationDropletStub        func(string, string) (v7action.Warnings, error)
 	setApplicationDropletMutex       sync.RWMutex
 	setApplicationDropletArgsForCall []struct {
@@ -152,6 +183,73 @@ type FakeRestageActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeRestageActor) CreateDeployment(arg1 string, arg2 string) (string, v7action.Warnings, error) {
+	fake.createDeploymentMutex.Lock()
+	ret, specificReturn := fake.createDeploymentReturnsOnCall[len(fake.createDeploymentArgsForCall)]
+	fake.createDeploymentArgsForCall = append(fake.createDeploymentArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateDeployment", []interface{}{arg1, arg2})
+	fake.createDeploymentMutex.Unlock()
+	if fake.CreateDeploymentStub != nil {
+		return fake.CreateDeploymentStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createDeploymentReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeRestageActor) CreateDeploymentCallCount() int {
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
+	return len(fake.createDeploymentArgsForCall)
+}
+
+func (fake *FakeRestageActor) CreateDeploymentCalls(stub func(string, string) (string, v7action.Warnings, error)) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = stub
+}
+
+func (fake *FakeRestageActor) CreateDeploymentArgsForCall(i int) (string, string) {
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
+	argsForCall := fake.createDeploymentArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeRestageActor) CreateDeploymentReturns(result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = nil
+	fake.createDeploymentReturns = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRestageActor) CreateDeploymentReturnsOnCall(i int, result1 string, result2 v7action.Warnings, result3 error) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = nil
+	if fake.createDeploymentReturnsOnCall == nil {
+		fake.createDeploymentReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createDeploymentReturnsOnCall[i] = struct {
+		result1 string
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeRestageActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
@@ -493,6 +591,71 @@ func (fake *FakeRestageActor) PollStartReturnsOnCall(i int, result1 v7action.War
 	}{result1, result2}
 }
 
+func (fake *FakeRestageActor) PollStartForRolling(arg1 string, arg2 string, arg3 bool) (v7action.Warnings, error) {
+	fake.pollStartForRollingMutex.Lock()
+	ret, specificReturn := fake.pollStartForRollingReturnsOnCall[len(fake.pollStartForRollingArgsForCall)]
+	fake.pollStartForRollingArgsForCall = append(fake.pollStartForRollingArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 bool
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("PollStartForRolling", []interface{}{arg1, arg2, arg3})
+	fake.pollStartForRollingMutex.Unlock()
+	if fake.PollStartForRollingStub != nil {
+		return fake.PollStartForRollingStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.pollStartForRollingReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeRestageActor) PollStartForRollingCallCount() int {
+	fake.pollStartForRollingMutex.RLock()
+	defer fake.pollStartForRollingMutex.RUnlock()
+	return len(fake.pollStartForRollingArgsForCall)
+}
+
+func (fake *FakeRestageActor) PollStartForRollingCalls(stub func(string, string, bool) (v7action.Warnings, error)) {
+	fake.pollStartForRollingMutex.Lock()
+	defer fake.pollStartForRollingMutex.Unlock()
+	fake.PollStartForRollingStub = stub
+}
+
+func (fake *FakeRestageActor) PollStartForRollingArgsForCall(i int) (string, string, bool) {
+	fake.pollStartForRollingMutex.RLock()
+	defer fake.pollStartForRollingMutex.RUnlock()
+	argsForCall := fake.pollStartForRollingArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeRestageActor) PollStartForRollingReturns(result1 v7action.Warnings, result2 error) {
+	fake.pollStartForRollingMutex.Lock()
+	defer fake.pollStartForRollingMutex.Unlock()
+	fake.PollStartForRollingStub = nil
+	fake.pollStartForRollingReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeRestageActor) PollStartForRollingReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.pollStartForRollingMutex.Lock()
+	defer fake.pollStartForRollingMutex.Unlock()
+	fake.PollStartForRollingStub = nil
+	if fake.pollStartForRollingReturnsOnCall == nil {
+		fake.pollStartForRollingReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.pollStartForRollingReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeRestageActor) SetApplicationDroplet(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.setApplicationDropletMutex.Lock()
 	ret, specificReturn := fake.setApplicationDropletReturnsOnCall[len(fake.setApplicationDropletArgsForCall)]
@@ -754,6 +917,8 @@ func (fake *FakeRestageActor) StopApplicationReturnsOnCall(i int, result1 v7acti
 func (fake *FakeRestageActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getDetailedAppSummaryMutex.RLock()
@@ -764,6 +929,8 @@ func (fake *FakeRestageActor) Invocations() map[string][][]interface{} {
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
+	fake.pollStartForRollingMutex.RLock()
+	defer fake.pollStartForRollingMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.stagePackageMutex.RLock()

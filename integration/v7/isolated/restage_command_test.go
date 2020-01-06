@@ -20,11 +20,19 @@ var _ = Describe("restage command", func() {
 				session := helpers.CF("restage", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`restage - Recreate the app's executable artifact using the latest pushed app files and the latest environment \(variables, service bindings, buildpack, stack, etc\.\). This action will cause app downtime.`))
+				Eventually(session).Should(Say(`restage - Recreate the app's executable artifact using the latest pushed app files and the latest environment \(variables, service bindings, buildpack, stack, etc\.\).`))
+				Eventually(session).ShouldNot(Say(`This action will cause app downtime.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restage APP_NAME"))
+				Eventually(session).Should(Say("EXAMPLES:"))
+				Eventually(session).Should(Say("cf restage APP_NAME"))
+				Eventually(session).Should(Say("cf restage APP_NAME --strategy=rolling"))
+				Eventually(session).Should(Say("cf restage APP_NAME --strategy=rolling --no-wait"))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rg"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("--strategy      Deployment strategy, either rolling or null"))
+				Eventually(session).Should(Say("--no-wait       Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for buildpack staging, in minutes`))
 				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
@@ -131,6 +139,23 @@ var _ = Describe("restage command", func() {
 					Eventually(session.Err).Should(Say("TIP: use 'cf logs .* --recent' for more information"))
 					Eventually(session).Should(Exit(1))
 				})
+
+				When("strategy rolling is given", func() {
+					It("fails and displays the deployment failure message", func() {
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CustomCF(helpers.CFEnv{
+							EnvVars:          map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
+						}, "restage", appName, "--strategy", "rolling")
+						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
+						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
+						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+						Eventually(session.Err).Should(Say(`Start app timeout`))
+						Eventually(session.Err).Should(Say(`TIP: Application must be listening on the right port\.`))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
 			})
 
 			When("the app stages and starts properly", func() {
@@ -177,6 +202,30 @@ applications:
 					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
 					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 					Eventually(session).Should(Exit(0))
+				})
+
+				When("strategy rolling is given", func() {
+					It("creates a deploy", func() {
+						userName, _ := helpers.GetCredentials()
+						session := helpers.CF("restage", appName, "--strategy=rolling")
+						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
+						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`Creating deployment for app %s\.\.\.`, appName))
+						Eventually(session).Should(Say(`Waiting for app to deploy\.\.\.`))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
+						Eventually(session).Should(Say(`last uploaded:\s+%s`, helpers.ReadableDateTimeRegex))
+						Eventually(session).Should(Say(`stack:\s+cflinuxfs`))
+						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+						Eventually(session).Should(Say(`type:\s+web`))
+						Eventually(session).Should(Say(`sidecars:`))
+						Eventually(session).Should(Say(`instances:\s+\d/2`))
+						Eventually(session).Should(Say(`memory usage:\s+128M`))
+						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 
 				When("isolation segments are available", func() {

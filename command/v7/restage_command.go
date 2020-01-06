@@ -1,16 +1,16 @@
 package v7
 
 import (
-	"context"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/clock"
+	"context"
 )
 
 //go:generate counterfeiter . RestageActor
@@ -25,14 +25,18 @@ type RestageActor interface {
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
+	CreateDeployment(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
+	PollStartForRolling(appGUID string, deploymentGUID string, noWait bool) (v7action.Warnings, error)
 }
 
 type RestageCommand struct {
-	RequiredArgs        flag.AppName `positional-args:"yes"`
-	usage               interface{}  `usage:"CF_NAME restage APP_NAME"`
-	relatedCommands     interface{}  `related_commands:"restart"`
-	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
-	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	RequiredArgs        flag.AppName            `positional-args:"yes"`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null."`
+	NoWait              bool                    `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
+	usage               interface{}             `usage:"CF_NAME restage APP_NAME\n\nEXAMPLES:\n   CF_NAME restage APP_NAME\n   CF_NAME restage APP_NAME --strategy=rolling\n   CF_NAME restage APP_NAME --strategy=rolling --no-wait\n"`
+	relatedCommands     interface{}             `related_commands:"restart"`
+	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI             command.UI
 	Config         command.Config
@@ -68,7 +72,10 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayWarning("This action will cause app downtime.")
+	if cmd.Strategy.Name != constant.DeploymentStrategyRolling {
+		cmd.UI.DisplayWarning("This action will cause app downtime.")
+	}
+
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTextWithFlavor("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
@@ -109,34 +116,54 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
 	}
 
-	warnings, err = cmd.Actor.StopApplication(app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
+	if cmd.Strategy.Name == constant.DeploymentStrategyRolling {
+		cmd.UI.DisplayText("Creating deployment for app {{.AppName}}...\n",
+			map[string]interface{}{
+				"AppName": cmd.RequiredArgs.AppName,
+			},
+		)
+		deploymentGUID, warnings, err := cmd.Actor.CreateDeployment(app.GUID, droplet.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
 
-	// attach droplet to app
-	warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
+		cmd.UI.DisplayText("Waiting for app to deploy...\n")
+		warnings, err = cmd.Actor.PollStartForRolling(app.GUID, deploymentGUID, cmd.NoWait)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return cmd.mapErr(cmd.RequiredArgs.AppName, err)
+		}
+	} else {
+		warnings, err = cmd.Actor.StopApplication(app.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
 
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("Waiting for app to start...")
-	cmd.UI.DisplayNewline()
+		// attach droplet to app
+		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
 
-	// start the application
-	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for app to start...")
+		cmd.UI.DisplayNewline()
 
-	warnings, err = cmd.Actor.PollStart(app.GUID, false)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return cmd.mapErr(cmd.RequiredArgs.AppName, err)
+		// start the application
+		warnings, err = cmd.Actor.StartApplication(app.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		warnings, err = cmd.Actor.PollStart(app.GUID, cmd.NoWait)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return cmd.mapErr(cmd.RequiredArgs.AppName, err)
+		}
 	}
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
