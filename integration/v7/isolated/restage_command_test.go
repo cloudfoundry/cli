@@ -144,7 +144,7 @@ var _ = Describe("restage command", func() {
 					It("fails and displays the deployment failure message", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CustomCF(helpers.CFEnv{
-							EnvVars:          map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
+							EnvVars: map[string]string{"CF_STARTUP_TIMEOUT": "0.1"},
 						}, "restage", appName, "--strategy", "rolling")
 						Consistently(session.Err).ShouldNot(Say(`This action will cause app downtime\.`))
 						Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
