@@ -171,7 +171,7 @@ var _ = Describe("delete-buildpack command", func() {
 							[]string{"OK"},
 						))
 
-						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"Buildpack my-buildpack with stack my-stack not found."}))
+						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"Buildpack 'my-buildpack' with stack 'my-stack' not found."}))
 					})
 				})
 			})

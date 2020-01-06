@@ -70,7 +70,7 @@ var _ = Describe("delete-buildpack command", func() {
 				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack", "-s", stacks[0])
 				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack with stack %s\.\.\.`, stacks[0]))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Buildpack nonexistent-buildpack with stack %s not found.", stacks[0]))
+				Eventually(session).Should(Say("Buildpack 'nonexistent-buildpack' with stack '%s' not found.", stacks[0]))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -134,7 +134,7 @@ var _ = Describe("delete-buildpack command", func() {
 				session = helpers.CF("delete-buildpack", buildpackName, "-s", "not-a-real-stack", "-f")
 				Eventually(session).Should(Say(`Deleting buildpack %s with stack not-a-real-stack\.\.\.`, buildpackName))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say(`Buildpack %s with stack not-a-real-stack not found\.`, buildpackName))
+				Eventually(session).Should(Say(`Buildpack '%s' with stack 'not-a-real-stack' not found\.`, buildpackName))
 				Eventually(session).Should(Exit(0))
 
 				By("deleting the buildpack when the associated stack is specified")

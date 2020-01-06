@@ -81,7 +81,7 @@ var _ = Describe("update-buildpack command", func() {
 			When("the buildpack does not exist", func() {
 				It("returns a buildpack not found error", func() {
 					session := helpers.CF("update-buildpack", buildpackName)
-					Eventually(session.Err).Should(Say("Buildpack %s not found", buildpackName))
+					Eventually(session.Err).Should(Say("Buildpack '%s' not found", buildpackName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
@@ -140,7 +140,7 @@ var _ = Describe("update-buildpack command", func() {
 							nonexistentStack := "some-incorrect-stack-name"
 							session := helpers.CF("update-buildpack", buildpackName, "-s", nonexistentStack)
 
-							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, nonexistentStack))
+							Eventually(session.Err).Should(Say("Buildpack '%s' with stack '%s' not found", buildpackName, nonexistentStack))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -265,7 +265,7 @@ var _ = Describe("update-buildpack command", func() {
 							nonexistentStack := "some-incorrect-stack-name"
 							session := helpers.CF("update-buildpack", buildpackName, "-s", nonexistentStack)
 
-							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, nonexistentStack))
+							Eventually(session.Err).Should(Say("Buildpack '%s' with stack '%s' not found", buildpackName, nonexistentStack))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -315,7 +315,7 @@ var _ = Describe("update-buildpack command", func() {
 							nonexistentStack := "some-incorrect-stack-name"
 							session := helpers.CF("update-buildpack", buildpackName, "-s", nonexistentStack)
 
-							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, nonexistentStack))
+							Eventually(session.Err).Should(Say("Buildpack '%s' with stack '%s' not found", buildpackName, nonexistentStack))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
@@ -389,7 +389,7 @@ var _ = Describe("update-buildpack command", func() {
 						})
 
 						It("returns a buildpack with stack not found error", func() {
-							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, stackName))
+							Eventually(session.Err).Should(Say("Buildpack '%s' with stack '%s' not found", buildpackName, stackName))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
