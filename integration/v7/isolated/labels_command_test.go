@@ -132,7 +132,7 @@ var _ = Describe("labels command", func() {
 
 					It("fails if a non-existent stack is specified", func() {
 						session := helpers.CF("labels", "buildpack", buildpackName, "-s", "bogus-stack")
-						Eventually(session.Err).Should(Say("Buildpack %s with stack bogus-stack not found", buildpackName))
+						Eventually(session.Err).Should(Say("Buildpack '%s' with stack 'bogus-stack' not found", buildpackName))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
@@ -208,7 +208,7 @@ var _ = Describe("labels command", func() {
 
 					It("fails if a non-existent stack is specified", func() {
 						session := helpers.CF("labels", "buildpack", buildpackName, "-s", "bogus-stack")
-						Eventually(session.Err).Should(Say("Buildpack %s with stack bogus-stack not found", buildpackName))
+						Eventually(session.Err).Should(Say("Buildpack '%s' with stack 'bogus-stack' not found", buildpackName))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
@@ -256,7 +256,7 @@ var _ = Describe("labels command", func() {
 
 				It("fails when a non-existent stack is given", func() {
 					session := helpers.CF("labels", "buildpack", buildpackName, "-s", "bogus-stack")
-					Eventually(session.Err).Should(Say("Buildpack %s with stack bogus-stack not found", buildpackName))
+					Eventually(session.Err).Should(Say("Buildpack '%s' with stack 'bogus-stack' not found", buildpackName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
@@ -303,7 +303,7 @@ var _ = Describe("labels command", func() {
 
 					It("fails if a non-existent stack is specified", func() {
 						session := helpers.CF("labels", "buildpack", buildpackName, "-s", "bogus-stack")
-						Eventually(session.Err).Should(Say("Buildpack %s with stack bogus-stack not found", buildpackName))
+						Eventually(session.Err).Should(Say("Buildpack '%s' with stack 'bogus-stack' not found", buildpackName))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})
