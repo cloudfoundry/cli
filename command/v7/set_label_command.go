@@ -128,14 +128,15 @@ func (cmd SetLabelCommand) executeBuildpack() error {
 		return err
 	}
 
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+	preFlavoringText := "Setting label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}..."
 	if cmd.BuildpackStack != "" {
-		preFlavoringText = fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
+		preFlavoringText = "Setting label(s) for {{.ResourceType}} {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
 	}
 
 	cmd.UI.DisplayTextWithFlavor(
 		preFlavoringText,
 		map[string]interface{}{
+			"ResourceType": strings.ToLower(cmd.RequiredArgs.ResourceType),
 			"ResourceName": cmd.RequiredArgs.ResourceName,
 			"StackName":    cmd.BuildpackStack,
 			"User":         cmd.username,
@@ -189,21 +190,21 @@ func (cmd SetLabelCommand) executeSpace() error {
 		return err
 	}
 
-	spaceName := cmd.RequiredArgs.ResourceName
-
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
 	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
+		"Setting label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} as {{.User}}...",
 		map[string]interface{}{
-			"ResourceName": spaceName,
+			"ResourceType": strings.ToLower(cmd.RequiredArgs.ResourceType),
+			"ResourceName": cmd.RequiredArgs.ResourceName,
 			"OrgName":      cmd.Config.TargetedOrganization().Name,
 			"User":         cmd.username,
 		},
 	)
 
-	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(spaceName,
+	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(
+		cmd.RequiredArgs.ResourceName,
 		cmd.Config.TargetedOrganization().GUID,
-		cmd.labels)
+		cmd.labels,
+	)
 
 	cmd.UI.DisplayWarnings(warnings)
 
@@ -260,10 +261,10 @@ func (cmd SetLabelCommand) validateFlags() error {
 }
 
 func (cmd SetLabelCommand) displayMessage() {
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
 	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
+		"Setting label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}...",
 		map[string]interface{}{
+			"ResourceType": strings.ToLower(cmd.RequiredArgs.ResourceType),
 			"ResourceName": cmd.RequiredArgs.ResourceName,
 			"User":         cmd.username,
 		},
@@ -271,10 +272,10 @@ func (cmd SetLabelCommand) displayMessage() {
 }
 
 func (cmd SetLabelCommand) displayMessageWithOrgAndSpace() {
-	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", strings.ToLower(cmd.RequiredArgs.ResourceType))
 	cmd.UI.DisplayTextWithFlavor(
-		preFlavoringText,
+		"Setting label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
 		map[string]interface{}{
+			"ResourceType": strings.ToLower(cmd.RequiredArgs.ResourceType),
 			"ResourceName": cmd.RequiredArgs.ResourceName,
 			"OrgName":      cmd.Config.TargetedOrganization().Name,
 			"SpaceName":    cmd.Config.TargetedSpace().Name,

@@ -88,7 +88,7 @@ var _ = Describe("unset-label command", func() {
 				var expectedMap map[string]types.NullString
 
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -158,7 +158,7 @@ var _ = Describe("unset-label command", func() {
 			})
 			When("getting the user fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -169,7 +169,7 @@ var _ = Describe("unset-label command", func() {
 		})
 	})
 
-	When("Unsetting labels on buildpacks", func() {
+	When("unsetting labels on buildpacks", func() {
 		var resourceName string
 
 		BeforeEach(func() {
@@ -215,17 +215,17 @@ var _ = Describe("unset-label command", func() {
 
 			When("fetching the current user's name fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("boom"))
+					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 				})
 
 				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("boom"))
+					Expect(executeErr).To(MatchError("could not get user"))
 				})
 			})
 
 			When("fetching current user's name succeeds", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
 				})
 
 				When("all the provided labels are valid", func() {
@@ -385,7 +385,7 @@ var _ = Describe("unset-label command", func() {
 
 			When("fetching the current user's name fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -406,7 +406,7 @@ var _ = Describe("unset-label command", func() {
 			}
 			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
 			fakeActor.UpdateDomainLabelsByDomainNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
 				nil)
 		})
@@ -475,7 +475,7 @@ var _ = Describe("unset-label command", func() {
 
 		When("getting the user fails", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+				fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 				cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 			})
 
@@ -485,7 +485,7 @@ var _ = Describe("unset-label command", func() {
 		})
 	})
 
-	When("Unsetting labels on orgs", func() {
+	When("unsetting labels on orgs", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "org",
@@ -507,7 +507,7 @@ var _ = Describe("unset-label command", func() {
 
 			When("fetching current user's name succeeds", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -560,7 +560,7 @@ var _ = Describe("unset-label command", func() {
 
 			When("fetching the current user's name fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -581,7 +581,7 @@ var _ = Describe("unset-label command", func() {
 			}
 			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "space-guid"})
 			fakeActor.UpdateRouteLabelsReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
@@ -654,7 +654,7 @@ var _ = Describe("unset-label command", func() {
 		})
 	})
 
-	When("Unsetting labels on spaces", func() {
+	When("unsetting labels on spaces", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "space",
@@ -700,7 +700,7 @@ var _ = Describe("unset-label command", func() {
 
 			When("getting the current user succeeds", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -768,7 +768,7 @@ var _ = Describe("unset-label command", func() {
 			})
 			When("getting the user fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -779,7 +779,7 @@ var _ = Describe("unset-label command", func() {
 		})
 	})
 
-	When("Unsetting labels on stacks", func() {
+	When("unsetting labels on stacks", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "stack",
@@ -807,7 +807,7 @@ var _ = Describe("unset-label command", func() {
 
 			When("fetching current user's name succeeds", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 
@@ -856,7 +856,7 @@ var _ = Describe("unset-label command", func() {
 
 			When("fetching the current user's name fails", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("could not get user"))
+					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
 					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 				})
 

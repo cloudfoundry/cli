@@ -8,7 +8,7 @@ import (
 
 type MetadataLabels map[string]string
 
-func CheckExpectedMetadata(url string, list bool, expected MetadataLabels) {
+func CheckExpectedLabels(url string, list bool, expected MetadataLabels) {
 	type commonResource struct {
 		Metadata struct {
 			Labels MetadataLabels

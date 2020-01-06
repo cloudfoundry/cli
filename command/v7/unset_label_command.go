@@ -23,6 +23,9 @@ type UnsetLabelCommand struct {
 	Config          command.Config
 	SharedActor     command.SharedActor
 	Actor           SetLabelActor
+
+	username string
+	labels   map[string]types.NullString
 }
 
 func (cmd *UnsetLabelCommand) Setup(config command.Config, ui command.UI) error {
@@ -38,7 +41,13 @@ func (cmd *UnsetLabelCommand) Setup(config command.Config, ui command.UI) error 
 }
 
 func (cmd UnsetLabelCommand) Execute(args []string) error {
-	user, err := cmd.Config.CurrentUser()
+	cmd.labels = make(map[string]types.NullString)
+	for _, value := range cmd.RequiredArgs.LabelKeys {
+		cmd.labels[value] = types.NewNullString()
+	}
+
+	var err error
+	cmd.username, err = cmd.Config.CurrentUserName()
 	if err != nil {
 		return err
 	}
@@ -48,27 +57,22 @@ func (cmd UnsetLabelCommand) Execute(args []string) error {
 		return err
 	}
 
-	labels := make(map[string]types.NullString)
-	for _, value := range cmd.RequiredArgs.LabelKeys {
-		labels[value] = types.NewNullString()
-	}
-
 	resourceTypeString := strings.ToLower(cmd.RequiredArgs.ResourceType)
 	switch ResourceType(resourceTypeString) {
 	case App:
-		err = cmd.executeApp(user.Name, labels)
+		err = cmd.executeApp()
 	case Buildpack:
-		err = cmd.executeBuildpack(user.Name, labels)
+		err = cmd.executeBuildpack()
 	case Domain:
-		err = cmd.executeDomain(user.Name, labels)
+		err = cmd.executeDomain()
 	case Org:
-		err = cmd.executeOrg(user.Name, labels)
+		err = cmd.executeOrg()
 	case Route:
-		err = cmd.executeRoute(user.Name, labels)
+		err = cmd.executeRoute()
 	case Space:
-		err = cmd.executeSpace(user.Name, labels)
+		err = cmd.executeSpace()
 	case Stack:
-		err = cmd.executeStack(user.Name, labels)
+		err = cmd.executeStack()
 
 	default:
 		err = errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.RequiredArgs.ResourceType}))
@@ -82,55 +86,42 @@ func (cmd UnsetLabelCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd UnsetLabelCommand) executeApp(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeApp() error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing label(s) for app {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceName": cmd.RequiredArgs.ResourceName,
-		"OrgName":      cmd.Config.TargetedOrganization().Name,
-		"SpaceName":    cmd.Config.TargetedSpace().Name,
-		"User":         username,
-	})
+	cmd.displayMessageWithOrgAndSpace()
 
-	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
+	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd UnsetLabelCommand) executeDomain(username string, labels map[string]types.NullString) error {
-	cmd.UI.DisplayTextWithFlavor("Removing label(s) for domain {{.ResourceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceName": cmd.RequiredArgs.ResourceName,
-		"User":         username,
-	})
+func (cmd UnsetLabelCommand) executeDomain() error {
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, labels)
+	warnings, err := cmd.Actor.UpdateDomainLabelsByDomainName(cmd.RequiredArgs.ResourceName, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd UnsetLabelCommand) executeRoute(username string, labels map[string]types.NullString) error {
-	cmd.UI.DisplayTextWithFlavor("Removing label(s) for route {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceName": cmd.RequiredArgs.ResourceName,
-		"OrgName":      cmd.Config.TargetedOrganization().Name,
-		"SpaceName":    cmd.Config.TargetedSpace().Name,
-		"User":         username,
-	})
+func (cmd UnsetLabelCommand) executeRoute() error {
+	cmd.displayMessageWithOrgAndSpace()
 
-	warnings, err := cmd.Actor.UpdateRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, labels)
+	warnings, err := cmd.Actor.UpdateRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd UnsetLabelCommand) executeBuildpack(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeBuildpack() error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
@@ -145,35 +136,32 @@ func (cmd UnsetLabelCommand) executeBuildpack(username string, labels map[string
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"StackName":    cmd.BuildpackStack,
-		"User":         username,
+		"User":         cmd.username,
 	})
 
-	warnings, err := cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, labels)
+	warnings, err := cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.RequiredArgs.ResourceName, cmd.BuildpackStack, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd UnsetLabelCommand) executeOrg(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeOrg() error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing label(s) for org {{.ResourceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceName": cmd.RequiredArgs.ResourceName,
-		"User":         username,
-	})
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, labels)
+	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd UnsetLabelCommand) executeSpace(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeSpace() error {
 	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
@@ -182,28 +170,25 @@ func (cmd UnsetLabelCommand) executeSpace(username string, labels map[string]typ
 	cmd.UI.DisplayTextWithFlavor("Removing label(s) for space {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
-		"User":         username,
+		"User":         cmd.username,
 	})
 
-	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID, labels)
+	warnings, err := cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedOrganization().GUID, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
 	return err
 }
 
-func (cmd UnsetLabelCommand) executeStack(username string, labels map[string]types.NullString) error {
+func (cmd UnsetLabelCommand) executeStack() error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing label(s) for stack {{.ResourceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceName": cmd.RequiredArgs.ResourceName,
-		"User":         username,
-	})
+	cmd.displayMessage()
 
-	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, labels)
+	warnings, err := cmd.Actor.UpdateStackLabelsByStackName(cmd.RequiredArgs.ResourceName, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 
@@ -220,4 +205,21 @@ func (cmd UnsetLabelCommand) validateFlags() error {
 		}
 	}
 	return nil
+}
+
+func (cmd UnsetLabelCommand) displayMessage() {
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}...", map[string]interface{}{
+		"ResourceType": strings.ToLower(cmd.RequiredArgs.ResourceType),
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"User":         cmd.username,
+	})
+}
+func (cmd UnsetLabelCommand) displayMessageWithOrgAndSpace() {
+	cmd.UI.DisplayTextWithFlavor("Removing label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"ResourceType": strings.ToLower(cmd.RequiredArgs.ResourceType),
+		"ResourceName": cmd.RequiredArgs.ResourceName,
+		"OrgName":      cmd.Config.TargetedOrganization().Name,
+		"SpaceName":    cmd.Config.TargetedSpace().Name,
+		"User":         cmd.username,
+	})
 }
