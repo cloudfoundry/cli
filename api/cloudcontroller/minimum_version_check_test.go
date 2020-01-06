@@ -40,9 +40,9 @@ var _ = Describe("Minimum Version Check", func() {
 		})
 	})
 
-	XDescribe("Minimum version numbers", func() {
+	Describe("Minimum version numbers", func() {
 		It("are up to date", func() {
-			expirationDate, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
+			expirationDate, err := time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(time.Now().Before(expirationDate)).To(BeTrue(), "Check https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version and update versions if necessary")
 		})
