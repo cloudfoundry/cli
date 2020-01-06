@@ -255,6 +255,78 @@ V7
    ]
 }
 
+### GetSpace
+
+#### Model changes
+The main difference here is the removal of Quota information from GetOrg, in our
+User research we found no uses of this, we also added Metadata to the V7 object
+
+V6
+```
+  Guid:a53cf02c-4d18-4955-b321-b8c45e33df1e Name:myspace 
+  Organization:{Guid:2e2eb386-34a9-4b29-ad49-365a57bdca6c Name:tom}
+  Applications:[{Name:pora Guid:d8e2ed07-804b-4ed1-b2e6-21953d13c0f7} {Name:zora Guid:85706f87-14b9-4e9b-b9eb-7f3aee2fe9a8}]
+  ServiceInstances:[]
+  Domains:[{
+    Guid:e672e331-def1-418b-ad4c-428177de353d
+    Name:frost-dagger.lite.cli.fun OwningOrganizationGuid: Shared:true
+  }]
+  SecurityGroups:[
+    { 
+    Name:public_networks 
+    Guid:3b4b1860-446c-4827-ac46-41c69a53868c 
+    Rules:[
+      map[destination:0.0.0.0-9.255.255.255 protocol:all] 
+      map[destination:11.0.0.0-169.253.255.255 protocol:all] 
+      map[destination:169.255.0.0-172.15.255.255 protocol:all] 
+      map[destination:172.32.0.0-192.167.255.255 protocol:all] 
+      map[destination:192.169.0.0-255.255.255.255 protocol:all]]
+    } 
+    {
+       Name:dns 
+       Guid:b10e310c-e3c1-4882-9835-58b413b9c9b8 
+       Rules:[map[destination:0.0.0.0/0 ports:53 protocol:tcp] map[destination:0.0.0.0/0 ports:53 protocol:udp]]
+       }
+   ]
+ SpaceQuota: {
+   Guid: 
+   Name: 
+   MemoryLimit:0 
+   InstanceMemoryLimit:0 
+   RoutesLimit:0 ServicesLimit:0 
+   NonBasicServicesAllowed:false
+   }
+  }
+```
+V7
+
+```
+{
+   Space: {
+     Name: myspace GUID: 1a873322-a1cb-47aa-ad81-5b7460941910
+   }
+   Org: {
+     Name: toim GUID: 3a873322-a1cb-47aa-ad81-5b7460941910
+   }
+   Metadata: {
+     Labels: map[
+        label: { Value: test IsSet: true }
+        fun: { Value: true IsSet: true }
+      ]
+   }
+   Apps: [
+     {
+       Name: shmora GUID: 00954f6d-fd0f-47f7-80e8-a597a47df9df
+     }
+   ]
+   Domains: [
+     {
+       Name: frost-dagger.lite.cli.fun
+       GUID: e672e331-def1-418b-ad4c-428177de353d
+     }
+   ]
+}
+
 ```
 
 ### GetApps
