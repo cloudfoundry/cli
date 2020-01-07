@@ -76,9 +76,9 @@ func (cmd RestartCommand) Execute(args []string) error {
 	})
 	switch cmd.Strategy.Name {
 	case constant.DeploymentStrategyRolling:
-		err = cmd.ZeroDowntimeRestart(app)
+		err = cmd.zeroDowntimeRestart(app)
 	default:
-		err = cmd.DowntimeRestart(app)
+		err = cmd.downtimeRestart(app)
 	}
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd RestartCommand) DowntimeRestart(app v7action.Application) error {
+func (cmd RestartCommand) downtimeRestart(app v7action.Application) error {
 	var warnings v7action.Warnings
 	var err error
 	if app.Started() {
@@ -119,12 +119,12 @@ func (cmd RestartCommand) DowntimeRestart(app v7action.Application) error {
 	}
 
 	cmd.UI.DisplayText("Waiting for app to start...\n")
-	warnings, err = cmd.Actor.PollStart(app.GUID, false)
+	warnings, err = cmd.Actor.PollStart(app.GUID, cmd.NoWait)
 	cmd.UI.DisplayWarnings(warnings)
 	return err
 }
 
-func (cmd RestartCommand) ZeroDowntimeRestart(app v7action.Application) error {
+func (cmd RestartCommand) zeroDowntimeRestart(app v7action.Application) error {
 	cmd.UI.DisplayText("Creating deployment for app {{.AppName}}...\n",
 		map[string]interface{}{
 			"AppName": cmd.RequiredArgs.AppName,
