@@ -144,9 +144,10 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, War
 }
 
 // GetServiceBrokers lists service brokers.
-func (client *Client) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
+func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceBrokersRequest,
+		Query:       query,
 	})
 	if err != nil {
 		return nil, nil, err

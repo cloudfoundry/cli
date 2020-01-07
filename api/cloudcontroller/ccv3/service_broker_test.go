@@ -20,16 +20,79 @@ var _ = Describe("ServiceBroker", func() {
 
 	Describe("GetServiceBrokers", func() {
 		var (
+			query          []Query
 			serviceBrokers []ServiceBroker
 			warnings       Warnings
 			executeErr     error
 		)
 
 		JustBeforeEach(func() {
-			serviceBrokers, warnings, executeErr = client.GetServiceBrokers()
+			serviceBrokers, warnings, executeErr = client.GetServiceBrokers(query...)
 		})
 
-		When("service brokers exist", func() {
+		When("there are no service brokers", func() {
+			BeforeEach(func() {
+				response := `
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": []
+					}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_brokers"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an empty list", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(serviceBrokers).To(HaveLen(0))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("there is a service broker", func() {
+			BeforeEach(func() {
+				response := `
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"name": "service-broker-name-1",
+								"guid": "service-broker-guid-1",
+								"url": "service-broker-url-1",
+							    "status": "synchronization in progress"
+							}
+						]
+					}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_brokers"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the service broker", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(serviceBrokers).To(ConsistOf(ServiceBroker{
+					Name:   "service-broker-name-1",
+					GUID:   "service-broker-guid-1",
+					URL:    "service-broker-url-1",
+					Status: "synchronization in progress",
+				}))
+				Expect(warnings).To(ConsistOf("this is another warning"))
+			})
+		})
+
+		When("there is more than one page of service brokers", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
 					{
@@ -95,6 +158,45 @@ var _ = Describe("ServiceBroker", func() {
 					ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3", Status: "available"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
+			})
+		})
+
+		When("a filter is specified", func() {
+			BeforeEach(func() {
+				query = []Query{
+					{
+						Key:    NameFilter,
+						Values: []string{"special-unicorn-broker"},
+					},
+				}
+
+				response := `
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"name": "special-unicorn-broker",
+								"guid": "service-broker-guid-1",
+								"url": "service-broker-url-1",
+							    "status": "synchronization in progress"
+							}
+						]
+					}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_brokers", "names=special-unicorn-broker"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("passes the filter in the query and returns the result", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(serviceBrokers[0].Name).To(Equal("special-unicorn-broker"))
+				Expect(warnings).To(ConsistOf("this is another warning"))
 			})
 		})
 

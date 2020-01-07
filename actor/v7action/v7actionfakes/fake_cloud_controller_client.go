@@ -1143,9 +1143,10 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetServiceBrokersStub        func() ([]ccv3.ServiceBroker, ccv3.Warnings, error)
+	GetServiceBrokersStub        func(...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []struct {
+		arg1 []ccv3.Query
 	}
 	getServiceBrokersReturns struct {
 		result1 []ccv3.ServiceBroker
@@ -6724,15 +6725,16 @@ func (fake *FakeCloudControllerClient) GetSSHEnabledReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetServiceBrokers() ([]ccv3.ServiceBroker, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetServiceBrokers(arg1 ...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error) {
 	fake.getServiceBrokersMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
 	fake.getServiceBrokersArgsForCall = append(fake.getServiceBrokersArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetServiceBrokers", []interface{}{})
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetServiceBrokers", []interface{}{arg1})
 	fake.getServiceBrokersMutex.Unlock()
 	if fake.GetServiceBrokersStub != nil {
-		return fake.GetServiceBrokersStub()
+		return fake.GetServiceBrokersStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -6747,10 +6749,17 @@ func (fake *FakeCloudControllerClient) GetServiceBrokersCallCount() int {
 	return len(fake.getServiceBrokersArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetServiceBrokersCalls(stub func() ([]ccv3.ServiceBroker, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetServiceBrokersCalls(stub func(...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error)) {
 	fake.getServiceBrokersMutex.Lock()
 	defer fake.getServiceBrokersMutex.Unlock()
 	fake.GetServiceBrokersStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServiceBrokersArgsForCall(i int) []ccv3.Query {
+	fake.getServiceBrokersMutex.RLock()
+	defer fake.getServiceBrokersMutex.RUnlock()
+	argsForCall := fake.getServiceBrokersArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeCloudControllerClient) GetServiceBrokersReturns(result1 []ccv3.ServiceBroker, result2 ccv3.Warnings, result3 error) {

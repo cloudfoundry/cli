@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -81,26 +83,20 @@ var _ = Describe("Service Broker Actions", func() {
 	})
 
 	Describe("GetServiceBrokerByName", func() {
+		const (
+			serviceBroker1Name = "broker-name"
+			serviceBroker1Guid = "broker-guid"
+		)
+
 		var (
 			ccv3ServiceBrokers []ccv3.ServiceBroker
 			serviceBroker      ServiceBroker
-
-			serviceBroker1Name string
-			serviceBroker1Guid string
-
-			serviceBrokerNotTheOneYouWant string
-			notTheBrokerYouAreLookingFor  string
-
-			warnings   Warnings
-			executeErr error
+			warnings           Warnings
+			executeErr         error
 		)
 
 		BeforeEach(func() {
-			serviceBroker1Name = "broker-name"
-			serviceBroker1Guid = "broker-guid"
-
 			ccv3ServiceBrokers = []ccv3.ServiceBroker{
-				{Name: serviceBrokerNotTheOneYouWant, GUID: notTheBrokerYouAreLookingFor},
 				{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
 			}
 		})
@@ -109,7 +105,7 @@ var _ = Describe("Service Broker Actions", func() {
 			serviceBroker, warnings, executeErr = actor.GetServiceBrokerByName(serviceBroker1Name)
 		})
 
-		When("the API layer call is successful", func() {
+		When("the service broker is found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
 					ccv3ServiceBrokers,
@@ -118,16 +114,34 @@ var _ = Describe("Service Broker Actions", func() {
 				)
 			})
 
-			It("returns back the serviceBrokers and warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
+			It("returns the service broker and warnings", func() {
 				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(ConsistOf(ccv3.Query{
+					Key:    ccv3.NameFilter,
+					Values: []string{serviceBroker1Name},
+				}))
 
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-service-broker-warning"))
 				Expect(serviceBroker).To(Equal(
 					ServiceBroker{Name: serviceBroker1Name, GUID: serviceBroker1Guid},
 				))
-				Expect(warnings).To(ConsistOf("some-service-broker-warning"))
+			})
+		})
 
+		When("the service broker is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ServiceBroker{},
+					ccv3.Warnings{"some-other-service-broker-warning"},
+					nil,
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError(actionerror.ServiceBrokerNotFoundError{Name: serviceBroker1Name}))
+				Expect(warnings).To(ConsistOf("some-other-service-broker-warning"))
+				Expect(serviceBroker).To(Equal(ServiceBroker{}))
 			})
 		})
 

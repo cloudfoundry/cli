@@ -85,7 +85,7 @@ type CloudControllerClient interface {
 	GetRoles(query ...ccv3.Query) ([]ccv3.Role, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetRouteDestinations(routeGUID string) ([]ccv3.RouteDestination, ccv3.Warnings, error)
 	GetRoutes(query ...ccv3.Query) ([]ccv3.Route, ccv3.Warnings, error)
-	GetServiceBrokers() ([]ccv3.ServiceBroker, ccv3.Warnings, error)
+	GetServiceBrokers(query ...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
