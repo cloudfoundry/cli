@@ -533,6 +533,7 @@ var _ = Describe("ServiceBroker", func() {
 					ServiceBrokerModel{Username: username},
 				)
 				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError("Incorrect usage: both username and password must be defined in order to do an update"))
 			})
 		})
 	})
