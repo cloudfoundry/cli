@@ -1,11 +1,11 @@
 package v7
 
 import (
+	"errors"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -17,7 +17,7 @@ import (
 type UnsetLabelCommand struct {
 	RequiredArgs    flag.UnsetLabelArgs `positional-args:"yes"`
 	BuildpackStack  string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage           interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY...\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n   cf unset-label org business pci public-facing\n   cf unset-label buildpack go_buildpack go -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   space\n   stack"`
+	usage           interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY...\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n   cf unset-label org business pci public-facing\n   cf unset-label buildpack go_buildpack go -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   space\n   stack"`
 	relatedCommands interface{}         `related_commands:"labels, set-label"`
 	UI              command.UI
 	Config          command.Config
@@ -69,6 +69,8 @@ func (cmd UnsetLabelCommand) Execute(args []string) error {
 		err = cmd.executeOrg()
 	case Route:
 		err = cmd.executeRoute()
+	case ServiceBroker:
+		err = cmd.executeServiceBroker()
 	case Space:
 		err = cmd.executeSpace()
 	case Stack:
@@ -155,6 +157,20 @@ func (cmd UnsetLabelCommand) executeOrg() error {
 	cmd.displayMessage()
 
 	warnings, err := cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.RequiredArgs.ResourceName, cmd.labels)
+
+	cmd.UI.DisplayWarnings(warnings)
+
+	return err
+}
+
+func (cmd UnsetLabelCommand) executeServiceBroker() error {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.displayMessage()
+	warnings, err := cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.RequiredArgs.ResourceName, cmd.labels)
 
 	cmd.UI.DisplayWarnings(warnings)
 

@@ -3,7 +3,6 @@ package v7_test
 import (
 	"errors"
 	"regexp"
-
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -16,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
@@ -42,19 +42,60 @@ var _ = Describe("unset-label command", func() {
 		}
 	})
 
+	Describe("shared validations", func() {
+		When("getting the user fails", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
+				cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+			})
+
+			It("returns the error", func() {
+				err := cmd.Execute(nil)
+				Expect(err).To(MatchError("could not get user"))
+			})
+		})
+
+		DescribeTable(
+			"when checking the target fails",
+			func(resourceType string) {
+				fakeSharedActor.CheckTargetReturns(errors.New("Target not found"))
+				cmd.RequiredArgs = flag.UnsetLabelArgs{
+					ResourceType: resourceType,
+				}
+
+				err := cmd.Execute(nil)
+				Expect(err).To(MatchError("Target not found"))
+			},
+			Entry("app", "app"),
+			Entry("buildpack", "buildpack"),
+			// domain - does not check target
+			Entry("org", "org"),
+			// route - does not check target
+			Entry("service-broker", "service-broker"),
+			Entry("space", "space"),
+			Entry("stack", "stack"),
+		)
+	})
+
 	When("unsetting labels on apps", func() {
+		var appName string
+
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.UnsetLabelArgs{
 				ResourceType: "app",
 			}
+
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
+			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
+			appName = "some-app"
+			cmd.RequiredArgs.ResourceName = appName
+
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
 		})
 
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
-		})
-
-		It("doesn't error", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
 		})
 
 		It("checks that the user is logged in and targeted to an org and space", func() {
@@ -64,107 +105,68 @@ var _ = Describe("unset-label command", func() {
 			Expect(checkSpace).To(BeTrue())
 		})
 
-		When("checking the target fails", func() {
+		It("informs the user that labels are being removed", func() {
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
+		})
+
+		When("updating the app labels succeeds", func() {
+			var expectedMap map[string]types.NullString
+
 			BeforeEach(func() {
-				fakeSharedActor.CheckTargetReturns(errors.New("Target not found"))
+				fakeActor.UpdateApplicationLabelsByApplicationNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+					nil)
+				expectedMap = map[string]types.NullString{
+					"some-label":     types.NewNullString(),
+					"some-other-key": types.NewNullString()}
 			})
 
-			It("we expect an error to be returned", func() {
-				Expect(executeErr).To(MatchError("Target not found"))
+			It("does not return an error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("passes the correct parameters into the actor", func() {
+				Expect(fakeActor.UpdateApplicationLabelsByApplicationNameCallCount()).To(Equal(1))
+				actualAppName, spaceGUID, labelsMap := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
+				Expect(actualAppName).To(Equal(appName))
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(labelsMap).To(Equal(expectedMap))
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs.ResourceType = "aPp"
+				})
+
+				It("passes the correct parameters into the actor", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.UpdateApplicationLabelsByApplicationNameCallCount()).To(Equal(1))
+					actualAppName, spaceGUID, labelsMap := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
+					Expect(actualAppName).To(Equal(appName))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(labelsMap).To(Equal(expectedMap))
+				})
 			})
 		})
 
-		When("checking the target succeeds", func() {
-			var appName string
-
+		When("updating the app labels fails", func() {
 			BeforeEach(func() {
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
-				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
-				appName = "some-app"
-				cmd.RequiredArgs.ResourceName = appName
+				fakeActor.UpdateApplicationLabelsByApplicationNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"))
 			})
 
-			When("getting the current user succeeds", func() {
-				var expectedMap map[string]types.NullString
-
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("some-user", nil)
-					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
-				})
-
-				It("informs the user that labels are being removed", func() {
-					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
-				})
-
-				When("updating the app labels succeeds", func() {
-					BeforeEach(func() {
-						fakeActor.UpdateApplicationLabelsByApplicationNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
-							nil)
-						expectedMap = map[string]types.NullString{
-							"some-label":     types.NewNullString(),
-							"some-other-key": types.NewNullString()}
-					})
-
-					It("does not return an error", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-					})
-
-					It("prints all warnings", func() {
-						Expect(testUI.Err).To(Say("some-warning-1"))
-						Expect(testUI.Err).To(Say("some-warning-2"))
-					})
-
-					It("passes the correct parameters into the actor", func() {
-
-						Expect(fakeActor.UpdateApplicationLabelsByApplicationNameCallCount()).To(Equal(1))
-						actualAppName, spaceGUID, labelsMap := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
-						Expect(actualAppName).To(Equal(appName))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-						Expect(labelsMap).To(Equal(expectedMap))
-					})
-
-					When("the resource type argument is not lowercase", func() {
-						BeforeEach(func() {
-							cmd.RequiredArgs.ResourceType = "aPp"
-						})
-
-						It("passes the correct parameters into the actor", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-
-							Expect(fakeActor.UpdateApplicationLabelsByApplicationNameCallCount()).To(Equal(1))
-							actualAppName, spaceGUID, labelsMap := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
-							Expect(actualAppName).To(Equal(appName))
-							Expect(spaceGUID).To(Equal("some-space-guid"))
-							Expect(labelsMap).To(Equal(expectedMap))
-						})
-					})
-				})
-
-				When("updating the app labels fails", func() {
-					BeforeEach(func() {
-						fakeActor.UpdateApplicationLabelsByApplicationNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
-							errors.New("api call failed"))
-					})
-
-					It("prints all warnings", func() {
-						Expect(testUI.Err).To(Say("some-warning-1"))
-						Expect(testUI.Err).To(Say("some-warning-2"))
-					})
-
-					It("returns the error", func() {
-						Expect(executeErr).To(MatchError("api call failed"))
-					})
-				})
+			It("prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
-			When("getting the user fails", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
-				})
 
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("could not get user"))
-				})
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
 			})
 		})
 	})
@@ -189,208 +191,177 @@ var _ = Describe("unset-label command", func() {
 				ResourceName: resourceName,
 			}
 			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+
+			fakeSharedActor.CheckTargetReturns(nil)
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
+
 		})
 
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		When("checking target succeeds", func() {
-			var buildpackName = "some-buildpack"
+		It("doesn't error", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
 
+		It("checks that the user is logged in", func() {
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(checkOrg).To(BeFalse())
+			Expect(checkSpace).To(BeFalse())
+		})
+
+		When("all the provided labels are valid", func() {
 			BeforeEach(func() {
-				fakeSharedActor.CheckTargetReturns(nil)
+				cmd.RequiredArgs = flag.UnsetLabelArgs{
+					ResourceType: "buildpack",
+					ResourceName: "some-buildpack",
+					LabelKeys:    []string{"FOO", "ENV"},
+				}
+
+				fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
+					v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+					nil,
+				)
 			})
 
-			It("doesn't error", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-			})
-
-			It("checks that the user is logged in", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeFalse())
-				Expect(checkSpace).To(BeFalse())
-			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("could not get user"))
-				})
-			})
-
-			When("fetching current user's name succeeds", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("some-user", nil)
-				})
-
-				When("all the provided labels are valid", func() {
+			When("updating the buildpack labels succeeds", func() {
+				When("the stack is specified", func() {
 					BeforeEach(func() {
-						cmd.RequiredArgs = flag.UnsetLabelArgs{
-							ResourceType: "buildpack",
-							ResourceName: buildpackName,
-							LabelKeys:    []string{"FOO", "ENV"},
-						}
-
-						fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
-							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
-							nil,
-						)
+						cmd.BuildpackStack = "globinski"
 					})
 
-					When("updating the buildpack labels succeeds", func() {
-						When("the stack is specified", func() {
-							BeforeEach(func() {
-								cmd.BuildpackStack = "globinski"
-							})
+					It("unsets the provided labels on the buildpack", func() {
+						Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+						Expect(stack).To(Equal("globinski"), "failed to pass stack name")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString(),
+							"ENV": types.NewNullString(),
+						}))
+					})
 
-							It("unsets the provided labels on the buildpack", func() {
-								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-								Expect(stack).To(Equal("globinski"), "failed to pass stack name")
-								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
-									"FOO": types.NewNullString(),
-									"ENV": types.NewNullString(),
-								}))
-							})
+					It("displays a message", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-							It("displays a message", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 
-								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
+						Expect(testUI.Out).To(Say("OK"))
+					})
 
-								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack %s as some-user...`), resourceName, cmd.BuildpackStack))
-								Expect(testUI.Out).To(Say("OK"))
-							})
-
-							It("prints all warnings", func() {
-								Expect(testUI.Err).To(Say("some-warning-1"))
-								Expect(testUI.Err).To(Say("some-warning-2"))
-							})
-						})
-
-						When("the stack is not specified", func() {
-							It("unsets the provided labels on the buildpack", func() {
-								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-								Expect(stack).To(Equal(""), "failed to pass stack name")
-								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
-									"FOO": types.NewNullString(),
-									"ENV": types.NewNullString(),
-								}))
-							})
-
-							It("displays a message", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-
-								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-
-								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
-								Expect(testUI.Out).To(Say("OK"))
-							})
-
-							It("prints all warnings", func() {
-								Expect(testUI.Err).To(Say("some-warning-1"))
-								Expect(testUI.Err).To(Say("some-warning-2"))
-							})
-						})
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
 				})
 
-				When("the resource type is not lowercase", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs = flag.UnsetLabelArgs{
-							ResourceType: "bUiLdPaCk",
-							ResourceName: buildpackName,
-							LabelKeys:    []string{"FOO", "ENV"},
-						}
-
-						fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
-							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
-							nil,
-						)
+				When("the stack is not specified", func() {
+					It("unsets the provided labels on the buildpack", func() {
+						Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+						Expect(stack).To(Equal(""), "failed to pass stack name")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString(),
+							"ENV": types.NewNullString(),
+						}))
 					})
 
-					When("updating the buildpack labels succeeds", func() {
-						When("the stack is specified", func() {
-							BeforeEach(func() {
-								cmd.BuildpackStack = "globinski"
-							})
+					It("displays a message", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-							It("does not display an argument combination error", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-							})
+						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 
-							It("unsets the provided labels on the buildpack", func() {
-								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-								Expect(stack).To(Equal("globinski"), "failed to pass stack name")
-								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
-									"FOO": types.NewNullString(),
-									"ENV": types.NewNullString(),
-								}))
-							})
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
 
-							It("displays a message", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-
-								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-
-								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack globinski as some-user...`), resourceName))
-								Expect(testUI.Out).To(Say("OK"))
-							})
-
-							It("prints all warnings", func() {
-								Expect(testUI.Err).To(Say("some-warning-1"))
-								Expect(testUI.Err).To(Say("some-warning-2"))
-							})
-						})
-
-						When("the stack is not specified", func() {
-							It("unsets the provided labels on the buildpack", func() {
-								Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-								name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-								Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-								Expect(stack).To(Equal(""), "failed to pass stack name")
-								Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
-									"FOO": types.NewNullString(),
-									"ENV": types.NewNullString(),
-								}))
-							})
-
-							It("displays a message", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-
-								Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-
-								Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
-								Expect(testUI.Out).To(Say("OK"))
-							})
-
-							It("prints all warnings", func() {
-								Expect(testUI.Err).To(Say("some-warning-1"))
-								Expect(testUI.Err).To(Say("some-warning-2"))
-							})
-						})
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
 				})
 			})
+		})
 
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+		When("the resource type is not lowercase", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs = flag.UnsetLabelArgs{
+					ResourceType: "bUiLdPaCk",
+					ResourceName: "some-buildpack",
+					LabelKeys:    []string{"FOO", "ENV"},
+				}
+
+				fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackReturns(
+					v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+					nil,
+				)
+			})
+
+			When("updating the buildpack labels succeeds", func() {
+				When("the stack is specified", func() {
+					BeforeEach(func() {
+						cmd.BuildpackStack = "globinski"
+					})
+
+					It("does not display an argument combination error", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+					})
+
+					It("unsets the provided labels on the buildpack", func() {
+						Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+						Expect(stack).To(Equal("globinski"), "failed to pass stack name")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString(),
+							"ENV": types.NewNullString(),
+						}))
+					})
+
+					It("displays a message", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s with stack globinski as some-user...`), resourceName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
 				})
 
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("could not get user"))
+				When("the stack is not specified", func() {
+					It("unsets the provided labels on the buildpack", func() {
+						Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
+						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
+						Expect(stack).To(Equal(""), "failed to pass stack name")
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString(),
+							"ENV": types.NewNullString(),
+						}))
+					})
+
+					It("displays a message", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
 				})
 			})
 		})
@@ -472,17 +443,6 @@ var _ = Describe("unset-label command", func() {
 				Expect(executeErr).To(MatchError("api call failed"))
 			})
 		})
-
-		When("getting the user fails", func() {
-			BeforeEach(func() {
-				fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-				cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
-			})
-
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError("could not get user"))
-			})
-		})
 	})
 
 	When("unsetting labels on orgs", func() {
@@ -555,17 +515,6 @@ var _ = Describe("unset-label command", func() {
 							Expect(labelsMap).To(Equal(expectedMap))
 						})
 					})
-				})
-			})
-
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
-				})
-
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("could not get user"))
 				})
 			})
 		})
@@ -654,6 +603,91 @@ var _ = Describe("unset-label command", func() {
 		})
 	})
 
+	When("unsetting labels on service-broker", func() {
+		expectedServiceBrokerName := "my-broker"
+		BeforeEach(func() {
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
+				ResourceType: "service-broker",
+			}
+
+			cmd.RequiredArgs.ResourceName = expectedServiceBrokerName
+
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("checks that the user is logged in", func() {
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(checkOrg).To(BeFalse())
+			Expect(checkSpace).To(BeFalse())
+		})
+
+		It("informs the user that labels are being removed", func() {
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-broker %s as some-user...`), expectedServiceBrokerName))
+		})
+
+		When("updating the service-broker labels succeeds", func() {
+			var expectedMap map[string]types.NullString
+
+			BeforeEach(func() {
+				fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+					nil)
+				expectedMap = map[string]types.NullString{
+					"some-label":     types.NewNullString(),
+					"some-other-key": types.NewNullString()}
+			})
+
+			It("prints all warnings and does not return an error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("passes the correct parameters into the actor", func() {
+				Expect(fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameCallCount()).To(Equal(1))
+				serviceBrokerName, labelsMap := fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameArgsForCall(0)
+				Expect(serviceBrokerName).To(Equal(expectedServiceBrokerName))
+				Expect(labelsMap).To(Equal(expectedMap))
+			})
+
+			When("the resource type argument is not lowercase", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs.ResourceType = "sErVice-BroKer"
+				})
+
+				It("passes the correct parameters into the actor", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameCallCount()).To(Equal(1))
+					serviceBrokerName, labelsMap := fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameArgsForCall(0)
+					Expect(serviceBrokerName).To(Equal(expectedServiceBrokerName))
+					Expect(labelsMap).To(Equal(expectedMap))
+				})
+			})
+		})
+
+		When("updating the service-broker labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"))
+			})
+
+			It("prints all warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
+			})
+		})
+	})
+
 	When("unsetting labels on spaces", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs = flag.UnsetLabelArgs{
@@ -674,16 +708,6 @@ var _ = Describe("unset-label command", func() {
 			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(checkOrg).To(BeTrue())
 			Expect(checkSpace).To(BeFalse())
-		})
-
-		When("checking the target fails", func() {
-			BeforeEach(func() {
-				fakeSharedActor.CheckTargetReturns(errors.New("Target not found"))
-			})
-
-			It("we expect an error to be returned", func() {
-				Expect(executeErr).To(MatchError("Target not found"))
-			})
 		})
 
 		When("checking the target succeeds", func() {
@@ -766,16 +790,6 @@ var _ = Describe("unset-label command", func() {
 					})
 				})
 			})
-			When("getting the user fails", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
-				})
-
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("could not get user"))
-				})
-			})
 		})
 	})
 
@@ -851,19 +865,18 @@ var _ = Describe("unset-label command", func() {
 						})
 					})
 				})
-
 			})
+		})
+	})
 
-			When("fetching the current user's name fails", func() {
-				BeforeEach(func() {
-					fakeConfig.CurrentUserNameReturns("", errors.New("could not get user"))
-					cmd.RequiredArgs.LabelKeys = []string{"some-label", "some-other-key"}
-				})
+	When("the resource type is invalid", func() {
+		It("fails", func() {
+			cmd.RequiredArgs = flag.UnsetLabelArgs{
+				ResourceType: "invalid",
+			}
 
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("could not get user"))
-				})
-			})
+			err := cmd.Execute(nil)
+			Expect(err).To(MatchError("Unsupported resource type of 'invalid'"))
 		})
 	})
 
