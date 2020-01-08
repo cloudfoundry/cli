@@ -18,22 +18,22 @@ func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 }
 
 func (actor Actor) GetServiceBrokerByName(serviceBrokerName string) (ServiceBroker, Warnings, error) {
-	serviceBrokers, warnings, err := actor.GetServiceBrokers()
-
+	query := []ccv3.Query{
+		{
+			Key:    ccv3.NameFilter,
+			Values: []string{serviceBrokerName},
+		},
+	}
+	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers(query...)
 	if err != nil {
-		return ServiceBroker{}, warnings, err
+		return ServiceBroker{}, Warnings(warnings), err
 	}
 
 	if len(serviceBrokers) == 0 {
-		return ServiceBroker{}, warnings, actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
+		return ServiceBroker{}, Warnings(warnings), actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
 	}
 
-	for _, serviceBroker := range serviceBrokers {
-		if serviceBroker.Name == serviceBrokerName {
-			return serviceBroker, warnings, nil
-		}
-	}
-	return ServiceBroker{}, warnings, actionerror.ServiceBrokerNotFoundError{Name: serviceBrokerName}
+	return serviceBrokers[0], Warnings(warnings), nil
 }
 
 func (actor Actor) CreateServiceBroker(model ServiceBrokerModel) (Warnings, error) {
