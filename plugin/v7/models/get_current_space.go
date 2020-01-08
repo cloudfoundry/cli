@@ -3,7 +3,13 @@
 package models
 
 // Space represents a Cloud Controller V3 Space.
-type Space struct {
+type CurrentSpace struct {
 	Name string
 	GUID string
+}
+
+type Space struct {
+	Name     string
+	GUID     string
+	Metadata Metadata
 }

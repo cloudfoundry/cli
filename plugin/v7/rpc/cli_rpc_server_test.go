@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -431,6 +432,86 @@ var _ = Describe("Server", func() {
 			})
 		})
 
+		Describe("GetSpace", func() {
+			var (
+				labels   map[string]types.NullString
+				metadata ccv3.Metadata
+				space    v7action.Space
+			)
+
+			BeforeEach(func() {
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+					Name: "im-an-org-name",
+					GUID: "and-im-an-org-guid",
+				})
+
+				labels = map[string]types.NullString{
+					"k1": types.NewNullString("v1"),
+					"k2": types.NewNullString("v2"),
+				}
+
+				metadata = ccv3.Metadata{
+					Labels: labels,
+				}
+
+				space = v7action.Space{
+					Name:     "space-name",
+					GUID:     "space-guid",
+					Metadata: &metadata,
+				}
+
+				fakePluginActor.GetSpaceByNameAndOrganizationReturns(space, v7action.Warnings{}, nil)
+			})
+
+			It("retrieves the space", func() {
+				result := plugin_models.Space{}
+				err := client.Call("CliRpcCmd.GetSpace", "space-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(1))
+				actualSpaceName, actualOrgGUID := fakePluginActor.GetSpaceByNameAndOrganizationArgsForCall(0)
+				Expect(actualSpaceName).To(Equal(space.Name))
+				Expect(actualOrgGUID).To(Equal("and-im-an-org-guid"))
+			})
+
+			It("populates the plugin model with the retrieved space information", func() {
+				result := plugin_models.Space{}
+				err := client.Call("CliRpcCmd.GetSpace", "space-name", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(result.Name).To(Equal(space.Name))
+				Expect(result.GUID).To(Equal(space.GUID))
+				Expect(result.Metadata).ToNot(BeNil())
+				Expect(result.Metadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			Context("when retrieving the space fails", func() {
+				BeforeEach(func() {
+					fakePluginActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, v7action.Warnings{}, errors.New("space-error"))
+				})
+
+				It("returns an error", func() {
+					result := plugin_models.Space{}
+					err := client.Call("CliRpcCmd.GetSpace", "space-name", &result)
+					Expect(err).To(MatchError("space-error"))
+				})
+			})
+
+			Context("when no org is targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+						Name: "",
+						GUID: "",
+					})
+				})
+				It("complains that no org is targeted", func() {
+					result := plugin_models.Space{}
+					err := client.Call("CliRpcCmd.GetSpace", "space-name", &result)
+					Expect(err).To(MatchError("no organization targeted"))
+				})
+			})
+		})
+
 		Describe("GetCurrentSpace", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetedSpaceReturns(configv3.Space{
@@ -449,13 +530,8 @@ var _ = Describe("Server", func() {
 			})
 
 			It("populates the plugin Space object with the current space settings in config", func() {
-				var space plugin_models.Space
-				err = client.Call("CliRpcCmd.GetCurrentSpace", "", &space)
-
-				Expect(err).ToNot(HaveOccurred())
-
-				result := plugin_models.DetailedApplicationSummary{}
-				err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
+				result := plugin_models.CurrentSpace{}
+				err := client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakePluginActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(1))
@@ -463,8 +539,8 @@ var _ = Describe("Server", func() {
 				Expect(spaceName).To(Equal("the-charlatans"))
 				Expect(orgGUID).To(Equal("family"))
 
-				Expect(space.Name).To(Equal("the-charlatans"))
-				Expect(space.GUID).To(Equal("united-travel-service"))
+				Expect(result.Name).To(Equal("the-charlatans"))
+				Expect(result.GUID).To(Equal("united-travel-service"))
 			})
 
 			Context("when retrieving the current space fails", func() {
@@ -473,7 +549,7 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns an error", func() {
-					result := plugin_models.DetailedApplicationSummary{}
+					result := plugin_models.CurrentSpace{}
 					err := client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 					Expect(err).To(MatchError("some-error"))
 				})

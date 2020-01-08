@@ -108,6 +108,42 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("GetSpace", func() {
+		var orgName string
+		var spaceName string
+		var spaceGUID string
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.CreateOrgAndSpace(orgName, spaceName)
+			helpers.TargetOrg(orgName)
+			spaceGUID = helpers.GetSpaceGUID(spaceName)
+		})
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
+		It("gets the space information", func() {
+			confirmTestPluginOutputWithArg("GetSpace", spaceName, spaceGUID)
+		})
+
+		When("the space has metadata", func() {
+			BeforeEach(func() {
+				Eventually(helpers.CF("set-label", "space", spaceName, "spaceType=production")).Should(Exit(0))
+			})
+			It("Displays the metadata correctly", func() {
+				confirmTestPluginOutputWithArg("GetSpace", spaceName, "spaceType", "production")
+			})
+		})
+
+		When("the space does not exist", func() {
+			It("Displays a useful error message", func() {
+				confirmTestPluginOutputWithArg("GetSpace", "blahblahblah", "Error GetSpace: Space 'blahblahblah' not found")
+			})
+		})
+	})
+
 	Describe("GetCurrentSpace", func() {
 		It("gets the current targeted Space", func() {
 			_, space := createTargetedOrgAndSpace()

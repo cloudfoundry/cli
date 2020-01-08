@@ -72,8 +72,8 @@ func (c *cliConnection) GetCurrentOrg() (plugin_models.Org, error) {
 	return result, err
 }
 
-func (c *cliConnection) GetCurrentSpace() (plugin_models.Space, error) {
-	var result plugin_models.Space
+func (c *cliConnection) GetCurrentSpace() (plugin_models.CurrentSpace, error) {
+	var result plugin_models.CurrentSpace
 
 	err := c.withClientDo(func(client *rpc.Client) error {
 		return client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
@@ -87,6 +87,16 @@ func (c *cliConnection) GetOrg(orgName string) (plugin_models.OrgSummary, error)
 
 	err := c.withClientDo(func(client *rpc.Client) error {
 		return client.Call("CliRpcCmd.GetOrg", orgName, &result)
+	})
+
+	return result, err
+}
+
+func (c *cliConnection) GetSpace(spaceName string) (plugin_models.Space, error) {
+	var result plugin_models.Space
+
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.GetSpace", spaceName, &result)
 	})
 
 	return result, err

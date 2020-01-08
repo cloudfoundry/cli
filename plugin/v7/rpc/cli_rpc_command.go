@@ -233,6 +233,33 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.OrgSummary) e
 	return nil
 }
 
+func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.Space) error {
+	orgGUID := cmd.Config.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return errors.New("no organization targeted")
+	}
+	space, _, err := cmd.PluginActor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	if err != nil {
+		return err
+	}
+
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(space)
+	if err != nil {
+		panic(err)
+	}
+
+	err = dec.Decode(retVal)
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
 func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
 	*retVal = cmd.Config.AccessToken() != ""
 	return nil

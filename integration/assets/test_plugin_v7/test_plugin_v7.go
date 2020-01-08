@@ -70,6 +70,13 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		} else {
 			fmt.Printf("Done GetOrg: name: %s, guid: %s, everything: %+v\n", result.Name, result.GUID, result)
 		}
+	case "GetSpace":
+		result, err := cliConnection.GetSpace(args[1])
+		if err != nil {
+			fmt.Printf("Error %s: %s\n", commandName, err)
+		} else {
+			fmt.Printf("Done GetSpace: name: %s, guid: %s, everything: %+v\n", result.Name, result.GUID, result)
+		}
 	case "IsLoggedIn":
 		result, err := cliConnection.IsLoggedIn()
 		if err != nil {
@@ -118,6 +125,7 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{Name: "GetCurrentOrg"},
 			{Name: "GetCurrentSpace"},
 			{Name: "GetOrg"},
+			{Name: "GetSpace"},
 			{Name: "IsLoggedIn"},
 			{Name: "IsSkipSSLValidation"},
 			{Name: "Username"},
