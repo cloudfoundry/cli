@@ -263,6 +263,8 @@ var _ = Describe("Server", func() {
 				}
 				fakePluginActor.GetDetailedAppSummaryReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
 
+				fakeConfig.HasTargetedOrganizationReturns(true)
+
 				fakeConfig.TargetedSpaceReturns(configv3.Space{
 					Name: "some-space",
 					GUID: "some-space-guid",
@@ -299,6 +301,31 @@ var _ = Describe("Server", func() {
 					result := plugin_models.DetailedApplicationSummary{}
 					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
 					Expect(err).To(MatchError("some-error"))
+				})
+			})
+
+			Context("when no org is targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.HasTargetedOrganizationReturns(false)
+				})
+				It("complains that no org is targeted", func() {
+					result := plugin_models.DetailedApplicationSummary{}
+					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
+					Expect(err).To(MatchError("no organization targeted"))
+				})
+			})
+
+			Context("when no space is targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.TargetedSpaceReturns(configv3.Space{
+						Name: "",
+						GUID: "",
+					})
+				})
+				It("complains that no space is targeted", func() {
+					result := plugin_models.DetailedApplicationSummary{}
+					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
+					Expect(err).To(MatchError("no space targeted"))
 				})
 			})
 		})

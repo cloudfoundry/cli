@@ -79,7 +79,14 @@ func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedApplicationSummary) error {
+	if !cmd.Config.HasTargetedOrganization() {
+		return errors.New("no organization targeted")
+	}
 	spaceGUID := cmd.Config.TargetedSpace().GUID
+	if spaceGUID == "" {
+		return errors.New("no space targeted")
+	}
+
 	app, _, err := cmd.PluginActor.GetDetailedAppSummary(appName, spaceGUID, true)
 
 	if err != nil {
