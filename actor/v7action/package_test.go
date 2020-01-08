@@ -185,7 +185,7 @@ var _ = Describe("Package Actions", func() {
 					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
 						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"my-app-guid"}},
 						ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"READY"}},
-						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"updated_at"}},
+						ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-updated_at"}},
 					))
 
 					Expect(err).ToNot(HaveOccurred())
