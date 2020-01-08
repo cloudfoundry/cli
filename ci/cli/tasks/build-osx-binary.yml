@@ -21,7 +21,6 @@ run:
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
     export TARGET_GO_VERSION=${TARGET_GO_VERSION:-"UNSET"}
-    export GODEBUG="tls13=0"
 
     if go version | grep -v "\b$TARGET_GO_VERSION\b"; then
       echo "ERROR: expected target go version [ $TARGET_GO_VERSION ]"
