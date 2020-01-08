@@ -97,7 +97,7 @@ var _ = Describe("delete-service-broker Command", func() {
 			It("deletes the service broker", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say(`Deleting service-broker %s...`, serviceBrokerName))
+				Expect(testUI.Out).To(Say(`Deleting service broker %s...`, serviceBrokerName))
 				Expect(testUI.Err).To(Say("get-broker-by-name-warning"))
 				Expect(testUI.Err).To(Say("delete-broker-warning"))
 				Expect(testUI.Out).To(Say("OK"))
@@ -142,9 +142,9 @@ var _ = Describe("delete-service-broker Command", func() {
 			It("asks the user again", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(testUI.Out).To(Say(`Really delete the service\-broker some\-service\-broker\? \[yN\]`))
+				Expect(testUI.Out).To(Say(`Really delete the service broker some\-service\-broker\? \[yN\]`))
 				Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
-				Expect(testUI.Out).To(Say(`Really delete the service\-broker some\-service\-broker\? \[yN\]`))
+				Expect(testUI.Out).To(Say(`Really delete the service broker some\-service\-broker\? \[yN\]`))
 				Expect(fakeActor.DeleteServiceBrokerCallCount()).To(Equal(0))
 			})
 		})
@@ -163,7 +163,7 @@ var _ = Describe("delete-service-broker Command", func() {
 
 				It("displays all warnings, and returns the error", func() {
 					Expect(testUI.Err).To(Say("some-warning"))
-					Expect(testUI.Out).To(Say(`Deleting service\-broker some\-service\-broker\.\.\.`))
+					Expect(testUI.Out).To(Say(`Deleting service broker some\-service\-broker\.\.\.`))
 					Expect(testUI.Out).ToNot(Say("OK"))
 					Expect(executeErr).To(MatchError("some-error"))
 				})
@@ -184,7 +184,7 @@ var _ = Describe("delete-service-broker Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Deleting service-broker %s...`, serviceBrokerName))
+				Expect(testUI.Out).To(Say(`Deleting service broker %s...`, serviceBrokerName))
 				Expect(testUI.Out).To(Say(`Service broker '%s' does not exist.`, serviceBrokerName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -199,7 +199,7 @@ var _ = Describe("delete-service-broker Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Deleting service-broker %s...`, serviceBrokerName))
+				Expect(testUI.Out).To(Say(`Deleting service broker %s...`, serviceBrokerName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})

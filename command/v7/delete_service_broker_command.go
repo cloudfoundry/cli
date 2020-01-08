@@ -51,7 +51,7 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 
 	serviceBrokerName := cmd.RequiredArgs.ServiceBroker
 	if !cmd.Force {
-		confirmed, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the service-broker {{.ServiceBroker}}?", map[string]interface{}{
+		confirmed, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the service broker {{.ServiceBroker}}?", map[string]interface{}{
 			"ServiceBroker": serviceBrokerName,
 		})
 
@@ -67,7 +67,7 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting service-broker {{.ServiceBroker}}...",
+	cmd.UI.DisplayTextWithFlavor("Deleting service broker {{.ServiceBroker}}...",
 		map[string]interface{}{
 			"ServiceBroker": serviceBrokerName,
 		})
@@ -77,8 +77,6 @@ func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.ServiceBrokerNotFoundError); ok {
-			// TODO: Verify the correct error message to display for idempotent case
-			//cmd.UI.DisplayText(`Unable to delete. ` + err.Error())
 			cmd.UI.DisplayText("Service broker '{{.ServiceBroker}}' does not exist.", map[string]interface{}{
 				"ServiceBroker": serviceBrokerName,
 			})
