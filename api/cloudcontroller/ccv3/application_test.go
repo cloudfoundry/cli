@@ -216,7 +216,7 @@ var _ = Describe("Application", func() {
 				})
 			})
 
-			When("Labels are provided", func() {
+			When("labels are provided", func() {
 				BeforeEach(func() {
 					appBytes = []byte(`{"metadata":{"labels":{"some-key":"some-value"}}}`)
 				})

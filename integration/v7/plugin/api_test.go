@@ -97,7 +97,7 @@ var _ = Describe("plugin API", func() {
 				Eventually(helpers.CF("set-label", "org", orgName, "orgType=production")).Should(Exit(0))
 			})
 			It("Displays the metadata correctly", func() {
-				confirmTestPluginOutputWithArg("GetOrg", orgName, regexp.QuoteMeta("Labels:map[orgType:{Value:production"))
+				confirmTestPluginOutputWithArg("GetOrg", orgName, regexp.QuoteMeta("labels:map[orgType:{Value:production"))
 			})
 		})
 
