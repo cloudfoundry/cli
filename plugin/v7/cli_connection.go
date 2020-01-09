@@ -102,6 +102,15 @@ func (c *cliConnection) GetSpace(spaceName string) (plugin_models.Space, error) 
 	return result, err
 }
 
+func (c *cliConnection) GetSpaces() ([]plugin_models.Space, error) {
+	var result []plugin_models.Space
+
+	err := c.withClientDo(func(client *rpc.Client) error {
+		return client.Call("CliRpcCmd.GetSpaces", "", &result)
+	})
+	return result, err
+}
+
 func (c *cliConnection) IsLoggedIn() (bool, error) {
 	var result bool
 	err := c.withClientDo(func(client *rpc.Client) error {

@@ -539,6 +539,110 @@ var _ = Describe("Server", func() {
 			})
 		})
 
+		Describe("GetSpaces", func() {
+			var (
+				space1    v7action.Space
+				space2    v7action.Space
+				spaces    []v7action.Space
+				labels1   map[string]types.NullString
+				metadata1 ccv3.Metadata
+				labels2   map[string]types.NullString
+				metadata2 ccv3.Metadata
+			)
+
+			BeforeEach(func() {
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+					Name: "im-an-org-name",
+					GUID: "and-im-an-org-guid",
+				})
+
+				labels1 = map[string]types.NullString{
+					"k1": types.NewNullString("v1"),
+					"k2": types.NewNullString("v2"),
+				}
+
+				metadata1 = ccv3.Metadata{
+					Labels: labels1,
+				}
+
+				space1 = v7action.Space{
+					Name:     "space1-name",
+					GUID:     "space1-guid",
+					Metadata: &metadata1,
+				}
+
+				labels2 = map[string]types.NullString{
+					"b1": types.NewNullString("c1"),
+					"b2": types.NewNullString("c2"),
+				}
+
+				metadata2 = ccv3.Metadata{
+					Labels: labels2,
+				}
+
+				space2 = v7action.Space{
+					Name:     "space2-name",
+					GUID:     "space2-guid",
+					Metadata: &metadata2,
+				}
+				spaces = []v7action.Space{space1, space2}
+
+				fakePluginActor.GetOrganizationSpacesReturns(spaces, v7action.Warnings{}, nil)
+			})
+
+			It("retrieves the spaces", func() {
+				result := []plugin_models.Space{}
+				err := client.Call("CliRpcCmd.GetSpaces", "", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginActor.GetOrganizationSpacesCallCount()).To(Equal(1))
+				actualOrgGUID := fakePluginActor.GetOrganizationSpacesArgsForCall(0)
+				Expect(actualOrgGUID).To(Equal("and-im-an-org-guid"))
+			})
+
+			It("populates the plugin model with the retrieved space information", func() {
+				result := []plugin_models.Space{}
+				err := client.Call("CliRpcCmd.GetSpaces", "", &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(len(result)).To(Equal(2))
+				Expect(result[0].Name).To(Equal(space1.Name))
+				Expect(result[0].GUID).To(Equal(space1.GUID))
+				Expect(result[0].Metadata).ToNot(BeNil())
+				Expect(result[0].Metadata.Labels).To(BeEquivalentTo(labels1))
+				Expect(result[1].Name).To(Equal(space2.Name))
+				Expect(result[1].GUID).To(Equal(space2.GUID))
+				Expect(result[1].Metadata).ToNot(BeNil())
+				Expect(result[1].Metadata.Labels).To(BeEquivalentTo(labels2))
+			})
+
+			Context("when retrieving the spaces fails", func() {
+				BeforeEach(func() {
+					fakePluginActor.GetOrganizationSpacesReturns([]v7action.Space{}, v7action.Warnings{}, errors.New("spaces-error"))
+				})
+
+				It("returns an error", func() {
+					result := []plugin_models.Space{}
+					err := client.Call("CliRpcCmd.GetSpaces", "", &result)
+					Expect(err).To(MatchError("spaces-error"))
+				})
+			})
+
+			Context("when no org is targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+						Name: "",
+						GUID: "",
+					})
+				})
+				It("complains that no org is targeted", func() {
+					result := []plugin_models.Space{}
+					err := client.Call("CliRpcCmd.GetSpaces", "", &result)
+					Expect(err).To(MatchError("no organization targeted"))
+				})
+			})
+		})
+
 		Describe("GetCurrentSpace", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetedSpaceReturns(configv3.Space{

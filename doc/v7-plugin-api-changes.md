@@ -394,6 +394,33 @@ V6: Returns empty string with no error
 
 V7: Returns empty string with error `not logged in`
 
+### GetSpaces
+#### Model Changes
+
+V6:
+```json
+[
+ {
+  Name: myspace
+  Guid: myguid
+ },...
+]
+```
+
+V7:
+```
+[
+ {
+  Name: myspace
+  GUID: myguid
+  Metadata: {
+     Labels: map[key:{Value: avalue}]
+  }
+ },...
+]
+```
+
+
 ### IsSSLDisabled (Renamed to IsSkipSSLValidation in V7)
 
 The only difference in this method is that it was renamed from the V6

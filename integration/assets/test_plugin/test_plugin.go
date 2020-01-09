@@ -90,7 +90,7 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Done GetSpace:", result)
 	case "GetSpaces":
 		result, _ := cliConnection.GetSpaces()
-		fmt.Println("Done GetSpaces:", result)
+		fmt.Printf("Done GetSpaces: %+v\n", result)
 	case "GetOrgUsers":
 		result, _ := cliConnection.GetOrgUsers(args[1], args[2:]...)
 		fmt.Println("Done GetOrgUsers:", result)

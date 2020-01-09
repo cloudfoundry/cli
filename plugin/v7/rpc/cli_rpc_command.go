@@ -267,6 +267,33 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.Space) er
 	return nil
 }
 
+func (cmd *CliRpcCmd) GetSpaces(not_used string, retVal *[]plugin_models.Space) error {
+	orgGUID := cmd.Config.TargetedOrganization().GUID
+	if orgGUID == "" {
+		return errors.New("no organization targeted")
+	}
+	spaces, _, err := cmd.PluginActor.GetOrganizationSpaces(orgGUID)
+	if err != nil {
+		return err
+	}
+
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	dec := gob.NewDecoder(&b)
+
+	err = enc.Encode(spaces)
+	if err != nil {
+		return err
+	}
+
+	err = dec.Decode(retVal)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
 	*retVal = cmd.Config.AccessToken() != ""
 	return nil

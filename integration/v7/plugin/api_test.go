@@ -144,6 +144,58 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("GetSpaces", func() {
+		var orgName string
+
+		BeforeEach(func() {
+			orgName = helpers.CreateAndTargetOrg()
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
+		Context("when there are no spaces", func() {
+			It("gets no spaces", func() {
+				confirmTestPluginOutputWithArg("GetSpaces", "No spaces found")
+			})
+		})
+
+		Context("when there are spaces", func() {
+			var spaceName string
+			var spaceGUID string
+			var spaceName2 string
+			var spaceGUID2 string
+
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				helpers.CreateSpace(spaceName)
+				spaceName2 = helpers.NewSpaceName()
+				helpers.CreateSpace(spaceName2)
+				spaceGUID = helpers.GetSpaceGUID(spaceName)
+				spaceGUID2 = helpers.GetSpaceGUID(spaceName2)
+			})
+
+			It("gets the spaces' information", func() {
+				// Results are in random order so make two separate calls
+				confirmTestPluginOutputWithArg("GetSpaces", spaceName, spaceGUID)
+				confirmTestPluginOutputWithArg("GetSpaces", spaceName2, spaceGUID2)
+			})
+
+			When("the spaces have metadata", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("set-label", "space", spaceName, "spaceType=production")).Should(Exit(0))
+					Eventually(helpers.CF("set-label", "space", spaceName2, "squadron=goose")).Should(Exit(0))
+				})
+				It("Displays the metadata", func() {
+					// Results are in random order so make two separate calls
+					confirmTestPluginOutputWithArg("GetSpaces", spaceName, "spaceType", "production")
+					confirmTestPluginOutputWithArg("GetSpaces", spaceName2, "squadron", "goose")
+				})
+			})
+		})
+	})
+
 	Describe("GetCurrentSpace", func() {
 		It("gets the current targeted Space", func() {
 			_, space := createTargetedOrgAndSpace()
