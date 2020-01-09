@@ -258,6 +258,7 @@ V7
      }
    ]
 }
+```
 
 ### GetSpace
 
@@ -267,6 +268,7 @@ User research we found no uses of this, we also added Metadata to the V7 object
 
 V6
 ```
+{
   Guid:a53cf02c-4d18-4955-b321-b8c45e33df1e Name:myspace 
   Organization:{Guid:2e2eb386-34a9-4b29-ad49-365a57bdca6c Name:tom}
   Applications:[{Name:pora Guid:d8e2ed07-804b-4ed1-b2e6-21953d13c0f7} {Name:zora Guid:85706f87-14b9-4e9b-b9eb-7f3aee2fe9a8}]
@@ -301,6 +303,7 @@ V6
    NonBasicServicesAllowed:false
    }
   }
+}
 ```
 V7
 
