@@ -134,7 +134,11 @@ Not targeted errors:
 
 cf6: `No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space`
 
-cf7: `Application 'APP' not found.`
+cf7:
+
+`No organization targeted.`
+
+`No space targeted`
 
 ### GetCurrentSpace
 

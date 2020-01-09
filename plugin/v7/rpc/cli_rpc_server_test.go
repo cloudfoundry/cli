@@ -330,6 +330,64 @@ var _ = Describe("Server", func() {
 			})
 		})
 
+		Describe("GetApps", func() {
+			Context("when a space is targeted", func() {
+				BeforeEach(func() {
+					appList := []v7action.Application{
+						v7action.Application{Name: "name1", GUID: "guid1"},
+						v7action.Application{Name: "name2", GUID: "guid2"},
+						v7action.Application{Name: "name3", GUID: "guid3"},
+					}
+					fakePluginActor.GetApplicationsBySpaceReturns(appList, v7action.Warnings{"warning-1", "warning-2"}, nil)
+
+					fakeConfig.HasTargetedOrganizationReturns(true)
+
+					fakeConfig.TargetedSpaceReturns(configv3.Space{
+						Name: "some-space",
+						GUID: "some-space-guid",
+					})
+
+				})
+
+				It("retrieves the app summary", func() {
+					result := []plugin_models.Application{}
+					err := client.Call("CliRpcCmd.GetApps", "", &result)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakePluginActor.GetApplicationsBySpaceCallCount()).To(Equal(1))
+					spaceGUID := fakePluginActor.GetApplicationsBySpaceArgsForCall(0)
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(len(result)).To(Equal(3))
+				})
+			})
+
+			Context("when no org is targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.HasTargetedOrganizationReturns(false)
+				})
+				It("complains that no org is targeted", func() {
+					result := plugin_models.DetailedApplicationSummary{}
+					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
+					Expect(err).To(MatchError("no organization targeted"))
+				})
+			})
+
+			Context("when no space is targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.HasTargetedOrganizationReturns(true)
+					fakeConfig.TargetedSpaceReturns(configv3.Space{
+						Name: "",
+						GUID: "",
+					})
+				})
+				It("complains that no space is targeted", func() {
+					result := plugin_models.DetailedApplicationSummary{}
+					err := client.Call("CliRpcCmd.GetApp", "some-app", &result)
+					Expect(err).To(MatchError("no space targeted"))
+				})
+			})
+		})
+
 		Describe("GetOrg", func() {
 			var (
 				labels   map[string]types.NullString
