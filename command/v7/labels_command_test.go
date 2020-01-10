@@ -906,6 +906,27 @@ var _ = Describe("labels command", func() {
 				})
 			})
 		})
+
+		FDescribe("for service-brokers", func() {
+			When("Service broker does not exist", func() {
+				BeforeEach(func() {
+					fakeConfig.CurrentUserNameReturns("some-user", nil)
+					//fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org", GUID: "some-org-guid"})
+					cmd.RequiredArgs = flag.LabelsArgs{
+						ResourceType: "service-broker",
+						ResourceName: "non-existent-broker",
+					}
+					fakeLabelsActor.GetServiceBrokerLabelsReturns(
+						nil,
+						v7action.Warnings{},
+						errors.New("service broker does not exist"))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("service broker does not exist"))
+				})
+			})
+		})
 	})
 
 	Describe("disallowed --stack option", func() {

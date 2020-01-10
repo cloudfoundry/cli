@@ -39,12 +39,13 @@ type LabelsActor interface {
 	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 	GetStackLabels(stackName string) (map[string]types.NullString, v7action.Warnings, error)
+	GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
 }
 
 type LabelsCommand struct {
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   space\n   stack"`
+	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   space\n   stack"`
 	relatedCommands interface{}     `related_commands:"set-label, unset-label"`
 	UI              command.UI
 	Config          command.Config
@@ -90,6 +91,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchOrgLabels(username)
 	case Route:
 		labels, warnings, err = cmd.fetchRouteLabels(username)
+	case ServiceBroker:
+		_, _, err = cmd.fetchServiceBrokerLabels(username)
 	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
 	case Stack:
@@ -170,6 +173,11 @@ func (cmd LabelsCommand) fetchRouteLabels(username string) (map[string]types.Nul
 	cmd.UI.DisplayNewline()
 
 	return cmd.Actor.GetRouteLabels(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
+}
+
+func (cmd LabelsCommand) fetchServiceBrokerLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	_, _, err := cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
+	return map[string]types.NullString{}, nil, err
 }
 
 func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {

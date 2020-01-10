@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("labels command", func() {
+var _ = FDescribe("labels command", func() {
 	When("--help flag is set", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -38,6 +38,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+route`))
+			Eventually(session).Should(Say(`\s+service-broker`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("OPTIONS:"))
@@ -558,6 +559,33 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("labels", "space", "non-existent-space")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), "non-existent-space", orgName, username))
 					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		FDescribe("service-broker labels", func() {
+			BeforeEach(func() {
+				helpers.LoginCF()
+				//helpers.SetupCF(orgName, spaceName)
+			})
+
+			AfterEach(func() {
+				//helpers.QuickDeleteOrg(orgName)
+			})
+
+			PWhen("there are labels set on the service broker", func() {})
+
+			PWhen("there are no labels set on the service broker", func() {
+
+			})
+
+			When("the service broker does not exist", func() {
+				FIt("displays an error", func() {
+					session := helpers.CF("labels", "service-brokers", "non-existent-broker")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), "non-existent-space", username))
+					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
