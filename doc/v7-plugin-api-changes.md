@@ -309,31 +309,15 @@ V7
 
 ```
 {
-   Space: {
-     Name: myspace GUID: 1a873322-a1cb-47aa-ad81-5b7460941910
-   }
-   Org: {
-     Name: toim GUID: 3a873322-a1cb-47aa-ad81-5b7460941910
-   }
+   Name: myspace 
+   GUID: 1a873322-a1cb-47aa-ad81-5b7460941910
    Metadata: {
      Labels: map[
-        label: { Value: test IsSet: true }
-        fun: { Value: true IsSet: true }
+        key1: { Value: value1 IsSet: true }
+        key2: { Value: value2 IsSet: true }
       ]
    }
-   Apps: [
-     {
-       Name: shmora GUID: 00954f6d-fd0f-47f7-80e8-a597a47df9df
-     }
-   ]
-   Domains: [
-     {
-       Name: frost-dagger.lite.cli.fun
-       GUID: e672e331-def1-418b-ad4c-428177de353d
-     }
-   ]
 }
-
 ```
 
 ### GetApps
