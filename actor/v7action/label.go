@@ -26,7 +26,8 @@ func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[stri
 }
 
 func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
-	panic("implement me")
+	_, _, err := actor.GetServiceBrokerByName(serviceBrokerName)
+	return nil, nil, err
 }
 
 func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, Warnings, error) {

@@ -5,8 +5,8 @@ import (
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -566,25 +566,37 @@ var _ = FDescribe("labels command", func() {
 		})
 
 		FDescribe("service-broker labels", func() {
+			var broker *fakeservicebroker.FakeServiceBroker
+
 			BeforeEach(func() {
 				helpers.LoginCF()
-				//helpers.SetupCF(orgName, spaceName)
+
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
 			})
 
 			AfterEach(func() {
-				//helpers.QuickDeleteOrg(orgName)
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			PWhen("there are labels set on the service broker", func() {})
 
-			PWhen("there are no labels set on the service broker", func() {
-
+			When("there are no labels set on the service broker", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "service-broker", broker.Name())
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s..."), broker.Name(), username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Eventually(session).Should(Say("No labels found."))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 
 			When("the service broker does not exist", func() {
-				FIt("displays an error", func() {
-					session := helpers.CF("labels", "service-brokers", "non-existent-broker")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), "non-existent-space", username))
+				It("displays an error", func() {
+					session := helpers.CF("labels", "service-broker", "non-existent-broker")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s..."), "non-existent-broker", username))
 					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))

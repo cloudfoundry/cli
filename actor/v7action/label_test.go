@@ -885,4 +885,26 @@ var _ = Describe("labels", func() {
 			})
 		})
 	})
+
+	FContext("GetServiceBrokerLabels", func() {
+		When("service broker does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ccv3.ServiceBroker{},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServiceBrokerLabels(resourceName)
+			})
+
+			It("returns a service broker not found error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				//Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(executeErr.Error()).To(ContainSubstring("Service broker 'some-resource' not found"))
+			})
+		})
+	})
 })

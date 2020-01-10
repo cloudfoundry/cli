@@ -925,6 +925,10 @@ var _ = Describe("labels command", func() {
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("service broker does not exist"))
 				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-broker non-existent-broker as some-user...`)))
+				})
 			})
 		})
 	})

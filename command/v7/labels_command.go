@@ -176,6 +176,10 @@ func (cmd LabelsCommand) fetchRouteLabels(username string) (map[string]types.Nul
 }
 
 func (cmd LabelsCommand) fetchServiceBrokerLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	cmd.UI.DisplayTextWithFlavor("Getting labels for service-broker {{.ServiceBrokerName}} as {{.Username}}...", map[string]interface{}{
+		"ServiceBrokerName": cmd.RequiredArgs.ResourceName,
+		"Username":          username,
+	})
 	_, _, err := cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
 	return map[string]types.NullString{}, nil, err
 }
@@ -185,7 +189,6 @@ func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.Nul
 	if err != nil {
 		return nil, nil, err
 	}
-
 	cmd.UI.DisplayTextWithFlavor("Getting labels for space {{.SpaceName}} in org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
 		"SpaceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
