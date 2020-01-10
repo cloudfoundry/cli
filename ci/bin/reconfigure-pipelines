@@ -87,11 +87,6 @@ configure_infrastructure_pipeline inf-tropisueno tropisueno-pipeline baked-potat
 arsicault_pipeline="bosh int $pipelines_path/infrastructure/pipeline.yml -o $pipelines_path/infrastructure/add-pm-alert-and-wait.yml"
 configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato <(eval $arsicault_pipeline)
 
-# Lola (legacy pipeline) uses a different base pipeline configuration than the other infrastructures.
-lola_pipeline=$pipelines_path/infrastructure/lola-pipeline.yml
-configure_infrastructure_pipeline inf-lola lola-pipeline kloesse $lola_pipeline
-configure_infrastructure_pipeline inf-chipotle chipotle-pipeline kloesse $lola_pipeline
-
 legacy_pipeline=$pipelines_path/infrastructure/legacy-pipeline.yml
 configure_infrastructure_pipeline inf-aster aster-pipeline kloesse $legacy_pipeline
 configure_infrastructure_pipeline inf-solstice solstice-pipeline kloesse $legacy_pipeline
