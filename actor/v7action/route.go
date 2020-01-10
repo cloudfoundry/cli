@@ -19,15 +19,16 @@ type RouteDestination struct {
 type RouteDestinationApp ccv3.RouteDestinationApp
 
 type Route struct {
-	GUID       string
-	SpaceGUID  string
-	DomainGUID string
-	Host       string
-	Path       string
-	DomainName string
-	SpaceName  string
-	URL        string
-	Metadata   *Metadata
+	GUID         string
+	SpaceGUID    string
+	DomainGUID   string
+	Host         string
+	Path         string
+	DomainName   string
+	SpaceName    string
+	URL          string
+	Destinations []RouteDestination
+	Metadata     *Metadata
 }
 
 type RouteSummary struct {
@@ -224,13 +225,7 @@ func (actor Actor) GetRouteSummaries(routes []Route) ([]RouteSummary, Warnings, 
 	var uniqueAppGUIDs []string
 
 	for _, route := range routes {
-		destinations, warnings, err := actor.GetRouteDestinations(route.GUID)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return nil, allWarnings, err
-		}
-
-		for _, destination := range destinations {
+		for _, destination := range route.Destinations {
 			appGUID := destination.App.GUID
 
 			if _, ok := destinationAppGUIDs[appGUID]; !ok {
@@ -419,20 +414,31 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 
 	actorRoutes := []Route{}
 	for _, route := range routes {
-		actorRoute := Route{
-			GUID:       route.GUID,
-			Host:       route.Host,
-			Path:       route.Path,
-			SpaceGUID:  route.SpaceGUID,
-			DomainGUID: route.DomainGUID,
-			URL:        route.URL,
-			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
-			DomainName: getDomainName(route.URL, route.Host, route.Path),
+		destinations := make([]RouteDestination, len(route.Destinations))
+		for i, destination := range route.Destinations {
+			destinations[i] = RouteDestination{
+				GUID: destination.GUID,
+				App:  RouteDestinationApp(destination.App),
+			}
 		}
+
+		actorRoute := Route{
+			GUID:         route.GUID,
+			Host:         route.Host,
+			Path:         route.Path,
+			SpaceGUID:    route.SpaceGUID,
+			DomainGUID:   route.DomainGUID,
+			URL:          route.URL,
+			SpaceName:    spacesByGUID[route.SpaceGUID].Name,
+			DomainName:   getDomainName(route.URL, route.Host, route.Path),
+			Destinations: destinations,
+		}
+
 		if route.Metadata != nil {
 			metadata := Metadata(*route.Metadata)
 			actorRoute.Metadata = &metadata
 		}
+
 		actorRoutes = append(actorRoutes, actorRoute)
 	}
 
