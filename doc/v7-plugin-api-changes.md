@@ -263,8 +263,7 @@ V7
 ### GetSpace
 
 #### Model changes
-The main difference here is the removal of Quota information from GetOrg, in our
-User research we found no uses of this, we also added Metadata to the V7 object
+The main difference is that the V7 plugin will return only the space name and GUID, as well as its Metadata (currently existing uses of the V6 plugin are only using the `Guid` field).
 
 V6
 ```
