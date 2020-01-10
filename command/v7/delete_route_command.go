@@ -61,7 +61,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 	fqdn := desiredFQDN(domain, hostname, pathName)
 
 	cmd.UI.DisplayText("This action impacts all apps using this route.")
-	cmd.UI.DisplayText("Deleting the route will remove associated apps which will make apps with this route unreachable.")
+	cmd.UI.DisplayText("Deleting this route will make apps unreachable via this route.")
 
 	if !cmd.Force {
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the route {{.FQDN}}?", map[string]interface{}{

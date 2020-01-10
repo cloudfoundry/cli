@@ -101,7 +101,7 @@ var _ = Describe("delete-route command", func() {
 					It("it asks for confirmation and deletes the domain", func() {
 						session := helpers.CFWithStdin(buffer, "delete-route", domainName)
 						Eventually(session).Should(Say("This action impacts all apps using this route."))
-						Eventually(session).Should(Say("Deleting the route will remove associated apps which will make apps with this route unreachable."))
+						Eventually(session).Should(Say("Deleting this route will make apps unreachable via this route."))
 						Eventually(session).Should(Say(`Really delete the route %s\?`, domainName))
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting route %s...`), domainName))
 						Eventually(session).Should(Say("OK"))
@@ -121,7 +121,7 @@ var _ = Describe("delete-route command", func() {
 				It("it asks for confirmation and does not delete the domain", func() {
 					session := helpers.CFWithStdin(buffer, "delete-route", domainName)
 					Eventually(session).Should(Say("This action impacts all apps using this route."))
-					Eventually(session).Should(Say("Deleting the route will remove associated apps which will make apps with this route unreachable."))
+					Eventually(session).Should(Say("Deleting this route will make apps unreachable via this route."))
 					Eventually(session).Should(Say(`Really delete the route %s\?`, domainName))
 					Eventually(session).Should(Say(`'%s' has not been deleted`, domainName))
 					Consistently(session).ShouldNot(Say("OK"))
