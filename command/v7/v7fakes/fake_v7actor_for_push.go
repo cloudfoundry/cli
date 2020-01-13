@@ -5,6 +5,7 @@ import (
 	"context"
 	"sync"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
@@ -43,22 +44,22 @@ type FakeV7ActorForPush struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetStreamingLogsForApplicationByNameAndSpaceStub        func(string, string, v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpaceStub        func(string, string, sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
 	getStreamingLogsForApplicationByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.LogCacheClient
+		arg3 sharedaction.LogCacheClient
 	}
 	getStreamingLogsForApplicationByNameAndSpaceReturns struct {
-		result1 <-chan v7action.LogMessage
+		result1 <-chan sharedaction.LogMessage
 		result2 <-chan error
 		result3 context.CancelFunc
 		result4 v7action.Warnings
 		result5 error
 	}
 	getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 <-chan v7action.LogMessage
+		result1 <-chan sharedaction.LogMessage
 		result2 <-chan error
 		result3 context.CancelFunc
 		result4 v7action.Warnings
@@ -231,13 +232,13 @@ func (fake *FakeV7ActorForPush) GetDetailedAppSummaryReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpace(arg1 string, arg2 string, arg3 v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpace(arg1 string, arg2 string, arg3 sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)]
 	fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall = append(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 v7action.LogCacheClient
+		arg3 sharedaction.LogCacheClient
 	}{arg1, arg2, arg3})
 	fake.recordInvocation("GetStreamingLogsForApplicationByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
@@ -257,25 +258,25 @@ func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceCall
 	return len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceCalls(stub func(string, string, v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)) {
+func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceCalls(stub func(string, string, sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = stub
 }
 
-func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, v7action.LogCacheClient) {
+func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, sharedaction.LogCacheClient) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	argsForCall := fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceReturns(result1 <-chan v7action.LogMessage, result2 <-chan error, result3 context.CancelFunc, result4 v7action.Warnings, result5 error) {
+func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceReturns(result1 <-chan sharedaction.LogMessage, result2 <-chan error, result3 context.CancelFunc, result4 v7action.Warnings, result5 error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = nil
 	fake.getStreamingLogsForApplicationByNameAndSpaceReturns = struct {
-		result1 <-chan v7action.LogMessage
+		result1 <-chan sharedaction.LogMessage
 		result2 <-chan error
 		result3 context.CancelFunc
 		result4 v7action.Warnings
@@ -283,13 +284,13 @@ func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceRetu
 	}{result1, result2, result3, result4, result5}
 }
 
-func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceReturnsOnCall(i int, result1 <-chan v7action.LogMessage, result2 <-chan error, result3 context.CancelFunc, result4 v7action.Warnings, result5 error) {
+func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceReturnsOnCall(i int, result1 <-chan sharedaction.LogMessage, result2 <-chan error, result3 context.CancelFunc, result4 v7action.Warnings, result5 error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetStreamingLogsForApplicationByNameAndSpaceStub = nil
 	if fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 <-chan v7action.LogMessage
+			result1 <-chan sharedaction.LogMessage
 			result2 <-chan error
 			result3 context.CancelFunc
 			result4 v7action.Warnings
@@ -297,7 +298,7 @@ func (fake *FakeV7ActorForPush) GetStreamingLogsForApplicationByNameAndSpaceRetu
 		})
 	}
 	fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 <-chan v7action.LogMessage
+		result1 <-chan sharedaction.LogMessage
 		result2 <-chan error
 		result3 context.CancelFunc
 		result4 v7action.Warnings

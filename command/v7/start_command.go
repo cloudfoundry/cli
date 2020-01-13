@@ -21,7 +21,7 @@ type StartActor interface {
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 }
 
@@ -34,7 +34,7 @@ type StartCommand struct {
 
 	UI             command.UI
 	Config         command.Config
-	LogCacheClient v7action.LogCacheClient
+	LogCacheClient sharedaction.LogCacheClient
 	SharedActor    command.SharedActor
 	Actor          StartActor
 }

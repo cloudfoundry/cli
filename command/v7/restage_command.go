@@ -17,7 +17,7 @@ import (
 //go:generate counterfeiter . RestageActor
 
 type RestageActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetNewestReadyPackageForApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
@@ -42,7 +42,7 @@ type RestageCommand struct {
 	UI             command.UI
 	Config         command.Config
 	SharedActor    command.SharedActor
-	LogCacheClient v7action.LogCacheClient
+	LogCacheClient sharedaction.LogCacheClient
 	Actor          RestageActor
 }
 

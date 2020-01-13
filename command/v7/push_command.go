@@ -44,7 +44,7 @@ type PushActor interface {
 type V7ActorForPush interface {
 	AppActor
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
@@ -93,7 +93,7 @@ type PushCommand struct {
 
 	Config          command.Config
 	UI              command.UI
-	LogCacheClient  v7action.LogCacheClient
+	LogCacheClient  sharedaction.LogCacheClient
 	Actor           PushActor
 	VersionActor    V7ActorForPush
 	SharedActor     command.SharedActor
@@ -587,7 +587,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 	return nil
 }
 
-func (cmd PushCommand) getLogs(logStream <-chan v7action.LogMessage, errStream <-chan error) {
+func (cmd PushCommand) getLogs(logStream <-chan sharedaction.LogMessage, errStream <-chan error) {
 	for {
 		select {
 		case logMessage, open := <-logStream:

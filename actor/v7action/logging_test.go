@@ -7,11 +7,13 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
 var _ = Describe("Logging Actions", func() {
@@ -19,12 +21,12 @@ var _ = Describe("Logging Actions", func() {
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 		fakeConfig                *v7actionfakes.FakeConfig
-		fakeLogCacheClient        *v7actionfakes.FakeLogCacheClient
+		fakeLogCacheClient        *sharedactionfakes.FakeLogCacheClient
 	)
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
-		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
+		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
 
@@ -139,7 +141,7 @@ var _ = Describe("Logging Actions", func() {
 			var (
 				expectedAppGUID string
 
-				messages      <-chan LogMessage
+				messages      <-chan sharedaction.LogMessage
 				logErrs       <-chan error
 				stopStreaming context.CancelFunc
 			)
@@ -209,7 +211,7 @@ var _ = Describe("Logging Actions", func() {
 			It("converts them to log messages and passes them through the messages channel", func() {
 				var err error
 				var warnings Warnings
-				var message LogMessage
+				var message sharedaction.LogMessage
 
 				messages, logErrs, stopStreaming, warnings, err = actor.GetStreamingLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeLogCacheClient)
 

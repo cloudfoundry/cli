@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
 var _ = Describe("V3PollStage", func() {
@@ -22,7 +23,7 @@ var _ = Describe("V3PollStage", func() {
 		dropletStream         chan v7action.Droplet
 		warningsStream        chan v7action.Warnings
 		errStream             chan error
-		logStream             chan v7action.LogMessage
+		logStream             chan sharedaction.LogMessage
 		logErrStream          chan error
 		closeStreams          func()
 		writeEventsAsync      func(func())
@@ -68,7 +69,7 @@ var _ = Describe("V3PollStage", func() {
 		dropletStream = make(chan v7action.Droplet)
 		warningsStream = make(chan v7action.Warnings)
 		errStream = make(chan error)
-		logStream = make(chan v7action.LogMessage)
+		logStream = make(chan sharedaction.LogMessage)
 		logErrStream = make(chan error)
 
 		finishedWritingEvents = make(chan bool)
@@ -120,7 +121,7 @@ var _ = Describe("V3PollStage", func() {
 		Context("and the message is a staging message", func() {
 			BeforeEach(func() {
 				writeEventsAsync(func() {
-					logStream <- *v7action.NewLogMessage("some-log-message", "OUT", time.Now(), v7action.StagingLog, "1")
+					logStream <- *sharedaction.NewLogMessage("some-log-message", "OUT", time.Now(), sharedaction.StagingLog, "1")
 				})
 			})
 
@@ -136,7 +137,7 @@ var _ = Describe("V3PollStage", func() {
 		Context("and the message is not a staging message", func() {
 			BeforeEach(func() {
 				writeEventsAsync(func() {
-					logStream <- *v7action.NewLogMessage("some-log-message", "OUT", time.Now(), "RUN", "1")
+					logStream <- *sharedaction.NewLogMessage("some-log-message", "OUT", time.Now(), "RUN", "1")
 				})
 			})
 

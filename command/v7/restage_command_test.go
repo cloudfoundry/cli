@@ -9,7 +9,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -20,6 +19,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 )
 
 var _ = Describe("restage Command", func() {
@@ -29,7 +30,7 @@ var _ = Describe("restage Command", func() {
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
 		fakeActor          *v7fakes.FakeRestageActor
-		fakeLogCacheClient *v7actionfakes.FakeLogCacheClient
+		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
 		executeErr       error
 		appName          string
@@ -46,7 +47,7 @@ var _ = Describe("restage Command", func() {
 		fakeConfig.BinaryNameReturns("some-binary-name")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeRestageActor)
-		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
+		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		cmd = v7.RestageCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
 
@@ -78,8 +79,8 @@ var _ = Describe("restage Command", func() {
 			v7action.Warnings{"get-package-warning"},
 			nil,
 		)
-		fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
-			logStream := make(chan v7action.LogMessage)
+		fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+			logStream := make(chan sharedaction.LogMessage)
 			errorStream := make(chan error)
 			closedTheStreams = false
 
@@ -92,7 +93,7 @@ var _ = Describe("restage Command", func() {
 				close(errorStream)
 			}
 			go func() {
-				logStream <- *v7action.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
+				logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
 				errorStream <- expectedErr
 				allLogsWritten <- true
 			}()

@@ -1,4 +1,4 @@
-package v7action
+package sharedaction
 
 import (
 	"context"

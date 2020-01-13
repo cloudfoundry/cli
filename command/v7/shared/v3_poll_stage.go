@@ -4,9 +4,10 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
-func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7action.Warnings, errStream <-chan error, logStream <-chan v7action.LogMessage, logErrStream <-chan error, ui command.UI) (v7action.Droplet, error) {
+func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7action.Warnings, errStream <-chan error, logStream <-chan sharedaction.LogMessage, logErrStream <-chan error, ui command.UI) (v7action.Droplet, error) {
 	var closedBuildStream, closedWarningsStream, closedErrStream bool
 	var droplet v7action.Droplet
 

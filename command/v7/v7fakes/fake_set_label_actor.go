@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command/v7"
+	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/types"
 )
 

@@ -3,9 +3,6 @@ package v7_test
 import (
 	"errors"
 	"time"
-
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-
 	"context"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -21,6 +18,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 )
 
 var _ = Describe("start Command", func() {
@@ -30,7 +29,7 @@ var _ = Describe("start Command", func() {
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
 		fakeActor          *v7fakes.FakeStartActor
-		fakeLogCacheClient *v7actionfakes.FakeLogCacheClient
+		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
 		binaryName  string
 		executeErr  error
@@ -43,7 +42,7 @@ var _ = Describe("start Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeStartActor)
-		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
+		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -289,8 +288,8 @@ var _ = Describe("start Command", func() {
 
 			BeforeEach(func() {
 				allLogsWritten = make(chan bool)
-				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
-					logStream := make(chan v7action.LogMessage)
+				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+					logStream := make(chan sharedaction.LogMessage)
 					errorStream := make(chan error)
 					closedTheStreams = false
 
@@ -303,8 +302,8 @@ var _ = Describe("start Command", func() {
 						close(errorStream)
 					}
 					go func() {
-						logStream <- *v7action.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
-						logStream <- *v7action.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
+						logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
+						logStream <- *sharedaction.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
 						allLogsWritten <- true
 					}()
 
@@ -443,8 +442,8 @@ var _ = Describe("start Command", func() {
 				allLogsWritten = make(chan bool)
 				expectedErr = errors.New("banana")
 
-				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
-					logStream := make(chan v7action.LogMessage)
+				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+					logStream := make(chan sharedaction.LogMessage)
 					errorStream := make(chan error)
 					closedTheStreams = false
 
@@ -457,7 +456,7 @@ var _ = Describe("start Command", func() {
 						close(errorStream)
 					}
 					go func() {
-						logStream <- *v7action.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
+						logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
 						errorStream <- expectedErr
 						allLogsWritten <- true
 					}()

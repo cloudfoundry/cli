@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -25,6 +25,7 @@ import (
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
 type Step struct {
@@ -49,13 +50,13 @@ func FillInEvents(steps []Step) <-chan *v7pushaction.PushEvent {
 }
 
 type LogEvent struct {
-	Log   *v7action.LogMessage
+	Log   *sharedaction.LogMessage
 	Error error
 }
 
-func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedError error) func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
-	return func(appName string, spaceGUID string, client v7action.LogCacheClient) (<-chan v7action.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
-		logStream := make(chan v7action.LogMessage)
+func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedError error) func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+	return func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
+		logStream := make(chan sharedaction.LogMessage)
 		errStream := make(chan error)
 		go func() {
 			defer close(logStream)
@@ -85,7 +86,7 @@ var _ = Describe("push Command", func() {
 		fakeActor           *v7fakes.FakePushActor
 		fakeVersionActor    *v7fakes.FakeV7ActorForPush
 		fakeProgressBar     *v6fakes.FakeProgressBar
-		fakeLogCacheClient  *v7actionfakes.FakeLogCacheClient
+		fakeLogCacheClient  *sharedactionfakes.FakeLogCacheClient
 		fakeManifestLocator *v7fakes.FakeManifestLocator
 		fakeManifestParser  *v7fakes.FakeManifestParser
 		binaryName          string
@@ -107,7 +108,7 @@ var _ = Describe("push Command", func() {
 		fakeActor = new(v7fakes.FakePushActor)
 		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
 		fakeProgressBar = new(v6fakes.FakeProgressBar)
-		fakeLogCacheClient = new(v7actionfakes.FakeLogCacheClient)
+		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		appName1 = "first-app"
 		appName2 = "second-app"
@@ -482,9 +483,9 @@ var _ = Describe("push Command", func() {
 													BeforeEach(func() {
 														fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 															[]LogEvent{
-																{Log: v7action.NewLogMessage("log-message-1", "OUT", time.Now(), v7action.StagingLog, "source-instance")},
-																{Log: v7action.NewLogMessage("log-message-2", "OUT", time.Now(), v7action.StagingLog, "source-instance")},
-																{Log: v7action.NewLogMessage("log-message-3", "OUT", time.Now(), "potato", "source-instance")},
+																{Log: sharedaction.NewLogMessage("log-message-1", "OUT", time.Now(), sharedaction.StagingLog, "source-instance")},
+																{Log: sharedaction.NewLogMessage("log-message-2", "OUT", time.Now(), sharedaction.StagingLog, "source-instance")},
+																{Log: sharedaction.NewLogMessage("log-message-3", "OUT", time.Now(), "potato", "source-instance")},
 															},
 															v7action.Warnings{"log-warning-1", "log-warning-2"},
 															nil,
@@ -518,7 +519,7 @@ var _ = Describe("push Command", func() {
 															[]LogEvent{
 																{Error: errors.New("some-random-err")},
 																{Error: actionerror.LogCacheTimeoutError{}},
-																{Log: v7action.NewLogMessage("log-message-1", "OUT", time.Now(), v7action.StagingLog, "source-instance")},
+																{Log: sharedaction.NewLogMessage("log-message-1", "OUT", time.Now(), sharedaction.StagingLog, "source-instance")},
 															},
 															v7action.Warnings{"log-warning-1", "log-warning-2"},
 															nil,

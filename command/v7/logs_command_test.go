@@ -7,7 +7,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -16,6 +15,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
 var _ = Describe("logs command", func() {
@@ -25,7 +26,7 @@ var _ = Describe("logs command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeLogsActor
-		logCacheClient  *v7actionfakes.FakeLogCacheClient
+		logCacheClient  *sharedactionfakes.FakeLogCacheClient
 		binaryName      string
 		executeErr      error
 	)
@@ -35,7 +36,7 @@ var _ = Describe("logs command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeLogsActor)
-		logCacheClient = new(v7actionfakes.FakeLogCacheClient)
+		logCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		cmd = LogsCommand{
 			UI:             testUI,
@@ -95,8 +96,8 @@ var _ = Describe("logs command", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
 					fakeActor.GetRecentLogsForApplicationByNameAndSpaceReturns(
-						[]v7action.LogMessage{
-							*v7action.NewLogMessage(
+						[]sharedaction.LogMessage{
+							*sharedaction.NewLogMessage(
 								"all your base are belong to us",
 								"1",
 								time.Unix(0, 0),
@@ -119,15 +120,15 @@ var _ = Describe("logs command", func() {
 			When("the logs actor returns logs", func() {
 				BeforeEach(func() {
 					fakeActor.GetRecentLogsForApplicationByNameAndSpaceReturns(
-						[]v7action.LogMessage{
-							*v7action.NewLogMessage(
+						[]sharedaction.LogMessage{
+							*sharedaction.NewLogMessage(
 								"i am message 1",
 								"1",
 								time.Unix(0, 0),
 								"app",
 								"1",
 							),
-							*v7action.NewLogMessage(
+							*sharedaction.NewLogMessage(
 								"i am message 2",
 								"1",
 								time.Unix(1, 0),
@@ -199,12 +200,12 @@ var _ = Describe("logs command", func() {
 					expectedErr = errors.New("banana")
 
 					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub =
-						func(appName string, spaceGUID string, client v7action.LogCacheClient) (
-							<-chan v7action.LogMessage,
+						func(appName string, spaceGUID string, client sharedaction.LogCacheClient) (
+							<-chan sharedaction.LogMessage,
 							<-chan error,
 							context.CancelFunc,
 							v7action.Warnings, error) {
-							logStream := make(chan v7action.LogMessage)
+							logStream := make(chan sharedaction.LogMessage)
 							errorStream := make(chan error)
 							cancelFunctionHasBeenCalled = false
 
@@ -245,18 +246,18 @@ var _ = Describe("logs command", func() {
 			When("the logs actor returns logs", func() {
 				BeforeEach(func() {
 					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub =
-						func(_ string, _ string, _ v7action.LogCacheClient) (
-							<-chan v7action.LogMessage,
+						func(_ string, _ string, _ sharedaction.LogCacheClient) (
+							<-chan sharedaction.LogMessage,
 							<-chan error, context.CancelFunc,
 							v7action.Warnings,
 							error) {
 
-							logStream := make(chan v7action.LogMessage)
+							logStream := make(chan sharedaction.LogMessage)
 							errorStream := make(chan error)
 
 							go func() {
-								logStream <- *v7action.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance") //TODO: is it ok to leave staging logs here?
-								logStream <- *v7action.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), v7action.StagingLog, "sourceInstance")
+								logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance") //TODO: is it ok to leave staging logs here?
+								logStream <- *sharedaction.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
 								close(logStream)
 								close(errorStream)
 							}()
