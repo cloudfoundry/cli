@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/loggingaction"
-	"github.com/SermoDigital/jose/jws"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"github.com/SermoDigital/jose/jws"
 )
 
 func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, Warnings, error) {

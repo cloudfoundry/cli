@@ -9,10 +9,10 @@ import (
 	. "code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
 var _ = Describe("V3PollStage", func() {

@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -15,8 +17,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
 var _ = Describe("logs command", func() {

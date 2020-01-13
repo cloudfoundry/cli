@@ -3,13 +3,14 @@ package sharedaction
 import (
 	"context"
 	"errors"
-	"github.com/sirupsen/logrus"
-	"time"
 	"log"
+	"strings"
+	"time"
+
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	"code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1"
-	"strings"
+	"github.com/sirupsen/logrus"
 )
 
 const StagingLog = "STG"
@@ -55,7 +56,6 @@ func NewLogMessage(message string, messageType string, timestamp time.Time, sour
 		sourceInstance: sourceInstance,
 	}
 }
-
 
 type LogMessages []*LogMessage
 
@@ -117,7 +117,6 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 
 	return outgoingLogStream, outgoingErrStream, cancelFunc
 }
-
 
 func convertEnvelopesToLogMessages(envelopes []*loggregator_v2.Envelope) []*LogMessage {
 	var logMessages []*LogMessage
