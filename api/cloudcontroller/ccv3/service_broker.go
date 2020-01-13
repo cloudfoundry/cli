@@ -21,6 +21,8 @@ type ServiceBroker struct {
 	URL string
 	// Status is the state of the service broker.
 	Status string
+
+	Metadata *Metadata
 }
 
 type ServiceBrokerModel struct {
@@ -62,6 +64,8 @@ type serviceBrokerResponse struct {
 	Status string `json:"status,omitempty"`
 	// Authentication contains the authentication for authenticating with the service broker.
 	Authentication serviceBrokerAuthentication `json:"authentication"`
+	// Metadata is used for custom tagging of API resources
+	Metadata *Metadata
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }
@@ -251,9 +255,10 @@ func newUpdateServiceBroker(serviceBroker ServiceBrokerModel) (serviceBrokerRequ
 
 func extractServiceBrokerData(response serviceBrokerResponse) ServiceBroker {
 	return ServiceBroker{
-		Name:   response.Name,
-		URL:    response.URL,
-		GUID:   response.GUID,
-		Status: response.Status,
+		Name:     response.Name,
+		URL:      response.URL,
+		GUID:     response.GUID,
+		Status:   response.Status,
+		Metadata: response.Metadata,
 	}
 }

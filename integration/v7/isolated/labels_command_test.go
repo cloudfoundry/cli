@@ -581,7 +581,20 @@ var _ = FDescribe("labels command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			PWhen("there are labels set on the service broker", func() {})
+			When("there are labels set on the service broker", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "service-broker", broker.Name(), "some-other-key=some-other-value")
+					Eventually(session).Should(Exit(0))
+
+				})
+				It("returns the labels associated with the broker", func() {
+					session := helpers.CF("labels", "service-broker", broker.Name())
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s..."), broker.Name(), username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Expect(session).To(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
 
 			When("there are no labels set on the service broker", func() {
 				It("indicates that there are no labels", func() {

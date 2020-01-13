@@ -886,7 +886,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	FContext("GetServiceBrokerLabels", func() {
+	Context("GetServiceBrokerLabels", func() {
 		When("service broker does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
@@ -906,5 +906,53 @@ var _ = Describe("labels", func() {
 				Expect(executeErr.Error()).To(ContainSubstring("Service broker 'some-resource' not found"))
 			})
 		})
+
+		When("client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ccv3.ServiceBroker{},
+					[]string{"warning"},
+					errors.New("some random error"),
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServiceBrokerLabels(resourceName)
+			})
+
+			It("returns error and prints warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning"))
+				Expect(executeErr).To(MatchError("some random error"))
+			})
+		})
+		When("service broker has labels", func() {
+			var expectedLabels map[string]types.NullString
+
+			BeforeEach(func() {
+				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ccv3.ServiceBroker{ccv3.ServiceBroker{
+						GUID: "some-guid",
+						Name: resourceName,
+						Metadata: &ccv3.Metadata{
+							Labels: expectedLabels,
+						}}},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServiceBrokerLabels(resourceName)
+			})
+
+			It("returns labels associated with the service broker", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(labels).To(Equal(expectedLabels))
+			})
+		})
+
 	})
 })

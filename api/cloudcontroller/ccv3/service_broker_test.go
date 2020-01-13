@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -83,12 +84,61 @@ var _ = Describe("ServiceBroker", func() {
 			It("returns the service broker", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(serviceBrokers).To(ConsistOf(ServiceBroker{
+					Name:     "service-broker-name-1",
+					GUID:     "service-broker-guid-1",
+					URL:      "service-broker-url-1",
+					Status:   "synchronization in progress",
+					Metadata: nil,
+				}))
+				Expect(warnings).To(ConsistOf("this is another warning"))
+			})
+		})
+
+		When("the service broker has labels", func() {
+			BeforeEach(func() {
+				response := `
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"name": "service-broker-name-1",
+								"guid": "service-broker-guid-1",
+								"url": "service-broker-url-1",
+							    "status": "synchronization in progress",
+								"metadata": {
+									"labels": {
+										"some-key":"some-value",
+										"other-key":"other-value"
+									}
+								}
+							}
+						]
+					}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_brokers"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the service broker with the labels in Metadata", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(serviceBrokers).To(ConsistOf(ServiceBroker{
 					Name:   "service-broker-name-1",
 					GUID:   "service-broker-guid-1",
 					URL:    "service-broker-url-1",
 					Status: "synchronization in progress",
+					Metadata: &Metadata{
+						Labels: map[string]types.NullString{
+							"some-key":  types.NewNullString("some-value"),
+							"other-key": types.NewNullString("other-value"),
+						},
+					},
 				}))
-				Expect(warnings).To(ConsistOf("this is another warning"))
 			})
 		})
 

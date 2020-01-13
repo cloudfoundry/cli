@@ -92,7 +92,7 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	case Route:
 		labels, warnings, err = cmd.fetchRouteLabels(username)
 	case ServiceBroker:
-		_, _, err = cmd.fetchServiceBrokerLabels(username)
+		labels, warnings, err = cmd.fetchServiceBrokerLabels(username)
 	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
 	case Stack:
@@ -176,12 +176,19 @@ func (cmd LabelsCommand) fetchRouteLabels(username string) (map[string]types.Nul
 }
 
 func (cmd LabelsCommand) fetchServiceBrokerLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	cmd.UI.DisplayTextWithFlavor("Getting labels for service-broker {{.ServiceBrokerName}} as {{.Username}}...", map[string]interface{}{
 		"ServiceBrokerName": cmd.RequiredArgs.ResourceName,
 		"Username":          username,
 	})
-	_, _, err := cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
-	return map[string]types.NullString{}, nil, err
+
+	cmd.UI.DisplayNewline()
+
+	return cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
 }
 
 func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
