@@ -211,8 +211,8 @@ var _ = Describe("Application Summary Actions", func() {
 							},
 						},
 						Routes: []v7action.Route{
-							{GUID: "some-route-guid"},
-							{GUID: "some-other-route-guid"},
+							{GUID: "some-route-guid", Destinations: []RouteDestination{}},
+							{GUID: "some-other-route-guid", Destinations: []RouteDestination{}},
 						},
 					},
 				}))
@@ -471,8 +471,8 @@ var _ = Describe("Application Summary Actions", func() {
 										},
 									},
 									Routes: []v7action.Route{
-										{GUID: "some-route-guid"},
-										{GUID: "some-other-route-guid"},
+										{GUID: "some-route-guid", Destinations: []RouteDestination{}},
+										{GUID: "some-other-route-guid", Destinations: []RouteDestination{}},
 									},
 								},
 								CurrentDroplet: Droplet{

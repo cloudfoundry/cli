@@ -72,16 +72,29 @@ type ProcessSummary struct {
 
 type ProcessSummaries []ProcessSummary
 
+type RouteDestinationApp struct {
+	GUID    string
+	Process struct {
+		Type string
+	}
+}
+
+type RouteDestination struct {
+	GUID string
+	App  RouteDestinationApp
+}
+
 type Route struct {
-	GUID       string
-	SpaceGUID  string
-	DomainGUID string
-	Host       string
-	Path       string
-	DomainName string
-	SpaceName  string
-	URL        string
-	Metadata   *Metadata
+	GUID         string
+	SpaceGUID    string
+	DomainGUID   string
+	Host         string
+	Path         string
+	DomainName   string
+	SpaceName    string
+	URL          string
+	Destinations []RouteDestination
+	Metadata     *Metadata
 }
 
 type ApplicationSummary struct {
