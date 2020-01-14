@@ -62,27 +62,6 @@ resources:
     uri: https://github.com/cloudfoundry/cli-i18n
     branch: master
 
-- name: cli-ci
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths:
-    - bin
-    - ci
-    - integration
-    - README.md
-    - .github
-
-- name: cli-integration
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths:
-    - api/cloudcontroller/ccversion
-    - integration
-
 - name: cf-cli-binaries
   type: s3
   icon: folder
@@ -243,10 +222,9 @@ jobs:
   - in_parallel:
     - get: cli
       trigger: true
-    - get: cli-ci
   - in_parallel:
     - task: lint
-      file: cli-ci/ci/cli-v7/tasks/lint.yml
+      file: cli/ci/cli-v7/tasks/lint.yml
       on_failure:
         put: slack-alert
         params:
@@ -255,14 +233,14 @@ jobs:
             $BUILD_JOB_NAME failed :(
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-linux
-      file: cli-ci/ci/cli-v7/tasks/units-linux.yml
+      file: cli/ci/cli-v7/tasks/units-linux.yml
       on_failure:
         put: slack-alert
         params:
           channel: '#v3-acceleration-team'
           text: *slack_notification_text
     - task: units-osx
-      file: cli-ci/ci/cli-v7/tasks/units-osx.yml
+      file: cli/ci/cli-v7/tasks/units-osx.yml
       on_failure:
         put: slack-alert
         params:
@@ -270,7 +248,7 @@ jobs:
           text: *slack_notification_text
     - task: units-windows
       tags: [vat-windows]
-      file: cli-ci/ci/cli-v7/tasks/units-windows.yml
+      file: cli/ci/cli-v7/tasks/units-windows.yml
       on_failure:
         put: slack-alert
         params:
@@ -284,10 +262,9 @@ jobs:
     - get: cli
       trigger: true
       passed: [units]
-    - get: cli-ci
     - get: cli-i18n
   - task: build-i18n
-    file: cli-ci/ci/cli-v7/tasks/generate-i18n-resources.yml
+    file: cli/ci/cli-v7/tasks/generate-i18n-resources.yml
     on_failure:
       put: slack-alert
       params:
@@ -295,7 +272,7 @@ jobs:
         text: *slack_notification_text
   - in_parallel:
     - task: build
-      file: cli-ci/ci/cli-v7/tasks/build-binaries.yml
+      file: cli/ci/cli-v7/tasks/build-binaries.yml
       params:
         TARGET_GO_VERSION: go1.13.4
       on_failure:
@@ -304,7 +281,7 @@ jobs:
           channel: '#v3-acceleration-team'
           text: *slack_notification_text
     - task: build-osx
-      file: cli-ci/ci/cli-v7/tasks/build-osx-binary.yml
+      file: cli/ci/cli-v7/tasks/build-osx-binary.yml
       params:
         TARGET_GO_VERSION: go1.13.4
       on_failure:
@@ -313,7 +290,7 @@ jobs:
           channel: '#v3-acceleration-team'
           text: *slack_notification_text
   - task: combine-binaries
-    file: cli-ci/ci/cli-v7/tasks/combine-binaries.yml
+    file: cli/ci/cli-v7/tasks/combine-binaries.yml
   - put: cf-cli-binaries
     params:
       file: compiled/cf-cli-binaries.tgz
@@ -327,8 +304,6 @@ jobs:
     - get: cf-cli-binaries
       passed: [build-binaries]
       trigger: true
-    - get: cli-ci
-    - get: cli-integration
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
@@ -336,9 +311,9 @@ jobs:
         acquire: true
   - do:
     - task: cleanup-integration
-      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      file: cli/ci/cli-v7/tasks/cleanup-integration.yml
     - task: integration
-      file: cli-ci/ci/cli-v7/tasks/integration-linux.yml
+      file: cli/ci/cli-v7/tasks/integration-linux.yml
       on_failure:
         put: slack-alert
         params:
@@ -346,7 +321,7 @@ jobs:
           text: *slack_notification_text
       ensure:
         task: cleanup-integration
-        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+        file: cli/ci/cli-v7/tasks/cleanup-integration.yml
       params: &integration_params
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client-secret))
@@ -370,8 +345,6 @@ jobs:
     - get: cf-cli-binaries
       passed: [build-binaries]
       trigger: true
-    - get: cli-ci
-    - get: cli-integration
     - get: edge-capi-release
     - get: vars-store
   - do:
@@ -423,8 +396,8 @@ jobs:
                 - cli/ci/infrastructure/operations/add-oidc-provider.yml
                 - cli/ci/infrastructure/operations/add-uaa-client-cf-custom.yml
                 - cli/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml
-                - cli-ci/ci/infrastructure/operations/use-edge-capi.yml
-                - cli-ci/ci/infrastructure/operations/add-uaa-client-credentials.yml
+                - cli/ci/infrastructure/operations/use-edge-capi.yml
+                - cli/ci/infrastructure/operations/add-uaa-client-credentials.yml
             - task: upload-to-gcs
               file: capi-ci/ci/gcs/upload-to-gcs.yml
               input_mapping:
@@ -455,7 +428,7 @@ jobs:
           action: destroy
   - do:
     - task: integration
-      file: cli-ci/ci/cli-v7/tasks/integration-linux-bosh-lite.yml
+      file: cli/ci/cli-v7/tasks/integration-linux-bosh-lite.yml
       on_failure:
         put: slack-alert
         params:
@@ -486,9 +459,9 @@ jobs:
   - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
-      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      file: cli/ci/cli-v7/tasks/cleanup-integration.yml
     - task: integration
-      file: cli-ci/ci/cli-v7/tasks/integration-linux.yml
+      file: cli/ci/cli-v7/tasks/integration-linux.yml
       on_failure:
         put: slack-alert
         params:
@@ -496,7 +469,7 @@ jobs:
           text: *slack_notification_text
       ensure:
         task: cleanup-integration
-        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+        file: cli/ci/cli-v7/tasks/cleanup-integration.yml
       params:
         <<: *integration_params
         CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
@@ -511,10 +484,10 @@ jobs:
   - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
-      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      file: cli/ci/cli-v7/tasks/cleanup-integration.yml
     - task: integration
       tags: [vat-windows]
-      file: cli-ci/ci/cli-v7/tasks/integration-windows.yml
+      file: cli/ci/cli-v7/tasks/integration-windows.yml
       params:
         <<: *integration_params
       input_mapping:
@@ -526,7 +499,7 @@ jobs:
           text: *slack_notification_text
       ensure:
         task: cleanup-integration
-        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+        file: cli/ci/cli-v7/tasks/cleanup-integration.yml
   ensure:
     put: gcp-bosh-pool
     params:
@@ -538,10 +511,10 @@ jobs:
   - in_parallel: *integration_resources
   - do:
     - task: cleanup-integration
-      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      file: cli/ci/cli-v7/tasks/cleanup-integration.yml
     - task: integration
       tags: [vat-windows]
-      file: cli-ci/ci/cli-v7/tasks/integration-windows.yml
+      file: cli/ci/cli-v7/tasks/integration-windows.yml
       params:
         <<: *integration_params
         CF_INT_CLIENT_CREDENTIALS_TEST_MODE: true
@@ -554,7 +527,7 @@ jobs:
           text: *slack_notification_text
       ensure:
         task: cleanup-integration
-        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+        file: cli/ci/cli-v7/tasks/cleanup-integration.yml
   ensure:
     put: gcp-bosh-pool
     params:
@@ -577,9 +550,8 @@ jobs:
       - integration-windows
       - integration-windows-client-creds
       trigger: true
-    - get: cli-ci
   - task: extract-binaries
-    file: cli-ci/ci/cli-v7/tasks/extract-binaries.yml
+    file: cli/ci/cli-v7/tasks/extract-binaries.yml
     on_failure:
       put: slack-alert
       params:
@@ -589,7 +561,7 @@ jobs:
           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - in_parallel:
     - task: unix
-      file: cli-ci/ci/cli-v7/tasks/create-installers.yml
+      file: cli/ci/cli-v7/tasks/create-installers.yml
       on_failure:
         put: slack-alert
         params:
@@ -599,7 +571,7 @@ jobs:
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: windows
       tags: [vat-windows]
-      file: cli-ci/ci/cli-v7/tasks/create-installers-windows.yml
+      file: cli/ci/cli-v7/tasks/create-installers-windows.yml
       on_failure:
         put: slack-alert
         params:
@@ -608,7 +580,7 @@ jobs:
             create windows installer failed :winc:
             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - task: package-binaries
-    file: cli-ci/ci/cli-v7/tasks/package-binaries.yml
+    file: cli/ci/cli-v7/tasks/package-binaries.yml
     on_failure:
       put: slack-alert
       params:

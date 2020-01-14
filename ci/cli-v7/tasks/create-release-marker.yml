@@ -8,7 +8,7 @@ image_resource:
 
 inputs:
   - name: bump-v7-version
-  - name: cli-ci
+  - name: cli
 
 params:
   TRACKER_PROJECT_ID:
@@ -16,4 +16,4 @@ params:
 
 
 run:
-  path: cli-ci/ci/cli-v7/tasks/create-release-marker.sh
+  path: cli/ci/cli-v7/tasks/create-release-marker.sh

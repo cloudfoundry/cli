@@ -8,7 +8,6 @@ image_resource:
 
 inputs:
 - name: cli
-- name: cli-ci
 - name: extracted-binaries
 
 outputs:
@@ -35,7 +34,7 @@ run:
     (
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_i686 | cut -f 1)"
 
-        pushd cli-ci/ci/installers/deb
+        pushd cli/ci/installers/deb
           mkdir -p cf/usr/bin cf/usr/share/doc/cf7-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
@@ -67,7 +66,7 @@ run:
     (
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_x86-64 | cut -f 1)"
 
-        pushd cli-ci/ci/installers/deb
+        pushd cli/ci/installers/deb
           mkdir -p cf/usr/bin cf/usr/share/doc/cf7-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
@@ -96,7 +95,7 @@ run:
 
     echo "Building 32-bit RedHat package"
     (
-      pushd cli-ci/ci/installers/rpm
+      pushd cli/ci/installers/rpm
         cp $root/extracted-binaries/cf7-cli_linux_i686 cf7
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
@@ -110,7 +109,7 @@ run:
 
     echo "Building 64-bit RedHat package"
     (
-      pushd cli-ci/ci/installers/rpm
+      pushd cli/ci/installers/rpm
         cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf7
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
@@ -126,7 +125,7 @@ run:
     (
       SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_osx | cut -f 1)"
 
-      pushd cli-ci/ci/installers/osx_v7
+      pushd cli/ci/installers/osx_v7
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
         mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf7-cli

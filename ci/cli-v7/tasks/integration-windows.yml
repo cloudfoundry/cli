@@ -3,11 +3,9 @@ platform: windows
 
 inputs:
 - name: cli
-- name: cli-integration
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
 - name: bosh-lock
-- name: cli-ci
 - name: cf-credentials
 
 params:
@@ -22,4 +20,4 @@ params:
 run:
   path: powershell
   args:
-  - cli-ci/ci/cli-v7/tasks/integration-windows.ps1
+  - cli/ci/cli-v7/tasks/integration-windows.ps1

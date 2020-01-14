@@ -7,7 +7,7 @@ image_resource:
     repository: cfcli/cli-base
 
 inputs:
-- name: cli-ci
+- name: cli
 - name: cf-cli-binaries
 - name: bosh-lock
 - name: vars-store
@@ -65,5 +65,5 @@ run:
       mv cf7-cli_linux_x86-64 $GOPATH/bin/cf
     popd
 
-    cd cli-ci
+    cd cli
     bin/cleanup-integration "${ARGS}"
