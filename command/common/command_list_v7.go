@@ -107,6 +107,7 @@ type commandList struct {
 	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
 	Org                                v7.OrgCommand                                `command:"org" description:"Show org info"`
+	OrgQuotas                          v7.OrgQuotasCommand                          `command:"org-quotas" description:"List available organization quotas"`
 	OrgUsers                           v7.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Orgs                               v7.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
 	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`
@@ -116,7 +117,6 @@ type commandList struct {
 	PurgeServiceOffering               v6.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
 	Push                               v7.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quota                              v6.QuotaCommand                              `command:"quota" description:"Show quota info"`
-	Quotas                             v6.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	RemoveNetworkPolicy                v6.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	Rename                             v7.RenameCommand                             `command:"rename" description:"Rename an app"`

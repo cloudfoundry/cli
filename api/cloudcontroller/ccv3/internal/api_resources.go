@@ -13,6 +13,7 @@ const (
 	FeatureFlagsResource              = "feature_flags"
 	IsolationSegmentsResource         = "isolation_segments"
 	OrgsResource                      = "organizations"
+	OrgQuotasResource                 = "organization_quotas"
 	PackagesResource                  = "packages"
 	ProcessesResource                 = "processes"
 	ResourceMatches                   = "resource_matches"
