@@ -47,17 +47,9 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 			return allWarnings, err
 		}
 
-		var destinations []RouteDestination
-		var getDestinationsWarnings Warnings
 		for _, route := range routes {
-			destinations, getDestinationsWarnings, err = actor.GetRouteDestinations(route.GUID)
-			allWarnings = append(allWarnings, getDestinationsWarnings...)
-			if err != nil {
-				return allWarnings, err
-			}
-
-			if len(destinations) > 1 {
-				for _, destination := range destinations {
+			if len(route.Destinations) > 1 {
+				for _, destination := range route.Destinations {
 					guid := destination.App.GUID
 					if guid != app.GUID {
 						return allWarnings, actionerror.RouteBoundToMultipleAppsError{AppName: app.Name, RouteURL: route.URL}
