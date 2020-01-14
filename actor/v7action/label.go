@@ -27,7 +27,7 @@ func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[stri
 
 func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
 	serviceBroker, warnings, err := actor.GetServiceBrokerByName(serviceBrokerName)
-	return actor.getLabels((*ccv3.Metadata)(serviceBroker.Metadata), warnings, err)
+	return actor.getLabels(serviceBroker.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, Warnings, error) {

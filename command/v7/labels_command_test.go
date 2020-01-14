@@ -229,22 +229,6 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "aPp",
-						ResourceName: "dora",
-					}
-				})
-
-				It("retrieves the labels associated with the app", func() {
-					Expect(fakeLabelsActor.GetApplicationLabelsCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeLabelsActor.GetApplicationLabelsArgsForCall(0)
-					Expect(appName).To(Equal("dora"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-				})
-			})
 		})
 
 		Describe("for domains", func() {
@@ -329,20 +313,7 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Out).ToNot(Say("OK"))
 				})
 			})
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "DoMaiN",
-						ResourceName: "example.com",
-					}
-				})
 
-				It("retrieves the labels associated with the domain", func() {
-					Expect(fakeLabelsActor.GetDomainLabelsCallCount()).To(Equal(1))
-					domainName := fakeLabelsActor.GetDomainLabelsArgsForCall(0)
-					Expect(domainName).To(Equal("example.com"))
-				})
-			})
 		})
 
 		Describe("for orgs", func() {
@@ -427,20 +398,6 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "OrG",
-						ResourceName: "fake-org",
-					}
-				})
-
-				It("retrieves the labels associated with the org", func() {
-					Expect(fakeLabelsActor.GetOrganizationLabelsCallCount()).To(Equal(1))
-					orgName := fakeLabelsActor.GetOrganizationLabelsArgsForCall(0)
-					Expect(orgName).To(Equal("fake-org"))
-				})
-			})
 		})
 
 		Describe("for routes", func() {
@@ -529,20 +486,6 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "RoUtE",
-						ResourceName: "example.com",
-					}
-				})
-
-				It("retrieves the labels associated with the route", func() {
-					Expect(fakeLabelsActor.GetRouteLabelsCallCount()).To(Equal(1))
-					routeName, _ := fakeLabelsActor.GetRouteLabelsArgsForCall(0)
-					Expect(routeName).To(Equal("example.com"))
-				})
-			})
 		})
 
 		Describe("for spaces", func() {
@@ -628,21 +571,6 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "SpAcE",
-						ResourceName: "fake-space",
-					}
-				})
-
-				It("retrieves the labels associated with the space", func() {
-					Expect(fakeLabelsActor.GetSpaceLabelsCallCount()).To(Equal(1))
-					spaceName, orgGUID := fakeLabelsActor.GetSpaceLabelsArgsForCall(0)
-					Expect(spaceName).To(Equal("fake-space"))
-					Expect(orgGUID).To(Equal("some-org-guid"))
-				})
-			})
 		})
 
 		Describe("for stacks", func() {
@@ -727,20 +655,6 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "sTack",
-						ResourceName: "fake-stack",
-					}
-				})
-
-				It("retrieves the labels associated with the stack", func() {
-					Expect(fakeLabelsActor.GetStackLabelsCallCount()).To(Equal(1))
-					stackName := fakeLabelsActor.GetStackLabelsArgsForCall(0)
-					Expect(stackName).To(Equal("fake-stack"))
-				})
-			})
 		})
 
 		Describe("for buildpacks", func() {
@@ -845,23 +759,6 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			When("the resource type argument is not lowercase", func() {
-				BeforeEach(func() {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: "buildPack",
-						ResourceName: "fake-buildpack",
-					}
-					cmd.BuildpackStack = "fake-stack"
-				})
-
-				It("retrieves the labels associated with the buildpack", func() {
-					Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
-					buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
-					Expect(buildpackName).To(Equal("fake-buildpack"))
-					Expect(stackName).To(Equal("fake-stack"))
-				})
-			})
-
 			When("specifying --stack", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs = flag.LabelsArgs{
@@ -951,53 +848,6 @@ var _ = Describe("labels command", func() {
 					Expect(checkSpace).To(BeFalse())
 				})
 
-				When("the resource type argument is not lowercase", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs = flag.LabelsArgs{
-							ResourceType: "seRvIce-broKer",
-							ResourceName: "fake-broker",
-						}
-					})
-
-					It("retrieves the labels associated with the buildpack", func() {
-						Expect(fakeLabelsActor.GetServiceBrokerLabelsCallCount()).To(Equal(1))
-					})
-				})
-
-			})
-		})
-	})
-
-	Describe("disallowed --stack option", func() {
-		When("specifying --stack", func() {
-			It("errors with a disallowed resource type", func() {
-				names := []string{"app", "space", "stack", "org"}
-				for _, name := range names {
-					cmd.RequiredArgs = flag.LabelsArgs{
-						ResourceType: name,
-						ResourceName: "oshkosh",
-					}
-					cmd.BuildpackStack = "cflinuxfs3"
-					executeErr := cmd.Execute(nil)
-					argumentCombinationError := translatableerror.ArgumentCombinationError{
-						Args: []string{strings.ToLower(cmd.RequiredArgs.ResourceType), "--stack, -s"},
-					}
-					Expect(executeErr).To(MatchError(argumentCombinationError), "'%s' resource did complain", name)
-				}
-			})
-
-			It("retrieves the labels when resource type is buildpack", func() {
-				cmd.RequiredArgs = flag.LabelsArgs{
-					ResourceType: "buildpack",
-					ResourceName: "oshkosh",
-				}
-				cmd.BuildpackStack = "cflinuxfs3"
-				executeErr := cmd.Execute(nil)
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeLabelsActor.GetBuildpackLabelsCallCount()).To(Equal(1))
-				buildpackName, stackName := fakeLabelsActor.GetBuildpackLabelsArgsForCall(0)
-				Expect(buildpackName).To(Equal("oshkosh"))
-				Expect(stackName).To(Equal("cflinuxfs3"))
 			})
 		})
 	})

@@ -900,9 +900,9 @@ var _ = Describe("labels", func() {
 				labels, warnings, executeErr = actor.GetServiceBrokerLabels(resourceName)
 			})
 
-			It("returns a service broker not found error", func() {
+			It("returns a service broker not found error and warnings", func() {
 				Expect(executeErr).To(HaveOccurred())
-				//Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(executeErr.Error()).To(ContainSubstring("Service broker 'some-resource' not found"))
 			})
 		})
@@ -947,7 +947,7 @@ var _ = Describe("labels", func() {
 				labels, warnings, executeErr = actor.GetServiceBrokerLabels(resourceName)
 			})
 
-			It("returns labels associated with the service broker", func() {
+			It("returns labels associated with the service broker as well as warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(labels).To(Equal(expectedLabels))

@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("labels command", func() {
+var _ = Describe("labels command", func() {
 	When("--help flag is set", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
@@ -565,7 +565,7 @@ var _ = FDescribe("labels command", func() {
 			})
 		})
 
-		FDescribe("service-broker labels", func() {
+		Describe("service-broker labels", func() {
 			var broker *fakeservicebroker.FakeServiceBroker
 
 			BeforeEach(func() {
@@ -589,7 +589,7 @@ var _ = FDescribe("labels command", func() {
 				})
 				It("returns the labels associated with the broker", func() {
 					session := helpers.CF("labels", "service-broker", broker.Name())
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s..."), broker.Name(), username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
 					Eventually(session).Should(Say(`key\s+value`))
 					Expect(session).To(Say(`some-other-key\s+some-other-value`))
 					Eventually(session).Should(Exit(0))
@@ -599,7 +599,7 @@ var _ = FDescribe("labels command", func() {
 			When("there are no labels set on the service broker", func() {
 				It("indicates that there are no labels", func() {
 					session := helpers.CF("labels", "service-broker", broker.Name())
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s..."), broker.Name(), username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
 					Expect(session).ToNot(Say(`key\s+value`))
 					Eventually(session).Should(Say("No labels found."))
 					Eventually(session).Should(Exit(0))
@@ -609,7 +609,7 @@ var _ = FDescribe("labels command", func() {
 			When("the service broker does not exist", func() {
 				It("displays an error", func() {
 					session := helpers.CF("labels", "service-broker", "non-existent-broker")
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s..."), "non-existent-broker", username))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), "non-existent-broker", username))
 					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
