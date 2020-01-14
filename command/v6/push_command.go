@@ -18,7 +18,6 @@ import (
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/progressbar"
 	"github.com/cloudfoundry/bosh-cli/director/template"
-	"github.com/cloudfoundry/noaa/consumer"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -80,8 +79,8 @@ type PushCommand struct {
 	ApplicationSummaryActor shared.ApplicationSummaryActor
 	ProgressBar             ProgressBar
 
-	RestartActor RestartActor
-	NOAAClient   *consumer.Consumer
+	RestartActor   RestartActor
+	LogCacheClient sharedaction.LogCacheClient
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -108,7 +107,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
 
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
 
 	cmd.ProgressBar = progressbar.NewProgressBar()
 	return nil
@@ -196,7 +195,9 @@ func (cmd PushCommand) Execute(args []string) error {
 		}
 
 		if !cmd.NoStart {
-			messages, logErrs, appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication.Application, cmd.NOAAClient)
+			appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication.Application)
+			messages, logErrs, stopStreaming := cmd.RestartActor.GetStreamingLogs(updatedConfig.CurrentApplication.Application.GUID, cmd.LogCacheClient)
+			defer stopStreaming()
 			err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 			if err != nil {
 				return err

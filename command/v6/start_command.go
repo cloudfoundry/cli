@@ -1,7 +1,7 @@
 package v6
 
 import (
-	"github.com/cloudfoundry/noaa/consumer"
+	"context"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -19,7 +19,8 @@ import (
 type StartActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
-	StartApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	GetStreamingLogs(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)
+	StartApplication(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 }
 
 type StartCommand struct {
@@ -34,7 +35,7 @@ type StartCommand struct {
 	SharedActor             command.SharedActor
 	Actor                   StartActor // todo rename key to StartActor to avoid confusion
 	ApplicationSummaryActor shared.ApplicationSummaryActor
-	NOAAClient              *consumer.Consumer
+	LogCacheClient          sharedaction.LogCacheClient
 }
 
 func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
@@ -58,8 +59,7 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Actor = v2Actor
 
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
-
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
 
 	return nil
 }
@@ -97,7 +97,9 @@ func (cmd StartCommand) Execute(args []string) error {
 		return nil
 	}
 
-	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.StartApplication(app, cmd.NOAAClient)
+	appState, apiWarnings, errs := cmd.Actor.StartApplication(app)
+	messages, logErrs, stopStreaming := cmd.Actor.GetStreamingLogs(app.GUID, cmd.LogCacheClient)
+	defer stopStreaming()
 	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 	if err != nil {
 		return err

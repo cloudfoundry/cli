@@ -15,8 +15,8 @@ import (
 //go:generate counterfeiter . LogsActor
 
 type LogsActor interface {
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v7action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	ScheduleTokenRefresh() (chan bool, error)
 }
 
@@ -46,7 +46,7 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.CC_Client = ccClient
 
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, uaaClient, clock.NewClock())
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 	return nil
 }
 
