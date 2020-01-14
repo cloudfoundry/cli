@@ -20,4 +20,4 @@ params:
 run:
   path: powershell
   args:
-  - cli/ci/cli-v7/tasks/integration-windows.ps1
+  - go/src/code.cloudfoundry.org/cli/ci/cli-v7/tasks/integration-windows.ps1
