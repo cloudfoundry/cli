@@ -3,11 +3,8 @@ platform: windows
 
 inputs:
 - name: cli
-- name: cli-integration
-  path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
 - name: bosh-lock
-- name: cli-ci
 - name: cf-credentials
 
 params:
@@ -18,4 +15,4 @@ params:
   CF_INT_DOCKER_PASSWORD:
 
 run:
-  path: cli-ci/ci/cli/tasks/integration-experimental-windows.bat
+  path: cli/ci/cli/tasks/integration-experimental-windows.bat

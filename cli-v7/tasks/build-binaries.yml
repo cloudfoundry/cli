@@ -6,7 +6,6 @@ image_resource:
     repository: cfcli/cli-base
 
 inputs:
-- name: cli-ci
 - name: cli
   path: gopath/src/code.cloudfoundry.org/cli
 - name: i18n-data
