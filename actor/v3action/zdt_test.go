@@ -52,7 +52,7 @@ var _ = Describe("v3-zdt-push", func() {
 			Expect(fakeCloudControllerClient.GetDeploymentsArgsForCall(0)).To(ConsistOf(
 				ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"app-guid"}},
 				ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
-				ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+				ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 			))
 			Expect(fakeCloudControllerClient.CancelDeploymentArgsForCall(0)).To(Equal("deployment-guid"))
 		})

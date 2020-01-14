@@ -251,7 +251,7 @@ func (actor Actor) GetUnstagedNewestPackageGUID(appGUID string) (string, Warning
 	var allWarnings Warnings
 	packages, warnings, err := actor.CloudControllerClient.GetPackages(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
-		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {

@@ -40,7 +40,7 @@ func (actor Actor) GetCurrentDeployment(appGUID string) (string, Warnings, error
 	var collectedWarnings Warnings
 	deployments, warnings, err := actor.CloudControllerClient.GetDeployments(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
-		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
 	)
 	collectedWarnings = append(collectedWarnings, warnings...)

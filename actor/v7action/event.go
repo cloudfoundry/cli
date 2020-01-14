@@ -29,7 +29,7 @@ func (actor Actor) GetRecentEventsByApplicationNameAndSpace(appName string, spac
 
 	ccEvents, warnings, err := actor.CloudControllerClient.GetEvents(
 		ccv3.Query{Key: ccv3.TargetGUIDFilter, Values: []string{app.GUID}},
-		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 	)
 	allWarnings = append(allWarnings, warnings...)
 

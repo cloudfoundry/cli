@@ -69,6 +69,10 @@ const (
 	// PositionOrder is a query value for ordering by position. This value is
 	// used in conjunction with the OrderBy QueryKey.
 	PositionOrder = "position"
+
+	// CreatedAtDescendingOrder is a query value for ordering by created_at timestamp,
+	// in descending order.
+	CreatedAtDescendingOrder = "-created_at"
 )
 
 // Query is additional settings that can be passed to some requests that can

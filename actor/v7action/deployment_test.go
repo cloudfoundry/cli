@@ -63,7 +63,7 @@ var _ = Describe("Deployment Actions", func() {
 				[]ccv3.Query{
 					{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
 					{Key: ccv3.StatusValueFilter, Values: []string{string(constant.DeploymentStatusValueActive)}},
-					{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+					{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 					{Key: ccv3.PerPage, Values: []string{"1"}},
 				},
 			))
