@@ -142,7 +142,7 @@ func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package,
 		},
 		ccv3.Query{
 			Key:    ccv3.OrderBy,
-			Values: []string{"-updated_at"},
+			Values: []string{ccv3.CreatedAtDescendingOrder},
 		},
 	)
 
