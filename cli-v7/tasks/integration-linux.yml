@@ -32,7 +32,7 @@ run:
     set -e
 
     mkdir -p go/src/code.cloudfoundry.org
-    ln -s cli go/src/code.cloudfoundry.org
+    ln -s ${PWD}/cli go/src/code.cloudfoundry.org
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
     export SSL_CERT_DIR=/tmp/cert_dir
     mkdir -p $SSL_CERT_DIR
