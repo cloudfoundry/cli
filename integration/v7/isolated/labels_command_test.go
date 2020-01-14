@@ -5,8 +5,8 @@ import (
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -38,6 +38,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+domain`))
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+route`))
+			Eventually(session).Should(Say(`\s+service-broker`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("OPTIONS:"))
@@ -558,6 +559,58 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("labels", "space", "non-existent-space")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for space %s in org %s as %s...\n\n"), "non-existent-space", orgName, username))
 					Eventually(session.Err).Should(Say("Space 'non-existent-space' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		Describe("service-broker labels", func() {
+			var broker *fakeservicebroker.FakeServiceBroker
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			When("there are labels set on the service broker", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "service-broker", broker.Name(), "some-other-key=some-other-value")
+					Eventually(session).Should(Exit(0))
+
+				})
+				It("returns the labels associated with the broker", func() {
+					session := helpers.CF("labels", "service-broker", broker.Name())
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Expect(session).To(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("there are no labels set on the service broker", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "service-broker", broker.Name())
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Eventually(session).Should(Say("No labels found."))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the service broker does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "service-broker", "non-existent-broker")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), "non-existent-broker", username))
+					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
