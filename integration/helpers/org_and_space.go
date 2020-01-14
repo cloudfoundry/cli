@@ -144,3 +144,4 @@ func QuickDeleteSpace(spaceName string) {
 	session := CF("curl", "-X", "DELETE", url)
 	Eventually(session).Should(Exit(0))
 }
+

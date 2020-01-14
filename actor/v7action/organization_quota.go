@@ -8,13 +8,13 @@ import (
 type OrganizationQuota ccv3.OrgQuota
 
 // CreateOrganization creates a new organization with the given name
-func (actor Actor) CreateOrganizationQuota(orgQuotaName string) (OrganizationQuota, Warnings, error) {
+func (actor Actor) CreateOrganizationQuota(orgQuotaName string) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	// organization, apiWarnings, err := actor.CloudControllerClient.CreateOrganization(orgName)
 	// allWarnings = append(allWarnings, apiWarnings...)
 
-	return OrganizationQuota{}, allWarnings, nil
+	return allWarnings, nil
 }
 
 func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error) {

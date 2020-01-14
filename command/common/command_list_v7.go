@@ -49,6 +49,7 @@ type commandList struct {
 	CreatePackage                      v7.CreatePackageCommand                      `command:"create-package" description:"Uploads a Package"`
 	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
 	CreateOrg                          v7.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
+	CreateOrgQuota                     v7.CreateOrgQuotaCommand                     `command:"create-org-quota" description:"Define a new quota for an organization"`
 	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" description:"Create a private domain for a specific org"`
 	CreateQuota                        v6.CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
 	CreateRoute                        v7.CreateRouteCommand                        `command:"create-route" description:"Create a route for later use"`

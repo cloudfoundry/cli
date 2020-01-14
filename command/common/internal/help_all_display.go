@@ -93,7 +93,7 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "ORG ADMIN:",
 		CommandList: [][]string{
 			{"org-quotas", "org-quota", "set-quota"},
-			{"create-quota", "delete-quota", "update-quota"},
+			{"create-org-quota", "delete-quota", "update-quota"},
 			{"share-private-domain", "unshare-private-domain"},
 		},
 	},

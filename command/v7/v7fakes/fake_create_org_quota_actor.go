@@ -9,26 +9,24 @@ import (
 )
 
 type FakeCreateOrgQuotaActor struct {
-	CreateOrganizationQuotaStub        func(string) (v7action.OrganizationQuota, v7action.Warnings, error)
+	CreateOrganizationQuotaStub        func(string) (v7action.Warnings, error)
 	createOrganizationQuotaMutex       sync.RWMutex
 	createOrganizationQuotaArgsForCall []struct {
 		arg1 string
 	}
 	createOrganizationQuotaReturns struct {
-		result1 v7action.OrganizationQuota
-		result2 v7action.Warnings
-		result3 error
+		result1 v7action.Warnings
+		result2 error
 	}
 	createOrganizationQuotaReturnsOnCall map[int]struct {
-		result1 v7action.OrganizationQuota
-		result2 v7action.Warnings
-		result3 error
+		result1 v7action.Warnings
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuota(arg1 string) (v7action.OrganizationQuota, v7action.Warnings, error) {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuota(arg1 string) (v7action.Warnings, error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	ret, specificReturn := fake.createOrganizationQuotaReturnsOnCall[len(fake.createOrganizationQuotaArgsForCall)]
 	fake.createOrganizationQuotaArgsForCall = append(fake.createOrganizationQuotaArgsForCall, struct {
@@ -40,10 +38,10 @@ func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuota(arg1 string) (v7act
 		return fake.CreateOrganizationQuotaStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.createOrganizationQuotaReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCallCount() int {
@@ -52,7 +50,7 @@ func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCallCount() int {
 	return len(fake.createOrganizationQuotaArgsForCall)
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCalls(stub func(string) (v7action.OrganizationQuota, v7action.Warnings, error)) {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCalls(stub func(string) (v7action.Warnings, error)) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = stub
@@ -65,33 +63,30 @@ func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaArgsForCall(i int) s
 	return argsForCall.arg1
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaReturns(result1 v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaReturns(result1 v7action.Warnings, result2 error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = nil
 	fake.createOrganizationQuotaReturns = struct {
-		result1 v7action.OrganizationQuota
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaReturnsOnCall(i int, result1 v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = nil
 	if fake.createOrganizationQuotaReturnsOnCall == nil {
 		fake.createOrganizationQuotaReturnsOnCall = make(map[int]struct {
-			result1 v7action.OrganizationQuota
-			result2 v7action.Warnings
-			result3 error
+			result1 v7action.Warnings
+			result2 error
 		})
 	}
 	fake.createOrganizationQuotaReturnsOnCall[i] = struct {
-		result1 v7action.OrganizationQuota
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCreateOrgQuotaActor) Invocations() map[string][][]interface{} {
