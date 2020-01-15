@@ -975,9 +975,10 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetOrganizationQuotasStub        func() ([]ccv3.OrgQuota, ccv3.Warnings, error)
+	GetOrganizationQuotasStub        func(...ccv3.Query) ([]ccv3.OrgQuota, ccv3.Warnings, error)
 	getOrganizationQuotasMutex       sync.RWMutex
 	getOrganizationQuotasArgsForCall []struct {
+		arg1 []ccv3.Query
 	}
 	getOrganizationQuotasReturns struct {
 		result1 []ccv3.OrgQuota
@@ -6009,15 +6010,16 @@ func (fake *FakeCloudControllerClient) GetOrganizationDomainsReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotas() ([]ccv3.OrgQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotas(arg1 ...ccv3.Query) ([]ccv3.OrgQuota, ccv3.Warnings, error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotasReturnsOnCall[len(fake.getOrganizationQuotasArgsForCall)]
 	fake.getOrganizationQuotasArgsForCall = append(fake.getOrganizationQuotasArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetOrganizationQuotas", []interface{}{})
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetOrganizationQuotas", []interface{}{arg1})
 	fake.getOrganizationQuotasMutex.Unlock()
 	if fake.GetOrganizationQuotasStub != nil {
-		return fake.GetOrganizationQuotasStub()
+		return fake.GetOrganizationQuotasStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -6032,10 +6034,17 @@ func (fake *FakeCloudControllerClient) GetOrganizationQuotasCallCount() int {
 	return len(fake.getOrganizationQuotasArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotasCalls(stub func() ([]ccv3.OrgQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotasCalls(stub func(...ccv3.Query) ([]ccv3.OrgQuota, ccv3.Warnings, error)) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotasArgsForCall(i int) []ccv3.Query {
+	fake.getOrganizationQuotasMutex.RLock()
+	defer fake.getOrganizationQuotasMutex.RUnlock()
+	argsForCall := fake.getOrganizationQuotasArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeCloudControllerClient) GetOrganizationQuotasReturns(result1 []ccv3.OrgQuota, result2 ccv3.Warnings, result3 error) {

@@ -40,6 +40,10 @@ type Organization struct {
 	Organization string `positional-arg-name:"ORG" required:"true" description:"The organization"`
 }
 
+type OrganizationQuota struct {
+	OrganizationQuota string `positional-arg-name:"ORG_QUOTA_NAME" required:"true" description:"The organization quota name"`
+}
+
 type APIPath struct {
 	Path string `positional-arg-name:"PATH" required:"true" description:"The API endpoint"`
 }

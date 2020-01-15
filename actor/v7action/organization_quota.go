@@ -1,6 +1,9 @@
 package v7action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+)
 
 type OrganizationQuota ccv3.OrgQuota
 
@@ -16,4 +19,23 @@ func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error
 	}
 
 	return orgQuotas, Warnings(warnings), nil
+}
+
+func (actor Actor) GetOrganizationQuotaByName(orgQuotaName string) (OrganizationQuota, Warnings, error) {
+	ccv3OrgQuotas, warnings, err := actor.CloudControllerClient.GetOrganizationQuotas(
+		ccv3.Query{
+			Key:    ccv3.NameFilter,
+			Values: []string{orgQuotaName},
+		},
+	)
+	if err != nil {
+		return OrganizationQuota{}, Warnings(warnings), err
+
+	}
+
+	if len(ccv3OrgQuotas) == 0 {
+		return OrganizationQuota{}, Warnings(warnings), actionerror.OrganizationQuotaNotFoundForNameError{Name: orgQuotaName}
+	}
+
+	return OrganizationQuota(ccv3OrgQuotas[0]), Warnings(warnings), nil
 }

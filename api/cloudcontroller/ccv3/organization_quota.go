@@ -36,9 +36,10 @@ type RouteLimit struct {
 	TotalRoutePorts types.NullInt `json:"total_reserved_ports"`
 }
 
-func (client *Client) GetOrganizationQuotas() ([]OrgQuota, Warnings, error) {
+func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrgQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotasRequest,
+		Query:       query,
 	})
 	if err != nil {
 		return []OrgQuota{}, nil, err

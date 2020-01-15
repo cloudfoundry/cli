@@ -18,6 +18,7 @@ var _ = Describe("Organization Quotas", func() {
 	var executeErr error
 	var warnings Warnings
 	var orgQuotas []OrgQuota
+	var query Query
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
@@ -25,7 +26,7 @@ var _ = Describe("Organization Quotas", func() {
 
 	Describe("GetOrganizationQuotas", func() {
 		JustBeforeEach(func() {
-			orgQuotas, warnings, executeErr = client.GetOrganizationQuotas()
+			orgQuotas, warnings, executeErr = client.GetOrganizationQuotas(query)
 		})
 
 		When("the cloud controller returns without errors", func() {
@@ -160,6 +161,86 @@ var _ = Describe("Organization Quotas", func() {
 							TotalRoutePorts: types.NullInt{Value: 4, IsSet: true},
 						},
 					},
+					OrgQuota{
+						GUID: "quota-2-guid",
+						Name: "sancho-panza",
+						Apps: AppLimit{
+							TotalMemory:       types.NullInt{Value: 10240, IsSet: true},
+							InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: types.NullInt{Value: 8, IsSet: true},
+						},
+						Services: ServiceLimit{
+							TotalServiceInstances: types.NullInt{Value: 8, IsSet: true},
+							PaidServicePlans:      false,
+						},
+						Routes: RouteLimit{
+							TotalRoutes:     types.NullInt{Value: 10, IsSet: true},
+							TotalRoutePorts: types.NullInt{Value: 5, IsSet: true},
+						},
+					},
+				))
+			})
+		})
+
+		When("requesting quotas by name", func() {
+			BeforeEach(func() {
+				query = Query{
+					Key:    NameFilter,
+					Values: []string{"sancho-panza"},
+				}
+
+				response := fmt.Sprintf(`{
+					"pagination": {
+						"next": null
+					},
+					"resources": [
+						{
+						  "guid": "quota-2-guid",
+						  "created_at": "2017-05-04T17:00:41Z",
+						  "updated_at": "2017-05-04T17:00:41Z",
+						  "name": "sancho-panza",
+						  "apps": {
+							"total_memory_in_mb": 10240,
+							"per_process_memory_in_mb": 1024,
+							"total_instances": 8,
+							"per_app_tasks": 5
+						  },
+						  "services": {
+							"paid_services_allowed": false,
+							"total_service_instances": 8,
+							"total_service_keys": 20
+						  },
+						  "routes": {
+							"total_routes": 10,
+							"total_reserved_ports": 5
+						  },
+						  "domains": {
+							"total_private_domains": 7
+						  },
+						  "relationships": {
+							"organizations": {
+							  "data": []
+							}
+						  },
+						  "links": {
+							"self": { "href": "%s/v3/organization_quotas/quota-2-guid" }
+						  }
+						}
+					]
+				}`, server.URL())
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/organization_quotas", "names=sancho-panza"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"page1 warning"}}),
+					),
+				)
+			})
+
+			It("queries the API with the given name", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("page1 warning"))
+				Expect(orgQuotas).To(ConsistOf(
 					OrgQuota{
 						GUID: "quota-2-guid",
 						Name: "sancho-panza",
