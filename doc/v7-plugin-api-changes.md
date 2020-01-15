@@ -4,129 +4,166 @@ This document lists the differences in the objects the V7 Plugin API returns com
 
 ## Methods that have changed
 
-### GetExample
-
-GetExample returned an "example" string on success and an error string on error in V6
-
-In V7 it now returns "cool example" with no change to the error text
-
 ### GetApp
-Model changes (TODO)
+Model changes
 
 V6
-```
+```json
 {
-        "Guid": STRING,
-        "Name": STRING,
-        "BuildpackUrl": STRING,
-        "Command": STRING,
-        "DetectedStartCommand": STRING,
-        "DiskQuota": 1024,
-        "EnvironmentVars": HASH,
-        "InstanceCount": 1,
-        "Memory": 32,
-        "RunningInstances": 1,
-        "HealthCheckTimeout": 0,
-        "State": "started",
-        "SpaceGuid": STRING,
-        "PackageUpdatedAt": STRING,
-        "PackageState": "STAGED",
-        "StagingFailedReason": STRING,
-        "Stack": {
-                "Guid": STRING,
-                "Name": STRING,
-                "Description": STRING
-        },
-        "Instances": [
-                STATS_HASH
-        ],
-        "Routes": [
-                {
-                        "Guid": STRING,
-                        "Host": "dora",
-                        "Domain": {
-                                "Guid": STRING,
-                                "Name": "ancient-twister.lite.cli.fun"
-                        },
-                        "Path": STRING,
-                        "Port": 0
-                }
-        ],
-        "Services": null
+  "Guid": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
+  "Name": "some-app",
+  "BuildpackUrl": "",
+  "Command": "",
+  "DetectedStartCommand": "bundle exec rackup config.ru -p $PORT",
+  "DiskQuota": 1024,
+  "EnvironmentVars": null,
+  "InstanceCount": 1,
+  "Memory": 32,
+  "RunningInstances": 1,
+  "HealthCheckTimeout": 0,
+  "State": "started",
+  "SpaceGuid": "17586e2d-4df8-4879-b995-03d59a730e95",
+  "PackageUpdatedAt": "2020-01-14T22:50:20Z",
+  "PackageState": "STAGED",
+  "StagingFailedReason": "",
+  "Stack": {
+    "Guid": "881b268c-d234-4c08-b5c5-50099ccb02bc",
+    "Name": "cflinuxfs3",
+    "Description": ""
+  },
+  "Instances": [
+    {
+      "State": "running",
+      "Details": "",
+      "Since": "2020-01-14T14:51:28-08:00",
+      "CpuUsage": 0.0030685568679712145,
+      "DiskQuota": 1073741824,
+      "DiskUsage": 94228480,
+      "MemQuota": 33554432,
+      "MemUsage": 15935488
+    }
+  ],
+  "Routes": [
+    {
+      "Guid": "93f82997-a2e8-406e-a4fd-f7c6d0d0fce5",
+      "Host": "some-app",
+      "Domain": {
+        "Guid": "c0a63884-1260-4492-bf3c-119ed2c8a131",
+        "Name": "example.com"
+      },
+      "Path": "",
+      "Port": 0
+    }
+  ],
+  "Services": null
 }
 ```
 
 V7
-```
+```json
 {
-        "Name": STRING,
-        "GUID": STRING,
-        "StackName": "",
-        "State": "STARTED",
-        "LifecycleType": "buildpack",
-        "LifecycleBuildpacks": null,
-        "Metadata": null,
-        "ProcessSummaries": [
-                {
-                        "GUID": STRING,
-                        "Type": "web",
-                        "Command": "bundle exec rackup config.ru -p $PORT",
-                        "HealthCheckType": STRING,
-                        "HealthCheckEndpoint": STRING,
-                        "HealthCheckInvocationTimeout": 0,
-                        "HealthCheckTimeout": 0,
-                        "Instances": 1,
-                        "MemoryInMB": {
-                                "IsSet": true,
-                                "Value": 32
-                        },
-                        "DiskInMB": {
-                                "IsSet": true,
-                                "Value": 1024
-                        },
-                        "Sidecars": null,
-                        "InstanceDetails": [
-                                {
-                                        "CPU": 0.002718184649961429,
-                                        "Details": "",
-                                        "DiskQuota": 1073741824,
-                                        "DiskUsage": 115396608,
-                                        "Index": 0,
-                                        "IsolationSegment": "",
-                                        "MemoryQuota": 33554432,
-                                        "MemoryUsage": 14675968,
-                                        "State": "RUNNING",
-                                        "Type": "web",
-                                        "Uptime": 2437000000000
-                                }
-                        ]
-                }
-        ],
-        "Routes": [
-                {
-                        "GUID": STRING,
-                        "SpaceGUID": STRING,
-                        "DomainGUID": STRING,
-                        "Host": "dora",
-                        "Path": STRING,
-                        "DomainName": STRING,
-                        "SpaceName": STRING,
-                        "URL": STRING
-                }
-        ],
-        "CurrentDroplet": {
-                "GUID": STRING,
-                "State": "STAGED",
-                "CreatedAt": STRING,
-                "Stack": STRING,
-                "Image": STRING,
-                "Buildpacks": [
-                        {
-                                "Name": "ruby_buildpack",
-                                "DetectOutput": "ruby"
-                        }
-                ]
+  "Name": "some-app",
+  "GUID": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
+  "StackName": "",
+  "State": "STARTED",
+  "LifecycleType": "buildpack",
+  "LifecycleBuildpacks": null,
+  "Metadata": null,
+  "ProcessSummaries": [
+    {
+      "GUID": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
+      "Type": "web",
+      "Command": "bundle exec rackup config.ru -p $PORT",
+      "HealthCheckType": "port",
+      "HealthCheckEndpoint": "",
+      "HealthCheckInvocationTimeout": 0,
+      "HealthCheckTimeout": 0,
+      "Instances": 1,
+      "MemoryInMB": {
+        "IsSet": true,
+        "Value": 32
+      },
+      "DiskInMB": {
+        "IsSet": true,
+        "Value": 1024
+      },
+      "Sidecars": null,
+      "InstanceDetails": [
+        {
+          "CPU": 0.003201964487972746,
+          "Details": "",
+          "DiskQuota": 1073741824,
+          "DiskUsage": 94228480,
+          "Index": 0,
+          "IsolationSegment": "",
+          "MemoryQuota": 33554432,
+          "MemoryUsage": 15441920,
+          "State": "RUNNING",
+          "Type": "web",
+          "Uptime": 94000000000
         }
+      ]
+    },
+    {
+      "GUID": "bf024163-6e42-45a7-a1e1-07e14aaf899b",
+      "Type": "worker",
+      "Command": "bundle exec rackup config.ru",
+      "HealthCheckType": "process",
+      "HealthCheckEndpoint": "",
+      "HealthCheckInvocationTimeout": 0,
+      "HealthCheckTimeout": 0,
+      "Instances": 0,
+      "MemoryInMB": {
+        "IsSet": true,
+        "Value": 32
+      },
+      "DiskInMB": {
+        "IsSet": true,
+        "Value": 1024
+      },
+      "Sidecars": null,
+      "InstanceDetails": null
+    }
+  ],
+  "Routes": [
+    {
+      "GUID": "93f82997-a2e8-406e-a4fd-f7c6d0d0fce5",
+      "SpaceGUID": "17586e2d-4df8-4879-b995-03d59a730e95",
+      "DomainGUID": "c0a63884-1260-4492-bf3c-119ed2c8a131",
+      "Host": "some-app",
+      "Path": "",
+      "DomainName": "example.com",
+      "SpaceName": "some-space",
+      "URL": "some-app.example.com",
+      "Destinations": [
+        {
+          "GUID": "12c6dc1d-9a31-4deb-b0fd-5563936adae0",
+          "App": {
+            "GUID": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
+            "Process": {
+              "Type": "web"
+            }
+          }
+        }
+      ],
+      "Metadata": {
+        "Labels": {}
+      }
+    }
+  ],
+  "CurrentDroplet": {
+    "GUID": "0110f8db-f426-4aad-87d1-4106050cd129",
+    "State": "STAGED",
+    "CreatedAt": "2020-01-14T22:51:13Z",
+    "Stack": "cflinuxfs3",
+    "Image": "",
+    "Buildpacks": [
+      {
+        "Name": "ruby_buildpack",
+        "DetectOutput": "ruby"
+      }
+    ]
+  }
 }
 ```
 
@@ -143,17 +180,19 @@ cf7:
 ### GetCurrentSpace
 
 V6
-```
-{SpaceFields:
-  {Guid:a53cf02c-4d18-4955-b321-b8c45e33df1e 
-   Name:space
-   }
+```json
+{
+  "Guid": "17586e2d-4df8-4879-b995-03d59a730e95",
+  "Name": "some-space"
 }
 ```
 
 V7
-```
-{Name:space GUID:a53cf02c-4d18-4955-b321-b8c45e33df1e}
+```json
+{
+  "Name": "some-space",
+  "GUID": "17586e2d-4df8-4879-b995-03d59a730e95"
+}
 ```
 
 #### Error Changes
@@ -174,27 +213,27 @@ V7 : Error: no space targeted
 Model Changes
 
 V6
-```
+```json
 {
-    OrganizationFields:{
-        Guid:STRING 
-        Name:STRING 
-        QuotaDefinition: {
-            Guid: STRING: 
-            MemoryLimit:0 
-            InstanceMemoryLimit:0 
-            RoutesLimit:0 
-            ServicesLimit:0 
-            NonBasicServicesAllowed:false}
-    }
+  "Guid": "d00d3542-26d2-48eb-9c39-532c10ddf487",
+  "Name": "some-org",
+  "QuotaDefinition": {
+    "Guid": "",
+    "Name": "",
+    "MemoryLimit": 0,
+    "InstanceMemoryLimit": 0,
+    "RoutesLimit": 0,
+    "ServicesLimit": 0,
+    "NonBasicServicesAllowed": false
+  }
 }
 ```
 
 V7
-```
+```json
 {
-    Name:org 
-    GUID:2e2eb386-34a9-4b29-ad49-365a57bdca6c
+  "Name": "some-org",
+  "GUID": "d00d3542-26d2-48eb-9c39-532c10ddf487"
 }
 ```
 #### Error Changes
@@ -212,51 +251,63 @@ The main difference here is the removal of Quota information from GetOrg, in our
 User research we found no uses of this, we also added Metadata to the V7 object
 
 V6
-```
-  Guid:1a873322-a1cb-47aa-ad81-5b7460941910 Name:system 
-  QuotaDefinition:{
-    Guid:
-    Name:default
-    MemoryLimit:102400 
-    InstanceMemoryLimit:-1
-    RoutesLimit:1000
-    ServicesLimit:-1
-    NonBasicServicesAllowed:true
-  }
-  Spaces:[{
-    Guid:00954f6d-fd0f-47f7-80e8-a597a47df9df Name:test-org
+```json
+{
+  "Guid": "d00d3542-26d2-48eb-9c39-532c10ddf487",
+  "Name": "some-org",
+  "QuotaDefinition": {
+    "Guid": "",
+    "Name": "default",
+    "MemoryLimit": 102400,
+    "InstanceMemoryLimit": -1,
+    "RoutesLimit": 1000,
+    "ServicesLimit": -1,
+    "NonBasicServicesAllowed": true
+  },
+  "Spaces": [
+    {
+      "Guid": "17586e2d-4df8-4879-b995-03d59a730e95",
+      "Name": "some-space"
     }
-  ]
-  Domains:[{
-    Guid:e672e331-def1-418b-ad4c-428177de353d
-    Name:frost-dagger.lite.cli.fun OwningOrganizationGuid: Shared:true
-  }]
-  SpaceQuotas:[{SpaceQuoteObject}]}
+  ],
+  "Domains": [
+    {
+      "Guid": "c0a63884-1260-4492-bf3c-119ed2c8a131",
+      "Name": "example.com",
+      "OwningOrganizationGuid": "",
+      "Shared": true
+    }
+  ],
+  "SpaceQuotas": null
+}
 ```
+
 V7
 
-```
+```json
 {
-   Org: {
-     Name: system GUID: 1a873322-a1cb-47aa-ad81-5b7460941910
-   }
-   Metadata: {
-     Labels: map[
-        label: { Value: test IsSet: true }
-        fun: { Value: true IsSet: true }
-      ]
-   }
-   Spaces: [
-     {
-       Name: test-org GUID: 00954f6d-fd0f-47f7-80e8-a597a47df9df
-     }
-   ]
-   Domains: [
-     {
-       Name: frost-dagger.lite.cli.fun
-       GUID: e672e331-def1-418b-ad4c-428177de353d
-     }
-   ]
+  "Name": "some-org",
+  "GUID": "d00d3542-26d2-48eb-9c39-532c10ddf487",
+  "Metadata": {
+    "Labels": {
+      "some-key": "some-value"
+    }
+  },
+  "Spaces": [
+    {
+      "Name": "some-space",
+      "GUID": "17586e2d-4df8-4879-b995-03d59a730e95",
+      "Metadata": {
+        "Labels": null
+      }
+    }
+  ],
+  "Domains": [
+    {
+      "Name": "example.com",
+      "GUID": "c0a63884-1260-4492-bf3c-119ed2c8a131"
+    }
+  ]
 }
 ```
 
@@ -266,56 +317,64 @@ V7
 The main difference is that the V7 plugin will return only the space name and GUID, as well as its Metadata (currently existing uses of the V6 plugin are only using the `Guid` field).
 
 V6
-```
+```json
 {
-  Guid:a53cf02c-4d18-4955-b321-b8c45e33df1e Name:myspace 
-  Organization:{Guid:2e2eb386-34a9-4b29-ad49-365a57bdca6c Name:tom}
-  Applications:[{Name:pora Guid:d8e2ed07-804b-4ed1-b2e6-21953d13c0f7} {Name:zora Guid:85706f87-14b9-4e9b-b9eb-7f3aee2fe9a8}]
-  ServiceInstances:[]
-  Domains:[{
-    Guid:e672e331-def1-418b-ad4c-428177de353d
-    Name:frost-dagger.lite.cli.fun OwningOrganizationGuid: Shared:true
-  }]
-  SecurityGroups:[
-    { 
-    Name:public_networks 
-    Guid:3b4b1860-446c-4827-ac46-41c69a53868c 
-    Rules:[
-      map[destination:0.0.0.0-9.255.255.255 protocol:all] 
-      map[destination:11.0.0.0-169.253.255.255 protocol:all] 
-      map[destination:169.255.0.0-172.15.255.255 protocol:all] 
-      map[destination:172.32.0.0-192.167.255.255 protocol:all] 
-      map[destination:192.169.0.0-255.255.255.255 protocol:all]]
-    } 
+  "Guid": "17586e2d-4df8-4879-b995-03d59a730e95",
+  "Name": "some-space",
+  "Organization": {
+    "Guid": "d00d3542-26d2-48eb-9c39-532c10ddf487",
+    "Name": "some-org"
+  },
+  "Applications": [
     {
-       Name:dns 
-       Guid:b10e310c-e3c1-4882-9835-58b413b9c9b8 
-       Rules:[map[destination:0.0.0.0/0 ports:53 protocol:tcp] map[destination:0.0.0.0/0 ports:53 protocol:udp]]
-       }
-   ]
- SpaceQuota: {
-   Guid: 
-   Name: 
-   MemoryLimit:0 
-   InstanceMemoryLimit:0 
-   RoutesLimit:0 ServicesLimit:0 
-   NonBasicServicesAllowed:false
-   }
+      "Name": "some-app",
+      "Guid": "defbb5bb-f010-4e4c-9841-60f641dd5bd4"
+    }
+  ],
+  "ServiceInstances": null,
+  "Domains": [
+    {
+      "Guid": "c0a63884-1260-4492-bf3c-119ed2c8a131",
+      "Name": "example.com",
+      "OwningOrganizationGuid": "",
+      "Shared": true
+    }
+  ],
+  "SecurityGroups": [
+    {
+      "Name": "public_networks",
+      "Guid": "8a1f1ebf-41a4-4739-ac9f-e9a52e3e583c",
+      "Rules": [
+        {
+          "destination": "0.0.0.0-9.255.255.255",
+          "protocol": "all"
+        }
+      ]
+    }
+  ],
+  "SpaceQuota": {
+    "Guid": "",
+    "Name": "",
+    "MemoryLimit": 0,
+    "InstanceMemoryLimit": 0,
+    "RoutesLimit": 0,
+    "ServicesLimit": 0,
+    "NonBasicServicesAllowed": false
   }
 }
 ```
+
 V7
 
-```
+```json
 {
-   Name: myspace 
-   GUID: 1a873322-a1cb-47aa-ad81-5b7460941910
-   Metadata: {
-     Labels: map[
-        key1: { Value: value1 IsSet: true }
-        key2: { Value: value2 IsSet: true }
-      ]
-   }
+  "Name": "some-space",
+  "GUID": "17586e2d-4df8-4879-b995-03d59a730e95",
+  "Metadata": {
+    "Labels": {
+      "some-key": "some-value"
+    }
+  }
 }
 ```
 
@@ -323,45 +382,48 @@ V7
 #### Model Changes
 
 V6
-```
+```json
 [
-    {
-        Name:pora Guid:d8e2ed07-804b-4ed1-b2e6-21953d13c0f7 
-        State:started 
-        TotalInstances:1 
-        RunningInstances:1 
-        Memory:256 
-        DiskQuota:1024 
-        Routes:[
-            {
-                Guid:7248a64a-e98e-436c-851a-4fb9603b3e84 
-                Host:pora 
-                Domain:{
-                    Guid:177b07ba-b9e5-4189-b801-8a59cdf79021 
-                    Name:quasar-scarer.capi.land 
-                    OwningOrganizationGuid: 
-                    Shared:false
-                }
-            }
-        ]
-    },
-    ...
+  {
+    "Name": "some-app",
+    "Guid": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
+    "State": "started",
+    "TotalInstances": 1,
+    "RunningInstances": 1,
+    "Memory": 32,
+    "DiskQuota": 1024,
+    "Routes": [
+      {
+        "Guid": "93f82997-a2e8-406e-a4fd-f7c6d0d0fce5",
+        "Host": "some-app",
+        "Domain": {
+          "Guid": "c0a63884-1260-4492-bf3c-119ed2c8a131",
+          "Name": "example.com",
+          "OwningOrganizationGuid": "",
+          "Shared": false
+        }
+      }
+    ]
+  }
 ]
 ```
 
 V7
-```
+```json
 [
-    {
-        Name:pora 
-        GUID:d8e2ed07-804b-4ed1-b2e6-21953d13c0f7 
-        StackName:cflinuxfs3 
-        State:STARTED 
-        LifecycleType:buildpack 
-        LifecycleBuildpacks:[go_buildpack] 
-        Metadata: {Labels:map[]}
-    },
-    ...
+  {
+    "Name": "some-app",
+    "GUID": "defbb5bb-f010-4e4c-9841-60f641dd5bd4",
+    "StackName": "cflinuxfs3",
+    "State": "STARTED",
+    "LifecycleType": "buildpack",
+    "LifecycleBuildpacks": null,
+    "Metadata": {
+      "Labels": {
+        "some-key": "some-value"
+      }
+    }
+  }
 ]
 ```
 
@@ -390,23 +452,25 @@ V7: Returns empty string with error `not logged in`
 V6:
 ```json
 [
- {
-  Name: myspace
-  Guid: myguid
- },...
+  {
+    "Guid": "17586e2d-4df8-4879-b995-03d59a730e95",
+    "Name": "some-space"
+  }
 ]
 ```
 
 V7:
-```
+```json
 [
- {
-  Name: myspace
-  GUID: myguid
-  Metadata: {
-     Labels: map[key:{Value: avalue}]
+  {
+    "Name": "some-space",
+    "GUID": "17586e2d-4df8-4879-b995-03d59a730e95",
+    "Metadata": {
+      "Labels": {
+        "some-key": "some-value"
+      }
+    }
   }
- },...
 ]
 ```
 
