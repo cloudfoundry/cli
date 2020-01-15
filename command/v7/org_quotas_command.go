@@ -60,6 +60,7 @@ func (cmd OrgQuotasCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	cmd.UI.DisplayOK()
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
 	quotaDisplayer.DisplayQuotasTable(quotas)

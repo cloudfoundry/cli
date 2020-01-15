@@ -76,15 +76,17 @@ var _ = Describe("org-quotas command", func() {
 			fakeActor.GetOrganizationQuotasReturns(orgQuotas, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 		})
 
-		It("should print text indicating its running", func() {
+		It("should print text indicating the command status", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Out).To(Say(`Getting org quotas as apple\.\.\.`))
-		})
-
-		It("prints a table of quotas", func() {
-			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Err).To(Say("some-warning-1"))
 			Expect(testUI.Err).To(Say("some-warning-2"))
+			Expect(testUI.Out).To(Say("OK"))
+		})
+
+		It("retrieves and displays all quotas", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(fakeActor.GetOrganizationQuotasCallCount()).To(Equal(1))
 			Expect(testUI.Out).To(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports`))
 			Expect(testUI.Out).To(Say(`org-quota-1\s+1T\s+32M\s+5\s+3\s+allowed\s+3\s+2`))
 		})
