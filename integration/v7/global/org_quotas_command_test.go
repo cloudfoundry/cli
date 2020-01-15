@@ -59,7 +59,7 @@ var _ = Describe("org-quotas command", func() {
 		It("lists the org quotas", func() {
 			session := helpers.CF("org-quotas")
 			Eventually(session).Should(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports`))
-			Eventually(session).Should(Say(`%s\s+24\s+6\s+%s\s+%s\s+%s\s+%s\s+%s`, quotaName, routes, serviceInstances, "allowed", appInstances, reservedRoutePorts))
+			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s\s+%s`, quotaName, totalMemory, instanceMemory, routes, serviceInstances, "allowed", appInstances, reservedRoutePorts))
 			Eventually(session).Should(Exit(0))
 		})
 	})

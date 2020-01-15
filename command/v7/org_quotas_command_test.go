@@ -60,7 +60,7 @@ var _ = Describe("org-quotas command", func() {
 					Name: "org-quota-1",
 					Apps: ccv3.AppLimit{
 						TotalMemory:       types.NullInt{Value: 1048576, IsSet: true},
-						InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
+						InstanceMemory:    types.NullInt{Value: 32, IsSet: true},
 						TotalAppInstances: types.NullInt{Value: 3, IsSet: true},
 					},
 					Services: ccv3.ServiceLimit{
@@ -81,12 +81,12 @@ var _ = Describe("org-quotas command", func() {
 			Expect(testUI.Out).To(Say(`Getting org quotas as apple\.\.\.`))
 		})
 
-		It("prints a table of buildpacks", func() {
+		It("prints a table of quotas", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(testUI.Err).To(Say("some-warning-1"))
 			Expect(testUI.Err).To(Say("some-warning-2"))
 			Expect(testUI.Out).To(Say(`name\s+total memory\s+instance memory\s+routes\s+service instances\s+paid service plans\s+app instances\s+route ports`))
-			Expect(testUI.Out).To(Say(`org-quota-1\s+1048576\s+1024\s+5\s+3\s+allowed\s+3\s+2`))
+			Expect(testUI.Out).To(Say(`org-quota-1\s+1T\s+32M\s+5\s+3\s+allowed\s+3\s+2`))
 		})
 
 		When("there are limits that have not been configured", func() {
@@ -137,7 +137,7 @@ var _ = Describe("org-quotas command", func() {
 		})
 	})
 
-	When("getting buildpacks fails", func() {
+	When("getting quotas fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetOrganizationQuotasReturns(nil, v7action.Warnings{"some-warning-1", "some-warning-2"}, errors.New("some-error"))
 		})

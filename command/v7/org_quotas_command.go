@@ -1,14 +1,10 @@
 package v7
 
 import (
-	"strconv"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/clock"
 )
 
@@ -65,41 +61,8 @@ func (cmd OrgQuotasCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.displayTable(quotas)
+	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
+	quotaDisplayer.DisplayQuotasTable(quotas)
 
 	return nil
-}
-
-func (cmd OrgQuotasCommand) displayTable(orgQuotas []v7action.OrganizationQuota) {
-	var keyValueTable = [][]string{
-		{"name", "total memory", "instance memory", "routes", "service instances", "paid service plans", "app instances", "route ports"},
-	}
-
-	for _, orgQuota := range orgQuotas {
-		paidServicesOutput := "disallowed"
-		if orgQuota.Services.PaidServicePlans {
-			paidServicesOutput = "allowed"
-		}
-
-		keyValueTable = append(keyValueTable, []string{
-			orgQuota.Name,
-			cmd.presentNullOrIntValue(orgQuota.Apps.TotalMemory),
-			cmd.presentNullOrIntValue(orgQuota.Apps.InstanceMemory),
-			cmd.presentNullOrIntValue(orgQuota.Routes.TotalRoutes),
-			cmd.presentNullOrIntValue(orgQuota.Services.TotalServiceInstances),
-			paidServicesOutput,
-			cmd.presentNullOrIntValue(orgQuota.Apps.TotalAppInstances),
-			cmd.presentNullOrIntValue(orgQuota.Routes.TotalRoutePorts),
-		})
-	}
-
-	cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
-}
-
-func (cmd OrgQuotasCommand) presentNullOrIntValue(limit types.NullInt) string {
-	if !limit.IsSet {
-		return "unlimited"
-	} else {
-		return strconv.Itoa(limit.Value)
-	}
 }
