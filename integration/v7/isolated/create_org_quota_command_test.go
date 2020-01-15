@@ -52,16 +52,6 @@ var _ = Describe("create-org-quota command", func() {
 		})
 	})
 
-	When("the quota name is not provided", func() {
-		It("tells the user that the quota name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("create-org-quota")
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ORG_QUOTA_NAME` was not provided"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "create-org-quota", quotaOrgName)
@@ -69,6 +59,26 @@ var _ = Describe("create-org-quota command", func() {
 	})
 
 	When("the environment is set up correctly", func() {
+		When("the quota name is not provided", func() {
+			It("tells the user that the quota name is required, prints help text, and exits 1", func() {
+				session := helpers.CF("create-org-quota")
+
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ORG_QUOTA_NAME` was not provided"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		FWhen("a nonexistent flag is provided", func() {
+			It("tells the user that the flag is invalid", func() {
+				session := helpers.CF("create-org-quota", "--nonexistent")
+
+				Eventually(session.Err).Should(Say("Incorrect Usage: unknown flag `nonexistent'"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		When("the quota does not exist", func() {
 			When("no flags are provided", func() {
 				It("creates the quota with the default values", func() {
