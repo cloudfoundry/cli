@@ -1,9 +1,7 @@
-// Leaving this file in integration/v7/global for now, since it can be used as the test file for `cf7 org-quota` command
 package global
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/v7/global"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
