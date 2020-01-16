@@ -88,9 +88,8 @@ var _ = Describe("start command", func() {
 				BeforeEach(func() {
 					var packageGUID string
 
-					// TODO: uncomment when map-route works in V7
-					// mapRouteSession := helpers.CF("map-route", appName, helpers.DefaultSharedDomain(), "-n", appName)
-					// Eventually(mapRouteSession).Should(Exit(0))
+					mapRouteSession := helpers.CF("map-route", appName, helpers.DefaultSharedDomain(), "-n", appName)
+					Eventually(mapRouteSession).Should(Exit(0))
 
 					helpers.WithHelloWorldApp(func(dir string) {
 						pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "create-package", appName)
@@ -122,8 +121,7 @@ var _ = Describe("start command", func() {
 					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
 					Eventually(session).Should(Say(`name:\s+%s`, appName))
 					Eventually(session).Should(Say(`requested state:\s+started`))
-					// TODO: uncomment when map-route works in V7
-					// Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+1/1`))
 					Eventually(session).Should(Say(`memory usage:\s+32M`))
