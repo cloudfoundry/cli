@@ -19,6 +19,14 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+const UnknownCommandCode = -666
+
+// TODO Unwind this code, remove specific edge case just for v2v3 app command
+const switchToV2 = -3
+
+var ErrFailed = errors.New("command failed")
+var ParseErr = errors.New("incorrect type for arg")
+
 type UI interface {
 	DisplayError(err error)
 	DisplayWarning(template string, templateValues ...map[string]interface{})
@@ -35,14 +43,6 @@ type TriggerLegacyMain interface {
 	error
 }
 
-const UnknownCommandCode = -666
-
-// TODO Unwind this code, remove specific edge case just for v2v3 app command
-const switchToV2 = -3
-
-var ErrFailed = errors.New("command failed")
-var ParseErr = errors.New("incorrect type for arg")
-
 func ParseCommandFromArgs(args []string) int {
 	exitStatus := parse(args, &common.Commands)
 	if exitStatus == switchToV2 {
@@ -51,28 +51,93 @@ func ParseCommandFromArgs(args []string) int {
 	return exitStatus
 }
 
-func parse(args []string, commandList interface{}) int {
-	parser := flags.NewParser(commandList, flags.HelpFlag)
-	parser.CommandHandler = executionWrapper
-	extraArgs, err := parser.ParseArgs(args)
-	if err == nil {
-		return 0
-	} else if _, ok := err.(translatableerror.V3V2SwitchError); ok {
-		return switchToV2
-	} else if flagErr, ok := err.(*flags.Error); ok {
-		return handleFlagErrorAndCommandHelp(flagErr, parser, extraArgs, args, commandList)
-	} else if err == ErrFailed {
-		return 1
-	} else if err == ParseErr {
-		fmt.Println()
-		parse([]string{"help", args[0]}, commandList)
-		return 1
-	} else if exitError, ok := err.(*ssh.ExitError); ok {
-		return exitError.ExitStatus()
+func executionWrapper(cmd flags.Commander, args []string) error {
+	cfConfig, commandUI, err := getCFConfigAndCommandUIObjects()
+	if err != nil {
+		return err
+	}
+	defer commandUI.FlushDeferred()
+
+	err = preventExtraArgs(args)
+	if err != nil {
+		return handleError(err, commandUI)
 	}
 
-	fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
-	return 1
+	err = cfConfig.CreatePluginHome()
+	if err != nil {
+		return handleError(err, commandUI)
+	}
+
+	defer func() {
+		configWriteErr := cfConfig.WriteConfig()
+		if configWriteErr != nil {
+			fmt.Fprintf(os.Stderr, "Error writing config: %s", configWriteErr.Error())
+		}
+	}()
+
+	if extendedCmd, ok := cmd.(command.ExtendedCommander); ok {
+		log.SetOutput(os.Stderr)
+		log.SetLevel(log.Level(cfConfig.LogLevel()))
+
+		err = extendedCmd.Setup(cfConfig, commandUI)
+		if err != nil {
+			return handleError(err, commandUI)
+		}
+
+		return handleError(extendedCmd.Execute(args), commandUI)
+	}
+
+	return fmt.Errorf("command does not conform to ExtendedCommander")
+}
+
+func getCFConfigAndCommandUIObjects() (*configv3.Config, *ui.UI, error) {
+	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
+		Verbose: common.Commands.VerboseOrVersion,
+	})
+	if configErr != nil {
+		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
+			return nil, nil, configErr
+		}
+	}
+	commandUI, err := ui.NewUI(cfConfig)
+	return cfConfig, commandUI, err
+}
+
+func handleError(passedErr error, commandUI UI) error {
+	if passedErr == nil {
+		return nil
+	}
+
+	translatedErr := translatableerror.ConvertToTranslatableError(passedErr)
+
+	switch typedErr := translatedErr.(type) {
+	case translatableerror.V3V2SwitchError:
+		log.Info("Received a V3V2SwitchError - switch to the V2 version of the command")
+		return passedErr
+	case TriggerLegacyMain:
+		if typedErr.Error() != "" {
+			commandUI.DisplayWarning("")
+			commandUI.DisplayWarning(typedErr.Error())
+		}
+		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
+	case *ssh.ExitError:
+		exitStatus := typedErr.ExitStatus()
+		if sig := typedErr.Signal(); sig != "" {
+			commandUI.DisplayText("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
+				"Signal":   sig,
+				"ExitCode": exitStatus,
+			})
+		}
+		return passedErr
+	}
+
+	commandUI.DisplayError(translatedErr)
+
+	if _, ok := translatedErr.(DisplayUsage); ok {
+		return ParseErr
+	}
+
+	return ErrFailed
 }
 
 func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, extraArgs []string, originalArgs []string, commandList interface{}) int {
@@ -152,17 +217,14 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 	return 0
 }
 
-func getCFConfigAndCommandUIObjects() (*configv3.Config, *ui.UI, error) {
-	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
-	})
-	if configErr != nil {
-		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
-			return nil, nil, configErr
-		}
-	}
-	commandUI, err := ui.NewUI(cfConfig)
-	return cfConfig, commandUI, err
+func isCommand(s string) bool {
+	_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
+		func(fieldName string) bool {
+			field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
+			return s == field.Tag.Get("command") || s == field.Tag.Get("alias")
+		})
+
+	return found
 }
 
 func isHelpCommand(args []string) bool {
@@ -174,92 +236,30 @@ func isHelpCommand(args []string) bool {
 	return false
 }
 
-func isCommand(s string) bool {
-	_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
-		func(fieldName string) bool {
-			field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
-			return s == field.Tag.Get("command") || s == field.Tag.Get("alias")
-		})
-
-	return found
-}
-
 func isOption(s string) bool {
 	return strings.HasPrefix(s, "-")
 }
 
-func executionWrapper(cmd flags.Commander, args []string) error {
-	cfConfig, commandUI, err := getCFConfigAndCommandUIObjects()
-	if err != nil {
-		return err
-	}
-	defer commandUI.FlushDeferred()
-
-	err = preventExtraArgs(args)
-	if err != nil {
-		return handleError(err, commandUI)
-	}
-
-	err = cfConfig.CreatePluginHome()
-	if err != nil {
-		return handleError(err, commandUI)
-	}
-
-	defer func() {
-		configWriteErr := cfConfig.WriteConfig()
-		if configWriteErr != nil {
-			fmt.Fprintf(os.Stderr, "Error writing config: %s", configWriteErr.Error())
-		}
-	}()
-
-	if extendedCmd, ok := cmd.(command.ExtendedCommander); ok {
-		log.SetOutput(os.Stderr)
-		log.SetLevel(log.Level(cfConfig.LogLevel()))
-
-		err = extendedCmd.Setup(cfConfig, commandUI)
-		if err != nil {
-			return handleError(err, commandUI)
-		}
-
-		return handleError(extendedCmd.Execute(args), commandUI)
+func parse(args []string, commandList interface{}) int {
+	parser := flags.NewParser(commandList, flags.HelpFlag)
+	parser.CommandHandler = executionWrapper
+	extraArgs, err := parser.ParseArgs(args)
+	if err == nil {
+		return 0
+	} else if _, ok := err.(translatableerror.V3V2SwitchError); ok {
+		return switchToV2
+	} else if flagErr, ok := err.(*flags.Error); ok {
+		return handleFlagErrorAndCommandHelp(flagErr, parser, extraArgs, args, commandList)
+	} else if err == ErrFailed {
+		return 1
+	} else if err == ParseErr {
+		fmt.Println()
+		parse([]string{"help", args[0]}, commandList)
+		return 1
+	} else if exitError, ok := err.(*ssh.ExitError); ok {
+		return exitError.ExitStatus()
 	}
 
-	return fmt.Errorf("command does not conform to ExtendedCommander")
-}
-
-func handleError(passedErr error, commandUI UI) error {
-	if passedErr == nil {
-		return nil
-	}
-
-	translatedErr := translatableerror.ConvertToTranslatableError(passedErr)
-
-	switch typedErr := translatedErr.(type) {
-	case translatableerror.V3V2SwitchError:
-		log.Info("Received a V3V2SwitchError - switch to the V2 version of the command")
-		return passedErr
-	case TriggerLegacyMain:
-		if typedErr.Error() != "" {
-			commandUI.DisplayWarning("")
-			commandUI.DisplayWarning(typedErr.Error())
-		}
-		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
-	case *ssh.ExitError:
-		exitStatus := typedErr.ExitStatus()
-		if sig := typedErr.Signal(); sig != "" {
-			commandUI.DisplayText("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
-				"Signal":   sig,
-				"ExitCode": exitStatus,
-			})
-		}
-		return passedErr
-	}
-
-	commandUI.DisplayError(translatedErr)
-
-	if _, ok := translatedErr.(DisplayUsage); ok {
-		return ParseErr
-	}
-
-	return ErrFailed
+	fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
+	return 1
 }
