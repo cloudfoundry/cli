@@ -48,13 +48,13 @@ func (displayer QuotaDisplayer) DisplayQuotasTable(orgQuotas []v7action.Organiza
 
 func (displayer QuotaDisplayer) DisplaySingleQuota(orgQuota v7action.OrganizationQuota) {
 	orgQuotaTable := [][]string{
-		{displayer.ui.TranslateText("total memory"), displayer.presentQuotaMemoryValue(orgQuota.TotalMemory)},
-		{displayer.ui.TranslateText("instance memory"), displayer.presentQuotaMemoryValue(orgQuota.InstanceMemory)},
-		{displayer.ui.TranslateText("routes"), displayer.presentQuotaValue(orgQuota.TotalRoutes)},
-		{displayer.ui.TranslateText("service instances"), displayer.presentQuotaValue(orgQuota.TotalServiceInstances)},
-		{displayer.ui.TranslateText("paid service plans"), displayer.presentBooleanValue(orgQuota.PaidServicePlans)},
-		{displayer.ui.TranslateText("app instances"), displayer.presentQuotaValue(orgQuota.TotalAppInstances)},
-		{displayer.ui.TranslateText("route ports"), displayer.presentQuotaValue(orgQuota.TotalRoutePorts)},
+		{displayer.ui.TranslateText("total memory:"), displayer.presentQuotaMemoryValue(orgQuota.TotalMemory)},
+		{displayer.ui.TranslateText("instance memory:"), displayer.presentQuotaMemoryValue(orgQuota.InstanceMemory)},
+		{displayer.ui.TranslateText("routes:"), displayer.presentQuotaValue(orgQuota.TotalRoutes)},
+		{displayer.ui.TranslateText("service instances:"), displayer.presentQuotaValue(orgQuota.TotalServiceInstances)},
+		{displayer.ui.TranslateText("paid service plans:"), displayer.presentBooleanValue(orgQuota.PaidServicePlans)},
+		{displayer.ui.TranslateText("app instances:"), displayer.presentQuotaValue(orgQuota.TotalAppInstances)},
+		{displayer.ui.TranslateText("route ports:"), displayer.presentQuotaValue(orgQuota.TotalRoutePorts)},
 	}
 
 	displayer.ui.DisplayKeyValueTable("", orgQuotaTable, 3)
