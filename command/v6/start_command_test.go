@@ -58,7 +58,7 @@ var _ = Describe("Start Command", func() {
 		binaryName                  string
 		appName                     string
 		executeErr                  error
-		allLogsWritten              chan bool
+		allLogsWritten chan bool
 	)
 
 	BeforeEach(func() {
