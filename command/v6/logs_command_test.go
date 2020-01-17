@@ -1,19 +1,17 @@
 package v6_test
 
 import (
-	"context"
 	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"github.com/cloudfoundry/noaa/consumer"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -26,7 +24,7 @@ var _ = Describe("logs command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v6fakes.FakeLogsActor
-		logCacheClient  *sharedactionfakes.FakeLogCacheClient
+		noaaClient      *consumer.Consumer
 		binaryName      string
 		executeErr      error
 	)
@@ -36,14 +34,14 @@ var _ = Describe("logs command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v6fakes.FakeLogsActor)
-		logCacheClient = new(sharedactionfakes.FakeLogCacheClient)
+		noaaClient = new(consumer.Consumer)
 
 		cmd = LogsCommand{
-			UI:             testUI,
-			Config:         fakeConfig,
-			SharedActor:    fakeSharedActor,
-			Actor:          fakeActor,
-			LogCacheClient: logCacheClient,
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
+			NOAAClient:  noaaClient,
 		}
 
 		binaryName = "faceman"
@@ -111,17 +109,17 @@ var _ = Describe("logs command", func() {
 			When("the logs actor returns logs", func() {
 				BeforeEach(func() {
 					fakeActor.GetRecentLogsForApplicationByNameAndSpaceReturns(
-						[]sharedaction.LogMessage{
-							*sharedaction.NewLogMessage(
+						[]v2action.LogMessage{
+							*v2action.NewLogMessage(
 								"i am message 1",
-								"1",
+								1,
 								time.Unix(0, 0),
 								"app",
 								"1",
 							),
-							*sharedaction.NewLogMessage(
+							*v2action.NewLogMessage(
 								"i am message 2",
-								"1",
+								1,
 								time.Unix(1, 0),
 								"another-app",
 								"2",
@@ -144,7 +142,7 @@ var _ = Describe("logs command", func() {
 
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(client).To(Equal(logCacheClient))
+					Expect(client).To(Equal(noaaClient))
 				})
 			})
 		})
@@ -159,7 +157,7 @@ var _ = Describe("logs command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
-					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, nil, v2action.Warnings{"some-warning-1", "some-warning-2"}, expectedErr)
+					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(nil, nil, v2action.Warnings{"some-warning-1", "some-warning-2"}, expectedErr)
 				})
 
 				It("displays the error and all warnings", func() {
@@ -175,8 +173,8 @@ var _ = Describe("logs command", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
 
-					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v2action.Warnings, error) {
-						messages := make(chan sharedaction.LogMessage)
+					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
+						messages := make(chan *v2action.LogMessage)
 						logErrs := make(chan error)
 
 						go func() {
@@ -185,7 +183,7 @@ var _ = Describe("logs command", func() {
 							close(logErrs)
 						}()
 
-						return messages, logErrs, func() {}, v2action.Warnings{"some-warning-1", "some-warning-2"}, nil
+						return messages, logErrs, v2action.Warnings{"some-warning-1", "some-warning-2"}, nil
 					}
 				})
 
@@ -198,31 +196,32 @@ var _ = Describe("logs command", func() {
 
 			When("the logs actor returns logs", func() {
 				BeforeEach(func() {
-					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v2action.Warnings, error) {
-						messages := make(chan sharedaction.LogMessage)
+					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
+						messages := make(chan *v2action.LogMessage)
 						logErrs := make(chan error)
-						message1 := sharedaction.NewLogMessage(
+						message1 := v2action.NewLogMessage(
 							"i am message 1",
-							"1",
+							1,
 							time.Unix(0, 0),
 							"app",
 							"1",
 						)
-						message2 := sharedaction.NewLogMessage(
+						message2 := v2action.NewLogMessage(
 							"i am message 2",
-							"1", time.Unix(1, 0),
+							1,
+							time.Unix(1, 0),
 							"another-app",
 							"2",
 						)
 
 						go func() {
-							messages <- *message1
-							messages <- *message2
+							messages <- message1
+							messages <- message2
 							close(messages)
 							close(logErrs)
 						}()
 
-						return messages, logErrs, func() {}, v2action.Warnings{"some-warning-1", "some-warning-2"}, nil
+						return messages, logErrs, v2action.Warnings{"some-warning-1", "some-warning-2"}, nil
 					}
 				})
 
@@ -243,7 +242,7 @@ var _ = Describe("logs command", func() {
 
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(client).To(Equal(logCacheClient))
+					Expect(client).To(Equal(noaaClient))
 				})
 			})
 		})

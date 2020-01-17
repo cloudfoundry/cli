@@ -10,7 +10,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -43,15 +42,12 @@ var _ = Describe("push Command", func() {
 		fakeRestartActor            *v6fakes.FakeRestartActor
 		fakeApplicationSummaryActor *sharedfakes.FakeApplicationSummaryActor
 		fakeProgressBar             *v6fakes.FakeProgressBar
-		fakeLogCacheClient          *sharedactionfakes.FakeLogCacheClient
 		input                       *Buffer
 		binaryName                  string
 
 		appName    string
 		executeErr error
 		pwd        string
-	 allLogsWritten chan bool
-
 	)
 
 	BeforeEach(func() {
@@ -63,7 +59,6 @@ var _ = Describe("push Command", func() {
 		fakeRestartActor = new(v6fakes.FakeRestartActor)
 		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 		fakeProgressBar = new(v6fakes.FakeProgressBar)
-		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		cmd = PushCommand{
 			UI:                      testUI,
@@ -73,7 +68,6 @@ var _ = Describe("push Command", func() {
 			RestartActor:            fakeRestartActor,
 			ApplicationSummaryActor: fakeApplicationSummaryActor,
 			ProgressBar:             fakeProgressBar,
-			LogCacheClient:          fakeLogCacheClient,
 		}
 
 		appName = "some-app"
@@ -198,21 +192,29 @@ var _ = Describe("push Command", func() {
 								return configStream, eventStream, warningsStream, errorStream
 							}
 
-							fakeRestartActor.RestartApplicationStub = func(_ v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							fakeRestartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationStateChange)
-								allWarnings := make(chan string)
+								warnings := make(chan string)
 								errs := make(chan error)
+
 								go func() {
-									<- allLogsWritten
+									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
 									appState <- v2action.ApplicationStateStopping
+									appState <- v2action.ApplicationStateStaging
+									appState <- v2action.ApplicationStateStarting
+									close(messages)
+									close(logErrs)
 									close(appState)
-									close(allWarnings)
+									close(warnings)
 									close(errs)
 								}()
-								return appState, allWarnings, errs
+
+								return messages, logErrs, appState, warnings, errs
 							}
 
-							allLogsWritten, fakeRestartActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"i am message 1", "i am message "}, []string{})
 							applicationSummary := v2action.ApplicationSummary{
 								Application: v2action.Application{
 									DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
@@ -721,26 +723,15 @@ var _ = Describe("push Command", func() {
 								Expect(testUI.Err).To(Say("apply-2"))
 							})
 
-							Context("new logs", func() {
-								BeforeEach(func() {
-									allLogsWritten, fakeRestartActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"log message 1", "log message 2"}, []string{})
-								})
-								It("displays app staging logs", func() {
+							It("displays app staging logs", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
 
-									Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).To(Say("log message 1"))
+								Expect(testUI.Out).To(Say("log message 2"))
 
-									Expect(testUI.Out).To(Say("log message 1"))
-									Expect(testUI.Out).To(Say("log message 2"))
-
-									Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
-									appConfig := fakeRestartActor.RestartApplicationArgsForCall(0)
-									Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
-
-									Expect(fakeRestartActor.GetStreamingLogsCallCount()).To(Equal(1))
-									appGUID, client := fakeRestartActor.GetStreamingLogsArgsForCall(0)
-									Expect(appGUID).To(Equal(appConfig.GUID))
-									Expect(client).To(Equal(fakeLogCacheClient))
-								})
+								Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
+								appConfig, _ := fakeRestartActor.RestartApplicationArgsForCall(0)
+								Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
 							})
 
 							Context("Process Information", func() {

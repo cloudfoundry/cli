@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
+	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -654,11 +655,17 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("StartApplication/RestartApplication", func() {
 		var (
-			app Application
+			app            Application
+			fakeNOAAClient *v2actionfakes.FakeNOAAClient
 
+			messages <-chan *LogMessage
+			logErrs  <-chan error
 			appState <-chan ApplicationStateChange
 			warnings <-chan string
 			errs     <-chan error
+
+			eventStream chan *events.LogMessage
+			errStream   chan error
 		)
 
 		BeforeEach(func() {
@@ -670,6 +677,24 @@ var _ = Describe("Application Actions", func() {
 				Name:      "some-app",
 				Instances: types.NullInt{Value: 2, IsSet: true},
 			}
+
+			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
+			fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+				eventStream = make(chan *events.LogMessage)
+				errStream = make(chan error)
+				return eventStream, errStream
+			}
+
+			closed := false
+			fakeNOAAClient.CloseStub = func() error {
+				if !closed {
+					closed = true
+					close(errStream)
+					close(eventStream)
+				}
+				return nil
+			}
+
 			appCount := 0
 			fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
 				if appCount == 0 {
@@ -708,6 +733,8 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		AfterEach(func() {
+			Eventually(messages).Should(BeClosed())
+			Eventually(logErrs).Should(BeClosed())
 			Eventually(appState).Should(BeClosed())
 			Eventually(warnings).Should(BeClosed())
 			Eventually(errs).Should(BeClosed())
@@ -926,6 +953,7 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
+					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 			})
 
@@ -990,7 +1018,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				appState, warnings, errs = actor.StartApplication(app)
+				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient)
 			})
 
 			When("the app is already staged", func() {
@@ -1028,7 +1056,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				appState, warnings, errs = actor.RestartApplication(app)
+				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeNOAAClient)
 			})
 
 			When("application is running", func() {
@@ -1064,6 +1092,7 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
+					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
 				When("updating the application to stop fails", func() {
@@ -1148,7 +1177,7 @@ var _ = Describe("Application Actions", func() {
 
 		Describe("RestageApplication", func() {
 			JustBeforeEach(func() {
-				appState, warnings, errs = actor.RestageApplication(app)
+				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeNOAAClient)
 			})
 
 			When("restaging succeeds", func() {
@@ -1178,6 +1207,7 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
+					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
 				ItHandlesStagingIssues()

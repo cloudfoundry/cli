@@ -1,19 +1,20 @@
 package v6
 
 import (
+	"github.com/cloudfoundry/noaa/consumer"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
-	"context"
 )
 
 //go:generate counterfeiter . LogsActor
 
 type LogsActor interface {
-	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v2action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v2action.Warnings, error)
+	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient) ([]v2action.LogMessage, v2action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error)
 }
 
 type LogsCommand struct {
@@ -22,11 +23,11 @@ type LogsCommand struct {
 	usage           interface{}  `usage:"CF_NAME logs APP_NAME"`
 	relatedCommands interface{}  `related_commands:"app, apps, ssh"`
 
-	UI             command.UI
-	Config         command.Config
-	SharedActor    command.SharedActor
-	Actor          LogsActor
-	LogCacheClient sharedaction.LogCacheClient
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       LogsActor
+	NOAAClient  *consumer.Consumer
 }
 
 func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
@@ -38,15 +39,9 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-
-	ccClientV3, _, err := shared.NewV3BasedClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
 	return nil
 }
@@ -82,7 +77,7 @@ func (cmd LogsCommand) displayRecentLogs() error {
 	messages, warnings, err := cmd.Actor.GetRecentLogsForApplicationByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
-		cmd.LogCacheClient,
+		cmd.NOAAClient,
 	)
 
 	for _, message := range messages {
@@ -94,10 +89,10 @@ func (cmd LogsCommand) displayRecentLogs() error {
 }
 
 func (cmd LogsCommand) streamLogs() error {
-	messages, logErrs, stopStreaming, warnings, err := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(
+	messages, logErrs, warnings, err := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
-		cmd.LogCacheClient,
+		cmd.NOAAClient,
 	)
 
 	cmd.UI.DisplayWarnings(warnings)
@@ -121,7 +116,7 @@ func (cmd LogsCommand) streamLogs() error {
 				break
 			}
 
-			stopStreaming()
+			cmd.NOAAClient.Close()
 			return logErr
 		}
 

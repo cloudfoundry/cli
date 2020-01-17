@@ -357,10 +357,10 @@ var _ = Describe("start Command", func() {
 					Expect(testUI.Err).To(Say("steve for all I care"))
 
 					Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appNameArg, spaceGUID, logCacheClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+					appNameArg, spaceGUID, noaaClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
 					Expect(appNameArg).To(Equal(app))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(logCacheClient).To(Equal(fakeLogCacheClient))
+					Expect(noaaClient).To(Equal(fakeLogCacheClient))
 
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
 					guidArg, appNameArg, spaceGUIDArg := fakeActor.StagePackageArgsForCall(0)

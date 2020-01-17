@@ -1,12 +1,10 @@
 package v6_test
 
 import (
-	"context"
 	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -24,29 +22,6 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-// Used for command/v6 tests that need a `GetStreamingLogs' stub
-func GetStreamingLogsStub(logMessages []string, errorStrings []string) (chan bool, func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)) {
-	allLogsWritten := make(chan bool)
-	return allLogsWritten, func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
-
-		outgoingLogStream := make(chan sharedaction.LogMessage, 1)
-		outgoingErrStream := make(chan error, 1)
-		stopStreaming := func() {}
-		go func() {
-			for _, s := range logMessages {
-				outgoingLogStream <- *sharedaction.NewLogMessage(s, "OUT", time.Now(), sharedaction.StagingLog, "source-instance")
-			}
-			for _, s := range errorStrings {
-				outgoingErrStream <- errors.New(s)
-			}
-			close(outgoingLogStream)
-			close(outgoingErrStream)
-			allLogsWritten <- true
-		}()
-		return outgoingLogStream, outgoingErrStream, stopStreaming
-	}
-}
-
 var _ = Describe("Start Command", func() {
 	var (
 		cmd                         StartCommand
@@ -58,7 +33,6 @@ var _ = Describe("Start Command", func() {
 		binaryName                  string
 		appName                     string
 		executeErr                  error
-		allLogsWritten chan bool
 	)
 
 	BeforeEach(func() {
@@ -86,20 +60,22 @@ var _ = Describe("Start Command", func() {
 		testUI.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
 		Expect(err).NotTo(HaveOccurred())
 
-		allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{}, []string{})
-		fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+		fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+			messages := make(chan *v2action.LogMessage)
+			logErrs := make(chan error)
 			appState := make(chan v2action.ApplicationStateChange)
 			warnings := make(chan string)
 			errs := make(chan error)
 
 			go func() {
-				<-allLogsWritten
+				close(messages)
+				close(logErrs)
 				close(appState)
 				close(warnings)
 				close(errs)
 			}()
 
-			return appState, warnings, errs
+			return messages, logErrs, appState, warnings, errs
 		}
 	})
 
@@ -192,51 +168,63 @@ var _ = Describe("Start Command", func() {
 					Expect(testUI.Err).To(Say("warning-2"))
 
 					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-					app := fakeActor.StartApplicationArgsForCall(0)
+					app, _ := fakeActor.StartApplicationArgsForCall(0)
 					Expect(app.GUID).To(Equal("app-guid"))
 				})
 
 				When("passed an ApplicationStateStarting message", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							messages := make(chan *v2action.LogMessage)
+							logErrs := make(chan error)
 							appState := make(chan v2action.ApplicationStateChange)
 							warnings := make(chan string)
 							errs := make(chan error)
 
 							go func() {
-								<-allLogsWritten
+								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
 								appState <- v2action.ApplicationStateStarting
+								close(messages)
+								close(logErrs)
 								close(appState)
 								close(warnings)
 								close(errs)
 							}()
 
-							return appState, warnings, errs
+							return messages, logErrs, appState, warnings, errs
 						}
 					})
 
 					It("displays the log", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("log message 1"))
+						Expect(testUI.Out).To(Say("log message 2"))
 						Expect(testUI.Out).To(Say("Waiting for app to start..."))
 					})
 				})
 
 				When("passed a log message", func() {
 					BeforeEach(func() {
-						allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"log message 1", "log message 2"}, []string{})
-						fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							messages := make(chan *v2action.LogMessage)
+							logErrs := make(chan error)
 							appState := make(chan v2action.ApplicationStateChange)
 							warnings := make(chan string)
 							errs := make(chan error)
 
 							go func() {
-								<-allLogsWritten
+								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "Something else", "1")
+								close(messages)
+								close(logErrs)
 								close(appState)
 								close(warnings)
 								close(errs)
 							}()
 
-							return appState, warnings, errs
+							return messages, logErrs, appState, warnings, errs
 						}
 					})
 
@@ -251,22 +239,26 @@ var _ = Describe("Start Command", func() {
 				When("passed an log err", func() {
 					Context("NOAA connection times out/closes", func() {
 						BeforeEach(func() {
-							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"message 1", "message 2", "message 3"},
-								[]string{"timeout connecting to log server, no log will be shown"},
-							)
-							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
 								go func() {
-									<-allLogsWritten
+									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+									messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "STG", "1")
+									logErrs <- actionerror.NOAATimeoutError{}
+									close(messages)
+									close(logErrs)
 									close(appState)
 									close(warnings)
 									close(errs)
 								}()
 
-								return appState, warnings, errs
+								return messages, logErrs, appState, warnings, errs
 							}
 							v3ApplicationSummary := v3action.ApplicationSummary{
 								Application: v3action.Application{
@@ -316,21 +308,23 @@ var _ = Describe("Start Command", func() {
 
 						BeforeEach(func() {
 							expectedErr = errors.New("err log message")
-							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{}, []string{expectedErr.Error()})
-
-							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
 								go func() {
-									<-allLogsWritten
+									logErrs <- expectedErr
+									close(messages)
+									close(logErrs)
 									close(appState)
 									close(warnings)
 									close(errs)
 								}()
 
-								return appState, warnings, errs
+								return messages, logErrs, appState, warnings, errs
 							}
 						})
 
@@ -344,21 +338,24 @@ var _ = Describe("Start Command", func() {
 				When("passed a warning", func() {
 					Context("while NOAA is still logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
 								go func() {
-									<-allLogsWritten
 									warnings <- "warning 1"
 									warnings <- "warning 2"
+									close(messages)
+									close(logErrs)
 									close(appState)
 									close(warnings)
 									close(errs)
 								}()
 
-								return appState, warnings, errs
+								return messages, logErrs, appState, warnings, errs
 							}
 						})
 
@@ -371,15 +368,19 @@ var _ = Describe("Start Command", func() {
 
 					Context("while NOAA is no longer logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
 								go func() {
-									<-allLogsWritten
 									warnings <- "warning 1"
 									warnings <- "warning 2"
+									logErrs <- actionerror.NOAATimeoutError{}
+									close(messages)
+									close(logErrs)
 									warnings <- "warning 3"
 									warnings <- "warning 4"
 									close(appState)
@@ -387,7 +388,7 @@ var _ = Describe("Start Command", func() {
 									close(errs)
 								}()
 
-								return appState, warnings, errs
+								return messages, logErrs, appState, warnings, errs
 							}
 						})
 
@@ -395,6 +396,7 @@ var _ = Describe("Start Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Err).To(Say("warning 1"))
 							Expect(testUI.Err).To(Say("warning 2"))
+							Expect(testUI.Err).To(Say("timeout connecting to log server, no log will be shown"))
 							Expect(testUI.Err).To(Say("warning 3"))
 							Expect(testUI.Err).To(Say("warning 4"))
 						})
@@ -405,20 +407,23 @@ var _ = Describe("Start Command", func() {
 					var apiErr error
 
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+							messages := make(chan *v2action.LogMessage)
+							logErrs := make(chan error)
 							appState := make(chan v2action.ApplicationStateChange)
 							warnings := make(chan string)
 							errs := make(chan error)
 
 							go func() {
-								<-allLogsWritten
 								errs <- apiErr
+								close(messages)
+								close(logErrs)
 								close(appState)
 								close(warnings)
 								close(errs)
 							}()
 
-							return appState, warnings, errs
+							return messages, logErrs, appState, warnings, errs
 						}
 					})
 

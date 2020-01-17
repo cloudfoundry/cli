@@ -1,7 +1,7 @@
 package v6
 
 import (
-	"context"
+	"github.com/cloudfoundry/noaa/consumer"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -19,8 +19,7 @@ import (
 type RestageActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
-	GetStreamingLogs(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)
-	RestageApplication(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	RestageApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 }
 
 type RestageCommand struct {
@@ -35,7 +34,7 @@ type RestageCommand struct {
 	SharedActor             command.SharedActor
 	Actor                   RestageActor
 	ApplicationSummaryActor shared.ApplicationSummaryActor
-	LogCacheClient          sharedaction.LogCacheClient
+	NOAAClient              *consumer.Consumer
 }
 
 func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
@@ -60,7 +59,7 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
 
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
 	return nil
 }
@@ -91,9 +90,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
-	appState, apiWarnings, errs := cmd.Actor.RestageApplication(app)
-	messages, logErrs, stopStreaming := cmd.Actor.GetStreamingLogs(app.GUID, cmd.LogCacheClient)
-	defer stopStreaming()
+	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestageApplication(app, cmd.NOAAClient)
 	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 	if err != nil {
 		return err

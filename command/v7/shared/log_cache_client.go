@@ -1,4 +1,4 @@
-package command
+package shared
 
 import (
 	"fmt"
@@ -7,16 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 )
-
-type RequestLoggerOutput interface {
-	Start() error
-	Stop() error
-	DisplayType(name string, requestDate time.Time) error
-	DisplayDump(dump string) error
-}
 
 type DebugPrinter struct {
 	outputs []RequestLoggerOutput
@@ -76,7 +70,7 @@ func (c *httpDebugClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 // NewLogCacheClient returns back a configured Log Cache Client.
-func NewLogCacheClient(logCacheEndpoint string, config Config, ui UI) *logcache.Client {
+func NewLogCacheClient(logCacheEndpoint string, config command.Config, ui command.UI) *logcache.Client {
 	tr := &http.Transport{
 		Proxy:           http.ProxyFromEnvironment,
 		TLSClientConfig: util.NewTLSConfig(nil, config.SkipSSLValidation()),
