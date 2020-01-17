@@ -77,7 +77,6 @@ var _ = Describe("org-quotas command", func() {
 			Expect(testUI.Out).To(Say(`Getting org quotas as apple\.\.\.`))
 			Expect(testUI.Err).To(Say("some-warning-1"))
 			Expect(testUI.Err).To(Say("some-warning-2"))
-			Expect(testUI.Out).To(Say("OK"))
 		})
 
 		It("retrieves and displays all quotas", func() {
