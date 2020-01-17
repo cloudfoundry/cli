@@ -2,8 +2,10 @@
 package v6fakes
 
 import (
+	"context"
 	"sync"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
@@ -41,25 +43,36 @@ type FakeRestageActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	RestageApplicationStub        func(v2action.Application, v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	GetStreamingLogsStub        func(string, sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)
+	getStreamingLogsMutex       sync.RWMutex
+	getStreamingLogsArgsForCall []struct {
+		arg1 string
+		arg2 sharedaction.LogCacheClient
+	}
+	getStreamingLogsReturns struct {
+		result1 <-chan sharedaction.LogMessage
+		result2 <-chan error
+		result3 context.CancelFunc
+	}
+	getStreamingLogsReturnsOnCall map[int]struct {
+		result1 <-chan sharedaction.LogMessage
+		result2 <-chan error
+		result3 context.CancelFunc
+	}
+	RestageApplicationStub        func(v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 	restageApplicationMutex       sync.RWMutex
 	restageApplicationArgsForCall []struct {
 		arg1 v2action.Application
-		arg2 v2action.NOAAClient
 	}
 	restageApplicationReturns struct {
-		result1 <-chan *v2action.LogMessage
-		result2 <-chan error
-		result3 <-chan v2action.ApplicationStateChange
-		result4 <-chan string
-		result5 <-chan error
+		result1 <-chan v2action.ApplicationStateChange
+		result2 <-chan string
+		result3 <-chan error
 	}
 	restageApplicationReturnsOnCall map[int]struct {
-		result1 <-chan *v2action.LogMessage
-		result2 <-chan error
-		result3 <-chan v2action.ApplicationStateChange
-		result4 <-chan string
-		result5 <-chan error
+		result1 <-chan v2action.ApplicationStateChange
+		result2 <-chan string
+		result3 <-chan error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -199,23 +212,89 @@ func (fake *FakeRestageActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestageActor) RestageApplication(arg1 v2action.Application, arg2 v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+func (fake *FakeRestageActor) GetStreamingLogs(arg1 string, arg2 sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
+	fake.getStreamingLogsMutex.Lock()
+	ret, specificReturn := fake.getStreamingLogsReturnsOnCall[len(fake.getStreamingLogsArgsForCall)]
+	fake.getStreamingLogsArgsForCall = append(fake.getStreamingLogsArgsForCall, struct {
+		arg1 string
+		arg2 sharedaction.LogCacheClient
+	}{arg1, arg2})
+	fake.recordInvocation("GetStreamingLogs", []interface{}{arg1, arg2})
+	fake.getStreamingLogsMutex.Unlock()
+	if fake.GetStreamingLogsStub != nil {
+		return fake.GetStreamingLogsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getStreamingLogsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeRestageActor) GetStreamingLogsCallCount() int {
+	fake.getStreamingLogsMutex.RLock()
+	defer fake.getStreamingLogsMutex.RUnlock()
+	return len(fake.getStreamingLogsArgsForCall)
+}
+
+func (fake *FakeRestageActor) GetStreamingLogsCalls(stub func(string, sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)) {
+	fake.getStreamingLogsMutex.Lock()
+	defer fake.getStreamingLogsMutex.Unlock()
+	fake.GetStreamingLogsStub = stub
+}
+
+func (fake *FakeRestageActor) GetStreamingLogsArgsForCall(i int) (string, sharedaction.LogCacheClient) {
+	fake.getStreamingLogsMutex.RLock()
+	defer fake.getStreamingLogsMutex.RUnlock()
+	argsForCall := fake.getStreamingLogsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeRestageActor) GetStreamingLogsReturns(result1 <-chan sharedaction.LogMessage, result2 <-chan error, result3 context.CancelFunc) {
+	fake.getStreamingLogsMutex.Lock()
+	defer fake.getStreamingLogsMutex.Unlock()
+	fake.GetStreamingLogsStub = nil
+	fake.getStreamingLogsReturns = struct {
+		result1 <-chan sharedaction.LogMessage
+		result2 <-chan error
+		result3 context.CancelFunc
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRestageActor) GetStreamingLogsReturnsOnCall(i int, result1 <-chan sharedaction.LogMessage, result2 <-chan error, result3 context.CancelFunc) {
+	fake.getStreamingLogsMutex.Lock()
+	defer fake.getStreamingLogsMutex.Unlock()
+	fake.GetStreamingLogsStub = nil
+	if fake.getStreamingLogsReturnsOnCall == nil {
+		fake.getStreamingLogsReturnsOnCall = make(map[int]struct {
+			result1 <-chan sharedaction.LogMessage
+			result2 <-chan error
+			result3 context.CancelFunc
+		})
+	}
+	fake.getStreamingLogsReturnsOnCall[i] = struct {
+		result1 <-chan sharedaction.LogMessage
+		result2 <-chan error
+		result3 context.CancelFunc
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRestageActor) RestageApplication(arg1 v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 	fake.restageApplicationMutex.Lock()
 	ret, specificReturn := fake.restageApplicationReturnsOnCall[len(fake.restageApplicationArgsForCall)]
 	fake.restageApplicationArgsForCall = append(fake.restageApplicationArgsForCall, struct {
 		arg1 v2action.Application
-		arg2 v2action.NOAAClient
-	}{arg1, arg2})
-	fake.recordInvocation("RestageApplication", []interface{}{arg1, arg2})
+	}{arg1})
+	fake.recordInvocation("RestageApplication", []interface{}{arg1})
 	fake.restageApplicationMutex.Unlock()
 	if fake.RestageApplicationStub != nil {
-		return fake.RestageApplicationStub(arg1, arg2)
+		return fake.RestageApplicationStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3, ret.result4, ret.result5
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.restageApplicationReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4, fakeReturns.result5
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeRestageActor) RestageApplicationCallCount() int {
@@ -224,52 +303,46 @@ func (fake *FakeRestageActor) RestageApplicationCallCount() int {
 	return len(fake.restageApplicationArgsForCall)
 }
 
-func (fake *FakeRestageActor) RestageApplicationCalls(stub func(v2action.Application, v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)) {
+func (fake *FakeRestageActor) RestageApplicationCalls(stub func(v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error)) {
 	fake.restageApplicationMutex.Lock()
 	defer fake.restageApplicationMutex.Unlock()
 	fake.RestageApplicationStub = stub
 }
 
-func (fake *FakeRestageActor) RestageApplicationArgsForCall(i int) (v2action.Application, v2action.NOAAClient) {
+func (fake *FakeRestageActor) RestageApplicationArgsForCall(i int) v2action.Application {
 	fake.restageApplicationMutex.RLock()
 	defer fake.restageApplicationMutex.RUnlock()
 	argsForCall := fake.restageApplicationArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
-func (fake *FakeRestageActor) RestageApplicationReturns(result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationStateChange, result4 <-chan string, result5 <-chan error) {
+func (fake *FakeRestageActor) RestageApplicationReturns(result1 <-chan v2action.ApplicationStateChange, result2 <-chan string, result3 <-chan error) {
 	fake.restageApplicationMutex.Lock()
 	defer fake.restageApplicationMutex.Unlock()
 	fake.RestageApplicationStub = nil
 	fake.restageApplicationReturns = struct {
-		result1 <-chan *v2action.LogMessage
-		result2 <-chan error
-		result3 <-chan v2action.ApplicationStateChange
-		result4 <-chan string
-		result5 <-chan error
-	}{result1, result2, result3, result4, result5}
+		result1 <-chan v2action.ApplicationStateChange
+		result2 <-chan string
+		result3 <-chan error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeRestageActor) RestageApplicationReturnsOnCall(i int, result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationStateChange, result4 <-chan string, result5 <-chan error) {
+func (fake *FakeRestageActor) RestageApplicationReturnsOnCall(i int, result1 <-chan v2action.ApplicationStateChange, result2 <-chan string, result3 <-chan error) {
 	fake.restageApplicationMutex.Lock()
 	defer fake.restageApplicationMutex.Unlock()
 	fake.RestageApplicationStub = nil
 	if fake.restageApplicationReturnsOnCall == nil {
 		fake.restageApplicationReturnsOnCall = make(map[int]struct {
-			result1 <-chan *v2action.LogMessage
-			result2 <-chan error
-			result3 <-chan v2action.ApplicationStateChange
-			result4 <-chan string
-			result5 <-chan error
+			result1 <-chan v2action.ApplicationStateChange
+			result2 <-chan string
+			result3 <-chan error
 		})
 	}
 	fake.restageApplicationReturnsOnCall[i] = struct {
-		result1 <-chan *v2action.LogMessage
-		result2 <-chan error
-		result3 <-chan v2action.ApplicationStateChange
-		result4 <-chan string
-		result5 <-chan error
-	}{result1, result2, result3, result4, result5}
+		result1 <-chan v2action.ApplicationStateChange
+		result2 <-chan string
+		result3 <-chan error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeRestageActor) Invocations() map[string][][]interface{} {
@@ -279,6 +352,8 @@ func (fake *FakeRestageActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
+	fake.getStreamingLogsMutex.RLock()
+	defer fake.getStreamingLogsMutex.RUnlock()
 	fake.restageApplicationMutex.RLock()
 	defer fake.restageApplicationMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

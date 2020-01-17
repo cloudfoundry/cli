@@ -57,7 +57,7 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 	}
 
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-	cmd.LogCacheClient = shared.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	return nil
 }

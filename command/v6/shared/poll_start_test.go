@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -22,7 +23,7 @@ var _ = Describe("Poll Start", func() {
 	var (
 		testUI      *ui.UI
 		fakeConfig  *commandfakes.FakeConfig
-		messages    chan *v2action.LogMessage
+		messages    chan sharedaction.LogMessage
 		logErrs     chan error
 		appState    chan v2action.ApplicationStateChange
 		apiWarnings chan string
@@ -36,7 +37,7 @@ var _ = Describe("Poll Start", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("FiveThirtyEight")
 
-		messages = make(chan *v2action.LogMessage)
+		messages = make(chan sharedaction.LogMessage)
 		logErrs = make(chan error)
 		appState = make(chan v2action.ApplicationStateChange)
 		apiWarnings = make(chan string)
@@ -61,15 +62,15 @@ var _ = Describe("Poll Start", func() {
 			logErrs <- actionerror.NOAATimeoutError{}
 			apiWarnings <- "some warning"
 			logErrs <- errors.New("some logErrhea")
-			messages <- v2action.NewLogMessage(
+			messages <- *sharedaction.NewLogMessage(
 				"some log message",
-				1,
+				"1",
 				time.Unix(0, 0),
 				"STG",
 				"some source instance")
-			messages <- v2action.NewLogMessage(
+			messages <- *sharedaction.NewLogMessage(
 				"some other log message",
-				1,
+				"1",
 				time.Unix(0, 0),
 				"APP",
 				"some other source instance")
@@ -77,6 +78,8 @@ var _ = Describe("Poll Start", func() {
 			apiWarnings <- "some other warning"
 			close(apiWarnings)
 			close(apiErrs)
+			close(logErrs)
+			close(messages)
 
 			Eventually(testUI.Out).Should(Say("\nStopping app..."))
 			Eventually(testUI.Out).Should(Say("\nStaging app and tracing logs..."))
@@ -99,6 +102,8 @@ var _ = Describe("Poll Start", func() {
 			It("does not wait for it", func() {
 				close(apiWarnings)
 				close(apiErrs)
+				close(logErrs)
+				close(messages)
 
 				Eventually(block).Should(BeClosed())
 				Expect(err).ToNot(HaveOccurred())

@@ -231,8 +231,7 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 
 // StartApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) StartApplication(app Application, client NOAAClient) (<-chan *LogMessage, <-chan error, <-chan ApplicationStateChange, <-chan string, <-chan error) {
-	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
+func (actor Actor) StartApplication(app Application) (<-chan ApplicationStateChange, <-chan string, <-chan error) {
 
 	appState := make(chan ApplicationStateChange)
 	allWarnings := make(chan string)
@@ -241,7 +240,6 @@ func (actor Actor) StartApplication(app Application, client NOAAClient) (<-chan 
 		defer close(appState)
 		defer close(allWarnings)
 		defer close(errs)
-		defer client.Close() // automatic close to prevent stale clients
 
 		if app.PackageState != constant.ApplicationPackageStaged {
 			appState <- ApplicationStateStaging
@@ -260,16 +258,15 @@ func (actor Actor) StartApplication(app Application, client NOAAClient) (<-chan 
 			return
 		}
 
-		actor.waitForApplicationStageAndStart(Application(updatedApp), client, appState, allWarnings, errs)
+		actor.waitForApplicationStageAndStart(Application(updatedApp), appState, allWarnings, errs)
 	}()
 
-	return messages, logErrs, appState, allWarnings, errs
+	return appState, allWarnings, errs
 }
 
 // RestartApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) RestartApplication(app Application, client NOAAClient) (<-chan *LogMessage, <-chan error, <-chan ApplicationStateChange, <-chan string, <-chan error) {
-	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
+func (actor Actor) RestartApplication(app Application) (<-chan ApplicationStateChange, <-chan string, <-chan error) {
 
 	appState := make(chan ApplicationStateChange)
 	allWarnings := make(chan string)
@@ -278,7 +275,6 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient) (<-cha
 		defer close(appState)
 		defer close(allWarnings)
 		defer close(errs)
-		defer client.Close() // automatic close to prevent stale clients
 
 		if app.Started() {
 			appState <- ApplicationStateStopping
@@ -312,17 +308,15 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient) (<-cha
 			return
 		}
 
-		actor.waitForApplicationStageAndStart(Application(updatedApp), client, appState, allWarnings, errs)
+		actor.waitForApplicationStageAndStart(Application(updatedApp), appState, allWarnings, errs)
 	}()
 
-	return messages, logErrs, appState, allWarnings, errs
+	return appState, allWarnings, errs
 }
 
 // RestageApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) RestageApplication(app Application, client NOAAClient) (<-chan *LogMessage, <-chan error, <-chan ApplicationStateChange, <-chan string, <-chan error) {
-	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
-
+func (actor Actor) RestageApplication(app Application) (<-chan ApplicationStateChange, <-chan string, <-chan error) {
 	appState := make(chan ApplicationStateChange)
 	allWarnings := make(chan string)
 	errs := make(chan error)
@@ -330,7 +324,6 @@ func (actor Actor) RestageApplication(app Application, client NOAAClient) (<-cha
 		defer close(appState)
 		defer close(allWarnings)
 		defer close(errs)
-		defer client.Close() // automatic close to prevent stale clients
 
 		appState <- ApplicationStateStaging
 		restagedApp, warnings, err := actor.CloudControllerClient.RestageApplication(ccv2.Application{
@@ -345,10 +338,10 @@ func (actor Actor) RestageApplication(app Application, client NOAAClient) (<-cha
 			return
 		}
 
-		actor.waitForApplicationStageAndStart(Application(restagedApp), client, appState, allWarnings, errs)
+		actor.waitForApplicationStageAndStart(Application(restagedApp), appState, allWarnings, errs)
 	}()
 
-	return messages, logErrs, appState, allWarnings, errs
+	return appState, allWarnings, errs
 }
 
 // UpdateApplication updates an application.
@@ -408,7 +401,7 @@ func (actor Actor) pollStartup(app Application, allWarnings chan<- string) error
 	return actionerror.StartupTimeoutError{Name: app.Name}
 }
 
-func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAClient, appState chan ApplicationStateChange, allWarnings chan string, errs chan error) {
+func (actor Actor) waitForApplicationStageAndStart(app Application, appState chan ApplicationStateChange, allWarnings chan string, errs chan error) {
 	err := actor.pollStaging(app, allWarnings)
 	if err != nil {
 		errs <- err
@@ -419,7 +412,6 @@ func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAC
 		return
 	}
 
-	client.Close() // Explicit close to stop logs from displaying on the screen
 	appState <- ApplicationStateStarting
 
 	err = actor.pollStartup(app, allWarnings)

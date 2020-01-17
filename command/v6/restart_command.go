@@ -1,6 +1,8 @@
 package v6
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v6/shared"
-	"github.com/cloudfoundry/noaa/consumer"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,7 +19,8 @@ import (
 type RestartActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
-	RestartApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	GetStreamingLogs(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)
+	RestartApplication(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 }
 
 type RestartCommand struct {
@@ -33,7 +35,7 @@ type RestartCommand struct {
 	SharedActor             command.SharedActor
 	Actor                   RestartActor
 	ApplicationSummaryActor shared.ApplicationSummaryActor
-	NOAAClient              *consumer.Consumer
+	LogCacheClient          sharedaction.LogCacheClient
 }
 
 func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
@@ -55,12 +57,11 @@ func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClient, uaaClient, config)
 	v3Actor := v3action.NewActor(ccClientV3, config, sharedActor, nil)
 
-	cmd.Actor = v2Actor
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
 
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
 
 	return nil
 }
@@ -90,7 +91,9 @@ func (cmd RestartCommand) Execute(args []string) error {
 		return err
 	}
 
-	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestartApplication(app, cmd.NOAAClient)
+	appState, apiWarnings, errs := cmd.Actor.RestartApplication(app)
+	messages, logErrs, stopStreaming := cmd.Actor.GetStreamingLogs(app.GUID, cmd.LogCacheClient)
+	defer stopStreaming()
 	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 	if err != nil {
 		return err
