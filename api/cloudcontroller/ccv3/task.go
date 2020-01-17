@@ -1,9 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -49,29 +46,16 @@ type TaskProcessTemplate struct {
 // CreateApplicationTask runs a command in the Application environment
 // associated with the provided Application GUID.
 func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Warnings, error) {
-	bodyBytes, err := json.Marshal(task)
-	if err != nil {
-		return Task{}, nil, err
-	}
+	var responseBody Task
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationTasksRequest,
-		URIParams: internal.Params{
-			"app_guid": appGUID,
-		},
-		Body: bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return Task{}, nil, err
-	}
+	warnings, err := client.makeCreateRequestWithParams(
+		internal.PostApplicationTasksRequest,
+		internal.Params{"app_guid": appGUID},
+		task,
+		&responseBody,
+	)
 
-	var responseTask Task
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseTask,
-	}
-
-	err = client.connection.Make(request, &response)
-	return responseTask, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetApplicationTasks returns a list of tasks associated with the provided

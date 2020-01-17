@@ -22,26 +22,15 @@ type Space struct {
 }
 
 func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
-	spaceBytes, err := json.Marshal(space)
-	if err != nil {
-		return Space{}, nil, err
-	}
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostSpaceRequest,
-		Body:        bytes.NewReader(spaceBytes),
-	})
+	var responseBody Space
 
-	if err != nil {
-		return Space{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostSpaceRequest,
+		space,
+		&responseBody,
+	)
 
-	var responseSpace Space
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseSpace,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseSpace, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {

@@ -101,26 +101,15 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 // CreateBuildpack creates a buildpack with the given settings, Type and the
 // ApplicationRelationship must be set.
 func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error) {
-	bodyBytes, err := json.Marshal(bp)
-	if err != nil {
-		return Buildpack{}, nil, err
-	}
+	var responseBody Buildpack
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostBuildpackRequest,
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return Buildpack{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostBuildpackRequest,
+		bp,
+		&responseBody,
+	)
 
-	var responseBuildpack Buildpack
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseBuildpack,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseBuildpack, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // DeleteBuildpack deletes the buildpack with the provided guid.

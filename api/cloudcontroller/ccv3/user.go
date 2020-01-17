@@ -1,9 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -25,29 +22,16 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 		GUID string `json:"guid"`
 	}
 
-	bodyBytes, err := json.Marshal(userRequestBody{
-		GUID: uaaUserID,
-	})
-	if err != nil {
-		return User{}, nil, err
-	}
+	user := userRequestBody{GUID: uaaUserID}
+	var responseBody User
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostUserRequest,
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return User{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostUserRequest,
+		user,
+		&responseBody,
+	)
 
-	var user User
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &user,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return user, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {

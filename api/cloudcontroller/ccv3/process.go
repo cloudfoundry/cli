@@ -79,26 +79,16 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 
 // CreateApplicationProcessScale updates process instances count, memory or disk
 func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Process, Warnings, error) {
-	body, err := json.Marshal(process)
-	if err != nil {
-		return Process{}, nil, err
-	}
+	var responseBody Process
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationProcessActionScaleRequest,
-		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"app_guid": appGUID, "type": process.Type},
-	})
-	if err != nil {
-		return Process{}, nil, err
-	}
+	warnings, err := client.makeCreateRequestWithParams(
+		internal.PostApplicationProcessActionScaleRequest,
+		internal.Params{"app_guid": appGUID, "type": process.Type},
+		process,
+		&responseBody,
+	)
 
-	var responseProcess Process
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseProcess,
-	}
-	err = client.connection.Make(request, &response)
-	return responseProcess, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetApplicationProcessByType returns application process of specified type

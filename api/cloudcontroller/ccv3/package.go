@@ -116,26 +116,15 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 // CreatePackage creates a package with the given settings, Type and the
 // ApplicationRelationship must be set.
 func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
-	bodyBytes, err := json.Marshal(pkg)
-	if err != nil {
-		return Package{}, nil, err
-	}
+	var responseBody Package
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostPackageRequest,
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return Package{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostPackageRequest,
+		pkg,
+		&responseBody,
+	)
 
-	var responsePackage Package
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responsePackage,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responsePackage, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetPackage returns the package with the given GUID.

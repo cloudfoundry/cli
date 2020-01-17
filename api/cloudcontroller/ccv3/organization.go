@@ -23,31 +23,15 @@ type Organization struct {
 // CreateOrganization creates an organization with the given name.
 func (client *Client) CreateOrganization(orgName string) (Organization, Warnings, error) {
 	org := Organization{Name: orgName}
-	orgBytes, err := json.Marshal(org)
-	if err != nil {
-		return Organization{}, nil, err
-	}
+	var responseBody Organization
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostOrganizationRequest,
-		Body:        bytes.NewReader(orgBytes),
-	})
+	warnings, err := client.makeCreateRequest(
+		internal.PostOrganizationRequest,
+		org,
+		&responseBody,
+	)
 
-	if err != nil {
-		return Organization{}, nil, err
-	}
-
-	var responseOrg Organization
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrg,
-	}
-	err = client.connection.Make(request, &response)
-
-	if err != nil {
-		return Organization{}, response.Warnings, err
-	}
-
-	return responseOrg, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // DeleteOrganization deletes the organization with the given GUID.

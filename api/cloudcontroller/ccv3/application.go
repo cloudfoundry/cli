@@ -130,26 +130,15 @@ func (ccApp *ccApplication) setDockerLifecycle() {
 
 // CreateApplication creates an application with the given settings.
 func (client *Client) CreateApplication(app Application) (Application, Warnings, error) {
-	bodyBytes, err := json.Marshal(app)
-	if err != nil {
-		return Application{}, nil, err
-	}
+	var responseBody Application
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationRequest,
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return Application{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostApplicationRequest,
+		app,
+		&responseBody,
+	)
 
-	var responseApp Application
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseApp,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseApp, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetApplications lists applications with optional queries.

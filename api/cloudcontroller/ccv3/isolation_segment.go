@@ -1,9 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -21,26 +18,15 @@ type IsolationSegment struct {
 // Controller. Note: This will not validate that the placement tag exists in
 // the diego cluster.
 func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) (IsolationSegment, Warnings, error) {
-	body, err := json.Marshal(isolationSegment)
-	if err != nil {
-		return IsolationSegment{}, nil, err
-	}
+	var responseBody IsolationSegment
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostIsolationSegmentsRequest,
-		Body:        bytes.NewReader(body),
-	})
-	if err != nil {
-		return IsolationSegment{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostIsolationSegmentsRequest,
+		isolationSegment,
+		&responseBody,
+	)
 
-	var responseIsolationSegment IsolationSegment
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseIsolationSegment,
-	}
-
-	err = client.connection.Make(request, &response)
-	return responseIsolationSegment, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // DeleteIsolationSegment removes an isolation segment from the cloud

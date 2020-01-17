@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -109,26 +108,15 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 }
 
 func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
-	bodyBytes, err := json.Marshal(roleSpec)
-	if err != nil {
-		return Role{}, nil, err
-	}
+	var responseBody Role
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostRoleRequest,
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return Role{}, nil, err
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostRoleRequest,
+		roleSpec,
+		&responseBody,
+	)
 
-	var responseRole Role
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseRole,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseRole, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {

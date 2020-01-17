@@ -1,8 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
 	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -51,26 +49,15 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 		},
 	}
 
-	body, marshalErr := json.Marshal(requestBody)
-	if marshalErr != nil {
-		return Droplet{}, nil, marshalErr
-	}
+	var responseBody Droplet
 
-	request, createRequestErr := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostDropletRequest,
-		Body:        bytes.NewReader(body),
-	})
-	if createRequestErr != nil {
-		return Droplet{}, nil, createRequestErr
-	}
+	warnings, err := client.makeCreateRequest(
+		internal.PostDropletRequest,
+		requestBody,
+		&responseBody,
+	)
 
-	var responseDroplet Droplet
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseDroplet,
-	}
-	err := client.connection.Make(request, &response)
-
-	return responseDroplet, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetApplicationDropletCurrent returns the current droplet for a given
