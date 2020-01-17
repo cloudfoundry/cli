@@ -47,11 +47,10 @@ var _ = Describe("push Command", func() {
 		input                       *Buffer
 		binaryName                  string
 
-		appName    string
-		executeErr error
-		pwd        string
-	 allLogsWritten chan bool
-
+		appName        string
+		executeErr     error
+		pwd            string
+		allLogsWritten chan bool
 	)
 
 	BeforeEach(func() {
@@ -203,7 +202,7 @@ var _ = Describe("push Command", func() {
 								allWarnings := make(chan string)
 								errs := make(chan error)
 								go func() {
-									<- allLogsWritten
+									<-allLogsWritten
 									appState <- v2action.ApplicationStateStopping
 									close(appState)
 									close(allWarnings)
