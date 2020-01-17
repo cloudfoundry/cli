@@ -31,7 +31,7 @@ var _ = Describe("Restage Command", func() {
 		fakeActor                   *v6fakes.FakeRestageActor
 		binaryName                  string
 		executeErr                  error
-		allLogsWritten chan bool
+		allLogsWritten              chan bool
 	)
 
 	BeforeEach(func() {

@@ -32,7 +32,7 @@ var _ = Describe("Restart Command", func() {
 		fakeActor                   *v6fakes.FakeRestartActor
 		binaryName                  string
 		executeErr                  error
-	allLogsWritten chan bool
+		allLogsWritten              chan bool
 	)
 
 	BeforeEach(func() {
@@ -182,7 +182,7 @@ var _ = Describe("Restart Command", func() {
 							errs := make(chan error)
 
 							go func() {
-								<- allLogsWritten
+								<-allLogsWritten
 								appState <- v2action.ApplicationStateStopping
 								appState <- v2action.ApplicationStateStaging
 								appState <- v2action.ApplicationStateStarting
@@ -242,7 +242,7 @@ var _ = Describe("Restart Command", func() {
 								errs := make(chan error)
 
 								go func() {
-									<- allLogsWritten
+									<-allLogsWritten
 									warnings <- "warning 1"
 									warnings <- "warning 2"
 									warnings <- "warning 3"
@@ -276,7 +276,7 @@ var _ = Describe("Restart Command", func() {
 							errs := make(chan error)
 
 							go func() {
-								<- allLogsWritten
+								<-allLogsWritten
 								errs <- apiErr
 								close(appState)
 								close(warnings)

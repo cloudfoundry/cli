@@ -9,7 +9,7 @@ import (
 )
 
 func PollStart(ui command.UI, config command.Config, messages <-chan sharedaction.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationStateChange, apiWarnings <-chan string, apiErrs <-chan error) (apiError error) {
-	for appState != nil || apiWarnings != nil || apiErrs != nil  {
+	for appState != nil || apiWarnings != nil || apiErrs != nil {
 		select {
 		case message, ok := <-messages:
 			if !ok {
