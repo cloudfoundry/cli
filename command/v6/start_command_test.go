@@ -26,12 +26,22 @@ import (
 
 // Used for command/v6 tests that need a `GetStreamingLogs' stub
 func GetStreamingLogsStub(logMessages []string, errorStrings []string) (chan bool, func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)) {
+	var closedTheStreams bool
 	allLogsWritten := make(chan bool)
 	return allLogsWritten, func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
 
 		outgoingLogStream := make(chan sharedaction.LogMessage, 1)
 		outgoingErrStream := make(chan error, 1)
-		stopStreaming := func() {}
+		cancelFunc := func() {
+			if closedTheStreams {
+				return
+			}
+			closedTheStreams = true
+			close(outgoingLogStream)
+			close(outgoingErrStream)
+		}
+
+		closedTheStreams = false
 		go func() {
 			for _, s := range logMessages {
 				outgoingLogStream <- *sharedaction.NewLogMessage(s, "OUT", time.Now(), sharedaction.StagingLog, "source-instance")
@@ -39,11 +49,12 @@ func GetStreamingLogsStub(logMessages []string, errorStrings []string) (chan boo
 			for _, s := range errorStrings {
 				outgoingErrStream <- errors.New(s)
 			}
-			close(outgoingLogStream)
-			close(outgoingErrStream)
+			// Sleep for a bit so the multi-channel poller has a chance to process all the log streams before
+			// finding the other channels are all closed
+			time.Sleep(1 * time.Millisecond)
 			allLogsWritten <- true
 		}()
-		return outgoingLogStream, outgoingErrStream, stopStreaming
+		return outgoingLogStream, outgoingErrStream, cancelFunc
 	}
 }
 
