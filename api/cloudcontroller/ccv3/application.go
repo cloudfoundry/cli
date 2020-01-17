@@ -132,11 +132,11 @@ func (ccApp *ccApplication) setDockerLifecycle() {
 func (client *Client) CreateApplication(app Application) (Application, Warnings, error) {
 	var responseBody Application
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostApplicationRequest,
-		app,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationRequest,
+		RequestBody:  app,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }

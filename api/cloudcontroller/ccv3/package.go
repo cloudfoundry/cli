@@ -118,11 +118,11 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 	var responseBody Package
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostPackageRequest,
-		pkg,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostPackageRequest,
+		RequestBody:  pkg,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }

@@ -25,50 +25,34 @@ func (client *Client) CreateOrganization(orgName string) (Organization, Warnings
 	org := Organization{Name: orgName}
 	var responseBody Organization
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostOrganizationRequest,
-		org,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostOrganizationRequest,
+		RequestBody:  org,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }
 
 // DeleteOrganization deletes the organization with the given GUID.
 func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	return client.makeRequest(requestParams{
 		RequestName: internal.DeleteOrganizationRequest,
-		URIParams:   map[string]string{"organization_guid": orgGUID},
+		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
-
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // GetDefaultDomain gets the default domain for the organization with the given GUID.
 func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDefaultDomainRequest,
-		URIParams:   map[string]string{"organization_guid": orgGUID},
+	var responseBody Domain
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetDefaultDomainRequest,
+		URIParams:    internal.Params{"organization_guid": orgGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Domain{}, nil, err
-	}
 
-	var defaultDomain Domain
-
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &defaultDomain,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return defaultDomain, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetIsolationSegmentOrganizations lists organizations

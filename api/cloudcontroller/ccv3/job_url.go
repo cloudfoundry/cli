@@ -13,18 +13,10 @@ type JobURL string
 // DeleteApplication deletes the app with the given app GUID. Returns back a
 // resulting job URL to poll.
 func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	return client.makeRequest(requestParams{
 		RequestName: internal.DeleteApplicationRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // UpdateApplicationApplyManifest applies the manifest to the given

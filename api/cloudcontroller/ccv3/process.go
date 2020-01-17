@@ -81,12 +81,12 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Process, Warnings, error) {
 	var responseBody Process
 
-	warnings, err := client.makeCreateRequestWithParams(
-		internal.PostApplicationProcessActionScaleRequest,
-		internal.Params{"app_guid": appGUID, "type": process.Type},
-		process,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationProcessActionScaleRequest,
+		URIParams:    internal.Params{"app_guid": appGUID, "type": process.Type},
+		RequestBody:  process,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }

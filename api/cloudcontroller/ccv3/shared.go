@@ -2,46 +2,47 @@ package ccv3
 
 import (
 	"bytes"
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"encoding/json"
 )
 
-func (client *Client) makeCreateRequest(requestName string, requestBody interface{}, responseBody interface{}) (Warnings, error) {
-	return client.makeCreateRequestWithOptions(
-		requestOptions{
-			RequestName: requestName,
-		},
-		requestBody,
-		responseBody,
-	)
+type requestParams struct {
+	RequestName  string
+	URIParams    internal.Params
+	Query        []Query
+	RequestBody  interface{}
+	ResponseBody interface{}
 }
 
-func (client *Client) makeCreateRequestWithParams(requestName string, uriParams internal.Params, requestBody interface{}, responseBody interface{}) (Warnings, error) {
-	return client.makeCreateRequestWithOptions(
-		requestOptions{
-			RequestName: requestName,
-			URIParams:   uriParams,
-		},
-		requestBody,
-		responseBody,
-	)
-}
-
-func (client *Client) makeCreateRequestWithOptions(requestOptions requestOptions, requestBody interface{}, responseBody interface{}) (Warnings, error) {
-	body, err := json.Marshal(requestBody)
-	if err != nil {
-		return nil, err
+func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings, error) {
+	options := requestOptions{
+		RequestName: requestParams.RequestName,
+		URIParams:   requestParams.URIParams,
+		Query:       requestParams.Query,
 	}
 
-	requestOptions.Body = bytes.NewReader(body)
-	request, err := client.newHTTPRequest(requestOptions)
-	if err != nil {
-		return nil, err
+	if requestParams.RequestBody != nil {
+		body, err := json.Marshal(requestParams.RequestBody)
+		if err != nil {
+			return "", nil, err
+		}
+
+		options.Body = bytes.NewReader(body)
 	}
 
-	response := cloudcontroller.Response{DecodeJSONResponseInto: &responseBody}
+	request, err := client.newHTTPRequest(options)
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	if requestParams.ResponseBody != nil {
+		response.DecodeJSONResponseInto = &requestParams.ResponseBody
+	}
+
 	err = client.connection.Make(request, &response)
 
-	return response.Warnings, err
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }

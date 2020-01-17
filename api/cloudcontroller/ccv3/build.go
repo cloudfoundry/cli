@@ -74,30 +74,24 @@ func (b *Build) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
 	var responseBody Build
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostBuildRequest,
-		build,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostBuildRequest,
+		RequestBody:  build,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }
 
 // GetBuild gets the build with the given GUID.
 func (client *Client) GetBuild(guid string) (Build, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetBuildRequest,
-		URIParams:   internal.Params{"build_guid": guid},
+	var responseBody Build
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetBuildRequest,
+		URIParams:    internal.Params{"build_guid": guid},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Build{}, nil, err
-	}
 
-	var responseBuild Build
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseBuild,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseBuild, response.Warnings, err
+	return responseBody, warnings, err
 }

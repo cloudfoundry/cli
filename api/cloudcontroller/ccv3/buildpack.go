@@ -103,11 +103,11 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error) {
 	var responseBody Buildpack
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostBuildpackRequest,
-		bp,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostBuildpackRequest,
+		RequestBody:  bp,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }

@@ -37,20 +37,15 @@ func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
 
 // GetEnvironmentVariableGroup gets the values of a particular environment variable group.
 func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (EnvironmentVariables, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"group_name": string(group)},
-		RequestName: internal.GetEnvironmentVariableGroupRequest,
-	})
-	if err != nil {
-		return EnvironmentVariables{}, nil, err
-	}
+	var responseBody EnvironmentVariables
 
-	var responseEnvVars EnvironmentVariables
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseEnvVars,
-	}
-	err = client.connection.Make(request, &response)
-	return responseEnvVars, response.Warnings, err
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetEnvironmentVariableGroupRequest,
+		URIParams:    internal.Params{"group_name": string(group)},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
 }
 
 // UpdateApplicationEnvironmentVariables adds/updates the user provided

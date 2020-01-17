@@ -48,12 +48,12 @@ type TaskProcessTemplate struct {
 func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Warnings, error) {
 	var responseBody Task
 
-	warnings, err := client.makeCreateRequestWithParams(
-		internal.PostApplicationTasksRequest,
-		internal.Params{"app_guid": appGUID},
-		task,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationTasksRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		RequestBody:  task,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }

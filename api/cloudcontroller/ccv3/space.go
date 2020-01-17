@@ -24,27 +24,20 @@ type Space struct {
 func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
 	var responseBody Space
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostSpaceRequest,
-		space,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostSpaceRequest,
+		RequestBody:  space,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	return client.makeRequest(requestParams{
 		RequestName: internal.DeleteSpaceRequest,
-		URIParams:   map[string]string{"space_guid": spaceGUID},
+		URIParams:   internal.Params{"space_guid": spaceGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // GetSpaces lists spaces with optional filters.

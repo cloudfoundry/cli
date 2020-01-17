@@ -110,30 +110,20 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
 	var responseBody Role
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostRoleRequest,
-		roleSpec,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostRoleRequest,
+		RequestBody:  roleSpec,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams: map[string]string{
-			"role_guid": roleGUID,
-		},
+	return client.makeRequest(requestParams{
 		RequestName: internal.DeleteRoleRequest,
+		URIParams:   internal.Params{"role_guid": roleGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // GetRoles lists roles with optional filters & includes.

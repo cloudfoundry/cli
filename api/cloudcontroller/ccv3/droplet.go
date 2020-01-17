@@ -51,11 +51,11 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 
 	var responseBody Droplet
 
-	warnings, err := client.makeCreateRequest(
-		internal.PostDropletRequest,
-		requestBody,
-		&responseBody,
-	)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostDropletRequest,
+		RequestBody:  requestBody,
+		ResponseBody: &responseBody,
+	})
 
 	return responseBody, warnings, err
 }
@@ -63,39 +63,28 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 // GetApplicationDropletCurrent returns the current droplet for a given
 // application.
 func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationDropletCurrentRequest,
-		URIParams:   map[string]string{"app_guid": appGUID},
-	})
-	if err != nil {
-		return Droplet{}, nil, err
-	}
+	var responseBody Droplet
 
-	var responseDroplet Droplet
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseDroplet,
-	}
-	err = client.connection.Make(request, &response)
-	return responseDroplet, response.Warnings, err
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetApplicationDropletCurrentRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
 }
 
 // GetDroplet returns a droplet with the given GUID.
 func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDropletRequest,
-		URIParams:   map[string]string{"droplet_guid": dropletGUID},
+	var responseBody Droplet
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetDropletRequest,
+		URIParams:    internal.Params{"droplet_guid": dropletGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Droplet{}, nil, err
-	}
 
-	var responseDroplet Droplet
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseDroplet,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseDroplet, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetDroplets lists droplets with optional filters.
