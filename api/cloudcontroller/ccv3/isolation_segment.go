@@ -56,26 +56,24 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 
 // GetIsolationSegments lists isolation segments with optional filters.
 func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetIsolationSegmentsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var isolationSegments []IsolationSegment
 
-	var fullIsolationSegmentsList []IsolationSegment
-	warnings, err := client.paginate(request, IsolationSegment{}, func(item interface{}) error {
-		if isolationSegment, ok := item.(IsolationSegment); ok {
-			fullIsolationSegmentsList = append(fullIsolationSegmentsList, isolationSegment)
+	resources, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetIsolationSegmentsRequest,
+		Query:        query,
+		ResponseBody: IsolationSegment{},
+	})
+
+	for _, resource := range resources {
+		if isolationSegment, ok := resource.(IsolationSegment); ok {
+			isolationSegments = append(isolationSegments, isolationSegment)
 		} else {
-			return ccerror.UnknownObjectInListError{
+			return nil, nil, ccerror.UnknownObjectInListError{
 				Expected:   IsolationSegment{},
-				Unexpected: item,
+				Unexpected: isolationSegment,
 			}
 		}
-		return nil
-	})
+	}
 
-	return fullIsolationSegmentsList, warnings, err
+	return isolationSegments, warnings, err
 }
