@@ -49,9 +49,6 @@ func GetStreamingLogsStub(logMessages []string, errorStrings []string) (chan boo
 			for _, s := range errorStrings {
 				outgoingErrStream <- errors.New(s)
 			}
-			// Sleep for a bit so the multi-channel poller has a chance to process all the log streams before
-			// finding the other channels are all closed
-			time.Sleep(1 * time.Millisecond)
 			allLogsWritten <- true
 		}()
 		return outgoingLogStream, outgoingErrStream, cancelFunc

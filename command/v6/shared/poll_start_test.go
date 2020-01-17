@@ -49,7 +49,7 @@ var _ = Describe("Poll Start", func() {
 
 	JustBeforeEach(func() {
 		go func() {
-			err = PollStart(testUI, fakeConfig, messages, logErrs, appState, apiWarnings, apiErrs)
+			err = PollStart(testUI, fakeConfig, messages, logErrs, appState, apiWarnings, apiErrs, func() {})
 			close(block)
 		}()
 	})

@@ -197,8 +197,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		if !cmd.NoStart {
 			appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication.Application)
 			messages, logErrs, stopStreaming := cmd.RestartActor.GetStreamingLogs(updatedConfig.CurrentApplication.Application.GUID, cmd.LogCacheClient)
-			defer stopStreaming()
-			err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
+			err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs, stopStreaming)
 			if err != nil {
 				return err
 			}

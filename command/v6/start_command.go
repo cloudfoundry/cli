@@ -100,7 +100,7 @@ func (cmd StartCommand) Execute(args []string) error {
 	appState, apiWarnings, errs := cmd.Actor.StartApplication(app)
 	messages, logErrs, stopStreaming := cmd.Actor.GetStreamingLogs(app.GUID, cmd.LogCacheClient)
 	defer stopStreaming()
-	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
+	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs, stopStreaming)
 	if err != nil {
 		return err
 	}

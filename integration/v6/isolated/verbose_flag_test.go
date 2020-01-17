@@ -336,7 +336,7 @@ var _ = Describe("Verbose", func() {
 		)
 	})
 
-	Describe("NOAA", func() {
+	Describe("Log cache", func() {
 		var orgName string
 
 		BeforeEach(func() {
@@ -389,7 +389,8 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("GET /v2/info"))
-				Eventually(session).Should(Say("WEBSOCKET REQUEST:"))
+				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
+				Eventually(session).Should(Say("HTTP REQUEST:"))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Eventually(session.Kill()).Should(Exit())
 			},
@@ -440,17 +441,17 @@ var _ = Describe("Verbose", func() {
 
 				session := helpers.CFWithEnv(envMap, "logs", "-v", appName)
 
-				Eventually(session).Should(Say("WEBSOCKET RESPONSE"))
+				Eventually(session).Should(Say("HTTP RESPONSE:"))
 				Eventually(session.Kill()).Should(Exit())
 
 				for _, filePath := range location {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+					Expect(string(contents)).To(MatchRegexp("GET /v2/apps"))
 					Expect(string(contents)).To(MatchRegexp("GET /v2/info"))
-					Expect(string(contents)).To(MatchRegexp("WEBSOCKET REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
+					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+					Expect(string(contents)).To(MatchRegexp("HTTP RESPONSE:"))
 
 					stat, err := os.Stat(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())

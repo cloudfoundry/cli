@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -8,7 +10,21 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-func PollStart(ui command.UI, config command.Config, messages <-chan sharedaction.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationStateChange, apiWarnings <-chan string, apiErrs <-chan error) (apiError error) {
+func PollStart(ui command.UI, config command.Config, messages <-chan sharedaction.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationStateChange, apiWarnings <-chan string, apiErrs <-chan error, stopStreaming context.CancelFunc) (apiError error) {
+
+	handleMessage := func(message sharedaction.LogMessage) {
+		if message.Staging() {
+			ui.DisplayLogMessage(message, false)
+		}
+	}
+	handleLogErr := func(logErr error) {
+		switch logErr.(type) {
+		case actionerror.NOAATimeoutError:
+			ui.DisplayWarning("timeout connecting to log server, no log will be shown")
+		default:
+			ui.DisplayWarning(logErr.Error())
+		}
+	}
 	for appState != nil || apiWarnings != nil || apiErrs != nil {
 		select {
 		case message, ok := <-messages:
@@ -16,10 +32,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan sharedactio
 				messages = nil
 				continue
 			}
-
-			if message.Staging() {
-				ui.DisplayLogMessage(message, false)
-			}
+			handleMessage(message)
 
 		case state, ok := <-appState:
 			if !ok {
@@ -54,13 +67,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan sharedactio
 				logErrs = nil
 				continue
 			}
-
-			switch logErr.(type) {
-			case actionerror.NOAATimeoutError:
-				ui.DisplayWarning("timeout connecting to log server, no log will be shown")
-			default:
-				ui.DisplayWarning(logErr.Error())
-			}
+			handleLogErr(logErr)
 
 		case e, ok := <-apiErrs:
 			if !ok {
@@ -84,7 +91,28 @@ func PollStart(ui command.UI, config command.Config, messages <-chan sharedactio
 				apiError = err
 			}
 			// if an api error occurred, exit immediately
+			stopStreaming()
 			return apiError
+		}
+	}
+	stopStreaming()
+
+	// Consume any pending streamed messages
+	for messages != nil || logErrs != nil {
+		select {
+		case message, ok := <-messages:
+			if !ok {
+				messages = nil
+				continue
+			}
+			handleMessage(message)
+
+		case logErr, ok := <-logErrs:
+			if !ok {
+				logErrs = nil
+				continue
+			}
+			handleLogErr(logErr)
 		}
 	}
 	return nil
