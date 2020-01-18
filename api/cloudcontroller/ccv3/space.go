@@ -24,7 +24,7 @@ type Space struct {
 func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
 	var responseBody Space
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostSpaceRequest,
 		RequestBody:  space,
 		ResponseBody: &responseBody,
@@ -34,7 +34,7 @@ func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
 }
 
 func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
-	return client.makeRequest(requestParams{
+	return client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteSpaceRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 	})
@@ -42,7 +42,7 @@ func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
 
 // GetSpaces lists spaces with optional filters.
 func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetSpacesRequest,
 		Query:       query,
 	})
@@ -75,7 +75,7 @@ func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
 	if err != nil {
 		return Space{}, nil, err
 	}
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchSpaceRequest,
 		Body:        bytes.NewReader(spaceBytes),
 		URIParams:   map[string]string{"space_guid": spaceGUID},
@@ -89,7 +89,7 @@ func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseSpace,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	if err != nil {
 		return Space{}, nil, err

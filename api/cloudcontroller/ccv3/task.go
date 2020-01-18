@@ -48,7 +48,7 @@ type TaskProcessTemplate struct {
 func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Warnings, error) {
 	var responseBody Task
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostApplicationTasksRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  task,
@@ -61,7 +61,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 // GetApplicationTasks returns a list of tasks associated with the provided
 // application GUID. Results can be filtered by providing URL queries.
 func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Task, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationTasksRequest,
 		URIParams: internal.Params{
 			"app_guid": appGUID,
@@ -90,7 +90,7 @@ func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Tas
 
 // UpdateTaskCancel cancels a task.
 func (client *Client) UpdateTaskCancel(taskGUID string) (Task, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PutTaskCancelRequest,
 		URIParams: internal.Params{
 			"task_guid": taskGUID,
@@ -105,7 +105,7 @@ func (client *Client) UpdateTaskCancel(taskGUID string) (Task, Warnings, error) 
 		DecodeJSONResponseInto: &task,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	if err != nil {
 		return Task{}, response.Warnings, err
 	}

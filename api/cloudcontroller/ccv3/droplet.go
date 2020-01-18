@@ -51,7 +51,7 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 
 	var responseBody Droplet
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostDropletRequest,
 		RequestBody:  requestBody,
 		ResponseBody: &responseBody,
@@ -65,7 +65,7 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, Warnings, error) {
 	var responseBody Droplet
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetApplicationDropletCurrentRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
@@ -78,7 +78,7 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, War
 func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
 	var responseBody Droplet
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetDropletRequest,
 		URIParams:    internal.Params{"droplet_guid": dropletGUID},
 		ResponseBody: &responseBody,
@@ -89,7 +89,7 @@ func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) 
 
 // GetDroplets lists droplets with optional filters.
 func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetDropletsRequest,
 		Query:       query,
 	})
@@ -115,7 +115,7 @@ func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 
 // GetPackageDroplets returns the droplets that run the specified packages
 func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetPackageDropletsRequest,
 		URIParams:   map[string]string{"package_guid": packageGUID},
 		Query:       query,
@@ -150,7 +150,7 @@ func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, 
 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(droplet, dropletPath, "bits")
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostDropletBitsRequest,
 		URIParams:   internal.Params{"droplet_guid": dropletGUID},
 		Body:        body,
@@ -181,7 +181,7 @@ func (client *Client) uploadDropletAsynchronously(request *cloudcontroller.Reque
 	go func() {
 		defer close(httpErrors)
 
-		err := client.connection.Make(request, &response)
+		err := client.Connection.Make(request, &response)
 		if err != nil {
 			httpErrors <- err
 		}

@@ -132,7 +132,7 @@ func (ccApp *ccApplication) setDockerLifecycle() {
 func (client *Client) CreateApplication(app Application) (Application, Warnings, error) {
 	var responseBody Application
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostApplicationRequest,
 		RequestBody:  app,
 		ResponseBody: &responseBody,
@@ -143,7 +143,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 
 // GetApplications lists applications with optional queries.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationsRequest,
 		Query:       query,
 	})
@@ -174,7 +174,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 		return Application{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchApplicationRequest,
 		Body:        bytes.NewReader(bodyBytes),
 		URIParams:   map[string]string{"app_guid": app.GUID},
@@ -187,14 +187,14 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseApp,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
 }
 
 // UpdateApplicationRestart restarts the given application.
 func (client *Client) UpdateApplicationRestart(appGUID string) (Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionRestartRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
@@ -206,14 +206,14 @@ func (client *Client) UpdateApplicationRestart(appGUID string) (Application, War
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseApp,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
 }
 
 // UpdateApplicationStart starts the given application.
 func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionStartRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
@@ -225,14 +225,14 @@ func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warni
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseApp,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
 }
 
 // UpdateApplicationStop stops the given application.
 func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionStopRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
@@ -244,7 +244,7 @@ func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnin
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseApp,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
 }

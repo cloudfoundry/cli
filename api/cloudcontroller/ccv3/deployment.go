@@ -73,7 +73,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 }
 
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationDeploymentActionCancelRequest,
 		URIParams:   map[string]string{"deployment_guid": deploymentGUID},
 	})
@@ -84,7 +84,7 @@ func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) 
 
 	response := cloudcontroller.Response{}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return response.Warnings, err
 }
@@ -97,7 +97,7 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 
 	var responseBody Deployment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostApplicationDeploymentRequest,
 		RequestBody:  dep,
 		ResponseBody: &responseBody,
@@ -109,7 +109,7 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings, error) {
 	var responseBody Deployment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetDeploymentRequest,
 		URIParams:    internal.Params{"deployment_guid": deploymentGUID},
 		ResponseBody: &responseBody,
@@ -119,7 +119,7 @@ func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings
 }
 
 func (client *Client) GetDeployments(query ...Query) ([]Deployment, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetDeploymentsRequest,
 		Query:       query,
 	})

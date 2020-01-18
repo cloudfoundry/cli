@@ -86,7 +86,7 @@ func (client Client) ResourceMatch(resources []Resource) ([]Resource, Warnings, 
 		return []Resource{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostResourceMatchesRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
@@ -98,7 +98,7 @@ func (client Client) ResourceMatch(resources []Resource) ([]Resource, Warnings, 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &matchedResources,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return matchedResources["resources"], response.Warnings, err
 }

@@ -13,7 +13,7 @@ type JobURL string
 // DeleteApplication deletes the app with the given app GUID. Returns back a
 // resulting job URL to poll.
 func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error) {
-	return client.makeRequest(requestParams{
+	return client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteApplicationRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})
@@ -22,7 +22,7 @@ func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error
 // UpdateApplicationApplyManifest applies the manifest to the given
 // application. Returns back a resulting job URL to poll.
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionApplyManifest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 		Body:        bytes.NewReader(rawManifest),
@@ -35,7 +35,7 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 	request.Header.Set("Content-Type", "application/x-yaml")
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
@@ -51,7 +51,7 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 // (2) Applying manifest properties to this app.
 
 func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...Query) (JobURL, Warnings, error) {
-	request, requestExecuteErr := client.newHTTPRequest(requestOptions{
+	request, requestExecuteErr := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostSpaceActionApplyManifestRequest,
 		Query:       query,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
@@ -65,7 +65,7 @@ func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []b
 	request.Header.Set("Content-Type", "application/x-yaml")
 
 	response := cloudcontroller.Response{}
-	err := client.connection.Make(request, &response)
+	err := client.Connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }

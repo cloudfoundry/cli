@@ -24,7 +24,7 @@ func (client Client) paginate(request *cloudcontroller.Request, obj interface{},
 			break
 		}
 
-		request, err = client.newHTTPRequest(requestOptions{
+		request, err = client.NewHTTPRequest(requestOptions{
 			URL:    wrapper.NextPage(),
 			Method: http.MethodGet,
 		})
@@ -53,7 +53,7 @@ func (client Client) paginateWithIncludes(request *cloudcontroller.Request, obj 
 			break
 		}
 
-		request, err = client.newHTTPRequest(requestOptions{
+		request, err = client.NewHTTPRequest(requestOptions{
 			URL:    wrapper.NextPage(),
 			Method: http.MethodGet,
 		})
@@ -72,7 +72,7 @@ func (client Client) wrapFirstPage(request *cloudcontroller.Request, obj interfa
 		DecodeJSONResponseInto: &wrapper,
 	}
 
-	err := client.connection.Make(request, &response)
+	err := client.Connection.Make(request, &response)
 	warnings = append(warnings, response.Warnings...)
 	if err != nil {
 		return nil, warnings, err

@@ -73,7 +73,7 @@ type JobErrorDetails struct {
 
 // GetJob returns a job for the provided GUID.
 func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{URL: string(jobURL)})
+	request, err := client.NewHTTPRequest(requestOptions{URL: string(jobURL)})
 	if err != nil {
 		return Job{}, nil, err
 	}
@@ -83,7 +83,7 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 		DecodeJSONResponseInto: &job,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	warnings := response.Warnings
 
 	for _, jobWarning := range job.Warnings {

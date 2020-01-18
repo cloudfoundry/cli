@@ -110,7 +110,7 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
 	var responseBody Role
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostRoleRequest,
 		RequestBody:  roleSpec,
 		ResponseBody: &responseBody,
@@ -120,7 +120,7 @@ func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
 }
 
 func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
-	return client.makeRequest(requestParams{
+	return client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteRoleRequest,
 		URIParams:   internal.Params{"role_guid": roleGUID},
 	})
@@ -128,7 +128,7 @@ func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
 
 // GetRoles lists roles with optional filters & includes.
 func (client *Client) GetRoles(query ...Query) ([]Role, IncludedResources, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetRolesRequest,
 		Query:       query,
 	})

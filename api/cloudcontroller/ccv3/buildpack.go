@@ -103,7 +103,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error) {
 	var responseBody Buildpack
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostBuildpackRequest,
 		RequestBody:  bp,
 		ResponseBody: &responseBody,
@@ -114,7 +114,7 @@ func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error)
 
 // DeleteBuildpack deletes the buildpack with the provided guid.
 func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.DeleteBuildpackRequest,
 		URIParams: map[string]string{
 			"buildpack_guid": buildpackGUID,
@@ -125,14 +125,14 @@ func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, er
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // GetBuildpacks lists buildpacks with optional filters.
 func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetBuildpacksRequest,
 		Query:       query,
 	})
@@ -162,7 +162,7 @@ func (client Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, 
 		return Buildpack{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchBuildpackRequest,
 		Body:        bytes.NewReader(bodyBytes),
 		URIParams:   map[string]string{"buildpack_guid": buildpack.GUID},
@@ -175,7 +175,7 @@ func (client Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseBuildpack,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseBuildpack, response.Warnings, err
 }
@@ -190,7 +190,7 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "bits")
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostBuildpackBitsRequest,
 		URIParams:   internal.Params{"buildpack_guid": buildpackGUID},
 		Body:        body,
@@ -222,7 +222,7 @@ func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Req
 	go func() {
 		defer close(httpErrors)
 
-		err := client.connection.Make(request, &response)
+		err := client.Connection.Make(request, &response)
 		if err != nil {
 			httpErrors <- err
 		}

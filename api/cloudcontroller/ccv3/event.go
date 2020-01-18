@@ -44,7 +44,7 @@ func (e *Event) UnmarshalJSON(data []byte) error {
 // pages here because we only needed the first page for the `cf events` output. If we need to, we can refactor this
 // later to fetch all pages and make `cf events` only filter down to the first page.
 func (client *Client) GetEvents(query ...Query) ([]Event, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetEventsRequest,
 		Query:       query,
 	})
@@ -60,7 +60,7 @@ func (client *Client) GetEvents(query ...Query) ([]Event, Warnings, error) {
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &eventResponse,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return eventResponse.Resources, response.Warnings, err
 }

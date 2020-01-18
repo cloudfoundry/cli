@@ -116,7 +116,7 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 		return Info{}, ResourceLinks{}, warnings, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    rootResponse.ccV3Link(),
 	})
@@ -129,7 +129,7 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 		DecodeJSONResponseInto: &info,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	warnings = append(warnings, response.Warnings...)
 
 	if err != nil {
@@ -141,7 +141,7 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 
 // rootResponse returns the CC API root document.
 func (client *Client) rootResponse() (Info, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    client.cloudControllerURL,
 	})
@@ -154,7 +154,7 @@ func (client *Client) rootResponse() (Info, Warnings, error) {
 		DecodeJSONResponseInto: &rootResponse,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	if unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError); ok && unknownSourceErr.StatusCode == http.StatusNotFound {
 		return Info{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}

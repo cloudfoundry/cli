@@ -13,5 +13,5 @@ type ConnectionWrapper interface {
 
 // WrapConnection wraps the current Client connection in the wrapper.
 func (client *Client) WrapConnection(wrapper ConnectionWrapper) {
-	client.connection = wrapper.Wrap(client.connection)
+	client.Connection = wrapper.Wrap(client.Connection)
 }

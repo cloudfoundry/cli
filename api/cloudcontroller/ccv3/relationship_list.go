@@ -53,7 +53,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 		return RelationshipList{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostIsolationSegmentRelationshipOrganizationsRequest,
 		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID},
 		Body:        bytes.NewReader(body),
@@ -67,7 +67,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 		DecodeJSONResponseInto: &relationships,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return relationships, response.Warnings, err
 }
 
@@ -79,7 +79,7 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 		return RelationshipList{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
 		Body:        bytes.NewReader(body),
@@ -94,6 +94,6 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 		DecodeJSONResponseInto: &relationships,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return relationships, response.Warnings, err
 }

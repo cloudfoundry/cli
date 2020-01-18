@@ -116,7 +116,7 @@ func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 		return Route{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostRouteRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
@@ -130,13 +130,13 @@ func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 		DecodeJSONResponseInto: &ccRoute,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return ccRoute, response.Warnings, err
 }
 
 func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.DeleteOrphanedRoutesRequest,
 		URIParams: map[string]string{
 			"space_guid": spaceGUID,
@@ -148,13 +148,13 @@ func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, e
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams: map[string]string{
 			"route_guid": routeGUID,
 		},
@@ -165,13 +165,13 @@ func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationRoutesRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})
@@ -196,7 +196,7 @@ func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, er
 }
 
 func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetRouteDestinationsRequest,
 		URIParams:   internal.Params{"route_guid": routeGUID},
 	})
@@ -213,12 +213,12 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination,
 		DecodeJSONResponseInto: &destinationResponse,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return destinationResponse.Destinations, response.Warnings, err
 }
 
 func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetRoutesRequest,
 		Query:       query,
 	})
@@ -270,7 +270,7 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 		return nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.MapRouteRequest,
 		URIParams: map[string]string{
 			"route_guid": routeGUID,
@@ -282,13 +282,13 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return response.Warnings, err
 }
 
 func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.UnmapRouteRequest,
 		URIParams: map[string]string{
 			"route_guid":       routeGUID,
@@ -300,7 +300,7 @@ func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warni
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return response.Warnings, err
 }

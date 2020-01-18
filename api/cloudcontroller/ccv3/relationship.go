@@ -51,7 +51,7 @@ func (r *Relationship) UnmarshalJSON(data []byte) error {
 // DeleteIsolationSegmentOrganization will delete the relationship between
 // the isolation segment and the organization provided.
 func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID string, orgGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
 		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID, "organization_guid": orgGUID},
 	})
@@ -62,7 +62,7 @@ func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID st
 // DeleteServiceInstanceRelationshipsSharedSpace will delete the sharing relationship
 // between the service instance and the shared-to space provided.
 func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID, "space_guid": spaceGUID},
 	})
@@ -73,7 +73,7 @@ func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInsta
 // GetOrganizationDefaultIsolationSegment returns the relationship between an
 // organization and it's default isolation segment.
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
@@ -86,14 +86,14 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 		DecodeJSONResponseInto: &relationship,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return relationship, response.Warnings, err
 }
 
 // GetSpaceIsolationSegment returns the relationship between a space and it's
 // isolation segment.
 func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceRelationshipIsolationSegmentRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 	})
@@ -106,7 +106,7 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 		DecodeJSONResponseInto: &relationship,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return relationship, response.Warnings, err
 }
 
@@ -118,7 +118,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 		return Relationship{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchApplicationCurrentDropletRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 		Body:        bytes.NewReader(bodyBytes),
@@ -131,7 +131,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseRelationship,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseRelationship, response.Warnings, err
 }
@@ -145,7 +145,7 @@ func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgG
 		return Relationship{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
 		Body:        bytes.NewReader(body),
 		URIParams:   internal.Params{"organization_guid": orgGUID},
@@ -158,7 +158,7 @@ func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgG
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &relationship,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return relationship, response.Warnings, err
 }
 
@@ -170,7 +170,7 @@ func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, 
 		return Relationship{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchSpaceRelationshipIsolationSegmentRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 		Body:        bytes.NewReader(body),
@@ -184,6 +184,6 @@ func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, 
 		DecodeJSONResponseInto: &relationship,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return relationship, response.Warnings, err
 }

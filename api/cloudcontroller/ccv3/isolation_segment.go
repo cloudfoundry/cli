@@ -19,7 +19,7 @@ type IsolationSegment struct {
 func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) (IsolationSegment, Warnings, error) {
 	var responseBody IsolationSegment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostIsolationSegmentsRequest,
 		RequestBody:  isolationSegment,
 		ResponseBody: &responseBody,
@@ -32,7 +32,7 @@ func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) 
 // controller. Note: This will only remove it from the cloud controller
 // database. It will not remove it from diego.
 func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteIsolationSegmentRequest,
 		URIParams:   internal.Params{"isolation_segment_guid": guid},
 	})
@@ -45,7 +45,7 @@ func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
 func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnings, error) {
 	var responseBody IsolationSegment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetIsolationSegmentRequest,
 		URIParams:    internal.Params{"isolation_segment_guid": guid},
 		ResponseBody: &responseBody,
@@ -58,7 +58,7 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
 	var isolationSegments []IsolationSegment
 
-	resources, warnings, err := client.makeListRequest(requestParams{
+	resources, warnings, err := client.requester.MakeListRequest(client, requestParams{
 		RequestName:  internal.GetIsolationSegmentsRequest,
 		Query:        query,
 		ResponseBody: IsolationSegment{},

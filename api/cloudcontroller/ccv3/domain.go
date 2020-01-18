@@ -147,7 +147,7 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 		query = append(query, Query{Key: PathFilter, Values: []string{path}})
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainRouteReservationsRequest,
 		URIParams:   map[string]string{"domain_guid": domainGUID},
 		Query:       query,
@@ -163,7 +163,7 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseJson,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responseJson.MatchingRoute, response.Warnings, err
 }
@@ -174,7 +174,7 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 		return Domain{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostDomainRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
@@ -188,13 +188,13 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 		DecodeJSONResponseInto: &ccDomain,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return ccDomain, response.Warnings, err
 }
 
 func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams: map[string]string{
 			"domain_guid": domainGUID,
 		},
@@ -205,7 +205,7 @@ func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
@@ -214,7 +214,7 @@ func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	var responseBody Domain
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetDomainRequest,
 		URIParams:    internal.Params{"domain_guid": domainGUID},
 		ResponseBody: &responseBody,
@@ -224,7 +224,7 @@ func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 }
 
 func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainsRequest,
 		Query:       query,
 	})
@@ -249,7 +249,7 @@ func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 }
 
 func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 		RequestName: internal.GetOrganizationDomainsRequest,
 		Query:       query,
@@ -281,7 +281,7 @@ func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs Shar
 		return nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"domain_guid": domainGuid},
 		RequestName: internal.SharePrivateDomainRequest,
 		Body:        bytes.NewReader(bodyBytes),
@@ -296,13 +296,13 @@ func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs Shar
 		DecodeJSONResponseInto: &ccSharedOrgs,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return response.Warnings, err
 }
 
 func (client Client) UnsharePrivateDomainFromOrg(domainGuid string, orgGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"domain_guid": domainGuid, "org_guid": orgGUID},
 		RequestName: internal.DeleteSharedOrgFromDomainRequest,
 	})
@@ -313,6 +313,6 @@ func (client Client) UnsharePrivateDomainFromOrg(domainGuid string, orgGUID stri
 
 	var response cloudcontroller.Response
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return response.Warnings, err
 }

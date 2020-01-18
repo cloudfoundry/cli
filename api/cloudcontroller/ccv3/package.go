@@ -118,7 +118,7 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 	var responseBody Package
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostPackageRequest,
 		RequestBody:  pkg,
 		ResponseBody: &responseBody,
@@ -129,7 +129,7 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 
 // GetPackage returns the package with the given GUID.
 func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetPackageRequest,
 		URIParams:   internal.Params{"package_guid": packageGUID},
 	})
@@ -141,14 +141,14 @@ func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responsePackage,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responsePackage, response.Warnings, err
 }
 
 // GetPackages returns the list of packages.
 func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetPackagesRequest,
 		Query:       query,
 	})
@@ -201,7 +201,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 		return Package{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostPackageBitsRequest,
 		URIParams:   internal.Params{"package_guid": pkg.GUID},
 		Body:        body,
@@ -216,7 +216,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responsePackage,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return responsePackage, response.Warnings, err
 }
@@ -324,7 +324,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 	go func() {
 		defer close(httpErrors)
 
-		err := client.connection.Make(request, &response)
+		err := client.Connection.Make(request, &response)
 		if err != nil {
 			httpErrors <- err
 		}
@@ -384,7 +384,7 @@ func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedRes
 		return Package{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostPackageBitsRequest,
 		URIParams:   internal.Params{"package_guid": packageGUID},
 		Body:        bytes.NewReader(body.Bytes()),
@@ -400,7 +400,7 @@ func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedRes
 		DecodeJSONResponseInto: &pkg,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return pkg, response.Warnings, err
 }
 
@@ -412,7 +412,7 @@ func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedR
 
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(matchedResources, newResources, newResourcesLength)
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostPackageBitsRequest,
 		URIParams:   internal.Params{"package_guid": packageGUID},
 		Body:        body,

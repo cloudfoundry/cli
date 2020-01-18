@@ -90,7 +90,8 @@ type Client struct {
 	Info
 	cloudControllerURL string
 
-	connection cloudcontroller.Connection
+	requester  Requester
+	Connection cloudcontroller.Connection
 	router     *internal.Router
 	userAgent  string
 	wrappers   []ConnectionWrapper
@@ -122,8 +123,10 @@ type Config struct {
 // NewClient returns a new Client.
 func NewClient(config Config) *Client {
 	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.AppName, config.AppVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
+
 	return &Client{
 		clock:              new(internal.RealTime),
+		requester:          new(RealRequester),
 		userAgent:          userAgent,
 		jobPollingInterval: config.JobPollingInterval,
 		jobPollingTimeout:  config.JobPollingTimeout,
@@ -136,5 +139,19 @@ func NewClient(config Config) *Client {
 func TestClient(config Config, clock Clock) *Client {
 	client := NewClient(config)
 	client.clock = clock
+	client.requester = new(TestRequester)
 	return client
+}
+
+type TestRequester struct {
+}
+
+func (testReq *TestRequester) MakeRequest(client *Client, requestParams requestParams) (JobURL, Warnings, error) {
+	panic("WE DID IT")
+	return "", nil, nil
+}
+
+func (testReq *TestRequester) MakeListRequest(client *Client, requestParams requestParams) ([]interface{}, Warnings, error) {
+	panic("WE DID IT")
+	return nil, nil, nil
 }

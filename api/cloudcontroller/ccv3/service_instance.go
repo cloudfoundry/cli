@@ -15,7 +15,7 @@ type ServiceInstance struct {
 
 // GetServiceInstances lists service instances with optional filters.
 func (client *Client) GetServiceInstances(query ...Query) ([]ServiceInstance, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceInstancesRequest,
 		Query:       query,
 	})

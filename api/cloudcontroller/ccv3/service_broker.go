@@ -116,7 +116,7 @@ func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (Job
 		return "", nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PostServiceBrokerRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
@@ -125,13 +125,13 @@ func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (Job
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
 // DeleteServiceBroker deletes a named service broker
 func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, Warnings, error) {
-	return client.makeRequest(requestParams{
+	return client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteServiceBrokerRequest,
 		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
 	})
@@ -139,7 +139,7 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, War
 
 // GetServiceBrokers lists service brokers.
 func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceBrokersRequest,
 		Query:       query,
 	})
@@ -175,7 +175,7 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 		return "", nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchServiceBrokerRequest,
 		URIParams: map[string]string{
 			"service_broker_guid": serviceBrokerGUID,
@@ -187,7 +187,7 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 	}
 
 	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 

@@ -25,7 +25,7 @@ func (client *Client) CreateOrganization(orgName string) (Organization, Warnings
 	org := Organization{Name: orgName}
 	var responseBody Organization
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostOrganizationRequest,
 		RequestBody:  org,
 		ResponseBody: &responseBody,
@@ -36,7 +36,7 @@ func (client *Client) CreateOrganization(orgName string) (Organization, Warnings
 
 // DeleteOrganization deletes the organization with the given GUID.
 func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, error) {
-	return client.makeRequest(requestParams{
+	return client.requester.MakeRequest(client, requestParams{
 		RequestName: internal.DeleteOrganizationRequest,
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
@@ -46,7 +46,7 @@ func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, erro
 func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
 	var responseBody Domain
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetDefaultDomainRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		ResponseBody: &responseBody,
@@ -58,7 +58,7 @@ func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error)
 // GetIsolationSegmentOrganizations lists organizations
 // entitled to an isolation segment.
 func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]Organization, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentOrganizationsRequest,
 		URIParams:   map[string]string{"isolation_segment_guid": isolationSegmentGUID},
 	})
@@ -84,7 +84,7 @@ func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID stri
 
 // GetOrganization gets an organization by the given guid.
 func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationRequest,
 		URIParams:   map[string]string{"organization_guid": orgGUID},
 	})
@@ -97,7 +97,7 @@ func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, e
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrg,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	if err != nil {
 		return Organization{}, response.Warnings, err
 	}
@@ -107,7 +107,7 @@ func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, e
 
 // GetOrganizations lists organizations with optional filters.
 func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationsRequest,
 		Query:       query,
 	})
@@ -139,7 +139,7 @@ func (client *Client) UpdateOrganization(org Organization) (Organization, Warnin
 	if err != nil {
 		return Organization{}, nil, err
 	}
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchOrganizationRequest,
 		Body:        bytes.NewReader(orgBytes),
 		URIParams:   map[string]string{"organization_guid": orgGUID},
@@ -153,7 +153,7 @@ func (client *Client) UpdateOrganization(org Organization) (Organization, Warnin
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrg,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	if err != nil {
 		return Organization{}, nil, err

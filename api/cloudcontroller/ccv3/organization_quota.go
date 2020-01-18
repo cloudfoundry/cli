@@ -37,7 +37,7 @@ type RouteLimit struct {
 }
 
 func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrgQuota, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotasRequest,
 		Query:       query,
 	})

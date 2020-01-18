@@ -39,7 +39,7 @@ func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
 func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (EnvironmentVariables, Warnings, error) {
 	var responseBody EnvironmentVariables
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetEnvironmentVariableGroupRequest,
 		URIParams:    internal.Params{"group_name": string(group)},
 		ResponseBody: &responseBody,
@@ -57,7 +57,7 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 		return EnvironmentVariables{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"app_guid": appGUID},
 		RequestName: internal.PatchApplicationEnvironmentVariablesRequest,
 		Body:        bytes.NewReader(bodyBytes),
@@ -70,7 +70,7 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseEnvVars,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return responseEnvVars, response.Warnings, err
 }
 
@@ -81,7 +81,7 @@ func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentV
 		return EnvironmentVariables{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"group_name": string(group)},
 		RequestName: internal.PatchEnvironmentVariableGroupRequest,
 		Body:        bytes.NewReader(bodyBytes),
@@ -96,6 +96,6 @@ func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentV
 		DecodeJSONResponseInto: &responseEnvVars,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return responseEnvVars, response.Warnings, err
 }

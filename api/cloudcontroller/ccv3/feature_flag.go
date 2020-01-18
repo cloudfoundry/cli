@@ -28,7 +28,7 @@ func (f FeatureFlag) MarshalJSON() ([]byte, error) {
 func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, error) {
 	var responseBody FeatureFlag
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.GetFeatureFlagRequest,
 		URIParams:    internal.Params{"name": flagName},
 		ResponseBody: &responseBody,
@@ -39,7 +39,7 @@ func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, er
 
 // GetFeatureFlags lists feature flags.
 func (client *Client) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetFeatureFlagsRequest,
 	})
 
@@ -70,7 +70,7 @@ func (client *Client) UpdateFeatureFlag(flag FeatureFlag) (FeatureFlag, Warnings
 		return FeatureFlag{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchFeatureFlagRequest,
 		URIParams:   map[string]string{"name": flag.Name},
 		Body:        bytes.NewReader(bodyBytes),
@@ -85,7 +85,7 @@ func (client *Client) UpdateFeatureFlag(flag FeatureFlag) (FeatureFlag, Warnings
 		DecodeJSONResponseInto: &ccFlag,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return ccFlag, response.Warnings, err
 }

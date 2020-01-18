@@ -19,7 +19,7 @@ type Stack struct {
 
 // GetStacks lists stacks with optional filters.
 func (client *Client) GetStacks(query ...Query) ([]Stack, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetStacksRequest,
 		Query:       query,
 	})

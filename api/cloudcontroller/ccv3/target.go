@@ -32,13 +32,13 @@ type TargetSettings struct {
 func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	client.cloudControllerURL = settings.URL
 
-	client.connection = cloudcontroller.NewConnection(cloudcontroller.Config{
+	client.Connection = cloudcontroller.NewConnection(cloudcontroller.Config{
 		DialTimeout:       settings.DialTimeout,
 		SkipSSLValidation: settings.SkipSSLValidation,
 	})
 
 	for _, wrapper := range client.wrappers {
-		client.connection = wrapper.Wrap(client.connection)
+		client.Connection = wrapper.Wrap(client.Connection)
 	}
 
 	apiInfo, resourceLinks, warnings, err := client.GetInfo()

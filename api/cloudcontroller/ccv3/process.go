@@ -81,7 +81,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Process, Warnings, error) {
 	var responseBody Process
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.requester.MakeRequest(client, requestParams{
 		RequestName:  internal.PostApplicationProcessActionScaleRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "type": process.Type},
 		RequestBody:  process,
@@ -93,7 +93,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 
 // GetApplicationProcessByType returns application process of specified type
 func (client *Client) GetApplicationProcessByType(appGUID string, processType string) (Process, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationProcessRequest,
 		URIParams: map[string]string{
 			"app_guid": appGUID,
@@ -108,14 +108,14 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 		DecodeJSONResponseInto: &process,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return process, response.Warnings, err
 }
 
 // GetApplicationProcesses lists processes for a given application. **Note**:
 // Due to security, the API obfuscates certain values such as `command`.
 func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationProcessesRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
@@ -180,7 +180,7 @@ func (client *Client) GetNewApplicationProcesses(appGUID string, deploymentGUID 
 
 // GetProcess returns a process with the given guid
 func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetProcessRequest,
 		URIParams: map[string]string{
 			"process_guid": processGUID,
@@ -196,7 +196,7 @@ func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) 
 		DecodeJSONResponseInto: &process,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return process, response.Warnings, err
 }
 
@@ -215,7 +215,7 @@ func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) 
 		return Process{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.PatchProcessRequest,
 		Body:        bytes.NewReader(body),
 		URIParams:   internal.Params{"process_guid": process.GUID},
@@ -228,7 +228,7 @@ func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseProcess,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 	return responseProcess, response.Warnings, err
 }
 

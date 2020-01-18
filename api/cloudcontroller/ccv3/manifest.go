@@ -8,7 +8,7 @@ import (
 // GetApplicationManifest returns a (YAML) manifest for an application and its
 // underlying processes.
 func (client *Client) GetApplicationManifest(appGUID string) ([]byte, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := client.NewHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationManifestRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})
@@ -18,7 +18,7 @@ func (client *Client) GetApplicationManifest(appGUID string) ([]byte, Warnings, 
 	request.Header.Set("Accept", "application/x-yaml")
 
 	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
+	err = client.Connection.Make(request, &response)
 
 	return response.RawResponse, response.Warnings, err
 }
