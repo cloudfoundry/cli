@@ -31,7 +31,7 @@ var _ = Describe("LogCacheURL", func() {
 		When("there is a log cache url", func() {
 			var configuredLogcacheURL string
 			BeforeEach(func() {
-				configuredLogcacheURL = "https://logcache.up-to-date-logging.com"
+				configuredLogcacheURL = "https://log-cache.up-to-date-logging.com"
 				fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
 					Links: ccv3.InfoLinks{
 						LogCache: ccv3.APILink{
@@ -50,7 +50,7 @@ var _ = Describe("LogCacheURL", func() {
 				}, ccv3.ResourceLinks{}, ccv3.Warnings{}, nil)
 			})
 			It("uses the target", func() {
-				Expect(actualLogCacheURL).To(Equal("https://logcache.the-best-domain.com"))
+				Expect(actualLogCacheURL).To(Equal("https://log-cache.the-best-domain.com"))
 			})
 		})
 	})
@@ -62,7 +62,7 @@ var _ = Describe("LogCacheURL", func() {
 			}, ccv3.ResourceLinks{}, ccv3.Warnings{}, errors.New("awf splatz!"))
 		})
 		It("uses the target", func() {
-			Expect(actualLogCacheURL).To(Equal("https://logcache.the-best-domain.com"))
+			Expect(actualLogCacheURL).To(Equal("https://log-cache.the-best-domain.com"))
 		})
 	})
 })
