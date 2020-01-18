@@ -16,5 +16,5 @@ func (actor Actor) LogCacheURL() string {
 			return logCacheURL
 		}
 	}
-	return strings.Replace(actor.Config.Target(), "api", "logcache", 1)
+	return strings.Replace(actor.Config.Target(), "api", "log-cache", 1)
 }
