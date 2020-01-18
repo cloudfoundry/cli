@@ -107,7 +107,8 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
 
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
+	logcacheURL := v3Actor.LogCacheURL()
+	cmd.LogCacheClient = command.NewLogCacheClient(logcacheURL, config, ui)
 
 	cmd.ProgressBar = progressbar.NewProgressBar()
 	return nil

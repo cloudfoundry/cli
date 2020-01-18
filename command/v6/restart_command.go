@@ -61,7 +61,8 @@ func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
+	logcacheURL := v3Actor.LogCacheURL()
+	cmd.LogCacheClient = command.NewLogCacheClient(logcacheURL, config, ui)
 
 	return nil
 }

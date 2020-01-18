@@ -3,6 +3,7 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -46,7 +47,9 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClientV3.Info.LogCache(), config, ui)
+	v3Actor := v3action.NewActor(ccClientV3, config, nil, nil)
+	logcacheURL := v3Actor.LogCacheURL()
+	cmd.LogCacheClient = command.NewLogCacheClient(logcacheURL, config, ui)
 
 	return nil
 }
