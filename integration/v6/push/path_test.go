@@ -87,7 +87,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 
 			Eventually(session).Should(Say(`Getting app info\.\.\.`))
 			Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
-			Eventually(session).Should(helpers.SayPath(`path:\s+%s`, archive))
+			Eventually(session).Should(helpers.SayPath(`path:\s+(?:/private)?%s`, archive))
 			Eventually(session).Should(Say("routes:"))
 			Eventually(session).Should(Say(`Mapping routes\.\.\.`))
 			Eventually(session).Should(Say(`Comparing local files to remote cache\.\.\.`))
