@@ -85,7 +85,7 @@ var _ = Describe("Poll Start", func() {
 			Eventually(testUI.Out).Should(Say("\nStaging app and tracing logs..."))
 			Eventually(testUI.Out).Should(Say("some log message"))
 			Eventually(testUI.Out).Should(Say("\nWaiting for app to start..."))
-			Consistently(testUI.Out).ShouldNot(Say("some other log messsage"))
+			Consistently(testUI.Out).ShouldNot(Say("some other log message"))
 
 			Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 			Eventually(testUI.Err).Should(Say("some warning"))
