@@ -50,8 +50,10 @@ func PollStart(ui command.UI, config command.Config, messages <-chan sharedactio
 				ui.DisplayText("Staging app and tracing logs...")
 
 			case v2action.ApplicationStateStarting:
-				ui.DisplayNewline()
-				ui.DisplayText("Waiting for app to start...")
+				defer func() {
+					ui.DisplayNewline()
+					ui.DisplayText("Waiting for app to start...")
+				}()
 			}
 
 		case warning, ok := <-apiWarnings:

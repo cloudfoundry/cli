@@ -211,7 +211,7 @@ var _ = Describe("push Command", func() {
 								return appState, allWarnings, errs
 							}
 
-							allLogsWritten, fakeRestartActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"i am message 1", "i am message "}, []string{})
+							allLogsWritten, fakeRestartActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{}, []string{})
 							applicationSummary := v2action.ApplicationSummary{
 								Application: v2action.Application{
 									DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
@@ -723,13 +723,27 @@ var _ = Describe("push Command", func() {
 							Context("new logs", func() {
 								BeforeEach(func() {
 									allLogsWritten, fakeRestartActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"log message 1", "log message 2"}, []string{})
+									fakeRestartActor.RestartApplicationStub = func(_ v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+										appState := make(chan v2action.ApplicationStateChange)
+										allWarnings := make(chan string)
+										errs := make(chan error)
+										go func() {
+											<-allLogsWritten
+											appState <- v2action.ApplicationStateStarting
+											close(appState)
+											close(allWarnings)
+											close(errs)
+										}()
+										return appState, allWarnings, errs
+									}
 								})
-								It("displays app staging logs", func() {
+								It("displays app staging logs before the waiting-for-app-to-start message", func() {
 
 									Expect(executeErr).ToNot(HaveOccurred())
 
 									Expect(testUI.Out).To(Say("log message 1"))
 									Expect(testUI.Out).To(Say("log message 2"))
+									Expect(testUI.Out).To(Say("Waiting for app to start..."))
 
 									Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
 									appConfig := fakeRestartActor.RestartApplicationArgsForCall(0)

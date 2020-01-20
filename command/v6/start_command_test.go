@@ -227,6 +227,19 @@ var _ = Describe("Start Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(testUI.Out).To(Say("Waiting for app to start..."))
 					})
+
+					When("passed both an ApplicationStateStarting message and a log message", func() {
+						BeforeEach(func() {
+							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"log message 1", "log message 2"}, []string{})
+						})
+						It("displays the log messages first", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("log message 1"))
+							Expect(testUI.Out).To(Say("log message 2"))
+							Expect(testUI.Out).To(Say("Waiting for app to start..."))
+
+						})
+					})
 				})
 
 				When("passed a log message", func() {
