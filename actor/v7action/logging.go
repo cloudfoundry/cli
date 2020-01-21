@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/loggingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"github.com/SermoDigital/jose/jws"
 )
@@ -28,23 +27,20 @@ func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spa
 		return nil, allWarnings, err
 	}
 
-	logCacheMessages, err := loggingaction.GetRecentLogs(app.GUID, client)
+	logCacheMessages, err := sharedaction.GetRecentLogs(app.GUID, client)
 	if err != nil {
 		return nil, allWarnings, err
 	}
-
-	//TODO: Messages need sorting for most recent?
-	// logCacheMessages = client.SortRecent(logCacheMessages)
 
 	var logMessages []sharedaction.LogMessage
 
 	for _, message := range logCacheMessages {
 		logMessages = append(logMessages, *sharedaction.NewLogMessage(
-			message.Message,
-			message.MessageType,
-			message.Timestamp, // time.Unix(0, message.Timestamp),
-			message.SourceType,
-			message.SourceInstance,
+			message.Message(),
+			message.Type(),
+			message.Timestamp(),
+			message.SourceType(),
+			message.SourceInstance(),
 		))
 	}
 

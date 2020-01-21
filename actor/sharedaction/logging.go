@@ -13,7 +13,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const StagingLog = "STG"
+const (
+	StagingLog      = "STG"
+	RecentLogsLines = 100
+)
 
 type LogMessage struct {
 	message        string
@@ -116,6 +119,28 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 	}()
 
 	return outgoingLogStream, outgoingErrStream, cancelFunc
+}
+
+func GetRecentLogs(appGUID string, client LogCacheClient) ([]LogMessage, error) {
+	envelopes, err := client.Read(
+		context.Background(),
+		appGUID,
+		time.Time{},
+		logcache.WithEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
+		logcache.WithLimit(RecentLogsLines),
+		logcache.WithDescending(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	logMessages := convertEnvelopesToLogMessages(envelopes)
+	var reorderedLogMessages []LogMessage
+	for i := len(logMessages) - 1; i >= 0; i-- {
+		reorderedLogMessages = append(reorderedLogMessages, *logMessages[i])
+	}
+
+	return reorderedLogMessages, nil
 }
 
 func convertEnvelopesToLogMessages(envelopes []*loggregator_v2.Envelope) []*LogMessage {
