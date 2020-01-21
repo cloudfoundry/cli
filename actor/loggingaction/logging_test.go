@@ -1,16 +1,13 @@
 package loggingaction_test
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/loggingaction"
 
 	"code.cloudfoundry.org/cli/actor/loggingaction/loggingactionfakes"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -38,180 +35,6 @@ var _ = Describe("Logging Actions", func() {
 					message := loggingaction.LogMessage{SourceType: "APP"}
 					Expect(message.Staging()).To(BeFalse())
 				})
-			})
-		})
-	})
-
-	Describe("GetStreamingLogs", func() {
-		var (
-			expectedAppGUID string
-
-			messages      <-chan loggingaction.LogMessage
-			errs          <-chan error
-			stopStreaming context.CancelFunc
-		)
-
-		BeforeEach(func() {
-			expectedAppGUID = "some-app-guid"
-		})
-
-		AfterEach(func() {
-			Eventually(messages).Should(BeClosed())
-			Eventually(errs).Should(BeClosed())
-		})
-
-		JustBeforeEach(func() {
-			messages, errs, stopStreaming = loggingaction.GetStreamingLogs(expectedAppGUID, fakeLogCacheClient)
-		})
-
-		When("receiving logs", func() {
-			BeforeEach(func() {
-				fakeLogCacheClient.ReadStub = func(
-					ctx context.Context,
-					sourceID string,
-					start time.Time,
-					opts ...logcache.ReadOption,
-				) ([]*loggregator_v2.Envelope, error) {
-					if fakeLogCacheClient.ReadCallCount() > 2 {
-						stopStreaming()
-					}
-
-					return []*loggregator_v2.Envelope{{
-						// 2 seconds in the past to get past Walk delay
-						Timestamp:  time.Now().Add(-3 * time.Second).UnixNano(),
-						SourceId:   "some-app-guid",
-						InstanceId: "some-source-instance",
-						Message: &loggregator_v2.Envelope_Log{
-							Log: &loggregator_v2.Log{
-								Payload: []byte("message-1"),
-								Type:    loggregator_v2.Log_OUT,
-							},
-						},
-						Tags: map[string]string{
-							"source_type": "some-source-type",
-						},
-					}, {
-						// 2 seconds in the past to get past Walk delay
-						Timestamp:  time.Now().Add(-2 * time.Second).UnixNano(),
-						SourceId:   "some-app-guid",
-						InstanceId: "some-source-instance",
-						Message: &loggregator_v2.Envelope_Log{
-							Log: &loggregator_v2.Log{
-								Payload: []byte("message-2"),
-								Type:    loggregator_v2.Log_OUT,
-							},
-						},
-						Tags: map[string]string{
-							"source_type": "some-source-type",
-						},
-					}}, ctx.Err()
-				}
-			})
-
-			It("converts them to log messages, sorts them, and passes them through the messages channel", func() {
-				Eventually(messages).Should(HaveLen(4))
-				var message loggingaction.LogMessage
-				Expect(messages).To(Receive(&message))
-				Expect(message.Message).To(Equal("message-1"))
-				Expect(messages).To(Receive(&message))
-				Expect(message.Message).To(Equal("message-2"))
-
-				Expect(errs).ToNot(Receive())
-			})
-		})
-
-		When("logs are older than 5 seconds", func() {
-			var readStart chan time.Time
-
-			BeforeEach(func() {
-				readStart = make(chan time.Time, 100)
-				fakeLogCacheClient.ReadStub = func(
-					ctx context.Context,
-					sourceID string,
-					start time.Time,
-					opts ...logcache.ReadOption,
-				) ([]*loggregator_v2.Envelope, error) {
-					if fakeLogCacheClient.ReadCallCount() > 1 {
-						stopStreaming()
-					}
-
-					readStart <- start
-
-					return []*loggregator_v2.Envelope{{
-						// 2 seconds in the past to get past Walk delay
-						Timestamp:  time.Now().Add(-6 * time.Second).UnixNano(),
-						SourceId:   "some-app-guid",
-						InstanceId: "some-source-instance",
-						Message: &loggregator_v2.Envelope_Log{
-							Log: &loggregator_v2.Log{
-								Payload: []byte("message-1"),
-								Type:    loggregator_v2.Log_OUT,
-							},
-						},
-						Tags: map[string]string{
-							"source_type": "some-source-type",
-						},
-					}, {
-						// 2 seconds in the past to get past Walk delay
-						Timestamp:  time.Now().Add(-2 * time.Second).UnixNano(),
-						SourceId:   "some-app-guid",
-						InstanceId: "some-source-instance",
-						Message: &loggregator_v2.Envelope_Log{
-							Log: &loggregator_v2.Log{
-								Payload: []byte("message-2"),
-								Type:    loggregator_v2.Log_OUT,
-							},
-						},
-						Tags: map[string]string{
-							"source_type": "some-source-type",
-						},
-					}}, ctx.Err()
-				}
-			})
-
-			It("ignores them", func() {
-				Eventually(readStart).Should(Receive(BeTemporally("~", time.Now().Add(-5*time.Second), time.Second)))
-			})
-		})
-
-		When("cancelling log streaming", func() {
-			BeforeEach(func() {
-				fakeLogCacheClient.ReadStub = func(
-					ctx context.Context,
-					sourceID string,
-					start time.Time,
-					opts ...logcache.ReadOption,
-				) ([]*loggregator_v2.Envelope, error) {
-					return nil, ctx.Err()
-				}
-			})
-
-			It("can be called multiple times", func() {
-				Expect(stopStreaming).ToNot(Panic())
-				Expect(stopStreaming).ToNot(Panic())
-			})
-		})
-
-		Describe("log cache error", func() {
-			BeforeEach(func() {
-				fakeLogCacheClient.ReadStub = func(
-					ctx context.Context,
-					sourceID string,
-					start time.Time,
-					opts ...logcache.ReadOption,
-				) ([]*loggregator_v2.Envelope, error) {
-					if fakeLogCacheClient.ReadCallCount() > 2 {
-						stopStreaming()
-					}
-
-					return nil, fmt.Errorf("error number %d", fakeLogCacheClient.ReadCallCount())
-				}
-			})
-
-			It("passes them through the errors channel", func() {
-				Eventually(errs).Should(HaveLen(2))
-				Eventually(errs).Should(Receive(MatchError("error number 1")))
-				Eventually(errs).Should(Receive(MatchError("error number 2")))
 			})
 		})
 	})
