@@ -3,11 +3,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7d971f7c485ac99b3aeab603deb4b5d108e68a7881e6b68f329ab886b3f51f1f"
+  digest = "1:59f6949e3e236e3682287a6ad247390466c16c54eb18953977d86481379465c4"
   name = "code.cloudfoundry.org/bytefmt"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "f4415fafc5619dd75599a54a7c91fb3948ad58bd"
+  revision = "a7ec01c286f47b4dda6b3c10601bf4691d9e141d"
 
 [[projects]]
   branch = "master"
@@ -22,6 +22,22 @@
   ]
   pruneopts = "NUT"
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
+
+[[projects]]
+  digest = "1:c71b9f186430809f337cec9058b69b110b1afc252ebbe318b0857dc2300dc391"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "d0dfa93bb41add74220345383743f6c7ef32754c"
+  version = "v6.49.0"
 
 [[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
