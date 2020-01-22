@@ -62,7 +62,7 @@ var _ = Describe("delete-service-broker command", func() {
 			})
 
 			It("should delete the service broker", func() {
-				session := helpers.CF("delete-service-broker", broker.Name(), "-f")
+				session := helpers.CF("delete-service-broker", broker.Name(), "-f", "-v")
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("service-brokers")
