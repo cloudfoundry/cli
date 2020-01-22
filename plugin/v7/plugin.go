@@ -18,6 +18,7 @@ type Plugin interface {
 type CliConnection interface {
 	AccessToken() (string, error)
 	ApiEndpoint() (string, error)
+	CliCommand(args ...string) ([]string, error)
 	GetApp(string) (plugin_models.DetailedApplicationSummary, error)
 	GetApps() ([]plugin_models.Application, error)
 	GetCurrentOrg() (plugin_models.Org, error)

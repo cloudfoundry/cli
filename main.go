@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
@@ -15,7 +16,12 @@ func main() {
 	var exitCode int
 	defer panichandler.HandlePanic()
 
-	exitCode = command_parser.ParseCommandFromArgs(os.Args[1:])
+	p, err := command_parser.NewCommandParser()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
+		os.Exit(1)
+	}
+	exitCode = p.ParseCommandFromArgs(os.Args[1:])
 	if exitCode == command_parser.UnknownCommandCode {
 		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
 

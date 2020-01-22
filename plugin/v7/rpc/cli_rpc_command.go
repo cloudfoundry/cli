@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
+	"code.cloudfoundry.org/cli/util/command_parser"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 )
@@ -70,8 +71,25 @@ func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
-	return errors.New("unimplemented")
+func (cmd *CliRpcCmd) CliCommand(args []string, retVal *[]string) error {
+	outBuffer := bytes.Buffer{}
+	errBuffer := bytes.Buffer{}
+
+	p, err := command_parser.NewCommandParserForPlugins(&outBuffer, &errBuffer)
+	if err != nil {
+		return err
+	}
+	exitCode := p.ParseCommandFromArgs(args)
+
+	if exitCode == command_parser.UnknownCommandCode {
+		return errors.New("UnknownCommandCode")
+	} else if exitCode > 0 {
+		return errors.New("Some other error")
+	}
+
+	*retVal = []string{outBuffer.String(), errBuffer.String()}
+
+	return nil
 }
 
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {

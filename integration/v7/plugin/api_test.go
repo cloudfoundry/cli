@@ -32,6 +32,12 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
+	Describe("CliCommand", func() {
+		It("runs the given CLI command", func() {
+			confirmTestPluginOutputWithArg("CliCommand", "target", "api endpoint")
+		})
+	})
+
 	Describe("GetApp", func() {
 		var appName string
 		BeforeEach(func() {
