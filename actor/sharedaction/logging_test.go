@@ -213,26 +213,18 @@ var _ = Describe("Logging Actions", func() {
 					start time.Time,
 					opts ...logcache.ReadOption,
 				) ([]*loggregator_v2.Envelope, error) {
+					if fakeLogCacheClient.ReadCallCount() > 2 {
+						stopStreaming()
+					}
+
 					return nil, fmt.Errorf("error number %d", fakeLogCacheClient.ReadCallCount())
 				}
 			})
 
-			AfterEach(func() {
-				stopStreaming()
-			})
-
 			It("passes them through the errors channel", func() {
-				Eventually(errs, 2*time.Second).Should(HaveLen(5))
+				Eventually(errs).Should(HaveLen(2))
 				Eventually(errs).Should(Receive(MatchError("error number 1")))
 				Eventually(errs).Should(Receive(MatchError("error number 2")))
-				Eventually(errs).Should(Receive(MatchError("error number 3")))
-				Eventually(errs).Should(Receive(MatchError("error number 4")))
-				Eventually(errs).Should(Receive(MatchError("error number 5")))
-			})
-
-			It("retries exactly 5 times", func() {
-				Eventually(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(5))
-				Consistently(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(5))
 			})
 		})
 	})

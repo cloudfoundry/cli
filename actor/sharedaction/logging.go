@@ -16,9 +16,6 @@ import (
 const (
 	StagingLog      = "STG"
 	RecentLogsLines = 100
-
-	retryCount    = 5
-	retryInterval = time.Millisecond * 250
 )
 
 type LogMessage struct {
@@ -114,7 +111,7 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 			client.Read,
 			logcache.WithWalkStartTime(time.Now().Add(-5*time.Second)),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
-			logcache.WithWalkBackoff(logcache.NewRetryBackoff(retryInterval, retryCount)),
+			logcache.WithWalkBackoff(logcache.NewAlwaysRetryBackoff(250*time.Millisecond)),
 			logcache.WithWalkLogger(log.New(channelWriter{
 				errChannel: outgoingErrStream,
 			}, "", 0)),
