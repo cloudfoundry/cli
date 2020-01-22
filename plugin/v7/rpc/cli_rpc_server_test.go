@@ -201,6 +201,16 @@ var _ = Describe("Server", func() {
 			time.Sleep(50 * time.Millisecond)
 		})
 
+		Describe("CliCommand", func() {
+			It("calls a core command", func() {
+				var result []string
+				err := client.Call("CliRpcCmd.CliCommand", []string{"api"}, &result)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(result[0]).To(ContainSubstring("api endpoint"))
+			})
+		})
+
 		Describe("GetApp", func() {
 			var (
 				summary v7action.DetailedApplicationSummary

@@ -3,6 +3,7 @@ package command_parser
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"strings"
@@ -43,29 +44,57 @@ type TriggerLegacyMain interface {
 	error
 }
 
-func ParseCommandFromArgs(args []string) int {
-	exitStatus := parse(args, &common.Commands)
+type CommandParser struct {
+	Config *configv3.Config
+	UI     *ui.UI
+}
+
+func NewCommandParser() (CommandParser, error) {
+	cfConfig, err := getCFConfig()
+	if err != nil {
+		return CommandParser{}, err
+	}
+
+	commandUI, err := ui.NewUI(cfConfig)
+	if err != nil {
+		return CommandParser{}, err
+	}
+	return CommandParser{Config: cfConfig, UI: commandUI}, nil
+}
+
+func NewCommandParserForPlugins(outBuffer io.Writer, errBuffer io.Writer) (CommandParser, error) {
+	cfConfig, err := getCFConfig()
+	if err != nil {
+		return CommandParser{}, err
+	}
+
+	commandUI, err := ui.NewPluginUI(cfConfig, outBuffer, errBuffer)
+	if err != nil {
+		return CommandParser{}, err
+	}
+	return CommandParser{Config: cfConfig, UI: commandUI}, nil
+}
+
+func (p *CommandParser) ParseCommandFromArgs(args []string) int {
+	exitStatus := p.parse(args, &common.Commands)
 	if exitStatus == switchToV2 {
-		exitStatus = parse(args, &common.FallbackCommands)
+		exitStatus = p.parse(args, &common.FallbackCommands)
 	}
 	return exitStatus
 }
 
-func executionWrapper(cmd flags.Commander, args []string) error {
-	cfConfig, commandUI, err := getCFConfigAndCommandUIObjects()
-	if err != nil {
-		return err
-	}
-	defer commandUI.FlushDeferred()
+func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string) error {
+	cfConfig := p.Config
+	defer p.UI.FlushDeferred()
 
-	err = preventExtraArgs(args)
+	err := preventExtraArgs(args)
 	if err != nil {
-		return handleError(err, commandUI)
+		return p.handleError(err)
 	}
 
 	err = cfConfig.CreatePluginHome()
 	if err != nil {
-		return handleError(err, commandUI)
+		return p.handleError(err)
 	}
 
 	defer func() {
@@ -79,31 +108,18 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 		log.SetOutput(os.Stderr)
 		log.SetLevel(log.Level(cfConfig.LogLevel()))
 
-		err = extendedCmd.Setup(cfConfig, commandUI)
+		err = extendedCmd.Setup(cfConfig, p.UI)
 		if err != nil {
-			return handleError(err, commandUI)
+			return p.handleError(err)
 		}
 
-		return handleError(extendedCmd.Execute(args), commandUI)
+		return p.handleError(extendedCmd.Execute(args))
 	}
 
 	return fmt.Errorf("command does not conform to ExtendedCommander")
 }
 
-func getCFConfigAndCommandUIObjects() (*configv3.Config, *ui.UI, error) {
-	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
-	})
-	if configErr != nil {
-		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
-			return nil, nil, configErr
-		}
-	}
-	commandUI, err := ui.NewUI(cfConfig)
-	return cfConfig, commandUI, err
-}
-
-func handleError(passedErr error, commandUI UI) error {
+func (p *CommandParser) handleError(passedErr error) error {
 	if passedErr == nil {
 		return nil
 	}
@@ -116,14 +132,14 @@ func handleError(passedErr error, commandUI UI) error {
 		return passedErr
 	case TriggerLegacyMain:
 		if typedErr.Error() != "" {
-			commandUI.DisplayWarning("")
-			commandUI.DisplayWarning(typedErr.Error())
+			p.UI.DisplayWarning("")
+			p.UI.DisplayWarning(typedErr.Error())
 		}
 		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case *ssh.ExitError:
 		exitStatus := typedErr.ExitStatus()
 		if sig := typedErr.Signal(); sig != "" {
-			commandUI.DisplayText("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
+			p.UI.DisplayText("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
 				"Signal":   sig,
 				"ExitCode": exitStatus,
 			})
@@ -131,7 +147,7 @@ func handleError(passedErr error, commandUI UI) error {
 		return passedErr
 	}
 
-	commandUI.DisplayError(translatedErr)
+	p.UI.DisplayError(translatedErr)
 
 	if _, ok := translatedErr.(DisplayUsage); ok {
 		return ParseErr
@@ -140,17 +156,17 @@ func handleError(passedErr error, commandUI UI) error {
 	return ErrFailed
 }
 
-func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, extraArgs []string, originalArgs []string, commandList interface{}) int {
+func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flagsParser *flags.Parser, extraArgs []string, originalArgs []string, commandList interface{}) int {
 	switch flagErr.Type {
 	case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument, flags.ErrInvalidChoice:
 		_, commandExists := reflect.TypeOf(common.Commands).FieldByNameFunc(
 			func(fieldName string) bool {
 				field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
-				return parser.Active != nil && parser.Active.Name == field.Tag.Get("command")
+				return flagsParser.Active != nil && flagsParser.Active.Name == field.Tag.Get("command")
 			},
 		)
 
-		if commandExists && flagErr.Type == flags.ErrUnknownFlag && (parser.Active.Name == "set-env" || parser.Active.Name == "v3-set-env") {
+		if commandExists && flagErr.Type == flags.ErrUnknownFlag && (flagsParser.Active.Name == "set-env" || flagsParser.Active.Name == "v3-set-env") {
 			newArgs := []string{}
 			for _, arg := range originalArgs {
 				if arg[0] == '-' {
@@ -159,7 +175,7 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 					newArgs = append(newArgs, arg)
 				}
 			}
-			parse(newArgs, commandList)
+			p.parse(newArgs, commandList)
 			return 0
 		}
 
@@ -169,22 +185,22 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 
 		var helpExitCode int
 		if commandExists {
-			helpExitCode = parse([]string{"help", parser.Active.Name}, commandList)
+			helpExitCode = p.parse([]string{"help", flagsParser.Active.Name}, commandList)
 		} else {
 			switch len(extraArgs) {
 			case 0:
-				helpExitCode = parse([]string{"help"}, commandList)
+				helpExitCode = p.parse([]string{"help"}, commandList)
 			case 1:
 				if !isOption(extraArgs[0]) || (len(originalArgs) > 1 && extraArgs[0] == "-a") {
-					helpExitCode = parse([]string{"help", extraArgs[0]}, commandList)
+					helpExitCode = p.parse([]string{"help", extraArgs[0]}, commandList)
 				} else {
-					helpExitCode = parse([]string{"help"}, commandList)
+					helpExitCode = p.parse([]string{"help"}, commandList)
 				}
 			default:
 				if isCommand(extraArgs[0]) {
-					helpExitCode = parse([]string{"help", extraArgs[0]}, commandList)
+					helpExitCode = p.parse([]string{"help", extraArgs[0]}, commandList)
 				} else {
-					helpExitCode = parse(extraArgs[1:], commandList)
+					helpExitCode = p.parse(extraArgs[1:], commandList)
 				}
 			}
 		}
@@ -195,26 +211,62 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 
 	case flags.ErrRequired, flags.ErrMarshal:
 		fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
-		parse([]string{"help", originalArgs[0]}, commandList)
+		p.parse([]string{"help", originalArgs[0]}, commandList)
 		return 1
 	case flags.ErrUnknownCommand:
 		if !isHelpCommand(originalArgs) {
 			// TODO Extract handling of unknown commands/suggested  commands out of legacy
 			return UnknownCommandCode
 		} else {
-			helpExitCode := parse([]string{"help", originalArgs[0]}, commandList)
+			helpExitCode := p.parse([]string{"help", originalArgs[0]}, commandList)
 			return helpExitCode
 		}
 	case flags.ErrCommandRequired:
 		if common.Commands.VerboseOrVersion {
-			parse([]string{"version"}, commandList)
+			p.parse([]string{"version"}, commandList)
 		} else {
-			parse([]string{"help"}, commandList)
+			p.parse([]string{"help"}, commandList)
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 	}
 	return 0
+}
+
+func (p *CommandParser) parse(args []string, commandList interface{}) int {
+	flagsParser := flags.NewParser(commandList, flags.HelpFlag)
+	flagsParser.CommandHandler = p.executionWrapper
+	extraArgs, err := flagsParser.ParseArgs(args)
+	if err == nil {
+		return 0
+	} else if _, ok := err.(translatableerror.V3V2SwitchError); ok {
+		return switchToV2
+	} else if flagErr, ok := err.(*flags.Error); ok {
+		return p.handleFlagErrorAndCommandHelp(flagErr, flagsParser, extraArgs, args, commandList)
+	} else if err == ErrFailed {
+		return 1
+	} else if err == ParseErr {
+		fmt.Println()
+		p.parse([]string{"help", args[0]}, commandList)
+		return 1
+	} else if exitError, ok := err.(*ssh.ExitError); ok {
+		return exitError.ExitStatus()
+	}
+
+	fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
+	return 1
+}
+
+func getCFConfig() (*configv3.Config, error) {
+	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
+		Verbose: common.Commands.VerboseOrVersion,
+	})
+	if configErr != nil {
+		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
+			return nil, configErr
+		}
+	}
+	return cfConfig, nil
 }
 
 func isCommand(s string) bool {
@@ -238,28 +290,4 @@ func isHelpCommand(args []string) bool {
 
 func isOption(s string) bool {
 	return strings.HasPrefix(s, "-")
-}
-
-func parse(args []string, commandList interface{}) int {
-	parser := flags.NewParser(commandList, flags.HelpFlag)
-	parser.CommandHandler = executionWrapper
-	extraArgs, err := parser.ParseArgs(args)
-	if err == nil {
-		return 0
-	} else if _, ok := err.(translatableerror.V3V2SwitchError); ok {
-		return switchToV2
-	} else if flagErr, ok := err.(*flags.Error); ok {
-		return handleFlagErrorAndCommandHelp(flagErr, parser, extraArgs, args, commandList)
-	} else if err == ErrFailed {
-		return 1
-	} else if err == ParseErr {
-		fmt.Println()
-		parse([]string{"help", args[0]}, commandList)
-		return 1
-	} else if exitError, ok := err.(*ssh.ExitError); ok {
-		return exitError.ExitStatus()
-	}
-
-	fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
-	return 1
 }
