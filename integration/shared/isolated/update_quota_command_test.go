@@ -13,10 +13,12 @@ var _ = Describe("update-quota command", func() {
 		orgName   string
 		spaceName string
 		quotaName string
+		username  string
 	)
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
+		username, _ = helpers.GetCredentials()
 
 		helpers.SetupCF(orgName, spaceName)
 		quotaName = helpers.QuotaName()
@@ -53,5 +55,32 @@ var _ = Describe("update-quota command", func() {
 		Eventually(session).Should(Say(`App instance limit\s+%s`, appInstances))
 		Eventually(session).Should(Say(`Reserved Route Ports\s+%s`, reservedRoutePorts))
 		Eventually(session).Should(Exit(0))
+	})
+
+	When("the named quota does not exist", func() {
+		It("displays a missing quota error message and fails", func() {
+			session := helpers.CF("update-quota", "bogus-org-quota")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say(`Quota %s not found`, "bogus-org-quota"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	When("no user-provided updates to the quota are specified", func() {
+		It("behaves idempotently and succeeds", func() {
+			session := helpers.CF("update-quota", quotaName)
+			Eventually(session).Should(Say(`Updating quota %s as %s\.\.\.`, quotaName, username))
+			Eventually(session).Should(Say("OK"))
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	When("conflicting flags are specified", func() {
+		It("displays a flag conflict error message and fails", func() {
+			session := helpers.CF("update-quota", quotaName, "--allow-paid-service-plans", "--disallow-paid-service-plans")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say(`Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.`))
+			Eventually(session).Should(Exit(1))
+		})
 	})
 })
