@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/command"
@@ -87,7 +88,7 @@ func (cmd *CliRpcCmd) CliCommand(args []string, retVal *[]string) error {
 		return errors.New("Some other error")
 	}
 
-	*retVal = []string{outBuffer.String(), errBuffer.String()}
+	*retVal = strings.Split(strings.TrimSuffix(outBuffer.String(), "\n"), "\n")
 
 	return nil
 }
