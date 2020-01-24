@@ -33,7 +33,7 @@ var _ = Describe("plugin API", func() {
 	})
 
 	Describe("CliCommand", func() {
-		XDescribe("stdout output", func() {
+		Describe("stdout output", func() {
 			It("outputs the result of the command to stdout", func() {
 				confirmTestPluginOutputWithArg("CliCommand", "target", "api endpoint",
 					"@@ plugin api response")

@@ -68,7 +68,8 @@ func NewCommandParserForPlugins(outBuffer io.Writer, errBuffer io.Writer) (Comma
 		return CommandParser{}, err
 	}
 
-	commandUI, err := ui.NewPluginUI(cfConfig, outBuffer, errBuffer)
+	multiWriter := io.MultiWriter(os.Stdout, outBuffer)
+	commandUI, err := ui.NewPluginUI(cfConfig, multiWriter, errBuffer)
 	if err != nil {
 		return CommandParser{}, err
 	}
