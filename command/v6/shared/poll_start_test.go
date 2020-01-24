@@ -59,7 +59,7 @@ var _ = Describe("Poll Start", func() {
 			appState <- v2action.ApplicationStateStopping
 			appState <- v2action.ApplicationStateStaging
 			appState <- v2action.ApplicationStateStarting
-			logErrs <- actionerror.NOAATimeoutError{}
+			logErrs <- actionerror.LogCacheTimeoutError{}
 			apiWarnings <- "some warning"
 			logErrs <- errors.New("some logErrhea")
 			messages <- *sharedaction.NewLogMessage(
