@@ -1203,6 +1203,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetServiceOfferingsStub        func(...ccv3.Query) ([]ccv3.ServiceOffering, ccv3.Warnings, error)
+	getServiceOfferingsMutex       sync.RWMutex
+	getServiceOfferingsArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getServiceOfferingsReturns struct {
+		result1 []ccv3.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getServiceOfferingsReturnsOnCall map[int]struct {
+		result1 []ccv3.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetSpaceIsolationSegmentStub        func(string) (ccv3.Relationship, ccv3.Warnings, error)
 	getSpaceIsolationSegmentMutex       sync.RWMutex
 	getSpaceIsolationSegmentArgsForCall []struct {
@@ -7019,6 +7034,72 @@ func (fake *FakeCloudControllerClient) GetServiceInstancesReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetServiceOfferings(arg1 ...ccv3.Query) ([]ccv3.ServiceOffering, ccv3.Warnings, error) {
+	fake.getServiceOfferingsMutex.Lock()
+	ret, specificReturn := fake.getServiceOfferingsReturnsOnCall[len(fake.getServiceOfferingsArgsForCall)]
+	fake.getServiceOfferingsArgsForCall = append(fake.getServiceOfferingsArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetServiceOfferings", []interface{}{arg1})
+	fake.getServiceOfferingsMutex.Unlock()
+	if fake.GetServiceOfferingsStub != nil {
+		return fake.GetServiceOfferingsStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServiceOfferingsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingsCallCount() int {
+	fake.getServiceOfferingsMutex.RLock()
+	defer fake.getServiceOfferingsMutex.RUnlock()
+	return len(fake.getServiceOfferingsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingsCalls(stub func(...ccv3.Query) ([]ccv3.ServiceOffering, ccv3.Warnings, error)) {
+	fake.getServiceOfferingsMutex.Lock()
+	defer fake.getServiceOfferingsMutex.Unlock()
+	fake.GetServiceOfferingsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingsArgsForCall(i int) []ccv3.Query {
+	fake.getServiceOfferingsMutex.RLock()
+	defer fake.getServiceOfferingsMutex.RUnlock()
+	argsForCall := fake.getServiceOfferingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingsReturns(result1 []ccv3.ServiceOffering, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceOfferingsMutex.Lock()
+	defer fake.getServiceOfferingsMutex.Unlock()
+	fake.GetServiceOfferingsStub = nil
+	fake.getServiceOfferingsReturns = struct {
+		result1 []ccv3.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceOfferingsReturnsOnCall(i int, result1 []ccv3.ServiceOffering, result2 ccv3.Warnings, result3 error) {
+	fake.getServiceOfferingsMutex.Lock()
+	defer fake.getServiceOfferingsMutex.Unlock()
+	fake.GetServiceOfferingsStub = nil
+	if fake.getServiceOfferingsReturnsOnCall == nil {
+		fake.getServiceOfferingsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.ServiceOffering
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceOfferingsReturnsOnCall[i] = struct {
+		result1 []ccv3.ServiceOffering
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSpaceIsolationSegment(arg1 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.getSpaceIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.getSpaceIsolationSegmentReturnsOnCall[len(fake.getSpaceIsolationSegmentArgsForCall)]
@@ -9661,6 +9742,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceBrokersMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()
 	defer fake.getServiceInstancesMutex.RUnlock()
+	fake.getServiceOfferingsMutex.RLock()
+	defer fake.getServiceOfferingsMutex.RUnlock()
 	fake.getSpaceIsolationSegmentMutex.RLock()
 	defer fake.getSpaceIsolationSegmentMutex.RUnlock()
 	fake.getSpacesMutex.RLock()

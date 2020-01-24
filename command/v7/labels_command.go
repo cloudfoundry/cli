@@ -19,14 +19,15 @@ import (
 type ResourceType string
 
 const (
-	App           ResourceType = "app"
-	Buildpack     ResourceType = "buildpack"
-	Domain        ResourceType = "domain"
-	Org           ResourceType = "org"
-	Route         ResourceType = "route"
-	Space         ResourceType = "space"
-	Stack         ResourceType = "stack"
-	ServiceBroker ResourceType = "service-broker"
+	App             ResourceType = "app"
+	Buildpack       ResourceType = "buildpack"
+	Domain          ResourceType = "domain"
+	Org             ResourceType = "org"
+	Route           ResourceType = "route"
+	Space           ResourceType = "space"
+	Stack           ResourceType = "stack"
+	ServiceBroker   ResourceType = "service-broker"
+	ServiceOffering ResourceType = "service-offering"
 )
 
 //go:generate counterfeiter . LabelsActor
@@ -40,17 +41,20 @@ type LabelsActor interface {
 	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
 	GetStackLabels(stackName string) (map[string]types.NullString, v7action.Warnings, error)
 	GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
+	GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
 }
 
 type LabelsCommand struct {
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   space\n   stack"`
+	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   space\n   stack"`
 	relatedCommands interface{}     `related_commands:"set-label, unset-label"`
-	UI              command.UI
-	Config          command.Config
-	SharedActor     command.SharedActor
-	Actor           LabelsActor
+	ServiceBroker   string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings with the same name."`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       LabelsActor
 }
 
 func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
@@ -93,6 +97,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		labels, warnings, err = cmd.fetchRouteLabels(username)
 	case ServiceBroker:
 		labels, warnings, err = cmd.fetchServiceBrokerLabels(username)
+	case ServiceOffering:
+		labels, warnings, err = cmd.fetchServiceOfferingLabels(username)
 	case Space:
 		labels, warnings, err = cmd.fetchSpaceLabels(username)
 	case Stack:
@@ -189,6 +195,29 @@ func (cmd LabelsCommand) fetchServiceBrokerLabels(username string) (map[string]t
 	cmd.UI.DisplayNewline()
 
 	return cmd.Actor.GetServiceBrokerLabels(cmd.RequiredArgs.ResourceName)
+}
+
+func (cmd LabelsCommand) fetchServiceOfferingLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
+	if err := cmd.SharedActor.CheckTarget(false, false); err != nil {
+		return nil, nil, err
+	}
+
+	var template string
+	if cmd.ServiceBroker == "" {
+		template = "Getting labels for service-offering {{.ServiceBrokerName}} as {{.Username}}..."
+	} else {
+		template = "Getting labels for service-offering {{.ServiceBrokerName}} from service broker {{.ServiceBroker}} as {{.Username}}..."
+	}
+
+	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
+		"ServiceBrokerName": cmd.RequiredArgs.ResourceName,
+		"Username":          username,
+		"ServiceBroker":     cmd.ServiceBroker,
+	})
+
+	cmd.UI.DisplayNewline()
+
+	return cmd.Actor.GetServiceOfferingLabels(cmd.RequiredArgs.ResourceName, cmd.ServiceBroker)
 }
 
 func (cmd LabelsCommand) fetchSpaceLabels(username string) (map[string]types.NullString, v7action.Warnings, error) {
@@ -288,5 +317,14 @@ func (cmd LabelsCommand) validateFlags() error {
 			},
 		}
 	}
+
+	if cmd.ServiceBroker != "" && cmd.canonicalResourceTypeForName() != ServiceOffering {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.RequiredArgs.ResourceType, "--broker, -b",
+			},
+		}
+	}
+
 	return nil
 }

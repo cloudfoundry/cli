@@ -7,45 +7,50 @@ import (
 
 func (actor *Actor) GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+	return actor.extractLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor *Actor) GetDomainLabels(domainName string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetDomainByName(domainName)
-	return actor.getLabels(resource.Metadata, warnings, err)
+	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetOrganizationLabels(orgName string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetOrganizationByName(orgName)
-	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+	return actor.extractLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetRoute(routeName, spaceGUID)
-	return actor.getLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+	return actor.extractLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
 	serviceBroker, warnings, err := actor.GetServiceBrokerByName(serviceBrokerName)
-	return actor.getLabels(serviceBroker.Metadata, warnings, err)
+	return actor.extractLabels(serviceBroker.Metadata, warnings, err)
+}
+
+func (actor Actor) GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
+	serviceOffering, warnings, err := actor.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+	return actor.extractLabels(serviceOffering.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
-	return actor.getLabels(resource.Metadata, warnings, err)
+	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetStackLabels(stackName string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetStackByName(stackName)
-	return actor.getLabels(resource.Metadata, warnings, err)
+	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
-	return actor.getLabels(resource.Metadata, warnings, err)
+	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
-func (actor *Actor) getLabels(metadata *ccv3.Metadata, warnings Warnings, err error) (map[string]types.NullString, Warnings, error) {
+func (actor *Actor) extractLabels(metadata *ccv3.Metadata, warnings Warnings, err error) (map[string]types.NullString, Warnings, error) {
 	var labels map[string]types.NullString
 
 	if err != nil {
@@ -119,6 +124,14 @@ func (actor *Actor) UpdateServiceBrokerLabelsByServiceBrokerName(serviceBrokerNa
 		return warnings, err
 	}
 	return actor.updateResourceMetadataAsync("service-broker", serviceBroker.GUID, ccv3.Metadata{Labels: labels}, warnings)
+}
+
+func (actor *Actor) UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
+	serviceOffering, warnings, err := actor.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+	if err != nil {
+		return warnings, err
+	}
+	return actor.updateResourceMetadata("service-offering", serviceOffering.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {

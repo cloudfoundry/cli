@@ -18,40 +18,34 @@ var _ = Describe("unset-label command", func() {
 		executeErr error
 	)
 
-	Context("shared validations", func() {
-		BeforeEach(func() {
-			fakeLabelSetter = new(v7fakes.FakeLabelUnsetter)
-			cmd = v7.UnsetLabelCommand{
-				LabelUnsetter: fakeLabelSetter,
-			}
-		})
+	BeforeEach(func() {
+		fakeLabelSetter = new(v7fakes.FakeLabelUnsetter)
+		cmd = v7.UnsetLabelCommand{
+			LabelUnsetter: fakeLabelSetter,
+		}
 
-		When("all the provided labels are valid", func() {
-			BeforeEach(func() {
-				cmd.RequiredArgs = flag.UnsetLabelArgs{
-					ResourceType: "anything",
-					ResourceName: resourceName,
-					LabelKeys:    []string{"FOO", "ENV"},
-				}
-				cmd.BuildpackStack = "some-stack"
+		cmd.RequiredArgs = flag.UnsetLabelArgs{
+			ResourceType: "anything",
+			ResourceName: resourceName,
+			LabelKeys:    []string{"FOO", "ENV"},
+		}
+		cmd.BuildpackStack = "some-stack"
+		cmd.ServiceBroker = "some-service-broker"
+	})
 
-			})
+	It("calls execute with the right parameters", func() {
+		executeErr = cmd.Execute(nil)
 
-			It("calls execute with the right parameters", func() {
-				executeErr = cmd.Execute(nil)
-
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeLabelSetter.ExecuteCallCount()).To(Equal(1))
-				targetResource, keys := fakeLabelSetter.ExecuteArgsForCall(0)
-				Expect(targetResource.ResourceType).To(Equal(cmd.RequiredArgs.ResourceType))
-				Expect(targetResource.ResourceName).To(Equal(cmd.RequiredArgs.ResourceName))
-				Expect(targetResource.BuildpackStack).To(Equal(cmd.BuildpackStack))
-				Expect(keys).To(Equal(map[string]types.NullString{
-					"FOO": types.NewNullString(),
-					"ENV": types.NewNullString(),
-				}))
-			})
-		})
-
+		Expect(executeErr).ToNot(HaveOccurred())
+		Expect(fakeLabelSetter.ExecuteCallCount()).To(Equal(1))
+		targetResource, keys := fakeLabelSetter.ExecuteArgsForCall(0)
+		Expect(targetResource.ResourceType).To(Equal(cmd.RequiredArgs.ResourceType))
+		Expect(targetResource.ResourceName).To(Equal(cmd.RequiredArgs.ResourceName))
+		Expect(targetResource.BuildpackStack).To(Equal(cmd.BuildpackStack))
+		Expect(targetResource.ServiceBroker).To(Equal(cmd.ServiceBroker))
+		Expect(keys).To(Equal(map[string]types.NullString{
+			"FOO": types.NewNullString(),
+			"ENV": types.NewNullString(),
+		}))
 	})
 })

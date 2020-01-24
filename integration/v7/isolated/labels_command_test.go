@@ -39,10 +39,12 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+org`))
 			Eventually(session).Should(Say(`\s+route`))
 			Eventually(session).Should(Say(`\s+service-broker`))
+			Eventually(session).Should(Say(`\s+service-offering`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
+			Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings with the same name`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
@@ -55,14 +57,12 @@ var _ = Describe("labels command", func() {
 			buildpackName string
 			orgName       string
 			spaceName     string
-			stackName     string
 			username      string
 		)
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			buildpackName = helpers.NewBuildpackName()
-			stackName = helpers.NewStackName()
 			username, _ = helpers.GetCredentials()
 		})
 
@@ -475,7 +475,10 @@ var _ = Describe("labels command", func() {
 		})
 
 		Describe("stack labels", func() {
+			var stackName string
+
 			BeforeEach(func() {
+				stackName = helpers.NewStackName()
 				helpers.LoginCF()
 				helpers.CreateStack(stackName)
 			})
@@ -587,6 +590,7 @@ var _ = Describe("labels command", func() {
 					Eventually(session).Should(Exit(0))
 
 				})
+
 				It("returns the labels associated with the broker", func() {
 					session := helpers.CF("labels", "service-broker", broker.Name())
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
@@ -611,6 +615,73 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("labels", "service-broker", "non-existent-broker")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), "non-existent-broker", username))
 					Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		FDescribe("service-offering labels", func() {
+			var (
+				broker              *fakeservicebroker.FakeServiceBroker
+				serviceOfferingName string
+			)
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				serviceOfferingName = broker.Services[0].Name
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			When("there are labels set on the service offering", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "service-offering", serviceOfferingName, "some-other-key=some-other-value")
+					Eventually(session).Should(Exit(0))
+
+				})
+
+				It("returns the labels associated with the offering", func() {
+					session := helpers.CF("labels", "service-offering", serviceOfferingName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering %s as %s...\n\n"), serviceOfferingName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Expect(session).To(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+
+				When("the service broker is specified", func() {
+					It("returns the labels associated with the offering", func() {
+						session := helpers.CF("labels", "-b", broker.Name(), "service-offering", serviceOfferingName)
+						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering %s from service broker %s as %s...\n\n"), serviceOfferingName, broker.Name(), username))
+						Eventually(session).Should(Say(`key\s+value`))
+						Expect(session).To(Say(`some-other-key\s+some-other-value`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("there are no labels set on the service offering", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "service-offering", serviceOfferingName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering %s as %s...\n\n"), serviceOfferingName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Eventually(session).Should(Say("No labels found."))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the service offering does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "service-offering", "non-existent-offering")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering non-existent-offering as %s...\n\n"), username))
+					Eventually(session.Err).Should(Say("Service offering 'non-existent-offering' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})

@@ -144,6 +144,7 @@ var _ = Describe("Metadata", func() {
 		testForResourceType("route", "")
 		testForResourceType("space", "")
 		testForResourceType("stack", "")
+		testForResourceType("service-offering", "service_offering")
 
 		When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {

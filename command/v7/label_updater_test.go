@@ -19,6 +19,27 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
+func labelSubcommands(without ...string) []TableEntry {
+	all := []string{
+		"app",
+		"buildpack",
+		"domain",
+		"org",
+		"route",
+		"space",
+		"stack",
+		"service-broker",
+		"service-offering",
+	}
+	var entries []TableEntry
+	for _, v := range all {
+		if len(without) == 0 || v != without[0] {
+			entries = append(entries, Entry(v, v))
+		}
+	}
+	return entries
+}
+
 var _ = Describe("LabelUpdater", func() {
 
 	var (
@@ -75,7 +96,7 @@ var _ = Describe("LabelUpdater", func() {
 			})
 		})
 
-		When("an unrecognized resource is specified", func() {
+		When("an unrecognized resource type is specified", func() {
 			BeforeEach(func() {
 				resourceName = "some-unrecognized-resource"
 				cmd = LabelUpdater{
@@ -98,7 +119,7 @@ var _ = Describe("LabelUpdater", func() {
 		})
 
 		DescribeTable(
-			"Combination of --stack with resource type",
+			"Failure when --stack is combined with anything other than 'buildpack'",
 			func(resourceType string) {
 				targetResource = TargetResource{
 					ResourceType:   resourceType,
@@ -112,13 +133,25 @@ var _ = Describe("LabelUpdater", func() {
 				}
 				Expect(err).To(MatchError(argumentCombinationError))
 			},
-			Entry("app", "app"),
-			Entry("domains", "domain"),
-			Entry("orgs", "org"),
-			Entry("routes", "route"),
-			Entry("spaces", "space"),
-			Entry("stacks", "stack"),
-			Entry("service brokers", "service-broker"),
+			labelSubcommands("buildpack")...,
+		)
+
+		DescribeTable(
+			"Failure when --broker is combined with anything other than 'service-offering'",
+			func(resourceType string) {
+				targetResource = TargetResource{
+					ResourceType:  resourceType,
+					ServiceBroker: "my-broker",
+				}
+
+				err := cmd.Execute(targetResource, nil)
+
+				argumentCombinationError := translatableerror.ArgumentCombinationError{
+					Args: []string{strings.ToLower(resourceType), "--broker, -b"},
+				}
+				Expect(err).To(MatchError(argumentCombinationError))
+			},
+			labelSubcommands("service-offering")...,
 		)
 
 		DescribeTable(
@@ -132,15 +165,36 @@ var _ = Describe("LabelUpdater", func() {
 				err := cmd.Execute(targetResource, nil)
 				Expect(err).To(MatchError("Target not found"))
 			},
-			Entry("app", "app"),
-			Entry("buildpack", "buildpack"),
-			// domain - does not check target
-			Entry("org", "org"),
-			Entry("route", "route"),
-			Entry("service-broker", "service-broker"),
-			Entry("space", "space"),
-			Entry("stack", "stack"),
+			labelSubcommands()...,
 		)
+
+		DescribeTable(
+			"checking that the user is logged in",
+			func(resourceType string) {
+				targetResource = TargetResource{
+					ResourceType: resourceType,
+				}
+				err := cmd.Execute(targetResource, nil)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+
+				switch resourceType {
+				case "app", "route":
+					Expect(checkOrg).To(BeTrue())
+					Expect(checkSpace).To(BeTrue())
+				case "space":
+					Expect(checkOrg).To(BeTrue())
+					Expect(checkSpace).To(BeFalse())
+				default:
+					Expect(checkOrg).To(BeFalse())
+					Expect(checkSpace).To(BeFalse())
+				}
+			},
+			labelSubcommands()...,
+		)
+
 	})
 
 	When("updating labels on apps", func() {
@@ -171,18 +225,9 @@ var _ = Describe("LabelUpdater", func() {
 			executeErr = cmd.Execute(targetResource, labels)
 		})
 
-		It("checks that the user is logged in and targeted to an org and space", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeTrue())
-			Expect(checkSpace).To(BeTrue())
-		})
-
 		When("updating the app labels succeeds", func() {
 			BeforeEach(func() {
-				fakeActor.UpdateApplicationLabelsByApplicationNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"},
-					nil)
-
+				fakeActor.UpdateApplicationLabelsByApplicationNameReturns(v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 			})
 
 			It("prints all warnings and does not return an error ", func() {
@@ -199,24 +244,18 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(labelsMap).To(Equal(expectedMap))
 			})
 		})
-		// FIXME maybe checking it calls the right method is enough?
 
 		When("the resource type argument is not lowercase", func() {
 			BeforeEach(func() {
 				targetResource.ResourceType = "aPp"
 			})
 
-			It("passes the correct parameters into the actor", func() {
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-
 				Expect(fakeActor.UpdateApplicationLabelsByApplicationNameCallCount()).To(Equal(1))
-				actualAppName, spaceGUID, labelsMap := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
-				Expect(actualAppName).To(Equal(appName))
-				Expect(spaceGUID).To(Equal("some-space-guid"))
-				Expect(labelsMap).To(Equal(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for app (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -238,7 +277,7 @@ var _ = Describe("LabelUpdater", func() {
 			})
 		})
 
-		Context("Shows the right update message with org and space", func() {
+		Context("shows the right update message with org and space", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
@@ -248,6 +287,7 @@ var _ = Describe("LabelUpdater", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
 				})
 			})
+
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
@@ -256,10 +296,8 @@ var _ = Describe("LabelUpdater", func() {
 
 				It("shows 'Setting' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for app %s in org fake-org / space fake-space as some-user...`), appName))
-
 				})
 			})
-
 		})
 	})
 
@@ -294,13 +332,6 @@ var _ = Describe("LabelUpdater", func() {
 			executeErr = cmd.Execute(targetResource, labels)
 		})
 
-		It("checks that the user is logged in", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeFalse())
-			Expect(checkSpace).To(BeFalse())
-		})
-
 		When("updating the buildpack labels succeeds", func() {
 			When("the stack is specified", func() {
 				BeforeEach(func() {
@@ -315,7 +346,7 @@ var _ = Describe("LabelUpdater", func() {
 					Expect(labels).To(BeEquivalentTo(expectedMap))
 				})
 
-				It("prints all warnings and does not return an argument combination error ", func() {
+				It("prints all warnings and does not error ", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
@@ -330,42 +361,35 @@ var _ = Describe("LabelUpdater", func() {
 					Expect(stack).To(Equal(""), "failed to pass stack name")
 					Expect(labels).To(BeEquivalentTo(expectedMap))
 				})
+
+				It("prints all warnings and does not error ", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
 			})
 		})
 
 		When("the resource type is not lowercase", func() {
 			BeforeEach(func() {
 				targetResource = TargetResource{
-					ResourceType: "bUiLdPaCk",
-					ResourceName: resourceName,
+					ResourceType:   "bUiLdPaCk",
+					ResourceName:   resourceName,
+					BuildpackStack: "globinski",
 				}
 				expectedMap = map[string]types.NullString{
 					"some-label":     types.NewNullString("some-value"),
 					"some-other-key": types.NewNullString()}
 			})
 
-			When("updating the buildpack labels succeeds", func() {
-				When("the stack is specified", func() {
-					BeforeEach(func() {
-						targetResource.BuildpackStack = "globinski"
-					})
+			It("calls the right actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
+			})
 
-					It("passes the right parameters", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackCallCount()).To(Equal(1))
-						name, stack, labels := fakeActor.UpdateBuildpackLabelsByBuildpackNameAndStackArgsForCall(0)
-						Expect(name).To(Equal(resourceName), "failed to pass buildpack name")
-						Expect(stack).To(Equal("globinski"), "failed to pass stack name")
-						Expect(labels).To(BeEquivalentTo(expectedMap))
-					})
-
-					It("displays a message in the right casing", func() {
-						Expect(testUI.Out).To(Say("(.*) label\\(s\\) for buildpack (.*)"))
-						Expect(testUI.Out).To(Say("OK"))
-					})
-
-				})
-
+			It("displays a message in the right case", func() {
+				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for buildpack (.*)"))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 
@@ -380,14 +404,12 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
-
 		})
 
-		Context("Shows the right update message with correct stack and action", func() {
+		Context("shows the right update message with correct stack and action", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
-					//FIXME do we want to change the labels to all have nil values?
 				})
 
 				When("stack is passed", func() {
@@ -404,8 +426,8 @@ var _ = Describe("LabelUpdater", func() {
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for buildpack %s as some-user...`), resourceName))
 					})
 				})
-
 			})
+
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
@@ -427,7 +449,6 @@ var _ = Describe("LabelUpdater", func() {
 					})
 				})
 			})
-
 		})
 	})
 
@@ -460,11 +481,7 @@ var _ = Describe("LabelUpdater", func() {
 			executeErr = cmd.Execute(targetResource, labels)
 		})
 
-		It("doesn't check that the user is logged in", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
-		})
-
-		When("updating the app labels succeeds", func() {
+		When("updating the labels succeeds", func() {
 			It("prints all warnings and does not return an error ", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Err).To(Say("some-warning-1"))
@@ -484,16 +501,12 @@ var _ = Describe("LabelUpdater", func() {
 				targetResource.ResourceType = "DoMaiN"
 			})
 
-			It("passes the correct parameters into the actor", func() {
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-
 				Expect(fakeActor.UpdateDomainLabelsByDomainNameCallCount()).To(Equal(1))
-				name, labels := fakeActor.UpdateDomainLabelsByDomainNameArgsForCall(0)
-				Expect(name).To(Equal(domainName), "failed to pass domain name")
-				Expect(labels).To(BeEquivalentTo(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for domain (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -513,15 +526,17 @@ var _ = Describe("LabelUpdater", func() {
 			})
 		})
 
-		Context("Shows the right update message", func() {
+		Context("shows the right update message", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
 				})
+
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for domain %s as some-user...`), domainName))
 				})
 			})
+
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
@@ -563,13 +578,6 @@ var _ = Describe("LabelUpdater", func() {
 			executeErr = cmd.Execute(targetResource, labels)
 		})
 
-		It("checks that the user is logged in", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeFalse())
-			Expect(checkSpace).To(BeFalse())
-		})
-
 		When("updating the orgs labels succeeds", func() {
 			It("does not return an error and prints all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
@@ -590,15 +598,12 @@ var _ = Describe("LabelUpdater", func() {
 				targetResource.ResourceType = "OrG"
 			})
 
-			It("passes the correct parameters into the actor", func() {
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeActor.UpdateOrganizationLabelsByOrganizationNameCallCount()).To(Equal(1))
-				actualOrgName, labelsMap := fakeActor.UpdateOrganizationLabelsByOrganizationNameArgsForCall(0)
-				Expect(actualOrgName).To(Equal(orgName))
-				Expect(labelsMap).To(Equal(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for org (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -616,18 +621,19 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
-
 		})
 
-		Context("Shows the right update message", func() {
+		Context("shows the right update message", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
 				})
+
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for org %s as some-user...`), orgName))
 				})
 			})
+
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
@@ -670,13 +676,6 @@ var _ = Describe("LabelUpdater", func() {
 			executeErr = cmd.Execute(targetResource, labels)
 		})
 
-		It("checks that the user is logged in", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeTrue())
-			Expect(checkSpace).To(BeTrue())
-		})
-
 		When("updating the route labels succeeds", func() {
 			It("doesn't error and prints all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
@@ -698,19 +697,12 @@ var _ = Describe("LabelUpdater", func() {
 				targetResource.ResourceType = "rouTE"
 			})
 
-			It("passes the correct parameters into the actor", func() {
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-
 				Expect(fakeActor.UpdateRouteLabelsCallCount()).To(Equal(1))
-
-				name, spaceGUID, labels := fakeActor.UpdateRouteLabelsArgsForCall(0)
-
-				Expect(name).To(Equal(resourceName), "failed to pass route name")
-				Expect(spaceGUID).To(Equal("space-guid"))
-				Expect(labels).To(BeEquivalentTo(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for route (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -727,18 +719,19 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
-
 		})
 
-		Context("Shows the right update message", func() {
+		Context("shows the right update message", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
 				})
+
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for route %s in org fake-org / space fake-space as some-user...`), resourceName))
 				})
 			})
+
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
@@ -752,7 +745,7 @@ var _ = Describe("LabelUpdater", func() {
 	})
 
 	When("updating labels on service-broker", func() {
-		expectedServiceBrokerName := "my-broker"
+		const expectedServiceBrokerName = "my-broker"
 		var (
 			expectedMap map[string]types.NullString
 			executeErr  error
@@ -774,13 +767,6 @@ var _ = Describe("LabelUpdater", func() {
 
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(targetResource, labels)
-		})
-
-		It("checks that the user is logged in", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeFalse())
-			Expect(checkSpace).To(BeFalse())
 		})
 
 		When("updating the service-broker labels succeeds", func() {
@@ -811,16 +797,12 @@ var _ = Describe("LabelUpdater", func() {
 				targetResource.ResourceType = "sErVice-BroKer"
 			})
 
-			It("passes the correct parameters into the actor", func() {
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-
 				Expect(fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameCallCount()).To(Equal(1))
-				serviceBrokerName, labelsMap := fakeActor.UpdateServiceBrokerLabelsByServiceBrokerNameArgsForCall(0)
-				Expect(serviceBrokerName).To(Equal(expectedServiceBrokerName))
-				Expect(labelsMap).To(Equal(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for service-broker (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -839,16 +821,18 @@ var _ = Describe("LabelUpdater", func() {
 			})
 		})
 
-		Context("Shows the right update message", func() {
+		Context("shows the right update message", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
 				})
+
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-broker %s as some-user...`), expectedServiceBrokerName))
 					Expect(testUI.Out).To(Say("OK"))
 				})
 			})
+
 			When("Setting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Set
@@ -857,6 +841,149 @@ var _ = Describe("LabelUpdater", func() {
 				It("shows 'Setting' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s as some-user...`), expectedServiceBrokerName))
 					Expect(testUI.Out).To(Say("OK"))
+				})
+			})
+		})
+	})
+
+	When("updating labels on service-offering", func() {
+		var (
+			executeErr error
+		)
+
+		const serviceBrokerName = "brokerName"
+		const serviceOfferingName = "serviceOfferingName"
+
+		BeforeEach(func() {
+			targetResource = TargetResource{
+				ResourceType: "service-offering",
+				ResourceName: serviceOfferingName,
+			}
+			labels = map[string]types.NullString{
+				"some-label":     types.NewNullString("some-value"),
+				"some-other-key": types.NewNullString(),
+			}
+
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.UpdateServiceOfferingLabelsReturns(
+				v7action.Warnings{"some-warning-1", "some-warning-2"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(targetResource, labels)
+		})
+
+		When("updating the labels succeeds", func() {
+			It("does not return an error and prints all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("passes the correct parameters into the actor", func() {
+				Expect(fakeActor.UpdateServiceOfferingLabelsCallCount()).To(Equal(1))
+				gotServiceOfferingName, gotBrokerName, gotLabelsMap := fakeActor.UpdateServiceOfferingLabelsArgsForCall(0)
+				Expect(gotServiceOfferingName).To(Equal(serviceOfferingName))
+				Expect(gotBrokerName).To(BeEmpty())
+				Expect(gotLabelsMap).To(Equal(labels))
+			})
+
+			When("a service broker name is specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceBroker = serviceBrokerName
+				})
+
+				It("passes the broker name", func() {
+					Expect(fakeActor.UpdateServiceOfferingLabelsCallCount()).To(Equal(1))
+					_, gotBrokerName, _ := fakeActor.UpdateServiceOfferingLabelsArgsForCall(0)
+					Expect(gotBrokerName).To(Equal(serviceBrokerName))
+				})
+			})
+		})
+
+		When("the resource type argument is not lowercase", func() {
+			BeforeEach(func() {
+				targetResource.ResourceType = "Service-OffErinG"
+			})
+
+			It("calls the right actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.UpdateServiceOfferingLabelsCallCount()).To(Equal(1))
+			})
+
+			It("displays a message in the right case", func() {
+				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for service-offering (.*)"))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("updating the labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateServiceOfferingLabelsReturns(
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"),
+				)
+			})
+
+			It("returns the error and prints all warnings", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+		})
+
+		Context("shows the right update message", func() {
+			When("the broker name is not specified", func() {
+				When("Unsetting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Unset
+					})
+
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-offering %s as some-user...`), serviceOfferingName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("Setting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Set
+					})
+
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s as some-user...`), serviceOfferingName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+			})
+
+			When("the broker name is specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceBroker = serviceBrokerName
+				})
+
+				When("Unsetting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Unset
+					})
+
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-offering %s from service broker %s as some-user...`), serviceOfferingName, serviceBrokerName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("Setting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Set
+					})
+
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s from service broker %s as some-user...`), serviceOfferingName, serviceBrokerName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
 				})
 			})
 		})
@@ -893,13 +1020,6 @@ var _ = Describe("LabelUpdater", func() {
 			executeErr = cmd.Execute(targetResource, labels)
 		})
 
-		It("checks that the user is logged in and targeted to an org and space", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeTrue())
-			Expect(checkSpace).To(BeFalse())
-		})
-
 		When("updating the space labels succeeds", func() {
 			It("does not return an error and prints all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
@@ -914,7 +1034,6 @@ var _ = Describe("LabelUpdater", func() {
 				Expect(orgGUID).To(Equal("some-org-guid"))
 				Expect(labelsMap).To(Equal(expectedMap))
 			})
-
 		})
 
 		When("the resource type argument is not lowercase", func() {
@@ -922,16 +1041,12 @@ var _ = Describe("LabelUpdater", func() {
 				targetResource.ResourceType = "SpAcE"
 			})
 
-			It("passes the right parameters to the actor", func() {
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeActor.UpdateSpaceLabelsBySpaceNameCallCount()).To(Equal(1))
-				actualSpaceName, orgGUID, labelsMap := fakeActor.UpdateSpaceLabelsBySpaceNameArgsForCall(0)
-				Expect(actualSpaceName).To(Equal(spaceName))
-				Expect(orgGUID).To(Equal("some-org-guid"))
-				Expect(labelsMap).To(Equal(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for space (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -952,11 +1067,12 @@ var _ = Describe("LabelUpdater", func() {
 			})
 		})
 
-		Context("Shows the right update message", func() {
+		Context("shows the right update message", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
 				})
+
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for space %s in org fake-org as some-user...`), spaceName))
 					Expect(testUI.Out).To(Say("OK"))
@@ -977,12 +1093,13 @@ var _ = Describe("LabelUpdater", func() {
 	})
 
 	When("updating labels on stacks", func() {
+		const stackName = "some-stack"
+
 		var (
 			executeErr  error
 			expectedMap map[string]types.NullString
 		)
 
-		stackName := "some-stack"
 		BeforeEach(func() {
 			targetResource = TargetResource{
 				ResourceType: "stack",
@@ -995,18 +1112,10 @@ var _ = Describe("LabelUpdater", func() {
 				"some-other-key": types.NewNullString(),
 			}
 			labels = expectedMap
-
 		})
 
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(targetResource, labels)
-		})
-
-		It("checks that the user is logged in but not necessarily targeted to an org", func() {
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkOrg).To(BeFalse())
-			Expect(checkSpace).To(BeFalse())
 		})
 
 		When("updating the stack labels succeeds", func() {
@@ -1023,32 +1132,27 @@ var _ = Describe("LabelUpdater", func() {
 			})
 
 			It("passes the correct parameters into the actor", func() {
-
 				Expect(fakeActor.UpdateStackLabelsByStackNameCallCount()).To(Equal(1))
 				actualStackName, labelsMap := fakeActor.UpdateStackLabelsByStackNameArgsForCall(0)
 				Expect(actualStackName).To(Equal(stackName))
 				Expect(labelsMap).To(Equal(expectedMap))
 			})
-
 		})
 
 		When("the resource type argument is not lowercase", func() {
 			BeforeEach(func() {
 				targetResource.ResourceType = "sTaCk"
 			})
-			It("passes the correct parameters into the actor", func() {
+
+			It("calls the right actor", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeActor.UpdateStackLabelsByStackNameCallCount()).To(Equal(1))
-				actualStackName, labelsMap := fakeActor.UpdateStackLabelsByStackNameArgsForCall(0)
-				Expect(actualStackName).To(Equal(stackName))
-				Expect(labelsMap).To(Equal(expectedMap))
 			})
 
-			It("displays a message in the right casing", func() {
+			It("displays a message in the right case", func() {
 				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for stack (.*)"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
-
 		})
 
 		When("updating the stack labels fails", func() {
@@ -1066,11 +1170,12 @@ var _ = Describe("LabelUpdater", func() {
 			})
 		})
 
-		Context("Shows the right update message", func() {
+		Context("shows the right update message", func() {
 			When("Unsetting labels", func() {
 				BeforeEach(func() {
 					cmd.Action = Unset
 				})
+
 				It("shows 'Removing' as action", func() {
 					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for stack %s as some-user...`), stackName))
 					Expect(testUI.Out).To(Say("OK"))
@@ -1088,7 +1193,5 @@ var _ = Describe("LabelUpdater", func() {
 				})
 			})
 		})
-
 	})
-
 })

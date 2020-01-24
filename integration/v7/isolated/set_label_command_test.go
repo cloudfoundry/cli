@@ -41,10 +41,12 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+org`))
 				Eventually(session).Should(Say(`\s+route`))
 				Eventually(session).Should(Say(`\s+service-broker`))
+				Eventually(session).Should(Say(`\s+service-offering`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
+				Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings with the same name`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say(`\s+labels, unset-label`))
 
@@ -631,6 +633,67 @@ var _ = Describe("set-label command", func() {
 
 					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
 						"owner": "beth",
+					})
+				})
+			})
+		})
+
+		When("assigning label to service-offering", func() {
+			var (
+				broker              *fakeservicebroker.FakeServiceBroker
+				serviceOfferingName string
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				serviceOfferingName = broker.Services[0].Name
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("service-offering", "Service offering", serviceOfferingName)
+			})
+
+			It("sets the specified labels", func() {
+				session := helpers.CF("set-label", "service-offering", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s as %s...`), serviceOfferingName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_offerings?names=%s", serviceOfferingName), true, helpers.MetadataLabels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "service-broker", broker.Name(), "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+
+					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
+						"owner": "beth",
+					})
+				})
+			})
+
+			When("the service broker name is specified as part of the command", func() {
+				It("sets the specified labels", func() {
+					session := helpers.CF("set-label", "-b", broker.Name(), "service-offering", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
+					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s from service broker %s as %s...`), serviceOfferingName, broker.Name(), username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_offerings?names=%s", serviceOfferingName), true, helpers.MetadataLabels{
+						"some-key":       "some-value",
+						"some-other-key": "some-other-value",
 					})
 				})
 			})

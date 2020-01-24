@@ -45,14 +45,16 @@ const (
 	RoleTypesFilter QueryKey = "types"
 	// StackFilter is a query parameter for listing objects by stack name
 	StackFilter QueryKey = "stacks"
-	// Unmapped filter is a query parameter specifying unmapped routes
+	// UnmappedFilter is a query parameter specifying unmapped routes
 	UnmappedFilter QueryKey = "unmapped"
-	// UserGUIDFilter filter is a query parameter when getting a user by GUID
+	// UserGUIDFilter is a query parameter when getting a user by GUID
 	UserGUIDFilter QueryKey = "user_guids"
-	// Usernames filter is a query parameter when getting a user by username
+	// UsernamesFilter is a query parameter when getting a user by username
 	UsernamesFilter QueryKey = "usernames"
-	// States filter is a query parameter when getting a package's droplets by state
+	// StatesFilter is a query parameter when getting a package's droplets by state
 	StatesFilter QueryKey = "states"
+	// ServiceBrokerNamesFilter is a query parameter when getting a resource according to the Service Brokers that it relates to
+	ServiceBrokerNamesFilter QueryKey = "service_broker_names"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"

@@ -56,7 +56,7 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
-		When("an unrecognized resource is specified", func() {
+		When("an unrecognized resource type is specified", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.ResourceType = "unrecognized-resource"
 				executeErr = cmd.Execute(nil)
@@ -68,7 +68,7 @@ var _ = Describe("labels command", func() {
 		})
 
 		DescribeTable(
-			"Combination of --stack with resource type",
+			"Failure when --stack is combined with anything other than 'buildpack'",
 			func(resourceType string) {
 				cmd.RequiredArgs.ResourceType = resourceType
 				cmd.BuildpackStack = "cflinuxfs3"
@@ -80,13 +80,23 @@ var _ = Describe("labels command", func() {
 				}
 				Expect(executeErr).To(MatchError(argumentCombinationError))
 			},
-			Entry("app", "app"),
-			Entry("domains", "domain"),
-			Entry("orgs", "org"),
-			Entry("routes", "route"),
-			Entry("spaces", "space"),
-			Entry("stacks", "stack"),
-			Entry("service brokers", "service-broker"),
+			labelSubcommands("buildpack")...,
+		)
+
+		DescribeTable(
+			"Failure when --broker is combined with anything other than 'service-offering'",
+			func(resourceType string) {
+				cmd.RequiredArgs.ResourceType = resourceType
+				cmd.ServiceBroker = "a-service-broker"
+
+				executeErr = cmd.Execute(nil)
+
+				argumentCombinationError := translatableerror.ArgumentCombinationError{
+					Args: []string{strings.ToLower(resourceType), "--broker, -b"},
+				}
+				Expect(executeErr).To(MatchError(argumentCombinationError))
+			},
+			labelSubcommands("service-offering")...,
 		)
 
 		DescribeTable(
@@ -97,14 +107,7 @@ var _ = Describe("labels command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).To(MatchError("Target not found"))
 			},
-			Entry("app", "app"),
-			Entry("buildpack", "buildpack"),
-			Entry("domain", "domain"),
-			Entry("org", "org"),
-			Entry("route", "route"),
-			Entry("service-broker", "service-broker"),
-			Entry("space", "space"),
-			Entry("stack", "stack"),
+			labelSubcommands()...,
 		)
 
 		type MethodCallCountType func() int
@@ -119,14 +122,15 @@ var _ = Describe("labels command", func() {
 
 				testCases :=
 					map[string]MethodCallCountType{
-						"aPp":            fakeLabelsActor.GetApplicationLabelsCallCount,
-						"bUiLdPaCK":      fakeLabelsActor.GetBuildpackLabelsCallCount,
-						"dOmAiN":         fakeLabelsActor.GetDomainLabelsCallCount,
-						"oRg":            fakeLabelsActor.GetOrganizationLabelsCallCount,
-						"rOuTe":          fakeLabelsActor.GetRouteLabelsCallCount,
-						"sErViCe-BrOkEr": fakeLabelsActor.GetServiceBrokerLabelsCallCount,
-						"sPaCe":          fakeLabelsActor.GetSpaceLabelsCallCount,
-						"sTaCk":          fakeLabelsActor.GetStackLabelsCallCount,
+						"aPp":              fakeLabelsActor.GetApplicationLabelsCallCount,
+						"bUiLdPaCK":        fakeLabelsActor.GetBuildpackLabelsCallCount,
+						"dOmAiN":           fakeLabelsActor.GetDomainLabelsCallCount,
+						"oRg":              fakeLabelsActor.GetOrganizationLabelsCallCount,
+						"rOuTe":            fakeLabelsActor.GetRouteLabelsCallCount,
+						"sErViCe-BrOkEr":   fakeLabelsActor.GetServiceBrokerLabelsCallCount,
+						"serVice-OfferIng": fakeLabelsActor.GetServiceOfferingLabelsCallCount,
+						"sPaCe":            fakeLabelsActor.GetSpaceLabelsCallCount,
+						"sTaCk":            fakeLabelsActor.GetStackLabelsCallCount,
 					}
 
 				for resourceType, callCountMethod := range testCases {
@@ -848,6 +852,98 @@ var _ = Describe("labels command", func() {
 					Expect(checkSpace).To(BeFalse())
 				})
 
+			})
+		})
+
+		Describe("for service-offerings", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+
+				cmd.RequiredArgs = flag.LabelsArgs{
+					ResourceType: "service-offering",
+					ResourceName: "my-service-offering",
+				}
+			})
+
+			When("There is an error fetching the labels", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetServiceOfferingLabelsReturns(
+						map[string]types.NullString{},
+						v7action.Warnings([]string{"a warning"}),
+						errors.New("some random error"),
+					)
+				})
+
+				It("returns an error and prints all warnings", func() {
+					Expect(executeErr).To(MatchError("some random error"))
+					Expect(testUI.Err).To(Say("a warning"))
+				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say("Getting labels for service-offering my-service-offering as some-user..."))
+				})
+			})
+
+			When("Service offering has labels", func() {
+				var labels map[string]types.NullString
+				BeforeEach(func() {
+					labels = map[string]types.NullString{
+						"some-other-label": types.NewNullString("some-other-value"),
+						"some-label":       types.NewNullString("some-value"),
+					}
+
+					fakeLabelsActor.GetServiceOfferingLabelsReturns(
+						labels,
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						nil,
+					)
+				})
+
+				It("queries the right names", func() {
+					Expect(fakeLabelsActor.GetServiceOfferingLabelsCallCount()).To(Equal(1))
+					serviceOfferingName, serviceBrokerName := fakeLabelsActor.GetServiceOfferingLabelsArgsForCall(0)
+					Expect(serviceOfferingName).To(Equal("my-service-offering"))
+					Expect(serviceBrokerName).To(Equal(""))
+				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-offering my-service-offering as some-user...`)))
+				})
+
+				It("retrieves the labels alphabetically", func() {
+					Expect(testUI.Out).To(Say(`key\s+value`))
+					Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+					Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+				})
+
+				It("prints all the warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+
+				It("checks that the user is logged in", func() {
+					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+					checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+					Expect(checkOrg).To(BeFalse())
+					Expect(checkSpace).To(BeFalse())
+				})
+
+				When("a service broker name is specified", func() {
+					BeforeEach(func() {
+						cmd.ServiceBroker = "my-service-broker"
+					})
+
+					It("queries the right names", func() {
+						Expect(fakeLabelsActor.GetServiceOfferingLabelsCallCount()).To(Equal(1))
+						serviceOfferingName, serviceBrokerName := fakeLabelsActor.GetServiceOfferingLabelsArgsForCall(0)
+						Expect(serviceOfferingName).To(Equal("my-service-offering"))
+						Expect(serviceBrokerName).To(Equal("my-service-broker"))
+					})
+
+					It("displays a message that it is retrieving the labels", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-offering my-service-offering from service broker my-service-broker as some-user...`)))
+					})
+				})
 			})
 		})
 	})

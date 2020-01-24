@@ -35,7 +35,7 @@ var _ = Describe("labels", func() {
 		spaceGUID = "some-space-guid"
 	})
 
-	Context("UpdateApplicationLabelsByApplicationName", func() {
+	Describe("UpdateApplicationLabelsByApplicationName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateApplicationLabelsByApplicationName(resourceName, spaceGUID, labels)
 		})
@@ -117,7 +117,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("UpdateDomainLabelsByDomainName", func() {
+	Describe("UpdateDomainLabelsByDomainName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateDomainLabelsByDomainName(resourceName, labels)
 		})
@@ -196,7 +196,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("UpdateOrganizationLabelsByOrganizationName", func() {
+	Describe("UpdateOrganizationLabelsByOrganizationName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateOrganizationLabelsByOrganizationName(resourceName, labels)
 		})
@@ -275,7 +275,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("UpdateRouteLabels", func() {
+	Describe("UpdateRouteLabels", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateRouteLabels("sub.example.com/my-route/path", "space-guid", labels)
 		})
@@ -386,7 +386,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("UpdateSpaceLabelsBySpaceName", func() {
+	Describe("UpdateSpaceLabelsBySpaceName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateSpaceLabelsBySpaceName(resourceName, orgGUID, labels)
 		})
@@ -466,7 +466,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("UpdateStackLabelsByStackName", func() {
+	Describe("UpdateStackLabelsByStackName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateStackLabelsByStackName(resourceName, labels)
 		})
@@ -545,7 +545,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("UpdateServiceBrokerLabelsByServiceBrokerName", func() {
+	Describe("UpdateServiceBrokerLabelsByServiceBrokerName", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateServiceBrokerLabelsByServiceBrokerName(resourceName, labels)
 		})
@@ -656,7 +656,91 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("GetDomainLabels", func() {
+	Describe("UpdateServiceOfferingLabels", func() {
+		const serviceBrokerName = "fake-service-broker"
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateServiceOfferingLabels(resourceName, serviceBrokerName, labels)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceOfferingsReturns(
+					[]ccv3.ServiceOffering{{GUID: "some-service-offering-guid", Name: resourceName}},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					ccv3.ResourceMetadata{},
+					ccv3.Warnings{"set-service-offering-metadata"},
+					nil,
+				)
+			})
+
+			It("gets the service offering", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{serviceBrokerName}},
+				))
+			})
+
+			It("sets the service offering labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, serviceBrokerGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(resourceType).To(BeEquivalentTo("service-offering"))
+				Expect(serviceBrokerGUID).To(BeEquivalentTo("some-service-offering-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-offering-metadata"))
+			})
+		})
+
+		When("there are client errors", func() {
+			When("fetching the service offering fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceOfferingsReturns(
+						[]ccv3.ServiceOffering{},
+						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
+						errors.New("get-service-offerings-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-failure-1", "warning-failure-2"))
+					Expect(executeErr).To(MatchError("get-service-offerings-error"))
+				})
+			})
+
+			When("updating the service offering fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceOfferingsReturns(
+						[]ccv3.ServiceOffering{{GUID: "some-guid"}},
+						ccv3.Warnings([]string{"warning-1", "warning-2"}),
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
+						ccv3.ResourceMetadata{},
+						ccv3.Warnings{"set-service-offering"},
+						errors.New("update-service-offering-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-offering"))
+					Expect(executeErr).To(MatchError("update-service-offering-error"))
+				})
+			})
+		})
+	})
+
+	Describe("GetDomainLabels", func() {
 		JustBeforeEach(func() {
 			labels, warnings, executeErr = actor.GetDomainLabels(resourceName)
 		})
@@ -726,7 +810,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("GetRouteLabels", func() {
+	Describe("GetRouteLabels", func() {
 		JustBeforeEach(func() {
 			labels, warnings, executeErr = actor.GetRouteLabels("sub.example.com/my-route/path", spaceGUID)
 		})
@@ -816,7 +900,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("GetStackLabels", func() {
+	Describe("GetStackLabels", func() {
 		JustBeforeEach(func() {
 			labels, warnings, executeErr = actor.GetStackLabels(resourceName)
 		})
@@ -886,7 +970,7 @@ var _ = Describe("labels", func() {
 		})
 	})
 
-	Context("GetServiceBrokerLabels", func() {
+	Describe("GetServiceBrokerLabels", func() {
 		When("service broker does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBrokersReturns(
@@ -945,6 +1029,87 @@ var _ = Describe("labels", func() {
 
 			JustBeforeEach(func() {
 				labels, warnings, executeErr = actor.GetServiceBrokerLabels(resourceName)
+			})
+
+			It("returns labels associated with the service broker as well as warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(labels).To(Equal(expectedLabels))
+			})
+		})
+
+	})
+
+	Describe("GetServiceOfferingLabels", func() {
+		const serviceBrokerName = "my-service-broker"
+
+		When("service offering does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceOfferingsReturns(
+					[]ccv3.ServiceOffering{},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServiceOfferingLabels(resourceName, serviceBrokerName)
+			})
+
+			It("returns a service offering not found error and warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(executeErr.Error()).To(ContainSubstring("Service offering '%s' for service broker '%s' not found", resourceName, serviceBrokerName))
+			})
+		})
+
+		When("client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServiceOfferingsReturns(
+					[]ccv3.ServiceOffering{},
+					[]string{"warning"},
+					errors.New("some random error"),
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServiceOfferingLabels(resourceName, serviceBrokerName)
+			})
+
+			It("returns error and prints warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning"))
+				Expect(executeErr).To(MatchError("some random error"))
+			})
+		})
+
+		When("service offering has labels", func() {
+			var expectedLabels map[string]types.NullString
+
+			BeforeEach(func() {
+				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
+				fakeCloudControllerClient.GetServiceOfferingsReturns(
+					[]ccv3.ServiceOffering{{
+						GUID: "some-guid",
+						Name: resourceName,
+						Metadata: &ccv3.Metadata{
+							Labels: expectedLabels,
+						}}},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServiceOfferingLabels(resourceName, serviceBrokerName)
+			})
+
+			It("queries the right names", func() {
+				Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{serviceBrokerName}},
+				))
 			})
 
 			It("returns labels associated with the service broker as well as warnings", func() {
