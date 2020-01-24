@@ -4,6 +4,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/util/command_parser"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -25,14 +26,10 @@ var _ = Describe("Command 'Parser'", func() {
 		BeforeEach(func() {
 			stdout = ioutil.Discard
 			stderr = ioutil.Discard
-		})
-
-		It("doesn't turn verbose on by default", func() {
-			parser, err := command_parser.NewCommandParserForPlugins(stdout, stderr)
-			Expect(err).ToNot(HaveOccurred())
-			status := parser.ParseCommandFromArgs([]string{"help"})
-			Expect(status).To(Equal(0))
-			Expect(parser.Config.Flags).To(Equal(configv3.FlagOverride{Verbose: false}))
+			// Needed because the command-table is a singleton
+			// and the absence of -v relies on the default value of
+			// common.Commands.VerboseOrVersion to be false
+			common.Commands.VerboseOrVersion = false
 		})
 
 		It("sets the verbose/version flag", func() {
@@ -50,5 +47,14 @@ var _ = Describe("Command 'Parser'", func() {
 			Expect(status).To(Equal(0))
 			Expect(parser.Config.Flags).To(Equal(configv3.FlagOverride{Verbose: true}))
 		})
+
+		It("doesn't turn verbose on by default", func() {
+			parser, err := command_parser.NewCommandParserForPlugins(stdout, stderr)
+			Expect(err).ToNot(HaveOccurred())
+			status := parser.ParseCommandFromArgs([]string{"help"})
+			Expect(status).To(Equal(0))
+			Expect(parser.Config.Flags).To(Equal(configv3.FlagOverride{Verbose: false}))
+		})
+
 	})
 })
