@@ -1,11 +1,13 @@
 package v7action_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"errors"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -146,6 +148,86 @@ var _ = Describe("Organization Quota Actions", func() {
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
 				Expect(quota).To(Equal(OrganizationQuota{GUID: "quota-guid", Name: quotaName}))
+			})
+		})
+	})
+
+	Describe("CreateOrganizationQuota", func() {
+		var (
+			v7Quota    OrganizationQuota
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			v7Quota = OrganizationQuota{
+				Name:                  "quota-name",
+				TotalMemory:           types.NullInt{Value: 2048, IsSet: true},
+				InstanceMemory:        types.NullInt{Value: 1024, IsSet: true},
+				TotalAppInstances:     types.NullInt{Value: 0, IsSet: false},
+				TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
+				PaidServicePlans:      true,
+				TotalRoutes:           types.NullInt{Value: 6, IsSet: true},
+				TotalReservedPorts:    types.NullInt{Value: 5, IsSet: true},
+			}
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.CreateOrganizationQuota(v7Quota)
+		})
+
+		When("The create org v7Quota endpoint returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
+					ccv3.OrgQuota{},
+					ccv3.Warnings{"some-quota-warning"},
+					errors.New("create-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(fakeCloudControllerClient.CreateOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+				Expect(executeErr).To(MatchError("create-error"))
+			})
+		})
+
+		When("The create org quota endpoint succeeds", func() {
+			var (
+				ccv3Quota ccv3.OrgQuota
+			)
+			BeforeEach(func() {
+				ccv3Quota = ccv3.OrgQuota{
+					Name: v7Quota.Name,
+					Apps: ccv3.AppLimit{
+						TotalMemory:           types.NullInt{Value: 2048, IsSet: true},
+						InstanceMemory:        types.NullInt{Value: 1024, IsSet: true},
+						TotalAppInstances:     types.NullInt{Value: 0, IsSet: false},
+					},
+					Services: ccv3.ServiceLimit{
+						TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      true,
+					},
+					Routes: ccv3.RouteLimit{
+						TotalRoutes:           types.NullInt{Value: 6, IsSet: true},
+						TotalReservedPorts:    types.NullInt{Value: 5, IsSet: true},
+					},
+				}
+				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+			})
+
+			It("call the create endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.CreateOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.CreateOrganizationQuotaArgsForCall(0)
+				Expect(passedQuota).To(Equal(ccv3Quota))
 			})
 		})
 	})

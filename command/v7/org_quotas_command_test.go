@@ -65,8 +65,8 @@ var _ = Describe("org-quotas command", func() {
 					TotalServiceInstances: types.NullInt{Value: 3, IsSet: true},
 					PaidServicePlans:      true,
 
-					TotalRoutes:     types.NullInt{Value: 5, IsSet: true},
-					TotalRoutePorts: types.NullInt{Value: 2, IsSet: true},
+					TotalRoutes:        types.NullInt{Value: 5, IsSet: true},
+					TotalReservedPorts: types.NullInt{Value: 2, IsSet: true},
 				},
 			}
 			fakeActor.GetOrganizationQuotasReturns(orgQuotas, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
@@ -100,8 +100,8 @@ var _ = Describe("org-quotas command", func() {
 							TotalServiceInstances: types.NullInt{Value: 0, IsSet: false},
 							PaidServicePlans:      true,
 
-							TotalRoutes:     types.NullInt{Value: 0, IsSet: false},
-							TotalRoutePorts: types.NullInt{Value: 0, IsSet: false},
+							TotalRoutes:        types.NullInt{Value: 0, IsSet: false},
+							TotalReservedPorts: types.NullInt{Value: 0, IsSet: false},
 					},
 				}
 				fakeActor.GetOrganizationQuotasReturns(orgQuotas, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)

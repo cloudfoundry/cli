@@ -26,6 +26,7 @@ type CloudControllerClient interface {
 	CreateDroplet(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
 	CreateIsolationSegment(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	CreateOrganization(orgName string) (ccv3.Organization, ccv3.Warnings, error)
+	CreateOrganizationQuota(orgQuota ccv3.OrgQuota) (ccv3.OrgQuota, ccv3.Warnings, error)
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
 	CreateRole(role ccv3.Role) (ccv3.Role, ccv3.Warnings, error)
 	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)

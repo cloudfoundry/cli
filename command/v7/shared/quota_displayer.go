@@ -39,7 +39,7 @@ func (displayer QuotaDisplayer) DisplayQuotasTable(orgQuotas []v7action.Organiza
 			displayer.presentQuotaValue(orgQuota.TotalServiceInstances),
 			displayer.presentBooleanValue(orgQuota.PaidServicePlans),
 			displayer.presentQuotaValue(orgQuota.TotalAppInstances),
-			displayer.presentQuotaValue(orgQuota.TotalRoutePorts),
+			displayer.presentQuotaValue(orgQuota.TotalReservedPorts),
 		})
 	}
 
@@ -54,7 +54,7 @@ func (displayer QuotaDisplayer) DisplaySingleQuota(orgQuota v7action.Organizatio
 		{displayer.ui.TranslateText("service instances"), displayer.presentQuotaValue(orgQuota.TotalServiceInstances)},
 		{displayer.ui.TranslateText("paid service plans"), displayer.presentBooleanValue(orgQuota.PaidServicePlans)},
 		{displayer.ui.TranslateText("app instances"), displayer.presentQuotaValue(orgQuota.TotalAppInstances)},
-		{displayer.ui.TranslateText("route ports"), displayer.presentQuotaValue(orgQuota.TotalRoutePorts)},
+		{displayer.ui.TranslateText("route ports"), displayer.presentQuotaValue(orgQuota.TotalReservedPorts)},
 	}
 
 	displayer.ui.DisplayKeyValueTable("", orgQuotaTable, 3)

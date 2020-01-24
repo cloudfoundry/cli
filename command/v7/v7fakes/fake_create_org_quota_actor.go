@@ -9,10 +9,10 @@ import (
 )
 
 type FakeCreateOrgQuotaActor struct {
-	CreateOrganizationQuotaStub        func(string) (v7action.Warnings, error)
+	CreateOrganizationQuotaStub        func(v7action.OrganizationQuota) (v7action.Warnings, error)
 	createOrganizationQuotaMutex       sync.RWMutex
 	createOrganizationQuotaArgsForCall []struct {
-		arg1 string
+		arg1 v7action.OrganizationQuota
 	}
 	createOrganizationQuotaReturns struct {
 		result1 v7action.Warnings
@@ -26,11 +26,11 @@ type FakeCreateOrgQuotaActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuota(arg1 string) (v7action.Warnings, error) {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuota(arg1 v7action.OrganizationQuota) (v7action.Warnings, error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	ret, specificReturn := fake.createOrganizationQuotaReturnsOnCall[len(fake.createOrganizationQuotaArgsForCall)]
 	fake.createOrganizationQuotaArgsForCall = append(fake.createOrganizationQuotaArgsForCall, struct {
-		arg1 string
+		arg1 v7action.OrganizationQuota
 	}{arg1})
 	fake.recordInvocation("CreateOrganizationQuota", []interface{}{arg1})
 	fake.createOrganizationQuotaMutex.Unlock()
@@ -50,13 +50,13 @@ func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCallCount() int {
 	return len(fake.createOrganizationQuotaArgsForCall)
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCalls(stub func(string) (v7action.Warnings, error)) {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaCalls(stub func(v7action.OrganizationQuota) (v7action.Warnings, error)) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = stub
 }
 
-func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaArgsForCall(i int) string {
+func (fake *FakeCreateOrgQuotaActor) CreateOrganizationQuotaArgsForCall(i int) v7action.OrganizationQuota {
 	fake.createOrganizationQuotaMutex.RLock()
 	defer fake.createOrganizationQuotaMutex.RUnlock()
 	argsForCall := fake.createOrganizationQuotaArgsForCall[i]

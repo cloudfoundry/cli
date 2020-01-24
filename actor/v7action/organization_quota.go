@@ -22,18 +22,43 @@ type OrganizationQuota struct {
 	PaidServicePlans      bool          `json:"paid_services_allowed"`
 
 	//the various limits that are associated with routes
-	TotalRoutes     types.NullInt `json:"total_routes"`
-	TotalRoutePorts types.NullInt `json:"total_reserved_ports"`
+	TotalRoutes        types.NullInt `json:"total_routes"`
+	TotalReservedPorts types.NullInt `json:"total_reserved_ports"`
 }
 
 // CreateOrganization creates a new organization with the given name
-func (actor Actor) CreateOrganizationQuota(orgQuotaName string) (Warnings, error) {
-	allWarnings := Warnings{}
+func (actor Actor) CreateOrganizationQuota(orgQuota OrganizationQuota) (Warnings, error) {
+	// Flag that default to 0: total memory, total routes, total reserved ports, total service instances
+	setZeroDefaults(&orgQuota)
 
-	// organization, apiWarnings, err := actor.CloudControllerClient.CreateOrganization(orgName)
-	// allWarnings = append(allWarnings, apiWarnings...)
+	if orgQuota.TotalMemory.Value == -1 {
+		orgQuota.TotalMemory.IsSet = false
+	}
 
-	return allWarnings, nil
+	if orgQuota.InstanceMemory.Value == -1 {
+		orgQuota.InstanceMemory.IsSet = false
+	}
+
+	if orgQuota.TotalServiceInstances.Value == -1 {
+		orgQuota.TotalServiceInstances.IsSet = false
+	}
+
+	if orgQuota.TotalAppInstances.Value == -1 {
+		orgQuota.TotalAppInstances.IsSet = false
+	}
+
+	if orgQuota.TotalRoutes.Value == -1 {
+		orgQuota.TotalRoutes.IsSet = false
+	}
+
+	if orgQuota.TotalReservedPorts.Value == -1 {
+		orgQuota.TotalReservedPorts.IsSet = false
+	}
+
+	ccv3Quota := convertToCCV3Quota(orgQuota)
+	_, apiWarnings, err := actor.CloudControllerClient.CreateOrganizationQuota(ccv3Quota)
+
+	return Warnings(apiWarnings), err
 }
 
 func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error) {
@@ -80,9 +105,54 @@ func convertToOrganizationQuota(ccv3OrgQuota ccv3.OrgQuota) OrganizationQuota {
 		TotalServiceInstances: ccv3OrgQuota.Services.TotalServiceInstances,
 		PaidServicePlans:      ccv3OrgQuota.Services.PaidServicePlans,
 		TotalRoutes:           ccv3OrgQuota.Routes.TotalRoutes,
-		TotalRoutePorts:       ccv3OrgQuota.Routes.TotalRoutePorts,
+		TotalReservedPorts:    ccv3OrgQuota.Routes.TotalReservedPorts,
 	}
 	return orgQuota
 }
 
+func convertToCCV3Quota(orgQuota OrganizationQuota) ccv3.OrgQuota {
+	AppLimit := ccv3.AppLimit{
+		TotalMemory:       orgQuota.TotalMemory,
+		InstanceMemory:    orgQuota.InstanceMemory,
+		TotalAppInstances: orgQuota.TotalAppInstances,
+	}
+	ServiceLimit := ccv3.ServiceLimit{
+		TotalServiceInstances: orgQuota.TotalServiceInstances,
+		PaidServicePlans:      orgQuota.PaidServicePlans,
+	}
+	RouteLimit := ccv3.RouteLimit{
+		TotalRoutes:        orgQuota.TotalRoutes,
+		TotalReservedPorts: orgQuota.TotalReservedPorts,
+	}
+	return ccv3.OrgQuota{
+		GUID:     orgQuota.GUID,
+		Name:     orgQuota.Name,
+		Apps:     AppLimit,
+		Services: ServiceLimit,
+		Routes:   RouteLimit,
+	}
+}
 
+func setZeroDefaults(orgQuota *OrganizationQuota) {
+	orgQuota.TotalMemory.IsSet = true
+	orgQuota.TotalRoutes.IsSet = true
+	orgQuota.TotalReservedPorts.IsSet = true
+	orgQuota.TotalServiceInstances.IsSet = true
+}
+
+//func convertUnlimitedToNil(orgQuota OrganizationQuota) {
+//	flags := []*types.NullInt{
+//		&orgQuota.TotalMemory,
+//		&orgQuota.InstanceMemory,
+//		&orgQuota.TotalServiceInstances,
+//		&orgQuota.TotalAppInstances,
+//		&orgQuota.TotalRoutes,
+//		&orgQuota.TotalReservedPorts,
+//	}
+//
+//	for i := 0; i < len(flags); i++ {
+//		if flags[i].Value == -1 {
+//			flags[i].IsSet = false
+//		}
+//	}
+//}

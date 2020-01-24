@@ -37,7 +37,7 @@ var _ = Describe("Org Quota Command", func() {
 			Actor:       fakeActor,
 		}
 
-		cmd.RequiredArgs.OrganizationQuota = "some-org-quota"
+		cmd.RequiredArgs.OrganizationQuotaName = "some-org-quota"
 	})
 
 	JustBeforeEach(func() {
@@ -96,19 +96,16 @@ var _ = Describe("Org Quota Command", func() {
 			fakeActor.GetOrganizationQuotaByNameReturns(
 				v7action.OrganizationQuota{
 					Name: "some-org-quota",
-					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{IsSet: true, Value: 2048},
-						InstanceMemory:    types.NullInt{IsSet: true, Value: 1024},
-						TotalAppInstances: types.NullInt{IsSet: true, Value: 2},
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{IsSet: false},
-						PaidServicePlans:      false,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:     types.NullInt{IsSet: true, Value: 4},
-						TotalRoutePorts: types.NullInt{IsSet: false},
-					},
+
+					TotalMemory:           types.NullInt{IsSet: true, Value: 2048},
+					InstanceMemory:        types.NullInt{IsSet: true, Value: 1024},
+					TotalAppInstances:     types.NullInt{IsSet: true, Value: 2},
+
+					TotalServiceInstances: types.NullInt{IsSet: false},
+					PaidServicePlans:      false,
+
+					TotalRoutes:        types.NullInt{IsSet: true, Value: 4},
+					TotalReservedPorts: types.NullInt{IsSet: false},
 				},
 				v7action.Warnings{"warning-1", "warning-2"},
 				nil)

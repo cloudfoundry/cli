@@ -224,6 +224,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateOrganizationQuotaStub        func(ccv3.OrgQuota) (ccv3.OrgQuota, ccv3.Warnings, error)
+	createOrganizationQuotaMutex       sync.RWMutex
+	createOrganizationQuotaArgsForCall []struct {
+		arg1 ccv3.OrgQuota
+	}
+	createOrganizationQuotaReturns struct {
+		result1 ccv3.OrgQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createOrganizationQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.OrgQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreatePackageStub        func(ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
 	createPackageMutex       sync.RWMutex
 	createPackageArgsForCall []struct {
@@ -2710,6 +2725,72 @@ func (fake *FakeCloudControllerClient) CreateOrganizationReturnsOnCall(i int, re
 	}
 	fake.createOrganizationReturnsOnCall[i] = struct {
 		result1 ccv3.Organization
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationQuota(arg1 ccv3.OrgQuota) (ccv3.OrgQuota, ccv3.Warnings, error) {
+	fake.createOrganizationQuotaMutex.Lock()
+	ret, specificReturn := fake.createOrganizationQuotaReturnsOnCall[len(fake.createOrganizationQuotaArgsForCall)]
+	fake.createOrganizationQuotaArgsForCall = append(fake.createOrganizationQuotaArgsForCall, struct {
+		arg1 ccv3.OrgQuota
+	}{arg1})
+	fake.recordInvocation("CreateOrganizationQuota", []interface{}{arg1})
+	fake.createOrganizationQuotaMutex.Unlock()
+	if fake.CreateOrganizationQuotaStub != nil {
+		return fake.CreateOrganizationQuotaStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createOrganizationQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaCallCount() int {
+	fake.createOrganizationQuotaMutex.RLock()
+	defer fake.createOrganizationQuotaMutex.RUnlock()
+	return len(fake.createOrganizationQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaCalls(stub func(ccv3.OrgQuota) (ccv3.OrgQuota, ccv3.Warnings, error)) {
+	fake.createOrganizationQuotaMutex.Lock()
+	defer fake.createOrganizationQuotaMutex.Unlock()
+	fake.CreateOrganizationQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaArgsForCall(i int) ccv3.OrgQuota {
+	fake.createOrganizationQuotaMutex.RLock()
+	defer fake.createOrganizationQuotaMutex.RUnlock()
+	argsForCall := fake.createOrganizationQuotaArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaReturns(result1 ccv3.OrgQuota, result2 ccv3.Warnings, result3 error) {
+	fake.createOrganizationQuotaMutex.Lock()
+	defer fake.createOrganizationQuotaMutex.Unlock()
+	fake.CreateOrganizationQuotaStub = nil
+	fake.createOrganizationQuotaReturns = struct {
+		result1 ccv3.OrgQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaReturnsOnCall(i int, result1 ccv3.OrgQuota, result2 ccv3.Warnings, result3 error) {
+	fake.createOrganizationQuotaMutex.Lock()
+	defer fake.createOrganizationQuotaMutex.Unlock()
+	fake.CreateOrganizationQuotaStub = nil
+	if fake.createOrganizationQuotaReturnsOnCall == nil {
+		fake.createOrganizationQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.OrgQuota
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createOrganizationQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.OrgQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9450,6 +9531,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createIsolationSegmentMutex.RUnlock()
 	fake.createOrganizationMutex.RLock()
 	defer fake.createOrganizationMutex.RUnlock()
+	fake.createOrganizationQuotaMutex.RLock()
+	defer fake.createOrganizationQuotaMutex.RUnlock()
 	fake.createPackageMutex.RLock()
 	defer fake.createPackageMutex.RUnlock()
 	fake.createRoleMutex.RLock()

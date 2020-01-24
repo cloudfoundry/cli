@@ -11,16 +11,12 @@ import (
 
 var _ = Describe("create-org-quota command", func() {
 	var (
-		quotaOrgName string
+		orgQuotaName string
 	)
 
 	BeforeEach(func() {
 		_ = helpers.LoginCF()
-		quotaOrgName = helpers.NewOrgQuotaName()
-	})
-
-	AfterEach(func() {
-		// TODO: delete `quotaOrgName` when the `delete-org-quota` is implemented
+		orgQuotaName = helpers.NewOrgQuotaName()
 	})
 
 	Describe("help", func() {
@@ -54,7 +50,7 @@ var _ = Describe("create-org-quota command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "create-org-quota", quotaOrgName)
+			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "create-org-quota", orgQuotaName)
 		})
 	})
 
@@ -69,7 +65,7 @@ var _ = Describe("create-org-quota command", func() {
 			})
 		})
 
-		FWhen("a nonexistent flag is provided", func() {
+		When("a nonexistent flag is provided", func() {
 			It("tells the user that the flag is invalid", func() {
 				session := helpers.CF("create-org-quota", "--nonexistent")
 
@@ -77,75 +73,105 @@ var _ = Describe("create-org-quota command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
 			})
+
+		})
+
+		When("an invalid flag value is provided", func() {
+			It("tells the user that the flag value is invalid", func() {
+				session := helpers.CF("create-org-quota", orgQuotaName,
+					"-a", "hello")
+
+				Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag '-i' (expected int > 0)"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 
 		When("the quota does not exist", func() {
 			When("no flags are provided", func() {
 				It("creates the quota with the default values", func() {
-					session := helpers.CF("create-org-quota", quotaOrgName)
+					session := helpers.CF("create-org-quota", orgQuotaName)
 					userName, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Creating org quota %s as %s...", quotaOrgName, userName))
+					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					// TODO: find sustainable way to retrieve the created-quota to make sure it exists
-					// session = helpers.CF("org-quota", quotaOrgName)
-					//Eventually(session).Should(Say("Getting quota %s info as %s...", quotaOrgName, userName))
-					// The following defaults are correct, but the ordering and naming may change; they were copied from V6
-					//Eventually(session).Should(Say(`Total Memory\s+0`))
-					//Eventually(session).Should(Say(`Instance Memory\s+unlimited`))
-					//Eventually(session).Should(Say(`Routes\s+0`))
-					//Eventually(session).Should(Say(`Services\s+0`))
-					//Eventually(session).Should(Say(`Paid service plans\s+disallowed`))
-					//Eventually(session).Should(Say(`App instance limit\s+0`))
-					//Eventually(session).Should(Say(`Reserved Route Ports\s+unlimited`))
-					//Eventually(session).Should(Say("OK"))
-					//Eventually(session).Should(Exit(0))
+					session = helpers.CF("org-quota", orgQuotaName)
+					Eventually(session).Should(Say("Getting org quota %s as %s...", orgQuotaName, userName))
+					Eventually(session).Should(Say(`total memory\s+0`))
+					Eventually(session).Should(Say(`instance memory\s+unlimited`)) //FAIL
+					Eventually(session).Should(Say(`service instances\s+0`)) //FAIL
+					Eventually(session).Should(Say(`paid service plans\s+disallowed`))
+					Eventually(session).Should(Say(`app instances\s+unlimited`))
+					Eventually(session).Should(Say(`route ports\s+0`)) //TODO: should this just be routes like in v6?
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			When("all the optional flags are provided", func() {
+				//TODO: -a 2x?????
 				It("creates the quota with the specified values", func() {
 					userName, _ := helpers.GetCredentials()
-					session := helpers.CF("create-org-quota", quotaOrgName,
+					session := helpers.CF("create-org-quota", orgQuotaName,
 						"-a", "2",
 						"--allow-paid-service-plans",
-						"-i", "3M",
+						"-i", "2M",
 						"-m", "4M",
-						"-r", "5",
-						"--reserved-route-ports", "6",
+						"-r", "6",
+						"--reserved-route-ports", "5",
 						"-s", "7")
-					Eventually(session).Should(Say("Creating org quota %s as %s...", quotaOrgName, userName))
+					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					// TODO: find sustainable way to retrieve the created-quota to make sure it exists
-					// session = helpers.CF("org-quota", quotaOrgName)
-					//Eventually(session).Should(Say("Getting quota %s info as %s...", quotaOrgName, userName))
-					// The following defaults are correct, but the ordering and naming may change; they were copied from V6
-					//Eventually(session).Should(Say(`Total Memory\s+4M`))
-					//Eventually(session).Should(Say(`Instance Memory\s+3M`))
-					//Eventually(session).Should(Say(`Routes\s+5`))
-					//Eventually(session).Should(Say(`Services\s+7`))
-					//Eventually(session).Should(Say(`Paid service plans\s+allowed`))
-					//Eventually(session).Should(Say(`App instance limit\s+2`))
-					//Eventually(session).Should(Say(`Reserved Route Ports\s+6`))
-					//Eventually(session).Should(Say("OK"))
-					//Eventually(session).Should(Exit(0))
+					session = helpers.CF("org-quota", orgQuotaName)
+					Eventually(session).Should(Say("Getting org quota %s as %s...", orgQuotaName, userName))
+					Eventually(session).Should(Say(`total memory\s+4M`))
+					Eventually(session).Should(Say(`instance memory\s+2M`))
+					Eventually(session).Should(Say(`routes\s+6`))
+					Eventually(session).Should(Say(`service instances\s+7`))
+					Eventually(session).Should(Say(`paid service plans\s+allowed`))
+					Eventually(session).Should(Say(`app instances\s+2`))
+					Eventually(session).Should(Say(`route ports\s+5`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("The flags are all set to -1", func() {
+				It("creates the quota with the specified values", func() {
+					userName, _ := helpers.GetCredentials()
+					session := helpers.CF("create-org-quota", orgQuotaName,
+						"-a", "-1",
+						"-i", "-1",
+						"-m", "-1",
+						"-r", "-1",
+						"-s", "-1",
+						"--reserved-route-ports", "-1")
+					Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("org-quota", orgQuotaName)
+					Eventually(session).Should(Say(`total memory\s+unlimited`))
+					Eventually(session).Should(Say(`instance memory\s+unlimited`))
+					Eventually(session).Should(Say(`routes\s+unlimited`))
+					Eventually(session).Should(Say(`service instances\s+unlimited`))
+					Eventually(session).Should(Say(`app instances\s+unlimited`))
+					Eventually(session).Should(Say(`route ports\s+unlimited`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
 
 		When("the quota already exists", func() {
 			BeforeEach(func() {
-				Eventually(helpers.CF("create-org-quota", quotaOrgName)).Should(Exit(0))
+				Eventually(helpers.CF("create-org-quota", orgQuotaName)).Should(Exit(0))
 			})
 
 			It("notifies the user that the quota already exists and exits 0", func() {
-				session := helpers.CF("create-org-quota", quotaOrgName)
+				session := helpers.CF("create-org-quota", orgQuotaName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Creating org quota %s as %s...", quotaOrgName, userName))
-				Eventually(session).Should(Say(`Organization quota '%s' already exists\.`, quotaOrgName))
+				Eventually(session).Should(Say("Creating org quota %s as %s...", orgQuotaName, userName))
+				Eventually(session).Should(Say(`Organization Quota '%s' already exists\.`, orgQuotaName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})

@@ -1,9 +1,9 @@
 package ccerror
 
-type OrgQuotaAlreadyExists struct {
+type QuotaAlreadyExists struct {
 	Message string
 }
 
-func (e OrgQuotaAlreadyExists) Error() string {
+func (e QuotaAlreadyExists) Error() string {
 	return e.Message
 }

@@ -107,6 +107,7 @@ const (
 	PostIsolationSegmentRelationshipOrganizationsRequest        = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                                = "PostIsolationSegments"
 	PostOrganizationRequest                                     = "PostOrganization"
+	PostOrganizationQuotaRequest                                = "PostOrganizationQuota"
 	PostPackageRequest                                          = "PostPackage"
 	PostPackageBitsRequest                                      = "PostPackageBits"
 	PostResourceMatchesRequest                                  = "PostResourceMatches"
@@ -192,6 +193,7 @@ var APIRoutes = []Route{
 	{Resource: OrgsResource, Path: "/:organization_guid/domains/default", Method: http.MethodGet, Name: GetDefaultDomainRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationRelationshipDefaultIsolationSegmentRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodPatch, Name: PatchOrganizationRelationshipDefaultIsolationSegmentRequest},
+	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodPost, Name: PostOrganizationQuotaRequest},
 	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationQuotasRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodGet, Name: GetPackagesRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodPost, Name: PostPackageRequest},

@@ -41,7 +41,7 @@ type Organization struct {
 }
 
 type OrganizationQuota struct {
-	OrganizationQuota string `positional-arg-name:"ORG_QUOTA_NAME" required:"true" description:"The organization quota name"`
+	OrganizationQuotaName string `positional-arg-name:"ORG_QUOTA_NAME" required:"true" description:"The organization quota name"`
 }
 
 type APIPath struct {
