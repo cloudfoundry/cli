@@ -42,16 +42,6 @@ func (c *cliConnection) ApiEndpoint() (string, error) {
 	return result, err
 }
 
-func (c *cliConnection) CliCommand(args ...string) ([]string, error) {
-	var result []string
-
-	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRpcCmd.CliCommand", args, &result)
-	})
-
-	return result, err
-}
-
 func (c *cliConnection) GetApp(appName string) (plugin_models.DetailedApplicationSummary, error) {
 	var result plugin_models.DetailedApplicationSummary
 

@@ -32,28 +32,6 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
-	Describe("CliCommand", func() {
-		Describe("stdout output", func() {
-			It("outputs the result of the command to stdout", func() {
-				confirmTestPluginOutputWithArg("CliCommand", "target", "api endpoint",
-					"@@ plugin api response")
-			})
-		})
-
-		Describe("returned value from CliCommand", func() {
-			It("gets a slice of lines", func() {
-				confirmTestPluginOutputWithArg("CliCommand", "target",
-					"@@ plugin api response", "0: api endpoint", "1: api version")
-			})
-
-			It("does not see an empty line at the end", func() {
-				session := helpers.CF("CliCommand", "target")
-				Eventually(session).Should(Exit(0))
-				Expect(session).ShouldNot(Say(`\n[0-9]+:\s*\z`))
-			})
-		})
-	})
-
 	Describe("GetApp", func() {
 		var appName string
 		BeforeEach(func() {

@@ -29,16 +29,6 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		} else {
 			fmt.Println("Done ApiEndpoint:", result)
 		}
-	case "CliCommand":
-		result, err := cliConnection.CliCommand(args[1:]...)
-		if err != nil {
-			fmt.Printf("Error %s: %s\n", commandName, err)
-		} else {
-			fmt.Println("@@ plugin api response:")
-			for idx, s := range result {
-				fmt.Printf("%d: %s\n", idx, s)
-			}
-		}
 	case "GetApp":
 		result, err := cliConnection.GetApp(args[1])
 		if err != nil {
@@ -143,7 +133,6 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 		Commands: []plugin.Command{
 			{Name: "AccessToken"},
 			{Name: "ApiEndpoint"},
-			{Name: "CliCommand"},
 			{Name: "GetApp"},
 			{Name: "GetApps"},
 			{Name: "GetCurrentOrg"},

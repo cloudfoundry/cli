@@ -29,6 +29,7 @@ type UI interface {
 }
 
 func IsPluginCommand(osArgs []string) (configv3.Plugin, bool) {
+
 	if len(osArgs) < 1 {
 		return configv3.Plugin{}, false
 	}

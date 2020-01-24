@@ -9,9 +9,7 @@ import (
 var _ = Describe("Command 'Parser'", func() {
 
 	It("returns an unknown command error", func() {
-		parser, err := command_parser.NewCommandParser()
-		Expect(err).ToNot(HaveOccurred())
-		status := parser.ParseCommandFromArgs([]string{"howdy"})
+		status := command_parser.ParseCommandFromArgs([]string{"howdy"})
 		Expect(status).To(Equal(-666))
 	})
 })

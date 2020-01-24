@@ -123,32 +123,6 @@ func NewUI(config Config) (*UI, error) {
 	}, nil
 }
 
-// NewPluginUI will return a UI object where OUT and ERR are customizable.
-func NewPluginUI(config Config, outBuffer io.Writer, errBuffer io.Writer) (*UI, error) {
-	translateFunc, translationError := GetTranslationFunc(config)
-	if translationError != nil {
-		return nil, translationError
-	}
-
-	location := time.Now().Location()
-
-	return &UI{
-		In:               nil,
-		Out:              outBuffer,
-		OutForInteration: outBuffer,
-		Err:              errBuffer,
-		colorEnabled:     configv3.ColorDisabled,
-		translate:        translateFunc,
-		terminalLock:     &sync.Mutex{},
-		Exiter:           realExiter,
-		fileLock:         &sync.Mutex{},
-		Interactor:       realInteract,
-		IsTTY:            config.IsTTY(),
-		TerminalWidth:    config.TerminalWidth(),
-		TimezoneLocation: location,
-	}, nil
-}
-
 // NewTestUI will return a UI object where Out, In, and Err are customizable,
 // and colors are disabled
 func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
