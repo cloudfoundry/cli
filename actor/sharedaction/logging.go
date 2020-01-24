@@ -16,6 +16,9 @@ import (
 const (
 	StagingLog      = "STG"
 	RecentLogsLines = 100
+
+	retryCount    = 5
+	retryInterval = time.Millisecond * 250
 )
 
 type LogMessage struct {
@@ -82,6 +85,40 @@ func (c channelWriter) Write(bytes []byte) (n int, err error) {
 	return len(bytes), nil
 }
 
+// cliRetryBackoff returns true for OnErr after sleeping the given interval for a limited number of times,
+// and returns true for OnEmpty always.
+// Basically: retry x times on connection failures, and wait forever for logs to show up.
+type cliRetryBackoff struct {
+	interval time.Duration
+	maxCount int
+	count    int
+}
+
+func newCliRetryBackoff(interval time.Duration, maxCount int) *cliRetryBackoff {
+	return &cliRetryBackoff{
+		interval: interval,
+		maxCount: maxCount,
+	}
+}
+
+func (b *cliRetryBackoff) OnErr(error) bool {
+	b.count++
+	if b.count >= b.maxCount {
+		return false
+	}
+
+	time.Sleep(b.interval)
+	return true
+}
+
+func (b *cliRetryBackoff) OnEmpty() bool {
+	return true
+}
+
+func (b *cliRetryBackoff) Reset() {
+	b.count = 0
+}
+
 func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage, <-chan error, context.CancelFunc) {
 	logrus.Info("Start Tailing Logs")
 
@@ -111,7 +148,7 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 			client.Read,
 			logcache.WithWalkStartTime(time.Now().Add(-5*time.Second)),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
-			logcache.WithWalkBackoff(logcache.NewAlwaysRetryBackoff(250*time.Millisecond)),
+			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 			logcache.WithWalkLogger(log.New(channelWriter{
 				errChannel: outgoingErrStream,
 			}, "", 0)),
