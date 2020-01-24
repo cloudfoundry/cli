@@ -17,7 +17,7 @@ type Config struct {
 	// ENV stores the configuration from os.ENV
 	ENV EnvOverride
 
-	// Flags stores the configuration from gobal flags
+	// Flags stores the configuration from global flags
 	Flags FlagOverride
 
 	// detectedSettings are settings detected when the config is loaded.

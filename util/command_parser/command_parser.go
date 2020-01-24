@@ -85,6 +85,9 @@ func (p *CommandParser) ParseCommandFromArgs(args []string) int {
 
 func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string) error {
 	cfConfig := p.Config
+	cfConfig.Flags = configv3.FlagOverride{
+		Verbose: common.Commands.VerboseOrVersion,
+	}
 	defer p.UI.FlushDeferred()
 
 	err := preventExtraArgs(args)
@@ -258,9 +261,7 @@ func (p *CommandParser) parse(args []string, commandList interface{}) int {
 }
 
 func getCFConfig() (*configv3.Config, error) {
-	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
-	})
+	cfConfig, configErr := configv3.LoadConfig()
 	if configErr != nil {
 		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
 			return nil, configErr
