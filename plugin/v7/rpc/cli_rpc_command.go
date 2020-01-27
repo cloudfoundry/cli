@@ -87,10 +87,6 @@ func (cmd *CliRpcCmd) CliCommand(args []string, retVal *[]string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
-	return errors.New("unimplemented")
-}
-
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.DetailedApplicationSummary) error {
 	if !cmd.Config.HasTargetedOrganization() {
 		return errors.New("no organization targeted")
