@@ -46,9 +46,9 @@ type commandList struct {
 	CreateApp                          v7.CreateAppCommand                          `command:"create-app" description:"Create an Application in the target space"`
 	CreateAppManifest                  v7.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	CreateBuildpack                    v7.CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
-	CreatePackage                      v7.CreatePackageCommand                      `command:"create-package" description:"Uploads a Package"`
 	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
 	CreateOrg                          v7.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
+	CreatePackage                      v7.CreatePackageCommand                      `command:"create-package" description:"Uploads a Package"`
 	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" description:"Create a private domain for a specific org"`
 	CreateQuota                        v6.CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
 	CreateRoute                        v7.CreateRouteCommand                        `command:"create-route" description:"Create a route for later use"`
@@ -107,8 +107,8 @@ type commandList struct {
 	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
 	Org                                v7.OrgCommand                                `command:"org" description:"Show org info"`
-	OrgQuotas                          v7.OrgQuotasCommand                          `command:"org-quotas" description:"List available organization quotas"`
 	OrgQuota                           v7.OrgQuotaCommand                           `command:"org-quota" description:"Show organization quota"`
+	OrgQuotas                          v7.OrgQuotasCommand                          `command:"org-quotas" description:"List available organization quotas"`
 	OrgUsers                           v7.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Orgs                               v7.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
 	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`
@@ -129,7 +129,6 @@ type commandList struct {
 	ResetOrgDefaultIsolationSegment    v6.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v6.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v7.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)."`
-	Stage                              v7.StageCommand                              `command:"stage" description:"Create a new droplet for an app"`
 	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	RouterGroups                       v6.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
@@ -164,13 +163,14 @@ type commandList struct {
 	SharePrivateDomain                 v7.SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with a specific org"`
 	ShareService                       v6.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
 	Space                              v7.SpaceCommand                              `command:"space" description:"Show space info"`
-	SpaceQuota                         v6.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
+	SpaceQuota                         v7.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
 	SpaceQuotas                        v6.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space resource quotas"`
 	SpaceSSHAllowed                    v6.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
 	SpaceUsers                         v7.SpaceUsersCommand                         `command:"space-users" description:"Show space users by role"`
 	Spaces                             v7.SpacesCommand                             `command:"spaces" description:"List all spaces in an org"`
 	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	Stage                              v7.StageCommand                              `command:"stage" description:"Create a new droplet for an app"`
 	StagingEnvironmentVariableGroup    v7.StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
 	StagingSecurityGroups              v6.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups in the staging set for applications"`
 	Start                              v7.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
