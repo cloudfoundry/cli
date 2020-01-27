@@ -71,7 +71,7 @@ var _ = Describe("create-org-quota Command", func() {
 
 	When("the organization quota already exists", func() {
 		BeforeEach(func() {
-			fakeActor.CreateOrganizationQuotaReturns(v7action.Warnings{"warn-abc"}, ccerror.QuotaAlreadyExists{"quota-already-exists"})
+			fakeActor.CreateOrganizationQuotaReturns(v7action.Warnings{"warn-abc"}, ccerror.QuotaAlreadyExists{Message: "quota-already-exists"})
 		})
 
 		It("displays that it already exists, but does not return an error", func() {
