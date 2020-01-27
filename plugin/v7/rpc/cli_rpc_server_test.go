@@ -44,19 +44,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			_, err := cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -78,7 +78,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -106,7 +106,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -143,34 +143,6 @@ var _ = Describe("Server", func() {
 		})
 	})
 
-	Describe("disabling terminal output", func() {
-		var terminalOutputSwitch *rpcfakes.FakeTerminalOutputSwitch
-
-		BeforeEach(func() {
-			terminalOutputSwitch = new(rpcfakes.FakeTerminalOutputSwitch)
-			rpcService, err = cmdRunner.NewRpcService(nil, terminalOutputSwitch, nil, rpc.DefaultServer, nil, nil)
-			Expect(err).ToNot(HaveOccurred())
-
-			err := rpcService.Start()
-			Expect(err).ToNot(HaveOccurred())
-
-			pingCli(rpcService.Port())
-		})
-
-		It("should disable the terminal output switch", func() {
-			client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-			Expect(err).ToNot(HaveOccurred())
-
-			var success bool
-			err = client.Call("CliRpcCmd.DisableTerminalOutput", true, &success)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(success).To(BeTrue())
-			Expect(terminalOutputSwitch.DisableTerminalOutputCallCount()).To(Equal(1))
-			Expect(terminalOutputSwitch.DisableTerminalOutputArgsForCall(0)).To(Equal(true))
-		})
-	})
-
 	Describe("Plugin API", func() {
 		var (
 			fakePluginActor *rpcfakes.FakePluginActor
@@ -181,9 +153,8 @@ var _ = Describe("Server", func() {
 			fakePluginActor = new(rpcfakes.FakePluginActor)
 			fakeConfig = new(commandfakes.FakeConfig)
 			outputCapture := terminal.NewTeePrinter(os.Stdout)
-			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
 
-			rpcService, err = cmdRunner.NewRpcService(outputCapture, terminalOutputSwitch, nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
+			rpcService, err = cmdRunner.NewRpcService(outputCapture, nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -855,7 +826,7 @@ var _ = Describe("Server", func() {
 
 			Context(".ApiEndpoint", func() {
 				BeforeEach(func() {
-					rpcService, err = cmdRunner.NewRpcService(nil, nil, nil, rpc.DefaultServer, fakeConfig, nil)
+					rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, fakeConfig, nil)
 					err := rpcService.Start()
 					Expect(err).ToNot(HaveOccurred())
 

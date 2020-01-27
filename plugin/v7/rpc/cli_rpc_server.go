@@ -28,15 +28,8 @@ type OutputCapture interface {
 	SetOutputBucket(io.Writer)
 }
 
-//go:generate counterfeiter . TerminalOutputSwitch
-
-type TerminalOutputSwitch interface {
-	DisableTerminalOutput(bool)
-}
-
 func NewRpcService(
 	outputCapture OutputCapture,
-	terminalOutputSwitch TerminalOutputSwitch,
 	w io.Writer,
 	rpcServer *rpc.Server,
 	config command.Config,
@@ -45,14 +38,13 @@ func NewRpcService(
 	rpcService := &CliRpcService{
 		Server: rpcServer,
 		RpcCmd: &CliRpcCmd{
-			PluginMetadata:       &plugin.PluginMetadata{},
-			MetadataMutex:        &sync.RWMutex{},
-			Config:               config,
-			PluginActor:          pluginActor,
-			outputCapture:        outputCapture,
-			terminalOutputSwitch: terminalOutputSwitch,
-			outputBucket:         &bytes.Buffer{},
-			stdout:               w,
+			PluginMetadata: &plugin.PluginMetadata{},
+			MetadataMutex:  &sync.RWMutex{},
+			Config:         config,
+			PluginActor:    pluginActor,
+			outputCapture:  outputCapture,
+			outputBucket:   &bytes.Buffer{},
+			stdout:         w,
 		},
 	}
 

@@ -21,14 +21,13 @@ import (
 )
 
 type CliRpcCmd struct {
-	PluginMetadata       *plugin.PluginMetadata
-	MetadataMutex        *sync.RWMutex
-	Config               command.Config
-	PluginActor          PluginActor
-	outputCapture        OutputCapture
-	terminalOutputSwitch TerminalOutputSwitch
-	outputBucket         *bytes.Buffer
-	stdout               io.Writer
+	PluginMetadata *plugin.PluginMetadata
+	MetadataMutex  *sync.RWMutex
+	Config         command.Config
+	PluginActor    PluginActor
+	outputCapture  OutputCapture
+	outputBucket   *bytes.Buffer
+	stdout         io.Writer
 }
 
 func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
@@ -63,12 +62,6 @@ func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, re
 	defer cmd.MetadataMutex.Unlock()
 
 	cmd.PluginMetadata = &pluginMetadata
-	*retVal = true
-	return nil
-}
-
-func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
-	cmd.terminalOutputSwitch.DisableTerminalOutput(disable)
 	*retVal = true
 	return nil
 }
