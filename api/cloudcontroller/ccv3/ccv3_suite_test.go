@@ -117,6 +117,9 @@ func SetupV3Response() {
 			"spaces": {
 				"href": "SERVER_URL/v3/spaces"
 			},
+			"space_quotas": {
+				"href": "SERVER_URL/v3/space_quotas"
+			},
 			"packages": {
 				"href": "SERVER_URL/v3/packages"
 			},

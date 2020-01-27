@@ -51,7 +51,7 @@ var _ = FDescribe("create-space-quota command", func() {
 		})
 	})
 
-	XWhen("the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			userName = helpers.LoginCF()
 			orgName = helpers.CreateAndTargetOrg()
@@ -82,7 +82,7 @@ var _ = FDescribe("create-space-quota command", func() {
 			When("no flags are provided", func() {
 				It("creates the quota with the default values", func() {
 					session := helpers.CF("create-space-quota", spaceQuotaName)
-					Eventually(session).Should(Say("Creating org quota %s as %s...", spaceQuotaName, userName))
+					Eventually(session).Should(Say("Creating space quota %s for org %s as %s...", spaceQuotaName, orgName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
