@@ -52,7 +52,7 @@ func (cmd OrgQuotaCommand) Execute(args []string) error {
 		return err
 	}
 
-	quotaName := cmd.RequiredArgs.OrganizationQuota
+	quotaName := cmd.RequiredArgs.OrganizationQuotaName
 
 	cmd.UI.DisplayTextWithFlavor(
 		"Getting org quota {{.QuotaName}} as {{.Username}}...",

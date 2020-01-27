@@ -52,7 +52,7 @@ var _ = Describe("org-quotas command", func() {
 			serviceInstances = "2"
 			appInstances = "3"
 			reservedRoutePorts = "1"
-			session := helpers.CF("create-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-r", routes, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
+			session := helpers.CF("create-org-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-r", routes, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
 			Eventually(session).Should(Exit(0))
 		})
 

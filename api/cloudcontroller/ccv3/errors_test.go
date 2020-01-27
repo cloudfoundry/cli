@@ -373,6 +373,29 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
+					When("the quota already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "Organization Quota 'default' already exists.",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
+						It("returns a QuotaAlreadyExists error", func() {
+							Expect(makeError).To(Equal(
+								ccerror.QuotaAlreadyExists{
+									Message: "Organization Quota 'default' already exists.",
+								}),
+							)
+						})
+					})
+
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `

@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -57,16 +58,19 @@ var _ = Describe("org-quotas command", func() {
 			orgQuotas := []v7action.OrganizationQuota{
 				{
 					Name: "org-quota-1",
-
-					TotalMemory:       types.NullInt{Value: 1048576, IsSet: true},
-					InstanceMemory:    types.NullInt{Value: 32, IsSet: true},
-					TotalAppInstances: types.NullInt{Value: 3, IsSet: true},
-
-					TotalServiceInstances: types.NullInt{Value: 3, IsSet: true},
-					PaidServicePlans:      true,
-
-					TotalRoutes:     types.NullInt{Value: 5, IsSet: true},
-					TotalRoutePorts: types.NullInt{Value: 2, IsSet: true},
+					Apps: ccv3.AppLimit{
+						TotalMemory:       types.NullInt{Value: 1048576, IsSet: true},
+						InstanceMemory:    types.NullInt{Value: 32, IsSet: true},
+						TotalAppInstances: types.NullInt{Value: 3, IsSet: true},
+					},
+					Services: ccv3.ServiceLimit{
+						TotalServiceInstances: types.NullInt{Value: 3, IsSet: true},
+						PaidServicePlans:      true,
+					},
+					Routes: ccv3.RouteLimit{
+						TotalRoutes:        types.NullInt{Value: 5, IsSet: true},
+						TotalReservedPorts: types.NullInt{Value: 2, IsSet: true},
+					},
 				},
 			}
 			fakeActor.GetOrganizationQuotasReturns(orgQuotas, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
@@ -91,16 +95,19 @@ var _ = Describe("org-quotas command", func() {
 				orgQuotas := []v7action.OrganizationQuota{
 					{
 						Name: "default",
-
-						TotalMemory:       types.NullInt{Value: 0, IsSet: false},
-						InstanceMemory:    types.NullInt{Value: 0, IsSet: false},
-						TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
-
-						TotalServiceInstances: types.NullInt{Value: 0, IsSet: false},
-						PaidServicePlans:      true,
-
-						TotalRoutes:     types.NullInt{Value: 0, IsSet: false},
-						TotalRoutePorts: types.NullInt{Value: 0, IsSet: false},
+						Apps: ccv3.AppLimit{
+							TotalMemory:       types.NullInt{Value: 0, IsSet: false},
+							InstanceMemory:    types.NullInt{Value: 0, IsSet: false},
+							TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: types.NullInt{Value: 0, IsSet: false},
+							PaidServicePlans:      true,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        types.NullInt{Value: 0, IsSet: false},
+							TotalReservedPorts: types.NullInt{Value: 0, IsSet: false},
+						},
 					},
 				}
 				fakeActor.GetOrganizationQuotasReturns(orgQuotas, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)

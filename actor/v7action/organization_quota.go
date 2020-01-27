@@ -6,24 +6,25 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-type OrganizationQuota struct {
-	// GUID is the unique ID of the organization quota.
-	GUID string
-	// Name is the name of the organization quota
-	Name string
+type OrganizationQuota ccv3.OrganizationQuota
 
-	//the various limits that are associated with applications
-	TotalMemory       types.NullInt
-	InstanceMemory    types.NullInt
-	TotalAppInstances types.NullInt
-
-	//the various limits that are associated with services
+type QuotaLimits struct {
+	TotalMemoryInMB       types.NullInt
+	PerProcessMemoryInMB  types.NullInt
+	TotalInstances        types.NullInt
+	PaidServicesAllowed   bool
 	TotalServiceInstances types.NullInt
-	PaidServicePlans      bool
+	TotalRoutes           types.NullInt
+	TotalReservedPorts    types.NullInt
+}
 
-	//the various limits that are associated with routes
-	TotalRoutes     types.NullInt
-	TotalRoutePorts types.NullInt
+// CreateOrganization creates a new organization with the given name
+func (actor Actor) CreateOrganizationQuota(name string, limits QuotaLimits) (Warnings, error) {
+	orgQuota := createQuotaStruct(name, limits)
+
+	_, apiWarnings, err := actor.CloudControllerClient.CreateOrganizationQuota(orgQuota)
+
+	return Warnings(apiWarnings), err
 }
 
 func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error) {
@@ -34,7 +35,7 @@ func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error
 
 	var orgQuotas []OrganizationQuota
 	for _, quota := range ccv3OrgQuotas {
-		orgQuotas = append(orgQuotas, convertToOrganizationQuota(quota))
+		orgQuotas = append(orgQuotas, OrganizationQuota(quota))
 	}
 
 	return orgQuotas, Warnings(warnings), nil
@@ -55,22 +56,59 @@ func (actor Actor) GetOrganizationQuotaByName(orgQuotaName string) (Organization
 	if len(ccv3OrgQuotas) == 0 {
 		return OrganizationQuota{}, Warnings(warnings), actionerror.OrganizationQuotaNotFoundForNameError{Name: orgQuotaName}
 	}
-	orgQuota := convertToOrganizationQuota(ccv3OrgQuotas[0])
+	orgQuota := OrganizationQuota(ccv3OrgQuotas[0])
 
 	return orgQuota, Warnings(warnings), nil
 }
 
-func convertToOrganizationQuota(ccv3OrgQuota ccv3.OrgQuota) OrganizationQuota {
-	orgQuota := OrganizationQuota{
-		GUID:                  ccv3OrgQuota.GUID,
-		Name:                  ccv3OrgQuota.Name,
-		TotalMemory:           ccv3OrgQuota.Apps.TotalMemory,
-		InstanceMemory:        ccv3OrgQuota.Apps.InstanceMemory,
-		TotalAppInstances:     ccv3OrgQuota.Apps.TotalAppInstances,
-		TotalServiceInstances: ccv3OrgQuota.Services.TotalServiceInstances,
-		PaidServicePlans:      ccv3OrgQuota.Services.PaidServicePlans,
-		TotalRoutes:           ccv3OrgQuota.Routes.TotalRoutes,
-		TotalRoutePorts:       ccv3OrgQuota.Routes.TotalRoutePorts,
+func createQuotaStruct(name string, limits QuotaLimits) ccv3.OrganizationQuota {
+	AppLimit := ccv3.AppLimit{
+		TotalMemory:       limits.TotalMemoryInMB,
+		InstanceMemory:    limits.PerProcessMemoryInMB,
+		TotalAppInstances: limits.TotalInstances,
 	}
-	return orgQuota
+	ServiceLimit := ccv3.ServiceLimit{
+		TotalServiceInstances: limits.TotalServiceInstances,
+		PaidServicePlans:      limits.PaidServicesAllowed,
+	}
+	RouteLimit := ccv3.RouteLimit{
+		TotalRoutes:        limits.TotalRoutes,
+		TotalReservedPorts: limits.TotalReservedPorts,
+	}
+
+	quota := ccv3.OrganizationQuota{
+		Name:     name,
+		Apps:     AppLimit,
+		Services: ServiceLimit,
+		Routes:   RouteLimit,
+	}
+
+	setZeroDefaults(&quota)
+	convertUnlimitedToNil(&quota)
+
+	return quota
+}
+
+func setZeroDefaults(orgQuota *ccv3.OrganizationQuota) {
+	orgQuota.Apps.TotalMemory.IsSet = true
+	orgQuota.Routes.TotalRoutes.IsSet = true
+	orgQuota.Routes.TotalReservedPorts.IsSet = true
+	orgQuota.Services.TotalServiceInstances.IsSet = true
+}
+
+func convertUnlimitedToNil(orgQuota *ccv3.OrganizationQuota) {
+	flags := []*types.NullInt{
+		&orgQuota.Apps.TotalMemory,
+		&orgQuota.Apps.InstanceMemory,
+		&orgQuota.Apps.TotalAppInstances,
+		&orgQuota.Services.TotalServiceInstances,
+		&orgQuota.Routes.TotalRoutes,
+		&orgQuota.Routes.TotalReservedPorts,
+	}
+
+	for i := 0; i < len(flags); i++ {
+		if flags[i].Value == -1 {
+			flags[i].IsSet = false
+		}
+	}
 }

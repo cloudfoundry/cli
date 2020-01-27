@@ -1,13 +1,17 @@
 package ccv3
 
 import (
+	"bytes"
+	"encoding/json"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
 )
 
-// OrgQuota represents a Cloud Controller organization quota.
-type OrgQuota struct {
+// OrganizationQuota represents a Cloud Controller organization quota.
+type OrganizationQuota struct {
 	// GUID is the unique ID of the organization quota.
 	GUID string `json:"guid,omitempty"`
 	// Name is the name of the organization quota
@@ -32,26 +36,50 @@ type ServiceLimit struct {
 }
 
 type RouteLimit struct {
-	TotalRoutes     types.NullInt `json:"total_routes"`
-	TotalRoutePorts types.NullInt `json:"total_reserved_ports"`
+	TotalRoutes        types.NullInt `json:"total_routes"`
+	TotalReservedPorts types.NullInt `json:"total_reserved_ports"`
 }
 
-func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrgQuota, Warnings, error) {
+func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
+	quotaBytes, err := json.Marshal(orgQuota)
+	if err != nil {
+		return OrganizationQuota{}, nil, err
+	}
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostOrganizationQuotaRequest,
+		Body:        bytes.NewReader(quotaBytes),
+	})
+
+	if err != nil {
+		return OrganizationQuota{}, nil, err
+	}
+	var responseOrgQuota OrganizationQuota
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseOrgQuota,
+	}
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return OrganizationQuota{}, response.Warnings, err
+	}
+	return responseOrgQuota, response.Warnings, nil
+}
+
+func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotasRequest,
 		Query:       query,
 	})
 	if err != nil {
-		return []OrgQuota{}, nil, err
+		return []OrganizationQuota{}, nil, err
 	}
 
-	var orgQuotasList []OrgQuota
-	warnings, err := client.paginate(request, OrgQuota{}, func(item interface{}) error {
-		if orgQuota, ok := item.(OrgQuota); ok {
+	var orgQuotasList []OrganizationQuota
+	warnings, err := client.paginate(request, OrganizationQuota{}, func(item interface{}) error {
+		if orgQuota, ok := item.(OrganizationQuota); ok {
 			orgQuotasList = append(orgQuotasList, orgQuota)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   OrgQuota{},
+				Expected:   OrganizationQuota{},
 				Unexpected: item,
 			}
 		}

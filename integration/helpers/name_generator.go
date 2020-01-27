@@ -130,6 +130,11 @@ func NewHostName() string {
 	return PrefixedRandomName("HOST")
 }
 
+// NewOrgQuotaName provides a random name prefixed with ORG-QUOTA
+func NewOrgQuotaName() string {
+	return PrefixedRandomName("ORG-QUOTA")
+}
+
 // NewPath provides a random path prefixed with /PATH
 func NewPath() string {
 	return PrefixedRandomName("/PATH")

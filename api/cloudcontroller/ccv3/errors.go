@@ -139,6 +139,7 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	appNameTakenRegexp := regexp.MustCompile(`App with the name '.*' already exists\.`)
 	orgNameTakenRegexp := regexp.MustCompile(`Organization '.*' already exists\.`)
 	roleExistsRegexp := regexp.MustCompile(`User '.*' already has '.*' role.*`)
+	quotaExistsRegexp := regexp.MustCompile(`.* Quota '.*' already exists\.`)
 
 	// boolean switch case with partial/regex string matchers
 	switch {
@@ -160,6 +161,8 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 		return ccerror.OrganizationNameTakenError{UnprocessableEntityError: err}
 	case roleExistsRegexp.MatchString(errorString):
 		return ccerror.RoleAlreadyExistsError{UnprocessableEntityError: err}
+	case quotaExistsRegexp.MatchString(errorString):
+		return ccerror.QuotaAlreadyExists{Message: err.Message}
 	default:
 		return err
 	}
