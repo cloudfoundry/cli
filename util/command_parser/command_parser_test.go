@@ -21,11 +21,12 @@ var _ = Describe("Command 'Parser'", func() {
 	})
 
 	Describe("the verbose flag", func() {
-		var stdout, stderr io.Writer
+		var stdout, outBuffer, errBuffer io.Writer
 
 		BeforeEach(func() {
 			stdout = ioutil.Discard
-			stderr = ioutil.Discard
+			outBuffer = ioutil.Discard
+			errBuffer = ioutil.Discard
 			// Needed because the command-table is a singleton
 			// and the absence of -v relies on the default value of
 			// common.Commands.VerboseOrVersion to be false
@@ -33,7 +34,7 @@ var _ = Describe("Command 'Parser'", func() {
 		})
 
 		It("sets the verbose/version flag", func() {
-			parser, err := command_parser.NewCommandParserForPlugins(stdout, stderr)
+			parser, err := command_parser.NewCommandParserForPlugins(stdout, outBuffer, errBuffer)
 			Expect(err).ToNot(HaveOccurred())
 			status := parser.ParseCommandFromArgs([]string{"-v", "help"})
 			Expect(status).To(Equal(0))
@@ -41,7 +42,7 @@ var _ = Describe("Command 'Parser'", func() {
 		})
 
 		It("sets the verbose/version flag after the command-name", func() {
-			parser, err := command_parser.NewCommandParserForPlugins(stdout, stderr)
+			parser, err := command_parser.NewCommandParserForPlugins(stdout, outBuffer, errBuffer)
 			Expect(err).ToNot(HaveOccurred())
 			status := parser.ParseCommandFromArgs([]string{"help", "-v"})
 			Expect(status).To(Equal(0))
@@ -49,7 +50,7 @@ var _ = Describe("Command 'Parser'", func() {
 		})
 
 		It("doesn't turn verbose on by default", func() {
-			parser, err := command_parser.NewCommandParserForPlugins(stdout, stderr)
+			parser, err := command_parser.NewCommandParserForPlugins(stdout, outBuffer, errBuffer)
 			Expect(err).ToNot(HaveOccurred())
 			status := parser.ParseCommandFromArgs([]string{"help"})
 			Expect(status).To(Equal(0))

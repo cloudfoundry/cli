@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"sync"
 
@@ -76,7 +77,7 @@ func (cmd *CliRpcCmd) CliCommand(args []string, retVal *[]string) error {
 	outBuffer := bytes.Buffer{}
 	errBuffer := bytes.Buffer{}
 
-	p, err := command_parser.NewCommandParserForPlugins(&outBuffer, &errBuffer)
+	p, err := command_parser.NewCommandParserForPlugins(os.Stdout, &outBuffer, &errBuffer)
 	if err != nil {
 		return err
 	}

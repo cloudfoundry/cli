@@ -62,13 +62,13 @@ func NewCommandParser() (CommandParser, error) {
 	return CommandParser{Config: cfConfig, UI: commandUI}, nil
 }
 
-func NewCommandParserForPlugins(outBuffer io.Writer, errBuffer io.Writer) (CommandParser, error) {
+func NewCommandParserForPlugins(stdout io.Writer, outBuffer io.Writer, errBuffer io.Writer) (CommandParser, error) {
 	cfConfig, err := getCFConfig()
 	if err != nil {
 		return CommandParser{}, err
 	}
 
-	multiWriter := io.MultiWriter(os.Stdout, outBuffer)
+	multiWriter := io.MultiWriter(stdout, outBuffer)
 	commandUI, err := ui.NewPluginUI(cfConfig, multiWriter, errBuffer)
 	if err != nil {
 		return CommandParser{}, err
