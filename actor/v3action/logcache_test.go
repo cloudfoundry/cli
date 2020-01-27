@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -50,6 +51,9 @@ var _ = Describe("LogCacheURL", func() {
 				}, ccv3.ResourceLinks{}, ccv3.Warnings{}, nil)
 			})
 			It("uses the target", func() {
+				if ccversion.MinSupportedV2ClientVersion != "2.100.0" {
+					Fail("TIMEBOMB: This log-cache behavior should be removed in January 2021 when we no longer support cf-deployment 7.0.0")
+				}
 				Expect(actualLogCacheURL).To(Equal("https://log-cache.the-best-domain.com"))
 			})
 		})
