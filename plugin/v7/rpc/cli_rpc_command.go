@@ -25,8 +25,6 @@ type CliRpcCmd struct {
 	MetadataMutex  *sync.RWMutex
 	Config         command.Config
 	PluginActor    PluginActor
-	outputCapture  OutputCapture
-	outputBucket   *bytes.Buffer
 	stdout         io.Writer
 }
 

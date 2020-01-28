@@ -38,7 +38,7 @@ func RunPlugin(plugin configv3.Plugin, ui command.UI) error {
 	v7Actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 
 	server := netrpc.NewServer()
-	rpcService, err := rpc.NewRpcService(nil, nil, server, config, v7Actor)
+	rpcService, err := rpc.NewRpcService(nil, server, config, v7Actor)
 
 	if err != nil {
 		return err

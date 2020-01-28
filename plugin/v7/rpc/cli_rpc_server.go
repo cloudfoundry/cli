@@ -11,7 +11,6 @@ import (
 	"net/rpc"
 	"strconv"
 
-	"bytes"
 	"io"
 
 	"sync"
@@ -24,12 +23,8 @@ type CliRpcService struct {
 	RpcCmd   *CliRpcCmd
 	Server   *rpc.Server
 }
-type OutputCapture interface {
-	SetOutputBucket(io.Writer)
-}
 
 func NewRpcService(
-	outputCapture OutputCapture,
 	w io.Writer,
 	rpcServer *rpc.Server,
 	config command.Config,
@@ -42,8 +37,6 @@ func NewRpcService(
 			MetadataMutex:  &sync.RWMutex{},
 			Config:         config,
 			PluginActor:    pluginActor,
-			outputCapture:  outputCapture,
-			outputBucket:   &bytes.Buffer{},
 			stdout:         w,
 		},
 	}

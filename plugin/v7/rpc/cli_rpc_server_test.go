@@ -6,13 +6,11 @@ import (
 	"errors"
 	"net"
 	"net/rpc"
-	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
@@ -44,19 +42,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
+			_, err := cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -78,7 +76,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -106,7 +104,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -152,9 +150,8 @@ var _ = Describe("Server", func() {
 		BeforeEach(func() {
 			fakePluginActor = new(rpcfakes.FakePluginActor)
 			fakeConfig = new(commandfakes.FakeConfig)
-			outputCapture := terminal.NewTeePrinter(os.Stdout)
 
-			rpcService, err = cmdRunner.NewRpcService(outputCapture, nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
