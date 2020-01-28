@@ -621,7 +621,7 @@ var _ = Describe("labels command", func() {
 			})
 		})
 
-		FDescribe("service-offering labels", func() {
+		Describe("service-offering labels", func() {
 			var (
 				broker              *fakeservicebroker.FakeServiceBroker
 				serviceOfferingName string
