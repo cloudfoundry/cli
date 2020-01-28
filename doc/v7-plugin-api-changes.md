@@ -2,7 +2,27 @@
 
 This document lists the differences in the objects the V7 Plugin API returns compared to V6.
 
+
 ## Methods that have changed
+
+### CliCommand
+
+With the V6 CLI plugins that used `CliCommand` to run a `cf` command were
+actually calling into versions of these commands that were different to those
+accessible to a user from the command line.
+
+With the V7 CLI plugin authors will now see that command output reflects the current
+implementation of those commands.
+
+Plugins that inspect the output of `CliCommand` will need to be updated. We
+recommend that if you are writing a plugin you try to depend as little as
+possible on this output as it is subject to change.
+
+One significant change between older command implementations and the current
+implementations is that many newer commands now use `stderr` to report warnings
+or failures.
+
+We have not yet extended the plugin API to expose output on `stderr`.
 
 ### GetApp
 Model changes
@@ -474,11 +494,11 @@ V7:
 ]
 ```
 
-
 ### IsSSLDisabled (Renamed to IsSkipSSLValidation in V7)
 
 The only difference in this method is that it was renamed from the V6
 `IsSSLDisabled` to the V7 `IsSkipSSLValidation`
+
 
 ## Methods that have not changed
 
