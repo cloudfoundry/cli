@@ -172,6 +172,20 @@ var _ = Describe("Server", func() {
 			time.Sleep(50 * time.Millisecond)
 		})
 
+		Describe(".ApiEndpoint", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns("www.example.com")
+			})
+
+			It("returns the ApiEndpoint() setting in config", func() {
+				var result string
+				err = client.Call("CliRpcCmd.ApiEndpoint", "", &result)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).To(Equal("www.example.com"))
+				Expect(fakeConfig.TargetCallCount()).To(Equal(1))
+			})
+		})
+
 		Describe("CliCommand", func() {
 			It("calls a core command", func() {
 				var result []string
@@ -808,51 +822,6 @@ var _ = Describe("Server", func() {
 		})
 	})
 
-	Describe(".CallCoreCommand", func() {
-
-		Describe("CLI Config object methods", func() {
-			var (
-				fakeConfig *commandfakes.FakeConfig
-			)
-
-			BeforeEach(func() {
-				fakeConfig = new(commandfakes.FakeConfig)
-			})
-
-			AfterEach(func() {
-				//give time for server to stop
-				time.Sleep(50 * time.Millisecond)
-			})
-
-			Context(".ApiEndpoint", func() {
-				BeforeEach(func() {
-					rpcService, err = cmdRunner.NewRpcService(nil, nil, rpc.DefaultServer, fakeConfig, nil)
-					err := rpcService.Start()
-					Expect(err).ToNot(HaveOccurred())
-
-					pingCli(rpcService.Port())
-					fakeConfig.TargetReturns("www.fake-domain.com")
-				})
-				AfterEach(func() {
-					rpcService.Stop()
-
-					//give time for server to stop
-					time.Sleep(50 * time.Millisecond)
-				})
-
-				It("returns the ApiEndpoint() setting in config", func() {
-					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
-					Expect(err).ToNot(HaveOccurred())
-
-					var result string
-					err = client.Call("CliRpcCmd.ApiEndpoint", "", &result)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(result).To(Equal("www.fake-domain.com"))
-					Expect(fakeConfig.TargetCallCount()).To(Equal(1))
-				})
-			})
-		})
-	})
 })
 
 func pingCli(port string) {
