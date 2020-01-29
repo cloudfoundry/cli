@@ -22,6 +22,7 @@ const (
 	RoutesResource                    = "routes"
 	ServiceInstancesResource          = "service_instances"
 	ServiceOfferingsResource          = "service_offerings"
+	SpaceQuotasResource               = "space_quotas"
 	SpacesResource                    = "spaces"
 	StacksResource                    = "stacks"
 	TasksResource                     = "tasks"

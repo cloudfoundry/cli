@@ -83,27 +83,27 @@ func createQuotaStruct(name string, limits QuotaLimits) ccv3.OrganizationQuota {
 		Routes:   RouteLimit,
 	}
 
-	setZeroDefaults(&quota)
-	convertUnlimitedToNil(&quota)
+	setZeroDefaults(&quota.Apps, &quota.Routes, &quota.Services)
+	convertUnlimitedToNil(&quota.Apps, &quota.Routes, &quota.Services)
 
 	return quota
 }
 
-func setZeroDefaults(orgQuota *ccv3.OrganizationQuota) {
-	orgQuota.Apps.TotalMemory.IsSet = true
-	orgQuota.Routes.TotalRoutes.IsSet = true
-	orgQuota.Routes.TotalReservedPorts.IsSet = true
-	orgQuota.Services.TotalServiceInstances.IsSet = true
+func setZeroDefaults(apps *ccv3.AppLimit, routes *ccv3.RouteLimit, services *ccv3.ServiceLimit) {
+	apps.TotalMemory.IsSet = true
+	routes.TotalRoutes.IsSet = true
+	routes.TotalReservedPorts.IsSet = true
+	services.TotalServiceInstances.IsSet = true
 }
 
-func convertUnlimitedToNil(orgQuota *ccv3.OrganizationQuota) {
+func convertUnlimitedToNil(apps *ccv3.AppLimit, routes *ccv3.RouteLimit, services *ccv3.ServiceLimit) {
 	flags := []*types.NullInt{
-		&orgQuota.Apps.TotalMemory,
-		&orgQuota.Apps.InstanceMemory,
-		&orgQuota.Apps.TotalAppInstances,
-		&orgQuota.Services.TotalServiceInstances,
-		&orgQuota.Routes.TotalRoutes,
-		&orgQuota.Routes.TotalReservedPorts,
+		&apps.TotalMemory,
+		&apps.InstanceMemory,
+		&apps.TotalAppInstances,
+		&services.TotalServiceInstances,
+		&routes.TotalRoutes,
+		&routes.TotalReservedPorts,
 	}
 
 	for i := 0; i < len(flags); i++ {

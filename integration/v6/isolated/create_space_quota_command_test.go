@@ -31,8 +31,7 @@ var _ = Describe("create-space-quota command", func() {
 		Eventually(session).Should(Say(`instance memory limit\s+%s`, instanceMemory))
 		Eventually(session).Should(Say(`routes\s+%s`, routes))
 		Eventually(session).Should(Say(`services\s+%s`, serviceInstances))
-		//TODO: uncomment when #134821331 is complete
-		//Eventually(session).Should(Say(`paid service plans\s+%s`, "allowed"))
+		Eventually(session).Should(Say(`non basic services\s+%s`, "allowed"))
 		Eventually(session).Should(Say(`app instance limit\s+%s`, appInstances))
 		Eventually(session).Should(Say(`reserved route ports\s+%s`, reservedRoutePorts))
 		Eventually(session).Should(Exit(0))
