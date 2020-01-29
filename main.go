@@ -18,7 +18,7 @@ func main() {
 	var exitCode int
 	defer panichandler.HandlePanic()
 
-	config, err := configv3.LoadConfig()
+	config, err := configv3.GetCFConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)

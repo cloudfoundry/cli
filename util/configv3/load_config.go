@@ -37,6 +37,16 @@ func (c *Config) loadPluginConfig() error {
 	return nil
 }
 
+func GetCFConfig() (*Config, error) {
+	cfConfig, configErr := LoadConfig()
+	if configErr != nil {
+		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
+			return nil, configErr
+		}
+	}
+	return cfConfig, nil
+}
+
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
 // config.json does not exists, it will use a default config in it's place.
 // Takes in an optional FlagOverride, will only use the first one passed, that

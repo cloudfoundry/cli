@@ -49,7 +49,7 @@ type CommandParser struct {
 }
 
 func NewCommandParser() (CommandParser, error) {
-	cfConfig, err := getCFConfig()
+	cfConfig, err := configv3.GetCFConfig()
 	if err != nil {
 		return CommandParser{}, err
 	}
@@ -241,16 +241,6 @@ func (p *CommandParser) parse(args []string, commandList interface{}) int {
 
 	fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 	return 1
-}
-
-func getCFConfig() (*configv3.Config, error) {
-	cfConfig, configErr := configv3.LoadConfig()
-	if configErr != nil {
-		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
-			return nil, configErr
-		}
-	}
-	return cfConfig, nil
 }
 
 func isCommand(s string) bool {
