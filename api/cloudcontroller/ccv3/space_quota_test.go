@@ -57,16 +57,16 @@ var _ = Describe("Space Quotas", func() {
     "total_memory_in_mb": 2,
     "per_process_memory_in_mb": 3,
     "total_instances": 4,
-    "per_app_tasks": 5
+    "per_app_tasks": 900
   },
   "services": {
     "paid_services_allowed": true,
-    "total_service_instances": 6,
-    "total_service_keys": 7
+    "total_service_instances": 5,
+    "total_service_keys": 700
   },
   "routes": {
-    "total_routes": 8,
-    "total_reserved_ports": 9
+    "total_routes": 6,
+    "total_reserved_ports": 7
   },
   "relationships": {
     "organization": {
@@ -90,6 +90,19 @@ var _ = Describe("Space Quotas", func() {
 `)
 				expectedBody := map[string]interface{}{
 					"name": "my-space-quota",
+					"apps": map[string]interface{}{
+						"total_memory_in_mb":       2,
+						"per_process_memory_in_mb": 3,
+						"total_instances":          4,
+					},
+					"services": map[string]interface{}{
+						"paid_services_allowed":   true,
+						"total_service_instances": 5,
+					},
+					"routes": map[string]interface{}{
+						"total_routes":         6,
+						"total_reserved_ports": 7,
+					},
 					"relationships": map[string]interface{}{
 						"organization": map[string]interface{}{
 							"data": map[string]interface{}{
