@@ -3,7 +3,6 @@ package command_parser
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"reflect"
 	"strings"
@@ -55,28 +54,11 @@ func NewCommandParser() (CommandParser, error) {
 		return CommandParser{}, err
 	}
 
-	commandUI, err := ui.NewUI(cfConfig)
-	if err != nil {
-		return CommandParser{}, err
-	}
-	return CommandParser{Config: cfConfig, UI: commandUI}, nil
+	return CommandParser{Config: cfConfig}, nil
 }
 
-func NewCommandParserForPlugins(stdout io.Writer, outBuffer io.Writer, errBuffer io.Writer) (CommandParser, error) {
-	cfConfig, err := getCFConfig()
-	if err != nil {
-		return CommandParser{}, err
-	}
-
-	multiWriter := io.MultiWriter(stdout, outBuffer)
-	commandUI, err := ui.NewPluginUI(cfConfig, multiWriter, errBuffer)
-	if err != nil {
-		return CommandParser{}, err
-	}
-	return CommandParser{Config: cfConfig, UI: commandUI}, nil
-}
-
-func (p *CommandParser) ParseCommandFromArgs(args []string) int {
+func (p *CommandParser) ParseCommandFromArgs(ui *ui.UI, args []string) int {
+	p.UI = ui
 	exitStatus := p.parse(args, &common.Commands)
 	if exitStatus == switchToV2 {
 		exitStatus = p.parse(args, &common.FallbackCommands)

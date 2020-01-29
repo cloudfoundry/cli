@@ -5,6 +5,7 @@ package rpc
 import (
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
+	"code.cloudfoundry.org/cli/util/ui"
 
 	"fmt"
 	"net"
@@ -15,6 +16,12 @@ import (
 
 	"sync"
 )
+
+//go:generate counterfeiter . CommandParser
+
+type CommandParser interface {
+	ParseCommandFromArgs(ui *ui.UI, args []string) int
+}
 
 type CliRpcService struct {
 	listener net.Listener
@@ -29,6 +36,7 @@ func NewRpcService(
 	rpcServer *rpc.Server,
 	config command.Config,
 	pluginActor PluginActor,
+	commandParser CommandParser,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		Server: rpcServer,
@@ -37,6 +45,7 @@ func NewRpcService(
 			MetadataMutex:  &sync.RWMutex{},
 			Config:         config,
 			PluginActor:    pluginActor,
+			CommandParser:  commandParser,
 			stdout:         w,
 		},
 	}

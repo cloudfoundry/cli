@@ -18,6 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/plugin/v7/rpc/rpcfakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -42,19 +43,19 @@ var _ = Describe("Server", func() {
 
 	Describe(".NewRpcService", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns an err of another Rpc process is already registered", func() {
-			_, err := cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
+			_, err := cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe(".Stop", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -76,7 +77,7 @@ var _ = Describe("Server", func() {
 
 	Describe(".Start", func() {
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -104,7 +105,7 @@ var _ = Describe("Server", func() {
 		)
 
 		BeforeEach(func() {
-			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, nil, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -143,15 +144,18 @@ var _ = Describe("Server", func() {
 
 	Describe("Plugin API", func() {
 		var (
-			fakePluginActor *rpcfakes.FakePluginActor
-			fakeConfig      *commandfakes.FakeConfig
+			fakePluginActor   *rpcfakes.FakePluginActor
+			fakeConfig        *commandfakes.FakeConfig
+			fakeCommandParser *rpcfakes.FakeCommandParser
 		)
 
 		BeforeEach(func() {
 			fakePluginActor = new(rpcfakes.FakePluginActor)
 			fakeConfig = new(commandfakes.FakeConfig)
+			fakeCommandParser = new(rpcfakes.FakeCommandParser)
 
-			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, fakeConfig, fakePluginActor)
+			rpcService, err = cmdRunner.NewRpcService(nil, rpc.DefaultServer, fakeConfig,
+				fakePluginActor, fakeCommandParser)
 			Expect(err).ToNot(HaveOccurred())
 
 			err := rpcService.Start()
@@ -184,12 +188,21 @@ var _ = Describe("Server", func() {
 		})
 
 		Describe("CliCommand", func() {
+			BeforeEach(func() {
+				fakeCommandParser.ParseCommandFromArgsStub = func(ui *ui.UI, args []string) int {
+					ui.DisplayText("some-cf-command output")
+					return 0
+				}
+			})
+
 			It("calls a core command", func() {
 				var result []string
-				err := client.Call("CliRpcCmd.CliCommand", []string{"api"}, &result)
+				err := client.Call("CliRpcCmd.CliCommand", []string{"some-cf-command"}, &result)
 				Expect(err).ToNot(HaveOccurred())
-
-				Expect(result[0]).To(ContainSubstring("api endpoint"))
+				Expect(fakeCommandParser.ParseCommandFromArgsCallCount()).To(Equal(1))
+				_, args := fakeCommandParser.ParseCommandFromArgsArgsForCall(0)
+				Expect(args).To(Equal([]string{"some-cf-command"}))
+				Expect(result).To(Equal([]string{"some-cf-command output"}))
 			})
 		})
 

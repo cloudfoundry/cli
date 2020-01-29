@@ -16,6 +16,7 @@ import (
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
 	"code.cloudfoundry.org/cli/util/command_parser"
+	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 )
@@ -25,6 +26,7 @@ type CliRpcCmd struct {
 	MetadataMutex  *sync.RWMutex
 	Config         command.Config
 	PluginActor    PluginActor
+	CommandParser  CommandParser
 	stdout         io.Writer
 }
 
@@ -68,12 +70,15 @@ func (cmd *CliRpcCmd) CliCommand(args []string, retVal *[]string) error {
 	outBuffer := bytes.Buffer{}
 	errBuffer := bytes.Buffer{}
 
-	p, err := command_parser.NewCommandParserForPlugins(os.Stdout, &outBuffer, &errBuffer)
+	p := cmd.CommandParser
+
+	multiWriter := io.MultiWriter(os.Stdout, &outBuffer)
+	commandUI, err := ui.NewPluginUI(cmd.Config, multiWriter, &errBuffer)
 	if err != nil {
 		return err
 	}
-	exitCode := p.ParseCommandFromArgs(args)
 
+	exitCode := p.ParseCommandFromArgs(commandUI, args)
 	if exitCode == command_parser.UnknownCommandCode {
 		return errors.New("UnknownCommandCode")
 	} else if exitCode > 0 {

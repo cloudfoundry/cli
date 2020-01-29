@@ -191,6 +191,16 @@ type FakeConfig struct {
 	hasTargetedSpaceReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	IsTTYStub        func() bool
+	isTTYMutex       sync.RWMutex
+	isTTYArgsForCall []struct {
+	}
+	isTTYReturns struct {
+		result1 bool
+	}
+	isTTYReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	LocaleStub        func() string
 	localeMutex       sync.RWMutex
 	localeArgsForCall []struct {
@@ -447,6 +457,16 @@ type FakeConfig struct {
 	}
 	targetedSpaceReturnsOnCall map[int]struct {
 		result1 configv3.Space
+	}
+	TerminalWidthStub        func() int
+	terminalWidthMutex       sync.RWMutex
+	terminalWidthArgsForCall []struct {
+	}
+	terminalWidthReturns struct {
+		result1 int
+	}
+	terminalWidthReturnsOnCall map[int]struct {
+		result1 int
 	}
 	UAADisableKeepAlivesStub        func() bool
 	uAADisableKeepAlivesMutex       sync.RWMutex
@@ -1461,6 +1481,58 @@ func (fake *FakeConfig) HasTargetedSpaceReturnsOnCall(i int, result1 bool) {
 		})
 	}
 	fake.hasTargetedSpaceReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) IsTTY() bool {
+	fake.isTTYMutex.Lock()
+	ret, specificReturn := fake.isTTYReturnsOnCall[len(fake.isTTYArgsForCall)]
+	fake.isTTYArgsForCall = append(fake.isTTYArgsForCall, struct {
+	}{})
+	fake.recordInvocation("IsTTY", []interface{}{})
+	fake.isTTYMutex.Unlock()
+	if fake.IsTTYStub != nil {
+		return fake.IsTTYStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.isTTYReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) IsTTYCallCount() int {
+	fake.isTTYMutex.RLock()
+	defer fake.isTTYMutex.RUnlock()
+	return len(fake.isTTYArgsForCall)
+}
+
+func (fake *FakeConfig) IsTTYCalls(stub func() bool) {
+	fake.isTTYMutex.Lock()
+	defer fake.isTTYMutex.Unlock()
+	fake.IsTTYStub = stub
+}
+
+func (fake *FakeConfig) IsTTYReturns(result1 bool) {
+	fake.isTTYMutex.Lock()
+	defer fake.isTTYMutex.Unlock()
+	fake.IsTTYStub = nil
+	fake.isTTYReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) IsTTYReturnsOnCall(i int, result1 bool) {
+	fake.isTTYMutex.Lock()
+	defer fake.isTTYMutex.Unlock()
+	fake.IsTTYStub = nil
+	if fake.isTTYReturnsOnCall == nil {
+		fake.isTTYReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isTTYReturnsOnCall[i] = struct {
 		result1 bool
 	}{result1}
 }
@@ -2806,6 +2878,58 @@ func (fake *FakeConfig) TargetedSpaceReturnsOnCall(i int, result1 configv3.Space
 	}{result1}
 }
 
+func (fake *FakeConfig) TerminalWidth() int {
+	fake.terminalWidthMutex.Lock()
+	ret, specificReturn := fake.terminalWidthReturnsOnCall[len(fake.terminalWidthArgsForCall)]
+	fake.terminalWidthArgsForCall = append(fake.terminalWidthArgsForCall, struct {
+	}{})
+	fake.recordInvocation("TerminalWidth", []interface{}{})
+	fake.terminalWidthMutex.Unlock()
+	if fake.TerminalWidthStub != nil {
+		return fake.TerminalWidthStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.terminalWidthReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) TerminalWidthCallCount() int {
+	fake.terminalWidthMutex.RLock()
+	defer fake.terminalWidthMutex.RUnlock()
+	return len(fake.terminalWidthArgsForCall)
+}
+
+func (fake *FakeConfig) TerminalWidthCalls(stub func() int) {
+	fake.terminalWidthMutex.Lock()
+	defer fake.terminalWidthMutex.Unlock()
+	fake.TerminalWidthStub = stub
+}
+
+func (fake *FakeConfig) TerminalWidthReturns(result1 int) {
+	fake.terminalWidthMutex.Lock()
+	defer fake.terminalWidthMutex.Unlock()
+	fake.TerminalWidthStub = nil
+	fake.terminalWidthReturns = struct {
+		result1 int
+	}{result1}
+}
+
+func (fake *FakeConfig) TerminalWidthReturnsOnCall(i int, result1 int) {
+	fake.terminalWidthMutex.Lock()
+	defer fake.terminalWidthMutex.Unlock()
+	fake.TerminalWidthStub = nil
+	if fake.terminalWidthReturnsOnCall == nil {
+		fake.terminalWidthReturnsOnCall = make(map[int]struct {
+			result1 int
+		})
+	}
+	fake.terminalWidthReturnsOnCall[i] = struct {
+		result1 int
+	}{result1}
+}
+
 func (fake *FakeConfig) UAADisableKeepAlives() bool {
 	fake.uAADisableKeepAlivesMutex.Lock()
 	ret, specificReturn := fake.uAADisableKeepAlivesReturnsOnCall[len(fake.uAADisableKeepAlivesArgsForCall)]
@@ -3313,6 +3437,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.hasTargetedOrganizationMutex.RUnlock()
 	fake.hasTargetedSpaceMutex.RLock()
 	defer fake.hasTargetedSpaceMutex.RUnlock()
+	fake.isTTYMutex.RLock()
+	defer fake.isTTYMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
@@ -3373,6 +3499,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.targetedOrganizationNameMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
+	fake.terminalWidthMutex.RLock()
+	defer fake.terminalWidthMutex.RUnlock()
 	fake.uAADisableKeepAlivesMutex.RLock()
 	defer fake.uAADisableKeepAlivesMutex.RUnlock()
 	fake.uAAGrantTypeMutex.RLock()

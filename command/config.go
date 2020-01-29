@@ -28,6 +28,7 @@ type Config interface {
 	GetPluginCaseInsensitive(pluginName string) (configv3.Plugin, bool)
 	HasTargetedOrganization() bool
 	HasTargetedSpace() bool
+	IsTTY() bool
 	Locale() string
 	MinCLIVersion() string
 	NOAARequestRetryCount() int
@@ -60,6 +61,7 @@ type Config interface {
 	TargetedOrganization() configv3.Organization
 	TargetedOrganizationName() string
 	TargetedSpace() configv3.Space
+	TerminalWidth() int
 	UAADisableKeepAlives() bool
 	UAAGrantType() string
 	UAAOAuthClient() string
