@@ -28,6 +28,7 @@ var _ = Describe("org-quotas command", func() {
 		executeErr      error
 		args            []string
 		binaryName      string
+		trueValue       = true
 	)
 
 	BeforeEach(func() {
@@ -59,17 +60,17 @@ var _ = Describe("org-quotas command", func() {
 				{
 					Name: "org-quota-1",
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{Value: 1048576, IsSet: true},
-						InstanceMemory:    types.NullInt{Value: 32, IsSet: true},
-						TotalAppInstances: types.NullInt{Value: 3, IsSet: true},
+						TotalMemory:       &types.NullInt{Value: 1048576, IsSet: true},
+						InstanceMemory:    &types.NullInt{Value: 32, IsSet: true},
+						TotalAppInstances: &types.NullInt{Value: 3, IsSet: true},
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{Value: 3, IsSet: true},
-						PaidServicePlans:      true,
+						TotalServiceInstances: &types.NullInt{Value: 3, IsSet: true},
+						PaidServicePlans:      &trueValue,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{Value: 5, IsSet: true},
-						TotalReservedPorts: types.NullInt{Value: 2, IsSet: true},
+						TotalRoutes:        &types.NullInt{Value: 5, IsSet: true},
+						TotalReservedPorts: &types.NullInt{Value: 2, IsSet: true},
 					},
 				},
 			}
@@ -96,17 +97,17 @@ var _ = Describe("org-quotas command", func() {
 					{
 						Name: "default",
 						Apps: ccv3.AppLimit{
-							TotalMemory:       types.NullInt{Value: 0, IsSet: false},
-							InstanceMemory:    types.NullInt{Value: 0, IsSet: false},
-							TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
+							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 						},
 						Services: ccv3.ServiceLimit{
-							TotalServiceInstances: types.NullInt{Value: 0, IsSet: false},
-							PaidServicePlans:      true,
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+							PaidServicePlans:      &trueValue,
 						},
 						Routes: ccv3.RouteLimit{
-							TotalRoutes:        types.NullInt{Value: 0, IsSet: false},
-							TotalReservedPorts: types.NullInt{Value: 0, IsSet: false},
+							TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
 						},
 					},
 				}

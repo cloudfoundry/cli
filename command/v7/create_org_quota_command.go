@@ -69,13 +69,13 @@ func (cmd CreateOrgQuotaCommand) Execute(args []string) error {
 		})
 
 	warnings, err := cmd.Actor.CreateOrganizationQuota(orgQuotaName, v7action.QuotaLimits{
-		TotalMemoryInMB:       types.NullInt(cmd.TotalMemory),
-		PerProcessMemoryInMB:  types.NullInt(cmd.PerProcessMemory),
-		TotalInstances:        types.NullInt(cmd.NumAppInstances),
-		PaidServicesAllowed:   cmd.PaidServicePlans,
-		TotalServiceInstances: types.NullInt(cmd.TotalServiceInstances),
-		TotalRoutes:           types.NullInt(cmd.TotalRoutes),
-		TotalReservedPorts:    types.NullInt(cmd.TotalReservedPorts),
+		TotalMemoryInMB:       convertMegabytesFlagToNullInt(cmd.TotalMemory),
+		PerProcessMemoryInMB:  convertMegabytesFlagToNullInt(cmd.PerProcessMemory),
+		TotalInstances:        convertIntegerLimitFlagToNullInt(cmd.NumAppInstances),
+		PaidServicesAllowed:   &cmd.PaidServicePlans,
+		TotalServiceInstances: convertIntegerLimitFlagToNullInt(cmd.TotalServiceInstances),
+		TotalRoutes:           convertIntegerLimitFlagToNullInt(cmd.TotalRoutes),
+		TotalReservedPorts:    convertIntegerLimitFlagToNullInt(cmd.TotalReservedPorts),
 	})
 	cmd.UI.DisplayWarnings(warnings)
 
@@ -91,4 +91,20 @@ func (cmd CreateOrgQuotaCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+func convertMegabytesFlagToNullInt(flag flag.MemoryWithUnlimited) *types.NullInt {
+	if !flag.IsSet {
+		return nil
+	}
+
+	return &types.NullInt{IsSet: true, Value: flag.Value}
+}
+
+func convertIntegerLimitFlagToNullInt(flag flag.IntegerLimit) *types.NullInt {
+	if !flag.IsSet {
+		return nil
+	}
+
+	return &types.NullInt{IsSet: true, Value: flag.Value}
 }

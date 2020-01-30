@@ -84,6 +84,7 @@ const (
 	PatchFeatureFlagRequest                                     = "PatchFeatureFlag"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
 	PatchOrganizationRequest                                    = "PatchOrganization"
+	PatchOrganizationQuotaRequest                               = "PatchOrganizationQuota"
 	PatchProcessRequest                                         = "PatchProcess"
 	PatchRouteRequest                                           = "PatchRoute"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
@@ -196,6 +197,7 @@ var APIRoutes = []Route{
 	{Resource: OrgsResource, Path: "/:organization_guid/domains/default", Method: http.MethodGet, Name: GetDefaultDomainRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationRelationshipDefaultIsolationSegmentRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodPatch, Name: PatchOrganizationRelationshipDefaultIsolationSegmentRequest},
+	{Resource: OrgQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchOrganizationQuotaRequest},
 	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodPost, Name: PostOrganizationQuotaRequest},
 	{Resource: OrgQuotasResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationQuotasRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodGet, Name: GetPackagesRequest},

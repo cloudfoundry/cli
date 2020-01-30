@@ -1608,6 +1608,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateOrganizationQuotaStub        func(ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)
+	updateOrganizationQuotaMutex       sync.RWMutex
+	updateOrganizationQuotaArgsForCall []struct {
+		arg1 ccv3.OrganizationQuota
+	}
+	updateOrganizationQuotaReturns struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateOrganizationQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateProcessStub        func(ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	updateProcessMutex       sync.RWMutex
 	updateProcessArgsForCall []struct {
@@ -8840,6 +8855,72 @@ func (fake *FakeCloudControllerClient) UpdateOrganizationDefaultIsolationSegment
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuota(arg1 ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error) {
+	fake.updateOrganizationQuotaMutex.Lock()
+	ret, specificReturn := fake.updateOrganizationQuotaReturnsOnCall[len(fake.updateOrganizationQuotaArgsForCall)]
+	fake.updateOrganizationQuotaArgsForCall = append(fake.updateOrganizationQuotaArgsForCall, struct {
+		arg1 ccv3.OrganizationQuota
+	}{arg1})
+	fake.recordInvocation("UpdateOrganizationQuota", []interface{}{arg1})
+	fake.updateOrganizationQuotaMutex.Unlock()
+	if fake.UpdateOrganizationQuotaStub != nil {
+		return fake.UpdateOrganizationQuotaStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateOrganizationQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaCallCount() int {
+	fake.updateOrganizationQuotaMutex.RLock()
+	defer fake.updateOrganizationQuotaMutex.RUnlock()
+	return len(fake.updateOrganizationQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaCalls(stub func(ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)) {
+	fake.updateOrganizationQuotaMutex.Lock()
+	defer fake.updateOrganizationQuotaMutex.Unlock()
+	fake.UpdateOrganizationQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaArgsForCall(i int) ccv3.OrganizationQuota {
+	fake.updateOrganizationQuotaMutex.RLock()
+	defer fake.updateOrganizationQuotaMutex.RUnlock()
+	argsForCall := fake.updateOrganizationQuotaArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaReturns(result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+	fake.updateOrganizationQuotaMutex.Lock()
+	defer fake.updateOrganizationQuotaMutex.Unlock()
+	fake.UpdateOrganizationQuotaStub = nil
+	fake.updateOrganizationQuotaReturns = struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaReturnsOnCall(i int, result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+	fake.updateOrganizationQuotaMutex.Lock()
+	defer fake.updateOrganizationQuotaMutex.Unlock()
+	fake.UpdateOrganizationQuotaStub = nil
+	if fake.updateOrganizationQuotaReturnsOnCall == nil {
+		fake.updateOrganizationQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.OrganizationQuota
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateOrganizationQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateProcess(arg1 ccv3.Process) (ccv3.Process, ccv3.Warnings, error) {
 	fake.updateProcessMutex.Lock()
 	ret, specificReturn := fake.updateProcessReturnsOnCall[len(fake.updateProcessArgsForCall)]
@@ -9877,6 +9958,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateOrganizationMutex.RUnlock()
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
+	fake.updateOrganizationQuotaMutex.RLock()
+	defer fake.updateOrganizationQuotaMutex.RUnlock()
 	fake.updateProcessMutex.RLock()
 	defer fake.updateProcessMutex.RUnlock()
 	fake.updateResourceMetadataMutex.RLock()

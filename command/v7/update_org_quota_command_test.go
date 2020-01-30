@@ -3,9 +3,10 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/command/translatableerror"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -17,13 +18,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("create-org-quota Command", func() {
+var _ = Describe("UpdateOrgQuotaCommand", func() {
 	var (
-		cmd             v7.CreateOrgQuotaCommand
+		cmd             v7.UpdateOrgQuotaCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateOrgQuotaActor
+		fakeActor       *v7fakes.FakeUpdateOrgQuotaActor
 		orgQuotaName    string
 		executeErr      error
 
@@ -34,10 +35,10 @@ var _ = Describe("create-org-quota Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateOrgQuotaActor)
-		orgQuotaName = "new-org-quota-name"
+		fakeActor = new(v7fakes.FakeUpdateOrgQuotaActor)
+		orgQuotaName = "old-org-quota-name"
 
-		cmd = v7.CreateOrgQuotaCommand{
+		cmd = v7.UpdateOrgQuotaCommand{
 			UI:           testUI,
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,
@@ -50,7 +51,6 @@ var _ = Describe("create-org-quota Command", func() {
 	})
 
 	JustBeforeEach(func() {
-
 		executeErr = cmd.Execute(nil)
 	})
 
@@ -69,38 +69,24 @@ var _ = Describe("create-org-quota Command", func() {
 		})
 	})
 
-	When("the organization quota already exists", func() {
+	When("updating the organization quota fails", func() {
 		BeforeEach(func() {
-			fakeActor.CreateOrganizationQuotaReturns(v7action.Warnings{"warn-abc"}, ccerror.QuotaAlreadyExists{Message: "quota-already-exists"})
-		})
-
-		It("displays that it already exists, but does not return an error", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
-
-			Expect(fakeActor.CreateOrganizationQuotaCallCount()).To(Equal(1))
-			Expect(testUI.Err).To(Say("warn-abc"))
-			Expect(testUI.Err).To(Say("quota-already-exists"))
-		})
-	})
-
-	When("creating the organization quota fails", func() {
-		BeforeEach(func() {
-			fakeActor.CreateOrganizationQuotaReturns(v7action.Warnings{"warn-456", "warn-789"}, errors.New("create-org-quota-err"))
+			fakeActor.UpdateOrganizationQuotaReturns(v7action.Warnings{"warn-456", "warn-789"}, errors.New("update-org-quota-err"))
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError("create-org-quota-err"))
+			Expect(executeErr).To(MatchError("update-org-quota-err"))
 
-			Expect(fakeActor.CreateOrganizationQuotaCallCount()).To(Equal(1))
+			Expect(fakeActor.UpdateOrganizationQuotaCallCount()).To(Equal(1))
 			Expect(testUI.Err).To(Say("warn-456"))
 			Expect(testUI.Err).To(Say("warn-789"))
 		})
 	})
 
-	When("the org quota is created successfully", func() {
-		When("the org quota is provided a value for each flag", func() {
-			// before each to make sure the env is set up
+	When("the org quota is updated successfully", func() {
+		When("the org quota is provided a new value for each flag", func() {
 			BeforeEach(func() {
+				cmd.NewName = "new-org-quota-name"
 				cmd.PaidServicePlans = true
 				cmd.NumAppInstances = flag.IntegerLimit{IsSet: true, Value: 10}
 				cmd.PerProcessMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 9}
@@ -108,17 +94,19 @@ var _ = Describe("create-org-quota Command", func() {
 				cmd.TotalRoutes = flag.IntegerLimit{IsSet: true, Value: 7}
 				cmd.TotalReservedPorts = flag.IntegerLimit{IsSet: true, Value: 1}
 				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
-				fakeActor.CreateOrganizationQuotaReturns(
+				fakeActor.UpdateOrganizationQuotaReturns(
 					v7action.Warnings{"warning"},
 					nil)
 			})
 
-			It("creates a quota with the values given from the flags", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.CreateOrganizationQuotaCallCount()).To(Equal(1))
+			It("updates the org quota to the new values", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(fakeActor.UpdateOrganizationQuotaCallCount()).To(Equal(1))
 
-				quotaName, quotaLimits := fakeActor.CreateOrganizationQuotaArgsForCall(0)
-				Expect(quotaName).To(Equal(orgQuotaName))
+				oldQuotaName, newQuotaName, quotaLimits := fakeActor.UpdateOrganizationQuotaArgsForCall(0)
+
+				Expect(oldQuotaName).To(Equal("old-org-quota-name"))
+				Expect(newQuotaName).To(Equal("new-org-quota-name"))
 
 				Expect(quotaLimits.TotalInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalInstances.Value).To(Equal(10))
@@ -140,9 +128,61 @@ var _ = Describe("create-org-quota Command", func() {
 				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
 
-				Expect(testUI.Out).To(Say("Creating org quota %s as bob...", orgQuotaName))
+				Expect(testUI.Out).To(Say("Updating org quota %s as bob...", orgQuotaName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
+		})
+
+		When("only some org quota limits are updated", func() {
+			BeforeEach(func() {
+				cmd.TotalMemory = flag.MemoryWithUnlimited{IsSet: true, Value: 2048}
+				cmd.TotalServiceInstances = flag.IntegerLimit{IsSet: true, Value: 2}
+				fakeActor.UpdateOrganizationQuotaReturns(
+					v7action.Warnings{"warning"},
+					nil)
+			})
+
+			It("updates the org quota to the new values", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(fakeActor.UpdateOrganizationQuotaCallCount()).To(Equal(1))
+
+				oldQuotaName, newQuotaName, quotaLimits := fakeActor.UpdateOrganizationQuotaArgsForCall(0)
+
+				Expect(oldQuotaName).To(Equal("old-org-quota-name"))
+				Expect(newQuotaName).To(Equal(""))
+
+				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
+				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
+
+				Expect(quotaLimits.TotalMemoryInMB.IsSet).To(Equal(true))
+				Expect(quotaLimits.TotalMemoryInMB.Value).To(Equal(2048))
+
+				Expect(quotaLimits.TotalInstances).To(BeNil())
+
+				Expect(quotaLimits.PerProcessMemoryInMB).To(BeNil())
+
+				Expect(quotaLimits.PaidServicesAllowed).To(BeNil())
+
+				Expect(quotaLimits.TotalRoutes).To(BeNil())
+
+				Expect(quotaLimits.TotalReservedPorts).To(BeNil())
+
+				Expect(testUI.Out).To(Say("Updating org quota %s as bob...", orgQuotaName))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+	})
+
+	When("conflicting flags are given", func() {
+		BeforeEach(func() {
+			cmd.PaidServicePlans = true
+			cmd.NoPaidServicePlans = true
+		})
+
+		It("returns with a helpful error", func() {
+			Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+				Args: []string{"--allow-paid-service-plans", "--disallow-paid-service-plans"},
+			}))
 		})
 	})
 })

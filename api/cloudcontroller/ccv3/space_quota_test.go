@@ -13,11 +13,14 @@ import (
 )
 
 var _ = Describe("Space Quotas", func() {
-	var client *Client
-	var executeErr error
-	var warnings Warnings
-	var inputSpaceQuota SpaceQuota
-	var createdSpaceQuota SpaceQuota
+	var (
+		client            *Client
+		executeErr        error
+		warnings          Warnings
+		inputSpaceQuota   SpaceQuota
+		createdSpaceQuota SpaceQuota
+		trueValue         = true
+	)
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
@@ -33,17 +36,17 @@ var _ = Describe("Space Quotas", func() {
 				inputSpaceQuota = SpaceQuota{
 					Name: "my-space-quota",
 					Apps: AppLimit{
-						TotalMemory:       types.NullInt{IsSet: true, Value: 2},
-						InstanceMemory:    types.NullInt{IsSet: true, Value: 3},
-						TotalAppInstances: types.NullInt{IsSet: true, Value: 4},
+						TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
+						InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
+						TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 					},
 					Services: ServiceLimit{
-						PaidServicePlans:      true,
-						TotalServiceInstances: types.NullInt{IsSet: true, Value: 5},
+						PaidServicePlans:      &trueValue,
+						TotalServiceInstances: &types.NullInt{IsSet: true, Value: 5},
 					},
 					Routes: RouteLimit{
-						TotalRoutes:        types.NullInt{IsSet: true, Value: 6},
-						TotalReservedPorts: types.NullInt{IsSet: true, Value: 7},
+						TotalRoutes:        &types.NullInt{IsSet: true, Value: 6},
+						TotalReservedPorts: &types.NullInt{IsSet: true, Value: 7},
 					},
 					OrgGUID: "some-org-guid",
 				}
@@ -129,17 +132,17 @@ var _ = Describe("Space Quotas", func() {
 						GUID: "space-quota-guid",
 						Name: "my-space-quota",
 						Apps: AppLimit{
-							TotalMemory:       types.NullInt{IsSet: true, Value: 2},
-							InstanceMemory:    types.NullInt{IsSet: true, Value: 3},
-							TotalAppInstances: types.NullInt{IsSet: true, Value: 4},
+							TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
+							InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
+							TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 						},
 						Services: ServiceLimit{
-							PaidServicePlans:      true,
-							TotalServiceInstances: types.NullInt{IsSet: true, Value: 5},
+							PaidServicePlans:      &trueValue,
+							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 5},
 						},
 						Routes: RouteLimit{
-							TotalRoutes:        types.NullInt{IsSet: true, Value: 6},
-							TotalReservedPorts: types.NullInt{IsSet: true, Value: 7},
+							TotalRoutes:        &types.NullInt{IsSet: true, Value: 6},
+							TotalReservedPorts: &types.NullInt{IsSet: true, Value: 7},
 						},
 						OrgGUID: "some-org-guid",
 					}))
@@ -151,17 +154,17 @@ var _ = Describe("Space Quotas", func() {
 				inputSpaceQuota = SpaceQuota{
 					Name: "my-space-quota",
 					Apps: AppLimit{
-						TotalMemory:       types.NullInt{IsSet: true, Value: 2},
-						InstanceMemory:    types.NullInt{IsSet: true, Value: 3},
-						TotalAppInstances: types.NullInt{IsSet: true, Value: 4},
+						TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
+						InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
+						TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 					},
 					Services: ServiceLimit{
-						PaidServicePlans:      true,
-						TotalServiceInstances: types.NullInt{IsSet: true, Value: 6},
+						PaidServicePlans:      &trueValue,
+						TotalServiceInstances: &types.NullInt{IsSet: true, Value: 6},
 					},
 					Routes: RouteLimit{
-						TotalRoutes:        types.NullInt{IsSet: true, Value: 8},
-						TotalReservedPorts: types.NullInt{IsSet: true, Value: 9},
+						TotalRoutes:        &types.NullInt{IsSet: true, Value: 8},
+						TotalReservedPorts: &types.NullInt{IsSet: true, Value: 9},
 					},
 					OrgGUID:    "some-org-guid",
 					SpaceGUIDs: []string{"space-guid-1", "space-guid-2"},
@@ -255,17 +258,17 @@ var _ = Describe("Space Quotas", func() {
 						GUID: "space-quota-guid",
 						Name: "my-space-quota",
 						Apps: AppLimit{
-							TotalMemory:       types.NullInt{IsSet: true, Value: 2},
-							InstanceMemory:    types.NullInt{IsSet: true, Value: 3},
-							TotalAppInstances: types.NullInt{IsSet: true, Value: 4},
+							TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
+							InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
+							TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 						},
 						Services: ServiceLimit{
-							PaidServicePlans:      true,
-							TotalServiceInstances: types.NullInt{IsSet: true, Value: 6},
+							PaidServicePlans:      &trueValue,
+							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 6},
 						},
 						Routes: RouteLimit{
-							TotalRoutes:        types.NullInt{IsSet: true, Value: 8},
-							TotalReservedPorts: types.NullInt{IsSet: true, Value: 9},
+							TotalRoutes:        &types.NullInt{IsSet: true, Value: 8},
+							TotalReservedPorts: &types.NullInt{IsSet: true, Value: 9},
 						},
 						OrgGUID:    "some-org-guid",
 						SpaceGUIDs: []string{"space-guid-1", "space-guid-2"},

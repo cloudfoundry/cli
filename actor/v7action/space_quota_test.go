@@ -29,6 +29,7 @@ var _ = Describe("Space Quota Actions", func() {
 			warnings         Warnings
 			executeErr       error
 			limits           QuotaLimits
+			trueValue        = true
 		)
 
 		JustBeforeEach(func() {
@@ -39,13 +40,13 @@ var _ = Describe("Space Quota Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateSpaceQuotaReturns(ccv3.SpaceQuota{}, ccv3.Warnings{"some-quota-warning"}, nil)
 				limits = QuotaLimits{
-					TotalMemoryInMB:       types.NullInt{IsSet: true, Value: 2},
-					PerProcessMemoryInMB:  types.NullInt{IsSet: true, Value: 3},
-					TotalInstances:        types.NullInt{IsSet: true, Value: 4},
-					PaidServicesAllowed:   true,
-					TotalServiceInstances: types.NullInt{IsSet: true, Value: 6},
-					TotalRoutes:           types.NullInt{IsSet: true, Value: 8},
-					TotalReservedPorts:    types.NullInt{IsSet: true, Value: 9},
+					TotalMemoryInMB:       &types.NullInt{IsSet: true, Value: 2},
+					PerProcessMemoryInMB:  &types.NullInt{IsSet: true, Value: 3},
+					TotalInstances:        &types.NullInt{IsSet: true, Value: 4},
+					PaidServicesAllowed:   &trueValue,
+					TotalServiceInstances: &types.NullInt{IsSet: true, Value: 6},
+					TotalRoutes:           &types.NullInt{IsSet: true, Value: 8},
+					TotalReservedPorts:    &types.NullInt{IsSet: true, Value: 9},
 				}
 			})
 
@@ -59,17 +60,17 @@ var _ = Describe("Space Quota Actions", func() {
 					Name:    spaceQuotaName,
 					OrgGUID: organizationGuid,
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{IsSet: true, Value: 2},
-						InstanceMemory:    types.NullInt{IsSet: true, Value: 3},
-						TotalAppInstances: types.NullInt{IsSet: true, Value: 4},
+						TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
+						InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
+						TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{IsSet: true, Value: 6},
-						PaidServicePlans:      true,
+						TotalServiceInstances: &types.NullInt{IsSet: true, Value: 6},
+						PaidServicePlans:      &trueValue,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{IsSet: true, Value: 8},
-						TotalReservedPorts: types.NullInt{IsSet: true, Value: 9},
+						TotalRoutes:        &types.NullInt{IsSet: true, Value: 8},
+						TotalReservedPorts: &types.NullInt{IsSet: true, Value: 9},
 					},
 					SpaceGUIDs: nil,
 				}))
@@ -90,17 +91,17 @@ var _ = Describe("Space Quota Actions", func() {
 				ccv3Quota = ccv3.SpaceQuota{
 					Name: spaceQuotaName,
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{Value: 0, IsSet: true},
-						InstanceMemory:    types.NullInt{Value: 0, IsSet: false},
-						TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
+						TotalMemory:       &types.NullInt{Value: 0, IsSet: true},
+						InstanceMemory:    nil,
+						TotalAppInstances: nil,
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      false,
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      nil,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{Value: 0, IsSet: true},
-						TotalReservedPorts: types.NullInt{Value: 0, IsSet: true},
+						TotalRoutes:        &types.NullInt{Value: 0, IsSet: true},
+						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: true},
 					},
 				}
 				fakeCloudControllerClient.CreateSpaceQuotaReturns(
@@ -128,27 +129,28 @@ var _ = Describe("Space Quota Actions", func() {
 			BeforeEach(func() {
 				spaceQuotaName = "quota-name"
 				limits = QuotaLimits{
-					TotalMemoryInMB:       types.NullInt{Value: -1, IsSet: true},
-					PerProcessMemoryInMB:  types.NullInt{Value: -1, IsSet: true},
-					TotalInstances:        types.NullInt{Value: -1, IsSet: true},
-					TotalServiceInstances: types.NullInt{Value: -1, IsSet: true},
-					TotalRoutes:           types.NullInt{Value: -1, IsSet: true},
-					TotalReservedPorts:    types.NullInt{Value: -1, IsSet: true},
+					TotalMemoryInMB:       &types.NullInt{Value: -1, IsSet: true},
+					PerProcessMemoryInMB:  &types.NullInt{Value: -1, IsSet: true},
+					TotalInstances:        &types.NullInt{Value: -1, IsSet: true},
+					PaidServicesAllowed:   &trueValue,
+					TotalServiceInstances: &types.NullInt{Value: -1, IsSet: true},
+					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
+					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
 				}
 				ccv3Quota = ccv3.SpaceQuota{
 					Name: spaceQuotaName,
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{Value: -1, IsSet: false},
-						InstanceMemory:    types.NullInt{Value: -1, IsSet: false},
-						TotalAppInstances: types.NullInt{Value: -1, IsSet: false},
+						TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+						InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{Value: -1, IsSet: false},
-						PaidServicePlans:      false,
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+						PaidServicePlans:      &trueValue,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{Value: -1, IsSet: false},
-						TotalReservedPorts: types.NullInt{Value: -1, IsSet: false},
+						TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
 					},
 				}
 				fakeCloudControllerClient.CreateSpaceQuotaReturns(

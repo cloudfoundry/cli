@@ -118,6 +118,7 @@ type CloudControllerClient interface {
 	UpdateFeatureFlag(flag ccv3.FeatureFlag) (ccv3.FeatureFlag, ccv3.Warnings, error)
 	UpdateOrganization(org ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)
 	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	UpdateOrganizationQuota(orgQuota ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)
 	UpdateProcess(process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	UpdateResourceMetadata(resource string, resourceGUID string, metadata ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)
 	UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error)

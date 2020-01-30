@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/clock"
 )
 
@@ -70,13 +69,13 @@ func (cmd CreateSpaceQuotaCommand) Execute([]string) error {
 		cmd.RequiredArgs.SpaceQuota,
 		cmd.Config.TargetedOrganization().GUID,
 		v7action.QuotaLimits{
-			TotalMemoryInMB:       types.NullInt(cmd.TotalMemory),
-			PerProcessMemoryInMB:  types.NullInt(cmd.PerProcessMemory),
-			TotalInstances:        types.NullInt(cmd.NumAppInstances),
-			PaidServicesAllowed:   cmd.PaidServicePlans,
-			TotalServiceInstances: types.NullInt(cmd.TotalServiceInstances),
-			TotalRoutes:           types.NullInt(cmd.TotalRoutes),
-			TotalReservedPorts:    types.NullInt(cmd.TotalReservedPorts),
+			TotalMemoryInMB:       convertMegabytesFlagToNullInt(cmd.TotalMemory),
+			PerProcessMemoryInMB:  convertMegabytesFlagToNullInt(cmd.PerProcessMemory),
+			TotalInstances:        convertIntegerLimitFlagToNullInt(cmd.NumAppInstances),
+			PaidServicesAllowed:   &cmd.PaidServicePlans,
+			TotalServiceInstances: convertIntegerLimitFlagToNullInt(cmd.TotalServiceInstances),
+			TotalRoutes:           convertIntegerLimitFlagToNullInt(cmd.TotalRoutes),
+			TotalReservedPorts:    convertIntegerLimitFlagToNullInt(cmd.TotalReservedPorts),
 		},
 	)
 

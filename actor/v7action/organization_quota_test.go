@@ -16,6 +16,8 @@ var _ = Describe("Organization Quota Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		trueValue                 bool = true
+		falseValue                bool = false
 	)
 
 	BeforeEach(func() {
@@ -163,13 +165,13 @@ var _ = Describe("Organization Quota Actions", func() {
 		BeforeEach(func() {
 			quotaName = "quota-name"
 			quotaLimits = QuotaLimits{
-				TotalMemoryInMB:       types.NullInt{Value: 2048, IsSet: true},
-				PerProcessMemoryInMB:  types.NullInt{Value: 1024, IsSet: true},
-				TotalInstances:        types.NullInt{Value: 0, IsSet: false},
-				TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
-				PaidServicesAllowed:   true,
-				TotalRoutes:           types.NullInt{Value: 6, IsSet: true},
-				TotalReservedPorts:    types.NullInt{Value: 5, IsSet: true},
+				TotalMemoryInMB:       &types.NullInt{Value: 2048, IsSet: true},
+				PerProcessMemoryInMB:  &types.NullInt{Value: 1024, IsSet: true},
+				TotalInstances:        &types.NullInt{Value: 0, IsSet: false},
+				TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+				PaidServicesAllowed:   &trueValue,
+				TotalRoutes:           &types.NullInt{Value: 6, IsSet: true},
+				TotalReservedPorts:    &types.NullInt{Value: 5, IsSet: true},
 			}
 		})
 
@@ -205,17 +207,17 @@ var _ = Describe("Organization Quota Actions", func() {
 				ccv3Quota = ccv3.OrganizationQuota{
 					Name: quotaName,
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{Value: 0, IsSet: true},
-						InstanceMemory:    types.NullInt{Value: 0, IsSet: false},
-						TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
+						TotalMemory:       &types.NullInt{Value: 0, IsSet: true},
+						InstanceMemory:    nil,
+						TotalAppInstances: nil,
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      false,
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      nil,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{Value: 0, IsSet: true},
-						TotalReservedPorts: types.NullInt{Value: 0, IsSet: true},
+						TotalRoutes:        &types.NullInt{Value: 0, IsSet: true},
+						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: true},
 					},
 				}
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
@@ -242,27 +244,28 @@ var _ = Describe("Organization Quota Actions", func() {
 			BeforeEach(func() {
 				quotaName = "quota-name"
 				quotaLimits = QuotaLimits{
-					TotalMemoryInMB:       types.NullInt{Value: -1, IsSet: true},
-					PerProcessMemoryInMB:  types.NullInt{Value: -1, IsSet: true},
-					TotalInstances:        types.NullInt{Value: -1, IsSet: true},
-					TotalServiceInstances: types.NullInt{Value: -1, IsSet: true},
-					TotalRoutes:           types.NullInt{Value: -1, IsSet: true},
-					TotalReservedPorts:    types.NullInt{Value: -1, IsSet: true},
+					TotalMemoryInMB:       &types.NullInt{Value: -1, IsSet: true},
+					PerProcessMemoryInMB:  &types.NullInt{Value: -1, IsSet: true},
+					TotalInstances:        &types.NullInt{Value: -1, IsSet: true},
+					PaidServicesAllowed:   &falseValue,
+					TotalServiceInstances: &types.NullInt{Value: -1, IsSet: true},
+					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
+					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
 				}
 				ccv3Quota = ccv3.OrganizationQuota{
 					Name: quotaName,
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{Value: -1, IsSet: false},
-						InstanceMemory:    types.NullInt{Value: -1, IsSet: false},
-						TotalAppInstances: types.NullInt{Value: -1, IsSet: false},
+						TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+						InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{Value: -1, IsSet: false},
-						PaidServicePlans:      false,
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+						PaidServicePlans:      &falseValue,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{Value: -1, IsSet: false},
-						TotalReservedPorts: types.NullInt{Value: -1, IsSet: false},
+						TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
 					},
 				}
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
@@ -290,17 +293,17 @@ var _ = Describe("Organization Quota Actions", func() {
 				ccv3Quota = ccv3.OrganizationQuota{
 					Name: quotaName,
 					Apps: ccv3.AppLimit{
-						TotalMemory:       types.NullInt{Value: 2048, IsSet: true},
-						InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
-						TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
+						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 					},
 					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      true,
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      &trueValue,
 					},
 					Routes: ccv3.RouteLimit{
-						TotalRoutes:        types.NullInt{Value: 6, IsSet: true},
-						TotalReservedPorts: types.NullInt{Value: 5, IsSet: true},
+						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 					},
 				}
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
@@ -317,6 +320,237 @@ var _ = Describe("Organization Quota Actions", func() {
 
 				passedQuota := fakeCloudControllerClient.CreateOrganizationQuotaArgsForCall(0)
 				Expect(passedQuota).To(Equal(ccv3Quota))
+			})
+		})
+	})
+
+	Describe("UpdateOrganizationQuota", func() {
+		var (
+			oldQuotaName string
+			newQuotaName string
+			quotaLimits  QuotaLimits
+			warnings     Warnings
+			executeErr   error
+		)
+
+		BeforeEach(func() {
+			oldQuotaName = "old-quota-name"
+			newQuotaName = "new-quota-name"
+			quotaLimits = QuotaLimits{
+				TotalMemoryInMB:       &types.NullInt{Value: 2048, IsSet: true},
+				PerProcessMemoryInMB:  &types.NullInt{Value: 1024, IsSet: true},
+				TotalInstances:        &types.NullInt{Value: 0, IsSet: false},
+				TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+				PaidServicesAllowed:   &trueValue,
+				TotalRoutes:           &types.NullInt{Value: 6, IsSet: true},
+				TotalReservedPorts:    &types.NullInt{Value: 5, IsSet: true},
+			}
+
+			fakeCloudControllerClient.GetOrganizationQuotasReturns(
+				[]ccv3.OrganizationQuota{{Name: oldQuotaName}},
+				ccv3.Warnings{"get-quotas-warning"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateOrganizationQuota(oldQuotaName, newQuotaName, quotaLimits)
+		})
+
+		When("the update-quota endpoint returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
+					ccv3.OrganizationQuota{},
+					ccv3.Warnings{"update-quota-warning"},
+					errors.New("update-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+				Expect(executeErr).To(MatchError("update-error"))
+			})
+		})
+
+		When("no quota limits are being updated", func() {
+			var (
+				ccv3Quota ccv3.OrganizationQuota
+			)
+
+			BeforeEach(func() {
+				quotaLimits = QuotaLimits{}
+
+				ccv3Quota = ccv3.OrganizationQuota{
+					Name: oldQuotaName,
+					Apps: ccv3.AppLimit{
+						TotalMemory:       nil,
+						InstanceMemory:    nil,
+						TotalAppInstances: nil,
+					},
+					Services: ccv3.ServiceLimit{
+						TotalServiceInstances: nil,
+						PaidServicePlans:      nil,
+					},
+					Routes: ccv3.RouteLimit{
+						TotalRoutes:        nil,
+						TotalReservedPorts: nil,
+					},
+				}
+
+				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+
+			It("calls the update endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.UpdateOrganizationQuotaArgsForCall(0)
+
+				updatedQuota := ccv3Quota
+				updatedQuota.Name = newQuotaName
+
+				Expect(passedQuota).To(Equal(updatedQuota))
+			})
+		})
+
+		When("the update org quota has all values set to unlimited", func() {
+			var (
+				ccv3Quota ccv3.OrganizationQuota
+			)
+
+			BeforeEach(func() {
+				quotaLimits = QuotaLimits{
+					TotalMemoryInMB:       &types.NullInt{Value: -1, IsSet: true},
+					PerProcessMemoryInMB:  &types.NullInt{Value: -1, IsSet: true},
+					TotalInstances:        &types.NullInt{Value: -1, IsSet: true},
+					PaidServicesAllowed:   &falseValue,
+					TotalServiceInstances: &types.NullInt{Value: -1, IsSet: true},
+					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
+					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
+				}
+				ccv3Quota = ccv3.OrganizationQuota{
+					Name: oldQuotaName,
+					Apps: ccv3.AppLimit{
+						TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+						InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+					},
+					Services: ccv3.ServiceLimit{
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+						PaidServicePlans:      &falseValue,
+					},
+					Routes: ccv3.RouteLimit{
+						TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
+					},
+				}
+				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+
+			It("calls the update endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.UpdateOrganizationQuotaArgsForCall(0)
+
+				updatedQuota := ccv3Quota
+				updatedQuota.Name = newQuotaName
+
+				Expect(passedQuota).To(Equal(updatedQuota))
+			})
+		})
+
+		When("The update org quota endpoint succeeds", func() {
+			var (
+				ccv3Quota ccv3.OrganizationQuota
+			)
+
+			BeforeEach(func() {
+				ccv3Quota = ccv3.OrganizationQuota{
+					Name: oldQuotaName,
+					Apps: ccv3.AppLimit{
+						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+					},
+					Services: ccv3.ServiceLimit{
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      &trueValue,
+					},
+					Routes: ccv3.RouteLimit{
+						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+					},
+				}
+
+				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+
+			It("calls the update endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.UpdateOrganizationQuotaArgsForCall(0)
+
+				updatedQuota := ccv3Quota
+				updatedQuota.Name = newQuotaName
+
+				Expect(passedQuota).To(Equal(updatedQuota))
+			})
+		})
+
+		When("the org quota name is not being updated", func() {
+			var (
+				ccv3Quota ccv3.OrganizationQuota
+			)
+
+			BeforeEach(func() {
+				newQuotaName = ""
+
+				ccv3Quota = ccv3.OrganizationQuota{
+					Name: oldQuotaName,
+					Apps: ccv3.AppLimit{
+						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+					},
+					Services: ccv3.ServiceLimit{
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      &trueValue,
+					},
+					Routes: ccv3.RouteLimit{
+						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+					},
+				}
+
+				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+			It("uses the current org quota name in the API request", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				inputQuota := fakeCloudControllerClient.UpdateOrganizationQuotaArgsForCall(0)
+				Expect(inputQuota.Name).To(Equal("old-quota-name"))
 			})
 		})
 	})

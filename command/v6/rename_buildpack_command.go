@@ -1,6 +1,9 @@
 package v6
 
 import (
+	"fmt"
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -8,8 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
-	"fmt"
-	"strings"
 )
 
 //go:generate counterfeiter . RenameBuildpackActor

@@ -71,3 +71,34 @@ func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota
 
 	return orgQuotasList, warnings, err
 }
+
+func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
+	orgQuotaGUID := orgQuota.GUID
+	orgQuota.GUID = ""
+
+	quotaBytes, err := json.Marshal(orgQuota)
+	if err != nil {
+		return OrganizationQuota{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchOrganizationQuotaRequest,
+		URIParams:   internal.Params{"quota_guid": orgQuotaGUID},
+		Body:        bytes.NewReader(quotaBytes),
+	})
+	if err != nil {
+		return OrganizationQuota{}, nil, err
+	}
+
+	var responseOrgQuota OrganizationQuota
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseOrgQuota,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return OrganizationQuota{}, response.Warnings, err
+	}
+
+	return responseOrgQuota, response.Warnings, nil
+}

@@ -104,6 +104,9 @@ var _ = Describe("create-space-quota Command", func() {
 		})
 
 		When("no flag limits are given", func() {
+			var (
+				falseValue = false
+			)
 			BeforeEach(func() {
 				fakeActor.CreateSpaceQuotaReturns(
 					v7action.Warnings{"warnings-1", "warnings-2"},
@@ -116,7 +119,7 @@ var _ = Describe("create-space-quota Command", func() {
 				expectedSpaceQuotaName, expectedOrgGUID, expectedLimits := fakeActor.CreateSpaceQuotaArgsForCall(0)
 				Expect(expectedSpaceQuotaName).To(Equal(spaceQuotaName))
 				Expect(expectedOrgGUID).To(Equal("some-org-guid"))
-				Expect(expectedLimits).To(Equal(v7action.QuotaLimits{}))
+				Expect(expectedLimits).To(Equal(v7action.QuotaLimits{PaidServicesAllowed: &falseValue}))
 			})
 
 			It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
@@ -149,14 +152,15 @@ var _ = Describe("create-space-quota Command", func() {
 				expectedSpaceQuotaName, expectedOrgGUID, expectedLimits := fakeActor.CreateSpaceQuotaArgsForCall(0)
 				Expect(expectedSpaceQuotaName).To(Equal(spaceQuotaName))
 				Expect(expectedOrgGUID).To(Equal("some-org-guid"))
+				trueValue := true
 				Expect(expectedLimits).To(Equal(v7action.QuotaLimits{
-					TotalMemoryInMB:       types.NullInt{IsSet: true, Value: 47},
-					PerProcessMemoryInMB:  types.NullInt{IsSet: true, Value: 23},
-					TotalInstances:        types.NullInt{IsSet: true, Value: 4},
-					PaidServicesAllowed:   true,
-					TotalServiceInstances: types.NullInt{IsSet: true, Value: 9},
-					TotalRoutes:           types.NullInt{IsSet: true, Value: 1},
-					TotalReservedPorts:    types.NullInt{IsSet: true, Value: 7},
+					TotalMemoryInMB:       &types.NullInt{IsSet: true, Value: 47},
+					PerProcessMemoryInMB:  &types.NullInt{IsSet: true, Value: 23},
+					TotalInstances:        &types.NullInt{IsSet: true, Value: 4},
+					PaidServicesAllowed:   &trueValue,
+					TotalServiceInstances: &types.NullInt{IsSet: true, Value: 9},
+					TotalRoutes:           &types.NullInt{IsSet: true, Value: 1},
+					TotalReservedPorts:    &types.NullInt{IsSet: true, Value: 7},
 				}))
 			})
 

@@ -26,7 +26,7 @@ func (actor Actor) CreateSpaceQuota(spaceQuotaName string, orgGuid string, limit
 		SpaceGUIDs: nil,
 	}
 
-	setZeroDefaults(&spaceQuota.Apps, &spaceQuota.Routes, &spaceQuota.Services)
+	setZeroDefaultsForQuotaCreation(&spaceQuota.Apps, &spaceQuota.Routes, &spaceQuota.Services)
 	convertUnlimitedToNil(&spaceQuota.Apps, &spaceQuota.Routes, &spaceQuota.Services)
 
 	_, warnings, err := actor.CloudControllerClient.CreateSpaceQuota(spaceQuota)

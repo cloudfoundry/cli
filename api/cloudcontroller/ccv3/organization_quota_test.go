@@ -14,11 +14,15 @@ import (
 )
 
 var _ = Describe("Organization Quotas", func() {
-	var client *Client
-	var executeErr error
-	var warnings Warnings
-	var orgQuotas []OrganizationQuota
-	var query Query
+	var (
+		client     *Client
+		executeErr error
+		warnings   Warnings
+		orgQuotas  []OrganizationQuota
+		query      Query
+		trueValue  = true
+		falseValue = false
+	)
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
@@ -148,34 +152,34 @@ var _ = Describe("Organization Quotas", func() {
 						GUID: "quota-guid",
 						Name: "don-quixote",
 						Apps: AppLimit{
-							TotalMemory:       types.NullInt{Value: 5120, IsSet: true},
-							InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
-							TotalAppInstances: types.NullInt{Value: 10, IsSet: true},
+							TotalMemory:       &types.NullInt{Value: 5120, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
 						},
 						Services: ServiceLimit{
-							TotalServiceInstances: types.NullInt{Value: 10, IsSet: true},
-							PaidServicePlans:      true,
+							TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
+							PaidServicePlans:      &trueValue,
 						},
 						Routes: RouteLimit{
-							TotalRoutes:        types.NullInt{Value: 8, IsSet: true},
-							TotalReservedPorts: types.NullInt{Value: 4, IsSet: true},
+							TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 						},
 					},
 					OrganizationQuota{
 						GUID: "quota-2-guid",
 						Name: "sancho-panza",
 						Apps: AppLimit{
-							TotalMemory:       types.NullInt{Value: 10240, IsSet: true},
-							InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
-							TotalAppInstances: types.NullInt{Value: 8, IsSet: true},
+							TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 						},
 						Services: ServiceLimit{
-							TotalServiceInstances: types.NullInt{Value: 8, IsSet: true},
-							PaidServicePlans:      false,
+							TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
+							PaidServicePlans:      &falseValue,
 						},
 						Routes: RouteLimit{
-							TotalRoutes:        types.NullInt{Value: 10, IsSet: true},
-							TotalReservedPorts: types.NullInt{Value: 5, IsSet: true},
+							TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 						},
 					},
 				))
@@ -245,17 +249,17 @@ var _ = Describe("Organization Quotas", func() {
 						GUID: "quota-2-guid",
 						Name: "sancho-panza",
 						Apps: AppLimit{
-							TotalMemory:       types.NullInt{Value: 10240, IsSet: true},
-							InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
-							TotalAppInstances: types.NullInt{Value: 8, IsSet: true},
+							TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 						},
 						Services: ServiceLimit{
-							TotalServiceInstances: types.NullInt{Value: 8, IsSet: true},
-							PaidServicePlans:      false,
+							TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
+							PaidServicePlans:      &falseValue,
 						},
 						Routes: RouteLimit{
-							TotalRoutes:        types.NullInt{Value: 10, IsSet: true},
-							TotalReservedPorts: types.NullInt{Value: 5, IsSet: true},
+							TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 						},
 					},
 				))
@@ -319,17 +323,17 @@ var _ = Describe("Organization Quotas", func() {
 			inputQuota = OrganizationQuota{
 				Name: "elephant-trunk",
 				Apps: AppLimit{
-					TotalMemory:       types.NullInt{Value: 2048, IsSet: true},
-					InstanceMemory:    types.NullInt{Value: 1024, IsSet: true},
-					TotalAppInstances: types.NullInt{Value: 0, IsSet: false},
+					TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+					InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+					TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 				},
 				Services: ServiceLimit{
-					TotalServiceInstances: types.NullInt{Value: 0, IsSet: true},
-					PaidServicePlans:      true,
+					TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+					PaidServicePlans:      &trueValue,
 				},
 				Routes: RouteLimit{
-					TotalRoutes:        types.NullInt{Value: 6, IsSet: true},
-					TotalReservedPorts: types.NullInt{Value: 5, IsSet: true},
+					TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+					TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 				},
 			}
 		})
@@ -454,6 +458,159 @@ var _ = Describe("Organization Quotas", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/organization_quotas"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10002,
+							Detail: "Fail",
+							Title:  "CF-SomeError",
+						},
+						{
+							Code:   10001,
+							Detail: "Something went terribly wrong",
+							Title:  "CF-UnknownError",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("UpdateOrganizationQuota", func() {
+		var (
+			updatedOrgQuota OrganizationQuota
+			warnings        Warnings
+			executeErr      error
+			inputQuota      OrganizationQuota
+		)
+
+		BeforeEach(func() {
+			inputQuota = OrganizationQuota{
+				GUID: "elephant-trunk-guid",
+				Name: "elephant-trunk",
+				Apps: AppLimit{
+					TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+					InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+					TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+				},
+				Services: ServiceLimit{
+					TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+					PaidServicePlans:      &trueValue,
+				},
+			}
+		})
+
+		JustBeforeEach(func() {
+			updatedOrgQuota, warnings, executeErr = client.UpdateOrganizationQuota(inputQuota)
+		})
+
+		When("updating the quota succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+					 "guid": "elephant-trunk-guid",
+					 "created_at": "2020-01-16T19:44:47Z",
+					 "updated_at": "2020-01-16T19:44:47Z",
+					 "name": "elephant-trunk",
+					 "apps": {
+						"total_memory_in_mb": 2048,
+						"per_process_memory_in_mb": 1024,
+						"total_instances": null,
+						"per_app_tasks": null
+					 },
+					 "services": {
+						"paid_services_allowed": true,
+						"total_service_instances": 0,
+						"total_service_keys": null
+					 },
+					 "routes": {
+						"total_routes": null,
+						"total_reserved_ports": null
+					 },
+					 "domains": {
+						"total_domains": null
+					 },
+					 "links": {
+						"self": {
+						   "href": "https://api.foil-venom.lite.cli.fun/v3/organization_quotas/08357710-8106-4d14-b0ea-03154a36fb79"
+						}
+					 }
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "elephant-trunk",
+					"apps": map[string]interface{}{
+						"total_memory_in_mb":       2048,
+						"per_process_memory_in_mb": 1024,
+						"total_instances":          nil,
+					},
+					"services": map[string]interface{}{
+						"paid_services_allowed":   true,
+						"total_service_instances": 0,
+					},
+					"routes": map[string]interface{}{},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/organization_quotas/elephant-trunk-guid"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated org quota", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(updatedOrgQuota).To(Equal(OrganizationQuota{
+					GUID: "elephant-trunk-guid",
+					Name: "elephant-trunk",
+					Apps: AppLimit{
+						TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
+						InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
+						TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
+					},
+					Services: ServiceLimit{
+						TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
+						PaidServicePlans:      &trueValue,
+					},
+					Routes: RouteLimit{
+						TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
+						TotalReservedPorts: &types.NullInt{IsSet: false, Value: 0},
+					},
+				}))
+			})
+		})
+
+		When("updating the quota fails", func() {
+			BeforeEach(func() {
+				response := `{
+					 "errors": [
+							{
+								 "detail": "Fail",
+								 "title": "CF-SomeError",
+								 "code": 10002
+							},
+							{
+								 "detail": "Something went terribly wrong",
+								 "title": "CF-UnknownError",
+								 "code": 10001
+							}
+					 ]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/organization_quotas/elephant-trunk-guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
