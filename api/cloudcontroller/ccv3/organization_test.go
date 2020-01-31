@@ -239,7 +239,14 @@ var _ = Describe("Organizations", func() {
 			BeforeEach(func() {
 				response := `{
 					"name": "some-org-name",
-					"guid": "some-org-guid"
+					"guid": "some-org-guid",
+					"relationships": {
+						"quota": {
+							"data": {
+								"guid": "some-org-quota-guid"
+							}
+						}
+					}
 				}`
 
 				server.AppendHandlers(
@@ -252,7 +259,11 @@ var _ = Describe("Organizations", func() {
 
 			It("returns the queried organization and all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(organization).To(Equal(Organization{Name: "some-org-name", GUID: "some-org-guid"}))
+				Expect(organization).To(Equal(Organization{
+					Name:      "some-org-name",
+					GUID:      "some-org-guid",
+					QuotaGUID: "some-org-quota-guid",
+				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})

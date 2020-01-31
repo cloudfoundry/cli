@@ -1005,6 +1005,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetOrganizationQuotaStub        func(string) (ccv3.OrganizationQuota, ccv3.Warnings, error)
+	getOrganizationQuotaMutex       sync.RWMutex
+	getOrganizationQuotaArgsForCall []struct {
+		arg1 string
+	}
+	getOrganizationQuotaReturns struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getOrganizationQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetOrganizationQuotasStub        func(...ccv3.Query) ([]ccv3.OrganizationQuota, ccv3.Warnings, error)
 	getOrganizationQuotasMutex       sync.RWMutex
 	getOrganizationQuotasArgsForCall []struct {
@@ -6202,6 +6217,72 @@ func (fake *FakeCloudControllerClient) GetOrganizationDomainsReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetOrganizationQuota(arg1 string) (ccv3.OrganizationQuota, ccv3.Warnings, error) {
+	fake.getOrganizationQuotaMutex.Lock()
+	ret, specificReturn := fake.getOrganizationQuotaReturnsOnCall[len(fake.getOrganizationQuotaArgsForCall)]
+	fake.getOrganizationQuotaArgsForCall = append(fake.getOrganizationQuotaArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationQuota", []interface{}{arg1})
+	fake.getOrganizationQuotaMutex.Unlock()
+	if fake.GetOrganizationQuotaStub != nil {
+		return fake.GetOrganizationQuotaStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getOrganizationQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaCallCount() int {
+	fake.getOrganizationQuotaMutex.RLock()
+	defer fake.getOrganizationQuotaMutex.RUnlock()
+	return len(fake.getOrganizationQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaCalls(stub func(string) (ccv3.OrganizationQuota, ccv3.Warnings, error)) {
+	fake.getOrganizationQuotaMutex.Lock()
+	defer fake.getOrganizationQuotaMutex.Unlock()
+	fake.GetOrganizationQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaArgsForCall(i int) string {
+	fake.getOrganizationQuotaMutex.RLock()
+	defer fake.getOrganizationQuotaMutex.RUnlock()
+	argsForCall := fake.getOrganizationQuotaArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturns(result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+	fake.getOrganizationQuotaMutex.Lock()
+	defer fake.getOrganizationQuotaMutex.Unlock()
+	fake.GetOrganizationQuotaStub = nil
+	fake.getOrganizationQuotaReturns = struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturnsOnCall(i int, result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+	fake.getOrganizationQuotaMutex.Lock()
+	defer fake.getOrganizationQuotaMutex.Unlock()
+	fake.GetOrganizationQuotaStub = nil
+	if fake.getOrganizationQuotaReturnsOnCall == nil {
+		fake.getOrganizationQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.OrganizationQuota
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.OrganizationQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetOrganizationQuotas(arg1 ...ccv3.Query) ([]ccv3.OrganizationQuota, ccv3.Warnings, error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotasReturnsOnCall[len(fake.getOrganizationQuotasArgsForCall)]
@@ -9878,6 +9959,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getOrganizationDefaultIsolationSegmentMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
+	fake.getOrganizationQuotaMutex.RLock()
+	defer fake.getOrganizationQuotaMutex.RUnlock()
 	fake.getOrganizationQuotasMutex.RLock()
 	defer fake.getOrganizationQuotasMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()

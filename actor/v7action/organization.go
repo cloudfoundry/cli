@@ -6,15 +6,7 @@ import (
 )
 
 // Organization represents a V7 actor organization.
-type Organization struct {
-	// GUID is the unique organization identifier.
-	GUID string
-	// Name is the name of the organization.
-	Name string
-
-	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata
-}
+type Organization ccv3.Organization
 
 func (actor Actor) GetOrganizations(labelSelector string) ([]Organization, Warnings, error) {
 	queries := []ccv3.Query{
@@ -30,7 +22,7 @@ func (actor Actor) GetOrganizations(labelSelector string) ([]Organization, Warni
 
 	orgs := make([]Organization, len(ccOrgs))
 	for i, ccOrg := range ccOrgs {
-		orgs[i] = actor.convertCCToActorOrganization(ccOrg)
+		orgs[i] = Organization(ccOrg)
 	}
 
 	return orgs, Warnings(warnings), nil
@@ -43,7 +35,7 @@ func (actor Actor) GetOrganizationByGUID(orgGUID string) (Organization, Warnings
 		return Organization{}, Warnings(warnings), err
 	}
 
-	return actor.convertCCToActorOrganization(ccOrg), Warnings(warnings), err
+	return Organization(ccOrg), Warnings(warnings), err
 }
 
 // GetOrganizationByName returns the organization with the given name.
@@ -59,7 +51,7 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 		return Organization{}, Warnings(warnings), actionerror.OrganizationNotFoundError{Name: name}
 	}
 
-	return actor.convertCCToActorOrganization(orgs[0]), Warnings(warnings), nil
+	return Organization(orgs[0]), Warnings(warnings), nil
 }
 
 // CreateOrganization creates a new organization with the given name
@@ -69,7 +61,7 @@ func (actor Actor) CreateOrganization(orgName string) (Organization, Warnings, e
 	organization, apiWarnings, err := actor.CloudControllerClient.CreateOrganization(orgName)
 	allWarnings = append(allWarnings, apiWarnings...)
 
-	return actor.convertCCToActorOrganization(organization), allWarnings, err
+	return Organization(organization), allWarnings, err
 }
 
 // updateOrganization updates the name and/or labels of an organization
@@ -77,7 +69,7 @@ func (actor Actor) updateOrganization(org Organization) (Organization, Warnings,
 	ccOrg := ccv3.Organization{
 		GUID:     org.GUID,
 		Name:     org.Name,
-		Metadata: (*ccv3.Metadata)(org.Metadata),
+		Metadata: org.Metadata,
 	}
 
 	updatedOrg, warnings, err := actor.CloudControllerClient.UpdateOrganization(ccOrg)
@@ -85,7 +77,7 @@ func (actor Actor) updateOrganization(org Organization) (Organization, Warnings,
 		return Organization{}, Warnings(warnings), err
 	}
 
-	return actor.convertCCToActorOrganization(updatedOrg), Warnings(warnings), nil
+	return Organization(updatedOrg), Warnings(warnings), nil
 }
 
 func (actor Actor) RenameOrganization(oldOrgName, newOrgName string) (Organization, Warnings, error) {
@@ -125,14 +117,6 @@ func (actor Actor) DeleteOrganization(name string) (Warnings, error) {
 	allWarnings = append(allWarnings, Warnings(ccWarnings)...)
 
 	return allWarnings, err
-}
-
-func (actor Actor) convertCCToActorOrganization(org ccv3.Organization) Organization {
-	return Organization{
-		GUID:     org.GUID,
-		Name:     org.Name,
-		Metadata: (*Metadata)(org.Metadata),
-	}
 }
 
 func (actor Actor) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {

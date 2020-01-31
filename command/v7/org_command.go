@@ -97,6 +97,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), orgSummary.Name},
 		{cmd.UI.TranslateText("domains:"), strings.Join(orgSummary.DomainNames, ", ")},
+		{cmd.UI.TranslateText("quota:"), orgSummary.QuotaName},
 		{cmd.UI.TranslateText("spaces:"), strings.Join(orgSummary.SpaceNames, ", ")},
 	}
 

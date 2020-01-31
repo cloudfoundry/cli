@@ -5,6 +5,7 @@ import "sort"
 type OrganizationSummary struct {
 	Organization
 	DomainNames []string
+	QuotaName   string
 	SpaceNames  []string
 
 	// DefaultIsolationSegmentGUID is the unique identifier of the isolation
@@ -23,6 +24,12 @@ func (actor Actor) GetOrganizationSummaryByName(orgName string) (OrganizationSum
 
 	domains, warnings, err := actor.GetOrganizationDomains(org.GUID, "")
 	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return OrganizationSummary{}, allWarnings, err
+	}
+
+	quota, ccv3Warnings, err := actor.CloudControllerClient.GetOrganizationQuota(org.QuotaGUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {
 		return OrganizationSummary{}, allWarnings, err
 	}
@@ -55,6 +62,7 @@ func (actor Actor) GetOrganizationSummaryByName(orgName string) (OrganizationSum
 	organizationSummary := OrganizationSummary{
 		Organization:                org,
 		DomainNames:                 domainNames,
+		QuotaName:                   quota.Name,
 		SpaceNames:                  spaceNames,
 		DefaultIsolationSegmentGUID: isoSegGUID,
 	}

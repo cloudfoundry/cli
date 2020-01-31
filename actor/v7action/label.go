@@ -17,7 +17,7 @@ func (actor *Actor) GetDomainLabels(domainName string) (map[string]types.NullStr
 
 func (actor *Actor) GetOrganizationLabels(orgName string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetOrganizationByName(orgName)
-	return actor.extractLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
 func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {

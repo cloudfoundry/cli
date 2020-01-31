@@ -92,7 +92,7 @@ var _ = Describe("org command", func() {
 					helpers.CreateSpace(spaceName2)
 				})
 
-				It("displays a table with org domains, spaces, space and isolation segments, and exits 0", func() {
+				It("displays a table with org domains, applied quota, spaces, space and isolation segments, and exits 0", func() {
 					session := helpers.CF("org", orgName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say(`Getting info for org %s as %s\.\.\.`, orgName, userName))
@@ -102,6 +102,8 @@ var _ = Describe("org command", func() {
 					domainsSorted := []string{helpers.DefaultSharedDomain(), domainName}
 					sort.Strings(domainsSorted)
 					Eventually(session).Should(Say("domains:.+%s,.+%s", domainsSorted[0], domainsSorted[1]))
+
+					Eventually(session).Should(Say(`quota:\s+default`))
 
 					spacesSorted := []string{spaceName, spaceName2}
 					sort.Strings(spacesSorted)
@@ -132,6 +134,24 @@ var _ = Describe("org command", func() {
 						session := helpers.CF("org", orgName)
 
 						Eventually(session).Should(Say(`isolation segments:\s+.*%s \(default\),.* %s`, isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
+					})
+				})
+
+				When("a custom quota is applied", func() {
+					var quotaName string
+
+					BeforeEach(func() {
+						quotaName = helpers.NewOrgQuotaName()
+						Eventually(helpers.CF("create-org-quota", quotaName)).Should(Exit(0))
+
+						// TODO use set-org-quota here when it's done in V7
+						Eventually(helpers.CF("set-quota", orgName, quotaName)).Should(Exit(0))
+					})
+
+					It("displays isolation segment information in the org table", func() {
+						session := helpers.CF("org", orgName)
+
+						Eventually(session).Should(Say(`quota:\s+%s`, quotaName))
 					})
 				})
 			})

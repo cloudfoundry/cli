@@ -396,7 +396,7 @@ var _ = Describe("Server", func() {
 		Describe("GetOrg", func() {
 			var (
 				labels   map[string]types.NullString
-				metadata v7action.Metadata
+				metadata ccv3.Metadata
 				org      v7action.Organization
 				spaces   []v7action.Space
 				domains  []v7action.Domain
@@ -408,7 +408,7 @@ var _ = Describe("Server", func() {
 					"k2": types.NewNullString("v2"),
 				}
 
-				metadata = v7action.Metadata{
+				metadata = ccv3.Metadata{
 					Labels: labels,
 				}
 

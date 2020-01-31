@@ -37,8 +37,9 @@ var _ = Describe("Organization Summary Actions", func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv3.Organization{
 						{
-							GUID: "some-org-guid",
-							Name: "some-org",
+							GUID:      "some-org-guid",
+							Name:      "some-org",
+							QuotaGUID: "org-quota-guid",
 						},
 					},
 					ccv3.Warnings{"get-org-warning-1", "get-org-warning-2"},
@@ -57,6 +58,10 @@ var _ = Describe("Organization Summary Actions", func() {
 					},
 					ccv3.Warnings{"domain-warning-1", "domain-warning-2"},
 					nil)
+
+				fakeCloudControllerClient.GetOrganizationQuotaReturns(
+					ccv3.OrganizationQuota{Name: "my-quota", GUID: "quota-guid"},
+					ccv3.Warnings{"get-quota-warning-1"}, nil)
 
 				fakeCloudControllerClient.GetSpacesReturns(
 					[]ccv3.Space{
@@ -83,19 +88,27 @@ var _ = Describe("Organization Summary Actions", func() {
 			It("returns the organization summary and all warnings", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)[0].Values).To(ConsistOf("some-org"))
+
 				Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
 				orgGuid, labelSelector := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
 				Expect(orgGuid).To(Equal("some-org-guid"))
 				Expect(labelSelector).To(Equal([]ccv3.Query{}))
+
+				Expect(fakeCloudControllerClient.GetOrganizationQuotaCallCount()).To(Equal(1))
+				givenQuotaGUID := fakeCloudControllerClient.GetOrganizationQuotaArgsForCall(0)
+				Expect(givenQuotaGUID).To(Equal("org-quota-guid"))
+
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)[0].Values).To(ConsistOf("some-org-guid"))
 
 				Expect(orgSummary).To(Equal(OrganizationSummary{
 					Organization: Organization{
-						Name: "some-org",
-						GUID: "some-org-guid",
+						Name:      "some-org",
+						GUID:      "some-org-guid",
+						QuotaGUID: "org-quota-guid",
 					},
 					DomainNames:                 []string{"shared-domain-1", "shared-domain-2"},
+					QuotaName:                   "my-quota",
 					SpaceNames:                  []string{"space-1", "space-2"},
 					DefaultIsolationSegmentGUID: "default-iso-seg-guid",
 				}))
@@ -104,6 +117,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					"get-org-warning-2",
 					"domain-warning-1",
 					"domain-warning-2",
+					"get-quota-warning-1",
 					"space-warning-1",
 					"space-warning-2",
 					"iso-seg-warning-1",
@@ -155,6 +169,18 @@ var _ = Describe("Organization Summary Actions", func() {
 				It("returns that error and all warnings", func() {
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("get-org-warning-1", "get-org-warning-2", "domains warning"))
+				})
+			})
+
+			When("an error is encountered getting the organization quota", func() {
+				BeforeEach(func() {
+					expectedErr = errors.New("quota error")
+					fakeCloudControllerClient.GetOrganizationQuotaReturns(ccv3.OrganizationQuota{}, ccv3.Warnings{"Quota warning"}, expectedErr)
+				})
+
+				It("returns that error and all warnings", func() {
+					Expect(err).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("get-org-warning-1", "get-org-warning-2", "Quota warning"))
 				})
 			})
 

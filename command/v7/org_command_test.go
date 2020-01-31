@@ -149,6 +149,7 @@ var _ = Describe("org Command", func() {
 							"c-shared.com",
 							"d-private.com",
 						},
+						QuotaName: "some-quota",
 						SpaceNames: []string{
 							"space1",
 							"space2",
@@ -176,7 +177,7 @@ var _ = Describe("org Command", func() {
 							nil)
 					})
 
-					It("displays warnings and a table with org domains, spaces and isolation segments", func() {
+					It("displays warnings and a table with org domains, quota, spaces and isolation segments", func() {
 						Expect(executeErr).To(BeNil())
 
 						Expect(testUI.Out).To(Say(`Getting info for org %s as some-user\.\.\.`, cmd.RequiredArgs.Organization))
@@ -187,6 +188,7 @@ var _ = Describe("org Command", func() {
 
 						Expect(testUI.Out).To(Say(`name:\s+%s`, cmd.RequiredArgs.Organization))
 						Expect(testUI.Out).To(Say(`domains:\s+a-shared.com, b-private.com, c-shared.com, d-private.com`))
+						Expect(testUI.Out).To(Say(`quota:\s+some-quota`))
 						Expect(testUI.Out).To(Say(`spaces:\s+space1, space2`))
 						Expect(testUI.Out).To(Say(`isolation segments:\s+isolation-segment-1 \(default\), isolation-segment-2`))
 
