@@ -638,7 +638,7 @@ var _ = Describe("set-label command", func() {
 			})
 		})
 
-		When("assigning label to service-offering", func() {
+		XWhen("assigning label to service-offering", func() {
 			var (
 				broker              *fakeservicebroker.FakeServiceBroker
 				serviceOfferingName string
@@ -661,7 +661,7 @@ var _ = Describe("set-label command", func() {
 				testExpectedBehaviors("service-offering", "Service offering", serviceOfferingName)
 			})
 
-			It("sets the specified labels", func() {
+			XIt("sets the specified labels", func() {
 				session := helpers.CF("set-label", "service-offering", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s as %s...`), serviceOfferingName, username))
 				Eventually(session).Should(Say("OK"))
@@ -684,7 +684,7 @@ var _ = Describe("set-label command", func() {
 				})
 			})
 
-			When("the service broker name is specified as part of the command", func() {
+			XWhen("the service broker name is specified as part of the command", func() {
 				It("sets the specified labels", func() {
 					session := helpers.CF("set-label", "-b", broker.Name(), "service-offering", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
 					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s from service broker %s as %s...`), serviceOfferingName, broker.Name(), username))

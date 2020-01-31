@@ -390,7 +390,7 @@ var _ = Describe("unset-label command", func() {
 			})
 		})
 
-		When("unsetting labels from a service-offering", func() {
+		XWhen("unsetting labels from a service-offering", func() {
 			var (
 				broker              *fakeservicebroker.FakeServiceBroker
 				serviceOfferingName string
