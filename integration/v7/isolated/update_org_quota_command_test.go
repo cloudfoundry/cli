@@ -31,7 +31,6 @@ var _ = Describe("update-org-quota command", func() {
 				Eventually(session).Should(Say("org, org-quota"))
 				Eventually(session).Should(Exit(0))
 			})
-
 		})
 	})
 
@@ -82,7 +81,6 @@ var _ = Describe("update-org-quota command", func() {
 			Eventually(session).Should(Say(`paid service plans:\s+%s`, "disallowed"))
 			Eventually(session).Should(Say(`app instances:\s+%s`, appInstances))
 			Eventually(session).Should(Say(`route ports:\s+%s`, reservedRoutePorts))
-			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 		})
 
