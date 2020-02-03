@@ -155,7 +155,7 @@ type commandList struct {
 	SetLabel                           v7.SetLabelCommand                           `command:"set-label" description:"Set a label (key-value pairs) for an API resource"`
 	SetOrgDefaultIsolationSegment      v6.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set the default isolation segment used for apps in spaces in an org"`
 	SetOrgRole                         v7.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
-	SetQuota                           v6.SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`
+	SetOrgQuota                        v7.SetOrgQuotaCommand                        `command:"set-org-quota" description:"Assign a quota to an org"`
 	SetRunningEnvironmentVariableGroup v7.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
 	SetSpaceIsolationSegment           v6.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
 	SetSpaceQuota                      v6.SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a space quota definition to a space"`

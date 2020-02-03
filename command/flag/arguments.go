@@ -213,8 +213,8 @@ type RenameSpaceArgs struct {
 }
 
 type SetOrgQuotaArgs struct {
-	Organization string `positional-arg-name:"ORG" required:"true" description:"The organization"`
-	Quota        string `positional-arg-name:"QUOTA" required:"true" description:"The quota"`
+	Organization      string `positional-arg-name:"ORG" required:"true" description:"The organization"`
+	OrganizationQuota string `positional-arg-name:"QUOTA" required:"true" description:"The quota"`
 }
 
 type SetSpaceQuotaArgs struct {
