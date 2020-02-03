@@ -18,6 +18,21 @@ type QuotaLimits struct {
 	TotalReservedPorts    *types.NullInt
 }
 
+func (actor Actor) ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	quota, warnings, err := actor.GetOrganizationQuotaByName(quotaName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	_, ccWarnings, err := actor.CloudControllerClient.ApplyOrganizationQuota(quota.GUID, orgGUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+
+	return allWarnings, err
+}
+
 // CreateOrganization creates a new organization with the given name
 func (actor Actor) CreateOrganizationQuota(name string, limits QuotaLimits) (Warnings, error) {
 	orgQuota := createQuotaStruct(name, limits)

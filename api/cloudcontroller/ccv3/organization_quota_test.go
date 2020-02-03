@@ -761,4 +761,86 @@ var _ = Describe("Organization Quotas", func() {
 			})
 		})
 	})
+
+	Describe("ApplyOrganizationQuota", func() {
+		var (
+			warnings             Warnings
+			executeErr           error
+			AppliedOrgQuotaGUIDS RelationshipList
+			quotaGuid            = "quotaGuid"
+			orgGuid              = "orgGuid"
+		)
+
+		JustBeforeEach(func() {
+			AppliedOrgQuotaGUIDS, warnings, executeErr = client.ApplyOrganizationQuota(quotaGuid, orgGuid)
+		})
+
+		When("the organization quota is applied successfully", func() {
+			BeforeEach(func() {
+				response := `{
+					"data": [
+						{
+							"guid": "orgGuid"
+						}
+					]
+				}`
+
+				expectedBody := map[string][]map[string]string{
+					"data": {{"guid": "orgGuid"}},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, fmt.Sprintf("/v3/organization_quotas/%s/relationships/organizations", quotaGuid)),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created org", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(AppliedOrgQuotaGUIDS).To(Equal(RelationshipList{GUIDs: []string{orgGuid}}))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, fmt.Sprintf("/v3/organization_quotas/%s/relationships/organizations", quotaGuid)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+	})
 })

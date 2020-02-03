@@ -122,3 +122,36 @@ func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 
 	return responseOrgQuota, response.Warnings, nil
 }
+
+func (client *Client) ApplyOrganizationQuota(quotaGuid,  orgGuid string) (RelationshipList, Warnings, error) {
+
+	orgs := RelationshipList{
+		[]string{orgGuid},
+	}
+
+	orgBytes, err := json.Marshal(orgs)
+
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostOrganizationQuotaApplyRequest,
+		URIParams:   internal.Params{"quota_guid": quotaGuid},
+		Body:        bytes.NewReader(orgBytes),
+	})
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	var responseOrgs RelationshipList
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseOrgs,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return RelationshipList{}, response.Warnings, err
+	}
+
+	return responseOrgs, response.Warnings, err
+}

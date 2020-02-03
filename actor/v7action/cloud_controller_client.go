@@ -11,6 +11,7 @@ import (
 
 // CloudControllerClient is the interface to the cloud controller V3 API.
 type CloudControllerClient interface {
+	ApplyOrganizationQuota(quotaGUID string, orgGUID string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	AppSSHEndpoint() string
 	AppSSHHostKeyFingerprint() string
 	CheckRoute(domainGUID string, hostname string, path string) (bool, ccv3.Warnings, error)
