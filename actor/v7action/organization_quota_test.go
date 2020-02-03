@@ -24,6 +24,99 @@ var _ = Describe("Organization Quota Actions", func() {
 		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
 	})
 
+	Describe("ApplyOrganizationQuotaByName", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+			quotaName  = "org-quota-name"
+			orgGUID    = "org-guid"
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.ApplyOrganizationQuotaByName(quotaName, orgGUID)
+		})
+
+		When("when the org quota could not be found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+				Expect(executeErr).To(MatchError(actionerror.OrganizationQuotaNotFoundForNameError{Name: quotaName}))
+			})
+		})
+
+		When("when applying the quota returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{
+						{GUID: "some-quota-guid"},
+					},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.ApplyOrganizationQuotaReturns(
+					ccv3.RelationshipList{},
+					ccv3.Warnings{"apply-quota-warning"},
+					errors.New("apply-quota-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.ApplyOrganizationQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning", "apply-quota-warning"))
+				Expect(executeErr).To(MatchError("apply-quota-error"))
+			})
+		})
+
+		When("Quota is successfully applied to the org", func() {
+			var quotaGUID = "some-quota-guid"
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{
+						{GUID: quotaGUID},
+					},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.ApplyOrganizationQuotaReturns(
+					ccv3.RelationshipList{
+						GUIDs: []string{orgGUID},
+					},
+					ccv3.Warnings{"apply-quota-warning"},
+					nil,
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
+				passedQuotaQuery := fakeCloudControllerClient.GetOrganizationQuotasArgsForCall(0)
+				Expect(passedQuotaQuery).To(Equal([]ccv3.Query{
+					{
+						Key:    "names",
+						Values: []string{quotaName},
+					},
+				}))
+				Expect(fakeCloudControllerClient.ApplyOrganizationQuotaCallCount()).To(Equal(1))
+				passedQuotaGUID, passedOrgGUID := fakeCloudControllerClient.ApplyOrganizationQuotaArgsForCall(0)
+				Expect(passedQuotaGUID).To(Equal(quotaGUID))
+				Expect(passedOrgGUID).To(Equal(orgGUID))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning", "apply-quota-warning"))
+				Expect(executeErr).To(BeNil())
+			})
+		})
+	})
+
 	Describe("GetOrganizationQuotas", func() {
 		var (
 			quotas     []OrganizationQuota
@@ -129,7 +222,7 @@ var _ = Describe("Organization Quota Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
 					[]ccv3.OrganizationQuota{
-						ccv3.OrganizationQuota{
+						{
 							GUID: "quota-guid",
 							Name: quotaName,
 						},

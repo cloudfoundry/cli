@@ -31,6 +31,22 @@ type FakeCloudControllerClient struct {
 	appSSHHostKeyFingerprintReturnsOnCall map[int]struct {
 		result1 string
 	}
+	ApplyOrganizationQuotaStub        func(string, string) (ccv3.RelationshipList, ccv3.Warnings, error)
+	applyOrganizationQuotaMutex       sync.RWMutex
+	applyOrganizationQuotaArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	applyOrganizationQuotaReturns struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}
+	applyOrganizationQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CancelDeploymentStub        func(string) (ccv3.Warnings, error)
 	cancelDeploymentMutex       sync.RWMutex
 	cancelDeploymentArgsForCall []struct {
@@ -1942,6 +1958,73 @@ func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturnsOnCall(i i
 	fake.appSSHHostKeyFingerprintReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) ApplyOrganizationQuota(arg1 string, arg2 string) (ccv3.RelationshipList, ccv3.Warnings, error) {
+	fake.applyOrganizationQuotaMutex.Lock()
+	ret, specificReturn := fake.applyOrganizationQuotaReturnsOnCall[len(fake.applyOrganizationQuotaArgsForCall)]
+	fake.applyOrganizationQuotaArgsForCall = append(fake.applyOrganizationQuotaArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ApplyOrganizationQuota", []interface{}{arg1, arg2})
+	fake.applyOrganizationQuotaMutex.Unlock()
+	if fake.ApplyOrganizationQuotaStub != nil {
+		return fake.ApplyOrganizationQuotaStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.applyOrganizationQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) ApplyOrganizationQuotaCallCount() int {
+	fake.applyOrganizationQuotaMutex.RLock()
+	defer fake.applyOrganizationQuotaMutex.RUnlock()
+	return len(fake.applyOrganizationQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) ApplyOrganizationQuotaCalls(stub func(string, string) (ccv3.RelationshipList, ccv3.Warnings, error)) {
+	fake.applyOrganizationQuotaMutex.Lock()
+	defer fake.applyOrganizationQuotaMutex.Unlock()
+	fake.ApplyOrganizationQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) ApplyOrganizationQuotaArgsForCall(i int) (string, string) {
+	fake.applyOrganizationQuotaMutex.RLock()
+	defer fake.applyOrganizationQuotaMutex.RUnlock()
+	argsForCall := fake.applyOrganizationQuotaArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) ApplyOrganizationQuotaReturns(result1 ccv3.RelationshipList, result2 ccv3.Warnings, result3 error) {
+	fake.applyOrganizationQuotaMutex.Lock()
+	defer fake.applyOrganizationQuotaMutex.Unlock()
+	fake.ApplyOrganizationQuotaStub = nil
+	fake.applyOrganizationQuotaReturns = struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) ApplyOrganizationQuotaReturnsOnCall(i int, result1 ccv3.RelationshipList, result2 ccv3.Warnings, result3 error) {
+	fake.applyOrganizationQuotaMutex.Lock()
+	defer fake.applyOrganizationQuotaMutex.Unlock()
+	fake.ApplyOrganizationQuotaStub = nil
+	if fake.applyOrganizationQuotaReturnsOnCall == nil {
+		fake.applyOrganizationQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.RelationshipList
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.applyOrganizationQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) CancelDeployment(arg1 string) (ccv3.Warnings, error) {
@@ -9829,6 +9912,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.appSSHEndpointMutex.RUnlock()
 	fake.appSSHHostKeyFingerprintMutex.RLock()
 	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
+	fake.applyOrganizationQuotaMutex.RLock()
+	defer fake.applyOrganizationQuotaMutex.RUnlock()
 	fake.cancelDeploymentMutex.RLock()
 	defer fake.cancelDeploymentMutex.RUnlock()
 	fake.checkRouteMutex.RLock()

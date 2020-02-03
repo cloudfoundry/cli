@@ -48,7 +48,7 @@ func GetCFConfig() (*Config, error) {
 }
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
-// config.json does not exists, it will use a default config in it's place.
+// config.json does not exists, it will use a default config in its place.
 // Takes in an optional FlagOverride, will only use the first one passed, that
 // can override the given flag values.
 //
