@@ -16,12 +16,14 @@ import (
 type CreateOrgActor interface {
 	CreateOrganization(orgName string) (v7action.Organization, v7action.Warnings, error)
 	CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
+	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 }
 
 type CreateOrgCommand struct {
 	RequiredArgs    flag.Organization `positional-args:"yes"`
+	Quota           string            `short:"q" long:"quota" description:"Quota to assign to the newly created org"`
 	usage           interface{}       `usage:"CF_NAME create-org ORG"`
-	relatedCommands interface{}       `related_commands:"create-space, orgs, quotas, set-org-role"`
+	relatedCommands interface{}       `related_commands:"create-space, orgs, org-quotas, set-org-role"`
 
 	UI          command.UI
 	Config      command.Config
@@ -74,6 +76,21 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 		return err
 	}
 	cmd.UI.DisplayOK()
+
+	if cmd.Quota != "" {
+		cmd.UI.DisplayTextWithFlavor("Setting org quota {{.Quota}} to org {{.Organization}} as {{.User}}...",
+			map[string]interface{}{
+				"Quota":        cmd.Quota,
+				"Organization": orgName,
+				"User":         user.Name,
+			})
+		warnings, err = cmd.Actor.ApplyOrganizationQuotaByName(cmd.Quota, org.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+		cmd.UI.DisplayOK()
+	}
 
 	cmd.UI.DisplayTextWithFlavor("Assigning role OrgManager to user {{.User}} in org {{.Organization}} as {{.User}}...",
 		map[string]interface{}{
