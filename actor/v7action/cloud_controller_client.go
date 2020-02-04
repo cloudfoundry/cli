@@ -41,6 +41,7 @@ type CloudControllerClient interface {
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
 	DeleteIsolationSegmentOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
 	DeleteOrganization(orgGUID string) (ccv3.JobURL, ccv3.Warnings, error)
+	DeleteOrganizationQuota(quotaGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteOrphanedRoutes(spaceGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteRole(roleGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv3.JobURL, ccv3.Warnings, error)

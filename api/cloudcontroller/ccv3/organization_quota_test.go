@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/types"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -601,6 +600,81 @@ var _ = Describe("Organization Quotas", func() {
 							Code:   10001,
 							Detail: "Something went terribly wrong",
 							Title:  "CF-UnknownError",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("DeleteOrganizationQuota", func() {
+		var (
+			jobURL       JobURL
+			orgQuotaGUID = "quota_guid"
+		)
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteOrganizationQuota(orgQuotaGUID)
+		})
+
+		When("the cloud controller returns without errors", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, fmt.Sprintf("/v3/organization_quotas/%s", orgQuotaGUID)),
+						RespondWith(http.StatusAccepted, nil, http.Header{
+							"X-Cf-Warnings": {"delete warning"},
+							"Location":      {"/v3/jobs/some-job"},
+						}),
+					),
+				)
+			})
+
+			It("returns org quotas and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("delete warning"))
+				Expect(jobURL).To(Equal(JobURL("/v3/jobs/some-job")))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Quota not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, fmt.Sprintf("/v3/organization_quotas/%s", orgQuotaGUID)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Quota not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))
