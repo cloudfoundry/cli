@@ -25,39 +25,39 @@ func NewQuotaDisplayer(ui command.UI) QuotaDisplayer {
 	return QuotaDisplayer{ui: ui}
 }
 
-func (displayer QuotaDisplayer) DisplayQuotasTable(orgQuotas []v7action.OrganizationQuota) {
+func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []v7action.Quota) {
 	var keyValueTable = [][]string{
 		{"name", "total memory", "instance memory", "routes", "service instances", "paid service plans", "app instances", "route ports"},
 	}
 
-	for _, orgQuota := range orgQuotas {
+	for _, quota := range quotas {
 		keyValueTable = append(keyValueTable, []string{
-			orgQuota.Name,
-			displayer.presentQuotaMemoryValue(*orgQuota.Apps.TotalMemory),
-			displayer.presentQuotaMemoryValue(*orgQuota.Apps.InstanceMemory),
-			displayer.presentQuotaValue(*orgQuota.Routes.TotalRoutes),
-			displayer.presentQuotaValue(*orgQuota.Services.TotalServiceInstances),
-			displayer.presentBooleanValue(*orgQuota.Services.PaidServicePlans),
-			displayer.presentQuotaValue(*orgQuota.Apps.TotalAppInstances),
-			displayer.presentQuotaValue(*orgQuota.Routes.TotalReservedPorts),
+			quota.Name,
+			displayer.presentQuotaMemoryValue(*quota.Apps.TotalMemory),
+			displayer.presentQuotaMemoryValue(*quota.Apps.InstanceMemory),
+			displayer.presentQuotaValue(*quota.Routes.TotalRoutes),
+			displayer.presentQuotaValue(*quota.Services.TotalServiceInstances),
+			displayer.presentBooleanValue(*quota.Services.PaidServicePlans),
+			displayer.presentQuotaValue(*quota.Apps.TotalAppInstances),
+			displayer.presentQuotaValue(*quota.Routes.TotalReservedPorts),
 		})
 	}
 
 	displayer.ui.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 }
 
-func (displayer QuotaDisplayer) DisplaySingleQuota(orgQuota v7action.OrganizationQuota) {
-	orgQuotaTable := [][]string{
-		{displayer.ui.TranslateText("total memory:"), displayer.presentQuotaMemoryValue(*orgQuota.Apps.TotalMemory)},
-		{displayer.ui.TranslateText("instance memory:"), displayer.presentQuotaMemoryValue(*orgQuota.Apps.InstanceMemory)},
-		{displayer.ui.TranslateText("routes:"), displayer.presentQuotaValue(*orgQuota.Routes.TotalRoutes)},
-		{displayer.ui.TranslateText("service instances:"), displayer.presentQuotaValue(*orgQuota.Services.TotalServiceInstances)},
-		{displayer.ui.TranslateText("paid service plans:"), displayer.presentBooleanValue(*orgQuota.Services.PaidServicePlans)},
-		{displayer.ui.TranslateText("app instances:"), displayer.presentQuotaValue(*orgQuota.Apps.TotalAppInstances)},
-		{displayer.ui.TranslateText("route ports:"), displayer.presentQuotaValue(*orgQuota.Routes.TotalReservedPorts)},
+func (displayer QuotaDisplayer) DisplaySingleQuota(quota v7action.Quota) {
+	quotaTable := [][]string{
+		{displayer.ui.TranslateText("total memory:"), displayer.presentQuotaMemoryValue(*quota.Apps.TotalMemory)},
+		{displayer.ui.TranslateText("instance memory:"), displayer.presentQuotaMemoryValue(*quota.Apps.InstanceMemory)},
+		{displayer.ui.TranslateText("routes:"), displayer.presentQuotaValue(*quota.Routes.TotalRoutes)},
+		{displayer.ui.TranslateText("service instances:"), displayer.presentQuotaValue(*quota.Services.TotalServiceInstances)},
+		{displayer.ui.TranslateText("paid service plans:"), displayer.presentBooleanValue(*quota.Services.PaidServicePlans)},
+		{displayer.ui.TranslateText("app instances:"), displayer.presentQuotaValue(*quota.Apps.TotalAppInstances)},
+		{displayer.ui.TranslateText("route ports:"), displayer.presentQuotaValue(*quota.Routes.TotalReservedPorts)},
 	}
 
-	displayer.ui.DisplayKeyValueTable("", orgQuotaTable, 3)
+	displayer.ui.DisplayKeyValueTable("", quotaTable, 3)
 }
 
 func (displayer QuotaDisplayer) presentBooleanValue(limit bool) string {

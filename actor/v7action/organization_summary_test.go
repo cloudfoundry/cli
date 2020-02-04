@@ -60,7 +60,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationQuotaReturns(
-					ccv3.OrganizationQuota{Name: "my-quota", GUID: "quota-guid"},
+					ccv3.OrganizationQuota{Quota: ccv3.Quota{Name: "my-quota", GUID: "quota-guid"}},
 					ccv3.Warnings{"get-quota-warning-1"}, nil)
 
 				fakeCloudControllerClient.GetSpacesReturns(

@@ -55,10 +55,15 @@ func (cmd OrgQuotasCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	quotas, warnings, err := cmd.Actor.GetOrganizationQuotas()
+	orgQuotas, warnings, err := cmd.Actor.GetOrganizationQuotas()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
+	}
+
+	var quotas []v7action.Quota
+	for _, orgQuota := range orgQuotas {
+		quotas = append(quotas, v7action.Quota(orgQuota.Quota))
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)

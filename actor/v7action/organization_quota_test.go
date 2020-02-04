@@ -57,7 +57,7 @@ var _ = Describe("Organization Quota Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
 					[]ccv3.OrganizationQuota{
-						{GUID: "some-quota-guid"},
+						{Quota: ccv3.Quota{GUID: "some-quota-guid"}},
 					},
 					ccv3.Warnings{"some-quota-warning"},
 					nil,
@@ -83,7 +83,7 @@ var _ = Describe("Organization Quota Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
 					[]ccv3.OrganizationQuota{
-						{GUID: quotaGUID},
+						{Quota: ccv3.Quota{GUID: quotaGUID}},
 					},
 					ccv3.Warnings{"some-quota-warning"},
 					nil,
@@ -133,12 +133,16 @@ var _ = Describe("Organization Quota Actions", func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
 					[]ccv3.OrganizationQuota{
 						{
-							GUID: "quota-guid",
-							Name: "kiwi",
+							Quota: ccv3.Quota{
+								GUID: "quota-guid",
+								Name: "kiwi",
+							},
 						},
 						{
-							GUID: "quota-2-guid",
-							Name: "strawberry",
+							Quota: ccv3.Quota{
+								GUID: "quota-2-guid",
+								Name: "strawberry",
+							},
 						},
 					},
 					ccv3.Warnings{"some-quota-warning"},
@@ -153,12 +157,16 @@ var _ = Describe("Organization Quota Actions", func() {
 
 				Expect(quotas).To(ConsistOf(
 					OrganizationQuota{
-						GUID: "quota-guid",
-						Name: "kiwi",
+						Quota: ccv3.Quota{
+							GUID: "quota-guid",
+							Name: "kiwi",
+						},
 					},
 					OrganizationQuota{
-						GUID: "quota-2-guid",
-						Name: "strawberry",
+						Quota: ccv3.Quota{
+							GUID: "quota-2-guid",
+							Name: "strawberry",
+						},
 					},
 				))
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
@@ -223,8 +231,10 @@ var _ = Describe("Organization Quota Actions", func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
 					[]ccv3.OrganizationQuota{
 						{
-							GUID: "quota-guid",
-							Name: quotaName,
+							Quota: ccv3.Quota{
+								GUID: "quota-guid",
+								Name: quotaName,
+							},
 						},
 					},
 					ccv3.Warnings{"some-quota-warning"},
@@ -242,7 +252,12 @@ var _ = Describe("Organization Quota Actions", func() {
 				))
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
-				Expect(quota).To(Equal(OrganizationQuota{GUID: "quota-guid", Name: quotaName}))
+				Expect(quota).To(Equal(OrganizationQuota{
+					Quota: ccv3.Quota{
+						GUID: "quota-guid",
+						Name: quotaName,
+					},
+				}))
 			})
 		})
 	})
@@ -298,19 +313,21 @@ var _ = Describe("Organization Quota Actions", func() {
 				quotaLimits = QuotaLimits{}
 
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: quotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       &types.NullInt{Value: 0, IsSet: true},
-						InstanceMemory:    nil,
-						TotalAppInstances: nil,
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      nil,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        &types.NullInt{Value: 0, IsSet: true},
-						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: true},
+					Quota: ccv3.Quota{
+						Name: quotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 0, IsSet: true},
+							InstanceMemory:    nil,
+							TotalAppInstances: nil,
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+							PaidServicePlans:      nil,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 0, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: true},
+						},
 					},
 				}
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
@@ -346,19 +363,21 @@ var _ = Describe("Organization Quota Actions", func() {
 					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
 				}
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: quotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
-						InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
-						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
-						PaidServicePlans:      &falseValue,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
-						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
+					Quota: ccv3.Quota{
+						Name: quotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+							PaidServicePlans:      &falseValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
+						},
 					},
 				}
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
@@ -384,19 +403,21 @@ var _ = Describe("Organization Quota Actions", func() {
 			)
 			BeforeEach(func() {
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: quotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
-						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
-						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      &trueValue,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
-						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+					Quota: ccv3.Quota{
+						Name: quotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+							PaidServicePlans:      &trueValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+						},
 					},
 				}
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
@@ -440,7 +461,7 @@ var _ = Describe("Organization Quota Actions", func() {
 			}
 
 			fakeCloudControllerClient.GetOrganizationQuotasReturns(
-				[]ccv3.OrganizationQuota{{Name: oldQuotaName}},
+				[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: oldQuotaName}}},
 				ccv3.Warnings{"get-quotas-warning"},
 				nil,
 			)
@@ -476,19 +497,21 @@ var _ = Describe("Organization Quota Actions", func() {
 				quotaLimits = QuotaLimits{}
 
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: oldQuotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       nil,
-						InstanceMemory:    nil,
-						TotalAppInstances: nil,
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: nil,
-						PaidServicePlans:      nil,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        nil,
-						TotalReservedPorts: nil,
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       nil,
+							InstanceMemory:    nil,
+							TotalAppInstances: nil,
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: nil,
+							PaidServicePlans:      nil,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        nil,
+							TotalReservedPorts: nil,
+						},
 					},
 				}
 
@@ -529,19 +552,21 @@ var _ = Describe("Organization Quota Actions", func() {
 					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
 				}
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: oldQuotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
-						InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
-						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
-						PaidServicePlans:      &falseValue,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
-						TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+							PaidServicePlans:      &falseValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
+						},
 					},
 				}
 				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
@@ -572,19 +597,21 @@ var _ = Describe("Organization Quota Actions", func() {
 
 			BeforeEach(func() {
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: oldQuotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
-						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
-						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      &trueValue,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
-						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+							PaidServicePlans:      &trueValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+						},
 					},
 				}
 
@@ -618,19 +645,21 @@ var _ = Describe("Organization Quota Actions", func() {
 				newQuotaName = ""
 
 				ccv3Quota = ccv3.OrganizationQuota{
-					Name: oldQuotaName,
-					Apps: ccv3.AppLimit{
-						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
-						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
-						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
-					},
-					Services: ccv3.ServiceLimit{
-						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
-						PaidServicePlans:      &trueValue,
-					},
-					Routes: ccv3.RouteLimit{
-						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
-						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+							PaidServicePlans:      &trueValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+						},
 					},
 				}
 

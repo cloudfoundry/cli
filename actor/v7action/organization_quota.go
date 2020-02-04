@@ -6,6 +6,8 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
+type Quota ccv3.Quota
+
 type OrganizationQuota ccv3.OrganizationQuota
 
 type QuotaLimits struct {
@@ -116,10 +118,12 @@ func createQuotaStruct(name string, limits QuotaLimits) ccv3.OrganizationQuota {
 	}
 
 	quota := ccv3.OrganizationQuota{
-		Name:     name,
-		Apps:     AppLimit,
-		Services: ServiceLimit,
-		Routes:   RouteLimit,
+		Quota: ccv3.Quota{
+			Name:     name,
+			Apps:     AppLimit,
+			Services: ServiceLimit,
+			Routes:   RouteLimit,
+		},
 	}
 
 	return quota

@@ -11,16 +11,7 @@ import (
 
 // OrganizationQuota represents a Cloud Controller organization quota.
 type OrganizationQuota struct {
-	// GUID is the unique ID of the organization quota.
-	GUID string `json:"guid,omitempty"`
-	// Name is the name of the organization quota
-	Name string `json:"name"`
-	// Apps contain the various limits that are associated with applications
-	Apps AppLimit `json:"apps"`
-	// Services contain the various limits that are associated with services
-	Services ServiceLimit `json:"services"`
-	// Routes contain the various limits that are associated with routes
-	Routes RouteLimit `json:"routes"`
+	Quota
 }
 
 func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (RelationshipList, Warnings, error) {
