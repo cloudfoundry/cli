@@ -36,14 +36,14 @@ var _ = Describe("plugin API", func() {
 		Describe("stdout output", func() {
 			It("outputs the result of the command to stdout", func() {
 				confirmTestPluginOutputWithArg("CliCommand", "target", "api endpoint",
-					"@@ plugin api response")
+					"@@ plugin CliCommand response")
 			})
 		})
 
 		Describe("returned value from CliCommand", func() {
 			It("gets a slice of lines", func() {
 				confirmTestPluginOutputWithArg("CliCommand", "target",
-					"@@ plugin api response", "0: api endpoint", "1: api version")
+					"@@ plugin CliCommand response", "0: api endpoint", "1: api version")
 			})
 
 			It("does not see an empty line at the end", func() {

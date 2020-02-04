@@ -9,7 +9,7 @@ import (
 )
 
 type FakeCommandParser struct {
-	ParseCommandFromArgsStub        func(*ui.UI, []string) int
+	ParseCommandFromArgsStub        func(*ui.UI, []string) (int, error)
 	parseCommandFromArgsMutex       sync.RWMutex
 	parseCommandFromArgsArgsForCall []struct {
 		arg1 *ui.UI
@@ -17,15 +17,17 @@ type FakeCommandParser struct {
 	}
 	parseCommandFromArgsReturns struct {
 		result1 int
+		result2 error
 	}
 	parseCommandFromArgsReturnsOnCall map[int]struct {
 		result1 int
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCommandParser) ParseCommandFromArgs(arg1 *ui.UI, arg2 []string) int {
+func (fake *FakeCommandParser) ParseCommandFromArgs(arg1 *ui.UI, arg2 []string) (int, error) {
 	var arg2Copy []string
 	if arg2 != nil {
 		arg2Copy = make([]string, len(arg2))
@@ -43,10 +45,10 @@ func (fake *FakeCommandParser) ParseCommandFromArgs(arg1 *ui.UI, arg2 []string) 
 		return fake.ParseCommandFromArgsStub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.parseCommandFromArgsReturns
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeCommandParser) ParseCommandFromArgsCallCount() int {
@@ -55,7 +57,7 @@ func (fake *FakeCommandParser) ParseCommandFromArgsCallCount() int {
 	return len(fake.parseCommandFromArgsArgsForCall)
 }
 
-func (fake *FakeCommandParser) ParseCommandFromArgsCalls(stub func(*ui.UI, []string) int) {
+func (fake *FakeCommandParser) ParseCommandFromArgsCalls(stub func(*ui.UI, []string) (int, error)) {
 	fake.parseCommandFromArgsMutex.Lock()
 	defer fake.parseCommandFromArgsMutex.Unlock()
 	fake.ParseCommandFromArgsStub = stub
@@ -68,27 +70,30 @@ func (fake *FakeCommandParser) ParseCommandFromArgsArgsForCall(i int) (*ui.UI, [
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeCommandParser) ParseCommandFromArgsReturns(result1 int) {
+func (fake *FakeCommandParser) ParseCommandFromArgsReturns(result1 int, result2 error) {
 	fake.parseCommandFromArgsMutex.Lock()
 	defer fake.parseCommandFromArgsMutex.Unlock()
 	fake.ParseCommandFromArgsStub = nil
 	fake.parseCommandFromArgsReturns = struct {
 		result1 int
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeCommandParser) ParseCommandFromArgsReturnsOnCall(i int, result1 int) {
+func (fake *FakeCommandParser) ParseCommandFromArgsReturnsOnCall(i int, result1 int, result2 error) {
 	fake.parseCommandFromArgsMutex.Lock()
 	defer fake.parseCommandFromArgsMutex.Unlock()
 	fake.ParseCommandFromArgsStub = nil
 	if fake.parseCommandFromArgsReturnsOnCall == nil {
 		fake.parseCommandFromArgsReturnsOnCall = make(map[int]struct {
 			result1 int
+			result2 error
 		})
 	}
 	fake.parseCommandFromArgsReturnsOnCall[i] = struct {
 		result1 int
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCommandParser) Invocations() map[string][][]interface{} {

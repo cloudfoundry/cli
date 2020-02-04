@@ -33,18 +33,22 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)
 	}
-	exitCode = p.ParseCommandFromArgs(commandUI, os.Args[1:])
-	if exitCode == command_parser.UnknownCommandCode {
+	exitCode, err = p.ParseCommandFromArgs(commandUI, os.Args[1:])
+	if err == nil {
+		os.Exit(exitCode)
+	}
+	if _, ok := err.(command_parser.UnknownCommandError); ok {
 		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
-
-		if commandIsPlugin == true {
-			exitCode = plugin_util.RunPlugin(plugin)
+		if commandIsPlugin {
+			err = plugin_util.RunPlugin(plugin)
+			if err != nil {
+				exitCode = 1
+			}
 		} else {
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
+			//NOT REACHED, legacy main will exit the process
 		}
 	}
 
-	if exitCode != 0 {
-		os.Exit(exitCode)
-	}
+	os.Exit(exitCode)
 }

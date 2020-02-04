@@ -15,7 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
 	plugin_models "code.cloudfoundry.org/cli/plugin/v7/models"
-	"code.cloudfoundry.org/cli/util/command_parser"
 	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
@@ -78,13 +77,13 @@ func (cmd *CliRpcCmd) CliCommand(args []string, retVal *[]string) error {
 		return err
 	}
 
-	exitCode := p.ParseCommandFromArgs(commandUI, args)
-	if exitCode == command_parser.UnknownCommandCode {
-		return errors.New("UnknownCommandCode")
-	} else if exitCode > 0 {
-		return errors.New("Some other error")
+	exitCode, err := p.ParseCommandFromArgs(commandUI, args)
+	if err != nil {
+		return err
 	}
-
+	if exitCode != 0 {
+		return errors.New("An error occurred while executing a command")
+	}
 	*retVal = strings.Split(strings.TrimSuffix(outBuffer.String(), "\n"), "\n")
 
 	return nil

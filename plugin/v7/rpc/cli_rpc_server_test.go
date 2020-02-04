@@ -189,9 +189,9 @@ var _ = Describe("Server", func() {
 
 		Describe("CliCommand", func() {
 			BeforeEach(func() {
-				fakeCommandParser.ParseCommandFromArgsStub = func(ui *ui.UI, args []string) int {
+				fakeCommandParser.ParseCommandFromArgsStub = func(ui *ui.UI, args []string) (int, error) {
 					ui.DisplayText("some-cf-command output")
-					return 0
+					return 0, nil
 				}
 			})
 
@@ -203,6 +203,18 @@ var _ = Describe("Server", func() {
 				_, args := fakeCommandParser.ParseCommandFromArgsArgsForCall(0)
 				Expect(args).To(Equal([]string{"some-cf-command"}))
 				Expect(result).To(Equal([]string{"some-cf-command output"}))
+			})
+
+			When("the command errors", func() {
+				BeforeEach(func() {
+					fakeCommandParser.ParseCommandFromArgsReturns(3, nil)
+				})
+				It("returns an error", func() {
+					var result []string
+					err := client.Call("CliRpcCmd.CliCommand", []string{"some-cf-command"}, &result)
+					Expect(err).To(MatchError("An error occurred while executing a command"))
+					Expect(result).To(BeEmpty())
+				})
 			})
 		})
 

@@ -5,7 +5,6 @@ package rpc
 import (
 	"code.cloudfoundry.org/cli/command"
 	plugin "code.cloudfoundry.org/cli/plugin/v7"
-	"code.cloudfoundry.org/cli/util/ui"
 
 	"fmt"
 	"net"
@@ -16,12 +15,6 @@ import (
 
 	"sync"
 )
-
-//go:generate counterfeiter . CommandParser
-
-type CommandParser interface {
-	ParseCommandFromArgs(ui *ui.UI, args []string) int
-}
 
 type CliRpcService struct {
 	listener net.Listener

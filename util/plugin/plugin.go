@@ -48,19 +48,18 @@ func IsPluginCommand(osArgs []string) (configv3.Plugin, bool) {
 	return configv3.Plugin{}, false
 }
 
-func RunPlugin(plugin configv3.Plugin) int {
+func RunPlugin(plugin configv3.Plugin) error {
 	_, commandUI, err := getCFConfigAndCommandUIObjects()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
-		return 1
+		return err
 	}
 	defer commandUI.FlushDeferred()
 	pluginErr := plugin_transition.RunPlugin(plugin, commandUI)
 	if pluginErr != nil {
-		handleError(pluginErr, commandUI) //nolint: errcheck
-		return 1
+		return handleError(pluginErr, commandUI)
 	}
-	return 0
+	return nil
 }
 
 func getCFConfigAndCommandUIObjects() (*configv3.Config, *ui.UI, error) {
