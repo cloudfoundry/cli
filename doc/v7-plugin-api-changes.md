@@ -18,11 +18,16 @@ Plugins that inspect the output of `CliCommand` will need to be updated. We
 recommend that if you are writing a plugin you try to depend as little as
 possible on this output as it is subject to change.
 
+#### Error handling
+
 One significant change between older command implementations and the current
-implementations is that many newer commands now use `stderr` to report warnings
+versions is that many newer commands now use `stderr` to report warnings
 or failures.
 
 We have not yet extended the plugin API to expose output on `stderr`.
+
+When an error occurred the V6 CLI plugin API would return specific errors.
+Currently the new plugin API only returns a generic error for all error cases.
 
 ### GetApp
 Model changes
@@ -506,9 +511,3 @@ AccessToken
 ApiEndpoint
 IsLoggedIn
 
-
-## Other changes
-When the CLI is not targeted at an API in V6, plugin methods will just return null objects with an error attatched, in V7 the plugin command will error in the CLI code without executing any of the plugin specific code. This will display the error in stderr like other CLI commands do.
-
-
-Not logged in errors? (TODO)
