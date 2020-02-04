@@ -18,7 +18,7 @@ type OrgQuotaActor interface {
 type OrgQuotaCommand struct {
 	RequiredArgs    flag.OrganizationQuota `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME quota QUOTA"`
-	relatedCommands interface{}            `related_commands:"org, quotas"`
+	relatedCommands interface{}            `related_commands:"org, org-quotas"`
 
 	UI          command.UI
 	Config      command.Config

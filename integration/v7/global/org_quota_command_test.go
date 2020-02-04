@@ -26,7 +26,7 @@ var _ = Describe("org-quota command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf quota QUOTA"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("org, quotas"))
+				Eventually(session).Should(Say("org, org-quotas"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
