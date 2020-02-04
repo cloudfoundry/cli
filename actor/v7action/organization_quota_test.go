@@ -117,6 +117,124 @@ var _ = Describe("Organization Quota Actions", func() {
 		})
 	})
 
+	Describe("DeleteOrganizationQuota", func() {
+		var (
+			quotaName  string
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			quotaName = "quota-name"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DeleteOrganizationQuota(quotaName)
+		})
+
+		When("all API calls succeed", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{{Name: quotaName, GUID: "quota-guid"}},
+					ccv3.Warnings{"get-quotas-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteOrganizationQuotaReturns(
+					"some-job-url",
+					ccv3.Warnings{"delete-quota-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"poll-job-warning"},
+					nil,
+				)
+			})
+
+			It("returns warnings but no error", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetOrganizationQuotasArgsForCall(0)
+				Expect(query).To(Equal([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{quotaName}},
+				}))
+
+				Expect(fakeCloudControllerClient.DeleteOrganizationQuotaCallCount()).To(Equal(1))
+				givenQuotaGUID := fakeCloudControllerClient.DeleteOrganizationQuotaArgsForCall(0)
+				Expect(givenQuotaGUID).To(Equal("quota-guid"))
+
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				givenJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+				Expect(givenJobURL).To(Equal(ccv3.JobURL("some-job-url")))
+
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "delete-quota-warning", "poll-job-warning"))
+			})
+		})
+
+		When("getting the quota by name fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{{Name: quotaName, GUID: "quota-guid"}},
+					ccv3.Warnings{"get-quotas-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteOrganizationQuotaReturns(
+					"some-job-url",
+					ccv3.Warnings{"delete-quota-warning"},
+					errors.New("delete-quota-error"),
+				)
+			})
+
+			It("returns error and warnings", func() {
+				Expect(executeErr).To(MatchError("delete-quota-error"))
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "delete-quota-warning"))
+			})
+		})
+
+		When("issuing the delete-quota request fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
+					ccv3.Warnings{"get-quotas-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteOrganizationQuotaReturns(
+					"some-job-url",
+					ccv3.Warnings{"delete-quota-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"poll-job-warning"},
+					errors.New("poll-job-error"),
+				)
+			})
+
+			It("returns error and warnings", func() {
+				Expect(executeErr).To(MatchError("poll-job-error"))
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "delete-quota-warning", "poll-job-warning"))
+			})
+		})
+
+		When("the delete job fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationQuotasReturns(
+					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
+					ccv3.Warnings{"get-quotas-warning"},
+					errors.New("get-quotas-error"),
+				)
+			})
+
+			It("returns error and warnings", func() {
+				Expect(executeErr).To(MatchError("get-quotas-error"))
+				Expect(warnings).To(ConsistOf("get-quotas-warning"))
+			})
+		})
+	})
+
 	Describe("GetOrganizationQuotas", func() {
 		var (
 			quotas     []OrganizationQuota

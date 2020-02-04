@@ -71,6 +71,24 @@ func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 	return responseOrgQuota, response.Warnings, nil
 }
 
+func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteOrganizationQuotaRequest,
+		URIParams:   internal.Params{"quota_guid": quotaGUID},
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return "", response.Warnings, err
+	}
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, nil
+}
+
 func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotaRequest,

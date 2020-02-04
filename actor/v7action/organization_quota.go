@@ -46,6 +46,27 @@ func (actor Actor) CreateOrganizationQuota(name string, limits QuotaLimits) (War
 	return Warnings(apiWarnings), err
 }
 
+func (actor Actor) DeleteOrganizationQuota(quotaName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	quota, warnings, err := actor.GetOrganizationQuotaByName(quotaName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobURL, ccWarnings, err := actor.CloudControllerClient.DeleteOrganizationQuota(quota.GUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	ccWarnings, err = actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, ccWarnings...)
+
+	return allWarnings, err
+}
+
 func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error) {
 	ccv3OrgQuotas, warnings, err := actor.CloudControllerClient.GetOrganizationQuotas()
 	if err != nil {
