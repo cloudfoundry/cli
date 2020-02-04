@@ -9,24 +9,24 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . OrgQuotaActor
+//go:generate counterfeiter . SpaceQuotaActor
 
-type OrgQuotaActor interface {
-	GetOrganizationQuotaByName(orgQuotaName string) (v7action.OrganizationQuota, v7action.Warnings, error)
+type SpaceQuotaActor interface {
+	GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (v7action.SpaceQuota, v7action.Warnings, error)
 }
 
-type OrgQuotaCommand struct {
-	RequiredArgs    flag.OrganizationQuota `positional-args:"yes"`
-	usage           interface{}            `usage:"CF_NAME quota QUOTA"`
-	relatedCommands interface{}            `related_commands:"org, org-quotas"`
+type SpaceQuotaCommand struct {
+	RequiredArgs    flag.SpaceQuota `positional-args:"yes"`
+	usage           interface{}     `usage:"CF_NAME space-quota QUOTA"`
+	relatedCommands interface{}     `related_commands:"space, space-quotas"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       OrgQuotaActor
+	Actor       SpaceQuotaActor
 }
 
-func (cmd *OrgQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *SpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
 	sharedActor := sharedaction.NewActor(config)
@@ -41,8 +41,8 @@ func (cmd *OrgQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd OrgQuotaCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(false, false)
+func (cmd SpaceQuotaCommand) Execute(args []string) error {
+	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
 	}
@@ -52,24 +52,24 @@ func (cmd OrgQuotaCommand) Execute(args []string) error {
 		return err
 	}
 
-	quotaName := cmd.RequiredArgs.OrganizationQuotaName
+	quotaName := cmd.RequiredArgs.SpaceQuota
 
 	cmd.UI.DisplayTextWithFlavor(
-		"Getting org quota {{.QuotaName}} as {{.Username}}...",
+		"Getting space quota {{.QuotaName}} as {{.Username}}...",
 		map[string]interface{}{
 			"QuotaName": quotaName,
 			"Username":  user.Name,
 		})
 	cmd.UI.DisplayNewline()
 
-	orgQuota, warnings, err := cmd.Actor.GetOrganizationQuotaByName(quotaName)
+	spaceQuota, warnings, err := cmd.Actor.GetSpaceQuotaByName(quotaName, cmd.Config.TargetedOrganization().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
-	quotaDisplayer.DisplaySingleQuota(v7action.Quota(orgQuota.Quota))
+	quotaDisplayer.DisplaySingleQuota(v7action.Quota(spaceQuota.Quota))
 
 	return nil
 }

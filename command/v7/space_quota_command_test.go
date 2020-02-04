@@ -15,13 +15,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("Org Quota Command", func() {
+var _ = Describe("Space Quota Command", func() {
 	var (
-		cmd             OrgQuotaCommand
+		cmd             SpaceQuotaCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeOrgQuotaActor
+		fakeActor       *v7fakes.FakeSpaceQuotaActor
 		executeErr      error
 	)
 
@@ -29,16 +29,16 @@ var _ = Describe("Org Quota Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeOrgQuotaActor)
+		fakeActor = new(v7fakes.FakeSpaceQuotaActor)
 
-		cmd = OrgQuotaCommand{
+		cmd = SpaceQuotaCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 		}
 
-		cmd.RequiredArgs.OrganizationQuotaName = "some-org-quota"
+		cmd.RequiredArgs.SpaceQuota = "some-space-quota"
 	})
 
 	JustBeforeEach(func() {
@@ -56,12 +56,12 @@ var _ = Describe("Org Quota Command", func() {
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(targetedOrganizationRequired).To(Equal(false))
+			Expect(targetedOrganizationRequired).To(Equal(true))
 			Expect(targetedSpaceRequired).To(Equal(false))
 		})
 	})
 
-	When("getting the org quota fails", func() {
+	When("getting the space quota fails", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(
 				configv3.User{
@@ -69,36 +69,32 @@ var _ = Describe("Org Quota Command", func() {
 				},
 				nil)
 
-			fakeActor.GetOrganizationQuotaByNameReturns(
-				v7action.OrganizationQuota{},
+			fakeActor.GetSpaceQuotaByNameReturns(
+				v7action.SpaceQuota{},
 				v7action.Warnings{"warning-1", "warning-2"},
-				actionerror.OrganizationQuotaNotFoundError{})
+				actionerror.SpaceQuotaNotFoundError{})
 		})
 
 		It("returns a translatable error and outputs all warnings", func() {
+			Expect(testUI.Out).To(Say("Getting space quota some-space-quota as some-user..."))
 
-			Expect(testUI.Out).To(Say("Getting org quota some-org-quota as some-user..."))
-
-			Expect(executeErr).To(MatchError(actionerror.OrganizationQuotaNotFoundError{}))
-			Expect(fakeActor.GetOrganizationQuotaByNameCallCount()).To(Equal(1))
+			Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundError{}))
+			Expect(fakeActor.GetSpaceQuotaByNameCallCount()).To(Equal(1))
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
 		})
 	})
 
-	When("getting the org quota succeeds", func() {
+	When("getting the space quota succeeds", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(
-				configv3.User{
-					Name: "some-user",
-				},
-				nil)
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid"})
 
 			falseValue := false
-			fakeActor.GetOrganizationQuotaByNameReturns(
-				v7action.OrganizationQuota{
+			fakeActor.GetSpaceQuotaByNameReturns(
+				v7action.SpaceQuota{
 					Quota: ccv3.Quota{
-						Name: "some-org-quota",
+						Name: "some-space-quota",
 						Apps: ccv3.AppLimit{
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
@@ -120,12 +116,13 @@ var _ = Describe("Org Quota Command", func() {
 
 		It("displays the quota and all warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(fakeActor.GetOrganizationQuotaByNameCallCount()).To(Equal(1))
-			Expect(fakeActor.GetOrganizationQuotaByNameCallCount()).To(Equal(1))
-			orgQuotaName := fakeActor.GetOrganizationQuotaByNameArgsForCall(0)
-			Expect(orgQuotaName).To(Equal("some-org-quota"))
+			Expect(fakeActor.GetSpaceQuotaByNameCallCount()).To(Equal(1))
+			Expect(fakeActor.GetSpaceQuotaByNameCallCount()).To(Equal(1))
+			quotaName, orgGUID := fakeActor.GetSpaceQuotaByNameArgsForCall(0)
+			Expect(quotaName).To(Equal("some-space-quota"))
+			Expect(orgGUID).To(Equal("some-org-guid"))
 
-			Expect(testUI.Out).To(Say("Getting org quota some-org-quota as some-user..."))
+			Expect(testUI.Out).To(Say("Getting space quota some-space-quota as some-user..."))
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
 

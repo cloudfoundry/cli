@@ -164,7 +164,7 @@ type commandList struct {
 	SharePrivateDomain                 v7.SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with a specific org"`
 	ShareService                       v6.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
 	Space                              v7.SpaceCommand                              `command:"space" description:"Show space info"`
-	SpaceQuota                         v6.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
+	SpaceQuota                         v7.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
 	SpaceQuotas                        v6.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space resource quotas"`
 	SpaceSSHAllowed                    v6.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
 	SpaceUsers                         v7.SpaceUsersCommand                         `command:"space-users" description:"Show space users by role"`

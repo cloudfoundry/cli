@@ -5,20 +5,12 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
 type SpaceQuota struct {
-	// GUID is the unique ID of the space quota.
-	GUID string
-	// Name is the name of the space quota
-	Name string
-	// Apps contain the various limits that are associated with applications
-	Apps AppLimit
-	// Services contain the various limits that are associated with services
-	Services ServiceLimit
-	// Routes contain the various limits that are associated with routes
-	Routes RouteLimit
+	Quota
 	// OrgGUID is the unique ID of the owning organization
 	OrgGUID string
 	// SpaceGUIDs are the list of unique ID's of the associated spaces
@@ -26,22 +18,23 @@ type SpaceQuota struct {
 }
 
 func (sq SpaceQuota) MarshalJSON() ([]byte, error) {
-	appsStruct := map[string]interface{}{
+	appLimits := map[string]interface{}{
 		"total_memory_in_mb":       sq.Apps.TotalMemory,
 		"per_process_memory_in_mb": sq.Apps.InstanceMemory,
 		"total_instances":          sq.Apps.TotalAppInstances,
 	}
 
-	servicesSruct := map[string]interface{}{
+	serviceLimits := map[string]interface{}{
 		"paid_services_allowed":   sq.Services.PaidServicePlans,
 		"total_service_instances": sq.Services.TotalServiceInstances,
 	}
-	routesStruct := map[string]interface{}{
+
+	routeLimits := map[string]interface{}{
 		"total_routes":         sq.Routes.TotalRoutes,
 		"total_reserved_ports": sq.Routes.TotalReservedPorts,
 	}
 
-	relationshipsStruct := map[string]interface{}{
+	relationships := map[string]interface{}{
 		"organization": map[string]interface{}{
 			"data": map[string]interface{}{
 				"guid": sq.OrgGUID,
@@ -57,25 +50,25 @@ func (sq SpaceQuota) MarshalJSON() ([]byte, error) {
 			}
 		}
 
-		relationshipsStruct["spaces"] = map[string]interface{}{
+		relationships["spaces"] = map[string]interface{}{
 			"data": spaceData,
 		}
 	}
 
 	jsonMap := map[string]interface{}{
 		"name":          sq.Name,
-		"apps":          appsStruct,
-		"services":      servicesSruct,
-		"routes":        routesStruct,
-		"relationships": relationshipsStruct,
+		"apps":          appLimits,
+		"services":      serviceLimits,
+		"routes":        routeLimits,
+		"relationships": relationships,
 	}
 
 	return json.Marshal(jsonMap)
 }
 
 func (sq *SpaceQuota) UnmarshalJSON(data []byte) error {
-	type spaceQuotaWithoutCustomUnmarshal SpaceQuota
-	var defaultUnmarshalledSpaceQuota spaceQuotaWithoutCustomUnmarshal
+	type alias SpaceQuota
+	var defaultUnmarshalledSpaceQuota alias
 	err := json.Unmarshal(data, &defaultUnmarshalledSpaceQuota)
 	if err != nil {
 		return err
@@ -140,4 +133,29 @@ func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnin
 	}
 
 	return createdSpaceQuota, response.Warnings, err
+}
+
+func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSpaceQuotasRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var spaceQuotasList []SpaceQuota
+	warnings, err := client.paginate(request, SpaceQuota{}, func(item interface{}) error {
+		if spaceQuota, ok := item.(SpaceQuota); ok {
+			spaceQuotasList = append(spaceQuotasList, spaceQuota)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   SpaceQuota{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return spaceQuotasList, warnings, err
 }
