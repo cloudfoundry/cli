@@ -10,6 +10,20 @@ import (
 )
 
 type FakeCreateOrgActor struct {
+	ApplyOrganizationQuotaByNameStub        func(string, string) (v7action.Warnings, error)
+	applyOrganizationQuotaByNameMutex       sync.RWMutex
+	applyOrganizationQuotaByNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	applyOrganizationQuotaByNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	applyOrganizationQuotaByNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	CreateOrgRoleStub        func(constant.RoleType, string, string, string, bool) (v7action.Warnings, error)
 	createOrgRoleMutex       sync.RWMutex
 	createOrgRoleArgsForCall []struct {
@@ -44,6 +58,70 @@ type FakeCreateOrgActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCreateOrgActor) ApplyOrganizationQuotaByName(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.applyOrganizationQuotaByNameMutex.Lock()
+	ret, specificReturn := fake.applyOrganizationQuotaByNameReturnsOnCall[len(fake.applyOrganizationQuotaByNameArgsForCall)]
+	fake.applyOrganizationQuotaByNameArgsForCall = append(fake.applyOrganizationQuotaByNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ApplyOrganizationQuotaByName", []interface{}{arg1, arg2})
+	fake.applyOrganizationQuotaByNameMutex.Unlock()
+	if fake.ApplyOrganizationQuotaByNameStub != nil {
+		return fake.ApplyOrganizationQuotaByNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.applyOrganizationQuotaByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateOrgActor) ApplyOrganizationQuotaByNameCallCount() int {
+	fake.applyOrganizationQuotaByNameMutex.RLock()
+	defer fake.applyOrganizationQuotaByNameMutex.RUnlock()
+	return len(fake.applyOrganizationQuotaByNameArgsForCall)
+}
+
+func (fake *FakeCreateOrgActor) ApplyOrganizationQuotaByNameCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.applyOrganizationQuotaByNameMutex.Lock()
+	defer fake.applyOrganizationQuotaByNameMutex.Unlock()
+	fake.ApplyOrganizationQuotaByNameStub = stub
+}
+
+func (fake *FakeCreateOrgActor) ApplyOrganizationQuotaByNameArgsForCall(i int) (string, string) {
+	fake.applyOrganizationQuotaByNameMutex.RLock()
+	defer fake.applyOrganizationQuotaByNameMutex.RUnlock()
+	argsForCall := fake.applyOrganizationQuotaByNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCreateOrgActor) ApplyOrganizationQuotaByNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.applyOrganizationQuotaByNameMutex.Lock()
+	defer fake.applyOrganizationQuotaByNameMutex.Unlock()
+	fake.ApplyOrganizationQuotaByNameStub = nil
+	fake.applyOrganizationQuotaByNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateOrgActor) ApplyOrganizationQuotaByNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.applyOrganizationQuotaByNameMutex.Lock()
+	defer fake.applyOrganizationQuotaByNameMutex.Unlock()
+	fake.ApplyOrganizationQuotaByNameStub = nil
+	if fake.applyOrganizationQuotaByNameReturnsOnCall == nil {
+		fake.applyOrganizationQuotaByNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.applyOrganizationQuotaByNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCreateOrgActor) CreateOrgRole(arg1 constant.RoleType, arg2 string, arg3 string, arg4 string, arg5 bool) (v7action.Warnings, error) {
@@ -182,6 +260,8 @@ func (fake *FakeCreateOrgActor) CreateOrganizationReturnsOnCall(i int, result1 v
 func (fake *FakeCreateOrgActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.applyOrganizationQuotaByNameMutex.RLock()
+	defer fake.applyOrganizationQuotaByNameMutex.RUnlock()
 	fake.createOrgRoleMutex.RLock()
 	defer fake.createOrgRoleMutex.RUnlock()
 	fake.createOrganizationMutex.RLock()
