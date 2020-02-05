@@ -63,6 +63,26 @@ func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (S
 	return SpaceQuota(ccv3Quotas[0]), Warnings(warnings), nil
 }
 
+func (actor Actor) GetSpaceQuotasByOrgGUID(orgGUID string) ([]SpaceQuota, Warnings, error) {
+	ccv3Quotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(
+		ccv3.Query{
+			Key:    ccv3.OrganizationGUIDFilter,
+			Values: []string{orgGUID},
+		},
+	)
+
+	if err != nil {
+		return []SpaceQuota{}, Warnings(warnings), err
+	}
+
+	var spaceQuotas []SpaceQuota
+	for _, quota := range ccv3Quotas {
+		spaceQuotas = append(spaceQuotas, SpaceQuota(quota))
+	}
+
+	return spaceQuotas, Warnings(warnings), nil
+}
+
 func (actor Actor) UpdateSpaceQuota(currentName, orgGUID, newName string, limits QuotaLimits) (Warnings, error) {
 	var allWarnings Warnings
 

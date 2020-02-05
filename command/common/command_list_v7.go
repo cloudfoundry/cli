@@ -165,7 +165,7 @@ type commandList struct {
 	ShareService                       v6.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
 	Space                              v7.SpaceCommand                              `command:"space" description:"Show space info"`
 	SpaceQuota                         v7.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
-	SpaceQuotas                        v6.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space resource quotas"`
+	SpaceQuotas                        v7.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space quotas"`
 	SpaceSSHAllowed                    v6.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
 	SpaceUsers                         v7.SpaceUsersCommand                         `command:"space-users" description:"Show space users by role"`
 	Spaces                             v7.SpacesCommand                             `command:"spaces" description:"List all spaces in an org"`

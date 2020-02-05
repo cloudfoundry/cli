@@ -286,6 +286,94 @@ var _ = Describe("Space Quota Actions", func() {
 		})
 	})
 
+	Describe("GetSpaceQuotasByOrgGUID", func() {
+		var (
+			orgGUID    string
+			quotas     []SpaceQuota
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			orgGUID = "org-guid"
+		})
+
+		JustBeforeEach(func() {
+			quotas, warnings, executeErr = actor.GetSpaceQuotasByOrgGUID(orgGUID)
+		})
+
+		When("when the API layer call returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceQuotasReturns(
+					[]ccv3.SpaceQuota{},
+					ccv3.Warnings{"some-quota-warning"},
+					errors.New("list-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+				Expect(executeErr).To(MatchError("list-error"))
+				Expect(quotas).To(Equal([]SpaceQuota{}))
+			})
+		})
+
+		When("getting all space quotas associated with the same organization", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceQuotasReturns(
+					[]ccv3.SpaceQuota{
+						{
+							Quota: ccv3.Quota{
+								GUID: "quota-guid",
+								Name: "quota-beluga",
+							},
+							OrgGUID: orgGUID,
+						},
+						{
+							Quota: ccv3.Quota{
+								GUID: "quota-2-guid",
+								Name: "quota-manatee",
+							},
+							OrgGUID: orgGUID,
+						},
+					},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+			})
+
+			It("queries the API and returns the matching space quotas", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetSpaceQuotasArgsForCall(0)
+				Expect(query).To(ConsistOf(
+					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+				))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+				Expect(quotas).To(ConsistOf(
+					SpaceQuota{
+						Quota: ccv3.Quota{
+							GUID: "quota-guid",
+							Name: "quota-beluga",
+						},
+						OrgGUID: orgGUID,
+					},
+					SpaceQuota{
+						Quota: ccv3.Quota{
+							GUID: "quota-2-guid",
+							Name: "quota-manatee",
+						},
+						OrgGUID: orgGUID,
+					},
+				))
+			})
+		})
+	})
+
 	Describe("UpdateSpaceQuota", func() {
 		var (
 			oldQuotaName string
