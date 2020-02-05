@@ -14,10 +14,10 @@ import (
 
 var _ = Describe("Space Quotas", func() {
 	var (
-		client            *Client
-		executeErr        error
-		warnings          Warnings
-		inputSpaceQuota   SpaceQuota
+		client          *Client
+		executeErr      error
+		warnings        Warnings
+		inputSpaceQuota SpaceQuota
 
 		createdSpaceQuota SpaceQuota
 		trueValue         = true

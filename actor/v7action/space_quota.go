@@ -44,7 +44,7 @@ func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (S
 	ccv3Quotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(
 		ccv3.Query{
 			Key:    ccv3.OrganizationGUIDFilter,
-			Values:[]string{orgGUID},
+			Values: []string{orgGUID},
 		},
 		ccv3.Query{
 			Key:    ccv3.NameFilter,
