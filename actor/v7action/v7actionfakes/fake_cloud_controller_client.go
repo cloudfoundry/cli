@@ -1797,6 +1797,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateSpaceQuotaStub        func(ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)
+	updateSpaceQuotaMutex       sync.RWMutex
+	updateSpaceQuotaArgsForCall []struct {
+		arg1 ccv3.SpaceQuota
+	}
+	updateSpaceQuotaReturns struct {
+		result1 ccv3.SpaceQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateSpaceQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.SpaceQuota
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateTaskCancelStub        func(string) (ccv3.Task, ccv3.Warnings, error)
 	updateTaskCancelMutex       sync.RWMutex
 	updateTaskCancelArgsForCall []struct {
@@ -9722,6 +9737,72 @@ func (fake *FakeCloudControllerClient) UpdateSpaceIsolationSegmentRelationshipRe
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSpaceQuota(arg1 ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error) {
+	fake.updateSpaceQuotaMutex.Lock()
+	ret, specificReturn := fake.updateSpaceQuotaReturnsOnCall[len(fake.updateSpaceQuotaArgsForCall)]
+	fake.updateSpaceQuotaArgsForCall = append(fake.updateSpaceQuotaArgsForCall, struct {
+		arg1 ccv3.SpaceQuota
+	}{arg1})
+	fake.recordInvocation("UpdateSpaceQuota", []interface{}{arg1})
+	fake.updateSpaceQuotaMutex.Unlock()
+	if fake.UpdateSpaceQuotaStub != nil {
+		return fake.UpdateSpaceQuotaStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateSpaceQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaCallCount() int {
+	fake.updateSpaceQuotaMutex.RLock()
+	defer fake.updateSpaceQuotaMutex.RUnlock()
+	return len(fake.updateSpaceQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaCalls(stub func(ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)) {
+	fake.updateSpaceQuotaMutex.Lock()
+	defer fake.updateSpaceQuotaMutex.Unlock()
+	fake.UpdateSpaceQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaArgsForCall(i int) ccv3.SpaceQuota {
+	fake.updateSpaceQuotaMutex.RLock()
+	defer fake.updateSpaceQuotaMutex.RUnlock()
+	argsForCall := fake.updateSpaceQuotaArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturns(result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+	fake.updateSpaceQuotaMutex.Lock()
+	defer fake.updateSpaceQuotaMutex.Unlock()
+	fake.UpdateSpaceQuotaStub = nil
+	fake.updateSpaceQuotaReturns = struct {
+		result1 ccv3.SpaceQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturnsOnCall(i int, result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+	fake.updateSpaceQuotaMutex.Lock()
+	defer fake.updateSpaceQuotaMutex.Unlock()
+	fake.UpdateSpaceQuotaStub = nil
+	if fake.updateSpaceQuotaReturnsOnCall == nil {
+		fake.updateSpaceQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.SpaceQuota
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateSpaceQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.SpaceQuota
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateTaskCancel(arg1 string) (ccv3.Task, ccv3.Warnings, error) {
 	fake.updateTaskCancelMutex.Lock()
 	ret, specificReturn := fake.updateTaskCancelReturnsOnCall[len(fake.updateTaskCancelArgsForCall)]
@@ -10308,6 +10389,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSpaceApplyManifestMutex.RUnlock()
 	fake.updateSpaceIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateSpaceIsolationSegmentRelationshipMutex.RUnlock()
+	fake.updateSpaceQuotaMutex.RLock()
+	defer fake.updateSpaceQuotaMutex.RUnlock()
 	fake.updateTaskCancelMutex.RLock()
 	defer fake.updateTaskCancelMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()

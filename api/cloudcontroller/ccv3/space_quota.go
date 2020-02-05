@@ -18,28 +18,41 @@ type SpaceQuota struct {
 }
 
 func (sq SpaceQuota) MarshalJSON() ([]byte, error) {
-	appLimits := map[string]interface{}{
-		"total_memory_in_mb":       sq.Apps.TotalMemory,
-		"per_process_memory_in_mb": sq.Apps.InstanceMemory,
-		"total_instances":          sq.Apps.TotalAppInstances,
+	appLimits := map[string]interface{}{}
+	if sq.Apps.TotalMemory != nil {
+		appLimits["total_memory_in_mb"] = sq.Apps.TotalMemory
+	}
+	if sq.Apps.InstanceMemory != nil {
+		appLimits["per_process_memory_in_mb"] = sq.Apps.InstanceMemory
+	}
+	if sq.Apps.TotalAppInstances != nil {
+		appLimits["total_instances"] = sq.Apps.TotalAppInstances
 	}
 
-	serviceLimits := map[string]interface{}{
-		"paid_services_allowed":   sq.Services.PaidServicePlans,
-		"total_service_instances": sq.Services.TotalServiceInstances,
+	serviceLimits := map[string]interface{}{}
+	if sq.Services.PaidServicePlans != nil {
+		serviceLimits["paid_services_allowed"] = sq.Services.PaidServicePlans
+	}
+	if sq.Services.TotalServiceInstances != nil {
+		serviceLimits["total_service_instances"] = sq.Services.TotalServiceInstances
 	}
 
-	routeLimits := map[string]interface{}{
-		"total_routes":         sq.Routes.TotalRoutes,
-		"total_reserved_ports": sq.Routes.TotalReservedPorts,
+	routeLimits := map[string]interface{}{}
+	if sq.Routes.TotalRoutes != nil {
+		routeLimits["total_routes"] = sq.Routes.TotalRoutes
+	}
+	if sq.Routes.TotalReservedPorts != nil {
+		routeLimits["total_reserved_ports"] = sq.Routes.TotalReservedPorts
 	}
 
-	relationships := map[string]interface{}{
-		"organization": map[string]interface{}{
+	relationships := map[string]interface{}{}
+
+	if sq.OrgGUID != "" {
+		relationships["organization"] = map[string]interface{}{
 			"data": map[string]interface{}{
 				"guid": sq.OrgGUID,
 			},
-		},
+		}
 	}
 
 	if len(sq.SpaceGUIDs) > 0 {
@@ -56,11 +69,14 @@ func (sq SpaceQuota) MarshalJSON() ([]byte, error) {
 	}
 
 	jsonMap := map[string]interface{}{
-		"name":          sq.Name,
-		"apps":          appLimits,
-		"services":      serviceLimits,
-		"routes":        routeLimits,
-		"relationships": relationships,
+		"name":     sq.Name,
+		"apps":     appLimits,
+		"services": serviceLimits,
+		"routes":   routeLimits,
+	}
+
+	if len(relationships) != 0 {
+		jsonMap["relationships"] = relationships
 	}
 
 	return json.Marshal(jsonMap)
@@ -158,4 +174,35 @@ func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, er
 	})
 
 	return spaceQuotasList, warnings, err
+}
+
+func (client *Client) UpdateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnings, error) {
+	spaceQuotaGUID := spaceQuota.GUID
+	spaceQuota.GUID = ""
+
+	quotaBytes, err := json.Marshal(spaceQuota)
+	if err != nil {
+		return SpaceQuota{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchSpaceQuotaRequest,
+		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
+		Body:        bytes.NewReader(quotaBytes),
+	})
+	if err != nil {
+		return SpaceQuota{}, nil, err
+	}
+
+	var responseSpaceQuota SpaceQuota
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseSpaceQuota,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return SpaceQuota{}, response.Warnings, err
+	}
+
+	return responseSpaceQuota, response.Warnings, nil
 }

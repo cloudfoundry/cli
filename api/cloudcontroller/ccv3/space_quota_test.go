@@ -210,7 +210,7 @@ var _ = Describe("Space Quotas", func() {
   },
   "links": {
     "self": {
-      "href": "https://api.example.org/v3/organization_quotas/9b370018-c38e-44c9-86d6-155c76801104"
+      "href": "https://api.example.org/v3/space_quotas/9b370018-c38e-44c9-86d6-155c76801104"
     },
     "organization": {
       "href": "https://api.example.org/v3/organizations/9b370018-c38e-44c9-86d6-155c76801104"
@@ -615,6 +615,160 @@ var _ = Describe("Space Quotas", func() {
 							Code:   10010,
 							Detail: "App not found",
 							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("UpdateSpaceQuota", func() {
+		var (
+			updatedSpaceQuota SpaceQuota
+			warnings          Warnings
+			executeErr        error
+			inputQuota        SpaceQuota
+		)
+
+		BeforeEach(func() {
+			inputQuota = SpaceQuota{
+				Quota: Quota{
+					GUID: "elephant-trunk-guid",
+					Name: "elephant-trunk",
+					Apps: AppLimit{
+						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+					},
+					Services: ServiceLimit{
+						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+						PaidServicePlans:      &trueValue,
+					},
+				},
+			}
+		})
+
+		JustBeforeEach(func() {
+			updatedSpaceQuota, warnings, executeErr = client.UpdateSpaceQuota(inputQuota)
+		})
+
+		When("updating the quota succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+					 "guid": "elephant-trunk-guid",
+					 "created_at": "2020-01-16T19:44:47Z",
+					 "updated_at": "2020-01-16T19:44:47Z",
+					 "name": "elephant-trunk",
+					 "apps": {
+						"total_memory_in_mb": 2048,
+						"per_process_memory_in_mb": 1024,
+						"total_instances": null,
+						"per_app_tasks": null
+					 },
+					 "services": {
+						"paid_services_allowed": true,
+						"total_service_instances": 0,
+						"total_service_keys": null
+					 },
+					 "routes": {
+						"total_routes": null,
+						"total_reserved_ports": null
+					 },
+					 "links": {
+						"self": {
+						   "href": "https://api.foil-venom.lite.cli.fun/v3/space_quotas/08357710-8106-4d14-b0ea-03154a36fb79"
+						}
+					 }
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "elephant-trunk",
+					"apps": map[string]interface{}{
+						"total_memory_in_mb":       2048,
+						"per_process_memory_in_mb": 1024,
+						"total_instances":          nil,
+					},
+					"services": map[string]interface{}{
+						"paid_services_allowed":   true,
+						"total_service_instances": 0,
+					},
+					"routes": map[string]interface{}{},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/space_quotas/elephant-trunk-guid"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated space quota", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(updatedSpaceQuota).To(Equal(SpaceQuota{
+					Quota: Quota{
+						GUID: "elephant-trunk-guid",
+						Name: "elephant-trunk",
+						Apps: AppLimit{
+							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
+							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
+							TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
+						},
+						Services: ServiceLimit{
+							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
+							PaidServicePlans:      &trueValue,
+						},
+						Routes: RouteLimit{
+							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
+							TotalReservedPorts: &types.NullInt{IsSet: false, Value: 0},
+						},
+					},
+				}))
+			})
+		})
+
+		When("updating the quota fails", func() {
+			BeforeEach(func() {
+				response := `{
+					 "errors": [
+							{
+								 "detail": "Fail",
+								 "title": "CF-SomeError",
+								 "code": 10002
+							},
+							{
+								 "detail": "Something went terribly wrong",
+								 "title": "CF-UnknownError",
+								 "code": 10001
+							}
+					 ]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/space_quotas/elephant-trunk-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10002,
+							Detail: "Fail",
+							Title:  "CF-SomeError",
+						},
+						{
+							Code:   10001,
+							Detail: "Something went terribly wrong",
+							Title:  "CF-UnknownError",
 						},
 					},
 				}))

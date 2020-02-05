@@ -62,3 +62,44 @@ func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (S
 
 	return SpaceQuota(ccv3Quotas[0]), Warnings(warnings), nil
 }
+
+func (actor Actor) UpdateSpaceQuota(currentName, orgGUID, newName string, limits QuotaLimits) (Warnings, error) {
+	var allWarnings Warnings
+
+	oldSpaceQuota, warnings, err := actor.GetSpaceQuotaByName(currentName, orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if newName == "" {
+		newName = currentName
+	}
+
+	newSpaceQuota := ccv3.SpaceQuota{
+		Quota: ccv3.Quota{
+			GUID: oldSpaceQuota.GUID,
+			Name: newName,
+			Apps: ccv3.AppLimit{
+				TotalMemory:       limits.TotalMemoryInMB,
+				InstanceMemory:    limits.PerProcessMemoryInMB,
+				TotalAppInstances: limits.TotalInstances,
+			},
+			Services: ccv3.ServiceLimit{
+				TotalServiceInstances: limits.TotalServiceInstances,
+				PaidServicePlans:      limits.PaidServicesAllowed,
+			},
+			Routes: ccv3.RouteLimit{
+				TotalRoutes:        limits.TotalRoutes,
+				TotalReservedPorts: limits.TotalReservedPorts,
+			},
+		},
+	}
+
+	convertUnlimitedToNil(&newSpaceQuota.Apps, &newSpaceQuota.Routes, &newSpaceQuota.Services)
+
+	_, ccWarnings, err := actor.CloudControllerClient.UpdateSpaceQuota(newSpaceQuota)
+	allWarnings = append(allWarnings, ccWarnings...)
+
+	return allWarnings, err
+}

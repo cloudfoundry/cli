@@ -16,6 +16,8 @@ var _ = Describe("Space Quota Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		trueValue                 = true
+		falseValue                = true
 	)
 
 	BeforeEach(func() {
@@ -29,7 +31,6 @@ var _ = Describe("Space Quota Actions", func() {
 			warnings         Warnings
 			executeErr       error
 			limits           QuotaLimits
-			trueValue        = true
 		)
 
 		JustBeforeEach(func() {
@@ -281,6 +282,250 @@ var _ = Describe("Space Quota Actions", func() {
 						Name: quotaName,
 					},
 				}))
+			})
+		})
+	})
+
+	Describe("UpdateSpaceQuota", func() {
+		var (
+			oldQuotaName string
+			orgGUID      string
+			newQuotaName string
+			quotaLimits  QuotaLimits
+			warnings     Warnings
+			executeErr   error
+		)
+
+		BeforeEach(func() {
+			oldQuotaName = "old-quota-name"
+			orgGUID = "some-org-guid"
+			newQuotaName = "new-quota-name"
+
+			quotaLimits = QuotaLimits{
+				TotalMemoryInMB:       &types.NullInt{Value: 2048, IsSet: true},
+				PerProcessMemoryInMB:  &types.NullInt{Value: 1024, IsSet: true},
+				TotalInstances:        &types.NullInt{Value: 0, IsSet: false},
+				TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+				PaidServicesAllowed:   &trueValue,
+				TotalRoutes:           &types.NullInt{Value: 6, IsSet: true},
+				TotalReservedPorts:    &types.NullInt{Value: 5, IsSet: true},
+			}
+
+			fakeCloudControllerClient.GetSpaceQuotasReturns(
+				[]ccv3.SpaceQuota{{Quota: ccv3.Quota{Name: oldQuotaName}}},
+				ccv3.Warnings{"get-quotas-warning"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateSpaceQuota(oldQuotaName, orgGUID, newQuotaName, quotaLimits)
+		})
+
+		When("the update-quota endpoint returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateSpaceQuotaReturns(
+					ccv3.SpaceQuota{},
+					ccv3.Warnings{"update-quota-warning"},
+					errors.New("update-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+				Expect(executeErr).To(MatchError("update-error"))
+			})
+		})
+
+		When("no quota limits are being updated", func() {
+			var (
+				ccv3Quota ccv3.SpaceQuota
+			)
+
+			BeforeEach(func() {
+				quotaLimits = QuotaLimits{}
+
+				ccv3Quota = ccv3.SpaceQuota{
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       nil,
+							InstanceMemory:    nil,
+							TotalAppInstances: nil,
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: nil,
+							PaidServicePlans:      nil,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        nil,
+							TotalReservedPorts: nil,
+						},
+					},
+				}
+
+				fakeCloudControllerClient.UpdateSpaceQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+
+			It("calls the update endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.UpdateSpaceQuotaArgsForCall(0)
+
+				updatedQuota := ccv3Quota
+				updatedQuota.Name = newQuotaName
+
+				Expect(passedQuota).To(Equal(updatedQuota))
+			})
+		})
+
+		When("the update space quota has all values set to unlimited", func() {
+			var (
+				ccv3Quota ccv3.SpaceQuota
+			)
+
+			BeforeEach(func() {
+				quotaLimits = QuotaLimits{
+					TotalMemoryInMB:       &types.NullInt{Value: -1, IsSet: true},
+					PerProcessMemoryInMB:  &types.NullInt{Value: -1, IsSet: true},
+					TotalInstances:        &types.NullInt{Value: -1, IsSet: true},
+					PaidServicesAllowed:   &falseValue,
+					TotalServiceInstances: &types.NullInt{Value: -1, IsSet: true},
+					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
+					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
+				}
+
+				ccv3Quota = ccv3.SpaceQuota{
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
+							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
+							PaidServicePlans:      &falseValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
+							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
+						},
+					},
+				}
+
+				fakeCloudControllerClient.UpdateSpaceQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+
+			It("calls the update endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.UpdateSpaceQuotaArgsForCall(0)
+
+				updatedQuota := ccv3Quota
+				updatedQuota.Name = newQuotaName
+
+				Expect(passedQuota).To(Equal(updatedQuota))
+			})
+		})
+
+		When("The update space quota endpoint succeeds", func() {
+			var (
+				ccv3Quota ccv3.SpaceQuota
+			)
+
+			BeforeEach(func() {
+				ccv3Quota = ccv3.SpaceQuota{
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+							PaidServicePlans:      &trueValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+						},
+					},
+				}
+
+				fakeCloudControllerClient.UpdateSpaceQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+
+			It("calls the update endpoint with the respective values and returns warnings", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("get-quotas-warning", "update-quota-warning"))
+
+				passedQuota := fakeCloudControllerClient.UpdateSpaceQuotaArgsForCall(0)
+
+				updatedQuota := ccv3Quota
+				updatedQuota.Name = newQuotaName
+
+				Expect(passedQuota).To(Equal(updatedQuota))
+			})
+		})
+
+		When("the space quota name is not being updated", func() {
+			var (
+				ccv3Quota ccv3.SpaceQuota
+			)
+
+			BeforeEach(func() {
+				newQuotaName = ""
+
+				ccv3Quota = ccv3.SpaceQuota{
+					Quota: ccv3.Quota{
+						Name: oldQuotaName,
+						Apps: ccv3.AppLimit{
+							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
+							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
+						},
+						Services: ccv3.ServiceLimit{
+							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
+							PaidServicePlans:      &trueValue,
+						},
+						Routes: ccv3.RouteLimit{
+							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
+							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+						},
+					},
+				}
+
+				fakeCloudControllerClient.UpdateSpaceQuotaReturns(
+					ccv3Quota,
+					ccv3.Warnings{"update-quota-warning"},
+					nil,
+				)
+			})
+			It("uses the current space quota name in the API request", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				inputQuota := fakeCloudControllerClient.UpdateSpaceQuotaArgsForCall(0)
+				Expect(inputQuota.Name).To(Equal("old-quota-name"))
 			})
 		})
 	})
