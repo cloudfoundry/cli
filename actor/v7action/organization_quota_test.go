@@ -135,7 +135,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("all API calls succeed", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{{Name: quotaName, GUID: "quota-guid"}},
+					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
 					ccv3.Warnings{"get-quotas-warning"},
 					nil,
 				)
@@ -175,7 +175,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("getting the quota by name fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{{Name: quotaName, GUID: "quota-guid"}},
+					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
 					ccv3.Warnings{"get-quotas-warning"},
 					nil,
 				)
