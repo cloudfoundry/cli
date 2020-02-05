@@ -87,5 +87,5 @@ run:
 
     echo "CF_INT_CLIENT_CREDENTIALS_TEST_MODE: $CF_INT_CLIENT_CREDENTIALS_TEST_MODE"
 
-    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v6/isolated integration/v6/plugin integration/v6/push
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v6/global

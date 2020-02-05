@@ -102,12 +102,8 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	}
 
 	switch cliVersion.Major {
-	case 6:
+	case 6, 7:
 		if pluginLibraryMajorVersion > 1 {
-			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
-		}
-	case 7:
-		if pluginLibraryMajorVersion != 2 {
 			return configv3.Plugin{}, actionerror.PluginInvalidLibraryVersionError{}
 		}
 	default:

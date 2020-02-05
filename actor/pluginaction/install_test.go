@@ -559,11 +559,6 @@ var _ = Describe("install actions", func() {
 
 				When("the plugin is valid", func() {
 					BeforeEach(func() {
-						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
-							Major: 2,
-							Minor: 0,
-							Build: 0,
-						}
 						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
 					})
 
@@ -590,19 +585,10 @@ var _ = Describe("install actions", func() {
 					})
 				})
 
-				When("the plugin is for an older CLI", func() {
-					BeforeEach(func() {
-						fakePluginMetadata.GetMetadataReturns(pluginToBeInstalled, nil)
-					})
-					It("reports the plugin is wrong", func() {
-						Expect(validateErr).To(MatchError(actionerror.PluginInvalidLibraryVersionError{}))
-					})
-				})
-
 				When("the plugin is for a newer CLI", func() {
 					BeforeEach(func() {
 						pluginToBeInstalled.LibraryVersion = configv3.PluginVersion{
-							Major: 3,
+							Major: 2,
 							Minor: 0,
 							Build: 0,
 						}
