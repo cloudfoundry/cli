@@ -67,7 +67,7 @@ func (cmd DeleteOrgQuotaCommand) Execute(args []string) error {
 		}
 
 		if !confirmedDelete {
-			cmd.UI.DisplayText("'{{.QuotaName}}' has not been deleted.", map[string]interface{}{"QuotaName": orgQuotaName})
+			cmd.UI.DisplayText("Organization quota '{{.QuotaName}}' has not been deleted.", map[string]interface{}{"QuotaName": orgQuotaName})
 			return nil
 		}
 	}

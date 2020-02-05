@@ -39,13 +39,13 @@ var _ = Describe("set-org-quota command", func() {
 				It("appears in cf help -a", func() {
 					session := helpers.CF("help", "-a")
 					Eventually(session).Should(Exit(0))
-					Expect(session).To(HaveCommandInCategoryWithDescription("set-org-quota", "ORG ADMIN", "Assign a quota to an org"))
+					Expect(session).To(HaveCommandInCategoryWithDescription("set-org-quota", "ORG ADMIN", "Assign a quota to an organization"))
 				})
 
 				It("Displays command usage to output", func() {
 					session := helpers.CF("set-org-quota", "--help")
 					Eventually(session).Should(Say("NAME:"))
-					Eventually(session).Should(Say("set-org-quota - Assign a quota to an org"))
+					Eventually(session).Should(Say("set-org-quota - Assign a quota to an organization"))
 					Eventually(session).Should(Say("USAGE:"))
 					Eventually(session).Should(Say("cf set-org-quota ORG QUOTA"))
 					Eventually(session).Should(Say("SEE ALSO:"))
@@ -86,7 +86,7 @@ var _ = Describe("set-org-quota command", func() {
 			It("fails and informs the user an invalid quota was provided", func() {
 				session := helpers.CF("set-org-quota", orgName, "fake-name")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Quota fake-name not found"))
+				Eventually(session.Err).Should(Say("Organization quota with name '%s' not found.", "fake-name"))
 				Eventually(session).Should(Exit(1))
 			})
 

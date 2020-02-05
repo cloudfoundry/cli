@@ -54,7 +54,7 @@ var _ = Describe("space-quota command", func() {
 				session := helpers.CF("space-quota", quotaName)
 				userName, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Getting space quota %s as %s\.\.\.`, quotaName, userName))
-				Eventually(session.Err).Should(Say("Quota %s not found", quotaName))
+				Eventually(session.Err).Should(Say("Space quota with name '%s' not found.", quotaName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

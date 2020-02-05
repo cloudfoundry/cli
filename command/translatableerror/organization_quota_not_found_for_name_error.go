@@ -6,7 +6,7 @@ type OrganizationQuotaNotFoundForNameError struct {
 }
 
 func (e OrganizationQuotaNotFoundForNameError) Error() string {
-	return "Quota {{.QuotaName}} not found"
+	return "Organization quota with name '{{.QuotaName}}' not found."
 }
 
 func (e OrganizationQuotaNotFoundForNameError) Translate(translate func(string, ...interface{}) string) string {

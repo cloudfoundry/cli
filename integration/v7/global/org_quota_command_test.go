@@ -48,7 +48,7 @@ var _ = Describe("org-quota command", func() {
 				session := helpers.CF("org-quota", quotaName)
 				userName, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Getting org quota %s as %s\.\.\.`, quotaName, userName))
-				Eventually(session.Err).Should(Say("Quota %s not found", quotaName))
+				Eventually(session.Err).Should(Say("Organization quota with name '%s' not found.", quotaName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

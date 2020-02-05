@@ -5,7 +5,7 @@ type SpaceQuotaNotFoundByNameError struct {
 }
 
 func (SpaceQuotaNotFoundByNameError) Error() string {
-	return "Quota {{.Name}} not found"
+	return "Space quota with name '{{.Name}}' not found."
 }
 
 func (e SpaceQuotaNotFoundByNameError) Translate(translate func(string, ...interface{}) string) string {

@@ -102,7 +102,7 @@ var _ = Describe("update-space-quota command", func() {
 				session := helpers.CF("update-space-quota", "bogota")
 				Eventually(session).Should(Say(`Updating space quota bogota as %s\.\.\.`, userName))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`Quota %s not found`, "bogota"))
+				Eventually(session.Err).Should(Say("Space quota with name '%s' not found.", "bogota"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

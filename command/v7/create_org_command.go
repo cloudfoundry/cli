@@ -22,7 +22,7 @@ type CreateOrgActor interface {
 type CreateOrgCommand struct {
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	Quota           string            `short:"q" long:"quota" description:"Quota to assign to the newly created org"`
-	usage           interface{}       `usage:"CF_NAME create-org ORG"`
+	usage           interface{}       `usage:"CF_NAME create-org ORG [-q ORG_QUOTA]"`
 	relatedCommands interface{}       `related_commands:"create-space, orgs, org-quotas, set-org-role"`
 
 	UI          command.UI

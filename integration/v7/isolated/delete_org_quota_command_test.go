@@ -105,7 +105,7 @@ var _ = Describe("delete-org-quota command", func() {
 
 			It("does not delete the quota", func() {
 				session := helpers.CFWithStdin(buffer, "delete-org-quota", quotaName)
-				Eventually(session).Should(Say(`'%s' has not been deleted\.`, quotaName))
+				Eventually(session).Should(Say(`Organization quota '%s' has not been deleted\.`, quotaName))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("org-quotas")
@@ -120,9 +120,9 @@ var _ = Describe("delete-org-quota command", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("does not delete the buildpack", func() {
+			It("does not delete the quota", func() {
 				session := helpers.CFWithStdin(buffer, "delete-org-quota", quotaName)
-				Eventually(session).Should(Say(`'%s' has not been deleted\.`, quotaName))
+				Eventually(session).Should(Say(`Organization quota '%s' has not been deleted\.`, quotaName))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("org-quotas")

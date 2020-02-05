@@ -117,7 +117,7 @@ var _ = Describe("update-org-quota command", func() {
 				session := helpers.CF("update-org-quota", "bogus-org-quota")
 				Eventually(session).Should(Say(`Updating org quota bogus-org-quota as %s\.\.\.`, username))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`Quota %s not found`, "bogus-org-quota"))
+				Eventually(session.Err).Should(Say("Organization quota with name '%s' not found.", "bogus-org-quota"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -31,7 +31,7 @@ var _ = Describe("create-org command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("create-org - Create an org"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf create-org ORG`))
+				Eventually(session).Should(Say(`cf create-org ORG \[-q ORG_QUOTA\]`))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say(`co`))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -115,7 +115,7 @@ var _ = Describe("create-org command", func() {
 					Eventually(session).Should(Say("OK"))
 
 					Eventually(session).Should(Say("Setting org quota %s to org %s as %s...", quotaName, orgNameNew, userName))
-					Eventually(session.Err).Should(Say("Quota %s not found", quotaName))
+					Eventually(session.Err).Should(Say("Organization quota with name '%s' not found.", quotaName))
 					Eventually(session).Should(Say("FAILED"))
 
 					session = helpers.CF("org", orgNameNew)
