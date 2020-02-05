@@ -122,11 +122,11 @@ var _ = Describe("SpaceQuota Actions", func() {
 				)
 			})
 
-			It("returns the SpaceQuotaNotFoundByNameError", func() {
+			It("returns the QuotaNotFoundForNameError", func() {
 				spaceQuota, warnings, err := actor.GetSpaceQuotaByName("some-space-quota", "some-org-guid")
 				Expect(spaceQuota).To(Equal(SpaceQuota{}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				Expect(err).To(MatchError(actionerror.SpaceQuotaNotFoundByNameError{Name: "some-space-quota"}))
+				Expect(err).To(MatchError(actionerror.QuotaNotFoundForNameError{Name: "some-space-quota"}))
 			})
 
 		})

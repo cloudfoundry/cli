@@ -93,8 +93,8 @@ func ConvertToTranslatableError(err error) error {
 		return NotLoggedInError(e)
 	case actionerror.OrganizationNotFoundError:
 		return OrganizationNotFoundError(e)
-	case actionerror.OrganizationQuotaNotFoundForNameError:
-		return OrganizationQuotaNotFoundForNameError(e)
+	case actionerror.QuotaNotFoundForNameError:
+		return QuotaNotFoundForNameError(e)
 	case actionerror.PasswordGrantTypeLogoutRequiredError:
 		return PasswordGrantTypeLogoutRequiredError(e)
 	case actionerror.PluginCommandsConflictError:
@@ -138,8 +138,6 @@ func ConvertToTranslatableError(err error) error {
 		return SharedServiceInstanceNotFoundError(e)
 	case actionerror.SpaceNotFoundError:
 		return SpaceNotFoundError{Name: e.Name}
-	case actionerror.SpaceQuotaNotFoundByNameError:
-		return SpaceQuotaNotFoundByNameError{Name: e.Name}
 	case actionerror.StackNotFoundError:
 		return StackNotFoundError(e)
 	case actionerror.StagingFailedError:

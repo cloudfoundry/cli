@@ -32,7 +32,7 @@ func (actor Actor) GetSpaceQuotaByName(quotaName, orgGUID string) (SpaceQuota, W
 		}
 	}
 
-	return SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundByNameError{Name: quotaName}
+	return SpaceQuota{}, Warnings(warnings), actionerror.QuotaNotFoundForNameError{Name: quotaName}
 }
 
 // SetSpaceQuota sets the space quota for the corresponding space

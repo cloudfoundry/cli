@@ -84,8 +84,8 @@ var _ = Describe("Space", func() {
 					)
 				})
 
-				It("returns a SpaceQuotaNotFoundByNameError", func() {
-					Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundByNameError{Name: quotaName}))
+				It("returns a QuotaNotFoundForNameError", func() {
+					Expect(executeErr).To(MatchError(actionerror.QuotaNotFoundForNameError{Name: quotaName}))
 					Expect(warnings).To(ContainElement("get-quota-warning-1"))
 					Expect(warnings).To(ContainElement("get-quota-warning-2"))
 				})

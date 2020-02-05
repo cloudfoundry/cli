@@ -177,9 +177,9 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.OrganizationNotFoundError{Name: "some-org"},
 			OrganizationNotFoundError{Name: "some-org"}),
 
-		Entry("actionerror.OrganizationQuotaNotFoundForNameError -> OrganizationQuotaNotFoundForNameError",
-			actionerror.OrganizationQuotaNotFoundForNameError{Name: "some-quota"},
-			OrganizationQuotaNotFoundForNameError{Name: "some-quota"}),
+		Entry("actionerror.QuotaNotFoundForNameError -> QuotaNotFoundForNameError",
+			actionerror.QuotaNotFoundForNameError{Name: "some-quota"},
+			QuotaNotFoundForNameError{Name: "some-quota"}),
 
 		Entry("actionerror.PasswordGrantTypeLogoutRequiredError -> PasswordGrantTypeLogoutRequiredError",
 			actionerror.PasswordGrantTypeLogoutRequiredError{},
@@ -271,10 +271,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("actionerror.SpaceNotFoundError -> SpaceNotFoundError",
 			actionerror.SpaceNotFoundError{Name: "some-space"},
 			SpaceNotFoundError{Name: "some-space"}),
-
-		Entry("actionerror.SpaceQuotaNotFoundByNameError -> SpaceQuotaNotFoundByNameError",
-			actionerror.SpaceQuotaNotFoundByNameError{Name: "some-space"},
-			SpaceQuotaNotFoundByNameError{Name: "some-space"}),
 
 		Entry("actionerror.StackNotFoundError -> StackNotFoundError",
 			actionerror.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"},
