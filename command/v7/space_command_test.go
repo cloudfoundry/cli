@@ -189,6 +189,45 @@ var _ = Describe("space Command", func() {
 			})
 		})
 
+		When("fetching a space with an applied quota", func() {
+			BeforeEach(func() {
+				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
+					v7action.SpaceSummary{
+						Name:                 "some-space",
+						OrgName:              "some-org",
+						AppNames:             []string{"app1", "app2", "app3"},
+						ServiceInstanceNames: []string{"instance1", "instance2"},
+						IsolationSegmentName: "iso-seg-name",
+						QuotaName:            "applied-quota-name",
+					},
+					v7action.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("displays the applied quota", func() {
+				Expect(testUI.Out).To(Say(`quota:\s+applied-quota-name`))
+			})
+		})
+
+		When("fetching a space that has no quota applied", func() {
+			BeforeEach(func() {
+				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
+					v7action.SpaceSummary{
+						Name:                 "some-space",
+						OrgName:              "some-org",
+						AppNames:             []string{"app1", "app2", "app3"},
+						ServiceInstanceNames: []string{"instance1", "instance2"},
+					},
+					v7action.Warnings{"some-warning"},
+					nil,
+				)
+			})
+			It("displays a quota row with no value", func() {
+				Expect(testUI.Out).To(Say(`quota:\s+$`))
+			})
+		})
+
 		When("fetching the space summary fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(

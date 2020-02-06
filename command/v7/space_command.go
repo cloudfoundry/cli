@@ -82,6 +82,7 @@ func (cmd SpaceCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("apps:"), strings.Join(spaceSummary.AppNames, ", ")},
 		{cmd.UI.TranslateText("services:"), strings.Join(spaceSummary.ServiceInstanceNames, ", ")},
 		{cmd.UI.TranslateText("isolation segment:"), spaceSummary.IsolationSegmentName},
+		{cmd.UI.TranslateText("quota:"), spaceSummary.QuotaName},
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)

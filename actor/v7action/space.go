@@ -19,6 +19,7 @@ type SpaceSummary struct {
 	AppNames             []string
 	ServiceInstanceNames []string
 	IsolationSegmentName string
+	QuotaName            string
 }
 
 func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, error) {
@@ -170,6 +171,18 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		}
 	}
 
+	appliedQuotaRelationshipGUID := space.Relationships[constant.RelationshipTypeQuota].GUID
+
+	var ccv3SpaceQuota ccv3.SpaceQuota
+	if appliedQuotaRelationshipGUID != "" {
+		ccv3SpaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
+
+		if err != nil {
+			return SpaceSummary{}, allWarnings, err
+		}
+	}
+
 	spaceSummary := SpaceSummary{
 		OrgName:              org.Name,
 		Name:                 space.Name,
@@ -177,6 +190,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		AppNames:             appNames,
 		ServiceInstanceNames: serviceInstanceNames,
 		IsolationSegmentName: isoSegName,
+		QuotaName:            ccv3SpaceQuota.Name,
 	}
 
 	return spaceSummary, allWarnings, nil

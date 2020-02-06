@@ -331,6 +331,132 @@ var _ = Describe("Space Quotas", func() {
 		})
 	})
 
+	Describe("GetSpaceQuota", func() {
+		var (
+			spaceQuota     SpaceQuota
+			spaceQuotaGUID string
+		)
+
+		JustBeforeEach(func() {
+			spaceQuota, warnings, executeErr = client.GetSpaceQuota(spaceQuotaGUID)
+		})
+		When("the cloud controller returns without errors", func() {
+			BeforeEach(func() {
+				spaceQuotaGUID = "space-quota-guid"
+
+				response := fmt.Sprintf(`{
+						  "guid": "space-quota-guid",
+						  "created_at": "2017-05-04T17:00:41Z",
+						  "updated_at": "2017-05-04T17:00:41Z",
+						  "name": "sancho-panza",
+						  "apps": {
+							"total_memory_in_mb": 10240,
+							"per_process_memory_in_mb": 1024,
+							"total_instances": 8,
+							"per_app_tasks": 5
+						  },
+						  "services": {
+							"paid_services_allowed": false,
+							"total_service_instances": 8,
+							"total_service_keys": 20
+						  },
+						  "routes": {
+							"total_routes": 10,
+							"total_reserved_ports": 5
+						  },
+						  "domains": {
+							"total_private_domains": 7
+						  },
+						  "relationships": {
+							"organization": {
+							  "data": null
+							}
+						  },
+						  "links": {
+							"self": { "href": "%s/v3/space_quotas/space-quota-guid" }
+						  }
+				}`, server.URL())
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/space_quotas/%s", spaceQuotaGUID)),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"get warning"}}),
+					),
+				)
+			})
+
+			It("queries the API with the given guid", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get warning"))
+				Expect(spaceQuota).To(Equal(
+					SpaceQuota{
+						Quota: Quota{
+							GUID: "space-quota-guid",
+							Name: "sancho-panza",
+							Apps: AppLimit{
+								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
+								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
+								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
+							},
+							Services: ServiceLimit{
+								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
+								PaidServicePlans:      &falseValue,
+							},
+							Routes: RouteLimit{
+								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
+								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
+							},
+						},
+					},
+				))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/space_quotas/%s", spaceQuotaGUID)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("GetSpaceQuotas", func() {
 		var (
 			spaceQuotas []SpaceQuota

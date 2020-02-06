@@ -95,6 +95,7 @@ type CloudControllerClient interface {
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetServiceOfferings(query ...ccv3.Query) ([]ccv3.ServiceOffering, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	GetSpaceQuota(spaceQuotaGUID string) (ccv3.SpaceQuota, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
 	GetSpaceQuotas(query ...ccv3.Query) ([]ccv3.SpaceQuota, ccv3.Warnings, error)
 	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, ccv3.Warnings, error)

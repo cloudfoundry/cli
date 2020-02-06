@@ -1,6 +1,7 @@
 package v7action_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -233,7 +234,12 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns back one space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName}},
+						[]ccv3.Space{
+							{
+								GUID: "some-space-guid",
+								Name: spaceName,
+							},
+						},
 						ccv3.Warnings{"some-space-warning"}, nil)
 				})
 
@@ -252,6 +258,34 @@ var _ = Describe("Space", func() {
 						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
 					))
 				})
+			})
+
+			When("the cloud controller returns a space with a quota relationship", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName,
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeQuota: ccv3.Relationship{GUID: "some-space-quota-guid"},
+							}}},
+						ccv3.Warnings{"some-space-warning"}, nil)
+				})
+				It("returns the quota relationship", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+
+					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					))
+					Expect(space).To(Equal(Space{
+						GUID: "some-space-guid",
+						Name: spaceName,
+						Relationships: ccv3.Relationships{
+							constant.RelationshipTypeQuota: ccv3.Relationship{GUID: "some-space-quota-guid"},
+						},
+					}))
+				})
+
 			})
 
 			When("the cloud controller returns back no spaces", func() {
@@ -865,6 +899,77 @@ var _ = Describe("Space", func() {
 						It("returns all warnings and the error", func() {
 							Expect(err).To(MatchError("get-space-iso-seg-error"))
 							Expect(warnings).To(ConsistOf("get-apps-warning", "get-space-warning", "get-org-warning", "get-space-iso-seg-warning"))
+						})
+					})
+
+					When("there is no quota applied to the space", func() {
+						It("requests never attempts to request the space quota", func() {
+							Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(0))
+						})
+
+						It("returns a space summary with an empty quota name", func() {
+							Expect(spaceSummary.QuotaName).To(Equal(""))
+						})
+
+					})
+
+					When("there is a quota applied to the space", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetSpacesReturns(
+								[]ccv3.Space{
+									{
+										GUID: "some-space-guid",
+										Name: "some-space-name",
+										Relationships: ccv3.Relationships{
+											constant.RelationshipTypeQuota: ccv3.Relationship{GUID: "some-space-quota-guid"},
+										},
+									},
+								},
+								ccv3.Warnings{"get-space-warning"}, nil)
+						})
+
+						It("requests the space quota by the applied quota GUID", func() {
+							Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)).To(Equal("some-space-quota-guid"))
+						})
+
+						When("getting the space quota succeeds", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetSpaceQuotaReturns(
+									ccv3.SpaceQuota{
+										Quota: ccv3.Quota{
+											Name: "some-space-quota",
+											GUID: "some-space-quota-guid",
+										},
+									},
+									ccv3.Warnings{"get-space-quota-warning"},
+									nil,
+								)
+							})
+
+							It("returns the applied quota name on the space summary", func() {
+								Expect(spaceSummary.QuotaName).To(Equal("some-space-quota"))
+							})
+						})
+						When("getting the space quota fails", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetSpaceQuotaReturns(
+									ccv3.SpaceQuota{
+										Quota: ccv3.Quota{
+											Name: "some-space-quota",
+											GUID: "some-space-quota-guid",
+										},
+									},
+									ccv3.Warnings{"get-space-quota-warning"},
+									errors.New("get-space-quota-error"),
+								)
+							})
+
+							It("returns all warnings and an error", func() {
+								Expect(err).To(MatchError("get-space-quota-error"))
+								Expect(warnings).To(ConsistOf("get-org-warning", "get-space-warning", "get-apps-warning", "get-space-quota-warning"))
+
+							})
 						})
 					})
 				})

@@ -151,6 +151,26 @@ func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnin
 	return createdSpaceQuota, response.Warnings, err
 }
 
+func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSpaceQuotaRequest,
+		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
+	})
+	if err != nil {
+		return SpaceQuota{}, nil, err
+	}
+	var responseOrgQuota SpaceQuota
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseOrgQuota,
+	}
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return SpaceQuota{}, response.Warnings, err
+	}
+
+	return responseOrgQuota, response.Warnings, nil
+}
+
 func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceQuotasRequest,
