@@ -334,7 +334,7 @@ var _ = Describe("Space Quotas", func() {
 	Describe("GetSpaceQuota", func() {
 		var (
 			spaceQuota     SpaceQuota
-			spaceQuotaGUID string
+			spaceQuotaGUID = "space-quota-guid"
 		)
 
 		JustBeforeEach(func() {
@@ -342,7 +342,6 @@ var _ = Describe("Space Quotas", func() {
 		})
 		When("the cloud controller returns without errors", func() {
 			BeforeEach(func() {
-				spaceQuotaGUID = "space-quota-guid"
 
 				response := fmt.Sprintf(`{
 						  "guid": "space-quota-guid",
