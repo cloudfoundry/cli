@@ -187,17 +187,17 @@ var _ = Describe("v3-env command", func() {
 				Eventually(helpers.CF("set-staging-environment-variable-group", `{}`)).Should(Exit(0))
 
 				session = helpers.CF("v3-env", appName)
-				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say("System-Provided:"))
-				Eventually(session).ShouldNot(Say("VCAP_SERVICES"))
-				Eventually(session).Should(Say("VCAP_APPLICATION"))
-
-				Eventually(session).Should(Say("No user-provided env variables have been set"))
-
-				Eventually(session).Should(Say("No running env variables have been set"))
-
-				Eventually(session).Should(Say("No staging env variables have been set"))
 				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+				Expect(session).Should(Say("System-Provided:"))
+				Expect(session).Should(Say(`VCAP_SERVICES: \{\}`))
+				Expect(session).Should(Say("VCAP_APPLICATION"))
+
+				Expect(session).Should(Say("No user-provided env variables have been set"))
+
+				Expect(session).Should(Say("No running env variables have been set"))
+
+				Expect(session).Should(Say("No staging env variables have been set"))
 			})
 		})
 	})
