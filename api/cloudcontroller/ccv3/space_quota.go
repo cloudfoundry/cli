@@ -151,6 +151,10 @@ func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnin
 	return createdSpaceQuota, response.Warnings, err
 }
 
+func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings, error) {
+	return SpaceQuota{}, Warnings{}, nil
+}
+
 func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceQuotasRequest,

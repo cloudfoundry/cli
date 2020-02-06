@@ -100,6 +100,8 @@ var _ = Describe("space command", func() {
 						Eventually(session).Should(Say(`org:\s+%s`, orgName))
 						Eventually(session).Should(Say(`apps:\s+%s`, appName))
 						Eventually(session).Should(Say(`services:`))
+						Eventually(session).Should(Say("isolation segment:"))
+						Eventually(session).Should(Say("quota:"))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -162,6 +164,23 @@ var _ = Describe("space command", func() {
 					It("shows the service instance", func() {
 						session := helpers.CF("space", spaceName)
 						Eventually(session).Should(Say(`services:\s+%s`, serviceInstanceName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the space has an applied quota", func() {
+					var spaceQuotaName = helpers.QuotaName()
+					BeforeEach(func() {
+						session := helpers.CF("create-space-quota", spaceQuotaName)
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("set-space-quota", spaceName, spaceQuotaName)
+						Eventually(session).Should(Exit(0))
+					})
+
+					It("shows the applied quota", func() {
+						session := helpers.CF("space", spaceName)
+						Eventually(session).Should(Say(`quota:\s+%s`, spaceQuotaName))
 						Eventually(session).Should(Exit(0))
 					})
 				})
