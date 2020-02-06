@@ -25,7 +25,12 @@ func NewQuotaDisplayer(ui command.UI) QuotaDisplayer {
 	return QuotaDisplayer{ui: ui}
 }
 
-func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []v7action.Quota) {
+func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []v7action.Quota, emptyMessage string) {
+	if len(quotas) == 0 {
+		displayer.ui.DisplayText(emptyMessage)
+		return
+	}
+
 	var keyValueTable = [][]string{
 		{"name", "total memory", "instance memory", "routes", "service instances", "paid service plans", "app instances", "route ports"},
 	}

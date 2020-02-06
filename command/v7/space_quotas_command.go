@@ -67,7 +67,7 @@ func (cmd SpaceQuotasCommand) Execute(args []string) error {
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
-	quotaDisplayer.DisplayQuotasTable(quotas)
+	quotaDisplayer.DisplayQuotasTable(quotas, "No space quotas found.")
 
 	return nil
 }

@@ -67,7 +67,7 @@ func (cmd OrgQuotasCommand) Execute(args []string) error {
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
-	quotaDisplayer.DisplayQuotasTable(quotas)
+	quotaDisplayer.DisplayQuotasTable(quotas, "No organization quotas found.")
 
 	return nil
 }

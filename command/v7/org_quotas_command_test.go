@@ -155,4 +155,20 @@ var _ = Describe("org-quotas command", func() {
 			Expect(testUI.Err).To(Say("some-warning-2"))
 		})
 	})
+
+	When("the quota list is empty", func() {
+		BeforeEach(func() {
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeActor.GetOrganizationQuotasReturns([]v7action.OrganizationQuota{}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
+		})
+
+		It("prints warnings and returns error", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+
+			Expect(testUI.Err).To(Say("some-warning-1"))
+			Expect(testUI.Err).To(Say("some-warning-2"))
+			Expect(testUI.Out).To(Say(`Getting org quotas as apple\.\.\.`))
+			Expect(testUI.Out).To(Say("No organization quotas found."))
+		})
+	})
 })
