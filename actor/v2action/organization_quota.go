@@ -36,7 +36,7 @@ func (actor Actor) GetOrganizationQuotaByName(quotaName string) (OrganizationQuo
 		}
 		return OrganizationQuota{}, Warnings(warnings), actionerror.MultipleOrganizationQuotasFoundForNameError{Name: quotaName, GUIDs: GUIDs}
 	} else if len(orgQuotas) == 0 {
-		return OrganizationQuota{}, Warnings(warnings), actionerror.OrganizationQuotaNotFoundForNameError{Name: quotaName}
+		return OrganizationQuota{}, Warnings(warnings), actionerror.QuotaNotFoundForNameError{Name: quotaName}
 	}
 
 	return OrganizationQuota(orgQuotas[0]), Warnings(warnings), nil

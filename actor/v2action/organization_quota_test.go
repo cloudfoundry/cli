@@ -167,7 +167,7 @@ var _ = Describe("OrganizationQuota Actions", func() {
 				})
 
 				It("returns an error that no quotas were found and does not try to create the org", func() {
-					Expect(executeErr).To(MatchError(actionerror.OrganizationQuotaNotFoundForNameError{Name: quotaName}))
+					Expect(executeErr).To(MatchError(actionerror.QuotaNotFoundForNameError{Name: quotaName}))
 					Expect(warnings).To(ConsistOf("quota-warning-1", "quota-warning-2"))
 
 					Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
