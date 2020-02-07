@@ -24,6 +24,22 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:c71b9f186430809f337cec9058b69b110b1afc252ebbe318b0857dc2300dc391"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "d0dfa93bb41add74220345383743f6c7ef32754c"
+  version = "v6.49.0"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -431,7 +447,7 @@
   version = "v1.7.0"
 
 [[projects]]
-  digest = "1:20237a6d616a2a70a29fcc2ac93e7039a39eed0d040ef4a818479fcd953f9466"
+  digest = "1:95f09e7b02ad73c56c05479182dba9de59a5576e2acaff2f0b2532369fe14ea0"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -453,8 +469,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "27d50ea6455b212cf516609fa58b2b5dce1abc81"
-  version = "v1.6.0"
+  revision = "6be6c439588487cd908a3a700795660c2a16dfec"
+  version = "v1.9.0"
 
 [[projects]]
   digest = "1:e0cc8395ea893c898ff5eb0850f4d9851c1f57c78c232304a026379a47a552d0"
@@ -602,6 +618,17 @@
   ]
   pruneopts = "NUT"
   revision = "cbf43d21aaebfdfeb81d91a5f444d13a3046e686"
+
+[[projects]]
+  branch = "master"
+  digest = "1:325a1b73817aa79fc85f10376ed41ea607f7dd7f6c6bfa46df6a28ef2857941f"
+  name = "golang.org/x/xerrors"
+  packages = [
+    ".",
+    "internal",
+  ]
+  pruneopts = "NUT"
+  revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
   branch = "master"
