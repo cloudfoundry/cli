@@ -132,6 +132,7 @@ type CloudControllerClient interface {
 	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateSpaceQuota(spaceQuota ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)
+	UnsetSpaceQuota(spaceQuotaGUID, spaceGUID string) (ccv3.Warnings, error)
 	UpdateServiceBroker(serviceBrokerGUID string, serviceBroker ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadBitsPackage(pkg ccv3.Package, matchedResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)

@@ -1501,6 +1501,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	UnsetSpaceQuotaStub        func(string, string) (ccv3.Warnings, error)
+	unsetSpaceQuotaMutex       sync.RWMutex
+	unsetSpaceQuotaArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	unsetSpaceQuotaReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	unsetSpaceQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UnsharePrivateDomainFromOrgStub        func(string, string) (ccv3.Warnings, error)
 	unsharePrivateDomainFromOrgMutex       sync.RWMutex
 	unsharePrivateDomainFromOrgArgsForCall []struct {
@@ -8494,6 +8508,70 @@ func (fake *FakeCloudControllerClient) UnmapRouteReturnsOnCall(i int, result1 cc
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UnsetSpaceQuota(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.unsetSpaceQuotaMutex.Lock()
+	ret, specificReturn := fake.unsetSpaceQuotaReturnsOnCall[len(fake.unsetSpaceQuotaArgsForCall)]
+	fake.unsetSpaceQuotaArgsForCall = append(fake.unsetSpaceQuotaArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UnsetSpaceQuota", []interface{}{arg1, arg2})
+	fake.unsetSpaceQuotaMutex.Unlock()
+	if fake.UnsetSpaceQuotaStub != nil {
+		return fake.UnsetSpaceQuotaStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unsetSpaceQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UnsetSpaceQuotaCallCount() int {
+	fake.unsetSpaceQuotaMutex.RLock()
+	defer fake.unsetSpaceQuotaMutex.RUnlock()
+	return len(fake.unsetSpaceQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UnsetSpaceQuotaCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.unsetSpaceQuotaMutex.Lock()
+	defer fake.unsetSpaceQuotaMutex.Unlock()
+	fake.UnsetSpaceQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UnsetSpaceQuotaArgsForCall(i int) (string, string) {
+	fake.unsetSpaceQuotaMutex.RLock()
+	defer fake.unsetSpaceQuotaMutex.RUnlock()
+	argsForCall := fake.unsetSpaceQuotaArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UnsetSpaceQuotaReturns(result1 ccv3.Warnings, result2 error) {
+	fake.unsetSpaceQuotaMutex.Lock()
+	defer fake.unsetSpaceQuotaMutex.Unlock()
+	fake.UnsetSpaceQuotaStub = nil
+	fake.unsetSpaceQuotaReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UnsetSpaceQuotaReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.unsetSpaceQuotaMutex.Lock()
+	defer fake.unsetSpaceQuotaMutex.Unlock()
+	fake.UnsetSpaceQuotaStub = nil
+	if fake.unsetSpaceQuotaReturnsOnCall == nil {
+		fake.unsetSpaceQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.unsetSpaceQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrg(arg1 string, arg2 string) (ccv3.Warnings, error) {
 	fake.unsharePrivateDomainFromOrgMutex.Lock()
 	ret, specificReturn := fake.unsharePrivateDomainFromOrgReturnsOnCall[len(fake.unsharePrivateDomainFromOrgArgsForCall)]
@@ -10513,6 +10591,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.unmapRouteMutex.RLock()
 	defer fake.unmapRouteMutex.RUnlock()
+	fake.unsetSpaceQuotaMutex.RLock()
+	defer fake.unsetSpaceQuotaMutex.RUnlock()
 	fake.unsharePrivateDomainFromOrgMutex.RLock()
 	defer fake.unsharePrivateDomainFromOrgMutex.RUnlock()
 	fake.updateAppFeatureMutex.RLock()

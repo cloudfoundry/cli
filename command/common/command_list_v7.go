@@ -188,7 +188,7 @@ type commandList struct {
 	UnsetEnv                           v7.UnsetEnvCommand                           `command:"unset-env" alias:"ue" description:"Remove an env variable from an app"`
 	UnsetLabel                         v7.UnsetLabelCommand                         `command:"unset-label" description:"Unset a label (key-value pairs) for an API resource"`
 	UnsetOrgRole                       v7.UnsetOrgRoleCommand                       `command:"unset-org-role" description:"Remove an org role from a user"`
-	UnsetSpaceQuota                    v6.UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
+	UnsetSpaceQuota                    v7.UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
 	UnsetSpaceRole                     v7.UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
 	UnsharePrivateDomain               v7.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with a specific org"`
 	UnshareService                     v6.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`

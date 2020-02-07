@@ -25,6 +25,7 @@ const (
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
 	DeleteSpaceQuotaRequest                                     = "DeleteSpaceQuota"
 	DeleteSpaceRequest                                          = "DeleteSpace"
+	DeleteSpaceQuotaFromSpaceRequest                            = "DeleteSpaceQuotaFromSpace"
 	DeleteUserRequest                                           = "DeleteUser"
 	GetApplicationDropletCurrentRequest                         = "GetApplicationDropletCurrent"
 	GetApplicationEnvRequest                                    = "GetApplicationEnv"
@@ -252,6 +253,7 @@ var APIRoutes = []Route{
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaRequest},
 	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodGet, Name: GetSpaceQuotasRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchSpaceQuotaRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaFromSpaceRequest},
 	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: StacksResource, Path: "/:stack_guid", Method: http.MethodPatch, Name: PatchStackRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},

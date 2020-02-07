@@ -724,4 +724,126 @@ var _ = Describe("Space Quota Actions", func() {
 			})
 		})
 	})
+
+	Describe("UnsetSpaceQuota", func() {
+		var (
+			spaceQuotaName string
+			orgGUID        string
+			spaceName      string
+			warnings       Warnings
+			executeErr     error
+		)
+
+		BeforeEach(func() {
+			spaceQuotaName = "some-quota-name"
+			orgGUID = "some-org-guid"
+			spaceName = "some-space-name"
+
+			fakeCloudControllerClient.GetSpaceQuotasReturns(
+				[]ccv3.SpaceQuota{{Quota: ccv3.Quota{Name: spaceQuotaName}}},
+				ccv3.Warnings{"get-quotas-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]ccv3.Space{{Name: spaceName}},
+				ccv3.Warnings{"get-spaces-warning"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UnsetSpaceQuota(spaceQuotaName, spaceName, orgGUID)
+		})
+
+		When("getting the space fails", func() {
+			When("no space with that name exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{},
+						ccv3.Warnings{"get-spaces-warning"},
+						nil,
+					)
+				})
+
+				It("returns the error and prints warnings", func() {
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+
+					Expect(warnings).To(ContainElement("get-spaces-warning"))
+					Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: spaceName}))
+				})
+			})
+
+			When("getting the space returns an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{},
+						ccv3.Warnings{"get-spaces-warning"},
+						errors.New("some-get-spaces-error"),
+					)
+				})
+
+				It("returns the error and prints warnings", func() {
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+
+					Expect(warnings).To(ContainElement("get-spaces-warning"))
+					Expect(executeErr).To(MatchError("some-get-spaces-error"))
+				})
+			})
+		})
+
+		When("getting the space quota fails", func() {
+			When("no space with that name exists", func() {
+
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpaceQuotasReturns(
+						[]ccv3.SpaceQuota{},
+						ccv3.Warnings{"get-quota-warning"},
+						nil,
+					)
+				})
+
+				It("returns the error and prints warnings", func() {
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+
+					Expect(warnings).To(ContainElement("get-quota-warning"))
+					Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundByNameError{Name: spaceQuotaName}))
+				})
+			})
+
+			When("getting the space returns an error", func() {
+
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpaceQuotasReturns(
+						[]ccv3.SpaceQuota{},
+						ccv3.Warnings{"get-quota-warning"},
+						errors.New("some-get-quotas-error"),
+					)
+				})
+
+				It("returns the error and prints warnings", func() {
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+
+					Expect(warnings).To(ContainElement("get-quota-warning"))
+					Expect(executeErr).To(MatchError("some-get-quotas-error"))
+				})
+			})
+		})
+
+		When("unsetting the space quota fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnsetSpaceQuotaReturns(
+					ccv3.Warnings{"unset-quota-warning"},
+					errors.New("some-unset-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(warnings).To(ConsistOf("unset-quota-warning", "get-spaces-warning", "get-quotas-warning"))
+				Expect(executeErr).To(MatchError("some-unset-error"))
+			})
+		})
+
+	})
+
 })

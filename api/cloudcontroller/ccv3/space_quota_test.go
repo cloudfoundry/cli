@@ -816,6 +816,82 @@ var _ = Describe("Space Quotas", func() {
 		})
 	})
 
+	Describe("UnsetSpaceQuota", func() {
+		var (
+			spaceGUID      = "space-guid"
+			spaceQuotaGUID = "space-quota-guid"
+			warnings       Warnings
+			executeErr     error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.UnsetSpaceQuota(
+				spaceQuotaGUID,
+				spaceGUID,
+			)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, fmt.Sprintf("/v3/space_quotas/%s/relationships/spaces/%s", spaceQuotaGUID, spaceGUID)),
+						RespondWith(http.StatusNoContent, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(executeErr).To(BeNil())
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Organization not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, fmt.Sprintf("/v3/space_quotas/%s/relationships/spaces/%s", spaceQuotaGUID, spaceGUID)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Organization not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("UpdateSpaceQuota", func() {
 		var (
 			updatedSpaceQuota SpaceQuota

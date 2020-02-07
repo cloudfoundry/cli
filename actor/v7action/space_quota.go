@@ -147,3 +147,26 @@ func (actor Actor) UpdateSpaceQuota(currentName, orgGUID, newName string, limits
 
 	return allWarnings, err
 }
+
+func (actor Actor) UnsetSpaceQuota(spaceQuotaName, spaceName, orgGUID string) (Warnings, error) {
+	var allWarnings Warnings
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	spaceQuota, warnings, err := actor.GetSpaceQuotaByName(spaceQuotaName, orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	ccWarnings, err := actor.CloudControllerClient.UnsetSpaceQuota(spaceQuota.GUID, space.GUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	return allWarnings, nil
+}

@@ -214,6 +214,22 @@ func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, er
 	return spaceQuotasList, warnings, err
 }
 
+func (client *Client) UnsetSpaceQuota(spaceQuotaGUID, spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID, "space_guid": spaceGUID},
+		RequestName: internal.DeleteSpaceQuotaFromSpaceRequest,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
 func (client *Client) UpdateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnings, error) {
 	spaceQuotaGUID := spaceQuota.GUID
 	spaceQuota.GUID = ""
