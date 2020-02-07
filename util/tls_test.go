@@ -20,8 +20,8 @@ var _ = Describe("TLS", func() {
 			tlsConfig = NewTLSConfig(nil, false)
 		})
 
-		It("sets minimum version of TLS to 1.0", func() {
-			Expect(tlsConfig.MinVersion).To(BeEquivalentTo(tls.VersionTLS10))
+		It("sets minimum version of TLS to 1.2", func() {
+			Expect(tlsConfig.MinVersion).To(BeEquivalentTo(tls.VersionTLS12))
 		})
 
 		It("sets maximum version of TLS to 1.2", func() {

@@ -3,13 +3,14 @@ package util
 import (
 	"crypto/tls"
 	"crypto/x509"
+
+	"code.cloudfoundry.org/tlsconfig"
 )
 
 func NewTLSConfig(trustedCerts []*x509.Certificate, skipTLSValidation bool) *tls.Config {
-	config := &tls.Config{
-		MinVersion: tls.VersionTLS10,
-		MaxVersion: tls.VersionTLS12,
-	}
+	config := &tls.Config{}
+
+	_ = tlsconfig.WithExternalServiceDefaults()(config) //nolint - always returns nil
 
 	if len(trustedCerts) > 0 {
 		certPool := x509.NewCertPool()

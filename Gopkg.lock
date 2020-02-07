@@ -98,6 +98,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:01b441faa3ff0ad22ace4d3583b2d6d1e27bee4efb8b9024f23c2688b622ed42"
+  name = "code.cloudfoundry.org/tlsconfig"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "bbe0f8da39b3c59d42217afcc79019c754dabdfb"
+
+[[projects]]
+  branch = "master"
   digest = "1:29bbdf8e9efdcac7e2f90bad14162cb85ed43c01c960dbe6b99b8029a74e0404"
   name = "code.cloudfoundry.org/ykk"
   packages = ["."]
@@ -711,6 +719,7 @@
     "code.cloudfoundry.org/lager/lagertest",
     "code.cloudfoundry.org/log-cache/pkg/client",
     "code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1",
+    "code.cloudfoundry.org/tlsconfig",
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",
     "github.com/SermoDigital/jose/jws",
