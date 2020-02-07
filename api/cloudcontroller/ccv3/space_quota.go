@@ -151,6 +151,24 @@ func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnin
 	return createdSpaceQuota, response.Warnings, err
 }
 
+func (client Client) DeleteSpaceQuota(spaceQuotaGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteSpaceQuotaRequest,
+		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return "", response.Warnings, err
+	}
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, nil
+}
+
 func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceQuotaRequest,
@@ -159,16 +177,16 @@ func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings,
 	if err != nil {
 		return SpaceQuota{}, nil, err
 	}
-	var responseOrgQuota SpaceQuota
+	var responseSpaceQuota SpaceQuota
 	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrgQuota,
+		DecodeJSONResponseInto: &responseSpaceQuota,
 	}
 	err = client.connection.Make(request, &response)
 	if err != nil {
 		return SpaceQuota{}, response.Warnings, err
 	}
 
-	return responseOrgQuota, response.Warnings, nil
+	return responseSpaceQuota, response.Warnings, nil
 }
 
 func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {

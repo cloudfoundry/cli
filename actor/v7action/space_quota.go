@@ -40,6 +40,30 @@ func (actor Actor) CreateSpaceQuota(spaceQuotaName string, orgGuid string, limit
 	return allWarnings, err
 }
 
+func (actor Actor) DeleteSpaceQuotaByName(quotaName string, orgGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	quota, warnings, err := actor.GetSpaceQuotaByName(quotaName, orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobURL, ccv3Warnings, err := actor.CloudControllerClient.DeleteSpaceQuota(quota.GUID)
+	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	ccv3Warnings, err = actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	return allWarnings, nil
+}
+
 func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (SpaceQuota, Warnings, error) {
 	ccv3Quotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(
 		ccv3.Query{

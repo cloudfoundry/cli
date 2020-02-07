@@ -566,6 +566,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteSpaceQuotaStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteSpaceQuotaMutex       sync.RWMutex
+	deleteSpaceQuotaArgsForCall []struct {
+		arg1 string
+	}
+	deleteSpaceQuotaReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteSpaceQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteUserStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteUserMutex       sync.RWMutex
 	deleteUserArgsForCall []struct {
@@ -4371,6 +4386,72 @@ func (fake *FakeCloudControllerClient) DeleteSpaceReturnsOnCall(i int, result1 c
 		})
 	}
 	fake.deleteSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceQuota(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteSpaceQuotaMutex.Lock()
+	ret, specificReturn := fake.deleteSpaceQuotaReturnsOnCall[len(fake.deleteSpaceQuotaArgsForCall)]
+	fake.deleteSpaceQuotaArgsForCall = append(fake.deleteSpaceQuotaArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteSpaceQuota", []interface{}{arg1})
+	fake.deleteSpaceQuotaMutex.Unlock()
+	if fake.DeleteSpaceQuotaStub != nil {
+		return fake.DeleteSpaceQuotaStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteSpaceQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceQuotaCallCount() int {
+	fake.deleteSpaceQuotaMutex.RLock()
+	defer fake.deleteSpaceQuotaMutex.RUnlock()
+	return len(fake.deleteSpaceQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceQuotaCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteSpaceQuotaMutex.Lock()
+	defer fake.deleteSpaceQuotaMutex.Unlock()
+	fake.DeleteSpaceQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceQuotaArgsForCall(i int) string {
+	fake.deleteSpaceQuotaMutex.RLock()
+	defer fake.deleteSpaceQuotaMutex.RUnlock()
+	argsForCall := fake.deleteSpaceQuotaArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceQuotaReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteSpaceQuotaMutex.Lock()
+	defer fake.deleteSpaceQuotaMutex.Unlock()
+	fake.DeleteSpaceQuotaStub = nil
+	fake.deleteSpaceQuotaReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceQuotaReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteSpaceQuotaMutex.Lock()
+	defer fake.deleteSpaceQuotaMutex.Unlock()
+	fake.DeleteSpaceQuotaStub = nil
+	if fake.deleteSpaceQuotaReturnsOnCall == nil {
+		fake.deleteSpaceQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteSpaceQuotaReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -10308,6 +10389,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
 	fake.deleteSpaceMutex.RLock()
 	defer fake.deleteSpaceMutex.RUnlock()
+	fake.deleteSpaceQuotaMutex.RLock()
+	defer fake.deleteSpaceQuotaMutex.RUnlock()
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()

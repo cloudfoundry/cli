@@ -331,6 +331,74 @@ var _ = Describe("Space Quotas", func() {
 		})
 	})
 
+	Describe("DeleteSpaceQuota", func() {
+		var (
+			jobURL     JobURL
+			warnings   Warnings
+			executeErr error
+
+			spaceQuotaGUID = "space-quota-guid"
+		)
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteSpaceQuota(spaceQuotaGUID)
+		})
+
+		When("the cloud controller returns without errors", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/space_quotas/space-quota-guid"),
+						RespondWith(http.StatusAccepted, nil, http.Header{"X-Cf-Warnings": {"some-quota-warning"}, "Location": {"some-job-url"}}),
+					),
+				)
+			})
+
+			It("returns a URL to the deletion job", func() {
+				Expect(jobURL).To(Equal(JobURL("some-job-url")))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Space quota not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/space_quotas/space-quota-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10010,
+								Detail: "Space quota not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("GetSpaceQuota", func() {
 		var (
 			spaceQuota     SpaceQuota

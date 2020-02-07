@@ -195,6 +195,113 @@ var _ = Describe("Space Quota Actions", func() {
 		})
 	})
 
+	Describe("DeleteSpaceQuotaByName", func() {
+		var (
+			quotaName  string
+			orgGUID    string
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			quotaName = "quota-name"
+			orgGUID = "some-org-guid"
+
+			fakeCloudControllerClient.GetSpaceQuotasReturns(
+				[]ccv3.SpaceQuota{{Quota: ccv3.Quota{GUID: "some-quota-guid"}}},
+				ccv3.Warnings{"get-quota-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.DeleteSpaceQuotaReturns(
+				ccv3.JobURL("some-job-url"),
+				ccv3.Warnings{"delete-quota-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.PollJobReturns(
+				ccv3.Warnings{"poll-job-warning"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DeleteSpaceQuotaByName(quotaName, orgGUID)
+		})
+
+		When("no errors occur", func() {
+			It("retrieves the space quota by name, makes the API call, and polls the deletion job until completion", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-quota-warning", "delete-quota-warning", "poll-job-warning"))
+
+				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetSpaceQuotasArgsForCall(0)
+				Expect(query).To(ConsistOf(
+					ccv3.Query{
+						Key:    ccv3.OrganizationGUIDFilter,
+						Values: []string{orgGUID},
+					},
+					ccv3.Query{
+						Key:    ccv3.NameFilter,
+						Values: []string{quotaName},
+					},
+				))
+
+				Expect(fakeCloudControllerClient.DeleteSpaceQuotaCallCount()).To(Equal(1))
+				quotaGUID := fakeCloudControllerClient.DeleteSpaceQuotaArgsForCall(0)
+				Expect(quotaGUID).To(Equal("some-quota-guid"))
+
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				inputJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+				Expect(inputJobURL).To(Equal(ccv3.JobURL("some-job-url")))
+			})
+		})
+
+		When("there is an error getting the space quota", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceQuotasReturns(
+					[]ccv3.SpaceQuota{},
+					ccv3.Warnings{"get-quota-warning"},
+					errors.New("get-quota-error"),
+				)
+			})
+
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("get-quota-error"))
+				Expect(warnings).To(ConsistOf("get-quota-warning"))
+			})
+		})
+
+		When("there is an error deleting the space quota", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteSpaceQuotaReturns(
+					"",
+					ccv3.Warnings{"delete-quota-warning"},
+					errors.New("delete-quota-error"),
+				)
+			})
+
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("delete-quota-error"))
+				Expect(warnings).To(ConsistOf("get-quota-warning", "delete-quota-warning"))
+			})
+		})
+
+		When("there is an error polling the job", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"poll-job-warning"},
+					errors.New("poll-job-error"),
+				)
+			})
+
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("poll-job-error"))
+				Expect(warnings).To(ConsistOf("get-quota-warning", "delete-quota-warning", "poll-job-warning"))
+			})
+		})
+	})
+
 	Describe("GetSpaceQuotaByName", func() {
 		var (
 			quotaName  string
