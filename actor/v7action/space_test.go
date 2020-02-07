@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -937,8 +938,8 @@ var _ = Describe("Space", func() {
 						When("getting the space quota succeeds", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.GetSpaceQuotaReturns(
-									ccv3.SpaceQuota{
-										Quota: ccv3.Quota{
+									resources.SpaceQuota{
+										Quota: resources.Quota{
 											Name: "some-space-quota",
 											GUID: "some-space-quota-guid",
 										},
@@ -955,8 +956,8 @@ var _ = Describe("Space", func() {
 						When("getting the space quota fails", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.GetSpaceQuotaReturns(
-									ccv3.SpaceQuota{
-										Quota: ccv3.Quota{
+									resources.SpaceQuota{
+										Quota: resources.Quota{
 											Name: "some-space-quota",
 											GUID: "some-space-quota-guid",
 										},

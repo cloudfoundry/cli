@@ -5,13 +5,14 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . SpaceQuotasActor
 
 type SpaceQuotasActor interface {
-	GetSpaceQuotasByOrgGUID(orgGUID string) ([]v7action.SpaceQuota, v7action.Warnings, error)
+	GetSpaceQuotasByOrgGUID(orgGUID string) ([]resources.SpaceQuota, v7action.Warnings, error)
 }
 
 type SpaceQuotasCommand struct {
@@ -61,9 +62,9 @@ func (cmd SpaceQuotasCommand) Execute(args []string) error {
 		return err
 	}
 
-	var quotas []v7action.Quota
+	var quotas []resources.Quota
 	for _, orgQuota := range orgQuotas {
-		quotas = append(quotas, v7action.Quota(orgQuota.Quota))
+		quotas = append(quotas, orgQuota.Quota)
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)

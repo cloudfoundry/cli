@@ -3,12 +3,9 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
-
-type Quota ccv3.Quota
-
-type OrganizationQuota ccv3.OrganizationQuota
 
 type QuotaLimits struct {
 	TotalMemoryInMB       *types.NullInt
@@ -67,21 +64,16 @@ func (actor Actor) DeleteOrganizationQuota(quotaName string) (Warnings, error) {
 	return allWarnings, err
 }
 
-func (actor Actor) GetOrganizationQuotas() ([]OrganizationQuota, Warnings, error) {
-	ccv3OrgQuotas, warnings, err := actor.CloudControllerClient.GetOrganizationQuotas()
+func (actor Actor) GetOrganizationQuotas() ([]resources.OrganizationQuota, Warnings, error) {
+	orgQuotas, warnings, err := actor.CloudControllerClient.GetOrganizationQuotas()
 	if err != nil {
-		return []OrganizationQuota{}, Warnings(warnings), err
-	}
-
-	var orgQuotas []OrganizationQuota
-	for _, quota := range ccv3OrgQuotas {
-		orgQuotas = append(orgQuotas, OrganizationQuota(quota))
+		return []resources.OrganizationQuota{}, Warnings(warnings), err
 	}
 
 	return orgQuotas, Warnings(warnings), nil
 }
 
-func (actor Actor) GetOrganizationQuotaByName(orgQuotaName string) (OrganizationQuota, Warnings, error) {
+func (actor Actor) GetOrganizationQuotaByName(orgQuotaName string) (resources.OrganizationQuota, Warnings, error) {
 	ccv3OrgQuotas, warnings, err := actor.CloudControllerClient.GetOrganizationQuotas(
 		ccv3.Query{
 			Key:    ccv3.NameFilter,
@@ -89,14 +81,14 @@ func (actor Actor) GetOrganizationQuotaByName(orgQuotaName string) (Organization
 		},
 	)
 	if err != nil {
-		return OrganizationQuota{}, Warnings(warnings), err
+		return resources.OrganizationQuota{}, Warnings(warnings), err
 
 	}
 
 	if len(ccv3OrgQuotas) == 0 {
-		return OrganizationQuota{}, Warnings(warnings), actionerror.OrganizationQuotaNotFoundForNameError{Name: orgQuotaName}
+		return resources.OrganizationQuota{}, Warnings(warnings), actionerror.OrganizationQuotaNotFoundForNameError{Name: orgQuotaName}
 	}
-	orgQuota := OrganizationQuota(ccv3OrgQuotas[0])
+	orgQuota := ccv3OrgQuotas[0]
 
 	return orgQuota, Warnings(warnings), nil
 }
@@ -123,23 +115,23 @@ func (actor Actor) UpdateOrganizationQuota(quotaName string, newName string, lim
 	return allWarnings, err
 }
 
-func createQuotaStruct(name string, limits QuotaLimits) ccv3.OrganizationQuota {
-	AppLimit := ccv3.AppLimit{
+func createQuotaStruct(name string, limits QuotaLimits) resources.OrganizationQuota {
+	AppLimit := resources.AppLimit{
 		TotalMemory:       limits.TotalMemoryInMB,
 		InstanceMemory:    limits.PerProcessMemoryInMB,
 		TotalAppInstances: limits.TotalInstances,
 	}
-	ServiceLimit := ccv3.ServiceLimit{
+	ServiceLimit := resources.ServiceLimit{
 		TotalServiceInstances: limits.TotalServiceInstances,
 		PaidServicePlans:      limits.PaidServicesAllowed,
 	}
-	RouteLimit := ccv3.RouteLimit{
+	RouteLimit := resources.RouteLimit{
 		TotalRoutes:        limits.TotalRoutes,
 		TotalReservedPorts: limits.TotalReservedPorts,
 	}
 
-	quota := ccv3.OrganizationQuota{
-		Quota: ccv3.Quota{
+	quota := resources.OrganizationQuota{
+		Quota: resources.Quota{
 			Name:     name,
 			Apps:     AppLimit,
 			Services: ServiceLimit,
@@ -150,7 +142,7 @@ func createQuotaStruct(name string, limits QuotaLimits) ccv3.OrganizationQuota {
 	return quota
 }
 
-func setZeroDefaultsForQuotaCreation(apps *ccv3.AppLimit, routes *ccv3.RouteLimit, services *ccv3.ServiceLimit) {
+func setZeroDefaultsForQuotaCreation(apps *resources.AppLimit, routes *resources.RouteLimit, services *resources.ServiceLimit) {
 	if apps.TotalMemory == nil {
 		apps.TotalMemory = &types.NullInt{IsSet: true, Value: 0}
 	}
@@ -168,7 +160,7 @@ func setZeroDefaultsForQuotaCreation(apps *ccv3.AppLimit, routes *ccv3.RouteLimi
 	}
 }
 
-func convertUnlimitedToNil(apps *ccv3.AppLimit, routes *ccv3.RouteLimit, services *ccv3.ServiceLimit) {
+func convertUnlimitedToNil(apps *resources.AppLimit, routes *resources.RouteLimit, services *resources.ServiceLimit) {
 	flags := []*types.NullInt{
 		apps.TotalMemory,
 		apps.InstanceMemory,

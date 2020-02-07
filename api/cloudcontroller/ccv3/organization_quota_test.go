@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
@@ -17,7 +19,7 @@ var _ = Describe("Organization Quotas", func() {
 		client     *Client
 		executeErr error
 		warnings   Warnings
-		orgQuotas  []OrganizationQuota
+		orgQuotas  []resources.OrganizationQuota
 		query      Query
 		trueValue  = true
 		falseValue = false
@@ -147,39 +149,39 @@ var _ = Describe("Organization Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("page1 warning", "page2 warning"))
 				Expect(orgQuotas).To(ConsistOf(
-					OrganizationQuota{
-						Quota: Quota{
+					resources.OrganizationQuota{
+						Quota: resources.Quota{
 							GUID: "quota-guid",
 							Name: "don-quixote",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 5120, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
 								PaidServicePlans:      &trueValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 							},
 						},
 					},
-					OrganizationQuota{
-						Quota: Quota{
+					resources.OrganizationQuota{
+						Quota: resources.Quota{
 							GUID: "quota-2-guid",
 							Name: "sancho-panza",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 							},
@@ -248,20 +250,20 @@ var _ = Describe("Organization Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("page1 warning"))
 				Expect(orgQuotas).To(ConsistOf(
-					OrganizationQuota{
-						Quota: Quota{
+					resources.OrganizationQuota{
+						Quota: resources.Quota{
 							GUID: "quota-2-guid",
 							Name: "sancho-panza",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 							},
@@ -318,7 +320,7 @@ var _ = Describe("Organization Quotas", func() {
 
 	Describe("GetOrganizationQuota", func() {
 		var (
-			returnedOrgQuota OrganizationQuota
+			returnedOrgQuota resources.OrganizationQuota
 			orgQuotaGUID     = "quota_guid"
 		)
 		JustBeforeEach(func() {
@@ -375,20 +377,20 @@ var _ = Describe("Organization Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("show warning"))
 				Expect(returnedOrgQuota).To(Equal(
-					OrganizationQuota{
-						Quota: Quota{
+					resources.OrganizationQuota{
+						Quota: resources.Quota{
 							GUID: "quota-guid",
 							Name: "don-quixote",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 5120, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
 								PaidServicePlans:      &trueValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 							},
@@ -445,26 +447,26 @@ var _ = Describe("Organization Quotas", func() {
 
 	Describe("CreateOrganizationQuota", func() {
 		var (
-			createdOrgQuota OrganizationQuota
+			createdOrgQuota resources.OrganizationQuota
 			warnings        Warnings
 			executeErr      error
-			inputQuota      OrganizationQuota
+			inputQuota      resources.OrganizationQuota
 		)
 
 		BeforeEach(func() {
-			inputQuota = OrganizationQuota{
-				Quota: Quota{
+			inputQuota = resources.OrganizationQuota{
+				Quota: resources.Quota{
 					Name: "elephant-trunk",
-					Apps: AppLimit{
+					Apps: resources.AppLimit{
 						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 					},
-					Services: ServiceLimit{
+					Services: resources.ServiceLimit{
 						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 						PaidServicePlans:      &trueValue,
 					},
-					Routes: RouteLimit{
+					Routes: resources.RouteLimit{
 						TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
 						TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 					},
@@ -695,23 +697,23 @@ var _ = Describe("Organization Quotas", func() {
 
 	Describe("UpdateOrganizationQuota", func() {
 		var (
-			updatedOrgQuota OrganizationQuota
+			updatedOrgQuota resources.OrganizationQuota
 			warnings        Warnings
 			executeErr      error
-			inputQuota      OrganizationQuota
+			inputQuota      resources.OrganizationQuota
 		)
 
 		BeforeEach(func() {
-			inputQuota = OrganizationQuota{
-				Quota: Quota{
+			inputQuota = resources.OrganizationQuota{
+				Quota: resources.Quota{
 					GUID: "elephant-trunk-guid",
 					Name: "elephant-trunk",
-					Apps: AppLimit{
+					Apps: resources.AppLimit{
 						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 					},
-					Services: ServiceLimit{
+					Services: resources.ServiceLimit{
 						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 						PaidServicePlans:      &trueValue,
 					},
@@ -782,20 +784,20 @@ var _ = Describe("Organization Quotas", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(updatedOrgQuota).To(Equal(OrganizationQuota{
-					Quota: Quota{
+				Expect(updatedOrgQuota).To(Equal(resources.OrganizationQuota{
+					Quota: resources.Quota{
 						GUID: "elephant-trunk-guid",
 						Name: "elephant-trunk",
-						Apps: AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
 							TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
 						},
-						Services: ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
 							PaidServicePlans:      &trueValue,
 						},
-						Routes: RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
 							TotalReservedPorts: &types.NullInt{IsSet: false, Value: 0},
 						},

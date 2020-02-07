@@ -1,9 +1,9 @@
-package ccv3_test
+package resources_test
 
 import (
 	"encoding/json"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	. "code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

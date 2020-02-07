@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Space ccv3.Space
@@ -173,7 +174,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 
 	appliedQuotaRelationshipGUID := space.Relationships[constant.RelationshipTypeQuota].GUID
 
-	var ccv3SpaceQuota ccv3.SpaceQuota
+	var ccv3SpaceQuota resources.SpaceQuota
 	if appliedQuotaRelationshipGUID != "" {
 		ccv3SpaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
 		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)

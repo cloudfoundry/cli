@@ -1,4 +1,4 @@
-package ccv3
+package resources
 
 import (
 	"encoding/json"

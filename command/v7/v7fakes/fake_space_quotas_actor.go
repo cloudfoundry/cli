@@ -6,21 +6,22 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeSpaceQuotasActor struct {
-	GetSpaceQuotasByOrgGUIDStub        func(string) ([]v7action.SpaceQuota, v7action.Warnings, error)
+	GetSpaceQuotasByOrgGUIDStub        func(string) ([]resources.SpaceQuota, v7action.Warnings, error)
 	getSpaceQuotasByOrgGUIDMutex       sync.RWMutex
 	getSpaceQuotasByOrgGUIDArgsForCall []struct {
 		arg1 string
 	}
 	getSpaceQuotasByOrgGUIDReturns struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceQuotasByOrgGUIDReturnsOnCall map[int]struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -28,7 +29,7 @@ type FakeSpaceQuotasActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUID(arg1 string) ([]v7action.SpaceQuota, v7action.Warnings, error) {
+func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUID(arg1 string) ([]resources.SpaceQuota, v7action.Warnings, error) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotasByOrgGUIDReturnsOnCall[len(fake.getSpaceQuotasByOrgGUIDArgsForCall)]
 	fake.getSpaceQuotasByOrgGUIDArgsForCall = append(fake.getSpaceQuotasByOrgGUIDArgsForCall, struct {
@@ -52,7 +53,7 @@ func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDCallCount() int {
 	return len(fake.getSpaceQuotasByOrgGUIDArgsForCall)
 }
 
-func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDCalls(stub func(string) ([]v7action.SpaceQuota, v7action.Warnings, error)) {
+func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDCalls(stub func(string) ([]resources.SpaceQuota, v7action.Warnings, error)) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	defer fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
 	fake.GetSpaceQuotasByOrgGUIDStub = stub
@@ -65,30 +66,30 @@ func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDArgsForCall(i int) stri
 	return argsForCall.arg1
 }
 
-func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDReturns(result1 []v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDReturns(result1 []resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	defer fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
 	fake.GetSpaceQuotasByOrgGUIDStub = nil
 	fake.getSpaceQuotasByOrgGUIDReturns = struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDReturnsOnCall(i int, result1 []v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeSpaceQuotasActor) GetSpaceQuotasByOrgGUIDReturnsOnCall(i int, result1 []resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	defer fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
 	fake.GetSpaceQuotasByOrgGUIDStub = nil
 	if fake.getSpaceQuotasByOrgGUIDReturnsOnCall == nil {
 		fake.getSpaceQuotasByOrgGUIDReturnsOnCall = make(map[int]struct {
-			result1 []v7action.SpaceQuota
+			result1 []resources.SpaceQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceQuotasByOrgGUIDReturnsOnCall[i] = struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

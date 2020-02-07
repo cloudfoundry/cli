@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 
 	. "github.com/onsi/ginkgo"
@@ -60,7 +61,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationQuotaReturns(
-					ccv3.OrganizationQuota{Quota: ccv3.Quota{Name: "my-quota", GUID: "quota-guid"}},
+					resources.OrganizationQuota{Quota: resources.Quota{Name: "my-quota", GUID: "quota-guid"}},
 					ccv3.Warnings{"get-quota-warning-1"}, nil)
 
 				fakeCloudControllerClient.GetSpacesReturns(
@@ -175,7 +176,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			When("an error is encountered getting the organization quota", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("quota error")
-					fakeCloudControllerClient.GetOrganizationQuotaReturns(ccv3.OrganizationQuota{}, ccv3.Warnings{"Quota warning"}, expectedErr)
+					fakeCloudControllerClient.GetOrganizationQuotaReturns(resources.OrganizationQuota{}, ccv3.Warnings{"Quota warning"}, expectedErr)
 				})
 
 				It("returns that error and all warnings", func() {

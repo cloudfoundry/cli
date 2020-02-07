@@ -6,13 +6,14 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . OrgQuotaActor
 
 type OrgQuotaActor interface {
-	GetOrganizationQuotaByName(orgQuotaName string) (v7action.OrganizationQuota, v7action.Warnings, error)
+	GetOrganizationQuotaByName(orgQuotaName string) (resources.OrganizationQuota, v7action.Warnings, error)
 }
 
 type OrgQuotaCommand struct {
@@ -69,7 +70,7 @@ func (cmd OrgQuotaCommand) Execute(args []string) error {
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
-	quotaDisplayer.DisplaySingleQuota(v7action.Quota(orgQuota.Quota))
+	quotaDisplayer.DisplaySingleQuota(orgQuota.Quota)
 
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -39,7 +40,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("when the org quota could not be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{},
+					[]resources.OrganizationQuota{},
 					ccv3.Warnings{"some-quota-warning"},
 					nil,
 				)
@@ -56,8 +57,8 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("when applying the quota returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{
-						{Quota: ccv3.Quota{GUID: "some-quota-guid"}},
+					[]resources.OrganizationQuota{
+						{Quota: resources.Quota{GUID: "some-quota-guid"}},
 					},
 					ccv3.Warnings{"some-quota-warning"},
 					nil,
@@ -82,8 +83,8 @@ var _ = Describe("Organization Quota Actions", func() {
 			var quotaGUID = "some-quota-guid"
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{
-						{Quota: ccv3.Quota{GUID: quotaGUID}},
+					[]resources.OrganizationQuota{
+						{Quota: resources.Quota{GUID: quotaGUID}},
 					},
 					ccv3.Warnings{"some-quota-warning"},
 					nil,
@@ -135,7 +136,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("all API calls succeed", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
+					[]resources.OrganizationQuota{{Quota: resources.Quota{Name: quotaName, GUID: "quota-guid"}}},
 					ccv3.Warnings{"get-quotas-warning"},
 					nil,
 				)
@@ -175,7 +176,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("getting the quota by name fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
+					[]resources.OrganizationQuota{{Quota: resources.Quota{Name: quotaName, GUID: "quota-guid"}}},
 					ccv3.Warnings{"get-quotas-warning"},
 					nil,
 				)
@@ -196,7 +197,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("issuing the delete-quota request fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
+					[]resources.OrganizationQuota{{Quota: resources.Quota{Name: quotaName, GUID: "quota-guid"}}},
 					ccv3.Warnings{"get-quotas-warning"},
 					nil,
 				)
@@ -222,7 +223,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("the delete job fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: quotaName, GUID: "quota-guid"}}},
+					[]resources.OrganizationQuota{{Quota: resources.Quota{Name: quotaName, GUID: "quota-guid"}}},
 					ccv3.Warnings{"get-quotas-warning"},
 					errors.New("get-quotas-error"),
 				)
@@ -237,7 +238,7 @@ var _ = Describe("Organization Quota Actions", func() {
 
 	Describe("GetOrganizationQuotas", func() {
 		var (
-			quotas     []OrganizationQuota
+			quotas     []resources.OrganizationQuota
 			warnings   Warnings
 			executeErr error
 		)
@@ -249,15 +250,15 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("getting organization quotas", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{
+					[]resources.OrganizationQuota{
 						{
-							Quota: ccv3.Quota{
+							Quota: resources.Quota{
 								GUID: "quota-guid",
 								Name: "kiwi",
 							},
 						},
 						{
-							Quota: ccv3.Quota{
+							Quota: resources.Quota{
 								GUID: "quota-2-guid",
 								Name: "strawberry",
 							},
@@ -274,14 +275,14 @@ var _ = Describe("Organization Quota Actions", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationQuotasCallCount()).To(Equal(1))
 
 				Expect(quotas).To(ConsistOf(
-					OrganizationQuota{
-						Quota: ccv3.Quota{
+					resources.OrganizationQuota{
+						Quota: resources.Quota{
 							GUID: "quota-guid",
 							Name: "kiwi",
 						},
 					},
-					OrganizationQuota{
-						Quota: ccv3.Quota{
+					resources.OrganizationQuota{
+						Quota: resources.Quota{
 							GUID: "quota-2-guid",
 							Name: "strawberry",
 						},
@@ -295,7 +296,7 @@ var _ = Describe("Organization Quota Actions", func() {
 	Describe("GetOrganizationQuotaByName", func() {
 		var (
 			quotaName  string
-			quota      OrganizationQuota
+			quota      resources.OrganizationQuota
 			warnings   Warnings
 			executeErr error
 		)
@@ -311,7 +312,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{},
+					[]resources.OrganizationQuota{},
 					ccv3.Warnings{"some-quota-warning"},
 					errors.New("list-error"),
 				)
@@ -322,14 +323,14 @@ var _ = Describe("Organization Quota Actions", func() {
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
 				Expect(executeErr).To(MatchError("list-error"))
-				Expect(quota).To(Equal(OrganizationQuota{}))
+				Expect(quota).To(Equal(resources.OrganizationQuota{}))
 			})
 		})
 
 		When("when the org quota could not be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{},
+					[]resources.OrganizationQuota{},
 					ccv3.Warnings{"some-quota-warning"},
 					nil,
 				)
@@ -340,16 +341,16 @@ var _ = Describe("Organization Quota Actions", func() {
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
 				Expect(executeErr).To(MatchError(actionerror.OrganizationQuotaNotFoundForNameError{Name: quotaName}))
-				Expect(quota).To(Equal(OrganizationQuota{}))
+				Expect(quota).To(Equal(resources.OrganizationQuota{}))
 			})
 		})
 
 		When("getting a single quota by name", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotasReturns(
-					[]ccv3.OrganizationQuota{
+					[]resources.OrganizationQuota{
 						{
-							Quota: ccv3.Quota{
+							Quota: resources.Quota{
 								GUID: "quota-guid",
 								Name: quotaName,
 							},
@@ -370,8 +371,8 @@ var _ = Describe("Organization Quota Actions", func() {
 				))
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
-				Expect(quota).To(Equal(OrganizationQuota{
-					Quota: ccv3.Quota{
+				Expect(quota).To(Equal(resources.OrganizationQuota{
+					Quota: resources.Quota{
 						GUID: "quota-guid",
 						Name: quotaName,
 					},
@@ -408,7 +409,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("The create org v7Quota endpoint returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateOrganizationQuotaReturns(
-					ccv3.OrganizationQuota{},
+					resources.OrganizationQuota{},
 					ccv3.Warnings{"some-quota-warning"},
 					errors.New("create-error"),
 				)
@@ -424,25 +425,25 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("The create org quota has an empty org quota request", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 			BeforeEach(func() {
 				quotaName = "quota-name"
 				quotaLimits = QuotaLimits{}
 
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: quotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 0, IsSet: true},
 							InstanceMemory:    nil,
 							TotalAppInstances: nil,
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 							PaidServicePlans:      nil,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 0, IsSet: true},
 							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: true},
 						},
@@ -467,7 +468,7 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("The create org quota has all values set to unlimited", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 			BeforeEach(func() {
 				quotaName = "quota-name"
@@ -480,19 +481,19 @@ var _ = Describe("Organization Quota Actions", func() {
 					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
 					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
 				}
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: quotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
 							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
 							PaidServicePlans:      &falseValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
 							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
 						},
@@ -517,22 +518,22 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("The create org quota endpoint succeeds", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 			BeforeEach(func() {
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: quotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 							PaidServicePlans:      &trueValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
 							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 						},
@@ -579,7 +580,7 @@ var _ = Describe("Organization Quota Actions", func() {
 			}
 
 			fakeCloudControllerClient.GetOrganizationQuotasReturns(
-				[]ccv3.OrganizationQuota{{Quota: ccv3.Quota{Name: oldQuotaName}}},
+				[]resources.OrganizationQuota{{Quota: resources.Quota{Name: oldQuotaName}}},
 				ccv3.Warnings{"get-quotas-warning"},
 				nil,
 			)
@@ -592,7 +593,7 @@ var _ = Describe("Organization Quota Actions", func() {
 		When("the update-quota endpoint returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateOrganizationQuotaReturns(
-					ccv3.OrganizationQuota{},
+					resources.OrganizationQuota{},
 					ccv3.Warnings{"update-quota-warning"},
 					errors.New("update-error"),
 				)
@@ -608,25 +609,25 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("no quota limits are being updated", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 
 			BeforeEach(func() {
 				quotaLimits = QuotaLimits{}
 
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: oldQuotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       nil,
 							InstanceMemory:    nil,
 							TotalAppInstances: nil,
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: nil,
 							PaidServicePlans:      nil,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        nil,
 							TotalReservedPorts: nil,
 						},
@@ -656,7 +657,7 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("the update org quota has all values set to unlimited", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 
 			BeforeEach(func() {
@@ -669,19 +670,19 @@ var _ = Describe("Organization Quota Actions", func() {
 					TotalRoutes:           &types.NullInt{Value: -1, IsSet: true},
 					TotalReservedPorts:    &types.NullInt{Value: -1, IsSet: true},
 				}
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: oldQuotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
 							InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
 							PaidServicePlans:      &falseValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
 							TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
 						},
@@ -710,23 +711,23 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("The update org quota endpoint succeeds", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 
 			BeforeEach(func() {
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: oldQuotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 							PaidServicePlans:      &trueValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
 							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 						},
@@ -756,25 +757,25 @@ var _ = Describe("Organization Quota Actions", func() {
 
 		When("the org quota name is not being updated", func() {
 			var (
-				ccv3Quota ccv3.OrganizationQuota
+				ccv3Quota resources.OrganizationQuota
 			)
 
 			BeforeEach(func() {
 				newQuotaName = ""
 
-				ccv3Quota = ccv3.OrganizationQuota{
-					Quota: ccv3.Quota{
+				ccv3Quota = resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: oldQuotaName,
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 							PaidServicePlans:      &trueValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 6, IsSet: true},
 							TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 						},

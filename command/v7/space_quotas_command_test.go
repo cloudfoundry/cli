@@ -5,10 +5,10 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -57,20 +57,20 @@ var _ = Describe("space-quotas command", func() {
 	When("running the command successfully", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
-			spaceQuotas := []v7action.SpaceQuota{
+			spaceQuotas := []resources.SpaceQuota{
 				{
-					Quota: ccv3.Quota{
+					Quota: resources.Quota{
 						Name: "space-quota-1",
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{Value: 1048576, IsSet: true},
 							InstanceMemory:    &types.NullInt{Value: 32, IsSet: true},
 							TotalAppInstances: &types.NullInt{Value: 3, IsSet: true},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{Value: 3, IsSet: true},
 							PaidServicePlans:      &trueValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{Value: 5, IsSet: true},
 							TotalReservedPorts: &types.NullInt{Value: 2, IsSet: true},
 						},
@@ -100,20 +100,20 @@ var _ = Describe("space-quotas command", func() {
 
 		When("there are limits that have not been configured", func() {
 			BeforeEach(func() {
-				spaceQuotas := []v7action.SpaceQuota{
+				spaceQuotas := []resources.SpaceQuota{
 					{
-						Quota: ccv3.Quota{
+						Quota: resources.Quota{
 							Name: "default",
-							Apps: ccv3.AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 0, IsSet: false},
 								InstanceMemory:    &types.NullInt{Value: 0, IsSet: false},
 								TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 							},
-							Services: ccv3.ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 0, IsSet: false},
 								PaidServicePlans:      &trueValue,
 							},
-							Routes: ccv3.RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 0, IsSet: false},
 								TotalReservedPorts: &types.NullInt{Value: 0, IsSet: false},
 							},
@@ -164,7 +164,7 @@ var _ = Describe("space-quotas command", func() {
 	When("the quota list is empty", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
-			fakeActor.GetSpaceQuotasByOrgGUIDReturns([]v7action.SpaceQuota{}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
+			fakeActor.GetSpaceQuotasByOrgGUIDReturns([]resources.SpaceQuota{}, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 		})
 
 		It("prints warnings and returns error", func() {

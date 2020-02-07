@@ -4,15 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
-
-// OrganizationQuota represents a Cloud Controller organization quota.
-type OrganizationQuota struct {
-	Quota
-}
 
 func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (RelationshipList, Warnings, error) {
 
@@ -47,10 +44,10 @@ func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (Relatio
 	return responseOrgs, response.Warnings, err
 }
 
-func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
+func (client *Client) CreateOrganizationQuota(orgQuota resources.OrganizationQuota) (resources.OrganizationQuota, Warnings, error) {
 	quotaBytes, err := json.Marshal(orgQuota)
 	if err != nil {
-		return OrganizationQuota{}, nil, err
+		return resources.OrganizationQuota{}, nil, err
 	}
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostOrganizationQuotaRequest,
@@ -58,15 +55,15 @@ func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 	})
 
 	if err != nil {
-		return OrganizationQuota{}, nil, err
+		return resources.OrganizationQuota{}, nil, err
 	}
-	var responseOrgQuota OrganizationQuota
+	var responseOrgQuota resources.OrganizationQuota
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrgQuota,
 	}
 	err = client.connection.Make(request, &response)
 	if err != nil {
-		return OrganizationQuota{}, response.Warnings, err
+		return resources.OrganizationQuota{}, response.Warnings, err
 	}
 	return responseOrgQuota, response.Warnings, nil
 }
@@ -89,42 +86,42 @@ func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warning
 	return JobURL(response.ResourceLocationURL), response.Warnings, nil
 }
 
-func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota, Warnings, error) {
+func (client *Client) GetOrganizationQuota(quotaGUID string) (resources.OrganizationQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotaRequest,
 		URIParams:   internal.Params{"quota_guid": quotaGUID},
 	})
 	if err != nil {
-		return OrganizationQuota{}, nil, err
+		return resources.OrganizationQuota{}, nil, err
 	}
-	var responseOrgQuota OrganizationQuota
+	var responseOrgQuota resources.OrganizationQuota
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrgQuota,
 	}
 	err = client.connection.Make(request, &response)
 	if err != nil {
-		return OrganizationQuota{}, response.Warnings, err
+		return resources.OrganizationQuota{}, response.Warnings, err
 	}
 
 	return responseOrgQuota, response.Warnings, nil
 }
 
-func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota, Warnings, error) {
+func (client *Client) GetOrganizationQuotas(query ...Query) ([]resources.OrganizationQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotasRequest,
 		Query:       query,
 	})
 	if err != nil {
-		return []OrganizationQuota{}, nil, err
+		return []resources.OrganizationQuota{}, nil, err
 	}
 
-	var orgQuotasList []OrganizationQuota
-	warnings, err := client.paginate(request, OrganizationQuota{}, func(item interface{}) error {
-		if orgQuota, ok := item.(OrganizationQuota); ok {
+	var orgQuotasList []resources.OrganizationQuota
+	warnings, err := client.paginate(request, resources.OrganizationQuota{}, func(item interface{}) error {
+		if orgQuota, ok := item.(resources.OrganizationQuota); ok {
 			orgQuotasList = append(orgQuotasList, orgQuota)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   OrganizationQuota{},
+				Expected:   resources.OrganizationQuota{},
 				Unexpected: item,
 			}
 		}
@@ -134,13 +131,13 @@ func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota
 	return orgQuotasList, warnings, err
 }
 
-func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
+func (client *Client) UpdateOrganizationQuota(orgQuota resources.OrganizationQuota) (resources.OrganizationQuota, Warnings, error) {
 	orgQuotaGUID := orgQuota.GUID
 	orgQuota.GUID = ""
 
 	quotaBytes, err := json.Marshal(orgQuota)
 	if err != nil {
-		return OrganizationQuota{}, nil, err
+		return resources.OrganizationQuota{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -149,17 +146,17 @@ func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 		Body:        bytes.NewReader(quotaBytes),
 	})
 	if err != nil {
-		return OrganizationQuota{}, nil, err
+		return resources.OrganizationQuota{}, nil, err
 	}
 
-	var responseOrgQuota OrganizationQuota
+	var responseOrgQuota resources.OrganizationQuota
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrgQuota,
 	}
 
 	err = client.connection.Make(request, &response)
 	if err != nil {
-		return OrganizationQuota{}, response.Warnings, err
+		return resources.OrganizationQuota{}, response.Warnings, err
 	}
 
 	return responseOrgQuota, response.Warnings, nil

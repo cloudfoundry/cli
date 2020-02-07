@@ -6,22 +6,23 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeSpaceQuotaActor struct {
-	GetSpaceQuotaByNameStub        func(string, string) (v7action.SpaceQuota, v7action.Warnings, error)
+	GetSpaceQuotaByNameStub        func(string, string) (resources.SpaceQuota, v7action.Warnings, error)
 	getSpaceQuotaByNameMutex       sync.RWMutex
 	getSpaceQuotaByNameArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getSpaceQuotaByNameReturns struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceQuotaByNameReturnsOnCall map[int]struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -29,7 +30,7 @@ type FakeSpaceQuotaActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByName(arg1 string, arg2 string) (v7action.SpaceQuota, v7action.Warnings, error) {
+func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByName(arg1 string, arg2 string) (resources.SpaceQuota, v7action.Warnings, error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotaByNameReturnsOnCall[len(fake.getSpaceQuotaByNameArgsForCall)]
 	fake.getSpaceQuotaByNameArgsForCall = append(fake.getSpaceQuotaByNameArgsForCall, struct {
@@ -54,7 +55,7 @@ func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameCallCount() int {
 	return len(fake.getSpaceQuotaByNameArgsForCall)
 }
 
-func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameCalls(stub func(string, string) (v7action.SpaceQuota, v7action.Warnings, error)) {
+func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameCalls(stub func(string, string) (resources.SpaceQuota, v7action.Warnings, error)) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	defer fake.getSpaceQuotaByNameMutex.Unlock()
 	fake.GetSpaceQuotaByNameStub = stub
@@ -67,30 +68,30 @@ func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameArgsForCall(i int) (string, 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameReturns(result1 v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameReturns(result1 resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	defer fake.getSpaceQuotaByNameMutex.Unlock()
 	fake.GetSpaceQuotaByNameStub = nil
 	fake.getSpaceQuotaByNameReturns = struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameReturnsOnCall(i int, result1 v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeSpaceQuotaActor) GetSpaceQuotaByNameReturnsOnCall(i int, result1 resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	defer fake.getSpaceQuotaByNameMutex.Unlock()
 	fake.GetSpaceQuotaByNameStub = nil
 	if fake.getSpaceQuotaByNameReturnsOnCall == nil {
 		fake.getSpaceQuotaByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.SpaceQuota
+			result1 resources.SpaceQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceQuotaByNameReturnsOnCall[i] = struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

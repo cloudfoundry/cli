@@ -6,20 +6,21 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeOrgQuotasActor struct {
-	GetOrganizationQuotasStub        func() ([]v7action.OrganizationQuota, v7action.Warnings, error)
+	GetOrganizationQuotasStub        func() ([]resources.OrganizationQuota, v7action.Warnings, error)
 	getOrganizationQuotasMutex       sync.RWMutex
 	getOrganizationQuotasArgsForCall []struct {
 	}
 	getOrganizationQuotasReturns struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrganizationQuotasReturnsOnCall map[int]struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -27,7 +28,7 @@ type FakeOrgQuotasActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeOrgQuotasActor) GetOrganizationQuotas() ([]v7action.OrganizationQuota, v7action.Warnings, error) {
+func (fake *FakeOrgQuotasActor) GetOrganizationQuotas() ([]resources.OrganizationQuota, v7action.Warnings, error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotasReturnsOnCall[len(fake.getOrganizationQuotasArgsForCall)]
 	fake.getOrganizationQuotasArgsForCall = append(fake.getOrganizationQuotasArgsForCall, struct {
@@ -50,36 +51,36 @@ func (fake *FakeOrgQuotasActor) GetOrganizationQuotasCallCount() int {
 	return len(fake.getOrganizationQuotasArgsForCall)
 }
 
-func (fake *FakeOrgQuotasActor) GetOrganizationQuotasCalls(stub func() ([]v7action.OrganizationQuota, v7action.Warnings, error)) {
+func (fake *FakeOrgQuotasActor) GetOrganizationQuotasCalls(stub func() ([]resources.OrganizationQuota, v7action.Warnings, error)) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = stub
 }
 
-func (fake *FakeOrgQuotasActor) GetOrganizationQuotasReturns(result1 []v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeOrgQuotasActor) GetOrganizationQuotasReturns(result1 []resources.OrganizationQuota, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = nil
 	fake.getOrganizationQuotasReturns = struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeOrgQuotasActor) GetOrganizationQuotasReturnsOnCall(i int, result1 []v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeOrgQuotasActor) GetOrganizationQuotasReturnsOnCall(i int, result1 []resources.OrganizationQuota, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = nil
 	if fake.getOrganizationQuotasReturnsOnCall == nil {
 		fake.getOrganizationQuotasReturnsOnCall = make(map[int]struct {
-			result1 []v7action.OrganizationQuota
+			result1 []resources.OrganizationQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationQuotasReturnsOnCall[i] = struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
