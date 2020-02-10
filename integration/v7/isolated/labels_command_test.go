@@ -641,7 +641,7 @@ var _ = Describe("labels command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			XWhen("there are labels set on the service offering", func() {
+			When("there are labels set on the service offering", func() {
 				BeforeEach(func() {
 					session := helpers.CF("set-label", "service-offering", serviceOfferingName, "some-other-key=some-other-value")
 					Eventually(session).Should(Exit(0))
@@ -667,7 +667,7 @@ var _ = Describe("labels command", func() {
 				})
 			})
 
-			XWhen("there are no labels set on the service offering", func() {
+			When("there are no labels set on the service offering", func() {
 				It("indicates that there are no labels", func() {
 					session := helpers.CF("labels", "service-offering", serviceOfferingName)
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering %s as %s...\n\n"), serviceOfferingName, username))
