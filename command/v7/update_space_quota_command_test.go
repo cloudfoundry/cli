@@ -27,6 +27,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		fakeActor       *v7fakes.FakeUpdateSpaceQuotaActor
 		spaceQuotaName  string
 		executeErr      error
+		orgName         = "some-org"
 
 		currentUserName string
 	)
@@ -49,6 +50,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		currentUserName = "bob"
 		fakeConfig.CurrentUserReturns(configv3.User{Name: currentUserName}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "targeted-org-guid"})
+		fakeConfig.TargetedOrganizationNameReturns(orgName)
 	})
 
 	JustBeforeEach(func() {
@@ -130,7 +132,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 				Expect(quotaLimits.TotalServiceInstances.IsSet).To(Equal(true))
 				Expect(quotaLimits.TotalServiceInstances.Value).To(Equal(2))
 
-				Expect(testUI.Out).To(Say("Updating space quota %s as bob...", spaceQuotaName))
+				Expect(testUI.Out).To(Say("Updating space quota %s for org %s as bob...", spaceQuotaName, orgName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
@@ -170,7 +172,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 
 				Expect(quotaLimits.TotalReservedPorts).To(BeNil())
 
-				Expect(testUI.Out).To(Say("Updating space quota %s as bob...", spaceQuotaName))
+				Expect(testUI.Out).To(Say("Updating space quota %s for org %s as bob...", spaceQuotaName, orgName))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})

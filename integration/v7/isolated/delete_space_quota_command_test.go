@@ -33,10 +33,11 @@ var _ = Describe("delete-space-quota command", func() {
 		var (
 			quotaName string
 			userName  string
+			orgName   string
 		)
 
 		BeforeEach(func() {
-			orgName := helpers.NewOrgName()
+			orgName = helpers.NewOrgName()
 			helpers.SetupCFWithOrgOnly(orgName)
 			quotaName = helpers.QuotaName()
 			userName, _ = helpers.GetCredentials()
@@ -56,7 +57,7 @@ var _ = Describe("delete-space-quota command", func() {
 
 			It("prompts for confirmation and deletes the space quota", func() {
 				session := helpers.CFWithStdin(buffer, "delete-space-quota", quotaName)
-				Eventually(session).Should(Say(`Deleting space quota %s as %s\.\.\.`, quotaName, userName))
+				Eventually(session).Should(Say(`Deleting space quota %s for org %s as %s\.\.\.`, quotaName, orgName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
@@ -74,7 +75,7 @@ var _ = Describe("delete-space-quota command", func() {
 
 			It("deletes the specified quota without prompting", func() {
 				session := helpers.CF("delete-space-quota", quotaName, "-f")
-				Eventually(session).Should(Say(`Deleting space quota %s as %s\.\.\.`, quotaName, userName))
+				Eventually(session).Should(Say(`Deleting space quota %s for org %s as %s\.\.\.`, quotaName, orgName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -92,7 +93,7 @@ var _ = Describe("delete-space-quota command", func() {
 		When("the quota doesn't exist", func() {
 			It("displays a warning and exits 0", func() {
 				session := helpers.CF("delete-space-quota", "-f", "nonexistent-quota")
-				Eventually(session).Should(Say(`Deleting space quota nonexistent-quota as %s\.\.\.`, userName))
+				Eventually(session).Should(Say(`Deleting space quota nonexistent-quota for org %s as %s\.\.\.`, orgName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session.Err).Should(Say(`Space quota with name 'nonexistent-quota' not found\.`))
 				Eventually(session).Should(Exit(0))

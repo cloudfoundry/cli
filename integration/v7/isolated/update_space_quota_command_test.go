@@ -82,7 +82,7 @@ var _ = Describe("update-space-quota command", func() {
 			appInstances := "2"
 			reservedRoutePorts := "0"
 			session := helpers.CF("update-space-quota", quotaName, "-m", totalMemory, "-i", instanceMemory, "-s", serviceInstances, "-a", appInstances, "--allow-paid-service-plans", "--reserved-route-ports", reservedRoutePorts)
-			Eventually(session).Should(Say("Updating space quota %s as %s...", quotaName, userName))
+			Eventually(session).Should(Say("Updating space quota %s for org %s as %s...", quotaName, orgName, userName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 
@@ -100,7 +100,7 @@ var _ = Describe("update-space-quota command", func() {
 		When("the named quota does not exist", func() {
 			It("displays a missing quota error message and fails", func() {
 				session := helpers.CF("update-space-quota", "bogota")
-				Eventually(session).Should(Say(`Updating space quota bogota as %s\.\.\.`, userName))
+				Eventually(session).Should(Say(`Updating space quota bogota for org %s as %s\.\.\.`, orgName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Space quota with name '%s' not found.", "bogota"))
 				Eventually(session).Should(Exit(1))

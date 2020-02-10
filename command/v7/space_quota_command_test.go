@@ -30,6 +30,7 @@ var _ = Describe("Space Quota Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeSpaceQuotaActor)
+		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = SpaceQuotaCommand{
 			UI:          testUI,
@@ -76,7 +77,7 @@ var _ = Describe("Space Quota Command", func() {
 		})
 
 		It("returns a translatable error and outputs all warnings", func() {
-			Expect(testUI.Out).To(Say("Getting space quota some-space-quota as some-user..."))
+			Expect(testUI.Out).To(Say("Getting space quota some-space-quota for org some-org as some-user..."))
 
 			Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundError{}))
 			Expect(fakeActor.GetSpaceQuotaByNameCallCount()).To(Equal(1))
@@ -88,7 +89,7 @@ var _ = Describe("Space Quota Command", func() {
 	When("getting the space quota succeeds", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid"})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "some-org-guid"})
 
 			falseValue := false
 			fakeActor.GetSpaceQuotaByNameReturns(
@@ -122,7 +123,7 @@ var _ = Describe("Space Quota Command", func() {
 			Expect(quotaName).To(Equal("some-space-quota"))
 			Expect(orgGUID).To(Equal("some-org-guid"))
 
-			Expect(testUI.Out).To(Say("Getting space quota some-space-quota as some-user..."))
+			Expect(testUI.Out).To(Say("Getting space quota some-space-quota for org some-org as some-user..."))
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
 

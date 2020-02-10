@@ -29,6 +29,7 @@ var _ = Describe("space-quotas command", func() {
 		args            []string
 		binaryName      string
 		trueValue       = true
+		orgName         = "some-org-name"
 	)
 
 	BeforeEach(func() {
@@ -48,6 +49,7 @@ var _ = Describe("space-quotas command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "targeted-org-guid"})
+		fakeConfig.TargetedOrganizationNameReturns(orgName)
 	})
 
 	JustBeforeEach(func() {
@@ -82,7 +84,7 @@ var _ = Describe("space-quotas command", func() {
 
 		It("should print text indicating the command status", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Getting space quotas as apple\.\.\.`))
+			Expect(testUI.Out).To(Say(`Getting space quotas for org %s as apple\.\.\.`, orgName))
 			Expect(testUI.Err).To(Say("some-warning-1"))
 			Expect(testUI.Err).To(Say("some-warning-2"))
 		})
@@ -172,7 +174,7 @@ var _ = Describe("space-quotas command", func() {
 
 			Expect(testUI.Err).To(Say("some-warning-1"))
 			Expect(testUI.Err).To(Say("some-warning-2"))
-			Expect(testUI.Out).To(Say(`Getting space quotas as apple\.\.\.`))
+			Expect(testUI.Out).To(Say(`Getting space quotas for org %s as apple\.\.\.`, orgName))
 			Expect(testUI.Out).To(Say("No space quotas found."))
 		})
 	})

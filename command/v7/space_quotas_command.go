@@ -50,7 +50,8 @@ func (cmd SpaceQuotasCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Getting space quotas as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting space quotas for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
+		"OrgName":  cmd.Config.TargetedOrganizationName(),
 		"Username": user.Name,
 	})
 	cmd.UI.DisplayNewline()

@@ -73,9 +73,10 @@ func (cmd UpdateSpaceQuotaCommand) Execute(args []string) error {
 	oldQuotaName := cmd.RequiredArgs.SpaceQuota
 	orgGUID := cmd.Config.TargetedOrganization().GUID
 
-	cmd.UI.DisplayTextWithFlavor("Updating space quota {{.QuotaName}} as {{.User}}...",
+	cmd.UI.DisplayTextWithFlavor("Updating space quota {{.QuotaName}} for org {{.OrgName}} as {{.User}}...",
 		map[string]interface{}{
 			"QuotaName": oldQuotaName,
+			"OrgName":   cmd.Config.TargetedOrganizationName(),
 			"User":      user.Name,
 		})
 

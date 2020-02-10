@@ -72,9 +72,10 @@ func (cmd DeleteSpaceQuotaCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting space quota {{.QuotaName}} as {{.User}}...",
+	cmd.UI.DisplayTextWithFlavor("Deleting space quota {{.QuotaName}} for org {{.Org}} as {{.User}}...",
 		map[string]interface{}{
 			"User":      user.Name,
+			"Org":       cmd.Config.TargetedOrganizationName(),
 			"QuotaName": spaceQuotaName,
 		})
 

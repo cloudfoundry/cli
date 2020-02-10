@@ -38,7 +38,8 @@ var _ = Describe("delete-space-quota Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
-		fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "targeted-org-guid"})
+		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "targeted-org-guid"})
+		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = DeleteSpaceQuotaCommand{
 			Actor:       fakeActor,
@@ -89,7 +90,7 @@ var _ = Describe("delete-space-quota Command", func() {
 				Expect(givenOrgGUID).To(Equal("targeted-org-guid"))
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Deleting space quota some-quota as some-user..."))
+				Expect(testUI.Out).To(Say("Deleting space quota some-quota for org some-org as some-user..."))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
@@ -107,7 +108,7 @@ var _ = Describe("delete-space-quota Command", func() {
 
 				It("goes through with the deletion", func() {
 					Expect(testUI.Out).To(Say("Really delete the space quota some-quota?"))
-					Expect(testUI.Out).To(Say("Deleting space quota some-quota as some-user..."))
+					Expect(testUI.Out).To(Say("Deleting space quota some-quota for org some-org as some-user..."))
 					Expect(testUI.Out).To(Say("OK"))
 				})
 			})
@@ -121,7 +122,7 @@ var _ = Describe("delete-space-quota Command", func() {
 				It("cancels the delete", func() {
 					Expect(testUI.Out).To(Say("Really delete the space quota some-quota?"))
 					Expect(testUI.Out).To(Say("'some-quota' has not been deleted."))
-					Expect(testUI.Out).NotTo(Say("Deleting space quota some-quota as some-user..."))
+					Expect(testUI.Out).NotTo(Say("Deleting space quota some-quota for org some-org as some-user..."))
 				})
 			})
 
@@ -134,7 +135,7 @@ var _ = Describe("delete-space-quota Command", func() {
 				It("defaults to canceling the delete", func() {
 					Expect(testUI.Out).To(Say("Really delete the space quota some-quota?"))
 					Expect(testUI.Out).To(Say("'some-quota' has not been deleted."))
-					Expect(testUI.Out).NotTo(Say("Deleting space quota some-quota as some-user..."))
+					Expect(testUI.Out).NotTo(Say("Deleting space quota some-quota for org some-org as some-user..."))
 				})
 			})
 		})

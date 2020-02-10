@@ -55,9 +55,10 @@ func (cmd SpaceQuotaCommand) Execute(args []string) error {
 	quotaName := cmd.RequiredArgs.SpaceQuota
 
 	cmd.UI.DisplayTextWithFlavor(
-		"Getting space quota {{.QuotaName}} as {{.Username}}...",
+		"Getting space quota {{.QuotaName}} for org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{
 			"QuotaName": quotaName,
+			"OrgName":   cmd.Config.TargetedOrganizationName(),
 			"Username":  user.Name,
 		})
 	cmd.UI.DisplayNewline()

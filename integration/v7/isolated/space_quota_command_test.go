@@ -53,7 +53,7 @@ var _ = Describe("space-quota command", func() {
 			It("displays quota not found and exits 1", func() {
 				session := helpers.CF("space-quota", quotaName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say(`Getting space quota %s as %s\.\.\.`, quotaName, userName))
+				Eventually(session).Should(Say(`Getting space quota %s for org %s as %s\.\.\.`, quotaName, orgName, userName))
 				Eventually(session.Err).Should(Say("Space quota with name '%s' not found.", quotaName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -77,7 +77,7 @@ var _ = Describe("space-quota command", func() {
 			It("displays a table with quota names and their values and exits 0", func() {
 				session := helpers.CF("space-quota", quotaName)
 
-				Eventually(session).Should(Say(`Getting space quota %s as %s\.\.\.`, quotaName, userName))
+				Eventually(session).Should(Say(`Getting space quota %s for org %s as %s\.\.\.`, quotaName, orgName, userName))
 				Eventually(session).Should(Say(`total memory:\s+7M`))
 				Eventually(session).Should(Say(`instance memory:\s+6M`))
 				Eventually(session).Should(Say(`routes:\s+8`))
