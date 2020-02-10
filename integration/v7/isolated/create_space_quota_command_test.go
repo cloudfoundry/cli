@@ -87,7 +87,7 @@ var _ = Describe("create-space-quota command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("space-quota", spaceQuotaName)
-					Eventually(session).Should(Say("Getting space quota %s as %s...", spaceQuotaName, userName))
+					Eventually(session).Should(Say("Getting space quota %s for org %s as %s...", spaceQuotaName, orgName, userName))
 					Eventually(session).Should(Say(`total memory:\s+0`))
 					Eventually(session).Should(Say(`instance memory:\s+unlimited`))
 					Eventually(session).Should(Say(`routes:\s+0`))
@@ -114,7 +114,7 @@ var _ = Describe("create-space-quota command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("space-quota", spaceQuotaName)
-					Eventually(session).Should(Say("Getting space quota %s as %s...", spaceQuotaName, userName))
+					Eventually(session).Should(Say("Getting space quota %s for org %s as %s...", spaceQuotaName, orgName, userName))
 					Eventually(session).Should(Say(`total memory:\s+4M`))
 					Eventually(session).Should(Say(`instance memory:\s+3M`))
 					Eventually(session).Should(Say(`routes:\s+15`))
