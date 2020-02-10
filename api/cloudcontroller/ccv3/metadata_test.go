@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -32,9 +34,9 @@ var _ = Describe("Metadata", func() {
 
 	Describe("UpdateResourceMetadata", func() {
 		var (
-			metadataToUpdate Metadata
+			metadataToUpdate resources.Metadata
 			resourceGUID     string
-			updatedMetadata  ResourceMetadata
+			updatedMetadata  resources.ResourceMetadata
 			warnings         Warnings
 			executeErr       error
 		)
@@ -80,7 +82,7 @@ var _ = Describe("Metadata", func() {
 							),
 						)
 
-						metadataToUpdate = Metadata{
+						metadataToUpdate = resources.Metadata{
 							Labels: map[string]types.NullString{
 								"k1": types.NewNullString("v1"),
 								"k2": types.NewNullString("v2"),
@@ -119,7 +121,7 @@ var _ = Describe("Metadata", func() {
 							),
 						)
 
-						metadataToUpdate = Metadata{
+						metadataToUpdate = resources.Metadata{
 							Labels: map[string]types.NullString{
 								"invalid*key": types.NewNullString("v1"),
 								"k2":          types.NewNullString("v2"),
@@ -148,7 +150,7 @@ var _ = Describe("Metadata", func() {
 
 		When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {
-				_, _, err := client.UpdateResourceMetadata("anything", "fake-guid", Metadata{})
+				_, _, err := client.UpdateResourceMetadata("anything", "fake-guid", resources.Metadata{})
 				Expect(err).To(MatchError("unknown resource type (anything) requested"))
 			})
 		})
@@ -166,7 +168,7 @@ var _ = Describe("Metadata", func() {
 						),
 					)
 
-					metadataToUpdate := Metadata{
+					metadataToUpdate := resources.Metadata{
 						Labels: map[string]types.NullString{
 							"k1": types.NewNullString("v1"),
 							"k2": types.NewNullString("v2"),
@@ -190,7 +192,7 @@ var _ = Describe("Metadata", func() {
 						),
 					)
 
-					_, warnings, err := client.UpdateResourceMetadataAsync("service-broker", "some-guid", Metadata{})
+					_, warnings, err := client.UpdateResourceMetadataAsync("service-broker", "some-guid", resources.Metadata{})
 
 					Expect(err).To(MatchError(ccerror.UnprocessableEntityError{
 						Message: "Metadata label key error: 'invalid*key' contains invalid characters",
@@ -202,7 +204,7 @@ var _ = Describe("Metadata", func() {
 
 		When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {
-				_, _, err := client.UpdateResourceMetadataAsync("anything", "fake-guid", Metadata{})
+				_, _, err := client.UpdateResourceMetadataAsync("anything", "fake-guid", resources.Metadata{})
 				Expect(err).To(MatchError("unknown async resource type (anything) requested"))
 			})
 		})

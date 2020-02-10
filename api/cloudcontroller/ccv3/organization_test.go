@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +22,7 @@ var _ = Describe("Organizations", func() {
 
 	Describe("GetDefaultDomain", func() {
 		var (
-			defaultDomain Domain
+			defaultDomain resources.Domain
 			warnings      Warnings
 			executeErr    error
 			orgGUID       = "some-org-guid"
@@ -60,7 +60,7 @@ var _ = Describe("Organizations", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(defaultDomain).To(Equal(
-					Domain{Name: "domain-name-1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: false},
+					resources.Domain{Name: "domain-name-1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: false},
 						OrganizationGUID: "some-org-guid"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning"))
@@ -114,7 +114,7 @@ var _ = Describe("Organizations", func() {
 
 	Describe("GetIsolationSegmentOrganizations", func() {
 		var (
-			organizations []Organization
+			organizations []resources.Organization
 			warnings      Warnings
 			executeErr    error
 		)
@@ -171,9 +171,9 @@ var _ = Describe("Organizations", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(organizations).To(ConsistOf(
-					Organization{Name: "org-name-1", GUID: "org-guid-1"},
-					Organization{Name: "org-name-2", GUID: "org-guid-2"},
-					Organization{Name: "org-name-3", GUID: "org-guid-3"},
+					resources.Organization{Name: "org-name-1", GUID: "org-guid-1"},
+					resources.Organization{Name: "org-name-2", GUID: "org-guid-2"},
+					resources.Organization{Name: "org-name-3", GUID: "org-guid-3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
@@ -226,7 +226,7 @@ var _ = Describe("Organizations", func() {
 
 	Describe("GetOrganization", func() {
 		var (
-			organization Organization
+			organization resources.Organization
 			warnings     Warnings
 			executeErr   error
 		)
@@ -259,7 +259,7 @@ var _ = Describe("Organizations", func() {
 
 			It("returns the queried organization and all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(organization).To(Equal(Organization{
+				Expect(organization).To(Equal(resources.Organization{
 					Name:      "some-org-name",
 					GUID:      "some-org-guid",
 					QuotaGUID: "some-org-quota-guid",
@@ -316,7 +316,7 @@ var _ = Describe("Organizations", func() {
 
 	Describe("GetOrganizations", func() {
 		var (
-			organizations []Organization
+			organizations []resources.Organization
 			warnings      Warnings
 			executeErr    error
 		)
@@ -376,9 +376,9 @@ var _ = Describe("Organizations", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(organizations).To(ConsistOf(
-					Organization{Name: "org-name-1", GUID: "org-guid-1"},
-					Organization{Name: "org-name-2", GUID: "org-guid-2"},
-					Organization{Name: "org-name-3", GUID: "org-guid-3"},
+					resources.Organization{Name: "org-name-1", GUID: "org-guid-1"},
+					resources.Organization{Name: "org-name-2", GUID: "org-guid-2"},
+					resources.Organization{Name: "org-name-3", GUID: "org-guid-3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
@@ -431,7 +431,7 @@ var _ = Describe("Organizations", func() {
 
 	Describe("CreateOrganization", func() {
 		var (
-			createdOrg Organization
+			createdOrg resources.Organization
 			warnings   Warnings
 			executeErr error
 		)
@@ -463,7 +463,7 @@ var _ = Describe("Organizations", func() {
 			It("returns the created org", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(createdOrg).To(Equal(ccv3.Organization{
+				Expect(createdOrg).To(Equal(resources.Organization{
 					GUID: "some-org-guid",
 					Name: "some-org-name",
 				}))
@@ -475,7 +475,7 @@ var _ = Describe("Organizations", func() {
 				response := `{
 					 "errors": [
 							{
-								 "detail": "Organization 'some-org-name' already exists.",
+								 "detail": "resources.Organization 'some-org-name' already exists.",
 								 "title": "CF-UnprocessableEntity",
 								 "code": 10008
 							}
@@ -498,7 +498,7 @@ var _ = Describe("Organizations", func() {
 			It("returns a meaningful organization-name-taken error", func() {
 				Expect(executeErr).To(MatchError(ccerror.OrganizationNameTakenError{
 					UnprocessableEntityError: ccerror.UnprocessableEntityError{
-						Message: "Organization 'some-org-name' already exists.",
+						Message: "resources.Organization 'some-org-name' already exists.",
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
@@ -558,8 +558,8 @@ var _ = Describe("Organizations", func() {
 
 	Describe("UpdateOrganization", func() {
 		var (
-			orgToUpdate Organization
-			updatedOrg  Organization
+			orgToUpdate resources.Organization
+			updatedOrg  resources.Organization
 			warnings    Warnings
 			executeErr  error
 		)
@@ -599,10 +599,10 @@ var _ = Describe("Organizations", func() {
 					),
 				)
 
-				orgToUpdate = Organization{
+				orgToUpdate = resources.Organization{
 					Name: "some-org-name",
 					GUID: "some-guid",
-					Metadata: &Metadata{
+					Metadata: &resources.Metadata{
 						Labels: map[string]types.NullString{
 							"k1": types.NewNullString("v1"),
 							"k2": types.NewNullString("v2"),
@@ -655,7 +655,7 @@ var _ = Describe("Organizations", func() {
 				response := `{
    "errors": [
       {
-         "detail": "Organization not found",
+         "detail": "resources.Organization not found",
          "title": "CF-ResourceNotFound",
          "code": 10010
       }
@@ -670,7 +670,7 @@ var _ = Describe("Organizations", func() {
 
 			It("returns an error and all warnings", func() {
 				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "Organization not found",
+					Message: "resources.Organization not found",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 			})

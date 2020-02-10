@@ -3,12 +3,13 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type ApplicationSummary struct {
 	Application
 	ProcessSummaries ProcessSummaries
-	Routes           []Route
+	Routes           []resources.Route
 }
 
 // v7action.DetailedApplicationSummary represents an application with its processes and droplet.
@@ -93,7 +94,7 @@ func (actor Actor) createSummary(app Application, withObfuscatedValues bool) (Ap
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	var appRoutes []Route
+	var appRoutes []resources.Route
 	routes, warnings, err := actor.GetApplicationRoutes(app.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {

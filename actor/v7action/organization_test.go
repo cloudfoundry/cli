@@ -7,12 +7,13 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Organization Actions", func() {
+var _ = Describe("resources.Organization Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -25,7 +26,7 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("GetOrganizations", func() {
 		var (
-			ccv3Organizations []ccv3.Organization
+			ccv3Organizations []resources.Organization
 			organizations     []Organization
 
 			organization1Name string
@@ -42,7 +43,7 @@ var _ = Describe("Organization Actions", func() {
 		)
 
 		BeforeEach(func() {
-			ccv3Organizations = []ccv3.Organization{
+			ccv3Organizations = []resources.Organization{
 				{Name: organization1Name, GUID: organization1GUID},
 				{Name: organization2Name, GUID: organization2GUID},
 				{Name: organization3Name, GUID: organization3GUID},
@@ -111,7 +112,7 @@ var _ = Describe("Organization Actions", func() {
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{"some-organizations-warning"},
 					errors.New("some-organizations-error"),
 				)
@@ -136,7 +137,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationReturns(
-					ccv3.Organization{
+					resources.Organization{
 						Name: "some-org-name",
 						GUID: "some-org-guid",
 					},
@@ -167,7 +168,7 @@ var _ = Describe("Organization Actions", func() {
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetOrganizationReturns(
-					ccv3.Organization{},
+					resources.Organization{},
 					ccv3.Warnings{"some-warning"},
 					expectedError)
 			})
@@ -184,7 +185,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{
 							Name: "some-org-name",
 							GUID: "some-org-guid",
@@ -217,7 +218,7 @@ var _ = Describe("Organization Actions", func() {
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{"some-warning"},
 					expectedError)
 			})
@@ -232,7 +233,7 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("GetDefaultDomain", func() {
 		var (
-			domain     Domain
+			domain     resources.Domain
 			warnings   Warnings
 			executeErr error
 
@@ -246,7 +247,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the api call is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDefaultDomainReturns(
-					ccv3.Domain{
+					resources.Domain{
 						Name: "some-domain-name",
 						GUID: "some-domain-guid",
 					},
@@ -257,7 +258,7 @@ var _ = Describe("Organization Actions", func() {
 
 			It("returns the domain and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(domain).To(Equal(Domain{
+				Expect(domain).To(Equal(resources.Domain{
 					Name: "some-domain-name",
 					GUID: "some-domain-guid",
 				}))
@@ -274,7 +275,7 @@ var _ = Describe("Organization Actions", func() {
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetDefaultDomainReturns(
-					ccv3.Domain{},
+					resources.Domain{},
 					ccv3.Warnings{"some-warning"},
 					expectedError)
 			})
@@ -289,7 +290,7 @@ var _ = Describe("Organization Actions", func() {
 	When("the org does not exist", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{},
+				[]resources.Organization{},
 				ccv3.Warnings{"some-warning"},
 				nil,
 			)
@@ -316,7 +317,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org is created successfully", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateOrganizationReturns(
-					ccv3.Organization{Name: "some-org-name", GUID: "some-org-guid"},
+					resources.Organization{Name: "some-org-name", GUID: "some-org-guid"},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -332,7 +333,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the request fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateOrganizationReturns(
-					ccv3.Organization{},
+					resources.Organization{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					errors.New("create-org-failed"),
 				)
@@ -358,7 +359,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org is not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{
 						"warning-1",
 						"warning-2",
@@ -376,7 +377,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the org is found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{{Name: "some-org", GUID: "some-org-guid"}},
+					[]resources.Organization{{Name: "some-org", GUID: "some-org-guid"}},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -489,7 +490,7 @@ var _ = Describe("Organization Actions", func() {
 		When("getting the org succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{{Name: oldOrgName, GUID: "org-guid"}},
+					[]resources.Organization{{Name: oldOrgName, GUID: "org-guid"}},
 					ccv3.Warnings{"get-org-warning"},
 					nil,
 				)
@@ -498,7 +499,7 @@ var _ = Describe("Organization Actions", func() {
 			It("delegates to the client to update the org", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.UpdateOrganizationCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.UpdateOrganizationArgsForCall(0)).To(Equal(ccv3.Organization{
+				Expect(fakeCloudControllerClient.UpdateOrganizationArgsForCall(0)).To(Equal(resources.Organization{
 					GUID: "org-guid",
 					Name: newOrgName,
 				}))
@@ -507,7 +508,7 @@ var _ = Describe("Organization Actions", func() {
 			When("updating the org fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateOrganizationReturns(
-						ccv3.Organization{},
+						resources.Organization{},
 						ccv3.Warnings{"update-org-warning"},
 						errors.New("update-org-error"),
 					)
@@ -523,7 +524,7 @@ var _ = Describe("Organization Actions", func() {
 			When("updating the org succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateOrganizationReturns(
-						ccv3.Organization{Name: newOrgName, GUID: "org-guid"},
+						resources.Organization{Name: newOrgName, GUID: "org-guid"},
 						ccv3.Warnings{"update-org-warning"},
 						nil,
 					)

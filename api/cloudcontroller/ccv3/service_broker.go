@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // ServiceBroker represents Service Broker data
@@ -22,7 +23,7 @@ type ServiceBroker struct {
 	// Status is the state of the service broker.
 	Status string
 
-	Metadata *Metadata
+	Metadata *resources.Metadata
 }
 
 type ServiceBrokerModel struct {
@@ -65,7 +66,7 @@ type serviceBrokerResponse struct {
 	// Authentication contains the authentication for authenticating with the service broker.
 	Authentication serviceBrokerAuthentication `json:"authentication"`
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata
+	Metadata *resources.Metadata
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }

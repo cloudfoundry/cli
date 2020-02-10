@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -101,14 +102,14 @@ var _ = Describe("delete-shared-domain Command", func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
 
-				fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning1"}, nil)
+				fakeActor.GetDomainByNameReturns(resources.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning1"}, nil)
 
 				fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning2"}, nil)
 			})
 
 			It("delegates to the Actor", func() {
 				domain := fakeActor.DeleteDomainArgsForCall(0)
-				Expect(domain).To(Equal(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}))
+				Expect(domain).To(Equal(resources.Domain{Name: "some-domain.com", GUID: "some-guid"}))
 			})
 
 			It("deletes the shared domain", func() {
@@ -123,7 +124,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 			When("GetDomainByName() errors", func() {
 				BeforeEach(func() {
-					fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning"}, errors.New("get-domain-by-name-errors"))
+					fakeActor.GetDomainByNameReturns(resources.Domain{Name: "some-domain.com", GUID: "some-guid"}, v7action.Warnings{"some-warning"}, errors.New("get-domain-by-name-errors"))
 				})
 
 				It("returns an error", func() {
@@ -140,7 +141,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 			When("the domain is private, not shared", func() {
 				BeforeEach(func() {
-					fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", GUID: "some-guid", OrganizationGUID: "private-org-guid"}, v7action.Warnings{"some-warning"}, nil)
+					fakeActor.GetDomainByNameReturns(resources.Domain{Name: "some-domain.com", GUID: "some-guid", OrganizationGUID: "private-org-guid"}, v7action.Warnings{"some-warning"}, nil)
 				})
 				It("returns an informative error message and does not delete the domain", func() {
 					Expect(executeErr).To(HaveOccurred())
@@ -220,7 +221,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 
 		When("the shared domain doesn't exist", func() {
 			BeforeEach(func() {
-				fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"some-warning"}, actionerror.DomainNotFoundError{Name: "some-domain.com"})
+				fakeActor.GetDomainByNameReturns(resources.Domain{}, v7action.Warnings{"some-warning"}, actionerror.DomainNotFoundError{Name: "some-domain.com"})
 			})
 
 			It("displays all warnings, that the domain wasn't found, and does not error", func() {

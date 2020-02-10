@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeUnmapRouteActor struct {
@@ -25,18 +26,18 @@ type FakeUnmapRouteActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetDomainByNameStub        func(string) (v7action.Domain, v7action.Warnings, error)
+	GetDomainByNameStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDomainByNameMutex       sync.RWMutex
 	getDomainByNameArgsForCall []struct {
 		arg1 string
 	}
 	getDomainByNameReturns struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getDomainByNameReturnsOnCall map[int]struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -159,7 +160,7 @@ func (fake *FakeUnmapRouteActor) GetApplicationByNameAndSpaceReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUnmapRouteActor) GetDomainByName(arg1 string) (v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeUnmapRouteActor) GetDomainByName(arg1 string) (resources.Domain, v7action.Warnings, error) {
 	fake.getDomainByNameMutex.Lock()
 	ret, specificReturn := fake.getDomainByNameReturnsOnCall[len(fake.getDomainByNameArgsForCall)]
 	fake.getDomainByNameArgsForCall = append(fake.getDomainByNameArgsForCall, struct {
@@ -183,7 +184,7 @@ func (fake *FakeUnmapRouteActor) GetDomainByNameCallCount() int {
 	return len(fake.getDomainByNameArgsForCall)
 }
 
-func (fake *FakeUnmapRouteActor) GetDomainByNameCalls(stub func(string) (v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeUnmapRouteActor) GetDomainByNameCalls(stub func(string) (resources.Domain, v7action.Warnings, error)) {
 	fake.getDomainByNameMutex.Lock()
 	defer fake.getDomainByNameMutex.Unlock()
 	fake.GetDomainByNameStub = stub
@@ -196,30 +197,30 @@ func (fake *FakeUnmapRouteActor) GetDomainByNameArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeUnmapRouteActor) GetDomainByNameReturns(result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeUnmapRouteActor) GetDomainByNameReturns(result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainByNameMutex.Lock()
 	defer fake.getDomainByNameMutex.Unlock()
 	fake.GetDomainByNameStub = nil
 	fake.getDomainByNameReturns = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUnmapRouteActor) GetDomainByNameReturnsOnCall(i int, result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeUnmapRouteActor) GetDomainByNameReturnsOnCall(i int, result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainByNameMutex.Lock()
 	defer fake.getDomainByNameMutex.Unlock()
 	fake.GetDomainByNameStub = nil
 	if fake.getDomainByNameReturnsOnCall == nil {
 		fake.getDomainByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Domain
+			result1 resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getDomainByNameReturnsOnCall[i] = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

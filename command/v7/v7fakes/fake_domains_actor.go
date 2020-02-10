@@ -6,22 +6,23 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeDomainsActor struct {
-	GetOrganizationDomainsStub        func(string, string) ([]v7action.Domain, v7action.Warnings, error)
+	GetOrganizationDomainsStub        func(string, string) ([]resources.Domain, v7action.Warnings, error)
 	getOrganizationDomainsMutex       sync.RWMutex
 	getOrganizationDomainsArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getOrganizationDomainsReturns struct {
-		result1 []v7action.Domain
+		result1 []resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrganizationDomainsReturnsOnCall map[int]struct {
-		result1 []v7action.Domain
+		result1 []resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -29,7 +30,7 @@ type FakeDomainsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomains(arg1 string, arg2 string) ([]v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeDomainsActor) GetOrganizationDomains(arg1 string, arg2 string) ([]resources.Domain, v7action.Warnings, error) {
 	fake.getOrganizationDomainsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationDomainsReturnsOnCall[len(fake.getOrganizationDomainsArgsForCall)]
 	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
@@ -54,7 +55,7 @@ func (fake *FakeDomainsActor) GetOrganizationDomainsCallCount() int {
 	return len(fake.getOrganizationDomainsArgsForCall)
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomainsCalls(stub func(string, string) ([]v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeDomainsActor) GetOrganizationDomainsCalls(stub func(string, string) ([]resources.Domain, v7action.Warnings, error)) {
 	fake.getOrganizationDomainsMutex.Lock()
 	defer fake.getOrganizationDomainsMutex.Unlock()
 	fake.GetOrganizationDomainsStub = stub
@@ -67,30 +68,30 @@ func (fake *FakeDomainsActor) GetOrganizationDomainsArgsForCall(i int) (string, 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomainsReturns(result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeDomainsActor) GetOrganizationDomainsReturns(result1 []resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationDomainsMutex.Lock()
 	defer fake.getOrganizationDomainsMutex.Unlock()
 	fake.GetOrganizationDomainsStub = nil
 	fake.getOrganizationDomainsReturns = struct {
-		result1 []v7action.Domain
+		result1 []resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeDomainsActor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeDomainsActor) GetOrganizationDomainsReturnsOnCall(i int, result1 []resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationDomainsMutex.Lock()
 	defer fake.getOrganizationDomainsMutex.Unlock()
 	fake.GetOrganizationDomainsStub = nil
 	if fake.getOrganizationDomainsReturnsOnCall == nil {
 		fake.getOrganizationDomainsReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Domain
+			result1 []resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationDomainsReturnsOnCall[i] = struct {
-		result1 []v7action.Domain
+		result1 []resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

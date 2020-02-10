@@ -3,6 +3,7 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -108,10 +109,10 @@ var _ = Describe("domains Command", func() {
 		})
 
 		When("GetDomains returns some domains", func() {
-			var domains []v7action.Domain
+			var domains []resources.Domain
 
 			BeforeEach(func() {
-				domains = []v7action.Domain{
+				domains = []resources.Domain{
 					{Name: "domain1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: true}},
 					{Name: "domain3", GUID: "domain-guid-3", Internal: types.NullBool{IsSet: false, Value: false}, OrganizationGUID: "owning-org-guid"},
 					{Name: "domain2", GUID: "domain-guid-2", Internal: types.NullBool{IsSet: true, Value: false}},
@@ -153,10 +154,10 @@ var _ = Describe("domains Command", func() {
 		})
 
 		When("GetDomains returns no domains", func() {
-			var domains []v7action.Domain
+			var domains []resources.Domain
 
 			BeforeEach(func() {
-				domains = []v7action.Domain{}
+				domains = []resources.Domain{}
 
 				fakeActor.GetOrganizationDomainsReturns(
 					domains,

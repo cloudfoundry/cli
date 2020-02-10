@@ -417,7 +417,7 @@ var _ = Describe("Space", func() {
 		When("the org is not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{
 						"warning-1",
 						"warning-2",
@@ -435,7 +435,7 @@ var _ = Describe("Space", func() {
 		When("the org is found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{{Name: "some-org", GUID: "some-org-guid"}},
+					[]resources.Organization{{Name: "some-org", GUID: "some-org-guid"}},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -647,10 +647,10 @@ var _ = Describe("Space", func() {
 		})
 
 		When("getting the organization succeeds", func() {
-			var org ccv3.Organization
+			var org resources.Organization
 
 			BeforeEach(func() {
-				org = ccv3.Organization{
+				org = resources.Organization{
 					GUID: "some-org-guid",
 					Name: "some-org-name",
 				}
@@ -1008,7 +1008,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				e := errors.New("get-org-error")
 				w := ccv3.Warnings{"get-org-warning"}
-				fakeCloudControllerClient.GetOrganizationReturns(ccv3.Organization{}, w, e)
+				fakeCloudControllerClient.GetOrganizationReturns(resources.Organization{}, w, e)
 			})
 
 			It("returns warnings and an error", func() {

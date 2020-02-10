@@ -3,6 +3,7 @@ package ccv3
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // ServiceOffering represents a Cloud Controller V3 Service Offering.
@@ -12,7 +13,7 @@ type ServiceOffering struct {
 	// Name is the name of the service offering.
 	Name string `json:"name"`
 
-	Metadata *Metadata
+	Metadata *resources.Metadata
 }
 
 // GetServiceOffering lists service offering with optional filters.

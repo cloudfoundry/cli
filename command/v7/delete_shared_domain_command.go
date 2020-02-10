@@ -8,14 +8,15 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . DeleteSharedDomainActor
 
 type DeleteSharedDomainActor interface {
-	DeleteDomain(domain v7action.Domain) (v7action.Warnings, error)
-	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
+	DeleteDomain(domain resources.Domain) (v7action.Warnings, error)
+	GetDomainByName(domainName string) (resources.Domain, v7action.Warnings, error)
 }
 
 type DeleteSharedDomainCommand struct {

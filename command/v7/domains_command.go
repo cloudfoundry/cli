@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/clock"
@@ -15,7 +16,7 @@ import (
 //go:generate counterfeiter . DomainsActor
 
 type DomainsActor interface {
-	GetOrganizationDomains(string, string) ([]v7action.Domain, v7action.Warnings, error)
+	GetOrganizationDomains(string, string) ([]resources.Domain, v7action.Warnings, error)
 }
 
 type DomainsCommand struct {
@@ -76,7 +77,7 @@ func (cmd DomainsCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd DomainsCommand) displayDomainsTable(domains []v7action.Domain) {
+func (cmd DomainsCommand) displayDomainsTable(domains []resources.Domain) {
 	var domainsTable = [][]string{
 		{
 			cmd.UI.TranslateText("name"),

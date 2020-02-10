@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 //go:generate counterfeiter . V7Actor
@@ -20,8 +21,8 @@ type V7Actor interface {
 	GetApplicationDroplets(appName string, spaceGUID string) ([]v7action.Droplet, v7action.Warnings, error)
 	GetApplicationRoutes(appGUID string) ([]v7action.Route, v7action.Warnings, error)
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
-	GetDefaultDomain(orgGUID string) (v7action.Domain, v7action.Warnings, error)
-	GetDomain(domainGUID string) (v7action.Domain, v7action.Warnings, error)
+	GetDefaultDomain(orgGUID string) (resources.Domain, v7action.Warnings, error)
+	GetDomain(domainGUID string) (resources.Domain, v7action.Warnings, error)
 	GetRouteByAttributes(domainName, domainGUID, hostname, path string) (v7action.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)

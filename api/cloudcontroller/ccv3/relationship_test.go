@@ -193,7 +193,7 @@ var _ = Describe("Relationship", func() {
 				response := `{
 					"errors": [
 						{
-							"detail": "Organization not found",
+							"detail": "resources.Organization not found",
 							"title": "CF-ResourceNotFound",
 							"code": 10010
 						}
@@ -210,7 +210,7 @@ var _ = Describe("Relationship", func() {
 			It("returns an error and warnings", func() {
 				_, warnings, err := client.GetOrganizationDefaultIsolationSegment("some-org-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "Organization not found",
+					Message: "resources.Organization not found",
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -306,7 +306,7 @@ var _ = Describe("Relationship", func() {
 				response := `{
 					"errors": [
 						{
-							"detail": "Organization not found",
+							"detail": "resources.Organization not found",
 							"title": "CF-ResourceNotFound",
 							"code": 10010
 						}
@@ -325,7 +325,7 @@ var _ = Describe("Relationship", func() {
 				relationship, warnings, err := client.UpdateOrganizationDefaultIsolationSegmentRelationship("some-org-guid", "some-isolation-segment-guid")
 				Expect(relationship).To(BeZero())
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "Organization not found",
+					Message: "resources.Organization not found",
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})

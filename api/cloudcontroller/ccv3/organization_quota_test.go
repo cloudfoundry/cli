@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Organization Quotas", func() {
+var _ = Describe("resources.Organization Quotas", func() {
 	var (
 		client     *Client
 		executeErr error
@@ -551,7 +551,7 @@ var _ = Describe("Organization Quotas", func() {
 				response := `{
 					 "errors": [
 							{
-								 "detail": "Organization Quota 'anteater-snout' already exists.",
+								 "detail": "resources.Organization Quota 'anteater-snout' already exists.",
 								 "title": "CF-UnprocessableEntity",
 								 "code": 10008
 							}
@@ -568,7 +568,7 @@ var _ = Describe("Organization Quotas", func() {
 
 			It("returns a meaningful organization quota-name-taken error", func() {
 				Expect(executeErr).To(MatchError(ccerror.QuotaAlreadyExists{
-					Message: "Organization Quota 'anteater-snout' already exists.",
+					Message: "resources.Organization Quota 'anteater-snout' already exists.",
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})

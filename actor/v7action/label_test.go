@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -48,7 +49,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"set-app-labels-warnings"},
 					nil,
 				)
@@ -101,7 +102,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"set-app-labels-warnings"},
 						errors.New("update-application-error"),
 					)
@@ -125,12 +126,12 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+					[]resources.Domain{resources.Domain{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"warning-updating-metadata"},
 					nil,
 				)
@@ -161,7 +162,7 @@ var _ = Describe("labels", func() {
 			When("fetching the domain fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+						[]resources.Domain{resources.Domain{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-domains-error"),
 					)
@@ -177,12 +178,12 @@ var _ = Describe("labels", func() {
 			When("updating the domain fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+						[]resources.Domain{resources.Domain{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"warning-updating-metadata"},
 						errors.New("update-domain-error"),
 					)
@@ -204,12 +205,12 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{ccv3.Organization{GUID: "some-guid"}},
+					[]resources.Organization{resources.Organization{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"set-org"},
 					nil,
 				)
@@ -240,7 +241,7 @@ var _ = Describe("labels", func() {
 			When("fetching the organization fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationsReturns(
-						[]ccv3.Organization{ccv3.Organization{GUID: "some-guid"}},
+						[]resources.Organization{resources.Organization{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-orgs-error"),
 					)
@@ -256,12 +257,12 @@ var _ = Describe("labels", func() {
 			When("updating the organization fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationsReturns(
-						[]ccv3.Organization{ccv3.Organization{GUID: "some-guid"}},
+						[]resources.Organization{resources.Organization{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"set-org"},
 						errors.New("update-orgs-error"),
 					)
@@ -283,7 +284,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{Name: "domain-name", GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
@@ -299,7 +300,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"set-route-warning"},
 					nil,
 				)
@@ -356,7 +357,7 @@ var _ = Describe("labels", func() {
 			When("updating the route fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{
+						[]resources.Domain{
 							{Name: "domain-name", GUID: "domain-guid"},
 						},
 						ccv3.Warnings{"get-domains-warning"},
@@ -372,7 +373,7 @@ var _ = Describe("labels", func() {
 					)
 
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"set-route-warning"},
 						errors.New("update-route-error"),
 					)
@@ -399,7 +400,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"set-space-metadata"},
 					nil,
 				)
@@ -452,7 +453,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"set-space"},
 						errors.New("update-space-error"),
 					)
@@ -479,7 +480,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"set-stack-metadata"},
 					nil,
 				)
@@ -531,7 +532,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"set-stack"},
 						errors.New("update-stack-error"),
 					)
@@ -672,7 +673,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					resources.ResourceMetadata{},
 					ccv3.Warnings{"set-service-offering-metadata"},
 					nil,
 				)
@@ -726,7 +727,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						resources.ResourceMetadata{},
 						ccv3.Warnings{"set-service-offering"},
 						errors.New("update-service-offering-error"),
 					)
@@ -748,7 +749,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+					[]resources.Domain{resources.Domain{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
@@ -775,9 +776,9 @@ var _ = Describe("labels", func() {
 				BeforeEach(func() {
 					expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{ccv3.Domain{
+						[]resources.Domain{resources.Domain{
 							GUID: "some-guid",
-							Metadata: &ccv3.Metadata{
+							Metadata: &resources.Metadata{
 								Labels: expectedLabels,
 							}}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
@@ -795,7 +796,7 @@ var _ = Describe("labels", func() {
 		When("there is a client error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{ccv3.Domain{GUID: "some-guid"}},
+					[]resources.Domain{resources.Domain{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					errors.New("get-domains-error"),
 				)
@@ -818,7 +819,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{Name: "domain-name", GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
@@ -860,7 +861,7 @@ var _ = Describe("labels", func() {
 					fakeCloudControllerClient.GetRoutesReturns(
 						[]ccv3.Route{ccv3.Route{
 							GUID: "some-guid",
-							Metadata: &ccv3.Metadata{
+							Metadata: &resources.Metadata{
 								Labels: expectedLabels,
 							}}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
@@ -878,7 +879,7 @@ var _ = Describe("labels", func() {
 		When("there is a client error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{Name: "domain-name", GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
@@ -937,7 +938,7 @@ var _ = Describe("labels", func() {
 					fakeCloudControllerClient.GetStacksReturns(
 						[]ccv3.Stack{ccv3.Stack{
 							GUID: "some-guid",
-							Metadata: &ccv3.Metadata{
+							Metadata: &resources.Metadata{
 								Labels: expectedLabels,
 							}}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
@@ -1019,7 +1020,7 @@ var _ = Describe("labels", func() {
 					[]ccv3.ServiceBroker{ccv3.ServiceBroker{
 						GUID: "some-guid",
 						Name: resourceName,
-						Metadata: &ccv3.Metadata{
+						Metadata: &resources.Metadata{
 							Labels: expectedLabels,
 						}}},
 					[]string{"warning-1", "warning-2"},
@@ -1092,7 +1093,7 @@ var _ = Describe("labels", func() {
 					[]ccv3.ServiceOffering{{
 						GUID: "some-guid",
 						Name: resourceName,
-						Metadata: &ccv3.Metadata{
+						Metadata: &resources.Metadata{
 							Labels: expectedLabels,
 						}}},
 					[]string{"warning-1", "warning-2"},

@@ -7,132 +7,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-type Domain struct {
-	GUID             string         `json:"guid,omitempty"`
-	Name             string         `json:"name"`
-	Internal         types.NullBool `json:"internal,omitempty"`
-	OrganizationGUID string         `json:"orgguid,omitempty"`
-
-	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
-}
-
-func (d Domain) MarshalJSON() ([]byte, error) {
-	type Data struct {
-		GUID string `json:"guid,omitempty"`
-	}
-
-	type OrgData struct {
-		Data Data `json:"data,omitempty"`
-	}
-
-	type OrgRelationship struct {
-		Org OrgData `json:"organization,omitempty"`
-	}
-
-	type ccDomain struct {
-		GUID          string           `json:"guid,omitempty"`
-		Name          string           `json:"name"`
-		Internal      *bool            `json:"internal,omitempty"`
-		Relationships *OrgRelationship `json:"relationships,omitempty"`
-	}
-
-	ccDom := ccDomain{
-		Name: d.Name,
-	}
-
-	if d.Internal.IsSet {
-		ccDom.Internal = &d.Internal.Value
-	}
-
-	if d.GUID != "" {
-		ccDom.GUID = d.GUID
-	}
-
-	if d.OrganizationGUID != "" {
-		ccDom.Relationships = &OrgRelationship{OrgData{Data{GUID: d.OrganizationGUID}}}
-	}
-	return json.Marshal(ccDom)
-}
-
-func (d *Domain) UnmarshalJSON(data []byte) error {
-	var ccRouteStruct struct {
-		GUID          string         `json:"guid,omitempty"`
-		Name          string         `json:"name"`
-		Internal      types.NullBool `json:"internal,omitempty"`
-		Relationships struct {
-			Organization struct {
-				Data struct {
-					GUID string `json:"guid,omitempty"`
-				} `json:"data,omitempty"`
-			} `json:"organization,omitempty"`
-		} `json:"relationships,omitempty"`
-		Metadata *Metadata
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &ccRouteStruct)
-	if err != nil {
-		return err
-	}
-
-	d.GUID = ccRouteStruct.GUID
-	d.Name = ccRouteStruct.Name
-	d.Internal = ccRouteStruct.Internal
-	d.OrganizationGUID = ccRouteStruct.Relationships.Organization.Data.GUID
-	d.Metadata = ccRouteStruct.Metadata
-	return nil
-}
-
-type SharedOrgs struct {
-	GUIDs []string
-}
-
-func (sharedOrgs SharedOrgs) MarshalJSON() ([]byte, error) {
-	type Org struct {
-		GUID string `json:"guid,omitempty"`
-	}
-
-	type Data = []Org
-
-	type sharedOrgsRelationship struct {
-		Data Data `json:"data"`
-	}
-
-	var orgs []Org
-	for _, sharedOrgGUID := range sharedOrgs.GUIDs {
-		orgs = append(orgs, Org{GUID: sharedOrgGUID})
-	}
-
-	relationship := sharedOrgsRelationship{
-		Data: orgs,
-	}
-
-	return json.Marshal(relationship)
-}
-
-func (sharedOrgs *SharedOrgs) UnmarshalJSON(data []byte) error {
-	var alias struct {
-		Data []struct {
-			GUID string `json:"guid,omitempty"`
-		} `json:"data,omitempty"`
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &alias)
-	if err != nil {
-		return err
-	}
-
-	var guids []string
-	for _, org := range alias.Data {
-		guids = append(guids, org.GUID)
-	}
-
-	sharedOrgs.GUIDs = guids
-	return nil
-}
 
 // CheckRoute checks whether the route with the given domain GUID, hostname,
 // and path exists in the foundation.
@@ -168,10 +44,10 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 	return responseJson.MatchingRoute, response.Warnings, err
 }
 
-func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
+func (client Client) CreateDomain(domain resources.Domain) (resources.Domain, Warnings, error) {
 	bodyBytes, err := json.Marshal(domain)
 	if err != nil {
-		return Domain{}, nil, err
+		return resources.Domain{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -180,10 +56,10 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 	})
 
 	if err != nil {
-		return Domain{}, nil, err
+		return resources.Domain{}, nil, err
 	}
 
-	var ccDomain Domain
+	var ccDomain resources.Domain
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &ccDomain,
 	}
@@ -211,16 +87,16 @@ func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 }
 
 // GetDomain returns a domain with the given GUID.
-func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
+func (client *Client) GetDomain(domainGUID string) (resources.Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainRequest,
 		URIParams:   map[string]string{"domain_guid": domainGUID},
 	})
 	if err != nil {
-		return Domain{}, nil, err
+		return resources.Domain{}, nil, err
 	}
 
-	var responseDomain Domain
+	var responseDomain resources.Domain
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseDomain,
 	}
@@ -229,7 +105,7 @@ func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	return responseDomain, response.Warnings, err
 }
 
-func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
+func (client Client) GetDomains(query ...Query) ([]resources.Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainsRequest,
 		Query:       query,
@@ -238,13 +114,13 @@ func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 		return nil, nil, err
 	}
 
-	var fullDomainsList []Domain
-	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
-		if domain, ok := item.(Domain); ok {
+	var fullDomainsList []resources.Domain
+	warnings, err := client.paginate(request, resources.Domain{}, func(item interface{}) error {
+		if domain, ok := item.(resources.Domain); ok {
 			fullDomainsList = append(fullDomainsList, domain)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Domain{},
+				Expected:   resources.Domain{},
 				Unexpected: item,
 			}
 		}
@@ -254,7 +130,7 @@ func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 	return fullDomainsList, warnings, err
 }
 
-func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]Domain, Warnings, error) {
+func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]resources.Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 		RequestName: internal.GetOrganizationDomainsRequest,
@@ -264,13 +140,13 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]D
 		return nil, nil, err
 	}
 
-	var fullDomainsList []Domain
-	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
-		if domain, ok := item.(Domain); ok {
+	var fullDomainsList []resources.Domain
+	warnings, err := client.paginate(request, resources.Domain{}, func(item interface{}) error {
+		if domain, ok := item.(resources.Domain); ok {
 			fullDomainsList = append(fullDomainsList, domain)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Domain{},
+				Expected:   resources.Domain{},
 				Unexpected: item,
 			}
 		}
@@ -280,7 +156,7 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]D
 	return fullDomainsList, warnings, err
 }
 
-func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {
+func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs resources.SharedOrgs) (Warnings, error) {
 	bodyBytes, err := json.Marshal(sharedOrgs)
 
 	if err != nil {
@@ -297,7 +173,7 @@ func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs Shar
 		return nil, err
 	}
 
-	var ccSharedOrgs SharedOrgs
+	var ccSharedOrgs resources.SharedOrgs
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &ccSharedOrgs,
 	}

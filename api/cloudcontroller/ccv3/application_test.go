@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -115,7 +116,7 @@ var _ = Describe("Application", func() {
 			When("metadata is provided", func() {
 				BeforeEach(func() {
 					app = Application{
-						Metadata: &Metadata{
+						Metadata: &resources.Metadata{
 							Labels: map[string]types.NullString{
 								"some-key":  types.NewNullString("some-value"),
 								"other-key": types.NewNullString("other-value\nwith a newline & a \" quote")},
@@ -137,7 +138,7 @@ var _ = Describe("Application", func() {
 				When("labels need to be removed", func() {
 					BeforeEach(func() {
 						app = Application{
-							Metadata: &Metadata{
+							Metadata: &resources.Metadata{
 								Labels: map[string]types.NullString{
 									"some-key":      types.NewNullString("some-value"),
 									"other-key":     types.NewNullString("other-value\nwith a newline & a \" quote"),
@@ -223,7 +224,7 @@ var _ = Describe("Application", func() {
 
 				It("sets the labels", func() {
 					Expect(app).To(Equal(Application{
-						Metadata: &Metadata{
+						Metadata: &resources.Metadata{
 							Labels: map[string]types.NullString{
 								"some-key": types.NewNullString("some-value"),
 							},

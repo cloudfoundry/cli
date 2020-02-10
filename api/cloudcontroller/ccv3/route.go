@@ -7,113 +7,13 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-type Route struct {
-	GUID         string
-	SpaceGUID    string
-	DomainGUID   string
-	Host         string
-	Path         string
-	URL          string
-	Destinations []RouteDestination
-	Metadata     *Metadata
-}
-
-func (r Route) MarshalJSON() ([]byte, error) {
-	type Data struct {
-		GUID string `json:"guid,omitempty"`
-	}
-
-	type RelationshipData struct {
-		Data Data `json:"data,omitempty"`
-	}
-
-	type Relationships struct {
-		Space  RelationshipData `json:"space,omitempty"`
-		Domain RelationshipData `json:"domain,omitempty"`
-	}
-
-	// Building up the request body in ccRoute
-	type ccRoute struct {
-		GUID          string         `json:"guid,omitempty"`
-		Host          string         `json:"host,omitempty"`
-		Path          string         `json:"path,omitempty"`
-		Relationships *Relationships `json:"relationships,omitempty"`
-	}
-
-	ccR := ccRoute{
-		GUID: r.GUID,
-		Host: r.Host,
-		Path: r.Path,
-	}
-
-	if r.SpaceGUID != "" {
-		ccR.Relationships = &Relationships{
-			Space:  RelationshipData{Data{GUID: r.SpaceGUID}},
-			Domain: RelationshipData{Data{GUID: r.DomainGUID}},
-		}
-	}
-
-	return json.Marshal(ccR)
-}
-
-func (r *Route) UnmarshalJSON(data []byte) error {
-	var alias struct {
-		GUID         string             `json:"guid,omitempty"`
-		Host         string             `json:"host,omitempty"`
-		Path         string             `json:"path,omitempty"`
-		URL          string             `json:"url,omitempty"`
-		Destinations []RouteDestination `json:"destinations,omitempty"`
-		Metadata     *Metadata          `json:"metadata,omitempty"`
-
-		Relationships struct {
-			Space struct {
-				Data struct {
-					GUID string `json:"guid,omitempty"`
-				} `json:"data,omitempty"`
-			} `json:"space,omitempty"`
-			Domain struct {
-				Data struct {
-					GUID string `json:"guid,omitempty"`
-				} `json:"data,omitempty"`
-			} `json:"domain,omitempty"`
-		} `json:"relationships,omitempty"`
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &alias)
-	if err != nil {
-		return err
-	}
-
-	r.GUID = alias.GUID
-	r.Host = alias.Host
-	r.SpaceGUID = alias.Relationships.Space.Data.GUID
-	r.DomainGUID = alias.Relationships.Domain.Data.GUID
-	r.Path = alias.Path
-	r.URL = alias.URL
-	r.Destinations = alias.Destinations
-	r.Metadata = alias.Metadata
-
-	return nil
-}
-
-type RouteDestinationApp struct {
-	GUID    string
-	Process struct {
-		Type string
-	}
-}
-
-type RouteDestination struct {
-	GUID string
-	App  RouteDestinationApp
-}
-
-func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
+func (client Client) CreateRoute(route resources.Route) (resources.Route, Warnings, error) {
 	bodyBytes, err := json.Marshal(route)
 	if err != nil {
-		return Route{}, nil, err
+		return resources.Route{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -122,10 +22,10 @@ func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 	})
 
 	if err != nil {
-		return Route{}, nil, err
+		return resources.Route{}, nil, err
 	}
 
-	var ccRoute Route
+	var ccRoute resources.Route
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &ccRoute,
 	}
@@ -170,7 +70,7 @@ func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
-func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {
+func (client Client) GetApplicationRoutes(appGUID string) ([]resources.Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationRoutesRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
@@ -179,13 +79,13 @@ func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, er
 		return nil, nil, err
 	}
 
-	var fullRoutesList []Route
-	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
-		if route, ok := item.(Route); ok {
+	var fullRoutesList []resources.Route
+	warnings, err := client.paginate(request, resources.Route{}, func(item interface{}) error {
+		if route, ok := item.(resources.Route); ok {
 			fullRoutesList = append(fullRoutesList, route)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Route{},
+				Expected:   resources.Route{},
 				Unexpected: item,
 			}
 		}
@@ -195,7 +95,7 @@ func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, er
 	return fullRoutesList, warnings, err
 }
 
-func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {
+func (client Client) GetRouteDestinations(routeGUID string) ([]resources.RouteDestination, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRouteDestinationsRequest,
 		URIParams:   internal.Params{"route_guid": routeGUID},
@@ -206,7 +106,7 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination,
 	}
 
 	var destinationResponse struct {
-		Destinations []RouteDestination `json:"destinations"`
+		Destinations []resources.RouteDestination `json:"destinations"`
 	}
 
 	response := cloudcontroller.Response{
@@ -217,7 +117,7 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination,
 	return destinationResponse.Destinations, response.Warnings, err
 }
 
-func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
+func (client Client) GetRoutes(query ...Query) ([]resources.Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRoutesRequest,
 		Query:       query,
@@ -226,13 +126,13 @@ func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
 		return nil, nil, err
 	}
 
-	var fullRoutesList []Route
-	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
-		if route, ok := item.(Route); ok {
+	var fullRoutesList []resources.Route
+	warnings, err := client.paginate(request, resources.Route{}, func(item interface{}) error {
+		if route, ok := item.(resources.Route); ok {
 			fullRoutesList = append(fullRoutesList, route)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Route{},
+				Expected:   resources.Route{},
 				Unexpected: item,
 			}
 		}

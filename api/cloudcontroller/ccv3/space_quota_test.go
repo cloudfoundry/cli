@@ -860,7 +860,7 @@ var _ = Describe("Space Quotas", func() {
 						},
 						{
 							"code": 10010,
-							"detail": "Organization not found",
+							"detail": "resources.Organization not found",
 							"title": "CF-ResourceNotFound"
 						}
 					]
@@ -884,7 +884,7 @@ var _ = Describe("Space Quotas", func() {
 						},
 						{
 							Code:   10010,
-							Detail: "Organization not found",
+							Detail: "resources.Organization not found",
 							Title:  "CF-ResourceNotFound",
 						},
 					},

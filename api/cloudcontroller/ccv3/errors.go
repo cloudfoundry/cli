@@ -137,7 +137,7 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	errorString := errorResponse.Detail
 	err := ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
 	appNameTakenRegexp := regexp.MustCompile(`App with the name '.*' already exists\.`)
-	orgNameTakenRegexp := regexp.MustCompile(`Organization '.*' already exists\.`)
+	orgNameTakenRegexp := regexp.MustCompile(`resources.Organization '.*' already exists\.`)
 	roleExistsRegexp := regexp.MustCompile(`User '.*' already has '.*' role.*`)
 	quotaExistsRegexp := regexp.MustCompile(`.* Quota '.*' already exists\.`)
 

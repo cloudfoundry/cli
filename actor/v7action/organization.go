@@ -3,10 +3,11 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// Organization represents a V7 actor organization.
-type Organization ccv3.Organization
+// resources.Organization represents a V7 actor organization.
+type Organization resources.Organization
 
 func (actor Actor) GetOrganizations(labelSelector string) ([]Organization, Warnings, error) {
 	queries := []ccv3.Query{
@@ -66,7 +67,7 @@ func (actor Actor) CreateOrganization(orgName string) (Organization, Warnings, e
 
 // updateOrganization updates the name and/or labels of an organization
 func (actor Actor) updateOrganization(org Organization) (Organization, Warnings, error) {
-	ccOrg := ccv3.Organization{
+	ccOrg := resources.Organization{
 		GUID:     org.GUID,
 		Name:     org.Name,
 		Metadata: org.Metadata,
@@ -119,8 +120,8 @@ func (actor Actor) DeleteOrganization(name string) (Warnings, error) {
 	return allWarnings, err
 }
 
-func (actor Actor) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
+func (actor Actor) GetDefaultDomain(orgGUID string) (resources.Domain, Warnings, error) {
 	domain, warnings, err := actor.CloudControllerClient.GetDefaultDomain(orgGUID)
 
-	return Domain(domain), Warnings(warnings), err
+	return domain, Warnings(warnings), err
 }

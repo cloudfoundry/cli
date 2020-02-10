@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // Space represents a Cloud Controller V3 Space.
@@ -18,7 +19,7 @@ type Space struct {
 	// Relationships list the relationships to the space.
 	Relationships Relationships `json:"relationships,omitempty"`
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
+	Metadata *resources.Metadata `json:"metadata,omitempty"`
 }
 
 func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {

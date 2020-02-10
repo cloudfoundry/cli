@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Organization Summary Actions", func() {
+var _ = Describe("resources.Organization Summary Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -36,7 +36,7 @@ var _ = Describe("Organization Summary Actions", func() {
 		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{
 							GUID:      "some-org-guid",
 							Name:      "some-org",
@@ -47,7 +47,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{
 							GUID: "shared-domain-guid-2",
 							Name: "shared-domain-2",
@@ -132,7 +132,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get-orgs-error")
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{
 						"get-org-warning-1",
 						"get-org-warning-2",
@@ -150,7 +150,7 @@ var _ = Describe("Organization Summary Actions", func() {
 		When("the organization exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{GUID: "some-org-guid"},
 					},
 					ccv3.Warnings{
@@ -164,7 +164,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			When("an error is encountered getting the organization domains", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("domains error")
-					fakeCloudControllerClient.GetOrganizationDomainsReturns([]ccv3.Domain{}, ccv3.Warnings{"domains warning"}, expectedErr)
+					fakeCloudControllerClient.GetOrganizationDomainsReturns([]resources.Domain{}, ccv3.Warnings{"domains warning"}, expectedErr)
 				})
 
 				It("returns that error and all warnings", func() {

@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 //go:generate counterfeiter . CloudControllerClient
@@ -40,10 +41,10 @@ type CloudControllerClient interface {
 	GetDroplets(query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
 	GetInfo() (ccv3.Info, ccv3.ResourceLinks, ccv3.Warnings, error)
 	GetIsolationSegment(guid string) (ccv3.IsolationSegment, ccv3.Warnings, error)
-	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]ccv3.Organization, ccv3.Warnings, error)
+	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]resources.Organization, ccv3.Warnings, error)
 	GetIsolationSegments(query ...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error)
 	GetOrganizationDefaultIsolationSegment(orgGUID string) (ccv3.Relationship, ccv3.Warnings, error)
-	GetOrganizations(query ...ccv3.Query) ([]ccv3.Organization, ccv3.Warnings, error)
+	GetOrganizations(query ...ccv3.Query) ([]resources.Organization, ccv3.Warnings, error)
 	GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error)
 	GetPackages(query ...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error)
 	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)

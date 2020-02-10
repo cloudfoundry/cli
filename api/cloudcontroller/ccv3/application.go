@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // Application represents a Cloud Controller V3 Application.
@@ -21,7 +22,7 @@ type Application struct {
 	// LifecycleType is the type of the lifecycle.
 	LifecycleType constant.AppLifecycleType
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata
+	Metadata *resources.Metadata
 	// Name is the name given to the application.
 	Name string
 	// Relationships list the relationships to the application.
@@ -98,7 +99,7 @@ type ccApplication struct {
 	Lifecycle     interface{}               `json:"lifecycle,omitempty"`
 	GUID          string                    `json:"guid,omitempty"`
 	State         constant.ApplicationState `json:"state,omitempty"`
-	Metadata      *Metadata                 `json:"metadata,omitempty"`
+	Metadata      *resources.Metadata       `json:"metadata,omitempty"`
 }
 
 func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle(a Application) {

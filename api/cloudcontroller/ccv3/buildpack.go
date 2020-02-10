@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -35,18 +36,18 @@ type Buildpack struct {
 	// Links are links to related resources.
 	Links APILinks
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata
+	Metadata *resources.Metadata
 }
 
 // MarshalJSON converts a Package into a Cloud Controller Package.
 func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 	ccBuildpack := struct {
-		Name     string    `json:"name,omitempty"`
-		Stack    string    `json:"stack,omitempty"`
-		Position *int      `json:"position,omitempty"`
-		Enabled  *bool     `json:"enabled,omitempty"`
-		Locked   *bool     `json:"locked,omitempty"`
-		Metadata *Metadata `json:"metadata,omitempty"`
+		Name     string              `json:"name,omitempty"`
+		Stack    string              `json:"stack,omitempty"`
+		Position *int                `json:"position,omitempty"`
+		Enabled  *bool               `json:"enabled,omitempty"`
+		Locked   *bool               `json:"locked,omitempty"`
+		Metadata *resources.Metadata `json:"metadata,omitempty"`
 	}{
 		Name:  buildpack.Name,
 		Stack: buildpack.Stack,
@@ -67,16 +68,16 @@ func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 
 func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	var ccBuildpack struct {
-		GUID     string         `json:"guid,omitempty"`
-		Links    APILinks       `json:"links,omitempty"`
-		Name     string         `json:"name,omitempty"`
-		Filename string         `json:"filename,omitempty"`
-		Stack    string         `json:"stack,omitempty"`
-		State    string         `json:"state,omitempty"`
-		Enabled  types.NullBool `json:"enabled"`
-		Locked   types.NullBool `json:"locked"`
-		Position types.NullInt  `json:"position"`
-		Metadata *Metadata      `json:"metadata"`
+		GUID     string              `json:"guid,omitempty"`
+		Links    APILinks            `json:"links,omitempty"`
+		Name     string              `json:"name,omitempty"`
+		Filename string              `json:"filename,omitempty"`
+		Stack    string              `json:"stack,omitempty"`
+		State    string              `json:"state,omitempty"`
+		Enabled  types.NullBool      `json:"enabled"`
+		Locked   types.NullBool      `json:"locked"`
+		Position types.NullInt       `json:"position"`
+		Metadata *resources.Metadata `json:"metadata"`
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccBuildpack)

@@ -7,57 +7,15 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// Organization represents a Cloud Controller V3 Organization.
-type Organization struct {
-	// GUID is the unique organization identifier.
-	GUID string `json:"guid,omitempty"`
-	// Name is the name of the organization.
-	Name string `json:"name"`
-	// QuotaGUID is the GUID of the organization Quota applied to this Organization
-	QuotaGUID string `json:"-"`
-
-	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
-}
-
-func (org *Organization) UnmarshalJSON(data []byte) error {
-	type alias Organization
-	var aliasOrg alias
-	err := json.Unmarshal(data, &aliasOrg)
-	if err != nil {
-		return err
-	}
-
-	*org = Organization(aliasOrg)
-
-	remainingFields := new(struct {
-		Relationships struct {
-			Quota struct {
-				Data struct {
-					GUID string
-				}
-			}
-		}
-	})
-
-	err = json.Unmarshal(data, &remainingFields)
-	if err != nil {
-		return err
-	}
-
-	org.QuotaGUID = remainingFields.Relationships.Quota.Data.GUID
-
-	return nil
-}
-
 // CreateOrganization creates an organization with the given name.
-func (client *Client) CreateOrganization(orgName string) (Organization, Warnings, error) {
-	org := Organization{Name: orgName}
+func (client *Client) CreateOrganization(orgName string) (resources.Organization, Warnings, error) {
+	org := resources.Organization{Name: orgName}
 	orgBytes, err := json.Marshal(org)
 	if err != nil {
-		return Organization{}, nil, err
+		return resources.Organization{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -66,17 +24,17 @@ func (client *Client) CreateOrganization(orgName string) (Organization, Warnings
 	})
 
 	if err != nil {
-		return Organization{}, nil, err
+		return resources.Organization{}, nil, err
 	}
 
-	var responseOrg Organization
+	var responseOrg resources.Organization
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrg,
 	}
 	err = client.connection.Make(request, &response)
 
 	if err != nil {
-		return Organization{}, response.Warnings, err
+		return resources.Organization{}, response.Warnings, err
 	}
 
 	return responseOrg, response.Warnings, err
@@ -99,16 +57,16 @@ func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, erro
 }
 
 // GetDefaultDomain gets the default domain for the organization with the given GUID.
-func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
+func (client *Client) GetDefaultDomain(orgGUID string) (resources.Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDefaultDomainRequest,
 		URIParams:   map[string]string{"organization_guid": orgGUID},
 	})
 	if err != nil {
-		return Domain{}, nil, err
+		return resources.Domain{}, nil, err
 	}
 
-	var defaultDomain Domain
+	var defaultDomain resources.Domain
 
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &defaultDomain,
@@ -121,7 +79,7 @@ func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error)
 
 // GetIsolationSegmentOrganizations lists organizations
 // entitled to an isolation segment.
-func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]Organization, Warnings, error) {
+func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]resources.Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentOrganizationsRequest,
 		URIParams:   map[string]string{"isolation_segment_guid": isolationSegmentGUID},
@@ -130,13 +88,13 @@ func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID stri
 		return nil, nil, err
 	}
 
-	var fullOrgsList []Organization
-	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
-		if app, ok := item.(Organization); ok {
+	var fullOrgsList []resources.Organization
+	warnings, err := client.paginate(request, resources.Organization{}, func(item interface{}) error {
+		if app, ok := item.(resources.Organization); ok {
 			fullOrgsList = append(fullOrgsList, app)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Organization{},
+				Expected:   resources.Organization{},
 				Unexpected: item,
 			}
 		}
@@ -147,30 +105,30 @@ func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID stri
 }
 
 // GetOrganization gets an organization by the given guid.
-func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, error) {
+func (client *Client) GetOrganization(orgGUID string) (resources.Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationRequest,
 		URIParams:   map[string]string{"organization_guid": orgGUID},
 	})
 
 	if err != nil {
-		return Organization{}, nil, err
+		return resources.Organization{}, nil, err
 	}
 
-	var responseOrg Organization
+	var responseOrg resources.Organization
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrg,
 	}
 	err = client.connection.Make(request, &response)
 	if err != nil {
-		return Organization{}, response.Warnings, err
+		return resources.Organization{}, response.Warnings, err
 	}
 
 	return responseOrg, response.Warnings, nil
 }
 
 // GetOrganizations lists organizations with optional filters.
-func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
+func (client *Client) GetOrganizations(query ...Query) ([]resources.Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationsRequest,
 		Query:       query,
@@ -179,13 +137,13 @@ func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings
 		return nil, nil, err
 	}
 
-	var fullOrgsList []Organization
-	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
-		if app, ok := item.(Organization); ok {
+	var fullOrgsList []resources.Organization
+	warnings, err := client.paginate(request, resources.Organization{}, func(item interface{}) error {
+		if app, ok := item.(resources.Organization); ok {
 			fullOrgsList = append(fullOrgsList, app)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Organization{},
+				Expected:   resources.Organization{},
 				Unexpected: item,
 			}
 		}
@@ -196,12 +154,12 @@ func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings
 }
 
 // UpdateOrganization updates an organization with the given properties.
-func (client *Client) UpdateOrganization(org Organization) (Organization, Warnings, error) {
+func (client *Client) UpdateOrganization(org resources.Organization) (resources.Organization, Warnings, error) {
 	orgGUID := org.GUID
 	org.GUID = ""
 	orgBytes, err := json.Marshal(org)
 	if err != nil {
-		return Organization{}, nil, err
+		return resources.Organization{}, nil, err
 	}
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchOrganizationRequest,
@@ -210,17 +168,17 @@ func (client *Client) UpdateOrganization(org Organization) (Organization, Warnin
 	})
 
 	if err != nil {
-		return Organization{}, nil, err
+		return resources.Organization{}, nil, err
 	}
 
-	var responseOrg Organization
+	var responseOrg resources.Organization
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseOrg,
 	}
 	err = client.connection.Make(request, &response)
 
 	if err != nil {
-		return Organization{}, nil, err
+		return resources.Organization{}, nil, err
 	}
 	return responseOrg, nil, err
 }

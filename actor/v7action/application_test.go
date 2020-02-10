@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/clock/fakeclock"
 
@@ -439,7 +440,7 @@ var _ = Describe("Application Actions", func() {
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
-							Metadata: &ccv3.Metadata{
+							Metadata: &resources.Metadata{
 								Labels: map[string]types.NullString{
 									"some-key": types.NewNullString("some-value"),
 								},
@@ -457,7 +458,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(app).To(Equal(Application{
 					Name: "some-app-name",
 					GUID: "some-app-guid",
-					Metadata: &Metadata{
+					Metadata: &resources.Metadata{
 						Labels: map[string]types.NullString{"some-key": types.NewNullString("some-value")},
 					},
 				}))
@@ -665,7 +666,7 @@ var _ = Describe("Application Actions", func() {
 				Name:                "some-app-name",
 				LifecycleType:       constant.AppLifecycleTypeBuildpack,
 				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
-				Metadata: &Metadata{Labels: map[string]types.NullString{
+				Metadata: &resources.Metadata{Labels: map[string]types.NullString{
 					"some-label":  types.NewNullString("some-value"),
 					"other-label": types.NewNullString("other-value"),
 				}},
@@ -710,7 +711,7 @@ var _ = Describe("Application Actions", func() {
 					LifecycleType:       submitApp.LifecycleType,
 					LifecycleBuildpacks: submitApp.LifecycleBuildpacks,
 					Name:                submitApp.Name,
-					Metadata:            (*ccv3.Metadata)(submitApp.Metadata),
+					Metadata:            (*resources.Metadata)(submitApp.Metadata),
 				}))
 			})
 		})

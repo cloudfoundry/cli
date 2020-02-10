@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -109,7 +110,7 @@ var _ = Describe("map-route Command", func() {
 	When("the user is logged in and targeted", func() {
 		When("getting the domain errors", func() {
 			BeforeEach(func() {
-				fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
+				fakeActor.GetDomainByNameReturns(resources.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
 			})
 
 			It("returns the error and displays warnings", func() {
@@ -132,7 +133,7 @@ var _ = Describe("map-route Command", func() {
 		When("getting the domain succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.GetDomainByNameReturns(
-					v7action.Domain{Name: "some-domain.com", GUID: "domain-guid"},
+					resources.Domain{Name: "some-domain.com", GUID: "domain-guid"},
 					v7action.Warnings{"get-domain-warnings"},
 					nil,
 				)

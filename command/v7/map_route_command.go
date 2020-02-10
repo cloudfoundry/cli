@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 )
 
@@ -15,7 +16,7 @@ import (
 type MapRouteActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
-	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
+	GetDomainByName(domainName string) (resources.Domain, v7action.Warnings, error)
 	CreateRoute(spaceGUID, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)

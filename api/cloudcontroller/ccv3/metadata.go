@@ -7,22 +7,13 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// Metadata is used for custom tagging of API resources
-type Metadata struct {
-	Labels map[string]types.NullString `json:"labels,omitempty"`
-}
-
-type ResourceMetadata struct {
-	Metadata *Metadata `json:"metadata,omitempty"`
-}
-
-func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata Metadata) (ResourceMetadata, Warnings, error) {
-	metadataBytes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
+func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata resources.Metadata) (resources.ResourceMetadata, Warnings, error) {
+	metadataBytes, err := json.Marshal(resources.ResourceMetadata{Metadata: &metadata})
 	if err != nil {
-		return ResourceMetadata{}, nil, err
+		return resources.ResourceMetadata{}, nil, err
 	}
 
 	var request *cloudcontroller.Request
@@ -77,14 +68,14 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 			URIParams:   map[string]string{"stack_guid": resourceGUID},
 		})
 	default:
-		return ResourceMetadata{}, nil, fmt.Errorf("unknown resource type (%s) requested", resource)
+		return resources.ResourceMetadata{}, nil, fmt.Errorf("unknown resource type (%s) requested", resource)
 	}
 
 	if err != nil {
-		return ResourceMetadata{}, nil, err
+		return resources.ResourceMetadata{}, nil, err
 	}
 
-	var responseMetadata ResourceMetadata
+	var responseMetadata resources.ResourceMetadata
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &responseMetadata,
 	}
@@ -92,8 +83,8 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 	return responseMetadata, response.Warnings, err
 }
 
-func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata Metadata) (JobURL, Warnings, error) {
-	metadataBytes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
+func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata resources.Metadata) (JobURL, Warnings, error) {
+	metadataBytes, err := json.Marshal(resources.ResourceMetadata{Metadata: &metadata})
 	if err != nil {
 		return "", nil, err
 	}

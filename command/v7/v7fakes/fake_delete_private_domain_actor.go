@@ -6,13 +6,14 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeDeletePrivateDomainActor struct {
-	DeleteDomainStub        func(v7action.Domain) (v7action.Warnings, error)
+	DeleteDomainStub        func(resources.Domain) (v7action.Warnings, error)
 	deleteDomainMutex       sync.RWMutex
 	deleteDomainArgsForCall []struct {
-		arg1 v7action.Domain
+		arg1 resources.Domain
 	}
 	deleteDomainReturns struct {
 		result1 v7action.Warnings
@@ -22,18 +23,18 @@ type FakeDeletePrivateDomainActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	GetDomainByNameStub        func(string) (v7action.Domain, v7action.Warnings, error)
+	GetDomainByNameStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDomainByNameMutex       sync.RWMutex
 	getDomainByNameArgsForCall []struct {
 		arg1 string
 	}
 	getDomainByNameReturns struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getDomainByNameReturnsOnCall map[int]struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -41,11 +42,11 @@ type FakeDeletePrivateDomainActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeletePrivateDomainActor) DeleteDomain(arg1 v7action.Domain) (v7action.Warnings, error) {
+func (fake *FakeDeletePrivateDomainActor) DeleteDomain(arg1 resources.Domain) (v7action.Warnings, error) {
 	fake.deleteDomainMutex.Lock()
 	ret, specificReturn := fake.deleteDomainReturnsOnCall[len(fake.deleteDomainArgsForCall)]
 	fake.deleteDomainArgsForCall = append(fake.deleteDomainArgsForCall, struct {
-		arg1 v7action.Domain
+		arg1 resources.Domain
 	}{arg1})
 	fake.recordInvocation("DeleteDomain", []interface{}{arg1})
 	fake.deleteDomainMutex.Unlock()
@@ -65,13 +66,13 @@ func (fake *FakeDeletePrivateDomainActor) DeleteDomainCallCount() int {
 	return len(fake.deleteDomainArgsForCall)
 }
 
-func (fake *FakeDeletePrivateDomainActor) DeleteDomainCalls(stub func(v7action.Domain) (v7action.Warnings, error)) {
+func (fake *FakeDeletePrivateDomainActor) DeleteDomainCalls(stub func(resources.Domain) (v7action.Warnings, error)) {
 	fake.deleteDomainMutex.Lock()
 	defer fake.deleteDomainMutex.Unlock()
 	fake.DeleteDomainStub = stub
 }
 
-func (fake *FakeDeletePrivateDomainActor) DeleteDomainArgsForCall(i int) v7action.Domain {
+func (fake *FakeDeletePrivateDomainActor) DeleteDomainArgsForCall(i int) resources.Domain {
 	fake.deleteDomainMutex.RLock()
 	defer fake.deleteDomainMutex.RUnlock()
 	argsForCall := fake.deleteDomainArgsForCall[i]
@@ -104,7 +105,7 @@ func (fake *FakeDeletePrivateDomainActor) DeleteDomainReturnsOnCall(i int, resul
 	}{result1, result2}
 }
 
-func (fake *FakeDeletePrivateDomainActor) GetDomainByName(arg1 string) (v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeDeletePrivateDomainActor) GetDomainByName(arg1 string) (resources.Domain, v7action.Warnings, error) {
 	fake.getDomainByNameMutex.Lock()
 	ret, specificReturn := fake.getDomainByNameReturnsOnCall[len(fake.getDomainByNameArgsForCall)]
 	fake.getDomainByNameArgsForCall = append(fake.getDomainByNameArgsForCall, struct {
@@ -128,7 +129,7 @@ func (fake *FakeDeletePrivateDomainActor) GetDomainByNameCallCount() int {
 	return len(fake.getDomainByNameArgsForCall)
 }
 
-func (fake *FakeDeletePrivateDomainActor) GetDomainByNameCalls(stub func(string) (v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeDeletePrivateDomainActor) GetDomainByNameCalls(stub func(string) (resources.Domain, v7action.Warnings, error)) {
 	fake.getDomainByNameMutex.Lock()
 	defer fake.getDomainByNameMutex.Unlock()
 	fake.GetDomainByNameStub = stub
@@ -141,30 +142,30 @@ func (fake *FakeDeletePrivateDomainActor) GetDomainByNameArgsForCall(i int) stri
 	return argsForCall.arg1
 }
 
-func (fake *FakeDeletePrivateDomainActor) GetDomainByNameReturns(result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeDeletePrivateDomainActor) GetDomainByNameReturns(result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainByNameMutex.Lock()
 	defer fake.getDomainByNameMutex.Unlock()
 	fake.GetDomainByNameStub = nil
 	fake.getDomainByNameReturns = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeDeletePrivateDomainActor) GetDomainByNameReturnsOnCall(i int, result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeDeletePrivateDomainActor) GetDomainByNameReturnsOnCall(i int, result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainByNameMutex.Lock()
 	defer fake.getDomainByNameMutex.Unlock()
 	fake.GetDomainByNameStub = nil
 	if fake.getDomainByNameReturnsOnCall == nil {
 		fake.getDomainByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.Domain
+			result1 resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getDomainByNameReturnsOnCall[i] = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

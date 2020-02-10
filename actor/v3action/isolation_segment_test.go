@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -161,7 +162,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			When("the organization exists", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+					fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 						{
 							Name: "some-org",
 							GUID: "some-org-guid",
@@ -534,8 +535,8 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			When("getting entitled organizations succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(0, []ccv3.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(1, []ccv3.Organization{
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(0, []resources.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(1, []resources.Organization{
 						{
 							Name: "iso-2-org-1",
 							GUID: "iso-2-org-guid-1",
@@ -615,7 +616,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			When("the organization exists", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+					fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 						{
 							Name: "org-1",
 							GUID: "org-guid-1",
@@ -648,7 +649,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 						fakeCloudControllerClient.DeleteIsolationSegmentOrganizationReturns(ccv3.Warnings{"revoke-warnings-1"}, expectedErr)
 					})
 
-					It("from Organization", func() {
+					It("from resources.Organization", func() {
 						warnings, err := actor.DeleteIsolationSegmentOrganizationByName("iso-1", "org-1")
 						Expect(err).To(MatchError(expectedErr))
 						Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1", "get-orgs-warning-1", "revoke-warnings-1"))

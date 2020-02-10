@@ -380,7 +380,7 @@ var _ = Describe("Error Wrapper", func() {
   "errors": [
     {
       "code": 10008,
-      "detail": "Organization Quota 'default' already exists.",
+      "detail": "resources.Organization Quota 'default' already exists.",
       "title": "CF-UnprocessableEntity"
     }
   ]
@@ -390,7 +390,7 @@ var _ = Describe("Error Wrapper", func() {
 						It("returns a QuotaAlreadyExists error", func() {
 							Expect(makeError).To(Equal(
 								ccerror.QuotaAlreadyExists{
-									Message: "Organization Quota 'default' already exists.",
+									Message: "resources.Organization Quota 'default' already exists.",
 								}),
 							)
 						})

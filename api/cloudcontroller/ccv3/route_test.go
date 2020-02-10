@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,14 +22,14 @@ var _ = Describe("Route", func() {
 
 	Describe("CreateRoute", func() {
 		var (
-			route      Route
+			route      resources.Route
 			warnings   Warnings
 			executeErr error
 			spaceGUID  string
 			domainGUID string
 			host       string
 			path       string
-			ccv3Route  Route
+			ccv3Route  resources.Route
 		)
 
 		BeforeEach(func() {
@@ -39,7 +40,7 @@ var _ = Describe("Route", func() {
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-			ccv3Route = Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path}
+			ccv3Route = resources.Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path}
 			route, warnings, executeErr = client.CreateRoute(ccv3Route)
 		})
 
@@ -84,7 +85,7 @@ var _ = Describe("Route", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1"))
 
-					Expect(route).To(Equal(Route{
+					Expect(route).To(Equal(resources.Route{
 						GUID:       "some-route-guid",
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
@@ -134,7 +135,7 @@ var _ = Describe("Route", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1"))
 
-					Expect(route).To(Equal(Route{
+					Expect(route).To(Equal(resources.Route{
 						GUID:       "some-route-guid",
 						SpaceGUID:  "space-guid",
 						DomainGUID: "domain-guid",
@@ -192,7 +193,7 @@ var _ = Describe("Route", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
-						Expect(route).To(Equal(Route{
+						Expect(route).To(Equal(resources.Route{
 							GUID:       "this-route-guid",
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
@@ -252,7 +253,7 @@ var _ = Describe("Route", func() {
 	Describe("GetRoutes", func() {
 		var (
 			query      Query
-			routes     []Route
+			routes     []resources.Route
 			warnings   Warnings
 			executeErr error
 		)
@@ -327,21 +328,21 @@ var _ = Describe("Route", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(routes).To(Equal([]Route{
-						Route{
+					Expect(routes).To(Equal([]resources.Route{
+						resources.Route{
 							GUID: "route-1-guid",
 							URL:  "hello",
-							Metadata: &Metadata{
+							Metadata: &resources.Metadata{
 								Labels: map[string]types.NullString{
 									"key1": types.NewNullString("value1"),
 								},
 							},
 						},
-						Route{
+						resources.Route{
 							GUID: "route-2-guid",
 							URL:  "bye",
 						},
-						Route{
+						resources.Route{
 							GUID: "route-3-guid",
 						},
 					}))
@@ -370,21 +371,21 @@ var _ = Describe("Route", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(routes).To(Equal([]Route{
-						Route{
+					Expect(routes).To(Equal([]resources.Route{
+						resources.Route{
 							GUID: "route-1-guid",
 							URL:  "hello",
-							Metadata: &Metadata{
+							Metadata: &resources.Metadata{
 								Labels: map[string]types.NullString{
 									"key1": types.NewNullString("value1"),
 								},
 							},
 						},
-						Route{
+						resources.Route{
 							GUID: "route-2-guid",
 							URL:  "bye",
 						},
-						Route{
+						resources.Route{
 							GUID: "route-3-guid",
 						},
 					}))
@@ -565,7 +566,7 @@ var _ = Describe("Route", func() {
 	Describe("GetRouteDestinations", func() {
 		var (
 			routeGUID    = "some-route-guid"
-			destinations []RouteDestination
+			destinations []resources.RouteDestination
 			warnings     Warnings
 			executeErr   error
 		)
@@ -619,14 +620,14 @@ var _ = Describe("Route", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1"))
 
-					Expect(destinations).To(Equal([]RouteDestination{
+					Expect(destinations).To(Equal([]resources.RouteDestination{
 						{
 							GUID: "destination-1-guid",
-							App:  RouteDestinationApp{GUID: "app-1-guid", Process: struct{ Type string }{Type: "web"}},
+							App:  resources.RouteDestinationApp{GUID: "app-1-guid", Process: struct{ Type string }{Type: "web"}},
 						},
 						{
 							GUID: "destination-2-guid",
-							App:  RouteDestinationApp{GUID: "app-2-guid", Process: struct{ Type string }{Type: "worker"}},
+							App:  resources.RouteDestinationApp{GUID: "app-2-guid", Process: struct{ Type string }{Type: "worker"}},
 						},
 					}))
 				})
@@ -802,7 +803,7 @@ var _ = Describe("Route", func() {
 		var (
 			appGUID string
 
-			routes     []Route
+			routes     []resources.Route
 			warnings   Warnings
 			executeErr error
 		)
@@ -873,7 +874,7 @@ var _ = Describe("Route", func() {
 				Expect(warnings).To(ConsistOf("get-app-routes-warning"))
 
 				Expect(routes).To(ConsistOf(
-					Route{
+					resources.Route{
 						GUID:       "route-guid",
 						DomainGUID: "domain-guid",
 						SpaceGUID:  "space-guid",
@@ -881,7 +882,7 @@ var _ = Describe("Route", func() {
 						Path:       "/path",
 						URL:        "host.domain.com/path",
 					},
-					Route{
+					resources.Route{
 						GUID:       "route2-guid",
 						DomainGUID: "domain2-guid",
 						SpaceGUID:  "space-guid",

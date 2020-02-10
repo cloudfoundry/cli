@@ -3,6 +3,8 @@ package v7
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -15,8 +17,8 @@ import (
 //go:generate counterfeiter . DeletePrivateDomainActor
 
 type DeletePrivateDomainActor interface {
-	DeleteDomain(domain v7action.Domain) (v7action.Warnings, error)
-	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
+	DeleteDomain(domain resources.Domain) (v7action.Warnings, error)
+	GetDomainByName(domainName string) (resources.Domain, v7action.Warnings, error)
 }
 
 type DeletePrivateDomainCommand struct {

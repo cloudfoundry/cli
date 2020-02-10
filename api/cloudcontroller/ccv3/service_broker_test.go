@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -132,7 +133,7 @@ var _ = Describe("ServiceBroker", func() {
 					GUID:   "service-broker-guid-1",
 					URL:    "service-broker-url-1",
 					Status: "synchronization in progress",
-					Metadata: &Metadata{
+					Metadata: &resources.Metadata{
 						Labels: map[string]types.NullString{
 							"some-key":  types.NewNullString("some-value"),
 							"other-key": types.NewNullString("other-value"),
