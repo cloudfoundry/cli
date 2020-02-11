@@ -159,7 +159,7 @@ var _ = Describe("delete-space-quota Command", func() {
 		BeforeEach(func() {
 			fakeActor.DeleteSpaceQuotaByNameReturns(
 				v7action.Warnings{"a-warning"},
-				actionerror.SpaceQuotaNotFoundByNameError{Name: quotaName},
+				actionerror.SpaceQuotaNotFoundForNameError{Name: quotaName},
 			)
 		})
 

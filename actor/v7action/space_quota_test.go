@@ -909,7 +909,7 @@ var _ = Describe("Space Quota Actions", func() {
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 
 					Expect(warnings).To(ContainElement("get-quota-warning"))
-					Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundByNameError{Name: spaceQuotaName}))
+					Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundForNameError{Name: spaceQuotaName}))
 				})
 			})
 

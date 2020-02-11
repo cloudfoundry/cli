@@ -85,7 +85,7 @@ func (cmd DeleteSpaceQuotaCommand) Execute(args []string) error {
 
 	if err != nil {
 		switch err.(type) {
-		case actionerror.SpaceQuotaNotFoundByNameError:
+		case actionerror.SpaceQuotaNotFoundForNameError:
 			cmd.UI.DisplayWarning(err.Error())
 		default:
 			return err
