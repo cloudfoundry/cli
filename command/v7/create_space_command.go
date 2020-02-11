@@ -17,12 +17,14 @@ type CreateSpaceActor interface {
 	CreateSpace(spaceName, orgGUID string) (v7action.Space, v7action.Warnings, error)
 	CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
+	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
 }
 
 type CreateSpaceCommand struct {
 	RequiredArgs    flag.Space  `positional-args:"yes"`
 	Organization    string      `short:"o" description:"Organization"`
-	usage           interface{} `usage:"CF_NAME create-space SPACE [-o ORG]"`
+	Quota           string      `long:"quota" short:"q" description:"Quota to assign to the newly created space"`
+	usage           interface{} `usage:"CF_NAME create-space SPACE [-o ORG] [-q QUOTA]"`
 	relatedCommands interface{} `related_commands:"set-space-isolation-segment, space-quotas, spaces, target"`
 
 	UI          command.UI
@@ -87,15 +89,33 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 		})
 	space, warnings, err := cmd.Actor.CreateSpace(spaceName, orgGUID)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		if _, ok := err.(actionerror.SpaceAlreadyExistsError); ok {
-			cmd.UI.DisplayText(err.Error())
-			cmd.UI.DisplayOK()
-			return nil
-		}
+
+	if _, ok := err.(actionerror.SpaceAlreadyExistsError); ok {
+		cmd.UI.DisplayText(err.Error())
+		cmd.UI.DisplayOK()
+		return nil
+	} else if err != nil {
 		return err
 	}
+
 	cmd.UI.DisplayOK()
+
+	if cmd.Quota != "" {
+		cmd.UI.DisplayTextWithFlavor("Setting space quota {{.Quota}} to space {{.Space}} as {{.User}}...",
+			map[string]interface{}{
+				"Quota": cmd.Quota,
+				"Space": spaceName,
+				"User":  user.Name,
+			})
+
+		warnings, err = cmd.Actor.ApplySpaceQuotaByName(cmd.Quota, space.GUID, orgGUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayOK()
+	}
 
 	cmd.UI.DisplayTextWithFlavor("Assigning role SpaceManager to user {{.User}} in org {{.Organization}} / space {{.Space}} as {{.User}}...",
 		map[string]interface{}{

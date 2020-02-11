@@ -42,6 +42,7 @@ var _ = Describe("create-space command", func() {
 				Eventually(session).Should(Say(`csp`))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`-o\s+Organization`))
+				Eventually(session).Should(Say(`--quota, -q\s+Quota to assign to the newly created space`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("set-space-isolation-segment, space-quotas, spaces, target"))
 				Eventually(session).Should(Exit(0))
@@ -160,6 +161,63 @@ var _ = Describe("create-space command", func() {
 					Eventually(session).Should(Say(`\s+%s`, userName))
 					Eventually(session).Should(Say("SPACE DEVELOPER"))
 					Eventually(session).Should(Say(`\s+%s`, userName))
+				})
+			})
+
+			When("the --quota flag is passed", func() {
+				When("the quota does not exist", func() {
+					var (
+						quotaName = "garb-quota"
+					)
+
+					It("makes a space and informs the user setting the quota has failed", func() {
+						session := helpers.CF("create-space", spaceNameNew, "-q", quotaName)
+						userName, _ := helpers.GetCredentials()
+						Eventually(session).Should(Say("Creating space %s in org %s as %s...", spaceNameNew, orgName, userName))
+						Eventually(session).Should(Say("OK"))
+
+						Eventually(session).Should(Say("Setting space quota %s to space %s as %s...", quotaName, spaceNameNew, userName))
+						Eventually(session.Err).Should(Say("Space quota with name '%s' not found.", quotaName))
+						Eventually(session).Should(Say("FAILED"))
+
+						session = helpers.CF("space", spaceNameNew)
+						Eventually(session).Should(Say(`name:\s+%s`, spaceNameNew))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the quota exists", func() {
+					var (
+						quotaName = helpers.QuotaName()
+					)
+
+					BeforeEach(func() {
+						Eventually(helpers.CF("create-space-quota", quotaName)).Should(Exit(0))
+					})
+
+					It("makes an org with the given quota", func() {
+						session := helpers.CF("create-space", spaceNameNew, "-q", quotaName)
+						userName, _ := helpers.GetCredentials()
+						Eventually(session).Should(Say("Creating space %s in org %s as %s...", spaceNameNew, orgName, userName))
+						Eventually(session).Should(Say("OK"))
+
+						Eventually(session).Should(Say("Setting space quota %s to space %s as %s...", quotaName, spaceNameNew, userName))
+						Eventually(session).Should(Say("OK"))
+
+						Eventually(session).Should(Say(`Assigning role SpaceManager to user %s in org %s / space %s as %s\.\.\.`, userName, orgName, spaceNameNew, userName))
+						Eventually(session).Should(Say(`OK\n`))
+
+						Eventually(session).Should(Say(`Assigning role SpaceDeveloper to user %s in org %s / space %s as %s\.\.\.`, userName, orgName, spaceNameNew, userName))
+						Eventually(session).Should(Say(`OK\n\n`))
+
+						Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, orgName, spaceNameNew))
+
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("space", spaceNameNew)
+						Eventually(session).Should(Say(`name:\s+%s`, spaceNameNew))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})

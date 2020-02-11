@@ -7,6 +7,21 @@ import (
 
 type SpaceQuota ccv3.SpaceQuota
 
+func (actor Actor) ApplySpaceQuotaByName(quotaName, spaceGUID, orgGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	spaceQuota, warnings, err := actor.GetSpaceQuotaByName(quotaName, orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	_, ccWarnings, err := actor.CloudControllerClient.ApplySpaceQuota(spaceQuota.GUID, spaceGUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+
+	return allWarnings, err
+}
+
 func (actor Actor) CreateSpaceQuota(spaceQuotaName string, orgGuid string, limits QuotaLimits) (Warnings, error) {
 	allWarnings := Warnings{}
 
@@ -81,7 +96,7 @@ func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (S
 	}
 
 	if len(ccv3Quotas) == 0 {
-		return SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundByNameError{Name: spaceQuotaName}
+		return SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundForNameError{Name: spaceQuotaName}
 	}
 
 	return SpaceQuota(ccv3Quotas[0]), Warnings(warnings), nil

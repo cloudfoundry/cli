@@ -10,6 +10,21 @@ import (
 )
 
 type FakeCreateSpaceActor struct {
+	ApplySpaceQuotaByNameStub        func(string, string, string) (v7action.Warnings, error)
+	applySpaceQuotaByNameMutex       sync.RWMutex
+	applySpaceQuotaByNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	applySpaceQuotaByNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	applySpaceQuotaByNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	CreateSpaceStub        func(string, string) (v7action.Space, v7action.Warnings, error)
 	createSpaceMutex       sync.RWMutex
 	createSpaceArgsForCall []struct {
@@ -61,6 +76,71 @@ type FakeCreateSpaceActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCreateSpaceActor) ApplySpaceQuotaByName(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
+	fake.applySpaceQuotaByNameMutex.Lock()
+	ret, specificReturn := fake.applySpaceQuotaByNameReturnsOnCall[len(fake.applySpaceQuotaByNameArgsForCall)]
+	fake.applySpaceQuotaByNameArgsForCall = append(fake.applySpaceQuotaByNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("ApplySpaceQuotaByName", []interface{}{arg1, arg2, arg3})
+	fake.applySpaceQuotaByNameMutex.Unlock()
+	if fake.ApplySpaceQuotaByNameStub != nil {
+		return fake.ApplySpaceQuotaByNameStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.applySpaceQuotaByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateSpaceActor) ApplySpaceQuotaByNameCallCount() int {
+	fake.applySpaceQuotaByNameMutex.RLock()
+	defer fake.applySpaceQuotaByNameMutex.RUnlock()
+	return len(fake.applySpaceQuotaByNameArgsForCall)
+}
+
+func (fake *FakeCreateSpaceActor) ApplySpaceQuotaByNameCalls(stub func(string, string, string) (v7action.Warnings, error)) {
+	fake.applySpaceQuotaByNameMutex.Lock()
+	defer fake.applySpaceQuotaByNameMutex.Unlock()
+	fake.ApplySpaceQuotaByNameStub = stub
+}
+
+func (fake *FakeCreateSpaceActor) ApplySpaceQuotaByNameArgsForCall(i int) (string, string, string) {
+	fake.applySpaceQuotaByNameMutex.RLock()
+	defer fake.applySpaceQuotaByNameMutex.RUnlock()
+	argsForCall := fake.applySpaceQuotaByNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCreateSpaceActor) ApplySpaceQuotaByNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.applySpaceQuotaByNameMutex.Lock()
+	defer fake.applySpaceQuotaByNameMutex.Unlock()
+	fake.ApplySpaceQuotaByNameStub = nil
+	fake.applySpaceQuotaByNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateSpaceActor) ApplySpaceQuotaByNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.applySpaceQuotaByNameMutex.Lock()
+	defer fake.applySpaceQuotaByNameMutex.Unlock()
+	fake.ApplySpaceQuotaByNameStub = nil
+	if fake.applySpaceQuotaByNameReturnsOnCall == nil {
+		fake.applySpaceQuotaByNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.applySpaceQuotaByNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCreateSpaceActor) CreateSpace(arg1 string, arg2 string) (v7action.Space, v7action.Warnings, error) {
@@ -267,6 +347,8 @@ func (fake *FakeCreateSpaceActor) GetOrganizationByNameReturnsOnCall(i int, resu
 func (fake *FakeCreateSpaceActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.applySpaceQuotaByNameMutex.RLock()
+	defer fake.applySpaceQuotaByNameMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
 	fake.createSpaceRoleMutex.RLock()

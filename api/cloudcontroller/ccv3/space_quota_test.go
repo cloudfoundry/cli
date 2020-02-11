@@ -28,6 +28,107 @@ var _ = Describe("Space Quotas", func() {
 		client, _ = NewTestClient()
 	})
 
+	Describe("ApplySpaceQuota", func() {
+		var (
+			warnings         Warnings
+			executeErr       error
+			quotaGUID        string
+			spaceGUID        string
+			relationshipList RelationshipList
+		)
+
+		BeforeEach(func() {
+			quotaGUID = "some-quota-guid"
+			spaceGUID = "space-guid-1"
+		})
+
+		JustBeforeEach(func() {
+			relationshipList, warnings, executeErr = client.ApplySpaceQuota(quotaGUID, spaceGUID)
+		})
+
+		When("applying the quota to a space", func() {
+			BeforeEach(func() {
+				response := `{ "data": [{"guid": "space-guid-1"}] }`
+
+				expectedBody := map[string]interface{}{
+					"data": []map[string]interface{}{
+						{"guid": "space-guid-1"},
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/space_quotas/some-quota-guid/relationships/spaces"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the a relationship list with the applied space", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(relationshipList).To(Equal(RelationshipList{
+					GUIDs: []string{"space-guid-1"},
+				}))
+			})
+		})
+
+		When("applying the quota fails", func() {
+			BeforeEach(func() {
+				response := `{
+					 "errors": [
+							{
+								 "detail": "Fail",
+								 "title": "CF-SomeError",
+								 "code": 10002
+							},
+							{
+								 "detail": "Something went terribly wrong",
+								 "title": "CF-UnknownError",
+								 "code": 10001
+							}
+					 ]
+				}`
+
+				expectedBody := map[string]interface{}{
+					"data": []map[string]interface{}{
+						{"guid": "space-guid-1"},
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/space_quotas/some-quota-guid/relationships/spaces"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10002,
+							Detail: "Fail",
+							Title:  "CF-SomeError",
+						},
+						{
+							Code:   10001,
+							Detail: "Something went terribly wrong",
+							Title:  "CF-UnknownError",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+	})
+
 	Describe("CreateSpaceQuotas", func() {
 		JustBeforeEach(func() {
 			createdSpaceQuota, warnings, executeErr = client.CreateSpaceQuota(inputSpaceQuota)

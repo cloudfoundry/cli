@@ -122,6 +122,35 @@ func (sq *SpaceQuota) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (RelationshipList, Warnings, error) {
+	relationshipList := RelationshipList{GUIDs: []string{spaceGUID}}
+	relationshipListBytes, err := json.Marshal(relationshipList)
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostSpaceQuotaRelationshipsRequest,
+		URIParams:   internal.Params{"quota_guid": quotaGUID},
+		Body:        bytes.NewReader(relationshipListBytes),
+	})
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	var appliedRelationshipList RelationshipList
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &appliedRelationshipList,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return RelationshipList{}, response.Warnings, err
+	}
+
+	return appliedRelationshipList, response.Warnings, nil
+}
+
 func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnings, error) {
 	spaceQuotaBytes, err := json.Marshal(spaceQuota)
 

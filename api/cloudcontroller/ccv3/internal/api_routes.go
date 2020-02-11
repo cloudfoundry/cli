@@ -129,6 +129,7 @@ const (
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PostSpaceRequest                                            = "PostSpace"
 	PostSpaceQuotaRequest                                       = "PostSpaceQuota"
+	PostSpaceQuotaRelationshipsRequest                          = "PostSpaceQuotaRelationships"
 	PostUserRequest                                             = "PostUser"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
@@ -251,6 +252,7 @@ var APIRoutes = []Route{
 	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodPost, Name: PostSpaceQuotaRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaRequest},
+	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces", Method: http.MethodPost, Name: PostSpaceQuotaRelationshipsRequest},
 	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodGet, Name: GetSpaceQuotasRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodPatch, Name: PatchSpaceQuotaRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid/relationships/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaFromSpaceRequest},

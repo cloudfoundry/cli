@@ -47,6 +47,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	ApplySpaceQuotaStub        func(string, string) (ccv3.RelationshipList, ccv3.Warnings, error)
+	applySpaceQuotaMutex       sync.RWMutex
+	applySpaceQuotaArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	applySpaceQuotaReturns struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}
+	applySpaceQuotaReturnsOnCall map[int]struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CancelDeploymentStub        func(string) (ccv3.Warnings, error)
 	cancelDeploymentMutex       sync.RWMutex
 	cancelDeploymentArgsForCall []struct {
@@ -2110,6 +2126,73 @@ func (fake *FakeCloudControllerClient) ApplyOrganizationQuotaReturnsOnCall(i int
 		})
 	}
 	fake.applyOrganizationQuotaReturnsOnCall[i] = struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) ApplySpaceQuota(arg1 string, arg2 string) (ccv3.RelationshipList, ccv3.Warnings, error) {
+	fake.applySpaceQuotaMutex.Lock()
+	ret, specificReturn := fake.applySpaceQuotaReturnsOnCall[len(fake.applySpaceQuotaArgsForCall)]
+	fake.applySpaceQuotaArgsForCall = append(fake.applySpaceQuotaArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ApplySpaceQuota", []interface{}{arg1, arg2})
+	fake.applySpaceQuotaMutex.Unlock()
+	if fake.ApplySpaceQuotaStub != nil {
+		return fake.ApplySpaceQuotaStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.applySpaceQuotaReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) ApplySpaceQuotaCallCount() int {
+	fake.applySpaceQuotaMutex.RLock()
+	defer fake.applySpaceQuotaMutex.RUnlock()
+	return len(fake.applySpaceQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) ApplySpaceQuotaCalls(stub func(string, string) (ccv3.RelationshipList, ccv3.Warnings, error)) {
+	fake.applySpaceQuotaMutex.Lock()
+	defer fake.applySpaceQuotaMutex.Unlock()
+	fake.ApplySpaceQuotaStub = stub
+}
+
+func (fake *FakeCloudControllerClient) ApplySpaceQuotaArgsForCall(i int) (string, string) {
+	fake.applySpaceQuotaMutex.RLock()
+	defer fake.applySpaceQuotaMutex.RUnlock()
+	argsForCall := fake.applySpaceQuotaArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) ApplySpaceQuotaReturns(result1 ccv3.RelationshipList, result2 ccv3.Warnings, result3 error) {
+	fake.applySpaceQuotaMutex.Lock()
+	defer fake.applySpaceQuotaMutex.Unlock()
+	fake.ApplySpaceQuotaStub = nil
+	fake.applySpaceQuotaReturns = struct {
+		result1 ccv3.RelationshipList
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) ApplySpaceQuotaReturnsOnCall(i int, result1 ccv3.RelationshipList, result2 ccv3.Warnings, result3 error) {
+	fake.applySpaceQuotaMutex.Lock()
+	defer fake.applySpaceQuotaMutex.Unlock()
+	fake.ApplySpaceQuotaStub = nil
+	if fake.applySpaceQuotaReturnsOnCall == nil {
+		fake.applySpaceQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv3.RelationshipList
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.applySpaceQuotaReturnsOnCall[i] = struct {
 		result1 ccv3.RelationshipList
 		result2 ccv3.Warnings
 		result3 error
@@ -10397,6 +10480,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
 	fake.applyOrganizationQuotaMutex.RLock()
 	defer fake.applyOrganizationQuotaMutex.RUnlock()
+	fake.applySpaceQuotaMutex.RLock()
+	defer fake.applySpaceQuotaMutex.RUnlock()
 	fake.cancelDeploymentMutex.RLock()
 	defer fake.cancelDeploymentMutex.RUnlock()
 	fake.checkRouteMutex.RLock()

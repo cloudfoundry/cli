@@ -24,6 +24,108 @@ var _ = Describe("Space Quota Actions", func() {
 		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
 	})
 
+	Describe("ApplySpaceQuotaByName", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+			quotaName  = "space-quota-name"
+			quotaGUID  = "space-quota-guid"
+			spaceGUID  = "space-guid"
+			orgGUID    = "org-guid"
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.ApplySpaceQuotaByName(quotaName, spaceGUID, orgGUID)
+		})
+
+		When("the space quota could not be found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceQuotasReturns(
+					[]ccv3.SpaceQuota{},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.ApplySpaceQuotaCallCount()).To(Equal(0))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning"))
+				Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundForNameError{Name: quotaName}))
+			})
+		})
+
+		When("applying the quota returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceQuotasReturns(
+					[]ccv3.SpaceQuota{
+						{Quota: ccv3.Quota{GUID: "some-quota-guid"}},
+					},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.ApplySpaceQuotaReturns(
+					ccv3.RelationshipList{},
+					ccv3.Warnings{"apply-quota-warning"},
+					errors.New("apply-quota-error"),
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.ApplySpaceQuotaCallCount()).To(Equal(1))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning", "apply-quota-warning"))
+				Expect(executeErr).To(MatchError("apply-quota-error"))
+			})
+		})
+
+		When("the quota is successfully applied to the space", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceQuotasReturns(
+					[]ccv3.SpaceQuota{
+						{Quota: ccv3.Quota{GUID: quotaGUID}},
+					},
+					ccv3.Warnings{"some-quota-warning"},
+					nil,
+				)
+				fakeCloudControllerClient.ApplySpaceQuotaReturns(
+					ccv3.RelationshipList{
+						GUIDs: []string{orgGUID},
+					},
+					ccv3.Warnings{"apply-quota-warning"},
+					nil,
+				)
+			})
+
+			It("returns the error and prints warnings", func() {
+				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
+				passedQuotaQuery := fakeCloudControllerClient.GetSpaceQuotasArgsForCall(0)
+				Expect(passedQuotaQuery).To(Equal(
+					[]ccv3.Query{
+						{
+							Key:    "organization_guids",
+							Values: []string{orgGUID},
+						},
+						{
+							Key:    "names",
+							Values: []string{quotaName},
+						},
+					},
+				))
+
+				Expect(fakeCloudControllerClient.ApplySpaceQuotaCallCount()).To(Equal(1))
+				passedQuotaGUID, passedSpaceGUID := fakeCloudControllerClient.ApplySpaceQuotaArgsForCall(0)
+				Expect(passedQuotaGUID).To(Equal(quotaGUID))
+				Expect(passedSpaceGUID).To(Equal(spaceGUID))
+
+				Expect(warnings).To(ConsistOf("some-quota-warning", "apply-quota-warning"))
+				Expect(executeErr).To(BeNil())
+			})
+		})
+	})
+
 	Describe("CreateSpaceQuota", func() {
 		var (
 			spaceQuotaName   string
@@ -351,7 +453,7 @@ var _ = Describe("Space Quota Actions", func() {
 				Expect(fakeCloudControllerClient.GetSpaceQuotasCallCount()).To(Equal(1))
 
 				Expect(warnings).To(ConsistOf("some-quota-warning"))
-				Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundByNameError{Name: quotaName}))
+				Expect(executeErr).To(MatchError(actionerror.SpaceQuotaNotFoundForNameError{Name: quotaName}))
 				Expect(quota).To(Equal(SpaceQuota{}))
 			})
 		})
