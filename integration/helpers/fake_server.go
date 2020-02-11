@@ -76,6 +76,9 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
       "logging": {
          "href": "wss://unused:443"
       },
+      "log_cache": {
+         "href": "%[1]s"
+      },
       "app_ssh": {
          "href": "unused:2222",
          "meta": {
@@ -98,6 +101,9 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
 	server.RouteToHandler(http.MethodGet, "/v2/info", RespondWithJSONEncoded(http.StatusOK, v2InfoResponse))
 
 	v3Response := strings.Replace(`{"links": {
+			"apps": {
+				"href": "SERVER_URL/v3/apps"
+			},
 			"organizations": {
 				"href": "SERVER_URL/v3/organizations"
 			},
@@ -207,6 +213,6 @@ func AddLoginRoutes(s *Server) {
 			"refresh_token": "some-refresh-token",
 			"scope": "openid routing.router_groups.write scim.read cloud_controller.admin uaa.user routing.router_groups.read cloud_controller.read password.write cloud_controller.write network.admin doppler.firehose scim.write",
 			"token_type": "bearer"
-		 }`, BuildTokenString(time.Now()))),
+		 }`, BuildTokenString(time.Now().Add(599*time.Second)))),
 	)
 }

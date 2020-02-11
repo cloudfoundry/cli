@@ -120,6 +120,7 @@ func (b *cliRetryBackoff) Reset() {
 }
 
 func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage, <-chan error, context.CancelFunc) {
+
 	logrus.Info("Start Tailing Logs")
 
 	outgoingLogStream := make(chan LogMessage, 1000)
@@ -128,6 +129,30 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 	go func() {
 		defer close(outgoingLogStream)
 		defer close(outgoingErrStream)
+
+		var (
+			mostRecentEnvelopes []*loggregator_v2.Envelope
+			err                 error
+		)
+
+		for len(mostRecentEnvelopes) == 0 {
+			mostRecentEnvelopes, err = client.Read(
+				ctx,
+				appGUID,
+				time.Time{},
+				logcache.WithLimit(1),
+				logcache.WithDescending(),
+			)
+			if err != nil {
+				outgoingErrStream <- err
+				return
+			}
+
+			if len(mostRecentEnvelopes) == 0 {
+				time.Sleep(time.Second)
+			}
+		}
+		walkStartTime := mostRecentEnvelopes[0].Timestamp - time.Second.Nanoseconds()
 
 		logcache.Walk(
 			ctx,
@@ -146,7 +171,7 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 				return true
 			}),
 			client.Read,
-			logcache.WithWalkStartTime(time.Now().Add(-5*time.Second)),
+			logcache.WithWalkStartTime(time.Unix(0, walkStartTime)),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
 			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 			logcache.WithWalkLogger(log.New(channelWriter{
