@@ -18,7 +18,7 @@ type UnsetSpaceQuotaActor interface {
 type UnsetSpaceQuotaCommand struct {
 	RequiredArgs    flag.UnsetSpaceQuotaArgs `positional-args:"yes"`
 	usage           interface{}              `usage:"CF_NAME unset-space-quota SPACE SPACE_QUOTA"`
-	relatedCommands interface{}              `related_commands:"spaces"`
+	relatedCommands interface{}              `related_commands:"space"`
 
 	UI          command.UI
 	Config      command.Config
