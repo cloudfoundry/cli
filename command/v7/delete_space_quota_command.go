@@ -57,9 +57,10 @@ func (cmd DeleteSpaceQuotaCommand) Execute(args []string) error {
 	spaceQuotaName := cmd.RequiredArgs.Quota
 
 	if !cmd.Force {
-		promptMessage := "Really delete the space quota {{.QuotaName}}?"
+		promptMessage := "Really delete the space quota {{.QuotaName}} in org {{.OrgName}}?"
 		confirmedDelete, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{
 			"QuotaName": spaceQuotaName,
+			"OrgName": cmd.Config.TargetedOrganizationName(),
 		})
 
 		if promptErr != nil {

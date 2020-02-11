@@ -57,6 +57,7 @@ var _ = Describe("delete-space-quota command", func() {
 
 			It("prompts for confirmation and deletes the space quota", func() {
 				session := helpers.CFWithStdin(buffer, "delete-space-quota", quotaName)
+				Eventually(session).Should(Say(`Really delete the space quota %s in org %s\? \[yN\]`, quotaName, orgName))
 				Eventually(session).Should(Say(`Deleting space quota %s for org %s as %s\.\.\.`, quotaName, orgName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))

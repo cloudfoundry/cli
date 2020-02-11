@@ -107,7 +107,7 @@ var _ = Describe("delete-space-quota Command", func() {
 				})
 
 				It("goes through with the deletion", func() {
-					Expect(testUI.Out).To(Say("Really delete the space quota some-quota?"))
+					Expect(testUI.Out).To(Say("Really delete the space quota some-quota in org some-org?"))
 					Expect(testUI.Out).To(Say("Deleting space quota some-quota for org some-org as some-user..."))
 					Expect(testUI.Out).To(Say("OK"))
 				})
@@ -120,7 +120,7 @@ var _ = Describe("delete-space-quota Command", func() {
 				})
 
 				It("cancels the delete", func() {
-					Expect(testUI.Out).To(Say("Really delete the space quota some-quota?"))
+					Expect(testUI.Out).To(Say("Really delete the space quota some-quota in org some-org?"))
 					Expect(testUI.Out).To(Say("'some-quota' has not been deleted."))
 					Expect(testUI.Out).NotTo(Say("Deleting space quota some-quota for org some-org as some-user..."))
 				})
@@ -133,7 +133,7 @@ var _ = Describe("delete-space-quota Command", func() {
 				})
 
 				It("defaults to canceling the delete", func() {
-					Expect(testUI.Out).To(Say("Really delete the space quota some-quota?"))
+					Expect(testUI.Out).To(Say("Really delete the space quota some-quota in org some-org?"))
 					Expect(testUI.Out).To(Say("'some-quota' has not been deleted."))
 					Expect(testUI.Out).NotTo(Say("Deleting space quota some-quota for org some-org as some-user..."))
 				})
