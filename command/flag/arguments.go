@@ -219,7 +219,7 @@ type SetOrgQuotaArgs struct {
 
 type SetSpaceQuotaArgs struct {
 	Space      string `positional-arg-name:"SPACE_NAME" required:"true" description:"The space"`
-	SpaceQuota string `positional-arg-name:"SPACE_QUOTA" required:"true" description:"The space quota"`
+	SpaceQuota string `positional-arg-name:"QUOTA" required:"true" description:"The space quota"`
 }
 
 type UnsetSpaceQuotaArgs struct {
