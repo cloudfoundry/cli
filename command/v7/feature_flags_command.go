@@ -72,10 +72,7 @@ func (cmd FeatureFlagsCommand) displayTable(featureFlags []v7action.FeatureFlag)
 			{"name", "state"},
 		}
 		for _, flag := range featureFlags {
-			state := "disabled"
-			if flag.Enabled {
-				state = "enabled"
-			}
+			state := shared.FlagBoolToString(flag.Enabled)
 			keyValueTable = append(keyValueTable, []string{flag.Name, state})
 		}
 

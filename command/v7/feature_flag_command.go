@@ -72,15 +72,8 @@ func (cmd FeatureFlagCommand) Execute(args []string) error {
 func (cmd FeatureFlagCommand) displayTable(featureFlag v7action.FeatureFlag) {
 	var keyValueTable = [][]string{
 		{"Features", "State"},
-		{featureFlag.Name, cmd.flagBoolToString(featureFlag.Enabled)},
+		{featureFlag.Name, shared.FlagBoolToString(featureFlag.Enabled)},
 	}
 
 	cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
-}
-
-func (cmd FeatureFlagCommand) flagBoolToString(enabled bool) string {
-	if enabled {
-		return "enabled"
-	}
-	return "disabled"
 }

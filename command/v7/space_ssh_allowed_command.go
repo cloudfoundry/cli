@@ -53,10 +53,8 @@ func (cmd SpaceSSHAllowedCommand) Execute(args []string) error {
 		return err
 	}
 
-	displayVal := "disabled"
-	if enabled {
-		displayVal = "enabled"
-	}
+	displayVal := shared.FlagBoolToString(enabled)
+
 	cmd.UI.DisplayText(
 		"ssh support is {{.DisplayVal}} in space '{{.SpaceName}}'.",
 		map[string]interface{}{
