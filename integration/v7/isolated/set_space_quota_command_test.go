@@ -14,6 +14,7 @@ var _ = Describe("set-space-quota command", func() {
 		orgName   string
 		spaceName string
 		quotaName string
+		userName  string
 	)
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
@@ -34,6 +35,10 @@ var _ = Describe("set-space-quota command", func() {
 	When("the environment is setup correctly", func() {
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(orgName)
+		})
+
+		BeforeEach(func() {
+			userName, _ = helpers.GetCredentials()
 		})
 
 		Describe("help", func() {
@@ -60,7 +65,7 @@ var _ = Describe("set-space-quota command", func() {
 		When("valid arguments are provided", func() {
 			It("sets the quota on a space", func() {
 				session := helpers.CF("set-space-quota", spaceName, quotaName)
-				Eventually(session).Should(Say("Setting space quota %s to space %s as admin...", quotaName, spaceName))
+				Eventually(session).Should(Say("Setting space quota %s to space %s as %s...", quotaName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
@@ -77,7 +82,7 @@ var _ = Describe("set-space-quota command", func() {
 
 				It("sets the quota on the space", func() {
 					session := helpers.CF("set-space-quota", spaceName, quotaName)
-					Eventually(session).Should(Say("Setting space quota %s to space %s as admin...", quotaName, spaceName))
+					Eventually(session).Should(Say("Setting space quota %s to space %s as %s...", quotaName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
