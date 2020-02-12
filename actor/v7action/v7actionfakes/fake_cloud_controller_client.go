@@ -1310,6 +1310,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetSpaceFeatureStub        func(string, string) (bool, ccv3.Warnings, error)
+	getSpaceFeatureMutex       sync.RWMutex
+	getSpaceFeatureArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getSpaceFeatureReturns struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getSpaceFeatureReturnsOnCall map[int]struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetSpaceIsolationSegmentStub        func(string) (ccv3.Relationship, ccv3.Warnings, error)
 	getSpaceIsolationSegmentMutex       sync.RWMutex
 	getSpaceIsolationSegmentArgsForCall []struct {
@@ -7664,6 +7680,73 @@ func (fake *FakeCloudControllerClient) GetServiceOfferingsReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpaceFeature(arg1 string, arg2 string) (bool, ccv3.Warnings, error) {
+	fake.getSpaceFeatureMutex.Lock()
+	ret, specificReturn := fake.getSpaceFeatureReturnsOnCall[len(fake.getSpaceFeatureArgsForCall)]
+	fake.getSpaceFeatureArgsForCall = append(fake.getSpaceFeatureArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceFeature", []interface{}{arg1, arg2})
+	fake.getSpaceFeatureMutex.Unlock()
+	if fake.GetSpaceFeatureStub != nil {
+		return fake.GetSpaceFeatureStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSpaceFeatureReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceFeatureCallCount() int {
+	fake.getSpaceFeatureMutex.RLock()
+	defer fake.getSpaceFeatureMutex.RUnlock()
+	return len(fake.getSpaceFeatureArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceFeatureCalls(stub func(string, string) (bool, ccv3.Warnings, error)) {
+	fake.getSpaceFeatureMutex.Lock()
+	defer fake.getSpaceFeatureMutex.Unlock()
+	fake.GetSpaceFeatureStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceFeatureArgsForCall(i int) (string, string) {
+	fake.getSpaceFeatureMutex.RLock()
+	defer fake.getSpaceFeatureMutex.RUnlock()
+	argsForCall := fake.getSpaceFeatureArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceFeatureReturns(result1 bool, result2 ccv3.Warnings, result3 error) {
+	fake.getSpaceFeatureMutex.Lock()
+	defer fake.getSpaceFeatureMutex.Unlock()
+	fake.GetSpaceFeatureStub = nil
+	fake.getSpaceFeatureReturns = struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceFeatureReturnsOnCall(i int, result1 bool, result2 ccv3.Warnings, result3 error) {
+	fake.getSpaceFeatureMutex.Lock()
+	defer fake.getSpaceFeatureMutex.Unlock()
+	fake.GetSpaceFeatureStub = nil
+	if fake.getSpaceFeatureReturnsOnCall == nil {
+		fake.getSpaceFeatureReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceFeatureReturnsOnCall[i] = struct {
+		result1 bool
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSpaceIsolationSegment(arg1 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.getSpaceIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.getSpaceIsolationSegmentReturnsOnCall[len(fake.getSpaceIsolationSegmentArgsForCall)]
@@ -10648,6 +10731,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceInstancesMutex.RUnlock()
 	fake.getServiceOfferingsMutex.RLock()
 	defer fake.getServiceOfferingsMutex.RUnlock()
+	fake.getSpaceFeatureMutex.RLock()
+	defer fake.getSpaceFeatureMutex.RUnlock()
 	fake.getSpaceIsolationSegmentMutex.RLock()
 	defer fake.getSpaceIsolationSegmentMutex.RUnlock()
 	fake.getSpaceQuotaMutex.RLock()

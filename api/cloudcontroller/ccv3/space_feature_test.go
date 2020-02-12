@@ -18,6 +18,81 @@ var _ = Describe("Space Features", func() {
 		client, _ = NewTestClient()
 	})
 
+	Describe("GetSpaceFeature", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+			spaceGUID  = "some-space-guid"
+			enabled    bool
+		)
+
+		Context("Getting the SSH feature", func() {
+			JustBeforeEach(func() {
+				enabled, warnings, executeErr = client.GetSpaceFeature(spaceGUID, "ssh")
+			})
+
+			When("there are no API errors", func() {
+				BeforeEach(func() {
+					response := fmt.Sprintf(`{
+   "name": "ssh",
+   "description": "Enable SSHing into apps in the space.",
+   "enabled": true
+}`)
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/spaces/%s/features/ssh", spaceGUID)),
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("gets the SSH feature value", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+					Expect(enabled).To(BeTrue())
+				})
+
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+		 "errors": [
+		   {
+		     "code": 10010,
+		     "detail": "Org not found",
+		     "title": "CF-ResourceNotFound"
+		   }
+		 ]
+		}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/spaces/%s/features/ssh", spaceGUID)),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+						ResponseCode: http.StatusTeapot,
+						V3ErrorResponse: ccerror.V3ErrorResponse{
+							Errors: []ccerror.V3Error{
+								{
+									Code:   10010,
+									Detail: "Org not found",
+									Title:  "CF-ResourceNotFound",
+								},
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+	})
+
 	Describe("UpdateSpaceFeature", func() {
 		var (
 			warnings   Warnings

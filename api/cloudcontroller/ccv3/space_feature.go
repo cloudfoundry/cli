@@ -13,6 +13,24 @@ type SpaceFeature struct {
 	Enabled bool
 }
 
+func (client *Client) GetSpaceFeature(spaceGUID string, featureName string) (bool, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSpaceFeatureRequest,
+		URIParams:   map[string]string{"space_guid": spaceGUID, "feature": featureName},
+	})
+	if err != nil {
+		return false, nil, err
+	}
+
+	var feature SpaceFeature
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &feature,
+	}
+	err = client.connection.Make(request, &response)
+
+	return feature.Enabled, response.Warnings, err
+}
+
 func (client *Client) UpdateSpaceFeature(spaceGUID string, enabled bool, featureName string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchSpaceFeaturesRequest,

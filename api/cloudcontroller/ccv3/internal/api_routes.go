@@ -71,6 +71,7 @@ const (
 	GetServiceBrokersRequest                                    = "GetServiceBrokers"
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetServiceOfferingsRequest                                  = "GetServiceOfferings"
+	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
 	GetSpacesRequest                                            = "GetSpaces"
 	GetSpaceQuotaRequest                                        = "GetSpaceQuota"
@@ -251,6 +252,7 @@ var APIRoutes = []Route{
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/routes", Method: http.MethodDelete, Name: DeleteOrphanedRoutesRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodPatch, Name: PatchSpaceFeaturesRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodGet, Name: GetSpaceFeatureRequest},
 	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodPost, Name: PostSpaceQuotaRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaRequest},
 	{Resource: SpaceQuotasResource, Path: "/:quota_guid", Method: http.MethodDelete, Name: DeleteSpaceQuotaRequest},
