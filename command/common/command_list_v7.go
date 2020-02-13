@@ -139,7 +139,7 @@ type commandList struct {
 	RunningSecurityGroups              v6.RunningSecurityGroupsCommand              `command:"running-security-groups" description:"List security groups in the set of security groups for running applications"`
 	SSH                                v7.SSHCommand                                `command:"ssh" description:"SSH to an application container instance"`
 	SSHCode                            v6.SSHCodeCommand                            `command:"ssh-code" description:"Get a one time password for ssh clients"`
-	SSHEnabled                         v6.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
+	SSHEnabled                         v7.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
 	Scale                              v7.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
 	SecurityGroup                      v6.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	SecurityGroups                     v6.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`

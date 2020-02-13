@@ -152,6 +152,22 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
+func (client *Client) GetApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
+	apps, warnings, err := client.GetApplications(
+		Query{Key: NameFilter, Values: []string{appName}},
+		Query{Key: SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
+	if err != nil {
+		return Application{}, warnings, err
+	}
+
+	if len(apps) == 0 {
+		return Application{}, warnings, ccerror.ApplicationNotFoundError{Name: appName}
+	}
+
+	return apps[0], warnings, nil
+}
+
 // GetApplications lists applications with optional queries.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

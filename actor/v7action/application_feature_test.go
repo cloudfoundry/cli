@@ -38,6 +38,7 @@ var _ = Describe("Application Feature Actions", func() {
 		JustBeforeEach(func() {
 			appFeature, warnings, executeErr = actor.GetAppFeature(appGUID, "ssh")
 		})
+
 		Context("Getting SSH", func() {
 			When("it succeeds", func() {
 				BeforeEach(func() {
@@ -92,7 +93,6 @@ var _ = Describe("Application Feature Actions", func() {
 				})
 			})
 		})
-
 	})
 
 	Describe("UpdateAppFeature", func() {
@@ -106,6 +106,7 @@ var _ = Describe("Application Feature Actions", func() {
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.UpdateAppFeature(app, true, "ssh")
 		})
+
 		Context("Getting SSH", func() {
 			When("it succeeds", func() {
 				It("calls ccv3 to enable ssh", func() {
@@ -157,6 +158,7 @@ var _ = Describe("Application Feature Actions", func() {
 		JustBeforeEach(func() {
 			sshEnabled, warnings, executeErr = actor.GetSSHEnabled(appGUID)
 		})
+
 		When("it succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSSHEnabledReturns(
@@ -211,6 +213,92 @@ var _ = Describe("Application Feature Actions", func() {
 				Expect(warnings).To(ConsistOf("some-get-ssh-warning"))
 
 				Expect(fakeCloudControllerClient.GetSSHEnabledCallCount()).To(Equal(1))
+			})
+		})
+	})
+
+	Describe("GetSSHEnabledByAppName", func() {
+		var (
+			appName    = "some-app-name"
+			appGUID    = "some-app-guid"
+			spaceGUID  = "some-space-GUID"
+			warnings   Warnings
+			executeErr error
+			sshEnabled ccv3.SSHEnabled
+		)
+
+		JustBeforeEach(func() {
+			sshEnabled, warnings, executeErr = actor.GetSSHEnabledByAppName(appName, spaceGUID)
+		})
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+				ccv3.Application{Name: appName, GUID: appGUID},
+				ccv3.Warnings{"get-app-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetSSHEnabledReturns(
+				ccv3.SSHEnabled{Enabled: false, Reason: "globally disabled"},
+				ccv3.Warnings{"get-ssh-enabled-warning"},
+				nil,
+			)
+		})
+
+		It("gets the app by name and space guid", func() {
+			Expect(executeErr).To(Not(HaveOccurred()))
+			Expect(sshEnabled).To(Equal(ccv3.SSHEnabled{Enabled: false, Reason: "globally disabled"}))
+			Expect(warnings).To(ConsistOf("get-app-warning", "get-ssh-enabled-warning"))
+
+			Expect(fakeCloudControllerClient.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+			appNameArg, spaceGUIDArg := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(0)
+			Expect(appName).To(Equal(appNameArg))
+			Expect(spaceGUID).To(Equal(spaceGUIDArg))
+		})
+
+		It("calls the API GetSSHEnabled with the expected arguments", func() {
+			Expect(executeErr).To(Not(HaveOccurred()))
+			Expect(sshEnabled).To(Equal(ccv3.SSHEnabled{Enabled: false, Reason: "globally disabled"}))
+			Expect(warnings).To(ConsistOf("get-app-warning", "get-ssh-enabled-warning"))
+
+			Expect(fakeCloudControllerClient.GetSSHEnabledCallCount()).To(Equal(1))
+			appGUIDArg := fakeCloudControllerClient.GetSSHEnabledArgsForCall(0)
+			Expect(appGUID).To(Equal(appGUIDArg))
+		})
+
+		When("getting the app fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+					ccv3.Application{},
+					ccv3.Warnings{"get-app-warning"},
+					errors.New("get-app-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("get-app-error"))
+				Expect(warnings).To(ConsistOf("get-app-warning"))
+			})
+		})
+
+		When("checking if SSH is enabled fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
+					ccv3.Application{Name: appName, GUID: appGUID},
+					ccv3.Warnings{"get-app-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetSSHEnabledReturns(
+					ccv3.SSHEnabled{},
+					ccv3.Warnings{"check-ssh-warning"},
+					errors.New("check-ssh-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("check-ssh-error"))
+				Expect(warnings).To(ConsistOf("get-app-warning", "check-ssh-warning"))
 			})
 		})
 	})

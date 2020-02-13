@@ -644,6 +644,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetApplicationByNameAndSpaceStub        func(string, string) (ccv3.Application, ccv3.Warnings, error)
+	getApplicationByNameAndSpaceMutex       sync.RWMutex
+	getApplicationByNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getApplicationByNameAndSpaceReturns struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetApplicationDropletCurrentStub        func(string) (ccv3.Droplet, ccv3.Warnings, error)
 	getApplicationDropletCurrentMutex       sync.RWMutex
 	getApplicationDropletCurrentArgsForCall []struct {
@@ -4786,6 +4802,73 @@ func (fake *FakeCloudControllerClient) GetAppFeatureReturnsOnCall(i int, result1
 	}
 	fake.getAppFeatureReturnsOnCall[i] = struct {
 		result1 ccv3.ApplicationFeature
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpace(arg1 string, arg2 string) (ccv3.Application, ccv3.Warnings, error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
+	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
+	fake.getApplicationByNameAndSpaceMutex.Unlock()
+	if fake.GetApplicationByNameAndSpaceStub != nil {
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpaceCallCount() int {
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpaceCalls(stub func(string, string) (ccv3.Application, ccv3.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpaceReturns(result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = nil
+	fake.getApplicationByNameAndSpaceReturns = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = nil
+	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Application
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.Application
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -10723,6 +10806,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
 	fake.getAppFeatureMutex.RLock()
 	defer fake.getAppFeatureMutex.RUnlock()
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationDropletCurrentMutex.RLock()
 	defer fake.getApplicationDropletCurrentMutex.RUnlock()
 	fake.getApplicationEnvironmentMutex.RLock()

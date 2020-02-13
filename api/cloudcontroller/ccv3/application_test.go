@@ -396,6 +396,124 @@ var _ = Describe("Application", func() {
 		})
 	})
 
+	Describe("GetApplicationByNameAndSpace", func() {
+		var (
+			appName   = "some-app-name"
+			spaceGUID = "some-space-guid"
+
+			app        Application
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			app, warnings, executeErr = client.GetApplicationByNameAndSpace(appName, spaceGUID)
+		})
+
+		When("the application exists", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+					"pagination": {
+						"next": null
+					},
+				  "resources": [
+					{
+					  "name": "app-name-2",
+					  "guid": "app-guid-2"
+					}
+				  ]
+				}`)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps", "space_guids=some-space-guid&names=some-app-name"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the queried application and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(app).To(Equal(
+					Application{
+						Name: "app-name-2",
+						GUID: "app-guid-2",
+					},
+				))
+			})
+		})
+
+		When("the application does not exist", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+					"pagination": {
+						"next": null
+					},
+				  "resources": [
+				  ]
+				}`)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps", "space_guids=some-space-guid&names=some-app-name"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.ApplicationNotFoundError{Name: appName}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("GetApplications", func() {
 		var (
 			filters []Query

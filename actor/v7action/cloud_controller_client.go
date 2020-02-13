@@ -53,6 +53,7 @@ type CloudControllerClient interface {
 	DeleteSpace(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteUser(userGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (ccv3.Application, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetApplicationEnvironment(appGUID string) (ccv3.Environment, ccv3.Warnings, error)
 	GetApplicationManifest(appGUID string) ([]byte, ccv3.Warnings, error)
