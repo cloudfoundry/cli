@@ -1857,6 +1857,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateSpaceFeatureStub        func(string, bool, string) (ccv3.Warnings, error)
+	updateSpaceFeatureMutex       sync.RWMutex
+	updateSpaceFeatureArgsForCall []struct {
+		arg1 string
+		arg2 bool
+		arg3 string
+	}
+	updateSpaceFeatureReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	updateSpaceFeatureReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UpdateSpaceIsolationSegmentRelationshipStub        func(string, string) (ccv3.Relationship, ccv3.Warnings, error)
 	updateSpaceIsolationSegmentRelationshipMutex       sync.RWMutex
 	updateSpaceIsolationSegmentRelationshipArgsForCall []struct {
@@ -10076,6 +10091,71 @@ func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSpaceFeature(arg1 string, arg2 bool, arg3 string) (ccv3.Warnings, error) {
+	fake.updateSpaceFeatureMutex.Lock()
+	ret, specificReturn := fake.updateSpaceFeatureReturnsOnCall[len(fake.updateSpaceFeatureArgsForCall)]
+	fake.updateSpaceFeatureArgsForCall = append(fake.updateSpaceFeatureArgsForCall, struct {
+		arg1 string
+		arg2 bool
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateSpaceFeature", []interface{}{arg1, arg2, arg3})
+	fake.updateSpaceFeatureMutex.Unlock()
+	if fake.UpdateSpaceFeatureStub != nil {
+		return fake.UpdateSpaceFeatureStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateSpaceFeatureReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceFeatureCallCount() int {
+	fake.updateSpaceFeatureMutex.RLock()
+	defer fake.updateSpaceFeatureMutex.RUnlock()
+	return len(fake.updateSpaceFeatureArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceFeatureCalls(stub func(string, bool, string) (ccv3.Warnings, error)) {
+	fake.updateSpaceFeatureMutex.Lock()
+	defer fake.updateSpaceFeatureMutex.Unlock()
+	fake.UpdateSpaceFeatureStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceFeatureArgsForCall(i int) (string, bool, string) {
+	fake.updateSpaceFeatureMutex.RLock()
+	defer fake.updateSpaceFeatureMutex.RUnlock()
+	argsForCall := fake.updateSpaceFeatureArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceFeatureReturns(result1 ccv3.Warnings, result2 error) {
+	fake.updateSpaceFeatureMutex.Lock()
+	defer fake.updateSpaceFeatureMutex.Unlock()
+	fake.UpdateSpaceFeatureStub = nil
+	fake.updateSpaceFeatureReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceFeatureReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.updateSpaceFeatureMutex.Lock()
+	defer fake.updateSpaceFeatureMutex.Unlock()
+	fake.UpdateSpaceFeatureStub = nil
+	if fake.updateSpaceFeatureReturnsOnCall == nil {
+		fake.updateSpaceFeatureReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.updateSpaceFeatureReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpaceIsolationSegmentRelationship(arg1 string, arg2 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.updateSpaceIsolationSegmentRelationshipMutex.Lock()
 	ret, specificReturn := fake.updateSpaceIsolationSegmentRelationshipReturnsOnCall[len(fake.updateSpaceIsolationSegmentRelationshipArgsForCall)]
@@ -10803,6 +10883,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSpaceMutex.RUnlock()
 	fake.updateSpaceApplyManifestMutex.RLock()
 	defer fake.updateSpaceApplyManifestMutex.RUnlock()
+	fake.updateSpaceFeatureMutex.RLock()
+	defer fake.updateSpaceFeatureMutex.RUnlock()
 	fake.updateSpaceIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateSpaceIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateSpaceQuotaMutex.RLock()

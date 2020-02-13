@@ -28,7 +28,7 @@ type commandList struct {
 	API                                v6.APICommand                                `command:"api" description:"Set or view target api url"`
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
-	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
+	AllowSpaceSSH                      v7.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	App                                v7.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	ApplyManifest                      v7.ApplyManifestCommand                      `command:"apply-manifest" description:"Apply manifest properties to a space"`
 	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
