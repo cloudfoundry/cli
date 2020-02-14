@@ -36,7 +36,7 @@ var _ = FDescribe("api command", func() {
 
 				BeforeEach(func() {
 					target = "https://api.fake.com"
-					apiVersion = "2.59.0"
+					apiVersion = "3.81.0"
 					org = "the-org"
 					space = "the-space"
 
@@ -86,7 +86,7 @@ var _ = FDescribe("api command", func() {
 					ConfigFile: configv3.JSONConfig{
 						ConfigVersion: configv3.CurrentConfigVersion,
 						Target:        "https://api.fake.com",
-						APIVersion:    "2.59.0",
+						APIVersion:    "3.81.0",
 						AccessToken:   "bearer tokenstuff",
 						TargetedOrganization: configv3.Organization{
 							Name: "the-org",
@@ -132,7 +132,7 @@ var _ = FDescribe("api command", func() {
 		})
 	})
 
-	When("Skip SSL Validation is required", func() {
+	FWhen("Skip SSL Validation is required", func() {
 		Context("api has SSL", func() {
 			var server *ghttp.Server
 
@@ -181,7 +181,7 @@ var _ = FDescribe("api command", func() {
 					"authorization_endpoint":"https://login.APISERVER",
 					"min_cli_version":null,
 					"min_recommended_cli_version":null,
-					"api_version":"2.59.0",
+					"api_version":"3.81.0",
 					"app_ssh_endpoint":"ssh.APISERVER",
 					"app_ssh_host_key_fingerprint":"a6:d1:08:0b:b0:cb:9b:5f:c4:ba:44:2a:97:26:19:8a",
 					"app_ssh_oauth_client":"ssh-proxy",
@@ -191,7 +191,13 @@ var _ = FDescribe("api command", func() {
 				response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/info"),
+						ghttp.VerifyRequest("GET", "/v3/info"),
+						ghttp.RespondWith(http.StatusOK, response),
+					),
+				)
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/"),
 						ghttp.RespondWith(http.StatusOK, response),
 					),
 				)
@@ -201,7 +207,7 @@ var _ = FDescribe("api command", func() {
 				server.Close()
 			})
 
-			It("falls back to http and gives a warning", func() {
+			FIt("falls back to http and gives a warning", func() {
 				session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
 				Eventually(session).Should(Say("Setting api endpoint to %s...", server.URL()))
 				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
@@ -260,7 +266,7 @@ var _ = FDescribe("api command", func() {
 	})
 
 	When("the v3 api supports routing", func() {
-		It("sets the routing endpoing in the config file", func() {
+		It("sets the routing endpoint in the config file", func() {
 			var session *Session
 			if skipSSLValidation {
 				session = helpers.CF("api", apiURL, "--skip-ssl-validation")

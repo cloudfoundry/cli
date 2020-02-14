@@ -1,6 +1,7 @@
 package ccv3
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 
@@ -27,6 +28,8 @@ type requestOptions struct {
 	URL string
 	// Body is the content of the request.
 	Body io.ReadSeeker
+	//TODO delete
+	FromFunc	bool
 }
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
@@ -42,6 +45,9 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 			passedRequest.Body,
 		)
 	} else {
+		if passedRequest.FromFunc {
+			panic(fmt.Sprintf("entire request %v", passedRequest))
+		}
 		request, err = client.router.CreateRequest(
 			passedRequest.RequestName,
 			map[string]string(passedRequest.URIParams),
@@ -51,7 +57,6 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 	if err != nil {
 		return nil, err
 	}
-
 	if passedRequest.Query != nil {
 		request.URL.RawQuery = FormatQueryParameters(passedRequest.Query).Encode()
 	}
@@ -63,6 +68,7 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 	if passedRequest.Body != nil {
 		request.Header.Set("Content-Type", "application/json")
 	}
+
 
 	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
 }
