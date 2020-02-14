@@ -22,7 +22,7 @@ var _ = Describe("Feature Flags Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeFeatureFlagsActor
+		fakeActor       *v7fakes.FakeActor
 		executeErr      error
 		binaryName      string
 	)
@@ -37,13 +37,15 @@ var _ = Describe("Feature Flags Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeFeatureFlagsActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = FeatureFlagsCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"

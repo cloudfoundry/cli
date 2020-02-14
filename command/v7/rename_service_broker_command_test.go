@@ -25,7 +25,7 @@ var _ = Describe("rename-service-broker command", func() {
 
 	var (
 		cmd                          *v7.RenameServiceBrokerCommand
-		fakeUpdateServiceBrokerActor *v7fakes.FakeUpdateServiceBrokerActor
+		fakeUpdateServiceBrokerActor *v7fakes.FakeActor
 		fakeSharedActor              *commandfakes.FakeSharedActor
 		fakeConfig                   *commandfakes.FakeConfig
 		testUI                       *ui.UI
@@ -33,7 +33,7 @@ var _ = Describe("rename-service-broker command", func() {
 	)
 
 	BeforeEach(func() {
-		fakeUpdateServiceBrokerActor = &v7fakes.FakeUpdateServiceBrokerActor{}
+		fakeUpdateServiceBrokerActor = &v7fakes.FakeActor{}
 		fakeSharedActor = &commandfakes.FakeSharedActor{}
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
@@ -42,10 +42,12 @@ var _ = Describe("rename-service-broker command", func() {
 				OldServiceBrokerName: oldBrokerName,
 				NewServiceBrokerName: newBrokerName,
 			},
-			Actor:       fakeUpdateServiceBrokerActor,
-			SharedActor: fakeSharedActor,
-			UI:          testUI,
-			Config:      fakeConfig,
+			BaseCommand: v7.BaseCommand{
+				Actor:       fakeUpdateServiceBrokerActor,
+				SharedActor: fakeSharedActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+			},
 		}
 	})
 

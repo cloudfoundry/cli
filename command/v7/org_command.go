@@ -5,48 +5,16 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . OrgActor
-
-type OrgActor interface {
-	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
-	GetOrganizationSummaryByName(orgName string) (v7action.OrganizationSummary, v7action.Warnings, error)
-	GetIsolationSegmentsByOrganization(orgName string) ([]v7action.IsolationSegment, v7action.Warnings, error)
-}
-
 type OrgCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	GUID            bool              `long:"guid" description:"Retrieve and display the given org's guid.  All other output for the org is suppressed."`
 	usage           interface{}       `usage:"CF_NAME org ORG [--guid]"`
 	relatedCommands interface{}       `related_commands:"org-users, orgs"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       OrgActor
-}
-
-func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd OrgCommand) Execute(args []string) error {

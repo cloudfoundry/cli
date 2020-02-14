@@ -3,58 +3,38 @@ package v7
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
-	"code.cloudfoundry.org/clock"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
-//go:generate counterfeiter . ApplyManifestActor
-
-type ApplyManifestActor interface {
-	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
-}
-
 type ApplyManifestCommand struct {
+	BaseCommand
+
 	PathToManifest   flag.ManifestPathWithExistenceCheck `short:"f" description:"Path to app manifest"`
 	Vars             []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	PathsToVarsFiles []flag.PathWithExistenceCheck       `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	usage            interface{}                         `usage:"CF_NAME apply-manifest -f APP_MANIFEST_PATH"`
 	relatedCommands  interface{}                         `related_commands:"create-app, create-app-manifest, push"`
 
-	UI              command.UI
-	Config          command.Config
-	SharedActor     command.SharedActor
-	Actor           ApplyManifestActor
 	ManifestLocator ManifestLocator
 	ManifestParser  ManifestParser
 	CWD             string
 }
 
 func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) error {
-
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
 	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.ManifestParser{}
 
 	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
 	cmd.CWD = currentDir
 
-	return err
+	return cmd.BaseCommand.Setup(config, ui)
 }
 
 func (cmd ApplyManifestCommand) Execute(args []string) error {

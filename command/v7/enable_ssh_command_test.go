@@ -21,7 +21,7 @@ var _ = Describe("enable-ssh Command", func() {
 		testUI             *ui.UI
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
-		fakeEnableSSHActor *v7fakes.FakeEnableSSHActor
+		fakeEnableSSHActor *v7fakes.FakeActor
 
 		binaryName      string
 		currentUserName string
@@ -32,13 +32,15 @@ var _ = Describe("enable-ssh Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeEnableSSHActor = new(v7fakes.FakeEnableSSHActor)
+		fakeEnableSSHActor = new(v7fakes.FakeActor)
 
 		cmd = EnableSSHCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeEnableSSHActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeEnableSSHActor,
+			},
 		}
 
 		cmd.RequiredArgs.AppName = "some-app"

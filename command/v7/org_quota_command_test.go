@@ -21,7 +21,7 @@ var _ = Describe("Org Quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeOrgQuotaActor
+		fakeActor       *v7fakes.FakeActor
 		executeErr      error
 	)
 
@@ -29,13 +29,15 @@ var _ = Describe("Org Quota Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeOrgQuotaActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = OrgQuotaCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.RequiredArgs.OrganizationQuotaName = "some-org-quota"

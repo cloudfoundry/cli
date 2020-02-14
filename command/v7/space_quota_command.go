@@ -1,44 +1,17 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . SpaceQuotaActor
-
-type SpaceQuotaActor interface {
-	GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (v7action.SpaceQuota, v7action.Warnings, error)
-}
-
 type SpaceQuotaCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.SpaceQuota `positional-args:"yes"`
 	usage           interface{}     `usage:"CF_NAME space-quota QUOTA"`
 	relatedCommands interface{}     `related_commands:"space, space-quotas"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       SpaceQuotaActor
-}
-
-func (cmd *SpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd SpaceQuotaCommand) Execute(args []string) error {

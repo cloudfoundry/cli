@@ -28,7 +28,7 @@ var _ = Describe("scale Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeScaleActor
+		fakeActor       *v7fakes.FakeActor
 		appName         string
 		binaryName      string
 		executeErr      error
@@ -40,14 +40,16 @@ var _ = Describe("scale Command", func() {
 		testUI = ui.NewTestUI(input, output, NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeScaleActor)
+		fakeActor = new(v7fakes.FakeActor)
 		appName = "some-app"
 
 		cmd = ScaleCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"

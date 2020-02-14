@@ -3,24 +3,14 @@ package v7
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . RunTaskActor
-
-type RunTaskActor interface {
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	RunTask(appGUID string, task v7action.Task) (v7action.Task, v7action.Warnings, error)
-	GetProcessByTypeAndApplication(processType string, appGUID string) (v7action.Process, v7action.Warnings, error)
-}
-
 type RunTaskCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.RunTaskArgsV7 `positional-args:"yes"`
 	Command         string             `long:"command" short:"c" description:"The command to execute"`
 	Disk            flag.Megabytes     `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
@@ -29,25 +19,6 @@ type RunTaskCommand struct {
 	Process         string             `long:"process" description:"Process type to use as a template for command, memory, and disk for the created task."`
 	usage           interface{}        `usage:"CF_NAME run-task APP_NAME [--command COMMAND] [-k DISK] [-m MEMORY] [--name TASK_NAME] [--process PROCESS_TYPE]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app --command \"bundle exec rake db:migrate\" --name migrate\n\n   CF_NAME run-task my-app --process batch_job\n\n   CF_NAME run-task my-app"`
 	relatedCommands interface{}        `related_commands:"logs, tasks, terminate-task"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       RunTaskActor
-}
-
-func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	client, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(client, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd RunTaskCommand) Execute(args []string) error {

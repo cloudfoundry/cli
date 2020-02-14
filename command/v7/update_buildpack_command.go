@@ -5,21 +5,16 @@ import (
 	"os"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/download"
-	"code.cloudfoundry.org/clock"
 )
-
-//go:generate counterfeiter . UpdateBuildpackActor
 
 type UpdateBuildpackActor interface {
 	UpdateBuildpackByNameAndStack(buildpackName string, buildpackStack string, buildpack v7action.Buildpack) (v7action.Buildpack, v7action.Warnings, error)
@@ -29,6 +24,8 @@ type UpdateBuildpackActor interface {
 }
 
 type UpdateBuildpackCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.BuildpackName               `positional-args:"Yes"`
 	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock] [--rename]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
 	relatedCommands interface{}                      `related_commands:"buildpacks, create-buildpack, delete-buildpack"`
@@ -42,27 +39,12 @@ type UpdateBuildpackCommand struct {
 	CurrentStack    string                           `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
 
-	UI          command.UI
-	Config      command.Config
 	ProgressBar v7action.SimpleProgressBar
-	SharedActor command.SharedActor
-	Actor       UpdateBuildpackActor
 }
 
 func (cmd *UpdateBuildpackCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
 	cmd.ProgressBar = v7action.NewProgressBar()
-
-	return nil
+	return cmd.BaseCommand.Setup(config, ui)
 }
 
 func (cmd UpdateBuildpackCommand) Execute(args []string) error {
