@@ -2,7 +2,7 @@ package v7action
 
 import "code.cloudfoundry.org/cli/actor/actionerror"
 
-func (actor Actor) AllowSpaceSSH(spaceName string, orgGUID string) (Warnings, error) {
+func (actor Actor) UpdateSpaceFeature(spaceName string, orgGUID string, enabled bool, feature string) (Warnings, error) {
 	var allWarnings Warnings
 
 	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
@@ -11,7 +11,7 @@ func (actor Actor) AllowSpaceSSH(spaceName string, orgGUID string) (Warnings, er
 		return allWarnings, err
 	}
 
-	enabled, ccv3Warnings, err := actor.CloudControllerClient.GetSpaceFeature(space.GUID, "ssh")
+	previousValue, ccv3Warnings, err := actor.CloudControllerClient.GetSpaceFeature(space.GUID, feature)
 
 	allWarnings = append(allWarnings, ccv3Warnings...)
 
@@ -19,11 +19,15 @@ func (actor Actor) AllowSpaceSSH(spaceName string, orgGUID string) (Warnings, er
 		return allWarnings, err
 	}
 
-	if enabled {
-		return allWarnings, actionerror.SpaceSSHAlreadyEnabledError{Space: space.Name}
+	if (previousValue == enabled) && (feature == "ssh") {
+		if enabled {
+			return allWarnings, actionerror.SpaceSSHAlreadyEnabledError{Space: space.Name}
+		} else {
+			return allWarnings, actionerror.SpaceSSHAlreadyDisabledError{Space: space.Name}
+		}
 	}
 
-	ccv3Warnings, err = actor.CloudControllerClient.UpdateSpaceFeature(space.GUID, true, "ssh")
+	ccv3Warnings, err = actor.CloudControllerClient.UpdateSpaceFeature(space.GUID, enabled, feature)
 	allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 
 	return allWarnings, err

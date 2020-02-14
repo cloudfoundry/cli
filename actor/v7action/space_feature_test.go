@@ -118,6 +118,8 @@ var _ = Describe("space features", func() {
 			spaceName  string
 			spaceGUID  string
 			orgGUID    string
+			enabled    bool
+			feature    = "ssh"
 			warnings   Warnings
 			executeErr error
 		)
@@ -125,6 +127,8 @@ var _ = Describe("space features", func() {
 		BeforeEach(func() {
 			spaceName = "some-space-name"
 			spaceGUID = "some-space-guid"
+			enabled = true
+			feature = "ssh"
 			orgGUID = "some-org-guid"
 			fakeCloudControllerClient.GetSpacesReturns(
 				[]ccv3.Space{
@@ -144,7 +148,7 @@ var _ = Describe("space features", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.AllowSpaceSSH(spaceName, orgGUID)
+			warnings, executeErr = actor.UpdateSpaceFeature(spaceName, orgGUID, enabled, feature)
 		})
 
 		When("the GetSpaceFeature returns an error", func() {
@@ -171,13 +175,86 @@ var _ = Describe("space features", func() {
 				)
 			})
 
-			It("returns a descriptive error", func() {
-				Expect(executeErr).To(MatchError(actionerror.SpaceSSHAlreadyEnabledError{
-					Space: spaceName}))
+			When("trying to set ssh to enabled", func() {
+				It("returns a descriptive error", func() {
+					Expect(executeErr).To(MatchError(actionerror.SpaceSSHAlreadyEnabledError{
+						Space: spaceName}))
+				})
+
 			})
 
+			When("trying to set ssh to disabled", func() {
+
+				BeforeEach(func() {
+					enabled = false
+				})
+
+				It("disables the ssh feature for the space", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
+					Expect(query).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					))
+
+					Expect(fakeCloudControllerClient.UpdateSpaceFeatureCallCount()).To(Equal(1))
+
+					spaceGUID, enable, feature := fakeCloudControllerClient.UpdateSpaceFeatureArgsForCall(0)
+
+					Expect(spaceGUID).To(Equal(spaceGUID))
+					Expect(enable).To(Equal(false))
+					Expect(feature).To(Equal("ssh"))
+					Expect(warnings).To(ConsistOf("get-space-warning", "get-space-feature-warning", "update-space-feature-warning"))
+
+				})
+			})
 		})
 
+		When("space ssh is already disabled", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceFeatureReturns(
+					false,
+					ccv3.Warnings{"get-space-feature-warning"},
+					nil,
+				)
+			})
+
+			When("trying to set ssh to disabled", func() {
+
+				BeforeEach(func() {
+					enabled = false
+				})
+
+				It("returns a descriptive error", func() {
+					Expect(executeErr).To(MatchError(actionerror.SpaceSSHAlreadyDisabledError{
+						Space: spaceName}))
+				})
+
+			})
+
+			When("trying to set ssh to enabled", func() {
+				It("enables the ssh feature for the space", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
+					Expect(query).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					))
+
+					Expect(fakeCloudControllerClient.UpdateSpaceFeatureCallCount()).To(Equal(1))
+
+					spaceGUID, enable, feature := fakeCloudControllerClient.UpdateSpaceFeatureArgsForCall(0)
+
+					Expect(spaceGUID).To(Equal(spaceGUID))
+					Expect(enable).To(Equal(true))
+					Expect(feature).To(Equal("ssh"))
+					Expect(warnings).To(ConsistOf("get-space-warning", "get-space-feature-warning", "update-space-feature-warning"))
+
+				})
+			})
+		})
 		When("the update space feature returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateSpaceFeatureReturns(

@@ -13,7 +13,7 @@ import (
 //go:generate counterfeiter . AllowSpaceSSHActor
 
 type AllowSpaceSSHActor interface {
-	AllowSpaceSSH(spaceName string, orgGUID string) (v7action.Warnings, error)
+	UpdateSpaceFeature(spaceName string, orgGUID string, enableds bool, feature string) (v7action.Warnings, error)
 }
 
 type AllowSpaceSSHCommand struct {
@@ -61,7 +61,7 @@ func (cmd *AllowSpaceSSHCommand) Execute(args []string) error {
 		"CurrentUserName": currentUserName,
 	})
 
-	warnings, err := cmd.Actor.AllowSpaceSSH(inputSpace, targetedOrgGUID)
+	warnings, err := cmd.Actor.UpdateSpaceFeature(inputSpace, targetedOrgGUID, true, "ssh")
 
 	cmd.UI.DisplayWarnings(warnings)
 
