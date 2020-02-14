@@ -22,7 +22,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeResetSpaceIsolationSegmentActor
+		fakeActor       *v7fakes.FakeActor
 		fakeActorV2     *v7fakes.FakeResetSpaceIsolationSegmentActorV2
 		binaryName      string
 		executeErr      error
@@ -34,14 +34,16 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeResetSpaceIsolationSegmentActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeActorV2 = new(v7fakes.FakeResetSpaceIsolationSegmentActorV2)
 
 		cmd = v7.ResetSpaceIsolationSegmentCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			ActorV2:     fakeActorV2,
 		}
 

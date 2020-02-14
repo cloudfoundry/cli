@@ -1,8 +1,6 @@
 package v7
 
 import (
-	"context"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -12,25 +10,15 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . LogsActor
-
-type LogsActor interface {
-	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v7action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
-	ScheduleTokenRefresh() (chan bool, error)
-}
-
 type LogsCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	Recent          bool         `long:"recent" description:"Dump recent logs instead of tailing"`
 	usage           interface{}  `usage:"CF_NAME logs APP_NAME"`
 	relatedCommands interface{}  `related_commands:"app, apps, ssh"`
 
-	UI             command.UI
-	Config         command.Config
 	CC_Client      *ccv3.Client
-	SharedActor    command.SharedActor
-	Actor          LogsActor
 	LogCacheClient sharedaction.LogCacheClient
 }
 
@@ -43,8 +31,8 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
+	// TODO what is going on here?
 	cmd.CC_Client = ccClient
-
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, uaaClient, clock.NewClock())
 	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 	return nil

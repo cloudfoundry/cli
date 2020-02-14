@@ -10,10 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
-
-//go:generate counterfeiter . StageActor
 
 type StageActor interface {
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
@@ -23,6 +20,8 @@ type StageActor interface {
 }
 
 type StageCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage (default: latest package)"`
 	usage           interface{}  `usage:"CF_NAME stage APP_NAME [--package-guid PACKAGE_GUID]"`
@@ -30,26 +29,16 @@ type StageCommand struct {
 
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 
-	UI             command.UI
-	Config         command.Config
 	LogCacheClient sharedaction.LogCacheClient
-	SharedActor    command.SharedActor
-	Actor          StageActor
 }
 
 func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}
 
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
-
+	cmd.LogCacheClient = command.NewLogCacheClient(cmd.Actor.GetLogCacheEndpoint(), config, ui)
 	return nil
 }
 

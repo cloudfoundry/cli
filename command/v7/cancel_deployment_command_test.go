@@ -24,7 +24,7 @@ var _ = Describe("Cancel deployment command", func() {
 		input           *Buffer
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCancelDeploymentActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		appName         string
 		spaceGUID       string
@@ -36,17 +36,19 @@ var _ = Describe("Cancel deployment command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCancelDeploymentActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "clodFoundry"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = CancelDeploymentCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

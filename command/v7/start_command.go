@@ -11,8 +11,6 @@ import (
 	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . StartActor
-
 type StartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
@@ -25,17 +23,15 @@ type StartActor interface {
 }
 
 type StartCommand struct {
+	BaseCommand
+
 	RequiredArgs        flag.AppName `positional-args:"yes"`
 	usage               interface{}  `usage:"CF_NAME start APP_NAME"`
 	relatedCommands     interface{}  `related_commands:"apps, logs, scale, ssh, stop, restart, run-task"`
 	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	UI             command.UI
-	Config         command.Config
 	LogCacheClient sharedaction.LogCacheClient
-	SharedActor    command.SharedActor
-	Actor          StartActor
 }
 
 func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
@@ -48,6 +44,7 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
+	// TODO something here?
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 

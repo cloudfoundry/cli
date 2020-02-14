@@ -1,42 +1,11 @@
 package v7
 
-import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
-)
-
-//go:generate counterfeiter . DeleteOrphanedRoutesActor
-
-type DeleteOrphanedRoutesActor interface {
-	DeleteOrphanedRoutes(spaceGUID string) (v7action.Warnings, error)
-}
-
 type DeleteOrphanedRoutesCommand struct {
+	BaseCommand
+
 	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]\n"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
 	relatedCommands interface{} `related_commands:"delete-routes, routes"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       DeleteOrphanedRoutesActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *DeleteOrphanedRoutesCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd DeleteOrphanedRoutesCommand) Execute(args []string) error {

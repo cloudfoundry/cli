@@ -1,43 +1,15 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . UnsetSpaceQuotaActor
-
-type UnsetSpaceQuotaActor interface {
-	UnsetSpaceQuota(spaceQuotaName, spaceName, orgGUID string) (v7action.Warnings, error)
-}
-
 type UnsetSpaceQuotaCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.UnsetSpaceQuotaArgs `positional-args:"yes"`
 	usage           interface{}              `usage:"CF_NAME unset-space-quota SPACE SPACE_QUOTA"`
 	relatedCommands interface{}              `related_commands:"space"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       UnsetSpaceQuotaActor
-}
-
-func (cmd *UnsetSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd *UnsetSpaceQuotaCommand) Execute(args []string) error {

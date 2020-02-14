@@ -25,7 +25,7 @@ var _ = Describe("ssh Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSSHActor
+		fakeActor       *v7fakes.FakeActor
 		fakeSSHActor    *v7fakes.FakeSharedSSHActor
 		executeErr      error
 		appName         string
@@ -35,7 +35,7 @@ var _ = Describe("ssh Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSSHActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeSSHActor = new(v7fakes.FakeSharedSSHActor)
 
 		appName = "some-app"
@@ -48,10 +48,12 @@ var _ = Describe("ssh Command", func() {
 			SkipHostValidation:  true,
 			SkipRemoteExecution: true,
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			SSHActor:    fakeSSHActor,
 		}
 	})

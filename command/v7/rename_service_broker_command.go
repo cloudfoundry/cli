@@ -10,14 +10,11 @@ import (
 )
 
 type RenameServiceBrokerCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.RenameServiceBrokerArgs `positional-args:"yes"`
 	usage           interface{}                  `usage:"CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"`
 	relatedCommands interface{}                  `related_commands:"service-brokers, update-service-broker"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       UpdateServiceBrokerActor
-	SharedActor command.SharedActor
 }
 
 func (cmd *RenameServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {

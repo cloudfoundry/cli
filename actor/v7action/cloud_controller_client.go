@@ -75,6 +75,7 @@ type CloudControllerClient interface {
 	GetEvents(query ...ccv3.Query) ([]ccv3.Event, ccv3.Warnings, error)
 	GetFeatureFlag(featureFlagName string) (ccv3.FeatureFlag, ccv3.Warnings, error)
 	GetFeatureFlags() ([]ccv3.FeatureFlag, ccv3.Warnings, error)
+	GetInfo() (ccv3.Info, ccv3.ResourceLinks, Warnings, error)
 	GetIsolationSegment(guid string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]ccv3.Organization, ccv3.Warnings, error)
 	GetIsolationSegments(query ...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error)

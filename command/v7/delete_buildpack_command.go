@@ -2,45 +2,17 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeleteBuildpackActor
-
-type DeleteBuildpackActor interface {
-	DeleteBuildpackByNameAndStack(buildpackName string, buildpackStack string) (v7action.Warnings, error)
-}
-
 type DeleteBuildpackCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.BuildpackName `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME delete-buildpack BUILDPACK [-f] [-s STACK]"`
 	relatedCommands interface{}        `related_commands:"buildpacks"`
 	Force           bool               `long:"force" short:"f" description:"Force deletion without confirmation"`
 	Stack           string             `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name. Required when buildpack name is ambiguous"`
-	Actor           DeleteBuildpackActor
-	UI              command.UI
-	Config          command.Config
-	SharedActor     command.SharedActor
-}
-
-func (cmd *DeleteBuildpackCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd DeleteBuildpackCommand) Execute(args []string) error {

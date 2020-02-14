@@ -1,44 +1,15 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . RenameOrganizationActor
-
-type RenameOrganizationActor interface {
-	RenameOrganization(oldOrgName, newOrgName string) (v7action.Organization, v7action.Warnings, error)
-}
-
 type RenameOrgCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.RenameOrgArgs `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME rename-org ORG NEW_ORG_NAME"`
 	relatedCommands interface{}        `related_commands:"orgs, quotas, set-org-role"`
-
-	Config      command.Config
-	UI          command.UI
-	SharedActor command.SharedActor
-	Actor       RenameOrganizationActor
-}
-
-func (cmd *RenameOrgCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd RenameOrgCommand) Execute(args []string) error {

@@ -1,15 +1,9 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
-
-	//"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . LabelUnsetter
@@ -19,6 +13,8 @@ type LabelUnsetter interface {
 }
 
 type UnsetLabelCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.UnsetLabelArgs `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY...\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n   cf unset-label org business pci public-facing\n   cf unset-label buildpack go_buildpack go -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   space\n   stack"`
 	relatedCommands interface{}         `related_commands:"labels, set-label"`
@@ -29,18 +25,16 @@ type UnsetLabelCommand struct {
 }
 
 func (cmd *UnsetLabelCommand) Setup(config command.Config, ui command.UI) error {
-	sharedActor := sharedaction.NewActor(config)
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}
-	actor := v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
 	cmd.LabelUnsetter = &LabelUpdater{
 		UI:          ui,
 		Config:      config,
-		SharedActor: sharedActor,
-		Actor:       actor,
+		SharedActor: cmd.SharedActor,
+		Actor:       cmd.Actor,
 		Action:      Unset,
 	}
 	return nil

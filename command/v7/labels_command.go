@@ -5,15 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock"
 )
 
 type ResourceType string
@@ -30,8 +26,6 @@ const (
 	ServiceOffering ResourceType = "service-offering"
 )
 
-//go:generate counterfeiter . LabelsActor
-
 type LabelsActor interface {
 	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetDomainLabels(domainName string) (map[string]types.NullString, v7action.Warnings, error)
@@ -45,28 +39,13 @@ type LabelsActor interface {
 }
 
 type LabelsCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   space\n   stack"`
 	relatedCommands interface{}     `related_commands:"set-label, unset-label"`
 	ServiceBroker   string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings with the same name."`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       LabelsActor
-}
-
-func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-	return nil
 }
 
 func (cmd LabelsCommand) Execute(args []string) error {

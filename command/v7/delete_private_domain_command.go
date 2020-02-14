@@ -4,45 +4,16 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeletePrivateDomainActor
-
-type DeletePrivateDomainActor interface {
-	DeleteDomain(domain v7action.Domain) (v7action.Warnings, error)
-	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
-}
-
 type DeletePrivateDomainCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
 	usage           interface{} `usage:"CF_NAME delete-private-domain DOMAIN [-f]"`
 	relatedCommands interface{} `related_commands:"delete-shared-domain, domains, unshare-private-domain"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       DeletePrivateDomainActor
-}
-
-func (cmd *DeletePrivateDomainCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd DeletePrivateDomainCommand) Execute(args []string) error {

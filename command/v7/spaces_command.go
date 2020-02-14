@@ -1,44 +1,16 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . SpacesActor
-
-type SpacesActor interface {
-	GetOrganizationSpacesWithLabelSelector(orgGUID string, labelSelector string) ([]v7action.Space, v7action.Warnings, error)
-}
-
 type SpacesCommand struct {
+	BaseCommand
+
 	usage           interface{} `usage:"CF_NAME spaces [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME spaces\n   CF_NAME spaces --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME spaces --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
 	relatedCommands interface{} `related_commands:"create-space, set-space-role, space, space-users"`
-
 	Labels string `long:"labels" description:"Selector to filter spaces by labels"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       SpacesActor
-}
-
-func (cmd *SpacesCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd SpacesCommand) Execute([]string) error {

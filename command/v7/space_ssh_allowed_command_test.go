@@ -23,7 +23,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSpaceSSHAllowedActor
+		fakeActor       *v7fakes.FakeActor
 		executeErr      error
 		binaryName      string
 
@@ -35,14 +35,16 @@ var _ = Describe("space-ssh-allowed command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSpaceSSHAllowedActor)
+		fakeActor = new(v7fakes.FakeActor)
 		spaceName = RandomString("space")
 
 		cmd = SpaceSSHAllowedCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			RequiredArgs: flag.Space{Space: spaceName},
 		}
 

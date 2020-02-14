@@ -25,7 +25,7 @@ var _ = Describe("logs command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeLogsActor
+		fakeActor       *v7fakes.FakeActor
 		logCacheClient  *sharedactionfakes.FakeLogCacheClient
 		binaryName      string
 		executeErr      error
@@ -35,14 +35,16 @@ var _ = Describe("logs command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeLogsActor)
+		fakeActor = new(v7fakes.FakeActor)
 		logCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		cmd = LogsCommand{
-			UI:             testUI,
-			Config:         fakeConfig,
-			SharedActor:    fakeSharedActor,
-			Actor:          fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			LogCacheClient: logCacheClient,
 		}
 
