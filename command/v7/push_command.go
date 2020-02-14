@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"context"
 	"os"
 	"strings"
 
@@ -37,15 +36,6 @@ type PushActor interface {
 	CreatePushPlans(spaceGUID string, orgGUID string, manifest manifestparser.Manifest, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7action.Warnings, error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent
-}
-
-//go:generate counterfeiter . V7ActorForPush
-
-type V7ActorForPush interface {
-	AppActor
-	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
-	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
 }
 
 //go:generate counterfeiter . ManifestParser
@@ -95,7 +85,7 @@ type PushCommand struct {
 	UI              command.UI
 	LogCacheClient  sharedaction.LogCacheClient
 	Actor           PushActor
-	VersionActor    V7ActorForPush
+	VersionActor    Actor
 	SharedActor     command.SharedActor
 	ProgressBar     ProgressBar
 	CWD             string

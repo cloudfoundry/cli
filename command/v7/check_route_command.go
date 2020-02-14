@@ -16,6 +16,8 @@ type CheckRouteActor interface {
 }
 
 type CheckRouteCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
 	Path            flag.V7RoutePath `long:"path" description:"Path for the route"`

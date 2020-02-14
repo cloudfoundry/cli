@@ -2,47 +2,16 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
-
-//go:generate counterfeiter . AllowSpaceSSHActor
-
-type AllowSpaceSSHActor interface {
-	AllowSpaceSSH(spaceName string, orgGUID string) (v7action.Warnings, error)
-}
 
 type AllowSpaceSSHCommand struct {
 	RequiredArgs    flag.Space  `positional-args:"yes"`
 	usage           interface{} `usage:"CF_NAME allow-space-ssh SPACE_NAME"`
 	relatedCommands interface{} `related_commands:"enable-ssh, space-ssh-allowed, ssh, ssh-enabled"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       AllowSpaceSSHActor
-}
-
-func (cmd *AllowSpaceSSHCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, nil, clock.NewClock())
-	return nil
 }
 
 func (cmd *AllowSpaceSSHCommand) Execute(args []string) error {
-
 	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
@@ -78,5 +47,4 @@ func (cmd *AllowSpaceSSHCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return err
-
 }

@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("allow-space-ssh command", func() {
+var _ = FDescribe("allow-space-ssh command", func() {
 	var (
 		orgName   string
 		spaceName string
