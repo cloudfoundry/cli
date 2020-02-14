@@ -11,6 +11,37 @@ import (
 )
 
 type FakeStageActor struct {
+	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
+	getApplicationByNameAndSpaceMutex       sync.RWMutex
+	getApplicationByNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getApplicationByNameAndSpaceReturns struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	GetNewestReadyPackageForApplicationStub        func(string) (v7action.Package, v7action.Warnings, error)
+	getNewestReadyPackageForApplicationMutex       sync.RWMutex
+	getNewestReadyPackageForApplicationArgsForCall []struct {
+		arg1 string
+	}
+	getNewestReadyPackageForApplicationReturns struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}
+	getNewestReadyPackageForApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetStreamingLogsForApplicationByNameAndSpaceStub        func(string, string, sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
 	getStreamingLogsForApplicationByNameAndSpaceArgsForCall []struct {
@@ -51,6 +82,139 @@ type FakeStageActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeStageActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
+	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
+	fake.getApplicationByNameAndSpaceMutex.Unlock()
+	if fake.GetApplicationByNameAndSpaceStub != nil {
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeStageActor) GetApplicationByNameAndSpaceCallCount() int {
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeStageActor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v7action.Application, v7action.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
+}
+
+func (fake *FakeStageActor) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeStageActor) GetApplicationByNameAndSpaceReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = nil
+	fake.getApplicationByNameAndSpaceReturns = struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeStageActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = nil
+	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Application
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeStageActor) GetNewestReadyPackageForApplication(arg1 string) (v7action.Package, v7action.Warnings, error) {
+	fake.getNewestReadyPackageForApplicationMutex.Lock()
+	ret, specificReturn := fake.getNewestReadyPackageForApplicationReturnsOnCall[len(fake.getNewestReadyPackageForApplicationArgsForCall)]
+	fake.getNewestReadyPackageForApplicationArgsForCall = append(fake.getNewestReadyPackageForApplicationArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetNewestReadyPackageForApplication", []interface{}{arg1})
+	fake.getNewestReadyPackageForApplicationMutex.Unlock()
+	if fake.GetNewestReadyPackageForApplicationStub != nil {
+		return fake.GetNewestReadyPackageForApplicationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getNewestReadyPackageForApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeStageActor) GetNewestReadyPackageForApplicationCallCount() int {
+	fake.getNewestReadyPackageForApplicationMutex.RLock()
+	defer fake.getNewestReadyPackageForApplicationMutex.RUnlock()
+	return len(fake.getNewestReadyPackageForApplicationArgsForCall)
+}
+
+func (fake *FakeStageActor) GetNewestReadyPackageForApplicationCalls(stub func(string) (v7action.Package, v7action.Warnings, error)) {
+	fake.getNewestReadyPackageForApplicationMutex.Lock()
+	defer fake.getNewestReadyPackageForApplicationMutex.Unlock()
+	fake.GetNewestReadyPackageForApplicationStub = stub
+}
+
+func (fake *FakeStageActor) GetNewestReadyPackageForApplicationArgsForCall(i int) string {
+	fake.getNewestReadyPackageForApplicationMutex.RLock()
+	defer fake.getNewestReadyPackageForApplicationMutex.RUnlock()
+	argsForCall := fake.getNewestReadyPackageForApplicationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeStageActor) GetNewestReadyPackageForApplicationReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+	fake.getNewestReadyPackageForApplicationMutex.Lock()
+	defer fake.getNewestReadyPackageForApplicationMutex.Unlock()
+	fake.GetNewestReadyPackageForApplicationStub = nil
+	fake.getNewestReadyPackageForApplicationReturns = struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeStageActor) GetNewestReadyPackageForApplicationReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+	fake.getNewestReadyPackageForApplicationMutex.Lock()
+	defer fake.getNewestReadyPackageForApplicationMutex.Unlock()
+	fake.GetNewestReadyPackageForApplicationStub = nil
+	if fake.getNewestReadyPackageForApplicationReturnsOnCall == nil {
+		fake.getNewestReadyPackageForApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Package
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getNewestReadyPackageForApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeStageActor) GetStreamingLogsForApplicationByNameAndSpace(arg1 string, arg2 string, arg3 sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error) {
@@ -198,6 +362,10 @@ func (fake *FakeStageActor) StagePackageReturnsOnCall(i int, result1 <-chan v7ac
 func (fake *FakeStageActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.getApplicationByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getNewestReadyPackageForApplicationMutex.RLock()
+	defer fake.getNewestReadyPackageForApplicationMutex.RUnlock()
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.stagePackageMutex.RLock()

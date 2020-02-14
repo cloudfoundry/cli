@@ -18,13 +18,15 @@ import (
 type StageActor interface {
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	GetNewestReadyPackageForApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
 }
 
 type StageCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
-	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage" required:"true"`
-	usage           interface{}  `usage:"CF_NAME stage APP_NAME --package-guid PACKAGE_GUID"`
-	relatedCommands interface{}  `related_commands:"app, create-package, droplets, packages, push, set-droplet, stage"`
+	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage (default: latest package)"`
+	usage           interface{}  `usage:"CF_NAME stage APP_NAME [--package-guid PACKAGE_GUID]"`
+	relatedCommands interface{}  `related_commands:"app, create-package, droplets, packages, push, set-droplet"`
 
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 
@@ -69,6 +71,24 @@ func (cmd StageCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
+	packageGUID := cmd.PackageGUID
+
+	if packageGUID == "" {
+		app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		packageGUID = pkg.GUID
+	}
+
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
@@ -77,7 +97,7 @@ func (cmd StageCommand) Execute(args []string) error {
 	defer stopLogStreamFunc()
 
 	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(
-		cmd.PackageGUID,
+		packageGUID,
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 	)
