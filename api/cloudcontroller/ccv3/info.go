@@ -111,19 +111,18 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 
 // GetInfo returns endpoint and API information from /v3.
 func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
-	rootResponse, warnings, err := client.rootResponse()
+	rootResponse, warnings, err := client.RootResponse()
 	if err != nil {
 		return Info{}, ResourceLinks{}, warnings, err
 	}
-
 	request, err := client.newHTTPRequest(requestOptions{
-		Method: http.MethodGet,
-		URL:    rootResponse.ccV3Link(),
+		Method:   http.MethodGet,
+		URL:      rootResponse.ccV3Link(),
+		FromFunc: true,
 	})
 	if err != nil {
 		return Info{}, ResourceLinks{}, warnings, err
 	}
-
 	info := ResourceLinks{} // Explicitly initializing
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &info,
@@ -140,7 +139,7 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 }
 
 // rootResponse returns the CC API root document.
-func (client *Client) rootResponse() (Info, Warnings, error) {
+func (client *Client) RootResponse() (Info, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    client.cloudControllerURL,
