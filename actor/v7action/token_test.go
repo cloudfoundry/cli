@@ -7,8 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
+	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -69,7 +68,7 @@ var _ = Describe("Token Actions", func() {
 					Type:        "bearer",
 				}, nil)
 				fakeConfig.RefreshTokenReturns("some-refresh-token")
-				notExpiringAccessToken = buildTokenString(time.Now().AddDate(5, 0, 0))
+				notExpiringAccessToken = helpers.BuildTokenString(time.Now().AddDate(5, 0, 0))
 				fakeConfig.AccessTokenReturns(notExpiringAccessToken)
 			})
 
@@ -88,7 +87,7 @@ var _ = Describe("Token Actions", func() {
 					Type:         "bearer",
 				}, nil)
 				fakeConfig.RefreshTokenReturns("some-refresh-token")
-				expiringAccessToken := buildTokenString(time.Now().Add(5))
+				expiringAccessToken := helpers.BuildTokenString(time.Now().Add(5))
 				fakeConfig.AccessTokenReturns(expiringAccessToken)
 			})
 
@@ -115,19 +114,10 @@ var _ = Describe("Token Actions", func() {
 				})
 
 				It("returns that error", func() {
-
-					Expect(accessToken).To(Equal(""))
 					Expect(err).To(MatchError("I'm still an error!"))
+					Expect(accessToken).To(Equal(""), "AccessToken was not equal to \"\"")
 				})
 			})
 		})
 	})
 })
-
-func buildTokenString(expiration time.Time) string {
-	c := jws.Claims{}
-	c.SetExpiration(expiration)
-	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, _ := token.Serialize(nil) //nolint: errcheck
-	return string(tokenBytes)
-}

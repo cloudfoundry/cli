@@ -91,6 +91,10 @@ var _ = Describe("logs command", func() {
 				Expect(testUI.Out).To(Say("Retrieving logs for app some-app in org some-org-name / space some-space-name as some-user..."))
 			})
 
+			It("does not attempt to refresh the access token periodically", func() {
+				Expect(fakeActor.ScheduleTokenRefreshCallCount()).To(Equal(0))
+			})
+
 			When("the logs actor returns an error", func() {
 				var expectedErr error
 				BeforeEach(func() {
@@ -152,6 +156,16 @@ var _ = Describe("logs command", func() {
 		When("the --recent flag is not provided", func() {
 			BeforeEach(func() {
 				cmd.Recent = false
+				fakeActor.ScheduleTokenRefreshStub = func(
+					after func(time.Duration) <-chan time.Time,
+					stop chan struct{}, stoppedRefreshing chan struct{}) (<-chan error, error) {
+					errCh := make(chan error, 1)
+					go func() {
+						<-stop
+						close(stoppedRefreshing)
+					}()
+					return errCh, nil
+				}
 			})
 
 			When("the logs setup returns an error", func() {
@@ -245,6 +259,40 @@ var _ = Describe("logs command", func() {
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(client).To(Equal(logCacheClient))
 				})
+
+				When("scheduling a token refresh errors immediately", func() {
+					BeforeEach(func() {
+						cmd.Recent = false
+						fakeActor.ScheduleTokenRefreshReturns(nil, errors.New("fjords pining"))
+					})
+					It("displays the errors", func() {
+						Expect(executeErr).To(MatchError("fjords pining"))
+						Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(0))
+					})
+				})
+
+				When("there is an error refreshing a token sometime later", func() {
+					BeforeEach(func() {
+						cmd.Recent = false
+						fakeActor.ScheduleTokenRefreshStub = func(
+							after func(time.Duration) <-chan time.Time,
+							stop chan struct{}, stoppedRefreshing chan struct{}) (<-chan error, error) {
+							errCh := make(chan error, 1)
+							go func() {
+								errCh <- errors.New("fjords pining")
+								<-stop
+								close(stoppedRefreshing)
+							}()
+							return errCh, nil
+						}
+					})
+					It("displays the errors", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						Expect(testUI.Err).To(Say("fjords pining"))
+					})
+				})
+
 			})
 		})
 	})

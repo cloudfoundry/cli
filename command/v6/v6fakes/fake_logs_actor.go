@@ -4,6 +4,7 @@ package v6fakes
 import (
 	"context"
 	"sync"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -48,6 +49,21 @@ type FakeLogsActor struct {
 		result3 context.CancelFunc
 		result4 v2action.Warnings
 		result5 error
+	}
+	ScheduleTokenRefreshStub        func(func(time.Duration) <-chan time.Time, chan struct{}, chan struct{}) (<-chan error, error)
+	scheduleTokenRefreshMutex       sync.RWMutex
+	scheduleTokenRefreshArgsForCall []struct {
+		arg1 func(time.Duration) <-chan time.Time
+		arg2 chan struct{}
+		arg3 chan struct{}
+	}
+	scheduleTokenRefreshReturns struct {
+		result1 <-chan error
+		result2 error
+	}
+	scheduleTokenRefreshReturnsOnCall map[int]struct {
+		result1 <-chan error
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -195,6 +211,71 @@ func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpaceReturnsOn
 	}{result1, result2, result3, result4, result5}
 }
 
+func (fake *FakeLogsActor) ScheduleTokenRefresh(arg1 func(time.Duration) <-chan time.Time, arg2 chan struct{}, arg3 chan struct{}) (<-chan error, error) {
+	fake.scheduleTokenRefreshMutex.Lock()
+	ret, specificReturn := fake.scheduleTokenRefreshReturnsOnCall[len(fake.scheduleTokenRefreshArgsForCall)]
+	fake.scheduleTokenRefreshArgsForCall = append(fake.scheduleTokenRefreshArgsForCall, struct {
+		arg1 func(time.Duration) <-chan time.Time
+		arg2 chan struct{}
+		arg3 chan struct{}
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("ScheduleTokenRefresh", []interface{}{arg1, arg2, arg3})
+	fake.scheduleTokenRefreshMutex.Unlock()
+	if fake.ScheduleTokenRefreshStub != nil {
+		return fake.ScheduleTokenRefreshStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.scheduleTokenRefreshReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeLogsActor) ScheduleTokenRefreshCallCount() int {
+	fake.scheduleTokenRefreshMutex.RLock()
+	defer fake.scheduleTokenRefreshMutex.RUnlock()
+	return len(fake.scheduleTokenRefreshArgsForCall)
+}
+
+func (fake *FakeLogsActor) ScheduleTokenRefreshCalls(stub func(func(time.Duration) <-chan time.Time, chan struct{}, chan struct{}) (<-chan error, error)) {
+	fake.scheduleTokenRefreshMutex.Lock()
+	defer fake.scheduleTokenRefreshMutex.Unlock()
+	fake.ScheduleTokenRefreshStub = stub
+}
+
+func (fake *FakeLogsActor) ScheduleTokenRefreshArgsForCall(i int) (func(time.Duration) <-chan time.Time, chan struct{}, chan struct{}) {
+	fake.scheduleTokenRefreshMutex.RLock()
+	defer fake.scheduleTokenRefreshMutex.RUnlock()
+	argsForCall := fake.scheduleTokenRefreshArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeLogsActor) ScheduleTokenRefreshReturns(result1 <-chan error, result2 error) {
+	fake.scheduleTokenRefreshMutex.Lock()
+	defer fake.scheduleTokenRefreshMutex.Unlock()
+	fake.ScheduleTokenRefreshStub = nil
+	fake.scheduleTokenRefreshReturns = struct {
+		result1 <-chan error
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeLogsActor) ScheduleTokenRefreshReturnsOnCall(i int, result1 <-chan error, result2 error) {
+	fake.scheduleTokenRefreshMutex.Lock()
+	defer fake.scheduleTokenRefreshMutex.Unlock()
+	fake.ScheduleTokenRefreshStub = nil
+	if fake.scheduleTokenRefreshReturnsOnCall == nil {
+		fake.scheduleTokenRefreshReturnsOnCall = make(map[int]struct {
+			result1 <-chan error
+			result2 error
+		})
+	}
+	fake.scheduleTokenRefreshReturnsOnCall[i] = struct {
+		result1 <-chan error
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeLogsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -202,6 +283,8 @@ func (fake *FakeLogsActor) Invocations() map[string][][]interface{} {
 	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.scheduleTokenRefreshMutex.RLock()
+	defer fake.scheduleTokenRefreshMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

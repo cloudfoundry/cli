@@ -2,6 +2,9 @@ package v6
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -16,6 +19,7 @@ import (
 type LogsActor interface {
 	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v2action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v2action.Warnings, error)
+	ScheduleTokenRefresh(func(time.Duration) <-chan time.Time, chan struct{}, chan struct{}) (<-chan error, error)
 }
 
 type LogsCommand struct {
@@ -79,7 +83,21 @@ func (cmd LogsCommand) Execute(args []string) error {
 		return cmd.displayRecentLogs()
 	}
 
-	return cmd.streamLogs()
+	stop := make(chan struct{})
+	stoppedRefreshing := make(chan struct{})
+	stoppedOutputtingRefreshErrors := make(chan struct{})
+	err = cmd.refreshTokenPeriodically(stop, stoppedRefreshing, stoppedOutputtingRefreshErrors)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.streamLogs()
+
+	close(stop)
+	<-stoppedRefreshing
+	<-stoppedOutputtingRefreshErrors
+
+	return err
 }
 
 func (cmd LogsCommand) displayRecentLogs() error {
@@ -97,6 +115,32 @@ func (cmd LogsCommand) displayRecentLogs() error {
 	return err
 }
 
+func (cmd LogsCommand) refreshTokenPeriodically(
+	stop chan struct{},
+	stoppedRefreshing chan struct{},
+	stoppedOutputtingRefreshErrors chan struct{}) error {
+
+	tokenRefreshErrors, err := cmd.Actor.ScheduleTokenRefresh(time.After, stop, stoppedRefreshing)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		defer close(stoppedOutputtingRefreshErrors)
+
+		for {
+			select {
+			case err := <-tokenRefreshErrors:
+				cmd.UI.DisplayError(err)
+			case <-stop:
+				return
+			}
+		}
+	}()
+
+	return nil
+}
+
 func (cmd LogsCommand) streamLogs() error {
 	messages, logErrs, stopStreaming, warnings, err := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(
 		cmd.RequiredArgs.AppName,
@@ -108,6 +152,9 @@ func (cmd LogsCommand) streamLogs() error {
 	if err != nil {
 		return err
 	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 
 	var messagesClosed, errLogsClosed bool
 	for {
@@ -124,9 +171,11 @@ func (cmd LogsCommand) streamLogs() error {
 				errLogsClosed = true
 				break
 			}
-
 			stopStreaming()
 			return logErr
+		case <-c:
+			stopStreaming()
+			return nil
 		}
 
 		if messagesClosed && errLogsClosed {

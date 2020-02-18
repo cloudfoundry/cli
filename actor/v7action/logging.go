@@ -58,22 +58,18 @@ func (actor Actor) ScheduleTokenRefresh() (chan bool, error) {
 		return nil, err
 	}
 
-	var expiresIn time.Duration
+	var timeToRefresh time.Duration
 	expiration, ok := token.Claims().Expiration()
 	if ok {
-		expiresIn = time.Until(expiration)
-
-		// When we refresh exactly every EXPIRY_DURATION nanoseconds usually the auth token
-		// ends up expiring on the log-cache client. Better to refresh a little more often
-		// to avoid log outage
-		expiresIn = expiresIn * 9 / 10
+		expiresIn := time.Until(expiration)
+		timeToRefresh = expiresIn * 9 / 10
 	} else {
 		return nil, errors.New("Failed to get an expiry time from the current access token")
 	}
 	quitNowChannel := make(chan bool, 1)
 
 	go func() {
-		ticker := time.NewTicker(expiresIn)
+		ticker := time.NewTicker(timeToRefresh)
 		defer ticker.Stop()
 		for {
 			select {
