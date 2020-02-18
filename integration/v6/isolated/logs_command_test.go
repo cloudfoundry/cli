@@ -33,7 +33,7 @@ var _ = Describe("Logs Command", func() {
 		})
 	})
 
-	When("authenticated as a user and targeting an org and space", func() {
+	When("authenticated and targeting an org and space", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -112,59 +112,4 @@ var _ = Describe("Logs Command", func() {
 			})
 		})
 	})
-
-	When("authenticated as a client and targeting an org and space", func() {
-		var (
-			orgName    string
-			spaceName  string
-			clientName string
-		)
-
-		BeforeEach(func() {
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-			clientName = helpers.LoginCFWithClientCredentials()
-			helpers.CreateOrgAndSpace(orgName, spaceName)
-			helpers.TargetOrgAndSpace(orgName, spaceName)
-		})
-
-		AfterEach(func() {
-			helpers.QuickDeleteOrg(orgName)
-		})
-
-		When("the specified app exists", func() {
-			var appName string
-
-			BeforeEach(func() {
-				appName = helpers.PrefixedRandomName("app")
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
-				})
-			})
-
-			Context("without the --recent flag", func() {
-				It("streams logs out to the screen", func() {
-					session := helpers.CF("logs", appName)
-					defer session.Terminate()
-
-					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, clientName))
-
-					response, err := http.Get(fmt.Sprintf("http://%s.%s", appName, helpers.DefaultSharedDomain()))
-					Expect(err).NotTo(HaveOccurred())
-					Expect(response.StatusCode).To(Equal(http.StatusOK))
-					Eventually(session).Should(Say(`%s \[APP/PROC/WEB/0\]\s+OUT .*? \"GET / HTTP/1.1\" 200 \d+`, helpers.ISO8601Regex))
-				})
-			})
-
-			Context("with the --recent flag", func() {
-				It("displays the most recent logs and closes the stream", func() {
-					session := helpers.CF("logs", appName, "--recent")
-					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, clientName))
-					Eventually(session).Should(Say(`%s \[API/\d+\]\s+OUT Created app with guid %s`, helpers.ISO8601Regex, helpers.GUIDRegex))
-					Eventually(session).Should(Exit(0))
-				})
-			})
-		})
-	})
-
 })
