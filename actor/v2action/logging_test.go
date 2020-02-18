@@ -573,7 +573,6 @@ var _ = Describe("Logging Actions", func() {
 					Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
 					fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
 					go func() {
-						defer GinkgoRecover()
 						Eventually(errChannel).Should(Receive(MatchError("some error")))
 					}()
 					ticker <- time.Time{}
