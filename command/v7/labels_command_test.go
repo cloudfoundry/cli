@@ -107,7 +107,7 @@ var _ = Describe("labels command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).To(MatchError("Target not found"))
 			},
-			labelSubcommands()...,
+			labelSubcommands("service-plan")..., // FIXME: add service-plan back
 		)
 
 		type MethodCallCountType func() int

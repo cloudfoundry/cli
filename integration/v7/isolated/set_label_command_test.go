@@ -42,6 +42,7 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+route`))
 				Eventually(session).Should(Say(`\s+service-broker`))
 				Eventually(session).Should(Say(`\s+service-offering`))
+				Eventually(session).Should(Say(`\s+service-plan`))
 				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -698,6 +699,45 @@ var _ = Describe("set-label command", func() {
 				})
 			})
 		})
+
+		When("assigning label to service-plan", func() {
+			var (
+				broker              *fakeservicebroker.FakeServiceBroker
+				servicePlanName     string
+				serviceOfferingName string
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				servicePlanName = broker.Services[0].Plans[0].Name
+				serviceOfferingName = broker.Services[0].Name
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("has the expected shared behaviors", func() {
+				testExpectedBehaviors("service-plan", "Service plan", servicePlanName)
+			})
+
+			It("sets the specified labels", func() {
+				session := helpers.CF("set-label", "service-plan", servicePlanName, "-b", broker.Name(), "-o", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s from service offering %s / service broker %s as %s...`), servicePlanName, serviceOfferingName, broker.Name(), username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_plans?names=%s", servicePlanName), true, helpers.MetadataLabels{
+					"some-key":       "some-value",
+					"some-other-key": "some-other-value",
+				})
+			})
+		})
+
 	})
 })
 

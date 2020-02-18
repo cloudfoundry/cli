@@ -112,6 +112,22 @@ type FakeSetLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateServicePlanLabelsStub        func(string, string, string, map[string]types.NullString) (v7action.Warnings, error)
+	updateServicePlanLabelsMutex       sync.RWMutex
+	updateServicePlanLabelsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]types.NullString
+	}
+	updateServicePlanLabelsReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateServicePlanLabelsReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateSpaceLabelsBySpaceNameStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	updateSpaceLabelsBySpaceNameMutex       sync.RWMutex
 	updateSpaceLabelsBySpaceNameArgsForCall []struct {
@@ -597,6 +613,72 @@ func (fake *FakeSetLabelActor) UpdateServiceOfferingLabelsReturnsOnCall(i int, r
 	}{result1, result2}
 }
 
+func (fake *FakeSetLabelActor) UpdateServicePlanLabels(arg1 string, arg2 string, arg3 string, arg4 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateServicePlanLabelsMutex.Lock()
+	ret, specificReturn := fake.updateServicePlanLabelsReturnsOnCall[len(fake.updateServicePlanLabelsArgsForCall)]
+	fake.updateServicePlanLabelsArgsForCall = append(fake.updateServicePlanLabelsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]types.NullString
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UpdateServicePlanLabels", []interface{}{arg1, arg2, arg3, arg4})
+	fake.updateServicePlanLabelsMutex.Unlock()
+	if fake.UpdateServicePlanLabelsStub != nil {
+		return fake.UpdateServicePlanLabelsStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateServicePlanLabelsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSetLabelActor) UpdateServicePlanLabelsCallCount() int {
+	fake.updateServicePlanLabelsMutex.RLock()
+	defer fake.updateServicePlanLabelsMutex.RUnlock()
+	return len(fake.updateServicePlanLabelsArgsForCall)
+}
+
+func (fake *FakeSetLabelActor) UpdateServicePlanLabelsCalls(stub func(string, string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateServicePlanLabelsMutex.Lock()
+	defer fake.updateServicePlanLabelsMutex.Unlock()
+	fake.UpdateServicePlanLabelsStub = stub
+}
+
+func (fake *FakeSetLabelActor) UpdateServicePlanLabelsArgsForCall(i int) (string, string, string, map[string]types.NullString) {
+	fake.updateServicePlanLabelsMutex.RLock()
+	defer fake.updateServicePlanLabelsMutex.RUnlock()
+	argsForCall := fake.updateServicePlanLabelsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeSetLabelActor) UpdateServicePlanLabelsReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateServicePlanLabelsMutex.Lock()
+	defer fake.updateServicePlanLabelsMutex.Unlock()
+	fake.UpdateServicePlanLabelsStub = nil
+	fake.updateServicePlanLabelsReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateServicePlanLabelsReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateServicePlanLabelsMutex.Lock()
+	defer fake.updateServicePlanLabelsMutex.Unlock()
+	fake.UpdateServicePlanLabelsStub = nil
+	if fake.updateServicePlanLabelsReturnsOnCall == nil {
+		fake.updateServicePlanLabelsReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateServicePlanLabelsReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeSetLabelActor) UpdateSpaceLabelsBySpaceName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateSpaceLabelsBySpaceNameMutex.Lock()
 	ret, specificReturn := fake.updateSpaceLabelsBySpaceNameReturnsOnCall[len(fake.updateSpaceLabelsBySpaceNameArgsForCall)]
@@ -743,6 +825,8 @@ func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	defer fake.updateServiceBrokerLabelsByServiceBrokerNameMutex.RUnlock()
 	fake.updateServiceOfferingLabelsMutex.RLock()
 	defer fake.updateServiceOfferingLabelsMutex.RUnlock()
+	fake.updateServicePlanLabelsMutex.RLock()
+	defer fake.updateServicePlanLabelsMutex.RUnlock()
 	fake.updateSpaceLabelsBySpaceNameMutex.RLock()
 	defer fake.updateSpaceLabelsBySpaceNameMutex.RUnlock()
 	fake.updateStackLabelsByStackNameMutex.RLock()

@@ -53,8 +53,10 @@ const (
 	UsernamesFilter QueryKey = "usernames"
 	// StatesFilter is a query parameter when getting a package's droplets by state
 	StatesFilter QueryKey = "states"
-	// ServiceBrokerNamesFilter is a query parameter when getting a resource according to the Service Brokers that it relates to
+	// ServiceBrokerNamesFilter is a query parameter when getting plans or offerings according to the Service Brokers that it relates to
 	ServiceBrokerNamesFilter QueryKey = "service_broker_names"
+	// ServiceOfferingNamesFilter is a query parameter when getting a plan according to the Service Offerings that it relates to
+	ServiceOfferingNamesFilter QueryKey = "service_offering_names"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"

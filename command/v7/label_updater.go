@@ -23,6 +23,7 @@ type SetLabelActor interface {
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServiceBrokerLabelsByServiceBrokerName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (v7action.Warnings, error)
+	UpdateServicePlanLabels(servicePlanName string, serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type ActionType string
@@ -33,10 +34,11 @@ const (
 )
 
 type TargetResource struct {
-	ResourceType   string
-	ResourceName   string
-	BuildpackStack string
-	ServiceBroker  string
+	ResourceType    string
+	ResourceName    string
+	BuildpackStack  string
+	ServiceBroker   string
+	ServiceOffering string
 }
 
 type LabelUpdater struct {
@@ -93,6 +95,8 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 		warnings, err = cmd.Actor.UpdateStackLabelsByStackName(cmd.targetResource.ResourceName, cmd.labels)
 	case ServiceOffering:
 		warnings, err = cmd.Actor.UpdateServiceOfferingLabels(cmd.targetResource.ResourceName, cmd.targetResource.ServiceBroker, cmd.labels)
+	case ServicePlan:
+		warnings, err = cmd.Actor.UpdateServicePlanLabels(cmd.targetResource.ResourceName, cmd.targetResource.ServiceOffering, cmd.targetResource.ServiceBroker, cmd.labels)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)
@@ -116,13 +120,14 @@ func (cmd *LabelUpdater) checkTarget() error {
 }
 
 func (cmd *LabelUpdater) validateFlags() error {
-	switch ResourceType(cmd.targetResource.ResourceType) {
-	case App, Buildpack, Domain, Org, Route, ServiceBroker, Space, Stack, ServiceOffering:
+	resourceType := ResourceType(cmd.targetResource.ResourceType)
+	switch resourceType {
+	case App, Buildpack, Domain, Org, Route, ServiceBroker, Space, Stack, ServiceOffering, ServicePlan:
 	default:
 		return errors.New(cmd.UI.TranslateText("Unsupported resource type of '{{.ResourceType}}'", map[string]interface{}{"ResourceType": cmd.targetResource.ResourceType}))
 	}
 
-	if cmd.targetResource.BuildpackStack != "" && ResourceType(cmd.targetResource.ResourceType) != Buildpack {
+	if cmd.targetResource.BuildpackStack != "" && resourceType != Buildpack {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
 				cmd.targetResource.ResourceType, "--stack, -s",
@@ -130,10 +135,18 @@ func (cmd *LabelUpdater) validateFlags() error {
 		}
 	}
 
-	if cmd.targetResource.ServiceBroker != "" && ResourceType(cmd.targetResource.ResourceType) != ServiceOffering {
+	if cmd.targetResource.ServiceBroker != "" && !(resourceType == ServiceOffering || resourceType == ServicePlan) {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{
 				cmd.targetResource.ResourceType, "--broker, -b",
+			},
+		}
+	}
+
+	if cmd.targetResource.ServiceOffering != "" && resourceType != ServicePlan {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				cmd.targetResource.ResourceType, "--offering, -o",
 			},
 		}
 	}
@@ -149,8 +162,8 @@ func (cmd *LabelUpdater) displayMessage() {
 		cmd.displayMessageForBuildpack()
 	case Space:
 		cmd.displayMessageForSpace()
-	case ServiceOffering:
-		cmd.displayMessageForServiceOffering()
+	case ServiceOffering, ServicePlan:
+		cmd.displayMessageForServiceCommands()
 	default:
 		cmd.displayMessageDefault()
 	}
@@ -192,20 +205,32 @@ func (cmd *LabelUpdater) displayMessageForBuildpack() {
 	})
 }
 
-func (cmd *LabelUpdater) displayMessageForServiceOffering() {
+func (cmd *LabelUpdater) displayMessageForServiceCommands() {
 	var template string
-	if cmd.targetResource.ServiceBroker == "" {
-		template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}..."
-	} else {
-		template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} from service broker {{.ServiceBroker}} as {{.User}}..."
+	template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}}"
+
+	if cmd.targetResource.ServiceOffering != "" || cmd.targetResource.ServiceBroker != "" {
+		template += " from"
+	}
+	if cmd.targetResource.ServiceOffering != "" {
+		template += " service offering {{.ServiceOffering}}"
+		if cmd.targetResource.ServiceBroker != "" {
+			template += " /"
+		}
 	}
 
+	if cmd.targetResource.ServiceBroker != "" {
+		template += " service broker {{.ServiceBroker}}"
+	}
+
+	template += " as {{.User}}..."
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"Action":        fmt.Sprintf("%s", cmd.Action),
-		"ResourceName":  cmd.targetResource.ResourceName,
-		"ResourceType":  cmd.targetResource.ResourceType,
-		"ServiceBroker": cmd.targetResource.ServiceBroker,
-		"User":          cmd.Username,
+		"Action":          fmt.Sprintf("%s", cmd.Action),
+		"ResourceName":    cmd.targetResource.ResourceName,
+		"ResourceType":    cmd.targetResource.ResourceType,
+		"ServiceBroker":   cmd.targetResource.ServiceBroker,
+		"ServiceOffering": cmd.targetResource.ServiceOffering,
+		"User":            cmd.Username,
 	})
 }
 

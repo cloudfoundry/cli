@@ -28,6 +28,7 @@ const (
 	Stack           ResourceType = "stack"
 	ServiceBroker   ResourceType = "service-broker"
 	ServiceOffering ResourceType = "service-offering"
+	ServicePlan     ResourceType = "service-plan"
 )
 
 //go:generate counterfeiter . LabelsActor

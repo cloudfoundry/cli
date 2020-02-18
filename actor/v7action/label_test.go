@@ -740,6 +740,92 @@ var _ = Describe("labels", func() {
 		})
 	})
 
+	Describe("UpdateServicePlanLabels", func() {
+		const serviceBrokerName = "fake-service-broker"
+		const serviceOfferingName = "fake-service-offering"
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateServicePlanLabels(resourceName, serviceOfferingName, serviceBrokerName, labels)
+		})
+
+		When("there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicePlansReturns(
+					[]ccv3.ServicePlan{{GUID: "some-service-plan-guid", Name: resourceName}},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
+					ccv3.ResourceMetadata{},
+					ccv3.Warnings{"set-service-plan-metadata"},
+					nil,
+				)
+			})
+
+			It("gets the service plan", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{serviceBrokerName}},
+					ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{serviceOfferingName}},
+				))
+			})
+
+			It("sets the service plan labels", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, servicePlanGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
+				Expect(resourceType).To(BeEquivalentTo("service-plan"))
+				Expect(servicePlanGUID).To(BeEquivalentTo("some-service-plan-guid"))
+				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
+			})
+
+			It("aggregates warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-plan-metadata"))
+			})
+		})
+
+		When("there are client errors", func() {
+			When("fetching the service plan fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]ccv3.ServicePlan{},
+						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
+						errors.New("get-service-plan-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-failure-1", "warning-failure-2"))
+					Expect(executeErr).To(MatchError("get-service-plan-error"))
+				})
+			})
+
+			When("updating the service plan fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]ccv3.ServicePlan{{GUID: "some-guid"}},
+						[]string{"warning-1", "warning-2"},
+						nil,
+					)
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
+						ccv3.ResourceMetadata{},
+						ccv3.Warnings{"set-service-plan"},
+						errors.New("update-service-plan-error"),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "set-service-plan"))
+					Expect(executeErr).To(MatchError("update-service-plan-error"))
+				})
+			})
+		})
+	})
+
 	Describe("GetDomainLabels", func() {
 		JustBeforeEach(func() {
 			labels, warnings, executeErr = actor.GetDomainLabels(resourceName)

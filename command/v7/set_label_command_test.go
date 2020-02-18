@@ -46,10 +46,11 @@ var _ = Describe("set-label command", func() {
 			cmd.RequiredArgs = flag.SetLabelArgs{
 				ResourceType: "anything",
 				ResourceName: resourceName,
-				Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+				Labels:       []string{"FOO=BAZ", "FOO=BAR", "ENV=FAKE"},
 			}
 			cmd.BuildpackStack = "some-stack"
 			cmd.ServiceBroker = "some-service-broker"
+			cmd.ServiceOffering = "some-service-offering"
 		})
 
 		It("calls execute with the right parameters", func() {
@@ -62,6 +63,7 @@ var _ = Describe("set-label command", func() {
 			Expect(targetResource.ResourceName).To(Equal(cmd.RequiredArgs.ResourceName))
 			Expect(targetResource.BuildpackStack).To(Equal(cmd.BuildpackStack))
 			Expect(targetResource.ServiceBroker).To(Equal(cmd.ServiceBroker))
+			Expect(targetResource.ServiceOffering).To(Equal(cmd.ServiceOffering))
 			Expect(labels).To(Equal(map[string]types.NullString{
 				"FOO": types.NewNullString("BAR"),
 				"ENV": types.NewNullString("FAKE"),

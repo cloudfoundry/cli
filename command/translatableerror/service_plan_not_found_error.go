@@ -6,6 +6,9 @@ type ServicePlanNotFoundError struct {
 }
 
 func (e ServicePlanNotFoundError) Error() string {
+	if e.ServiceName == "" {
+		return "Service plan '{{.PlanName}}' not found."
+	}
 	return "The plan {{.PlanName}} could not be found for service {{.ServiceName}}"
 }
 

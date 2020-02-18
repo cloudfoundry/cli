@@ -71,6 +71,7 @@ const (
 	GetServiceBrokersRequest                                    = "GetServiceBrokers"
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetServiceOfferingsRequest                                  = "GetServiceOfferings"
+	GetServicePlansRequest                                      = "GetServicePlans"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
 	GetSpacesRequest                                            = "GetSpaces"
@@ -96,6 +97,7 @@ const (
 	PatchRouteRequest                                           = "PatchRoute"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
 	PatchServiceOfferingRequest                                 = "PatchServiceOfferingRequest"
+	PatchServicePlanRequest                                     = "PatchServicePlanRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
 	PatchSpaceRequest                                           = "PatchSpace"
 	PatchSpaceFeaturesRequest                                   = "PatchSpaceFeatures"
@@ -243,6 +245,8 @@ var APIRoutes = []Route{
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteServiceInstanceRelationshipsSharedSpaceRequest},
 	{Resource: ServiceOfferingsResource, Path: "/", Method: http.MethodGet, Name: GetServiceOfferingsRequest},
 	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodPatch, Name: PatchServiceOfferingRequest},
+	{Resource: ServicePlansResource, Path: "/", Method: http.MethodGet, Name: GetServicePlansRequest},
+	{Resource: ServicePlansResource, Path: "/:service_plan_guid", Method: http.MethodPatch, Name: PatchServicePlanRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodPost, Name: PostSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},

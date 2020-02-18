@@ -64,6 +64,12 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   map[string]string{"service_offering_guid": resourceGUID},
 		})
+	case "service-plan":
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.PatchServicePlanRequest,
+			Body:        bytes.NewReader(metadataBytes),
+			URIParams:   map[string]string{"service_plan_guid": resourceGUID},
+		})
 	case "space":
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchSpaceRequest,

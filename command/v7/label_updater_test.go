@@ -19,7 +19,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-func labelSubcommands(without ...string) []TableEntry {
+func labelSubcommands(subcommandsToRemove ...string) []TableEntry {
 	all := []string{
 		"app",
 		"buildpack",
@@ -30,11 +30,19 @@ func labelSubcommands(without ...string) []TableEntry {
 		"stack",
 		"service-broker",
 		"service-offering",
+		"service-plan",
 	}
 	var entries []TableEntry
-	for _, v := range all {
-		if len(without) == 0 || v != without[0] {
-			entries = append(entries, Entry(v, v))
+	for _, labelSubcommand := range all {
+		remove := false
+		for _, subCommand := range subcommandsToRemove {
+			if labelSubcommand == subCommand {
+				remove = true
+				break
+			}
+		}
+		if !remove {
+			entries = append(entries, Entry(labelSubcommand, labelSubcommand))
 		}
 	}
 	return entries
@@ -137,7 +145,7 @@ var _ = Describe("LabelUpdater", func() {
 		)
 
 		DescribeTable(
-			"Failure when --broker is combined with anything other than 'service-offering'",
+			"Failure when --broker is combined with anything other than 'service-offering' or 'service-plan'",
 			func(resourceType string) {
 				targetResource = TargetResource{
 					ResourceType:  resourceType,
@@ -151,7 +159,25 @@ var _ = Describe("LabelUpdater", func() {
 				}
 				Expect(err).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("service-offering")...,
+			labelSubcommands("service-offering", "service-plan")...,
+		)
+
+		DescribeTable(
+			"Failure when --offering is combined with anything other than 'service-plan'",
+			func(resourceType string) {
+				targetResource = TargetResource{
+					ResourceType:    resourceType,
+					ServiceOffering: "my-service-offering",
+				}
+
+				err := cmd.Execute(targetResource, nil)
+
+				argumentCombinationError := translatableerror.ArgumentCombinationError{
+					Args: []string{strings.ToLower(resourceType), "--offering, -o"},
+				}
+				Expect(err).To(MatchError(argumentCombinationError))
+			},
+			labelSubcommands("service-plan")...,
 		)
 
 		DescribeTable(
@@ -986,6 +1012,221 @@ var _ = Describe("LabelUpdater", func() {
 					})
 				})
 			})
+		})
+	})
+
+	When("updating labels on service-plan", func() {
+		var (
+			executeErr error
+		)
+
+		const serviceBrokerName = "brokerName"
+		const serviceOfferingName = "serviceOfferingName"
+		const servicePlanName = "servicePlanName"
+
+		BeforeEach(func() {
+			targetResource = TargetResource{
+				ResourceType: "service-plan",
+				ResourceName: servicePlanName,
+			}
+			labels = map[string]types.NullString{
+				"some-label":     types.NewNullString("some-value"),
+				"some-other-key": types.NewNullString(),
+			}
+
+			fakeConfig.CurrentUserNameReturns("some-user", nil)
+			fakeActor.UpdateServicePlanLabelsReturns(
+				v7action.Warnings{"some-warning-1", "some-warning-2"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(targetResource, labels)
+		})
+
+		When("updating the labels succeeds", func() {
+			It("does not return an error and prints all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
+			It("passes the correct parameters into the actor", func() {
+				Expect(fakeActor.UpdateServicePlanLabelsCallCount()).To(Equal(1))
+				gotServicePlanName, gotServiceOfferingName, gotBrokerName, gotLabelsMap := fakeActor.UpdateServicePlanLabelsArgsForCall(0)
+				Expect(gotServicePlanName).To(Equal(servicePlanName))
+				Expect(gotServiceOfferingName).To(BeEmpty())
+				Expect(gotBrokerName).To(BeEmpty())
+				Expect(gotLabelsMap).To(Equal(labels))
+			})
+
+			When("a service broker name is specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceBroker = serviceBrokerName
+				})
+
+				It("passes the broker name", func() {
+					Expect(fakeActor.UpdateServicePlanLabelsCallCount()).To(Equal(1))
+					_, _, gotBrokerName, _ := fakeActor.UpdateServicePlanLabelsArgsForCall(0)
+					Expect(gotBrokerName).To(Equal(serviceBrokerName))
+				})
+			})
+
+			When("a service offering name is specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceOffering = serviceOfferingName
+				})
+
+				It("passes the broker name", func() {
+					Expect(fakeActor.UpdateServicePlanLabelsCallCount()).To(Equal(1))
+					_, gotOfferingName, _, _ := fakeActor.UpdateServicePlanLabelsArgsForCall(0)
+					Expect(gotOfferingName).To(Equal(serviceOfferingName))
+				})
+			})
+		})
+
+		When("the resource type argument is not lowercase", func() {
+			BeforeEach(func() {
+				targetResource.ResourceType = "Service-PlAN"
+			})
+
+			It("calls the right actor", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.UpdateServicePlanLabelsCallCount()).To(Equal(1))
+			})
+
+			It("displays a message in the right case", func() {
+				Expect(testUI.Out).To(Say("(.*) label\\(s\\) for service-plan (.*)"))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("updating the labels fails", func() {
+			BeforeEach(func() {
+				fakeActor.UpdateServicePlanLabelsReturns(
+					v7action.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("api call failed"),
+				)
+			})
+
+			It("returns the error and prints all warnings", func() {
+				Expect(executeErr).To(MatchError("api call failed"))
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+		})
+
+		Context("shows the right update message", func() {
+			When("no extra flags are specified", func() {
+				When("Unsetting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Unset
+					})
+
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-plan %s as some-user...`), servicePlanName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("Setting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Set
+					})
+
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s as some-user...`), servicePlanName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+			})
+
+			When("the broker name is specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceBroker = serviceBrokerName
+				})
+
+				When("Unsetting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Unset
+					})
+
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-plan %s from service broker %s as some-user...`), servicePlanName, serviceBrokerName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("Setting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Set
+					})
+
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s from service broker %s as some-user...`), servicePlanName, serviceBrokerName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+			})
+
+			When("the offering name is specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceOffering = serviceOfferingName
+				})
+
+				When("Unsetting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Unset
+					})
+
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-plan %s from service offering %s as some-user...`), servicePlanName, serviceOfferingName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("Setting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Set
+					})
+
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s from service offering %s as some-user...`), servicePlanName, serviceOfferingName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+			})
+
+			When("both the offering name and the broker name are specified", func() {
+				BeforeEach(func() {
+					targetResource.ServiceBroker = serviceBrokerName
+					targetResource.ServiceOffering = serviceOfferingName
+				})
+
+				When("Unsetting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Unset
+					})
+
+					It("shows 'Removing' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Removing label(s) for service-plan %s from service offering %s / service broker %s as some-user...`), servicePlanName, serviceOfferingName, serviceBrokerName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("Setting labels", func() {
+					BeforeEach(func() {
+						cmd.Action = Set
+					})
+
+					It("shows 'Setting' as action", func() {
+						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s from service offering %s / service broker %s as some-user...`), servicePlanName, serviceOfferingName, serviceBrokerName))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+			})
+
 		})
 	})
 

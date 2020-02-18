@@ -134,6 +134,14 @@ func (actor *Actor) UpdateServiceOfferingLabels(serviceOfferingName string, serv
 	return actor.updateResourceMetadata("service-offering", serviceOffering.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
+func (actor *Actor) UpdateServicePlanLabels(servicePlanName string, serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
+	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(servicePlanName, serviceOfferingName, serviceBrokerName)
+	if err != nil {
+		return warnings, err
+	}
+	return actor.updateResourceMetadata("service-plan", servicePlan.GUID, ccv3.Metadata{Labels: labels}, warnings)
+}
+
 func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
 	return append(warnings, updateWarnings...), err
