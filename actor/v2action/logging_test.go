@@ -10,8 +10,6 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	"github.com/cloudfoundry/sonde-go/events"
@@ -23,14 +21,12 @@ var _ = Describe("Logging Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
-		fakeUAAClient             *v2actionfakes.FakeUAAClient
 		fakeConfig                *v2actionfakes.FakeConfig
-
-		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
+		fakeLogCacheClient        *sharedactionfakes.FakeLogCacheClient
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, fakeUAAClient, fakeConfig = NewTestActor()
+		actor, fakeCloudControllerClient, _, fakeConfig = NewTestActor()
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
@@ -417,180 +413,5 @@ var _ = Describe("Logging Actions", func() {
 				Expect(fakeLogCacheClient.ReadCallCount()).To(Equal(0))
 			})
 		})
-	})
-
-	Describe("ScheduleTokenRefresh", func() {
-		var (
-			stop                   chan struct{}
-			stoppedRefreshingToken chan struct{}
-			ticker                 chan time.Time
-			after                  func(time.Duration) <-chan time.Time
-			delay                  chan time.Duration
-			errChannel             <-chan error
-			err                    error
-		)
-
-		BeforeEach(func() {
-			fakeConfig.RefreshTokenReturns(helpers.BuildTokenString(time.Now().Add(5 * time.Minute)))
-			ticker = make(chan time.Time)
-			delay = make(chan time.Duration, 100)
-			after = func(t time.Duration) <-chan time.Time {
-				delay <- t
-				return ticker
-			}
-		})
-
-		JustBeforeEach(func() {
-			stop = make(chan struct{})
-			stoppedRefreshingToken = make(chan struct{})
-			errChannel, err = actor.ScheduleTokenRefresh(after, stop, stoppedRefreshingToken)
-		})
-
-		AfterEach(func() {
-			if stop != nil {
-				close(stop)
-			}
-		})
-
-		When("the access token is not expiring soon", func() {
-			BeforeEach(func() {
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(5 * time.Minute)))
-			})
-
-			It("does not refresh the access token", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
-			})
-		})
-
-		When("the access token is expiring soon", func() {
-			BeforeEach(func() {
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken: helpers.BuildTokenString(time.Now().Add(5 * time.Minute)),
-					Type:        "bearer",
-				}, nil)
-			})
-
-			It("refreshes the access token", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
-			})
-		})
-
-		When("the access token has already expired", func() {
-			BeforeEach(func() {
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(-30 * time.Second)))
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken: helpers.BuildTokenString(time.Now().Add(5 * time.Minute)),
-					Type:        "bearer",
-				}, nil)
-			})
-
-			It("refreshes the access token", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
-			})
-
-			When("and the attempt to refresh the access token fails", func() {
-				BeforeEach(func() {
-					fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{}, errors.New("some error"))
-				})
-
-				It("will not refresh the access token", func() {
-					Expect(err).To(MatchError("some error"))
-				})
-			})
-		})
-
-		When("the access token expires while we are streaming logs", func() {
-
-			BeforeEach(func() {
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(2 * time.Minute)))
-				fakeConfig.RefreshTokenReturns(helpers.BuildTokenString(time.Now().Add(2 * time.Minute)))
-			})
-
-			JustBeforeEach(func() {
-				stop = make(chan struct{})
-				stoppedRefreshingToken = make(chan struct{})
-				errChannel, err = actor.ScheduleTokenRefresh(after, stop, stoppedRefreshingToken)
-			})
-
-			It("refreshes the access token", func() {
-				Expect(err).NotTo(HaveOccurred())
-
-				By("not initially refreshing the token when it is unnecessary")
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
-
-				By("refreshing the first access token when it is expiring soon")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
-				ticker <- time.Time{}
-				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(1))
-
-				By("not refreshing the second access token when it is not close to expiry")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(90 * time.Second)))
-				ticker <- time.Time{}
-				Consistently(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(1))
-
-				By("refreshing the second access token when it is near to expiry")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
-				ticker <- time.Time{}
-				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(2))
-			})
-
-			It("sleeps until the token is approaching expiry", func() {
-				Expect(err).NotTo(HaveOccurred())
-
-				By("not initially refreshing the token when it is unnecessary")
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
-
-				By("refreshing the first access token when it is expiring soon")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken: helpers.BuildTokenString(time.Now().Add(30 * time.Second)),
-					Type:        "bearer",
-				}, nil)
-
-				ticker <- time.Time{}
-				Eventually(delay).Should(Receive(BeNumerically("~", 27*time.Second, time.Second)))
-
-				By("using the expiry time of the token to calculate the sleep delay")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(10 * time.Second)))
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken: helpers.BuildTokenString(time.Now().Add(10 * time.Second)),
-					Type:        "bearer",
-				}, nil)
-				ticker <- time.Time{}
-				Eventually(delay).Should(Receive(BeNumerically("~", 9*time.Second, time.Second)))
-			})
-
-			When("and the token refresh errors", func() {
-				BeforeEach(func() {
-					fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{}, errors.New("some error"))
-				})
-				It("propagates the error to the caller", func() {
-					Expect(err).NotTo(HaveOccurred())
-					Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
-					fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
-					go func() {
-						Eventually(errChannel).Should(Receive(MatchError("some error")))
-					}()
-					ticker <- time.Time{}
-					Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(1))
-				})
-			})
-
-			When("token refreshing is stopped", func() {
-				It("closes a channel to indicate it has finished", func() {
-					close(stop)
-					Eventually(stoppedRefreshingToken).Should(BeClosed())
-				})
-				AfterEach(func() {
-					stop = nil
-				})
-			})
-
-		})
-
 	})
 })

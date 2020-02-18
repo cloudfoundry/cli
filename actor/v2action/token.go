@@ -2,37 +2,21 @@ package v2action
 
 import (
 	"strings"
-	"time"
 
 	"github.com/SermoDigital/jose/jws"
 	"github.com/SermoDigital/jose/jwt"
 )
 
 func (actor Actor) RefreshAccessToken(refreshToken string) (string, error) {
-	var expiresIn time.Duration
-
-	accessTokenString := strings.TrimPrefix(actor.Config.AccessToken(), "bearer ")
-	token, err := jws.ParseJWT([]byte(accessTokenString))
-
-	if err == nil {
-		expiration, ok := token.Claims().Expiration()
-		if ok {
-			expiresIn = time.Until(expiration)
-		}
+	tokens, err := actor.UAAClient.RefreshAccessToken(refreshToken)
+	if err != nil {
+		return "", err
 	}
 
-	if err != nil || expiresIn < time.Minute {
-		tokens, err := actor.UAAClient.RefreshAccessToken(refreshToken)
-		if err != nil {
-			return "", err
-		}
+	actor.Config.SetAccessToken(tokens.AuthorizationToken())
+	actor.Config.SetRefreshToken(tokens.RefreshToken)
 
-		actor.Config.SetAccessToken(tokens.AuthorizationToken())
-		actor.Config.SetRefreshToken(tokens.RefreshToken)
-
-		return tokens.AuthorizationToken(), nil
-	}
-	return actor.Config.AccessToken(), nil
+	return tokens.AuthorizationToken(), nil
 }
 
 func (actor Actor) ParseAccessToken(accessToken string) (jwt.JWT, error) {
