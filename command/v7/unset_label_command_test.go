@@ -31,6 +31,7 @@ var _ = Describe("unset-label command", func() {
 		}
 		cmd.BuildpackStack = "some-stack"
 		cmd.ServiceBroker = "some-service-broker"
+		cmd.ServiceOffering = "some-service-offering"
 	})
 
 	It("calls execute with the right parameters", func() {
@@ -43,6 +44,7 @@ var _ = Describe("unset-label command", func() {
 		Expect(targetResource.ResourceName).To(Equal(cmd.RequiredArgs.ResourceName))
 		Expect(targetResource.BuildpackStack).To(Equal(cmd.BuildpackStack))
 		Expect(targetResource.ServiceBroker).To(Equal(cmd.ServiceBroker))
+		Expect(targetResource.ServiceOffering).To(Equal(cmd.ServiceOffering))
 		Expect(keys).To(Equal(map[string]types.NullString{
 			"FOO": types.NewNullString(),
 			"ENV": types.NewNullString(),

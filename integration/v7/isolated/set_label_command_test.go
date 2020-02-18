@@ -47,7 +47,8 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+stack`))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
-				Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings with the same name`))
+				Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings or service plans with the same name`))
+				Eventually(session).Should(Say(`\s+--offering, -o\s+Specify a service offering to disambiguate service plans with the same name`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say(`\s+labels, unset-label`))
 
