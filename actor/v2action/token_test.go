@@ -2,12 +2,10 @@ package v2action_test
 
 import (
 	"errors"
-	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -26,107 +24,49 @@ var _ = Describe("Token Actions", func() {
 	})
 
 	Describe("RefreshAccessToken", func() {
-		var (
-			accessToken string
-			err         error
-		)
+		When("an error is encountered refreshing the access token", func() {
+			var expectedErr error
 
-		JustBeforeEach(func() {
-			accessToken, err = actor.RefreshAccessToken("existing-refresh-token")
-		})
-
-		When("the access token is invalid", func() {
 			BeforeEach(func() {
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken:  "some-token",
-					Type:         "bearer",
-					RefreshToken: "new-refresh-token",
-				}, nil)
-
-				fakeConfig.AccessTokenReturns("im a bad token :(")
+				expectedErr = errors.New("refresh tokens error")
+				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{}, expectedErr)
 			})
 
-			It("returns the new access token from the uaa client", func() {
-				Expect(err).ToNot(HaveOccurred())
+			It("does not save any tokens to config and returns the error", func() {
+				_, err := actor.RefreshAccessToken("existing-refresh-token")
+				Expect(err).To(MatchError(expectedErr))
+
 				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
 				Expect(fakeUAAClient.RefreshAccessTokenArgsForCall(0)).To(Equal("existing-refresh-token"))
-				Expect(accessToken).To(Equal("bearer some-token"))
-			})
 
-			It("updates the config with the refreshed tokens", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeConfig.SetAccessTokenCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetRefreshTokenCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetAccessTokenArgsForCall(0)).To(Equal("bearer some-token"))
-				Expect(fakeConfig.SetRefreshTokenArgsForCall(0)).To(Equal("new-refresh-token"))
+				Expect(fakeConfig.SetRefreshTokenCallCount()).To(Equal(0))
 			})
 		})
 
-		When("the token is not about to expire", func() {
-			var notExpiringAccessToken string
+		When("no errors are encountered refreshing the access token", func() {
 			BeforeEach(func() {
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken: "some-token",
-					Type:        "bearer",
-				}, nil)
-
-				notExpiringAccessToken = helpers.BuildTokenString(time.Now().AddDate(5, 0, 0))
-				fakeConfig.AccessTokenReturns(notExpiringAccessToken)
+				fakeUAAClient.RefreshAccessTokenReturns(
+					uaa.RefreshedTokens{
+						AccessToken:  "new-access-token",
+						RefreshToken: "new-refresh-token",
+						Type:         "bob",
+					},
+					nil)
 			})
 
-			It("returns the current access token without refreshing it", func() {
+			It("saves the new access and refresh tokens in the config and returns the access token", func() {
+				accessToken, err := actor.RefreshAccessToken("existing-refresh-token")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
-				Expect(accessToken).To(Equal(notExpiringAccessToken))
-			})
+				Expect(accessToken).To(Equal("bob new-access-token"))
 
-		})
-
-		When("the access token is about to expire", func() {
-			BeforeEach(func() {
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken:  "some-token",
-					RefreshToken: "new-refresh-token",
-					Type:         "bearer",
-				}, nil)
-
-				expiringAccessToken := helpers.BuildTokenString(time.Now().Add(5))
-				fakeConfig.AccessTokenReturns(expiringAccessToken)
-			})
-
-			It("returns the new access token from the uaa client", func() {
-				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
 				Expect(fakeUAAClient.RefreshAccessTokenArgsForCall(0)).To(Equal("existing-refresh-token"))
-				Expect(accessToken).To(Equal("bearer some-token"))
-			})
 
-			It("updates the config with the refreshed tokens", func() {
-				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeConfig.SetAccessTokenCallCount()).To(Equal(1))
+				Expect(fakeConfig.SetAccessTokenArgsForCall(0)).To(Equal("bob new-access-token"))
+
 				Expect(fakeConfig.SetRefreshTokenCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetAccessTokenArgsForCall(0)).To(Equal("bearer some-token"))
 				Expect(fakeConfig.SetRefreshTokenArgsForCall(0)).To(Equal("new-refresh-token"))
-			})
-
-			When("refreshing the access token fails", func() {
-				BeforeEach(func() {
-					fakeUAAClient.RefreshAccessTokenReturns(
-						uaa.RefreshedTokens{},
-						errors.New("I'm still an error!"),
-					)
-				})
-
-				It("returns that error", func() {
-					Expect(err).To(MatchError("I'm still an error!"))
-					Expect(accessToken).To(Equal(""), "AccessToken was not equal to \"\"")
-
-					Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
-					Expect(fakeUAAClient.RefreshAccessTokenArgsForCall(0)).To(Equal("existing-refresh-token"))
-
-					Expect(fakeConfig.SetAccessTokenCallCount()).To(Equal(0))
-					Expect(fakeConfig.SetRefreshTokenCallCount()).To(Equal(0))
-				})
 			})
 		})
 	})

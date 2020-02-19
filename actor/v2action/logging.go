@@ -59,6 +59,7 @@ func (actor Actor) ScheduleTokenRefresh(
 
 	timeToRefresh, err := actor.refreshAccessTokenIfNecessary()
 	if err != nil {
+		close(stoppedRefreshingToken)
 		return nil, err
 	}
 
@@ -84,14 +85,35 @@ func (actor Actor) ScheduleTokenRefresh(
 	return refreshErrs, nil
 }
 
-func (actor Actor) refreshAccessTokenIfNecessary() (*time.Duration, error) {
-	accessTokenString, err := actor.RefreshAccessToken(actor.Config.RefreshToken())
+func (actor Actor) tokenExpiryTime(accessToken string) (*time.Duration, error) {
+	var expiresIn time.Duration
+
+	accessTokenString := strings.TrimPrefix(accessToken, "bearer ")
+	token, err := jws.ParseJWT([]byte(accessTokenString))
 	if err != nil {
 		return nil, err
 	}
 
-	accessTokenString = strings.TrimPrefix(accessTokenString, "bearer ")
-	token, err := jws.ParseJWT([]byte(accessTokenString))
+	expiration, ok := token.Claims().Expiration()
+	if ok {
+		expiresIn = time.Until(expiration)
+	}
+	return &expiresIn, nil
+}
+
+func (actor Actor) refreshAccessTokenIfNecessary() (*time.Duration, error) {
+	accessToken := actor.Config.AccessToken()
+
+	duration, err := actor.tokenExpiryTime(accessToken)
+	if err != nil || *duration < time.Minute {
+		accessToken, err = actor.RefreshAccessToken(actor.Config.RefreshToken())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	accessToken = strings.TrimPrefix(accessToken, "bearer ")
+	token, err := jws.ParseJWT([]byte(accessToken))
 	if err != nil {
 		return nil, err
 	}

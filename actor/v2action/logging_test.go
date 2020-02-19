@@ -500,6 +500,27 @@ var _ = Describe("Logging Actions", func() {
 				It("will not refresh the access token", func() {
 					Expect(err).To(MatchError("some error"))
 				})
+				It("closes a channel to indicate it has finished", func() {
+					close(stop)
+					Eventually(stoppedRefreshingToken).Should(BeClosed())
+				})
+				AfterEach(func() {
+					stop = nil
+				})
+			})
+		})
+
+		When("the access token is invalid", func() {
+			BeforeEach(func() {
+				fakeConfig.AccessTokenReturns("bogus-access-token")
+				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+					AccessToken: helpers.BuildTokenString(time.Now().Add(5 * time.Minute)),
+					Type:        "bearer",
+				}, nil)
+			})
+			It("refreshes the access token", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(1))
 			})
 		})
 
