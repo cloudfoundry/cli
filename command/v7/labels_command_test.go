@@ -84,7 +84,7 @@ var _ = Describe("labels command", func() {
 		)
 
 		DescribeTable(
-			"Failure when --broker is combined with anything other than 'service-offering'",
+			"Failure when --broker is combined with anything other than 'service-offering' or 'service-plan'",
 			func(resourceType string) {
 				cmd.RequiredArgs.ResourceType = resourceType
 				cmd.ServiceBroker = "a-service-broker"
@@ -96,7 +96,23 @@ var _ = Describe("labels command", func() {
 				}
 				Expect(executeErr).To(MatchError(argumentCombinationError))
 			},
-			labelSubcommands("service-offering")...,
+			labelSubcommands("service-offering", "service-plan")...,
+		)
+
+		DescribeTable(
+			"Failure when --offering is combined with anything other than 'service-plan'",
+			func(resourceType string) {
+				cmd.RequiredArgs.ResourceType = resourceType
+				cmd.ServiceOffering = "my-service-offering"
+
+				err := cmd.Execute(nil)
+
+				argumentCombinationError := translatableerror.ArgumentCombinationError{
+					Args: []string{strings.ToLower(resourceType), "--offering, -o"},
+				}
+				Expect(err).To(MatchError(argumentCombinationError))
+			},
+			labelSubcommands("service-plan")...,
 		)
 
 		DescribeTable(
@@ -107,7 +123,32 @@ var _ = Describe("labels command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).To(MatchError("Target not found"))
 			},
-			labelSubcommands("service-plan")..., // FIXME: add service-plan back
+			labelSubcommands()...,
+		)
+
+		DescribeTable(
+			"checking that the user is logged in",
+			func(resourceType string) {
+				cmd.RequiredArgs.ResourceType = resourceType
+				err := cmd.Execute(nil)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+
+				switch resourceType {
+				case "app", "route":
+					Expect(checkOrg).To(BeTrue())
+					Expect(checkSpace).To(BeTrue())
+				case "space":
+					Expect(checkOrg).To(BeTrue())
+					Expect(checkSpace).To(BeFalse())
+				default:
+					Expect(checkOrg).To(BeFalse())
+					Expect(checkSpace).To(BeFalse())
+				}
+			},
+			labelSubcommands()...,
 		)
 
 		type MethodCallCountType func() int
@@ -129,6 +170,7 @@ var _ = Describe("labels command", func() {
 						"rOuTe":            fakeLabelsActor.GetRouteLabelsCallCount,
 						"sErViCe-BrOkEr":   fakeLabelsActor.GetServiceBrokerLabelsCallCount,
 						"serVice-OfferIng": fakeLabelsActor.GetServiceOfferingLabelsCallCount,
+						"serVice-PlAn":     fakeLabelsActor.GetServicePlanLabelsCallCount,
 						"sPaCe":            fakeLabelsActor.GetSpaceLabelsCallCount,
 						"sTaCk":            fakeLabelsActor.GetStackLabelsCallCount,
 					}
@@ -169,16 +211,8 @@ var _ = Describe("labels command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
-			It("checks that the user is logged in and targeted to an org and space", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeTrue())
-				Expect(checkSpace).To(BeTrue())
-			})
-
 			It("displays a message that it is retrieving the labels", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for app dora in org fake-org / space fake-space as some-user...`)))
 			})
 
@@ -253,13 +287,6 @@ var _ = Describe("labels command", func() {
 
 			It("doesn't error", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-			})
-
-			It("checks that the user is logged in", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeFalse())
-				Expect(checkSpace).To(BeFalse())
 			})
 
 			It("displays a message that it is retrieving the labels", func() {
@@ -340,16 +367,8 @@ var _ = Describe("labels command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
-			It("checks that the user is logged in", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeFalse())
-				Expect(checkSpace).To(BeFalse())
-			})
-
 			It("displays a message that it is retrieving the labels", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for org fake-org as some-user...`)))
 			})
 
@@ -424,13 +443,6 @@ var _ = Describe("labels command", func() {
 
 			It("doesn't error", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-			})
-
-			It("checks that the user is logged in", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeTrue())
-				Expect(checkSpace).To(BeTrue())
 			})
 
 			It("displays a message that it is retrieving the labels", func() {
@@ -513,16 +525,8 @@ var _ = Describe("labels command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
-			It("checks that the user is logged in and targetted to an org", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeTrue())
-				Expect(checkSpace).To(BeFalse())
-			})
-
 			It("displays a message that it is retrieving the labels", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for space fake-space in org fake-org as some-user...`)))
 			})
 
@@ -597,16 +601,8 @@ var _ = Describe("labels command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
-			It("checks that the user is logged in", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeFalse())
-				Expect(checkSpace).To(BeFalse())
-			})
-
 			It("displays a message that it is retrieving the labels", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for stack fake-stack as some-user...`)))
 			})
 
@@ -681,13 +677,6 @@ var _ = Describe("labels command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
-			It("checks that the user is logged in", func() {
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(checkOrg).To(BeFalse())
-				Expect(checkSpace).To(BeFalse())
-			})
-
 			Describe("the getting-labels message", func() {
 				When("the buildpack stack is not specified", func() {
 					BeforeEach(func() {
@@ -696,7 +685,6 @@ var _ = Describe("labels command", func() {
 
 					It("displays a message that it is retrieving the labels", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for buildpack my-buildpack as some-user...`)))
 					})
 				})
@@ -708,7 +696,6 @@ var _ = Describe("labels command", func() {
 
 					It("displays a message that it is retrieving the labels", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for buildpack my-buildpack with stack omelette as some-user...`)))
 					})
 				})
@@ -844,14 +831,6 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Err).To(Say("some-warning-2"))
 
 				})
-
-				It("checks that the user is logged in", func() {
-					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-					checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-					Expect(checkOrg).To(BeFalse())
-					Expect(checkSpace).To(BeFalse())
-				})
-
 			})
 		})
 
@@ -921,13 +900,6 @@ var _ = Describe("labels command", func() {
 					Expect(testUI.Err).To(Say("some-warning-2"))
 				})
 
-				It("checks that the user is logged in", func() {
-					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-					checkOrg, checkSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-					Expect(checkOrg).To(BeFalse())
-					Expect(checkSpace).To(BeFalse())
-				})
-
 				When("a service broker name is specified", func() {
 					BeforeEach(func() {
 						cmd.ServiceBroker = "my-service-broker"
@@ -942,6 +914,116 @@ var _ = Describe("labels command", func() {
 
 					It("displays a message that it is retrieving the labels", func() {
 						Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-offering my-service-offering from service broker my-service-broker as some-user...`)))
+					})
+				})
+			})
+		})
+
+		Describe("for service-plans", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+
+				cmd.RequiredArgs = flag.LabelsArgs{
+					ResourceType: "service-plan",
+					ResourceName: "my-service-plan",
+				}
+			})
+
+			When("there is an error fetching the labels", func() {
+				BeforeEach(func() {
+					fakeLabelsActor.GetServicePlanLabelsReturns(
+						map[string]types.NullString{},
+						v7action.Warnings([]string{"a warning"}),
+						errors.New("some random error"),
+					)
+				})
+
+				It("returns an error and prints all warnings", func() {
+					Expect(executeErr).To(MatchError("some random error"))
+					Expect(testUI.Err).To(Say("a warning"))
+				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say("Getting labels for service-plan my-service-plan as some-user..."))
+				})
+			})
+
+			When("service plan has labels", func() {
+				var labels map[string]types.NullString
+				BeforeEach(func() {
+					labels = map[string]types.NullString{
+						"some-other-label": types.NewNullString("some-other-value"),
+						"some-label":       types.NewNullString("some-value"),
+					}
+
+					fakeLabelsActor.GetServicePlanLabelsReturns(
+						labels,
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						nil,
+					)
+				})
+
+				It("queries the right names", func() {
+					Expect(fakeLabelsActor.GetServicePlanLabelsCallCount()).To(Equal(1))
+					servicePlanName, serviceOfferingName, serviceBrokerName := fakeLabelsActor.GetServicePlanLabelsArgsForCall(0)
+					Expect(servicePlanName).To(Equal("my-service-plan"))
+					Expect(serviceOfferingName).To(Equal(""))
+					Expect(serviceBrokerName).To(Equal(""))
+				})
+
+				It("displays a message that it is retrieving the labels", func() {
+					Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-plan my-service-plan as some-user...`)))
+				})
+
+				It("retrieves the labels alphabetically", func() {
+					Expect(testUI.Out).To(Say(`key\s+value`))
+					Expect(testUI.Out).To(Say(`some-label\s+some-value`))
+					Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+				})
+
+				It("prints all the warnings", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+
+				Context("command options", func() {
+					Context("service broker and service offering", func() {
+						BeforeEach(func() {
+							cmd.ServiceBroker = "my-service-broker"
+							cmd.ServiceOffering = "my-service-offering"
+						})
+
+						It("queries the right names", func() {
+							Expect(fakeLabelsActor.GetServicePlanLabelsCallCount()).To(Equal(1))
+							servicePlanName, serviceOfferingName, serviceBrokerName := fakeLabelsActor.GetServicePlanLabelsArgsForCall(0)
+							Expect(servicePlanName).To(Equal("my-service-plan"))
+							Expect(serviceBrokerName).To(Equal("my-service-broker"))
+							Expect(serviceOfferingName).To(Equal("my-service-offering"))
+						})
+
+						It("displays a message that it is retrieving the labels", func() {
+							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-plan my-service-plan from service offering my-service-offering / service broker my-service-broker as some-user...`)))
+						})
+					})
+
+					Context("service broker", func() {
+						BeforeEach(func() {
+							cmd.ServiceBroker = "my-service-broker"
+						})
+
+						It("displays a message that it is retrieving the labels", func() {
+							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-plan my-service-plan from service broker my-service-broker as some-user...`)))
+						})
+					})
+
+					Context("service offering", func() {
+						BeforeEach(func() {
+							cmd.ServiceOffering = "my-service-offering"
+						})
+
+						It("displays a message that it is retrieving the labels", func() {
+							Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for service-plan my-service-plan from service offering my-service-offering as some-user...`)))
+						})
 					})
 				})
 			})

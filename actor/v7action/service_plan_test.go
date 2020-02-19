@@ -23,9 +23,7 @@ var _ = Describe("Service Plan Actions", func() {
 	})
 
 	Describe("GetServicePlanByNameOfferingAndBroker", func() {
-		const (
-			servicePlanName = "myServicePlan"
-		)
+		const servicePlanName = "myServicePlan"
 
 		var (
 			servicePlan         ServicePlan
@@ -114,12 +112,12 @@ var _ = Describe("Service Plan Actions", func() {
 				fakeCloudControllerClient.GetServicePlansReturns(
 					nil,
 					ccv3.Warnings{"some-service-plan-warning"},
-					errors.New("no service plan"),
+					errors.New("random error"),
 				)
 			})
 
 			It("returns an error and warnings", func() {
-				Expect(executionError).To(MatchError("no service plan"))
+				Expect(executionError).To(MatchError("random error"))
 				Expect(warnings).To(ConsistOf("some-service-plan-warning"))
 			})
 		})
@@ -139,7 +137,7 @@ var _ = Describe("Service Plan Actions", func() {
 				}, ccv3.Warnings{"some-service-plan-warning"}, nil)
 			})
 
-			It("queries only on the service plan and offering name", func() {
+			It("queries on the service plan and offering name", func() {
 				Expect(warnings).To(ConsistOf("some-service-plan-warning"))
 				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
@@ -148,12 +146,14 @@ var _ = Describe("Service Plan Actions", func() {
 				))
 			})
 
-			When("It returns multiple results", func() {
+			When("it returns multiple results", func() {
 				It("returns an error with the right hint", func() {
-					Expect(executionError).To(MatchError(actionerror.DuplicateServicePlanError{Name: servicePlanName, ServiceOfferingName: serviceOfferingName}))
+					Expect(executionError).To(MatchError(actionerror.DuplicateServicePlanError{
+						Name:                servicePlanName,
+						ServiceOfferingName: serviceOfferingName,
+					}))
 				})
 			})
-
 		})
 
 		When("the broker name is provided", func() {
@@ -171,7 +171,7 @@ var _ = Describe("Service Plan Actions", func() {
 				}, ccv3.Warnings{"some-service-plan-warning"}, nil)
 			})
 
-			It("queries only on the service plan name", func() {
+			It("queries on the service plan name and the broker name", func() {
 				Expect(warnings).To(ConsistOf("some-service-plan-warning"))
 				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
@@ -180,12 +180,51 @@ var _ = Describe("Service Plan Actions", func() {
 				))
 			})
 
-			When("It returns multiple results", func() {
+			When("it returns multiple results", func() {
 				It("returns an error with the right hint", func() {
-					Expect(executionError).To(MatchError(actionerror.DuplicateServicePlanError{Name: servicePlanName, ServiceBrokerName: serviceBrokerName}))
+					Expect(executionError).To(MatchError(actionerror.DuplicateServicePlanError{
+						Name:              servicePlanName,
+						ServiceBrokerName: serviceBrokerName,
+					}))
 				})
 			})
+		})
 
+		When("the broker and offering name are provided", func() {
+			BeforeEach(func() {
+				serviceOfferingName = "some-offering-name"
+				serviceBrokerName = "some-broker-name"
+				fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{
+					{
+						Name: "some-service-plan",
+						GUID: "some-service-plan-guid",
+					},
+					{
+						Name: "some-service-plan",
+						GUID: "other-some-service-plan-guid",
+					},
+				}, ccv3.Warnings{"some-service-plan-warning"}, nil)
+			})
+
+			It("queries on the service plan, offering and broker names", func() {
+				Expect(warnings).To(ConsistOf("some-service-plan-warning"))
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{servicePlanName}},
+					ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{serviceOfferingName}},
+					ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{serviceBrokerName}},
+				))
+			})
+
+			When("it returns multiple results", func() {
+				It("returns an error with the right hint", func() {
+					Expect(executionError).To(MatchError(actionerror.DuplicateServicePlanError{
+						Name:                servicePlanName,
+						ServiceOfferingName: serviceOfferingName,
+						ServiceBrokerName:   serviceBrokerName,
+					}))
+				})
+			})
 		})
 	})
 })

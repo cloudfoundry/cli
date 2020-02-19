@@ -1198,12 +1198,90 @@ var _ = Describe("labels", func() {
 				))
 			})
 
-			It("returns labels associated with the service broker as well as warnings", func() {
+			It("returns labels associated with the service offering as well as warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(labels).To(Equal(expectedLabels))
 			})
 		})
+	})
 
+	Describe("GetServicePlanLabels", func() {
+		When("service plan does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicePlansReturns(
+					[]ccv3.ServicePlan{},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServicePlanLabels(resourceName, "", "")
+			})
+
+			It("returns a service plan not found error and warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(executeErr.Error()).To(ContainSubstring("Service plan '%s' not found", resourceName))
+			})
+		})
+
+		When("client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicePlansReturns(
+					[]ccv3.ServicePlan{},
+					[]string{"warning"},
+					errors.New("some random error"),
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServicePlanLabels(resourceName, "", "")
+			})
+
+			It("returns error and prints warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning"))
+				Expect(executeErr).To(MatchError("some random error"))
+			})
+		})
+
+		When("service plan has labels", func() {
+			var expectedLabels map[string]types.NullString
+
+			BeforeEach(func() {
+				expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
+				fakeCloudControllerClient.GetServicePlansReturns(
+					[]ccv3.ServicePlan{{
+						GUID: "some-guid",
+						Name: resourceName,
+						Metadata: &ccv3.Metadata{
+							Labels: expectedLabels,
+						}}},
+					[]string{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				labels, warnings, executeErr = actor.GetServicePlanLabels(resourceName, "serviceOfferingName", "serviceBrokerName")
+			})
+
+			It("queries the right names", func() {
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{resourceName}},
+					ccv3.Query{Key: ccv3.ServiceOfferingNamesFilter, Values: []string{"serviceOfferingName"}},
+					ccv3.Query{Key: ccv3.ServiceBrokerNamesFilter, Values: []string{"serviceBrokerName"}},
+				))
+			})
+
+			It("returns labels associated with the service plan as well as warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(labels).To(Equal(expectedLabels))
+			})
+		})
 	})
 })

@@ -119,6 +119,23 @@ type FakeLabelsActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetServicePlanLabelsStub        func(string, string, string) (map[string]types.NullString, v7action.Warnings, error)
+	getServicePlanLabelsMutex       sync.RWMutex
+	getServicePlanLabelsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	getServicePlanLabelsReturns struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
+	getServicePlanLabelsReturnsOnCall map[int]struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetSpaceLabelsStub        func(string, string) (map[string]types.NullString, v7action.Warnings, error)
 	getSpaceLabelsMutex       sync.RWMutex
 	getSpaceLabelsArgsForCall []struct {
@@ -620,6 +637,74 @@ func (fake *FakeLabelsActor) GetServiceOfferingLabelsReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
+func (fake *FakeLabelsActor) GetServicePlanLabels(arg1 string, arg2 string, arg3 string) (map[string]types.NullString, v7action.Warnings, error) {
+	fake.getServicePlanLabelsMutex.Lock()
+	ret, specificReturn := fake.getServicePlanLabelsReturnsOnCall[len(fake.getServicePlanLabelsArgsForCall)]
+	fake.getServicePlanLabelsArgsForCall = append(fake.getServicePlanLabelsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetServicePlanLabels", []interface{}{arg1, arg2, arg3})
+	fake.getServicePlanLabelsMutex.Unlock()
+	if fake.GetServicePlanLabelsStub != nil {
+		return fake.GetServicePlanLabelsStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getServicePlanLabelsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeLabelsActor) GetServicePlanLabelsCallCount() int {
+	fake.getServicePlanLabelsMutex.RLock()
+	defer fake.getServicePlanLabelsMutex.RUnlock()
+	return len(fake.getServicePlanLabelsArgsForCall)
+}
+
+func (fake *FakeLabelsActor) GetServicePlanLabelsCalls(stub func(string, string, string) (map[string]types.NullString, v7action.Warnings, error)) {
+	fake.getServicePlanLabelsMutex.Lock()
+	defer fake.getServicePlanLabelsMutex.Unlock()
+	fake.GetServicePlanLabelsStub = stub
+}
+
+func (fake *FakeLabelsActor) GetServicePlanLabelsArgsForCall(i int) (string, string, string) {
+	fake.getServicePlanLabelsMutex.RLock()
+	defer fake.getServicePlanLabelsMutex.RUnlock()
+	argsForCall := fake.getServicePlanLabelsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeLabelsActor) GetServicePlanLabelsReturns(result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getServicePlanLabelsMutex.Lock()
+	defer fake.getServicePlanLabelsMutex.Unlock()
+	fake.GetServicePlanLabelsStub = nil
+	fake.getServicePlanLabelsReturns = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeLabelsActor) GetServicePlanLabelsReturnsOnCall(i int, result1 map[string]types.NullString, result2 v7action.Warnings, result3 error) {
+	fake.getServicePlanLabelsMutex.Lock()
+	defer fake.getServicePlanLabelsMutex.Unlock()
+	fake.GetServicePlanLabelsStub = nil
+	if fake.getServicePlanLabelsReturnsOnCall == nil {
+		fake.getServicePlanLabelsReturnsOnCall = make(map[int]struct {
+			result1 map[string]types.NullString
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getServicePlanLabelsReturnsOnCall[i] = struct {
+		result1 map[string]types.NullString
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeLabelsActor) GetSpaceLabels(arg1 string, arg2 string) (map[string]types.NullString, v7action.Warnings, error) {
 	fake.getSpaceLabelsMutex.Lock()
 	ret, specificReturn := fake.getSpaceLabelsReturnsOnCall[len(fake.getSpaceLabelsArgsForCall)]
@@ -770,6 +855,8 @@ func (fake *FakeLabelsActor) Invocations() map[string][][]interface{} {
 	defer fake.getServiceBrokerLabelsMutex.RUnlock()
 	fake.getServiceOfferingLabelsMutex.RLock()
 	defer fake.getServiceOfferingLabelsMutex.RUnlock()
+	fake.getServicePlanLabelsMutex.RLock()
+	defer fake.getServicePlanLabelsMutex.RUnlock()
 	fake.getSpaceLabelsMutex.RLock()
 	defer fake.getSpaceLabelsMutex.RUnlock()
 	fake.getStackLabelsMutex.RLock()

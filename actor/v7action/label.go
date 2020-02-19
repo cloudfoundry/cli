@@ -35,6 +35,11 @@ func (actor Actor) GetServiceOfferingLabels(serviceOfferingName, serviceBrokerNa
 	return actor.extractLabels(serviceOffering.Metadata, warnings, err)
 }
 
+func (actor Actor) GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
+	servicePlan, warnings, err := actor.GetServicePlanByNameOfferingAndBroker(servicePlanName, serviceOfferingName, serviceBrokerName)
+	return actor.extractLabels(servicePlan.Metadata, warnings, err)
+}
+
 func (actor *Actor) GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
 	return actor.extractLabels(resource.Metadata, warnings, err)

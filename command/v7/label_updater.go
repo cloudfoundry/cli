@@ -2,7 +2,6 @@ package v7
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -73,29 +72,37 @@ func (cmd *LabelUpdater) Execute(targetResource TargetResource, labels map[strin
 		return err
 	}
 
-	cmd.displayMessage()
-
 	var warnings v7action.Warnings
 	switch ResourceType(cmd.targetResource.ResourceType) {
 	case App:
+		cmd.displayMessageWithOrgAndSpace()
 		warnings, err = cmd.Actor.UpdateApplicationLabelsByApplicationName(cmd.targetResource.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
 	case Buildpack:
+		cmd.displayMessageWithStack()
 		warnings, err = cmd.Actor.UpdateBuildpackLabelsByBuildpackNameAndStack(cmd.targetResource.ResourceName, cmd.targetResource.BuildpackStack, cmd.labels)
 	case Domain:
+		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateDomainLabelsByDomainName(cmd.targetResource.ResourceName, cmd.labels)
 	case Org:
+		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateOrganizationLabelsByOrganizationName(cmd.targetResource.ResourceName, cmd.labels)
 	case Route:
+		cmd.displayMessageWithOrgAndSpace()
 		warnings, err = cmd.Actor.UpdateRouteLabels(cmd.targetResource.ResourceName, cmd.Config.TargetedSpace().GUID, cmd.labels)
 	case ServiceBroker:
+		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateServiceBrokerLabelsByServiceBrokerName(cmd.targetResource.ResourceName, cmd.labels)
 	case Space:
+		cmd.displayMessageWithOrg()
 		warnings, err = cmd.Actor.UpdateSpaceLabelsBySpaceName(cmd.targetResource.ResourceName, cmd.Config.TargetedOrganization().GUID, cmd.labels)
 	case Stack:
+		cmd.displayMessageDefault()
 		warnings, err = cmd.Actor.UpdateStackLabelsByStackName(cmd.targetResource.ResourceName, cmd.labels)
 	case ServiceOffering:
+		cmd.displayMessageForServiceCommands()
 		warnings, err = cmd.Actor.UpdateServiceOfferingLabels(cmd.targetResource.ResourceName, cmd.targetResource.ServiceBroker, cmd.labels)
 	case ServicePlan:
+		cmd.displayMessageForServiceCommands()
 		warnings, err = cmd.Actor.UpdateServicePlanLabels(cmd.targetResource.ResourceName, cmd.targetResource.ServiceOffering, cmd.targetResource.ServiceBroker, cmd.labels)
 	}
 
@@ -154,21 +161,6 @@ func (cmd *LabelUpdater) validateFlags() error {
 	return nil
 }
 
-func (cmd *LabelUpdater) displayMessage() {
-	switch ResourceType(cmd.targetResource.ResourceType) {
-	case App, Route:
-		cmd.displayMessageWithOrgAndSpace()
-	case Buildpack:
-		cmd.displayMessageForBuildpack()
-	case Space:
-		cmd.displayMessageForSpace()
-	case ServiceOffering, ServicePlan:
-		cmd.displayMessageForServiceCommands()
-	default:
-		cmd.displayMessageDefault()
-	}
-}
-
 func (cmd *LabelUpdater) displayMessageDefault() {
 	cmd.UI.DisplayTextWithFlavor("{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}...", map[string]interface{}{
 		"Action":       cmd.Action,
@@ -189,16 +181,17 @@ func (cmd *LabelUpdater) displayMessageWithOrgAndSpace() {
 	})
 }
 
-func (cmd *LabelUpdater) displayMessageForBuildpack() {
+func (cmd *LabelUpdater) displayMessageWithStack() {
 	var template string
 	if cmd.targetResource.BuildpackStack == "" {
-		template = "{{.Action}} label(s) for buildpack {{.ResourceName}} as {{.User}}..."
+		template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}..."
 	} else {
-		template = "{{.Action}} label(s) for buildpack {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+		template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
 	}
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"Action":       fmt.Sprintf("%s", cmd.Action),
+		"Action":       cmd.Action,
+		"ResourceType": cmd.targetResource.ResourceType,
 		"ResourceName": cmd.targetResource.ResourceName,
 		"StackName":    cmd.targetResource.BuildpackStack,
 		"User":         cmd.Username,
@@ -225,7 +218,7 @@ func (cmd *LabelUpdater) displayMessageForServiceCommands() {
 
 	template += " as {{.User}}..."
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"Action":          fmt.Sprintf("%s", cmd.Action),
+		"Action":          cmd.Action,
 		"ResourceName":    cmd.targetResource.ResourceName,
 		"ResourceType":    cmd.targetResource.ResourceType,
 		"ServiceBroker":   cmd.targetResource.ServiceBroker,
@@ -234,9 +227,10 @@ func (cmd *LabelUpdater) displayMessageForServiceCommands() {
 	})
 }
 
-func (cmd *LabelUpdater) displayMessageForSpace() {
-	cmd.UI.DisplayTextWithFlavor("{{.Action}} label(s) for space {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
+func (cmd *LabelUpdater) displayMessageWithOrg() {
+	cmd.UI.DisplayTextWithFlavor("{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
 		"Action":       cmd.Action,
+		"ResourceType": cmd.targetResource.ResourceType,
 		"ResourceName": cmd.targetResource.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.Username,

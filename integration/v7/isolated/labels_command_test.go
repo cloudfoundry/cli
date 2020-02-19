@@ -40,11 +40,13 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say(`\s+route`))
 			Eventually(session).Should(Say(`\s+service-broker`))
 			Eventually(session).Should(Say(`\s+service-offering`))
+			Eventually(session).Should(Say(`\s+service-plan`))
 			Eventually(session).Should(Say(`\s+space`))
 			Eventually(session).Should(Say(`\s+stack`))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
-			Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings with the same name`))
+			Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings or service plans with the same name`))
+			Eventually(session).Should(Say(`\s+--offering, -o\s+Specify a service offering to disambiguate service plans with the same name`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
@@ -682,6 +684,74 @@ var _ = Describe("labels command", func() {
 					session := helpers.CF("labels", "service-offering", "non-existent-offering")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering non-existent-offering as %s...\n\n"), username))
 					Eventually(session.Err).Should(Say("Service offering 'non-existent-offering' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		Describe("service-plan labels", func() {
+			var (
+				broker              *fakeservicebroker.FakeServiceBroker
+				servicePlanName     string
+				serviceOfferingName string
+			)
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				servicePlanName = broker.Services[0].Plans[0].Name
+				serviceOfferingName = broker.Services[0].Name
+			})
+
+			AfterEach(func() {
+				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			When("there are labels set on the service plan", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-label", "service-plan", servicePlanName, "some-other-key=some-other-value")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("returns the labels associated with the plan", func() {
+					session := helpers.CF("labels", "service-plan", servicePlanName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan %s as %s...\n\n"), servicePlanName, username))
+					Eventually(session).Should(Say(`key\s+value`))
+					Expect(session).To(Say(`some-other-key\s+some-other-value`))
+					Eventually(session).Should(Exit(0))
+				})
+
+				When("the service offering and service broker are specified", func() {
+					It("returns the labels associated with the plan", func() {
+						session := helpers.CF("labels", "-o", serviceOfferingName, "-b", broker.Name(), "service-plan", servicePlanName)
+						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan %s from service offering %s / service broker %s as %s..."), servicePlanName, serviceOfferingName, broker.Name(), username))
+						Eventually(session).Should(Say(`key\s+value`))
+						Expect(session).To(Say(`some-other-key\s+some-other-value`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("there are no labels set on the service plan", func() {
+				It("indicates that there are no labels", func() {
+					session := helpers.CF("labels", "service-plan", servicePlanName)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan %s as %s...\n\n"), servicePlanName, username))
+					Expect(session).ToNot(Say(`key\s+value`))
+					Eventually(session).Should(Say("No labels found."))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the service plan does not exist", func() {
+				It("displays an error", func() {
+					session := helpers.CF("labels", "service-plan", "non-existent-plan")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan non-existent-plan as %s...\n\n"), username))
+					Eventually(session.Err).Should(Say("Service plan 'non-existent-plan' not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})

@@ -220,7 +220,6 @@ var _ = Describe("LabelUpdater", func() {
 			},
 			labelSubcommands()...,
 		)
-
 	})
 
 	When("updating labels on apps", func() {
