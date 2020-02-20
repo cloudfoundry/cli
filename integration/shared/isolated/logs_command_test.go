@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -108,6 +109,8 @@ var _ = Describe("logs command", func() {
 		const logMessage = "hello from log-cache"
 		var returnEmptyEnvelope bool
 
+		onWindows := runtime.GOOS == "windows"
+
 		BeforeEach(func() {
 			latestEnvelopeTimestamp := "1581447006352020890"
 			latestEnvelopeTimestampMinusOneSecond := "1581447005352020890"
@@ -172,16 +175,20 @@ var _ = Describe("logs command", func() {
 				returnEmptyEnvelope = false
 			})
 
-			XIt("fetches logs with a timestamp just prior to the latest log envelope", func() {
+			It("fetches logs with a timestamp just prior to the latest log envelope", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("logs", "some-fake-app")
 				Eventually(session).Should(Say(logMessage))
-				session.Interrupt()
-
-				Eventually(session).Should(Exit(0), "Interrupt should be handled and fail gracefully")
+				if onWindows {
+					session.Kill()
+					Eventually(session).Should(Exit())
+				} else {
+					session.Interrupt()
+					Eventually(session).Should(Exit(0), "Interrupt should be handled and fail gracefully")
+				}
 			})
 		})
 
@@ -198,9 +205,13 @@ var _ = Describe("logs command", func() {
 
 				session = helpers.CF("logs", "some-fake-app")
 				Eventually(session).Should(Say(logMessage))
-				session.Interrupt()
-
-				Eventually(session).Should(Exit(0))
+				if onWindows {
+					session.Kill()
+					Eventually(session).Should(Exit())
+				} else {
+					session.Interrupt()
+					Eventually(session).Should(Exit(0))
+				}
 			})
 		})
 	})
