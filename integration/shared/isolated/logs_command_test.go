@@ -15,7 +15,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("logs command", func() {
+var _ = Describe("logs command", func() {
 
 	var server *ghttp.Server
 
