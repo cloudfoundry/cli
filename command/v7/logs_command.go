@@ -2,6 +2,8 @@ package v7
 
 import (
 	"context"
+	"os"
+	"os/signal"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -109,6 +111,8 @@ func (cmd LogsCommand) streamLogs() error {
 	if err != nil {
 		return err
 	}
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 
 	var messagesClosed, errLogsClosed bool
 	for {
@@ -127,6 +131,9 @@ func (cmd LogsCommand) streamLogs() error {
 			}
 			cancelFunc()
 			return logErr
+		case <-c:
+			cancelFunc()
+			return nil
 		}
 
 		if messagesClosed && errLogsClosed {

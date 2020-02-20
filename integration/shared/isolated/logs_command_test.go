@@ -181,7 +181,7 @@ var _ = FDescribe("logs command", func() {
 				Eventually(session).Should(Say(logMessage))
 				session.Interrupt()
 
-				Eventually(session).Should(Exit(130))
+				Eventually(session).Should(Exit(0), "Interrupt should be handled and fail gracefully")
 			})
 		})
 
@@ -200,7 +200,7 @@ var _ = FDescribe("logs command", func() {
 				Eventually(session).Should(Say(logMessage))
 				session.Interrupt()
 
-				Eventually(session).Should(Exit(130))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
