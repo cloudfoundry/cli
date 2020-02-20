@@ -120,11 +120,14 @@ func (actor Actor) refreshAccessTokenIfNecessary() (*time.Duration, error) {
 
 	var timeToRefresh time.Duration
 	expiration, ok := token.Claims().Expiration()
-	if ok {
-		expiresIn := time.Until(expiration)
-		timeToRefresh = expiresIn * 9 / 10
-	} else {
+	if !ok {
 		return nil, errors.New("Failed to get an expiry time from the current access token")
+	}
+	expiresIn := time.Until(expiration)
+	if expiresIn >= 2*time.Minute {
+		timeToRefresh = expiresIn - time.Minute
+	} else {
+		timeToRefresh = expiresIn * 9 / 10
 	}
 	return &timeToRefresh, nil
 }

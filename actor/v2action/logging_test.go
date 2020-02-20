@@ -560,29 +560,54 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			It("sleeps until the token is approaching expiry", func() {
+				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
 				Expect(err).NotTo(HaveOccurred())
 
-				By("not initially refreshing the token when it is unnecessary")
-				Expect(fakeUAAClient.RefreshAccessTokenCallCount()).To(Equal(0))
+				By("sleeps until one minute before the new token is due to expire")
+				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+					AccessToken: helpers.BuildTokenString(time.Now().Add(5 * time.Minute)),
+					Type:        "bearer",
+				}, nil)
 
-				By("refreshing the first access token when it is expiring soon")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(30 * time.Second)))
+				ticker <- time.Time{}
+				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(1))
+				Eventually(delay).Should(Receive(BeNumerically("~", 4*time.Minute, time.Second)))
+
+				By("refreshing a longer-lived access token")
+				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+					AccessToken: helpers.BuildTokenString(time.Now().Add(20 * time.Minute)),
+					Type:        "bearer",
+				}, nil)
+				ticker <- time.Time{}
+				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(2))
+				Eventually(delay).Should(Receive(BeNumerically("~", 19*time.Minute, time.Second)))
+
+				By("refreshing a short-lived access token at 90% of its lifetime")
 				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
 					AccessToken: helpers.BuildTokenString(time.Now().Add(30 * time.Second)),
 					Type:        "bearer",
 				}, nil)
-
 				ticker <- time.Time{}
+				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(3))
 				Eventually(delay).Should(Receive(BeNumerically("~", 27*time.Second, time.Second)))
 
-				By("using the expiry time of the token to calculate the sleep delay")
-				fakeConfig.AccessTokenReturns(helpers.BuildTokenString(time.Now().Add(10 * time.Second)))
+				By("refreshing a very short-lived access token at 90% of its lifetime")
 				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
-					AccessToken: helpers.BuildTokenString(time.Now().Add(10 * time.Second)),
+					AccessToken: helpers.BuildTokenString(time.Now().Add(3000 * time.Millisecond)),
 					Type:        "bearer",
 				}, nil)
 				ticker <- time.Time{}
-				Eventually(delay).Should(Receive(BeNumerically("~", 9*time.Second, time.Second)))
+				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(4))
+				Eventually(delay).Should(Receive(BeNumerically("~", 2700*time.Millisecond, time.Second)))
+
+				By("refreshing a token with a little more than a minute left on it")
+				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{
+					AccessToken: helpers.BuildTokenString(time.Now().Add(90 * time.Second)),
+					Type:        "bearer",
+				}, nil)
+				ticker <- time.Time{}
+				Eventually(fakeUAAClient.RefreshAccessTokenCallCount).Should(Equal(5))
+				Eventually(delay).Should(Receive(BeNumerically("~", 81*time.Second, time.Second)))
 			})
 
 			When("and the token refresh errors", func() {
