@@ -2,7 +2,6 @@ package ccv3
 
 import (
 	"bytes"
-
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -27,24 +26,15 @@ func (f FeatureFlag) MarshalJSON() ([]byte, error) {
 }
 
 func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetFeatureFlagRequest,
-		URIParams:   map[string]string{"name": flagName},
+	var responseBody FeatureFlag
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetFeatureFlagRequest,
+		URIParams:    internal.Params{"name": flagName},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return FeatureFlag{}, nil, err
-	}
-	var ccFlag FeatureFlag
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &ccFlag,
-	}
 
-	err = client.connection.Make(request, &response)
-
-	if err != nil {
-		return FeatureFlag{}, response.Warnings, err
-	}
-	return ccFlag, response.Warnings, nil
+	return responseBody, warnings, err
 }
 
 // GetFeatureFlags lists feature flags.

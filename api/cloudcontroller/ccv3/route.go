@@ -111,63 +111,34 @@ type RouteDestination struct {
 }
 
 func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
-	bodyBytes, err := json.Marshal(route)
-	if err != nil {
-		return Route{}, nil, err
-	}
+	var responseBody Route
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostRouteRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostRouteRequest,
+		RequestBody:  route,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return Route{}, nil, err
-	}
-
-	var ccRoute Route
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &ccRoute,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return ccRoute, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteOrphanedRoutesRequest,
-		URIParams: map[string]string{
-			"space_guid": spaceGUID,
-		},
-		Query: []Query{{Key: UnmappedFilter, Values: []string{"true"}}},
+		URIParams:   internal.Params{"space_guid": spaceGUID},
+		Query:       []Query{{Key: UnmappedFilter, Values: []string{"true"}}},
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams: map[string]string{
-			"route_guid": routeGUID,
-		},
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteRouteRequest,
+		URIParams:   internal.Params{"route_guid": routeGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {

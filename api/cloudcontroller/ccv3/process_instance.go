@@ -84,22 +84,16 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 // DeleteApplicationProcessInstance deletes/stops a particular application's
 // process instance.
 func (client *Client) DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteApplicationProcessInstanceRequest,
-		URIParams: map[string]string{
+		URIParams: internal.Params{
 			"app_guid": appGUID,
 			"type":     processType,
 			"index":    strconv.Itoa(instanceIndex),
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }
 
 // GetProcessInstances lists instance stats for a given process.

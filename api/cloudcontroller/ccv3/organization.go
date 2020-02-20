@@ -55,68 +55,38 @@ func (org *Organization) UnmarshalJSON(data []byte) error {
 // CreateOrganization creates an organization with the given name.
 func (client *Client) CreateOrganization(orgName string) (Organization, Warnings, error) {
 	org := Organization{Name: orgName}
-	orgBytes, err := json.Marshal(org)
-	if err != nil {
-		return Organization{}, nil, err
-	}
+	var responseBody Organization
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostOrganizationRequest,
-		Body:        bytes.NewReader(orgBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostOrganizationRequest,
+		RequestBody:  org,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return Organization{}, nil, err
-	}
-
-	var responseOrg Organization
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrg,
-	}
-	err = client.connection.Make(request, &response)
-
-	if err != nil {
-		return Organization{}, response.Warnings, err
-	}
-
-	return responseOrg, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // DeleteOrganization deletes the organization with the given GUID.
 func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteOrganizationRequest,
-		URIParams:   map[string]string{"organization_guid": orgGUID},
+		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
 
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 // GetDefaultDomain gets the default domain for the organization with the given GUID.
 func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDefaultDomainRequest,
-		URIParams:   map[string]string{"organization_guid": orgGUID},
+	var responseBody Domain
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetDefaultDomainRequest,
+		URIParams:    internal.Params{"organization_guid": orgGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Domain{}, nil, err
-	}
 
-	var defaultDomain Domain
-
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &defaultDomain,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return defaultDomain, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetIsolationSegmentOrganizations lists organizations

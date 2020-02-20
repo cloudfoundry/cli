@@ -111,40 +111,22 @@ type serviceBrokerRelationshipsSpaceData struct {
 
 // CreateServiceBroker registers a new service broker.
 func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
-	bodyBytes, err := json.Marshal(newServiceBroker(serviceBroker))
-	if err != nil {
-		return "", nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PostServiceBrokerRequest,
-		Body:        bytes.NewReader(bodyBytes),
+		RequestBody: newServiceBroker(serviceBroker),
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 // DeleteServiceBroker deletes a named service broker
 func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteServiceBrokerRequest,
-		URIParams: map[string]string{
-			"service_broker_guid": serviceBrokerGUID,
-		},
+		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
 	})
 
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 // GetServiceBrokers lists service brokers.

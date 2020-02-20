@@ -20,82 +20,87 @@ type ResourceMetadata struct {
 }
 
 func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata Metadata) (ResourceMetadata, Warnings, error) {
-	metadataBytes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
-	if err != nil {
-		return ResourceMetadata{}, nil, err
-	}
+	var (
+		params           requestParams
+		err              error
+		responseMetadata ResourceMetadata
+		warnings         Warnings
+		requestMetadata  ResourceMetadata
+	)
 
-	var request *cloudcontroller.Request
+	requestMetadata = ResourceMetadata{Metadata: &metadata}
 
 	switch resource {
 	case "app":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchApplicationRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"app_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchApplicationRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"app_guid": resourceGUID},
+		}
 	case "buildpack":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchBuildpackRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"buildpack_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchBuildpackRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"buildpack_guid": resourceGUID},
+		}
 	case "domain":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchDomainRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"domain_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchDomainRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"domain_guid": resourceGUID},
+		}
 	case "org":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchOrganizationRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"organization_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchOrganizationRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"organization_guid": resourceGUID},
+		}
 	case "route":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchRouteRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"route_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchRouteRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"route_guid": resourceGUID},
+		}
 	case "service-offering":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchServiceOfferingRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"service_offering_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchServiceOfferingRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"service_offering_guid": resourceGUID},
+		}
 	case "service-plan":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchServicePlanRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"service_plan_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchServicePlanRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"service_plan_guid": resourceGUID},
+		}
 	case "space":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchSpaceRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"space_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchSpaceRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"space_guid": resourceGUID},
+		}
 	case "stack":
-		request, err = client.newHTTPRequest(requestOptions{
-			RequestName: internal.PatchStackRequest,
-			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"stack_guid": resourceGUID},
-		})
+		params = requestParams{
+			RequestName:  internal.PatchStackRequest,
+			RequestBody:  requestMetadata,
+			ResponseBody: &responseMetadata,
+			URIParams:    internal.Params{"stack_guid": resourceGUID},
+		}
 	default:
 		return ResourceMetadata{}, nil, fmt.Errorf("unknown resource type (%s) requested", resource)
 	}
 
-	if err != nil {
-		return ResourceMetadata{}, nil, err
-	}
+	_, warnings, err = client.makeRequest(params)
 
-	var responseMetadata ResourceMetadata
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseMetadata,
-	}
-	err = client.connection.Make(request, &response)
-	return responseMetadata, response.Warnings, err
+	return responseMetadata, warnings, err
 }
 
 func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata Metadata) (JobURL, Warnings, error) {

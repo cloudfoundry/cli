@@ -101,44 +101,25 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 // CreateBuildpack creates a buildpack with the given settings, Type and the
 // ApplicationRelationship must be set.
 func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error) {
-	bodyBytes, err := json.Marshal(bp)
-	if err != nil {
-		return Buildpack{}, nil, err
-	}
+	var responseBody Buildpack
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostBuildpackRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostBuildpackRequest,
+		RequestBody:  bp,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Buildpack{}, nil, err
-	}
 
-	var responseBuildpack Buildpack
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseBuildpack,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseBuildpack, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // DeleteBuildpack deletes the buildpack with the provided guid.
 func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteBuildpackRequest,
-		URIParams: map[string]string{
-			"buildpack_guid": buildpackGUID,
-		},
+		URIParams:   internal.Params{"buildpack_guid": buildpackGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 // GetBuildpacks lists buildpacks with optional filters.

@@ -21,43 +21,27 @@ type SSHEnabled struct {
 }
 
 func (client *Client) GetAppFeature(appGUID string, featureName string) (ApplicationFeature, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationFeaturesRequest,
-		URIParams:   map[string]string{"app_guid": appGUID, "name": featureName},
+	var responseBody ApplicationFeature
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetApplicationFeaturesRequest,
+		URIParams:    internal.Params{"app_guid": appGUID, "name": featureName},
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return ApplicationFeature{}, nil, err
-	}
-
-	var applicationFeature ApplicationFeature
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &applicationFeature,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return applicationFeature, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSSHEnabled,
-		URIParams:   map[string]string{"app_guid": appGUID},
+	var responseBody SSHEnabled
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetSSHEnabled,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return SSHEnabled{}, nil, err
-	}
-
-	var sshEnabled SSHEnabled
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &sshEnabled,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return sshEnabled, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // UpdateAppFeature enables/disables the ability to ssh for a given application.

@@ -48,45 +48,24 @@ func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (Relatio
 }
 
 func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
-	quotaBytes, err := json.Marshal(orgQuota)
-	if err != nil {
-		return OrganizationQuota{}, nil, err
-	}
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostOrganizationQuotaRequest,
-		Body:        bytes.NewReader(quotaBytes),
+	var responseOrgQuota OrganizationQuota
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostOrganizationQuotaRequest,
+		RequestBody:  orgQuota,
+		ResponseBody: &responseOrgQuota,
 	})
 
-	if err != nil {
-		return OrganizationQuota{}, nil, err
-	}
-	var responseOrgQuota OrganizationQuota
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrgQuota,
-	}
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return OrganizationQuota{}, response.Warnings, err
-	}
-	return responseOrgQuota, response.Warnings, nil
+	return responseOrgQuota, warnings, err
 }
 
 func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteOrganizationQuotaRequest,
 		URIParams:   internal.Params{"quota_guid": quotaGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return "", response.Warnings, err
-	}
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, nil
+	return jobURL, warnings, err
 }
 
 func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota, Warnings, error) {

@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -95,45 +94,28 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 		DropletGUID:   dropletGUID,
 		Relationships: Relationships{constant.RelationshipTypeApplication: Relationship{GUID: appGUID}},
 	}
-	bodyBytes, err := json.Marshal(dep)
 
-	if err != nil {
-		return "", nil, err
-	}
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationDeploymentRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	var responseBody Deployment
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationDeploymentRequest,
+		RequestBody:  dep,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return "", nil, err
-	}
-
-	var responseDeployment Deployment
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseDeployment,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseDeployment.GUID, response.Warnings, err
+	return responseBody.GUID, warnings, err
 }
 
 func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDeploymentRequest,
-		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
+	var responseBody Deployment
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetDeploymentRequest,
+		URIParams:    internal.Params{"deployment_guid": deploymentGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Deployment{}, nil, err
-	}
 
-	var responseDeployment Deployment
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseDeployment,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseDeployment, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) GetDeployments(query ...Query) ([]Deployment, Warnings, error) {

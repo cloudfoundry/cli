@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -109,43 +108,24 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 }
 
 func (client *Client) CreateRole(roleSpec Role) (Role, Warnings, error) {
-	bodyBytes, err := json.Marshal(roleSpec)
-	if err != nil {
-		return Role{}, nil, err
-	}
+	var responseBody Role
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostRoleRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostRoleRequest,
+		RequestBody:  roleSpec,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Role{}, nil, err
-	}
 
-	var responseRole Role
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseRole,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseRole, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams: map[string]string{
-			"role_guid": roleGUID,
-		},
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteRoleRequest,
+		URIParams:   internal.Params{"role_guid": roleGUID},
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 // GetRoles lists roles with optional filters & includes.

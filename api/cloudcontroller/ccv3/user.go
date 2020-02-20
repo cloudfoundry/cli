@@ -1,10 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -25,66 +21,37 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 		GUID string `json:"guid"`
 	}
 
-	bodyBytes, err := json.Marshal(userRequestBody{
-		GUID: uaaUserID,
+	user := userRequestBody{GUID: uaaUserID}
+	var responseBody User
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostUserRequest,
+		RequestBody:  user,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return User{}, nil, err
-	}
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostUserRequest,
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return User{}, nil, err
-	}
-
-	var user User
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &user,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return user, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteUserRequest,
-		URIParams: internal.Params{
-			"user_guid": uaaUserID,
-		},
+		URIParams:   internal.Params{"user_guid": uaaUserID},
 	})
 
-	if err != nil {
-		return JobURL(""), nil, err
-	}
-
-	response := cloudcontroller.Response{}
-
-	err = client.connection.Make(request, &response)
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetUserRequest,
-		URIParams:   map[string]string{"user_guid": userGUID},
+	var responseBody User
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetUserRequest,
+		URIParams:    internal.Params{"user_guid": userGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return User{}, nil, err
-	}
 
-	var responseUser User
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseUser,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseUser, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {

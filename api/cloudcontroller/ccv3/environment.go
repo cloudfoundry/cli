@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -28,18 +27,13 @@ type Environment struct {
 // GetApplicationEnvironment fetches all the environment variables on
 // an application by groups.
 func (client *Client) GetApplicationEnvironment(appGUID string) (Environment, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"app_guid": appGUID},
-		RequestName: internal.GetApplicationEnvRequest,
-	})
-	if err != nil {
-		return Environment{}, nil, err
-	}
+	var responseBody Environment
 
-	var responseEnvVars Environment
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseEnvVars,
-	}
-	err = client.connection.Make(request, &response)
-	return responseEnvVars, response.Warnings, err
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetApplicationEnvRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
 }

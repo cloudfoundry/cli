@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -73,43 +72,26 @@ func (b *Build) UnmarshalJSON(data []byte) error {
 // CreateBuild creates the given build, requires Package GUID to be set on the
 // build.
 func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
-	bodyBytes, err := json.Marshal(build)
-	if err != nil {
-		return Build{}, nil, err
-	}
+	var responseBody Build
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostBuildRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostBuildRequest,
+		RequestBody:  build,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Build{}, nil, err
-	}
 
-	var responseBuild Build
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseBuild,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseBuild, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetBuild gets the build with the given GUID.
 func (client *Client) GetBuild(guid string) (Build, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetBuildRequest,
-		URIParams:   internal.Params{"build_guid": guid},
+	var responseBody Build
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetBuildRequest,
+		URIParams:    internal.Params{"build_guid": guid},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Build{}, nil, err
-	}
 
-	var responseBuild Build
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseBuild,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseBuild, response.Warnings, err
+	return responseBody, warnings, err
 }
