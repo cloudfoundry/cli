@@ -69,6 +69,17 @@ type FakeConfig struct {
 	setRefreshTokenArgsForCall []struct {
 		arg1 string
 	}
+	SetTargetInformationStub        func(string, string, string, string, string, string, bool)
+	setTargetInformationMutex       sync.RWMutex
+	setTargetInformationArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+		arg6 string
+		arg7 bool
+	}
 	SetTokenInformationStub        func(string, string, string)
 	setTokenInformationMutex       sync.RWMutex
 	setTokenInformationArgsForCall []struct {
@@ -86,6 +97,16 @@ type FakeConfig struct {
 	setUAAGrantTypeMutex       sync.RWMutex
 	setUAAGrantTypeArgsForCall []struct {
 		arg1 string
+	}
+	SkipSSLValidationStub        func() bool
+	skipSSLValidationMutex       sync.RWMutex
+	skipSSLValidationArgsForCall []struct {
+	}
+	skipSSLValidationReturns struct {
+		result1 bool
+	}
+	skipSSLValidationReturnsOnCall map[int]struct {
+		result1 bool
 	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
@@ -106,6 +127,16 @@ type FakeConfig struct {
 	}
 	startupTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
+	}
+	TargetStub        func() string
+	targetMutex       sync.RWMutex
+	targetArgsForCall []struct {
+	}
+	targetReturns struct {
+		result1 string
+	}
+	targetReturnsOnCall map[int]struct {
+		result1 string
 	}
 	UAAGrantTypeStub        func() string
 	uAAGrantTypeMutex       sync.RWMutex
@@ -447,6 +478,43 @@ func (fake *FakeConfig) SetRefreshTokenArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
+func (fake *FakeConfig) SetTargetInformation(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 string, arg7 bool) {
+	fake.setTargetInformationMutex.Lock()
+	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+		arg6 string
+		arg7 bool
+	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	fake.recordInvocation("SetTargetInformation", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+	fake.setTargetInformationMutex.Unlock()
+	if fake.SetTargetInformationStub != nil {
+		fake.SetTargetInformationStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+	}
+}
+
+func (fake *FakeConfig) SetTargetInformationCallCount() int {
+	fake.setTargetInformationMutex.RLock()
+	defer fake.setTargetInformationMutex.RUnlock()
+	return len(fake.setTargetInformationArgsForCall)
+}
+
+func (fake *FakeConfig) SetTargetInformationCalls(stub func(string, string, string, string, string, string, bool)) {
+	fake.setTargetInformationMutex.Lock()
+	defer fake.setTargetInformationMutex.Unlock()
+	fake.SetTargetInformationStub = stub
+}
+
+func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string, bool) {
+	fake.setTargetInformationMutex.RLock()
+	defer fake.setTargetInformationMutex.RUnlock()
+	argsForCall := fake.setTargetInformationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
+}
+
 func (fake *FakeConfig) SetTokenInformation(arg1 string, arg2 string, arg3 string) {
 	fake.setTokenInformationMutex.Lock()
 	fake.setTokenInformationArgsForCall = append(fake.setTokenInformationArgsForCall, struct {
@@ -541,6 +609,58 @@ func (fake *FakeConfig) SetUAAGrantTypeArgsForCall(i int) string {
 	defer fake.setUAAGrantTypeMutex.RUnlock()
 	argsForCall := fake.setUAAGrantTypeArgsForCall[i]
 	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) SkipSSLValidation() bool {
+	fake.skipSSLValidationMutex.Lock()
+	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
+	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct {
+	}{})
+	fake.recordInvocation("SkipSSLValidation", []interface{}{})
+	fake.skipSSLValidationMutex.Unlock()
+	if fake.SkipSSLValidationStub != nil {
+		return fake.SkipSSLValidationStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.skipSSLValidationReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) SkipSSLValidationCallCount() int {
+	fake.skipSSLValidationMutex.RLock()
+	defer fake.skipSSLValidationMutex.RUnlock()
+	return len(fake.skipSSLValidationArgsForCall)
+}
+
+func (fake *FakeConfig) SkipSSLValidationCalls(stub func() bool) {
+	fake.skipSSLValidationMutex.Lock()
+	defer fake.skipSSLValidationMutex.Unlock()
+	fake.SkipSSLValidationStub = stub
+}
+
+func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
+	fake.skipSSLValidationMutex.Lock()
+	defer fake.skipSSLValidationMutex.Unlock()
+	fake.SkipSSLValidationStub = nil
+	fake.skipSSLValidationReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
+	fake.skipSSLValidationMutex.Lock()
+	defer fake.skipSSLValidationMutex.Unlock()
+	fake.SkipSSLValidationStub = nil
+	if fake.skipSSLValidationReturnsOnCall == nil {
+		fake.skipSSLValidationReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.skipSSLValidationReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
 }
 
 func (fake *FakeConfig) StagingTimeout() time.Duration {
@@ -647,6 +767,58 @@ func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration
 	}{result1}
 }
 
+func (fake *FakeConfig) Target() string {
+	fake.targetMutex.Lock()
+	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
+	fake.targetArgsForCall = append(fake.targetArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Target", []interface{}{})
+	fake.targetMutex.Unlock()
+	if fake.TargetStub != nil {
+		return fake.TargetStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.targetReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) TargetCallCount() int {
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
+	return len(fake.targetArgsForCall)
+}
+
+func (fake *FakeConfig) TargetCalls(stub func() string) {
+	fake.targetMutex.Lock()
+	defer fake.targetMutex.Unlock()
+	fake.TargetStub = stub
+}
+
+func (fake *FakeConfig) TargetReturns(result1 string) {
+	fake.targetMutex.Lock()
+	defer fake.targetMutex.Unlock()
+	fake.TargetStub = nil
+	fake.targetReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) TargetReturnsOnCall(i int, result1 string) {
+	fake.targetMutex.Lock()
+	defer fake.targetMutex.Unlock()
+	fake.TargetStub = nil
+	if fake.targetReturnsOnCall == nil {
+		fake.targetReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.targetReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) UAAGrantType() string {
 	fake.uAAGrantTypeMutex.Lock()
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
@@ -739,16 +911,22 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()
 	defer fake.setRefreshTokenMutex.RUnlock()
+	fake.setTargetInformationMutex.RLock()
+	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
 	fake.setUAAClientCredentialsMutex.RLock()
 	defer fake.setUAAClientCredentialsMutex.RUnlock()
 	fake.setUAAGrantTypeMutex.RLock()
 	defer fake.setUAAGrantTypeMutex.RUnlock()
+	fake.skipSSLValidationMutex.RLock()
+	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
 	defer fake.startupTimeoutMutex.RUnlock()
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
 	fake.uAAGrantTypeMutex.RLock()
 	defer fake.uAAGrantTypeMutex.RUnlock()
 	fake.unsetOrganizationAndSpaceInformationMutex.RLock()

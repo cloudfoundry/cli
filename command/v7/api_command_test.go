@@ -35,130 +35,93 @@ var _ = Describe("api Command", func() {
 		}
 
 		fakeConfig.BinaryNameReturns("faceman")
+		fakeConfig.TargetReturns("some-api-target")
 	})
 
 	JustBeforeEach(func() {
 		err = cmd.Execute(nil)
 	})
 
-	When("the API endpoint is not provided", func() {
-		When("the API is not set", func() {
-			It("displays a tip", func() {
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(testUI.Out).To(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
-			})
+	When("clearing the target (the --unset flag is given)", func() {
+		BeforeEach(func() {
+			cmd.Unset = true
 		})
 
-		When("the API is set, the user is logged in and an org and space are targeted", func() {
-			BeforeEach(func() {
-				fakeConfig.TargetReturns("some-api-target")
-				fakeConfig.APIVersionReturns("100.200.300")
-				fakeConfig.CurrentUserReturns(configv3.User{
-					Name: "admin",
-				}, nil)
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-					Name: "some-org",
-				})
-				fakeConfig.TargetedSpaceReturns(configv3.Space{
-					Name: "some-space",
-				})
-			})
-
-			It("outputs target information", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say(`api endpoint:\s+some-api-target`))
-				Expect(testUI.Out).To(Say(`api version:\s+100.200.300`))
-			})
-		})
-
-		When("passed a --unset", func() {
-			BeforeEach(func() {
-				cmd.Unset = true
-			})
-
-			It("clears the target", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("Unsetting api endpoint..."))
-				Expect(testUI.Out).To(Say("OK"))
-				Expect(fakeActor.ClearTargetCallCount()).To(Equal(1))
-			})
+		It("clears the target", func() {
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("Unsetting api endpoint..."))
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(fakeActor.ClearTargetCallCount()).To(Equal(1))
 		})
 	})
 
-	When("a valid API endpoint is provided", func() {
-		When("the API has SSL", func() {
-			Context("with no protocol", func() {
-				var (
-					CCAPI string
-				)
+	When("setting a new API endpoint (a valid API endpoint is provided)", func() {
+		var CCAPI string
 
-				BeforeEach(func() {
-					CCAPI = "api.foo.com"
-					cmd.OptionalArgs.URL = CCAPI
+		BeforeEach(func() {
+			CCAPI = "https://api.foo.com"
+			cmd.OptionalArgs.URL = CCAPI
 
-					fakeConfig.TargetReturns("some-api-target")
-					fakeConfig.APIVersionReturns("100.200.300")
-				})
+			fakeConfig.APIVersionReturns("100.200.300")
+		})
 
-				When("the url has verified SSL", func() {
-					It("sets the target", func() {
-						Expect(err).ToNot(HaveOccurred())
+		It("signals that it's setting the API endpoint", func() {
+			Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+		})
 
-						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-						settings := fakeActor.SetTargetArgsForCall(0)
-						Expect(settings.URL).To(Equal("https://" + CCAPI))
-						Expect(settings.SkipSSLValidation).To(BeFalse())
+		When("the API endpoint does not specify a protocol/schema (does not begin with 'http')", func() {
+			BeforeEach(func() {
+				CCAPI = "api.foo.com"
+				cmd.OptionalArgs.URL = CCAPI
+			})
 
-						Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-						Expect(testUI.Out).To(Say(`OK
+			It("defaults to TLS (prepends 'https://' to the endpoint)", func() {
+				Expect(err).ToNot(HaveOccurred())
 
-api endpoint:   some-api-target
-api version:    100.200.300`,
-						))
-					})
-				})
-
-				When("the url has unverified SSL", func() {
-					When("--skip-ssl-validation is passed", func() {
-						BeforeEach(func() {
-							cmd.SkipSSLValidation = true
-						})
-
-						It("sets the target", func() {
-							Expect(err).ToNot(HaveOccurred())
-
-							Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-							settings := fakeActor.SetTargetArgsForCall(0)
-							Expect(settings.URL).To(Equal("https://" + CCAPI))
-							Expect(settings.SkipSSLValidation).To(BeTrue())
-
-							Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-							Expect(testUI.Out).To(Say(`OK
+				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+				settings := fakeActor.SetTargetArgsForCall(0)
+				Expect(settings.URL).To(Equal("https://" + CCAPI))
+				Expect(settings.SkipSSLValidation).To(BeFalse())
+				Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+				Expect(testUI.Out).To(Say(`OK
 
 api endpoint:   some-api-target
 api version:    100.200.300`,
-							))
-						})
-					})
-
-					When("no additional flags are passed", func() {
-						BeforeEach(func() {
-							fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: CCAPI})
-						})
-
-						It("returns an error with a --skip-ssl-validation tip", func() {
-							Expect(err).To(MatchError(ccerror.UnverifiedServerError{URL: CCAPI}))
-							Expect(testUI.Out).ToNot(Say(`api endpoint:\s+some-api-target`))
-						})
-					})
-				})
+				))
 			})
 		})
 
-		When("the API does not have SSL", func() {
-			var CCAPI string
+		When("--skip-ssl-validation is passed", func() {
+			BeforeEach(func() {
+				cmd.SkipSSLValidation = true
+			})
 
+			It("skips SSL validation", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				settings := fakeActor.SetTargetArgsForCall(0)
+				Expect(settings.SkipSSLValidation).To(BeTrue())
+
+				Expect(testUI.Out).To(Say(`OK
+
+api endpoint:   some-api-target
+api version:    100.200.300`,
+				))
+			})
+		})
+
+		When("when the endpoint is TLS but the certificate is unverified", func() {
+			BeforeEach(func() {
+				fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: CCAPI})
+			})
+
+			It("returns an error with a --skip-ssl-validation tip", func() {
+				Expect(err).To(MatchError(ccerror.UnverifiedServerError{URL: CCAPI}))
+				Expect(testUI.Out).ToNot(Say(`api endpoint:\s+some-api-target`))
+			})
+		})
+
+		When("the endpoint specifies a non-TLS URL ('http://')", func() {
 			BeforeEach(func() {
 				CCAPI = "http://api.foo.com"
 				cmd.OptionalArgs.URL = CCAPI
@@ -178,49 +141,8 @@ api version:    100.200.300`,
 			})
 		})
 
-		When("the API is set but the user is not logged in", func() {
-			BeforeEach(func() {
-				cmd.OptionalArgs.URL = "https://api.foo.com"
-				fakeConfig.TargetReturns("something")
-			})
-
-			It("outputs a 'not logged in' message", func() {
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(testUI.Out).To(Say("Not logged in. Use 'faceman login' or 'faceman login --sso' to log in."))
-			})
-		})
-
-		When("the API is set but the user is logged in", func() {
-			BeforeEach(func() {
-				cmd.OptionalArgs.URL = "https://api.foo.com"
-				fakeConfig.TargetReturns("something")
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
-			})
-
-			It("does not output a 'not logged in' message", func() {
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(testUI.Out).ToNot(Say("Not logged in. Use 'faceman login' or 'faceman login --sso' to log in."))
-			})
-		})
-
-		When("the API has an older version", func() {
-			BeforeEach(func() {
-				cmd.OptionalArgs.URL = "https://api.foo.com"
-				fakeConfig.TargetReturns("something")
-				fakeConfig.APIVersionReturns("1.2.3")
-			})
-
-			It("outputs a warning", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Err).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
-			})
-		})
-
 		When("the URL host does not exist", func() {
 			var (
-				CCAPI      string
 				requestErr ccerror.RequestError
 			)
 
@@ -234,6 +156,51 @@ api version:    100.200.300`,
 
 			It("returns an APIRequestError", func() {
 				Expect(err).To(MatchError(ccerror.RequestError{Err: requestErr.Err}))
+			})
+		})
+
+		When("the API is set but the user is not logged in", func() {
+			It("outputs a 'not logged in' message", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("Not logged in. Use 'faceman login' or 'faceman login --sso' to log in."))
+			})
+		})
+	})
+
+	When("viewing the current API target (no endpoint is provided)", func() {
+		When("the API target is not set", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns("")
+			})
+
+			It("informs the user that the API endpoint is not set through a tip", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
+			})
+		})
+
+		When("the API is set, the user is logged in", func() {
+			BeforeEach(func() {
+				fakeConfig.APIVersionReturns("100.200.300")
+				fakeConfig.CurrentUserReturns(configv3.User{
+					Name: "admin",
+				}, nil)
+			})
+
+			It("outputs target information", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(testUI.Out).To(Say(`api endpoint:\s+some-api-target`))
+				Expect(testUI.Out).To(Say(`api version:\s+100.200.300`))
+			})
+		})
+
+		When("the API is set but the user is not logged in", func() {
+			It("outputs a 'not logged in' message", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("Not logged in. Use 'faceman login' or 'faceman login --sso' to log in."))
 			})
 		})
 	})

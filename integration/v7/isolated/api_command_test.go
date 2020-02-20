@@ -18,7 +18,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("api command", func() {
+var _ = Describe("api command", func() {
 	Context("no arguments", func() {
 		When("the api is set", func() {
 			When("the user is not logged in", func() {
@@ -100,7 +100,7 @@ var _ = FDescribe("api command", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("clears the targetted context", func() {
+			It("clears the targeted context", func() {
 				session := helpers.CF("api", "--unset")
 
 				Eventually(session).Should(Say("Unsetting api endpoint..."))
@@ -132,7 +132,7 @@ var _ = FDescribe("api command", func() {
 		})
 	})
 
-	FWhen("Skip SSL Validation is required", func() {
+	When("Skip SSL Validation is required", func() {
 		Context("api has SSL", func() {
 			var server *ghttp.Server
 
@@ -173,28 +173,48 @@ var _ = FDescribe("api command", func() {
 				serverAPIURL := server.URL()[7:]
 
 				response := `{
-					"name":"",
-					"build":"",
-					"support":"http://support.cloudfoundry.com",
-					"version":0,
-					"description":"",
-					"authorization_endpoint":"https://login.APISERVER",
-					"min_cli_version":null,
-					"min_recommended_cli_version":null,
-					"api_version":"3.81.0",
-					"app_ssh_endpoint":"ssh.APISERVER",
-					"app_ssh_host_key_fingerprint":"a6:d1:08:0b:b0:cb:9b:5f:c4:ba:44:2a:97:26:19:8a",
-					"app_ssh_oauth_client":"ssh-proxy",
-					"logging_endpoint":"wss://loggregator.APISERVER",
-					"doppler_logging_endpoint":"wss://doppler.APISERVER"
-				}`
+   "links":{
+      "self":{
+         "href":"http://APISERVER"
+      },
+      "bits_service":null,
+      "cloud_controller_v2":{
+         "href":"http://APISERVER/v2",
+         "meta":{
+            "version":"2.146.0"
+         }
+      },
+      "cloud_controller_v3":{
+         "href":"http://APISERVER/v3",
+         "meta":{
+            "version":"3.81.0"
+         }
+      }
+   }
+}`
 				response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v3/info"),
+						ghttp.VerifyRequest("GET", "/"),
 						ghttp.RespondWith(http.StatusOK, response),
 					),
 				)
+
+				response2 := `{
+   "links":{
+      "self":{
+         "href":"http://APISERVER/v3"
+      }
+   }
+}`
+				response2 = strings.Replace(response2, "APISERVER", serverAPIURL, -1)
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v3"),
+						ghttp.RespondWith(http.StatusOK, response2),
+					),
+				)
+
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/"),
@@ -207,7 +227,7 @@ var _ = FDescribe("api command", func() {
 				server.Close()
 			})
 
-			FIt("falls back to http and gives a warning", func() {
+			It("falls back to http and gives a warning", func() {
 				session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
 				Eventually(session).Should(Say("Setting api endpoint to %s...", server.URL()))
 				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))

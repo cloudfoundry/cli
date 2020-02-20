@@ -18,7 +18,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("api command", func() {
+var _ = Describe("api command", func() {
 	Context("no arguments", func() {
 		When("the api is set", func() {
 			When("the user is not logged in", func() {

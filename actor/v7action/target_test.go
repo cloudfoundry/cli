@@ -1,8 +1,10 @@
 package v7action_test
 
 import (
-	. "code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"errors"
+
+	. "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -11,45 +13,54 @@ import (
 
 var _ = Describe("Targeting", func() {
 	var (
-		actor             *Actor
-		skipSSLValidation bool
+		actor                     *Actor
+		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		fakeConfig                *v7actionfakes.FakeConfig
 
-		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
-		fakeConfig                *v3actionfakes.FakeConfig
-		settings                  TargetSettings
+		settings          TargetSettings
+		skipSSLValidation bool
+		targetedURL       string
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-		fakeConfig = new(v3actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil)
+		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
 
-		settings = TargetSettings{
-			SkipSSLValidation: skipSSLValidation,
-		}
 	})
 
 	Describe("SetTarget", func() {
-		var expectedAPI, expectedAPIVersion, expectedAuth, expectedDoppler, expectedRouting string
+		var (
+			expectedAPI        string
+			expectedAPIVersion string
+			expectedAuth       string
+			expectedDoppler    string
+			expectedRouting    string
+
+			err      error
+			warnings Warnings
+		)
 
 		BeforeEach(func() {
 			expectedAPI = "https://api.foo.com"
-			expectedAPIVersion = "2.59.0"
+			expectedAPIVersion = "3.81.0"
 			expectedAuth = "https://login.foo.com"
 			expectedDoppler = "wss://doppler.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
-			settings.URL = expectedAPI
+			skipSSLValidation = true
+			targetedURL = expectedAPI
 			var meta struct {
 				Version            string `json:"version"`
 				HostKeyFingerprint string `json:"host_key_fingerprint"`
 				OAuthClient        string `json:"oath_client"`
 			}
 			meta.Version = expectedAPIVersion
-			fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
+			fakeCloudControllerClient.TargetCFReturns(ccv3.Warnings{"info-warning"}, nil)
+
+			fakeCloudControllerClient.RootResponseReturns(ccv3.Info{
 				Links: ccv3.InfoLinks{
 					CCV3: ccv3.APILink{
-						Meta: meta},
+						Meta: meta,
+					},
 					Logging: ccv3.APILink{
 						HREF: expectedDoppler,
 					},
@@ -58,23 +69,80 @@ var _ = Describe("Targeting", func() {
 					},
 					UAA: ccv3.APILink{
 						HREF: expectedAuth,
-					}}}, ccv3.ResourceLinks{}, ccv3.Warnings{}, nil)
+					},
+				},
+			}, ccv3.Warnings{"root-response-warning"}, nil)
 		})
 
-		It("targets the passed API", func() {
-			_, err := actor.SetTarget(settings)
-			Expect(err).ToNot(HaveOccurred())
+		JustBeforeEach(func() {
+			settings = TargetSettings{
+				SkipSSLValidation: skipSSLValidation,
+				URL:               targetedURL,
+			}
+			warnings, err = actor.SetTarget(settings)
+		})
 
+		When("the requested API and SSL configuration match the existing state", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns(targetedURL)
+				fakeConfig.SkipSSLValidationReturns(skipSSLValidation)
+			})
+
+			It("does not make any API calls", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(BeNil())
+
+				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(BeZero())
+			})
+		})
+
+		It("targets CF with the expected arguments", func() {
 			Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
 			connectionSettings := fakeCloudControllerClient.TargetCFArgsForCall(0)
 			Expect(connectionSettings.URL).To(Equal(expectedAPI))
-			Expect(connectionSettings.SkipSSLValidation).To(BeFalse())
+			Expect(connectionSettings.SkipSSLValidation).To(BeTrue())
+		})
+
+		When("targeting CF fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.TargetCFReturns(ccv3.Warnings{"info-warning"}, errors.New("target-error"))
+			})
+
+			It("returns an error and all warnings", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError("target-error"))
+				Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
+
+				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(0))
+			})
+		})
+
+		It("queries the API root to get the target information", func() {
+			Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(1))
+		})
+
+		When("getting the API root response fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.RootResponseReturns(
+					ccv3.Info{},
+					ccv3.Warnings{"root-response-warning"},
+					errors.New("root-error"),
+				)
+			})
+
+			It("returns an error and all warnings", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError("root-error"))
+				Expect(warnings).To(ConsistOf(Warnings{"info-warning", "root-response-warning"}))
+
+				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(1))
+				Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(0))
+			})
 		})
 
 		It("sets all the target information", func() {
-			_, err := actor.SetTarget(settings)
-			Expect(err).ToNot(HaveOccurred())
-
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
 			api, apiVersion, auth, _, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 
@@ -87,9 +155,6 @@ var _ = Describe("Targeting", func() {
 		})
 
 		It("clears all the token information", func() {
-			_, err := actor.SetTarget(settings)
-			Expect(err).ToNot(HaveOccurred())
-
 			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
 			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
 
@@ -98,29 +163,16 @@ var _ = Describe("Targeting", func() {
 			Expect(sshOAuthClient).To(BeEmpty())
 		})
 
-		When("setting the same API and skip SSL configuration", func() {
-			var APIURL string
-
-			BeforeEach(func() {
-				APIURL = "https://some-api.com"
-				settings.URL = APIURL
-				fakeConfig.TargetReturns(APIURL)
-				fakeConfig.SkipSSLValidationReturns(skipSSLValidation)
-			})
-
-			It("does not make any API calls", func() {
-				warnings, err := actor.SetTarget(settings)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(BeNil())
-
-				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(BeZero())
-			})
+		It("succeeds and returns all warnings", func() {
+			Expect(err).ToNot(HaveOccurred())
+			Expect(warnings).To(ConsistOf(Warnings{"info-warning", "root-response-warning"}))
 		})
 	})
 
 	Describe("ClearTarget", func() {
 		It("clears all the target information", func() {
 			actor.ClearTarget()
+
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
 			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 

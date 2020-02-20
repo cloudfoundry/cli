@@ -9,21 +9,20 @@ type TargetSettings ccv3.TargetSettings
 // SetTarget targets the Cloud Controller using the client and sets target
 // information in the actor based on the response.
 func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
-	//TODO make sure these config function do something in v7 (track down implementations in the v3action package/command)
 	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
 	}
+
 	var allWarnings Warnings
-
 	warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
-	if err != nil {
-		return Warnings(warnings), err
-	}
 	allWarnings = Warnings(warnings)
-	var info ccv3.Info
+	if err != nil {
+		return allWarnings, err
+	}
 
-	info, _, err = actor.CloudControllerClient.RootResponse()
-	//allWarnings = append(allWarnings, Warnings(warnings)...)
+	var info ccv3.Info
+	info, warnings, err = actor.CloudControllerClient.RootResponse()
+	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -36,8 +35,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		settings.SkipSSLValidation,
 	)
 	actor.Config.SetTokenInformation("", "", "")
-
-	return Warnings(warnings), nil
+	return allWarnings, nil
 }
 
 // ClearTarget clears target information from the actor.

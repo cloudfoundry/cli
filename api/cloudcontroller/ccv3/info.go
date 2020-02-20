@@ -116,8 +116,8 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 		return Info{}, ResourceLinks{}, warnings, err
 	}
 	request, err := client.newHTTPRequest(requestOptions{
-		Method: http.MethodGet,
-		URL:    rootResponse.ccV3Link(),
+		Method:   http.MethodGet,
+		URL:      rootResponse.ccV3Link(),
 		FromFunc: true,
 	})
 	if err != nil {
@@ -135,7 +135,6 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 		return Info{}, ResourceLinks{}, warnings, err
 	}
 
-	//panic("not the right function")
 	return rootResponse, info, warnings, nil
 }
 
