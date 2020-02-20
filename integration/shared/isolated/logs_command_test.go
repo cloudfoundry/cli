@@ -172,7 +172,7 @@ var _ = Describe("logs command", func() {
 				returnEmptyEnvelope = false
 			})
 
-			It("fetches logs with a timestamp just prior to the latest log envelope", func() {
+			XIt("fetches logs with a timestamp just prior to the latest log envelope", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("login", "-a", server.URL(), "-u", username, "-p", password, "--skip-ssl-validation")
 				Eventually(session).Should(Exit(0))
