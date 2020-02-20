@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -147,25 +146,18 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 		query = append(query, Query{Key: PathFilter, Values: []string{path}})
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDomainRouteReservationsRequest,
-		URIParams:   map[string]string{"domain_guid": domainGUID},
-		Query:       query,
-	})
-	if err != nil {
-		return false, nil, err
-	}
-
-	var responseJson struct {
+	var responseBody struct {
 		MatchingRoute bool `json:"matching_route"`
 	}
 
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseJson,
-	}
-	err = client.connection.Make(request, &response)
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetDomainRouteReservationsRequest,
+		URIParams:    internal.Params{"domain_guid": domainGUID},
+		Query:        query,
+		ResponseBody: &responseBody,
+	})
 
-	return responseJson.MatchingRoute, response.Warnings, err
+	return responseBody.MatchingRoute, warnings, err
 }
 
 func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
@@ -254,44 +246,20 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]D
 }
 
 func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {
-	bodyBytes, err := json.Marshal(sharedOrgs)
-
-	if err != nil {
-		return nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"domain_guid": domainGuid},
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.SharePrivateDomainRequest,
-		Body:        bytes.NewReader(bodyBytes),
+		URIParams:   internal.Params{"domain_guid": domainGuid},
+		RequestBody: sharedOrgs,
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	var ccSharedOrgs SharedOrgs
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &ccSharedOrgs,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }
 
 func (client Client) UnsharePrivateDomainFromOrg(domainGuid string, orgGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"domain_guid": domainGuid, "org_guid": orgGUID},
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteSharedOrgFromDomainRequest,
+		URIParams:   internal.Params{"domain_guid": domainGuid, "org_guid": orgGUID},
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	var response cloudcontroller.Response
-
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return warnings, err
 }

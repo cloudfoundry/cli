@@ -1,10 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"fmt"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -46,18 +42,13 @@ func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error
 
 // UpdateAppFeature enables/disables the ability to ssh for a given application.
 func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PatchApplicationFeaturesRequest,
-		Body:        bytes.NewReader([]byte(fmt.Sprintf(`{"enabled":%t}`, enabled))),
-		URIParams:   map[string]string{"app_guid": appGUID, "name": featureName},
+		RequestBody: struct {
+			Enabled bool `json:"enabled"`
+		}{Enabled: enabled},
+		URIParams: internal.Params{"app_guid": appGUID, "name": featureName},
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }

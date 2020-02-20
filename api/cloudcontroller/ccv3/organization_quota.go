@@ -1,10 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -15,36 +11,16 @@ type OrganizationQuota struct {
 }
 
 func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (RelationshipList, Warnings, error) {
+	var responseBody RelationshipList
 
-	orgs := RelationshipList{
-		[]string{orgGuid},
-	}
-
-	orgBytes, err := json.Marshal(orgs)
-
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostOrganizationQuotaApplyRequest,
-		URIParams:   internal.Params{"quota_guid": quotaGuid},
-		Body:        bytes.NewReader(orgBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostOrganizationQuotaApplyRequest,
+		URIParams:    internal.Params{"quota_guid": quotaGuid},
+		RequestBody:  RelationshipList{GUIDs: []string{orgGuid}},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
 
-	var responseOrgs RelationshipList
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrgs,
-	}
-
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return RelationshipList{}, response.Warnings, err
-	}
-
-	return responseOrgs, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
@@ -69,23 +45,15 @@ func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warning
 }
 
 func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetOrganizationQuotaRequest,
-		URIParams:   internal.Params{"quota_guid": quotaGUID},
-	})
-	if err != nil {
-		return OrganizationQuota{}, nil, err
-	}
-	var responseOrgQuota OrganizationQuota
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrgQuota,
-	}
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return OrganizationQuota{}, response.Warnings, err
-	}
+	var responseBody OrganizationQuota
 
-	return responseOrgQuota, response.Warnings, nil
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetOrganizationQuotaRequest,
+		URIParams:    internal.Params{"quota_guid": quotaGUID},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
 }
 
 func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota, Warnings, error) {
@@ -117,29 +85,14 @@ func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 	orgQuotaGUID := orgQuota.GUID
 	orgQuota.GUID = ""
 
-	quotaBytes, err := json.Marshal(orgQuota)
-	if err != nil {
-		return OrganizationQuota{}, nil, err
-	}
+	var responseBody OrganizationQuota
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchOrganizationQuotaRequest,
-		URIParams:   internal.Params{"quota_guid": orgQuotaGUID},
-		Body:        bytes.NewReader(quotaBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchOrganizationQuotaRequest,
+		URIParams:    internal.Params{"quota_guid": orgQuotaGUID},
+		RequestBody:  orgQuota,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return OrganizationQuota{}, nil, err
-	}
 
-	var responseOrgQuota OrganizationQuota
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrgQuota,
-	}
-
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return OrganizationQuota{}, response.Warnings, err
-	}
-
-	return responseOrgQuota, response.Warnings, nil
+	return responseBody, warnings, err
 }

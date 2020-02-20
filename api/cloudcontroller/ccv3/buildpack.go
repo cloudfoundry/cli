@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 
@@ -149,27 +148,16 @@ func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, erro
 }
 
 func (client Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
-	bodyBytes, err := json.Marshal(buildpack)
-	if err != nil {
-		return Buildpack{}, nil, err
-	}
+	var responseBody Buildpack
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchBuildpackRequest,
-		Body:        bytes.NewReader(bodyBytes),
-		URIParams:   map[string]string{"buildpack_guid": buildpack.GUID},
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchBuildpackRequest,
+		URIParams:    internal.Params{"buildpack_guid": buildpack.GUID},
+		RequestBody:  buildpack,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Buildpack{}, nil, err
-	}
 
-	var responseBuildpack Buildpack
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseBuildpack,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseBuildpack, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // UploadBuildpack uploads the contents of a buildpack zip to the server.

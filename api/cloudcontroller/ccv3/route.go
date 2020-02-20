@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -167,25 +166,17 @@ func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, er
 }
 
 func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetRouteDestinationsRequest,
-		URIParams:   internal.Params{"route_guid": routeGUID},
-	})
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var destinationResponse struct {
+	var responseBody struct {
 		Destinations []RouteDestination `json:"destinations"`
 	}
 
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &destinationResponse,
-	}
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetRouteDestinationsRequest,
+		URIParams:    internal.Params{"route_guid": routeGUID},
+		ResponseBody: &responseBody,
+	})
 
-	err = client.connection.Make(request, &response)
-	return destinationResponse.Destinations, response.Warnings, err
+	return responseBody.Destinations, warnings, err
 }
 
 func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
@@ -236,42 +227,23 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 		},
 	}
 
-	bodyBytes, err := json.Marshal(requestBody)
-	if err != nil {
-		return nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.MapRouteRequest,
-		URIParams: map[string]string{
-			"route_guid": routeGUID,
-		},
-		Body: bytes.NewReader(bodyBytes),
+		URIParams:   internal.Params{"route_guid": routeGUID},
+		RequestBody: &requestBody,
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }
 
 func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.UnmapRouteRequest,
-		URIParams: map[string]string{
-			"route_guid":       routeGUID,
-			"destination_guid": destinationGUID,
-		},
+	var responseBody Build
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.UnmapRouteRequest,
+		URIParams:    internal.Params{"route_guid": routeGUID, "destination_guid": destinationGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }

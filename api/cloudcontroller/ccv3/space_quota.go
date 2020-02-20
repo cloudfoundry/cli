@@ -1,10 +1,8 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -123,32 +121,16 @@ func (sq *SpaceQuota) UnmarshalJSON(data []byte) error {
 }
 
 func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (RelationshipList, Warnings, error) {
-	relationshipList := RelationshipList{GUIDs: []string{spaceGUID}}
-	relationshipListBytes, err := json.Marshal(relationshipList)
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
+	var responseBody RelationshipList
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostSpaceQuotaRelationshipsRequest,
-		URIParams:   internal.Params{"quota_guid": quotaGUID},
-		Body:        bytes.NewReader(relationshipListBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostSpaceQuotaRelationshipsRequest,
+		URIParams:    internal.Params{"quota_guid": quotaGUID},
+		RequestBody:  RelationshipList{GUIDs: []string{spaceGUID}},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
 
-	var appliedRelationshipList RelationshipList
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &appliedRelationshipList,
-	}
-
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return RelationshipList{}, response.Warnings, err
-	}
-
-	return appliedRelationshipList, response.Warnings, nil
+	return responseBody, warnings, err
 }
 
 func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnings, error) {
@@ -173,23 +155,15 @@ func (client Client) DeleteSpaceQuota(spaceQuotaGUID string) (JobURL, Warnings, 
 }
 
 func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSpaceQuotaRequest,
-		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
-	})
-	if err != nil {
-		return SpaceQuota{}, nil, err
-	}
-	var responseSpaceQuota SpaceQuota
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseSpaceQuota,
-	}
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return SpaceQuota{}, response.Warnings, err
-	}
+	var responseBody SpaceQuota
 
-	return responseSpaceQuota, response.Warnings, nil
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetSpaceQuotaRequest,
+		URIParams:    internal.Params{"quota_guid": spaceQuotaGUID},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
 }
 
 func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {
@@ -218,48 +192,26 @@ func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, er
 }
 
 func (client *Client) UnsetSpaceQuota(spaceQuotaGUID, spaceGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID, "space_guid": spaceGUID},
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.DeleteSpaceQuotaFromSpaceRequest,
+		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID, "space_guid": spaceGUID},
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	var response cloudcontroller.Response
-
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return warnings, err
 }
 
 func (client *Client) UpdateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnings, error) {
 	spaceQuotaGUID := spaceQuota.GUID
 	spaceQuota.GUID = ""
 
-	quotaBytes, err := json.Marshal(spaceQuota)
-	if err != nil {
-		return SpaceQuota{}, nil, err
-	}
+	var responseBody SpaceQuota
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchSpaceQuotaRequest,
-		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
-		Body:        bytes.NewReader(quotaBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchSpaceQuotaRequest,
+		URIParams:    internal.Params{"quota_guid": spaceQuotaGUID},
+		RequestBody:  spaceQuota,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return SpaceQuota{}, nil, err
-	}
 
-	var responseSpaceQuota SpaceQuota
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseSpaceQuota,
-	}
-
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return SpaceQuota{}, response.Warnings, err
-	}
-
-	return responseSpaceQuota, response.Warnings, nil
+	return responseBody, warnings, err
 }

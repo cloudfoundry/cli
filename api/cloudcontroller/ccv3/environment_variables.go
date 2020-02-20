@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -52,50 +51,27 @@ func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVari
 // environment variables on an application. A restart is required for changes
 // to take effect.
 func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
-	bodyBytes, err := json.Marshal(envVars)
-	if err != nil {
-		return EnvironmentVariables{}, nil, err
-	}
+	var responseBody EnvironmentVariables
 
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"app_guid": appGUID},
-		RequestName: internal.PatchApplicationEnvironmentVariablesRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchApplicationEnvironmentVariablesRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		RequestBody:  envVars,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return EnvironmentVariables{}, nil, err
-	}
 
-	var responseEnvVars EnvironmentVariables
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseEnvVars,
-	}
-	err = client.connection.Make(request, &response)
-	return responseEnvVars, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
-	bodyBytes, err := json.Marshal(envVars)
+	var responseBody EnvironmentVariables
 
-	if err != nil {
-		return EnvironmentVariables{}, nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"group_name": string(group)},
-		RequestName: internal.PatchEnvironmentVariableGroupRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchEnvironmentVariableGroupRequest,
+		URIParams:    internal.Params{"group_name": string(group)},
+		RequestBody:  envVars,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return EnvironmentVariables{}, nil, err
-	}
-
-	var responseEnvVars EnvironmentVariables
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseEnvVars,
-	}
-
-	err = client.connection.Make(request, &response)
-	return responseEnvVars, response.Warnings, err
+	return responseBody, warnings, err
 }

@@ -129,21 +129,15 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 
 // GetPackage returns the package with the given GUID.
 func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetPackageRequest,
-		URIParams:   internal.Params{"package_guid": packageGUID},
+	var responseBody Package
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetPackageRequest,
+		URIParams:    internal.Params{"package_guid": packageGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Package{}, nil, err
-	}
 
-	var responsePackage Package
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responsePackage,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responsePackage, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // GetPackages returns the list of packages.

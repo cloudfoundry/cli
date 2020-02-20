@@ -15,6 +15,7 @@ type requestParams struct {
 	RequestBody    interface{}
 	RequestHeaders [][]string
 	ResponseBody   interface{}
+	URL            string
 }
 
 func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings, error) {
@@ -22,6 +23,7 @@ func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings
 		RequestName: requestParams.RequestName,
 		URIParams:   requestParams.URIParams,
 		Query:       requestParams.Query,
+		URL:         requestParams.URL,
 	}
 
 	if requestParams.RequestBody != nil {

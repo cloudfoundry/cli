@@ -1,10 +1,8 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -65,27 +63,14 @@ func (client *Client) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
 }
 
 func (client *Client) UpdateFeatureFlag(flag FeatureFlag) (FeatureFlag, Warnings, error) {
-	bodyBytes, err := json.Marshal(flag)
-	if err != nil {
-		return FeatureFlag{}, nil, err
-	}
+	var responseBody FeatureFlag
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchFeatureFlagRequest,
-		URIParams:   map[string]string{"name": flag.Name},
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchFeatureFlagRequest,
+		URIParams:    internal.Params{"name": flag.Name},
+		RequestBody:  flag,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return FeatureFlag{}, nil, err
-	}
-
-	var ccFlag FeatureFlag
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &ccFlag,
-	}
-
-	err = client.connection.Make(request, &response)
-
-	return ccFlag, response.Warnings, err
+	return responseBody, warnings, err
 }

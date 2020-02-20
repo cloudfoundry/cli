@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -93,23 +92,15 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 
 // GetApplicationProcessByType returns application process of specified type
 func (client *Client) GetApplicationProcessByType(appGUID string, processType string) (Process, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationProcessRequest,
-		URIParams: map[string]string{
-			"app_guid": appGUID,
-			"type":     processType,
-		},
-	})
-	if err != nil {
-		return Process{}, nil, err
-	}
-	var process Process
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &process,
-	}
+	var responseBody Process
 
-	err = client.connection.Make(request, &response)
-	return process, response.Warnings, err
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetApplicationProcessRequest,
+		URIParams:    internal.Params{"app_guid": appGUID, "type": processType},
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
 }
 
 // GetApplicationProcesses lists processes for a given application. **Note**:
@@ -180,56 +171,37 @@ func (client *Client) GetNewApplicationProcesses(appGUID string, deploymentGUID 
 
 // GetProcess returns a process with the given guid
 func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetProcessRequest,
-		URIParams: map[string]string{
-			"process_guid": processGUID,
-		},
+	var responseBody Process
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetProcessRequest,
+		URIParams:    internal.Params{"process_guid": processGUID},
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return Process{}, nil, err
-	}
-
-	var process Process
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &process,
-	}
-
-	err = client.connection.Make(request, &response)
-	return process, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // UpdateProcess updates the process's command or health check settings. GUID
 // is always required; HealthCheckType is only required when updating health
 // check settings.
 func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) {
-	body, err := json.Marshal(Process{
-		Command:                      process.Command,
-		HealthCheckType:              process.HealthCheckType,
-		HealthCheckEndpoint:          process.HealthCheckEndpoint,
-		HealthCheckTimeout:           process.HealthCheckTimeout,
-		HealthCheckInvocationTimeout: process.HealthCheckInvocationTimeout,
-	})
-	if err != nil {
-		return Process{}, nil, err
-	}
+	var responseBody Process
 
-	request, err := client.newHTTPRequest(requestOptions{
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PatchProcessRequest,
-		Body:        bytes.NewReader(body),
 		URIParams:   internal.Params{"process_guid": process.GUID},
+		RequestBody: Process{
+			Command:                      process.Command,
+			HealthCheckType:              process.HealthCheckType,
+			HealthCheckEndpoint:          process.HealthCheckEndpoint,
+			HealthCheckTimeout:           process.HealthCheckTimeout,
+			HealthCheckInvocationTimeout: process.HealthCheckInvocationTimeout,
+		},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Process{}, nil, err
-	}
 
-	var responseProcess Process
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseProcess,
-	}
-	err = client.connection.Make(request, &response)
-	return responseProcess, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 type healthCheck struct {

@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -90,25 +89,15 @@ func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Tas
 
 // UpdateTaskCancel cancels a task.
 func (client *Client) UpdateTaskCancel(taskGUID string) (Task, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	var responseBody Task
+
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PutTaskCancelRequest,
 		URIParams: internal.Params{
 			"task_guid": taskGUID,
 		},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Task{}, nil, err
-	}
 
-	var task Task
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &task,
-	}
-
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return Task{}, response.Warnings, err
-	}
-
-	return task, response.Warnings, nil
+	return responseBody, warnings, err
 }

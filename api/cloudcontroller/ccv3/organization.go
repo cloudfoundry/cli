@@ -1,10 +1,8 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -118,25 +116,15 @@ func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID stri
 
 // GetOrganization gets an organization by the given guid.
 func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetOrganizationRequest,
-		URIParams:   map[string]string{"organization_guid": orgGUID},
+	var responseBody Organization
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetOrganizationRequest,
+		URIParams:    internal.Params{"organization_guid": orgGUID},
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return Organization{}, nil, err
-	}
-
-	var responseOrg Organization
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrg,
-	}
-	err = client.connection.Make(request, &response)
-	if err != nil {
-		return Organization{}, response.Warnings, err
-	}
-
-	return responseOrg, response.Warnings, nil
+	return responseBody, warnings, err
 }
 
 // GetOrganizations lists organizations with optional filters.
@@ -169,28 +157,15 @@ func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings
 func (client *Client) UpdateOrganization(org Organization) (Organization, Warnings, error) {
 	orgGUID := org.GUID
 	org.GUID = ""
-	orgBytes, err := json.Marshal(org)
-	if err != nil {
-		return Organization{}, nil, err
-	}
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchOrganizationRequest,
-		Body:        bytes.NewReader(orgBytes),
-		URIParams:   map[string]string{"organization_guid": orgGUID},
+
+	var responseBody Organization
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchOrganizationRequest,
+		URIParams:    internal.Params{"organization_guid": orgGUID},
+		RequestBody:  org,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return Organization{}, nil, err
-	}
-
-	var responseOrg Organization
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseOrg,
-	}
-	err = client.connection.Make(request, &response)
-
-	if err != nil {
-		return Organization{}, nil, err
-	}
-	return responseOrg, nil, err
+	return responseBody, warnings, err
 }

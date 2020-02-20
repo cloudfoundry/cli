@@ -1,10 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"fmt"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -14,35 +10,25 @@ type SpaceFeature struct {
 }
 
 func (client *Client) GetSpaceFeature(spaceGUID string, featureName string) (bool, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSpaceFeatureRequest,
-		URIParams:   map[string]string{"space_guid": spaceGUID, "feature": featureName},
+	var responseBody SpaceFeature
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.GetSpaceFeatureRequest,
+		URIParams:    internal.Params{"space_guid": spaceGUID, "feature": featureName},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return false, nil, err
-	}
 
-	var feature SpaceFeature
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &feature,
-	}
-	err = client.connection.Make(request, &response)
-
-	return feature.Enabled, response.Warnings, err
+	return responseBody.Enabled, warnings, err
 }
 
 func (client *Client) UpdateSpaceFeature(spaceGUID string, enabled bool, featureName string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PatchSpaceFeaturesRequest,
-		Body:        bytes.NewReader([]byte(fmt.Sprintf(`{"enabled":%t}`, enabled))),
-		URIParams:   map[string]string{"space_guid": spaceGUID, "feature": featureName},
+		URIParams:   internal.Params{"space_guid": spaceGUID, "feature": featureName},
+		RequestBody: struct {
+			Enabled bool `json:"enabled"`
+		}{Enabled: enabled},
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }

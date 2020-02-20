@@ -1,11 +1,8 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -162,25 +159,13 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 		return "", nil, err
 	}
 
-	bodyBytes, err := json.Marshal(brokerUpdateRequest)
-	if err != nil {
-		return "", nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
+	jobURL, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PatchServiceBrokerRequest,
-		URIParams: map[string]string{
-			"service_broker_guid": serviceBrokerGUID,
-		},
-		Body: bytes.NewReader(bodyBytes),
+		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
+		RequestBody: brokerUpdateRequest,
 	})
-	if err != nil {
-		return "", nil, err
-	}
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }
 
 func newServiceBroker(serviceBroker ServiceBrokerModel) serviceBrokerRequest {

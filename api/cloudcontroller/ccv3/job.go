@@ -3,7 +3,6 @@ package ccv3
 import (
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
@@ -73,24 +72,18 @@ type JobErrorDetails struct {
 
 // GetJob returns a job for the provided GUID.
 func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{URL: string(jobURL)})
-	if err != nil {
-		return Job{}, nil, err
-	}
+	var responseBody Job
 
-	var job Job
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &job,
-	}
+	_, warnings, err := client.makeRequest(requestParams{
+		URL:          string(jobURL),
+		ResponseBody: &responseBody,
+	})
 
-	err = client.connection.Make(request, &response)
-	warnings := response.Warnings
-
-	for _, jobWarning := range job.Warnings {
+	for _, jobWarning := range responseBody.Warnings {
 		warnings = append(warnings, jobWarning.Detail)
 	}
 
-	return job, warnings, err
+	return responseBody, warnings, err
 }
 
 // PollJob will keep polling the given job until the job has terminated, an

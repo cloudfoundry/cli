@@ -1,10 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -73,28 +69,14 @@ func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
 	space.GUID = ""
 	space.Relationships = nil
 
-	spaceBytes, err := json.Marshal(space)
-	if err != nil {
-		return Space{}, nil, err
-	}
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchSpaceRequest,
-		Body:        bytes.NewReader(spaceBytes),
-		URIParams:   map[string]string{"space_guid": spaceGUID},
+	var responseBody Space
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchSpaceRequest,
+		URIParams:    map[string]string{"space_guid": spaceGUID},
+		RequestBody:  space,
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return Space{}, nil, err
-	}
-
-	var responseSpace Space
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseSpace,
-	}
-	err = client.connection.Make(request, &response)
-
-	if err != nil {
-		return Space{}, nil, err
-	}
-	return responseSpace, response.Warnings, err
+	return responseBody, warnings, err
 }

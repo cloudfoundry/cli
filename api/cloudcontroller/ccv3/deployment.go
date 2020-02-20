@@ -73,20 +73,12 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 }
 
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	_, warnings, err := client.makeRequest(requestParams{
 		RequestName: internal.PostApplicationDeploymentActionCancelRequest,
-		URIParams:   map[string]string{"deployment_guid": deploymentGUID},
+		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	response := cloudcontroller.Response{}
-
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
+	return warnings, err
 }
 
 func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID string) (string, Warnings, error) {

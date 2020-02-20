@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -185,82 +184,53 @@ func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, 
 
 // UpdateApplication updates an application with the given settings.
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
-	bodyBytes, err := json.Marshal(app)
-	if err != nil {
-		return Application{}, nil, err
-	}
+	var responseBody Application
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchApplicationRequest,
-		Body:        bytes.NewReader(bodyBytes),
-		URIParams:   map[string]string{"app_guid": app.GUID},
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PatchApplicationRequest,
+		URIParams:    internal.Params{"app_guid": app.GUID},
+		RequestBody:  app,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Application{}, nil, err
-	}
 
-	var responseApp Application
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseApp,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseApp, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // UpdateApplicationRestart restarts the given application.
 func (client *Client) UpdateApplicationRestart(appGUID string) (Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationActionRestartRequest,
-		URIParams:   map[string]string{"app_guid": appGUID},
+	var responseBody Application
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationActionRestartRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Application{}, nil, err
-	}
 
-	var responseApp Application
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseApp,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseApp, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // UpdateApplicationStart starts the given application.
 func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationActionStartRequest,
-		URIParams:   map[string]string{"app_guid": appGUID},
+	var responseBody Application
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationActionStartRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Application{}, nil, err
-	}
 
-	var responseApp Application
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseApp,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseApp, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // UpdateApplicationStop stops the given application.
 func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationActionStopRequest,
-		URIParams:   map[string]string{"app_guid": appGUID},
+	var responseBody Application
+
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostApplicationActionStopRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Application{}, nil, err
-	}
 
-	var responseApp Application
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responseApp,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseApp, response.Warnings, err
+	return responseBody, warnings, err
 }

@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -48,52 +47,29 @@ func (r *RelationshipList) UnmarshalJSON(data []byte) error {
 // EntitleIsolationSegmentToOrganizations will create a link between the
 // isolation segment and the list of organizations provided.
 func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUID string, organizationGUIDs []string) (RelationshipList, Warnings, error) {
-	body, err := json.Marshal(RelationshipList{GUIDs: organizationGUIDs})
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
+	var responseBody RelationshipList
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostIsolationSegmentRelationshipOrganizationsRequest,
-		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID},
-		Body:        bytes.NewReader(body),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostIsolationSegmentRelationshipOrganizationsRequest,
+		URIParams:    internal.Params{"isolation_segment_guid": isolationSegmentGUID},
+		RequestBody:  RelationshipList{GUIDs: organizationGUIDs},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
 
-	var relationships RelationshipList
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &relationships,
-	}
-
-	err = client.connection.Make(request, &response)
-	return relationships, response.Warnings, err
+	return responseBody, warnings, err
 }
 
 // ShareServiceInstanceToSpaces will create a sharing relationship between
 // the service instance and the shared-to space for each space provided.
 func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (RelationshipList, Warnings, error) {
-	body, err := json.Marshal(RelationshipList{GUIDs: spaceGUIDs})
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
+	var responseBody RelationshipList
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
-		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
-		Body:        bytes.NewReader(body),
+	_, warnings, err := client.makeRequest(requestParams{
+		RequestName:  internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
+		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
+		RequestBody:  RelationshipList{GUIDs: spaceGUIDs},
+		ResponseBody: &responseBody,
 	})
 
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
-
-	var relationships RelationshipList
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &relationships,
-	}
-
-	err = client.connection.Make(request, &response)
-	return relationships, response.Warnings, err
+	return responseBody, warnings, err
 }
