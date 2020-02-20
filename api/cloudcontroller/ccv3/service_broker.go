@@ -3,7 +3,6 @@ package ccv3
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -128,28 +127,19 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, War
 
 // GetServiceBrokers lists service brokers.
 func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetServiceBrokersRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []ServiceBroker
 
-	var fullList []ServiceBroker
-	warnings, err := client.paginate(request, serviceBrokerResponse{}, func(item interface{}) error {
-		if serviceBroker, ok := item.(serviceBrokerResponse); ok {
-			fullList = append(fullList, extractServiceBrokerData(serviceBroker))
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   serviceBrokerResponse{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetServiceBrokersRequest,
+		Query:        query,
+		ResponseBody: ServiceBroker{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(ServiceBroker))
+			return nil
+		},
 	})
 
-	return fullList, warnings, err
+	return resources, warnings, err
 }
 
 // UpdateServiceBroker updates an existing service broker.

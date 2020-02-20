@@ -3,7 +3,6 @@ package ccv3
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -37,29 +36,18 @@ func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, er
 
 // GetFeatureFlags lists feature flags.
 func (client *Client) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetFeatureFlagsRequest,
+	var resources []FeatureFlag
+
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetFeatureFlagsRequest,
+		ResponseBody: FeatureFlag{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(FeatureFlag))
+			return nil
+		},
 	})
 
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var fullFeatureFlagList []FeatureFlag
-	warnings, err := client.paginate(request, FeatureFlag{}, func(item interface{}) error {
-		if featureFlag, ok := item.(FeatureFlag); ok {
-			fullFeatureFlagList = append(fullFeatureFlagList, featureFlag)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   FeatureFlag{},
-				Unexpected: item,
-			}
-		}
-		return nil
-	})
-
-	return fullFeatureFlagList, warnings, err
-
+	return resources, warnings, err
 }
 
 func (client *Client) UpdateFeatureFlag(flag FeatureFlag) (FeatureFlag, Warnings, error) {

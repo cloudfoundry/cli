@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
@@ -106,28 +105,19 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 // GetApplicationProcesses lists processes for a given application. **Note**:
 // Due to security, the API obfuscates certain values such as `command`.
 func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationProcessesRequest,
-		URIParams:   map[string]string{"app_guid": appGUID},
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Process
 
-	var fullProcessesList []Process
-	warnings, err := client.paginate(request, Process{}, func(item interface{}) error {
-		if process, ok := item.(Process); ok {
-			fullProcessesList = append(fullProcessesList, process)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Process{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetApplicationProcessesRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: Process{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Process))
+			return nil
+		},
 	})
 
-	return fullProcessesList, warnings, err
+	return resources, warnings, err
 }
 
 // GetNewApplicationProcesses gets processes for an application in the middle of a deployment.

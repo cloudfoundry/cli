@@ -142,28 +142,19 @@ func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) 
 
 // GetPackages returns the list of packages.
 func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetPackagesRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Package
 
-	var fullPackagesList []Package
-	warnings, err := client.paginate(request, Package{}, func(item interface{}) error {
-		if pkg, ok := item.(Package); ok {
-			fullPackagesList = append(fullPackagesList, pkg)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Package{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetPackagesRequest,
+		Query:        query,
+		ResponseBody: Package{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Package))
+			return nil
+		},
 	})
 
-	return fullPackagesList, warnings, err
+	return resources, warnings, err
 }
 
 // UploadBitsPackage uploads the newResources and a list of existing resources

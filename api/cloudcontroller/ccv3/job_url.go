@@ -24,7 +24,7 @@ func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (JobURL, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionApplyManifest,
-		URIParams:   map[string]string{"app_guid": appGUID},
+		URIParams:   internal.Params{"app_guid": appGUID},
 		Body:        bytes.NewReader(rawManifest),
 	})
 
@@ -54,7 +54,7 @@ func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []b
 	request, requestExecuteErr := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostSpaceActionApplyManifestRequest,
 		Query:       query,
-		URIParams:   map[string]string{"space_guid": spaceGUID},
+		URIParams:   internal.Params{"space_guid": spaceGUID},
 		Body:        bytes.NewReader(rawManifest),
 	})
 

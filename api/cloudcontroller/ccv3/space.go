@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -40,28 +39,19 @@ func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
 
 // GetSpaces lists spaces with optional filters.
 func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSpacesRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Space
 
-	var fullSpacesList []Space
-	warnings, err := client.paginate(request, Space{}, func(item interface{}) error {
-		if space, ok := item.(Space); ok {
-			fullSpacesList = append(fullSpacesList, space)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Space{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetSpacesRequest,
+		Query:        query,
+		ResponseBody: Space{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Space))
+			return nil
+		},
 	})
 
-	return fullSpacesList, warnings, err
+	return resources, warnings, err
 }
 
 func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
@@ -73,7 +63,7 @@ func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
 
 	_, warnings, err := client.makeRequest(requestParams{
 		RequestName:  internal.PatchSpaceRequest,
-		URIParams:    map[string]string{"space_guid": spaceGUID},
+		URIParams:    internal.Params{"space_guid": spaceGUID},
 		RequestBody:  space,
 		ResponseBody: &responseBody,
 	})

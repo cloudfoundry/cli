@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -130,26 +129,17 @@ func (client *Client) DeleteRole(roleGUID string) (JobURL, Warnings, error) {
 
 // GetRoles lists roles with optional filters & includes.
 func (client *Client) GetRoles(query ...Query) ([]Role, IncludedResources, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetRolesRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, IncludedResources{}, nil, err
-	}
+	var resources []Role
 
-	var rolesList []Role
-	includes, warnings, err := client.paginateWithIncludes(request, Role{}, func(item interface{}) error {
-		if role, ok := item.(Role); ok {
-			rolesList = append(rolesList, role)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Role{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	includedResources, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetRolesRequest,
+		Query:        query,
+		ResponseBody: Role{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Role))
+			return nil
+		},
 	})
 
-	return rolesList, includes, warnings, err
+	return resources, includedResources, warnings, err
 }

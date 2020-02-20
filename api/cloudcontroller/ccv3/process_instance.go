@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -98,26 +97,17 @@ func (client *Client) DeleteApplicationProcessInstance(appGUID string, processTy
 
 // GetProcessInstances lists instance stats for a given process.
 func (client *Client) GetProcessInstances(processGUID string) ([]ProcessInstance, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetProcessStatsRequest,
-		URIParams:   map[string]string{"process_guid": processGUID},
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []ProcessInstance
 
-	var fullInstancesList []ProcessInstance
-	warnings, err := client.paginate(request, ProcessInstance{}, func(item interface{}) error {
-		if instance, ok := item.(ProcessInstance); ok {
-			fullInstancesList = append(fullInstancesList, instance)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   ProcessInstance{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetProcessStatsRequest,
+		URIParams:    internal.Params{"process_guid": processGUID},
+		ResponseBody: ProcessInstance{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(ProcessInstance))
+			return nil
+		},
 	})
 
-	return fullInstancesList, warnings, err
+	return resources, warnings, err
 }

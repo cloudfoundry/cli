@@ -116,7 +116,7 @@ func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID 
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.PatchServiceBrokerRequest,
 			Body:        bytes.NewReader(metadataBytes),
-			URIParams:   map[string]string{"service_broker_guid": resourceGUID},
+			URIParams:   internal.Params{"service_broker_guid": resourceGUID},
 		})
 	default:
 		return "", nil, fmt.Errorf("unknown async resource type (%s) requested", resource)

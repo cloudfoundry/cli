@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -57,28 +56,19 @@ func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota,
 }
 
 func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetOrganizationQuotasRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return []OrganizationQuota{}, nil, err
-	}
+	var resources []OrganizationQuota
 
-	var orgQuotasList []OrganizationQuota
-	warnings, err := client.paginate(request, OrganizationQuota{}, func(item interface{}) error {
-		if orgQuota, ok := item.(OrganizationQuota); ok {
-			orgQuotasList = append(orgQuotasList, orgQuota)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   OrganizationQuota{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetOrganizationQuotasRequest,
+		Query:        query,
+		ResponseBody: OrganizationQuota{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(OrganizationQuota))
+			return nil
+		},
 	})
 
-	return orgQuotasList, warnings, err
+	return resources, warnings, err
 }
 
 func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {

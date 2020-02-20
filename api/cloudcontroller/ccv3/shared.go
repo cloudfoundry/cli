@@ -16,9 +16,10 @@ type requestParams struct {
 	RequestHeaders [][]string
 	ResponseBody   interface{}
 	URL            string
+	AppendToList   func(item interface{}) error
 }
 
-func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings, error) {
+func (client *Client) buildRequest(requestParams requestParams) (*cloudcontroller.Request, error) {
 	options := requestOptions{
 		RequestName: requestParams.RequestName,
 		URIParams:   requestParams.URIParams,
@@ -29,7 +30,7 @@ func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings
 	if requestParams.RequestBody != nil {
 		body, err := json.Marshal(requestParams.RequestBody)
 		if err != nil {
-			return "", nil, err
+			return nil, err
 		}
 
 		options.Body = bytes.NewReader(body)
@@ -37,13 +38,25 @@ func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings
 
 	request, err := client.newHTTPRequest(options)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	if requestParams.RequestHeaders != nil {
-		for _, header := range requestParams.RequestHeaders {
-			request.Header.Set(header[0], header[1])
-		}
+	return request, err
+}
+
+func (client *Client) makeListRequest(requestParams requestParams) (IncludedResources, Warnings, error) {
+	request, err := client.buildRequest(requestParams)
+	if err != nil {
+		return IncludedResources{}, nil, err
+	}
+
+	return client.paginate(request, requestParams.ResponseBody, requestParams.AppendToList)
+}
+
+func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings, error) {
+	request, err := client.buildRequest(requestParams)
+	if err != nil {
+		return "", nil, err
 	}
 
 	response := cloudcontroller.Response{}

@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
@@ -89,55 +88,37 @@ func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) 
 
 // GetDroplets lists droplets with optional filters.
 func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDropletsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Droplet
 
-	var responseDroplets []Droplet
-	warnings, err := client.paginate(request, Droplet{}, func(item interface{}) error {
-		if droplet, ok := item.(Droplet); ok {
-			responseDroplets = append(responseDroplets, droplet)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Droplet{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetDropletsRequest,
+		Query:        query,
+		ResponseBody: Droplet{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Droplet))
+			return nil
+		},
 	})
 
-	return responseDroplets, warnings, err
+	return resources, warnings, err
 }
 
 // GetPackageDroplets returns the droplets that run the specified packages
 func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetPackageDropletsRequest,
-		URIParams:   map[string]string{"package_guid": packageGUID},
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Droplet
 
-	var responseDroplets []Droplet
-	warnings, err := client.paginate(request, Droplet{}, func(item interface{}) error {
-		if droplet, ok := item.(Droplet); ok {
-			responseDroplets = append(responseDroplets, droplet)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Droplet{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetPackageDropletsRequest,
+		URIParams:    internal.Params{"package_guid": packageGUID},
+		Query:        query,
+		ResponseBody: Droplet{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Droplet))
+			return nil
+		},
 	})
 
-	return responseDroplets, warnings, err
+	return resources, warnings, err
 }
 
 // UploadDropletBits asynchronously uploads bits from a .tgz file located at dropletPath to the

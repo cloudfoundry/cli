@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -55,26 +54,17 @@ func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
 }
 
 func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetUsersRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []User
 
-	var usersList []User
-	warnings, err := client.paginate(request, User{}, func(item interface{}) error {
-		if user, ok := item.(User); ok {
-			usersList = append(usersList, user)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   User{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetUsersRequest,
+		Query:        query,
+		ResponseBody: User{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(User))
+			return nil
+		},
 	})
 
-	return usersList, warnings, err
+	return resources, warnings, err
 }

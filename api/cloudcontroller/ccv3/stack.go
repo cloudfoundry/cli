@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -19,26 +18,17 @@ type Stack struct {
 
 // GetStacks lists stacks with optional filters.
 func (client *Client) GetStacks(query ...Query) ([]Stack, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetStacksRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Stack
 
-	var fullStacksList []Stack
-	warnings, err := client.paginate(request, Stack{}, func(item interface{}) error {
-		if stack, ok := item.(Stack); ok {
-			fullStacksList = append(fullStacksList, stack)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Stack{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetStacksRequest,
+		Query:        query,
+		ResponseBody: Stack{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Stack))
+			return nil
+		},
 	})
 
-	return fullStacksList, warnings, err
+	return resources, warnings, err
 }

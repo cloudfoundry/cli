@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
 )
@@ -195,54 +194,36 @@ func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 }
 
 func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDomainsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Domain
 
-	var fullDomainsList []Domain
-	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
-		if domain, ok := item.(Domain); ok {
-			fullDomainsList = append(fullDomainsList, domain)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Domain{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetDomainsRequest,
+		Query:        query,
+		ResponseBody: Domain{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Domain))
+			return nil
+		},
 	})
 
-	return fullDomainsList, warnings, err
+	return resources, warnings, err
 }
 
 func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URIParams:   internal.Params{"organization_guid": orgGUID},
-		RequestName: internal.GetOrganizationDomainsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Domain
 
-	var fullDomainsList []Domain
-	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
-		if domain, ok := item.(Domain); ok {
-			fullDomainsList = append(fullDomainsList, domain)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Domain{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		URIParams:    internal.Params{"organization_guid": orgGUID},
+		RequestName:  internal.GetOrganizationDomainsRequest,
+		Query:        query,
+		ResponseBody: Domain{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Domain))
+			return nil
+		},
 	})
 
-	return fullDomainsList, warnings, err
+	return resources, warnings, err
 }
 
 func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {

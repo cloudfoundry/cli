@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -60,31 +59,20 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 // GetApplicationTasks returns a list of tasks associated with the provided
 // application GUID. Results can be filtered by providing URL queries.
 func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Task, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationTasksRequest,
-		URIParams: internal.Params{
-			"app_guid": appGUID,
+	var resources []Task
+
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetApplicationTasksRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		Query:        query,
+		ResponseBody: Task{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Task))
+			return nil
 		},
-		Query: query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var fullTasksList []Task
-	warnings, err := client.paginate(request, Task{}, func(item interface{}) error {
-		if task, ok := item.(Task); ok {
-			fullTasksList = append(fullTasksList, task)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Task{},
-				Unexpected: item,
-			}
-		}
-		return nil
 	})
 
-	return fullTasksList, warnings, err
+	return resources, warnings, err
 }
 
 // UpdateTaskCancel cancels a task.

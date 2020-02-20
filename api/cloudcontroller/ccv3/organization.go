@@ -3,7 +3,6 @@ package ccv3
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -90,28 +89,19 @@ func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error)
 // GetIsolationSegmentOrganizations lists organizations
 // entitled to an isolation segment.
 func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]Organization, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetIsolationSegmentOrganizationsRequest,
-		URIParams:   map[string]string{"isolation_segment_guid": isolationSegmentGUID},
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Organization
 
-	var fullOrgsList []Organization
-	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
-		if app, ok := item.(Organization); ok {
-			fullOrgsList = append(fullOrgsList, app)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Organization{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetIsolationSegmentOrganizationsRequest,
+		URIParams:    internal.Params{"isolation_segment_guid": isolationSegmentGUID},
+		ResponseBody: Organization{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Organization))
+			return nil
+		},
 	})
 
-	return fullOrgsList, warnings, err
+	return resources, warnings, err
 }
 
 // GetOrganization gets an organization by the given guid.
@@ -129,28 +119,19 @@ func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, e
 
 // GetOrganizations lists organizations with optional filters.
 func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetOrganizationsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Organization
 
-	var fullOrgsList []Organization
-	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
-		if app, ok := item.(Organization); ok {
-			fullOrgsList = append(fullOrgsList, app)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Organization{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetOrganizationsRequest,
+		Query:        query,
+		ResponseBody: Organization{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Organization))
+			return nil
+		},
 	})
 
-	return fullOrgsList, warnings, err
+	return resources, warnings, err
 }
 
 // UpdateOrganization updates an organization with the given properties.

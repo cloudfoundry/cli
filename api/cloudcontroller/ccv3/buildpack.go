@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
 	"code.cloudfoundry.org/cli/types"
@@ -123,28 +122,19 @@ func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, er
 
 // GetBuildpacks lists buildpacks with optional filters.
 func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetBuildpacksRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Buildpack
 
-	var fullBuildpacksList []Buildpack
-	warnings, err := client.paginate(request, Buildpack{}, func(item interface{}) error {
-		if buildpack, ok := item.(Buildpack); ok {
-			fullBuildpacksList = append(fullBuildpacksList, buildpack)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Buildpack{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetBuildpacksRequest,
+		Query:        query,
+		ResponseBody: Buildpack{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Buildpack))
+			return nil
+		},
 	})
 
-	return fullBuildpacksList, warnings, err
+	return resources, warnings, err
 }
 
 func (client Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {

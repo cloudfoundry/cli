@@ -158,28 +158,19 @@ func (client *Client) GetApplicationByNameAndSpace(appName string, spaceGUID str
 
 // GetApplications lists applications with optional queries.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Application
 
-	var fullAppsList []Application
-	warnings, err := client.paginate(request, Application{}, func(item interface{}) error {
-		if app, ok := item.(Application); ok {
-			fullAppsList = append(fullAppsList, app)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Application{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetApplicationsRequest,
+		Query:        query,
+		ResponseBody: Application{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Application))
+			return nil
+		},
 	})
 
-	return fullAppsList, warnings, err
+	return resources, warnings, err
 }
 
 // UpdateApplication updates an application with the given settings.

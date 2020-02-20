@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -141,28 +140,19 @@ func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 }
 
 func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationRoutesRequest,
-		URIParams:   internal.Params{"app_guid": appGUID},
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Route
 
-	var fullRoutesList []Route
-	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
-		if route, ok := item.(Route); ok {
-			fullRoutesList = append(fullRoutesList, route)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Route{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetApplicationRoutesRequest,
+		URIParams:    internal.Params{"app_guid": appGUID},
+		ResponseBody: Route{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Route))
+			return nil
+		},
 	})
 
-	return fullRoutesList, warnings, err
+	return resources, warnings, err
 }
 
 func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination, Warnings, error) {
@@ -180,28 +170,19 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination,
 }
 
 func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetRoutesRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Route
 
-	var fullRoutesList []Route
-	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
-		if route, ok := item.(Route); ok {
-			fullRoutesList = append(fullRoutesList, route)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Route{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetRoutesRequest,
+		Query:        query,
+		ResponseBody: Route{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Route))
+			return nil
+		},
 	})
 
-	return fullRoutesList, warnings, err
+	return resources, warnings, err
 }
 
 func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error) {

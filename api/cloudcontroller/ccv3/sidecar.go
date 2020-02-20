@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
 	"code.cloudfoundry.org/cli/types"
@@ -14,26 +13,17 @@ type Sidecar struct {
 }
 
 func (client *Client) GetProcessSidecars(processGuid string) ([]Sidecar, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetProcessSidecarsRequest,
-		URIParams:   map[string]string{"process_guid": processGuid},
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []Sidecar
 
-	var fullSidecarList []Sidecar
-	warnings, err := client.paginate(request, Sidecar{}, func(item interface{}) error {
-		if sidecar, ok := item.(Sidecar); ok {
-			fullSidecarList = append(fullSidecarList, sidecar)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   Sidecar{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetProcessSidecarsRequest,
+		URIParams:    internal.Params{"process_guid": processGuid},
+		ResponseBody: Sidecar{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Sidecar))
+			return nil
+		},
 	})
 
-	return fullSidecarList, warnings, err
+	return resources, warnings, err
 }

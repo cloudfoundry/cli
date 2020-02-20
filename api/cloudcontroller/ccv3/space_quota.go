@@ -3,7 +3,6 @@ package ccv3
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -167,28 +166,19 @@ func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings,
 }
 
 func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSpaceQuotasRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []SpaceQuota
 
-	var spaceQuotasList []SpaceQuota
-	warnings, err := client.paginate(request, SpaceQuota{}, func(item interface{}) error {
-		if spaceQuota, ok := item.(SpaceQuota); ok {
-			spaceQuotasList = append(spaceQuotasList, spaceQuota)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   SpaceQuota{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetSpaceQuotasRequest,
+		Query:        query,
+		ResponseBody: SpaceQuota{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(SpaceQuota))
+			return nil
+		},
 	})
 
-	return spaceQuotasList, warnings, err
+	return resources, warnings, err
 }
 
 func (client *Client) UnsetSpaceQuota(spaceQuotaGUID, spaceGUID string) (Warnings, error) {

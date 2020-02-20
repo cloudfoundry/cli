@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -17,26 +16,17 @@ type ServiceOffering struct {
 
 // GetServiceOffering lists service offering with optional filters.
 func (client *Client) GetServiceOfferings(query ...Query) ([]ServiceOffering, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetServiceOfferingsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []ServiceOffering
 
-	var fullServiceOfferingList []ServiceOffering
-	warnings, err := client.paginate(request, ServiceOffering{}, func(item interface{}) error {
-		if serviceOffering, ok := item.(ServiceOffering); ok {
-			fullServiceOfferingList = append(fullServiceOfferingList, serviceOffering)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   ServiceOffering{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetServiceOfferingsRequest,
+		Query:        query,
+		ResponseBody: ServiceOffering{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(ServiceOffering))
+			return nil
+		},
 	})
 
-	return fullServiceOfferingList, warnings, err
+	return resources, warnings, err
 }

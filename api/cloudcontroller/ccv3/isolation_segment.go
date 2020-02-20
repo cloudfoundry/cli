@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -56,26 +55,17 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 
 // GetIsolationSegments lists isolation segments with optional filters.
 func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetIsolationSegmentsRequest,
-		Query:       query,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+	var resources []IsolationSegment
 
-	var fullIsolationSegmentsList []IsolationSegment
-	warnings, err := client.paginate(request, IsolationSegment{}, func(item interface{}) error {
-		if isolationSegment, ok := item.(IsolationSegment); ok {
-			fullIsolationSegmentsList = append(fullIsolationSegmentsList, isolationSegment)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   IsolationSegment{},
-				Unexpected: item,
-			}
-		}
-		return nil
+	_, warnings, err := client.makeListRequest(requestParams{
+		RequestName:  internal.GetIsolationSegmentsRequest,
+		Query:        query,
+		ResponseBody: IsolationSegment{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(IsolationSegment))
+			return nil
+		},
 	})
 
-	return fullIsolationSegmentsList, warnings, err
+	return resources, warnings, err
 }

@@ -10,33 +10,7 @@ type IncludedResources struct {
 	Users []User
 }
 
-func (client Client) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (Warnings, error) {
-	fullWarningsList := Warnings{}
-
-	for {
-		wrapper, warnings, err := client.wrapFirstPage(request, obj, appendToExternalList)
-		fullWarningsList = append(fullWarningsList, warnings...)
-		if err != nil {
-			return fullWarningsList, err
-		}
-
-		if wrapper.NextPage() == "" {
-			break
-		}
-
-		request, err = client.newHTTPRequest(requestOptions{
-			URL:    wrapper.NextPage(),
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return fullWarningsList, err
-		}
-	}
-
-	return fullWarningsList, nil
-}
-
-func (client Client) paginateWithIncludes(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
+func (client Client) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
 	fullWarningsList := Warnings{}
 	var includes IncludedResources
 
