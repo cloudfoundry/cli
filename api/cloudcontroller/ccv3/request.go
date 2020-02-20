@@ -29,7 +29,7 @@ type requestOptions struct {
 	// Body is the content of the request.
 	Body io.ReadSeeker
 	//TODO delete
-	FromFunc	bool
+	FromFunc bool
 }
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
@@ -68,7 +68,6 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 	if passedRequest.Body != nil {
 		request.Header.Set("Content-Type", "application/json")
 	}
-
 
 	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
 }
