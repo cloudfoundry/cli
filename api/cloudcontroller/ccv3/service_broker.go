@@ -132,9 +132,9 @@ func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnin
 	_, warnings, err := client.makeListRequest(requestParams{
 		RequestName:  internal.GetServiceBrokersRequest,
 		Query:        query,
-		ResponseBody: ServiceBroker{},
+		ResponseBody: serviceBrokerResponse{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(ServiceBroker))
+			resources = append(resources, extractServiceBrokerData(item.(serviceBrokerResponse)))
 			return nil
 		},
 	})
