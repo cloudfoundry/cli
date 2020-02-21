@@ -34,7 +34,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("ApiVersion", func() {
 		It("returns the API version", func() {
-			confirmTestPluginOutput("ApiVersion", `2\.\d+\.\d+`)
+			confirmTestPluginOutput("ApiVersion", `[23]\.\d+\.\d+`)
 		})
 	})
 
