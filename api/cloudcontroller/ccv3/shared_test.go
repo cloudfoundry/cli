@@ -31,6 +31,10 @@ var _ = Describe("shared request helpers", func() {
 			executeErr error
 		)
 
+		BeforeEach(func() {
+			requestParams = RequestParams{}
+		})
+
 		JustBeforeEach(func() {
 			jobURL, warnings, executeErr = client.MakeRequest(requestParams)
 		})
@@ -40,14 +44,16 @@ var _ = Describe("shared request helpers", func() {
 				responseBody Organization
 			)
 
+			BeforeEach(func() {
+				requestParams = RequestParams{
+					RequestName:  internal.GetOrganizationRequest,
+					URIParams:    internal.Params{"organization_guid": "some-org-guid"},
+					ResponseBody: &responseBody,
+				}
+			})
+
 			When("organization exists", func() {
 				BeforeEach(func() {
-					requestParams = RequestParams{
-						RequestName:  internal.GetOrganizationRequest,
-						URIParams:    internal.Params{"organization_guid": "some-org-guid"},
-						ResponseBody: &responseBody,
-					}
-
 					response := `{
 					"name": "some-org-name",
 					"guid": "some-org-guid",
@@ -126,23 +132,26 @@ var _ = Describe("shared request helpers", func() {
 		})
 
 		Context("POST resource", func() {
+			var (
+				requestBody  Buildpack
+				responseBody Buildpack
+			)
+
+			BeforeEach(func() {
+				requestBody = Buildpack{
+					Name:  "some-buildpack",
+					Stack: "some-stack",
+				}
+
+				requestParams = RequestParams{
+					RequestName:  internal.PostBuildpackRequest,
+					RequestBody:  requestBody,
+					ResponseBody: &responseBody,
+				}
+			})
+
 			When("the resource is successfully created", func() {
-				var (
-					responseBody Buildpack
-				)
-
 				BeforeEach(func() {
-					requestBody := Buildpack{
-						Name:  "some-buildpack",
-						Stack: "some-stack",
-					}
-
-					requestParams = RequestParams{
-						RequestName:  internal.PostBuildpackRequest,
-						RequestBody:  requestBody,
-						ResponseBody: &responseBody,
-					}
-
 					response := `{
 						"guid": "some-bp-guid",
 						"created_at": "2016-03-18T23:26:46Z",
@@ -254,16 +263,15 @@ var _ = Describe("shared request helpers", func() {
 		})
 
 		Context("DELETE resource", func() {
-			//var (
-			//	responseBody Space
-			//)
+			BeforeEach(func() {
+				requestParams = RequestParams{
+					RequestName: internal.DeleteSpaceRequest,
+					URIParams:   internal.Params{"space_guid": "space-guid"},
+				}
+			})
 
 			When("no errors are encountered", func() {
 				BeforeEach(func() {
-					requestParams = RequestParams{
-						RequestName: internal.DeleteSpaceRequest,
-						URIParams:   internal.Params{"space_guid": "space-guid"},
-					}
 
 					server.AppendHandlers(
 						CombineHandlers(
@@ -311,25 +319,28 @@ var _ = Describe("shared request helpers", func() {
 				responseBody Application
 			)
 
+			BeforeEach(func() {
+				requestBody := Application{
+					GUID:                "some-app-guid",
+					Name:                "some-app-name",
+					StackName:           "some-stack-name",
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					LifecycleBuildpacks: []string{"some-buildpack"},
+					Relationships: Relationships{
+						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
+					},
+				}
+				requestParams = RequestParams{
+					RequestName:  internal.PatchApplicationRequest,
+					URIParams:    internal.Params{"app_guid": requestBody.GUID},
+					RequestBody:  requestBody,
+					ResponseBody: &responseBody,
+				}
+
+			})
+
 			When("the application successfully is updated", func() {
 				BeforeEach(func() {
-					requestBody := Application{
-						GUID:                "some-app-guid",
-						Name:                "some-app-name",
-						StackName:           "some-stack-name",
-						LifecycleType:       constant.AppLifecycleTypeBuildpack,
-						LifecycleBuildpacks: []string{"some-buildpack"},
-						Relationships: Relationships{
-							constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
-						},
-					}
-
-					requestParams = RequestParams{
-						RequestName:  internal.PatchApplicationRequest,
-						URIParams:    internal.Params{"app_guid": requestBody.GUID},
-						RequestBody:  requestBody,
-						ResponseBody: &responseBody,
-					}
 
 					response := `{
 					"guid": "some-app-guid",

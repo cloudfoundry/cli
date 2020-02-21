@@ -19,31 +19,6 @@ type RequestParams struct {
 	AppendToList   func(item interface{}) error
 }
 
-func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {
-	options := requestOptions{
-		RequestName: requestParams.RequestName,
-		URIParams:   requestParams.URIParams,
-		Query:       requestParams.Query,
-		URL:         requestParams.URL,
-	}
-
-	if requestParams.RequestBody != nil {
-		body, err := json.Marshal(requestParams.RequestBody)
-		if err != nil {
-			return nil, err
-		}
-
-		options.Body = bytes.NewReader(body)
-	}
-
-	request, err := client.newHTTPRequest(options)
-	if err != nil {
-		return nil, err
-	}
-
-	return request, err
-}
-
 func (client *Client) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {
 	request, err := client.buildRequest(requestParams)
 	if err != nil {
@@ -67,4 +42,29 @@ func (client *Client) MakeRequest(requestParams RequestParams) (JobURL, Warnings
 	err = client.connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
+func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {
+	options := requestOptions{
+		RequestName: requestParams.RequestName,
+		URIParams:   requestParams.URIParams,
+		Query:       requestParams.Query,
+		URL:         requestParams.URL,
+	}
+
+	if requestParams.RequestBody != nil {
+		body, err := json.Marshal(requestParams.RequestBody)
+		if err != nil {
+			return nil, err
+		}
+
+		options.Body = bytes.NewReader(body)
+	}
+
+	request, err := client.newHTTPRequest(options)
+	if err != nil {
+		return nil, err
+	}
+
+	return request, err
 }
