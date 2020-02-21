@@ -115,48 +115,31 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 	if err != nil {
 		return Info{}, ResourceLinks{}, warnings, err
 	}
-	request, err := client.newHTTPRequest(requestOptions{
-		Method:   http.MethodGet,
-		URL:      rootResponse.ccV3Link(),
-		FromFunc: true,
+
+	info := ResourceLinks{}
+
+	_, v3Warnings, err := client.MakeRequest(RequestParams{
+		URL:          rootResponse.ccV3Link(),
+		ResponseBody: &info,
 	})
-	if err != nil {
-		return Info{}, ResourceLinks{}, warnings, err
-	}
-	info := ResourceLinks{} // Explicitly initializing
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &info,
-	}
+	warnings = append(warnings, v3Warnings...)
 
-	err = client.connection.Make(request, &response)
-	warnings = append(warnings, response.Warnings...)
-
-	if err != nil {
-		return Info{}, ResourceLinks{}, warnings, err
-	}
-
-	return rootResponse, info, warnings, nil
+	return rootResponse, info, warnings, err
 }
 
 // rootResponse returns the CC API root document.
 func (client *Client) RootResponse() (Info, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		Method: http.MethodGet,
-		URL:    client.cloudControllerURL,
+	var responseBody Info
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		URL:          client.cloudControllerURL,
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return Info{}, nil, err
-	}
 
-	var rootResponse Info
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &rootResponse,
-	}
-
-	err = client.connection.Make(request, &response)
-	if unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError); ok && unknownSourceErr.StatusCode == http.StatusNotFound {
+	unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError)
+	if ok && unknownSourceErr.StatusCode == http.StatusNotFound {
 		return Info{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}
 
-	return rootResponse, response.Warnings, err
+	return responseBody, warnings, err
 }

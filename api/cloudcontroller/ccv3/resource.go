@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"bytes"
 	"encoding/json"
 	"os"
 	"strconv"
@@ -81,24 +80,13 @@ func (r *Resource) UnmarshalJSON(data []byte) error {
 }
 
 func (client Client) ResourceMatch(resources []Resource) ([]Resource, Warnings, error) {
-	bodyBytes, err := json.Marshal(map[string][]Resource{"resources": resources})
-	if err != nil {
-		return []Resource{}, nil, err
-	}
+	var responseBody map[string][]Resource
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostResourceMatchesRequest,
-		Body:        bytes.NewReader(bodyBytes),
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.PostResourceMatchesRequest,
+		RequestBody:  map[string][]Resource{"resources": resources},
+		ResponseBody: &responseBody,
 	})
-	if err != nil {
-		return []Resource{}, nil, err
-	}
 
-	var matchedResources map[string][]Resource
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &matchedResources,
-	}
-	err = client.connection.Make(request, &response)
-
-	return matchedResources["resources"], response.Warnings, err
+	return responseBody["resources"], warnings, err
 }

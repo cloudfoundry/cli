@@ -1,11 +1,8 @@
 package ccv3
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
 )
@@ -104,29 +101,20 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 }
 
 func (client *Client) UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata Metadata) (JobURL, Warnings, error) {
-	metadataBytes, err := json.Marshal(ResourceMetadata{Metadata: &metadata})
-	if err != nil {
-		return "", nil, err
-	}
-
-	var request *cloudcontroller.Request
+	var params RequestParams
 
 	switch resource {
 	case "service-broker":
-		request, err = client.newHTTPRequest(requestOptions{
+		params = RequestParams{
 			RequestName: internal.PatchServiceBrokerRequest,
-			Body:        bytes.NewReader(metadataBytes),
 			URIParams:   internal.Params{"service_broker_guid": resourceGUID},
-		})
+			RequestBody: ResourceMetadata{Metadata: &metadata},
+		}
 	default:
 		return "", nil, fmt.Errorf("unknown async resource type (%s) requested", resource)
 	}
 
-	if err != nil {
-		return "", nil, err
-	}
+	jobURL, warnings, err := client.MakeRequest(params)
 
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-	return JobURL(response.ResourceLocationURL), response.Warnings, err
+	return jobURL, warnings, err
 }

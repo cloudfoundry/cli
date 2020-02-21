@@ -36,7 +36,7 @@ func (client *Client) MakeRequest(requestParams RequestParams) (JobURL, Warnings
 
 	response := cloudcontroller.Response{}
 	if requestParams.ResponseBody != nil {
-		response.DecodeJSONResponseInto = &requestParams.ResponseBody
+		response.DecodeJSONResponseInto = requestParams.ResponseBody
 	}
 
 	err = client.connection.Make(request, &response)
