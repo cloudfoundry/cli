@@ -19,7 +19,7 @@ type SSHEnabled struct {
 func (client *Client) GetAppFeature(appGUID string, featureName string) (ApplicationFeature, Warnings, error) {
 	var responseBody ApplicationFeature
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetApplicationFeaturesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "name": featureName},
 		ResponseBody: &responseBody,
@@ -31,7 +31,7 @@ func (client *Client) GetAppFeature(appGUID string, featureName string) (Applica
 func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error) {
 	var responseBody SSHEnabled
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetSSHEnabled,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
@@ -42,7 +42,7 @@ func (client *Client) GetSSHEnabled(appGUID string) (SSHEnabled, Warnings, error
 
 // UpdateAppFeature enables/disables the ability to ssh for a given application.
 func (client *Client) UpdateAppFeature(appGUID string, enabled bool, featureName string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PatchApplicationFeaturesRequest,
 		RequestBody: struct {
 			Enabled bool `json:"enabled"`

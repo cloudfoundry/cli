@@ -25,7 +25,7 @@ func (f FeatureFlag) MarshalJSON() ([]byte, error) {
 func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, error) {
 	var responseBody FeatureFlag
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetFeatureFlagRequest,
 		URIParams:    internal.Params{"name": flagName},
 		ResponseBody: &responseBody,
@@ -38,7 +38,7 @@ func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, er
 func (client *Client) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
 	var resources []FeatureFlag
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetFeatureFlagsRequest,
 		ResponseBody: FeatureFlag{},
 		AppendToList: func(item interface{}) error {
@@ -53,7 +53,7 @@ func (client *Client) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
 func (client *Client) UpdateFeatureFlag(flag FeatureFlag) (FeatureFlag, Warnings, error) {
 	var responseBody FeatureFlag
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchFeatureFlagRequest,
 		URIParams:    internal.Params{"name": flag.Name},
 		RequestBody:  flag,

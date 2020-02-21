@@ -101,7 +101,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error) {
 	var responseBody Buildpack
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostBuildpackRequest,
 		RequestBody:  bp,
 		ResponseBody: &responseBody,
@@ -112,7 +112,7 @@ func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error)
 
 // DeleteBuildpack deletes the buildpack with the provided guid.
 func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteBuildpackRequest,
 		URIParams:   internal.Params{"buildpack_guid": buildpackGUID},
 	})
@@ -124,7 +124,7 @@ func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, er
 func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, error) {
 	var resources []Buildpack
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetBuildpacksRequest,
 		Query:        query,
 		ResponseBody: Buildpack{},
@@ -140,7 +140,7 @@ func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, erro
 func (client Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
 	var responseBody Buildpack
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchBuildpackRequest,
 		URIParams:    internal.Params{"buildpack_guid": buildpack.GUID},
 		RequestBody:  buildpack,

@@ -111,7 +111,7 @@ type RouteDestination struct {
 func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 	var responseBody Route
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostRouteRequest,
 		RequestBody:  route,
 		ResponseBody: &responseBody,
@@ -121,7 +121,7 @@ func (client Client) CreateRoute(route Route) (Route, Warnings, error) {
 }
 
 func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteOrphanedRoutesRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 		Query:       []Query{{Key: UnmappedFilter, Values: []string{"true"}}},
@@ -131,7 +131,7 @@ func (client Client) DeleteOrphanedRoutes(spaceGUID string) (JobURL, Warnings, e
 }
 
 func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteRouteRequest,
 		URIParams:   internal.Params{"route_guid": routeGUID},
 	})
@@ -142,7 +142,7 @@ func (client Client) DeleteRoute(routeGUID string) (JobURL, Warnings, error) {
 func (client Client) GetApplicationRoutes(appGUID string) ([]Route, Warnings, error) {
 	var resources []Route
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetApplicationRoutesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: Route{},
@@ -160,7 +160,7 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination,
 		Destinations []RouteDestination `json:"destinations"`
 	}
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetRouteDestinationsRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID},
 		ResponseBody: &responseBody,
@@ -172,7 +172,7 @@ func (client Client) GetRouteDestinations(routeGUID string) ([]RouteDestination,
 func (client Client) GetRoutes(query ...Query) ([]Route, Warnings, error) {
 	var resources []Route
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetRoutesRequest,
 		Query:        query,
 		ResponseBody: Route{},
@@ -208,7 +208,7 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 		},
 	}
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.MapRouteRequest,
 		URIParams:   internal.Params{"route_guid": routeGUID},
 		RequestBody: &requestBody,
@@ -220,7 +220,7 @@ func (client Client) MapRoute(routeGUID string, appGUID string) (Warnings, error
 func (client Client) UnmapRoute(routeGUID string, destinationGUID string) (Warnings, error) {
 	var responseBody Build
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.UnmapRouteRequest,
 		URIParams:    internal.Params{"route_guid": routeGUID, "destination_guid": destinationGUID},
 		ResponseBody: &responseBody,

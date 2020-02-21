@@ -74,7 +74,7 @@ type JobErrorDetails struct {
 func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 	var responseBody Job
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		URL:          string(jobURL),
 		ResponseBody: &responseBody,
 	})

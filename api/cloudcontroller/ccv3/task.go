@@ -46,7 +46,7 @@ type TaskProcessTemplate struct {
 func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Warnings, error) {
 	var responseBody Task
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationTasksRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  task,
@@ -61,7 +61,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Task, Warnings, error) {
 	var resources []Task
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetApplicationTasksRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		Query:        query,
@@ -79,7 +79,7 @@ func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Tas
 func (client *Client) UpdateTaskCancel(taskGUID string) (Task, Warnings, error) {
 	var responseBody Task
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PutTaskCancelRequest,
 		URIParams: internal.Params{
 			"task_guid": taskGUID,

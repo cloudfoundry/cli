@@ -13,7 +13,7 @@ type JobURL string
 // DeleteApplication deletes the app with the given app GUID. Returns back a
 // resulting job URL to poll.
 func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error) {
-	return client.makeRequest(requestParams{
+	return client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteApplicationRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})

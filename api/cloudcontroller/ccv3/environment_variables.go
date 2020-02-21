@@ -38,7 +38,7 @@ func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
 func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (EnvironmentVariables, Warnings, error) {
 	var responseBody EnvironmentVariables
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetEnvironmentVariableGroupRequest,
 		URIParams:    internal.Params{"group_name": string(group)},
 		ResponseBody: &responseBody,
@@ -53,7 +53,7 @@ func (client *Client) GetEnvironmentVariableGroup(group constant.EnvironmentVari
 func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
 	var responseBody EnvironmentVariables
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchApplicationEnvironmentVariablesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  envVars,
@@ -66,7 +66,7 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 func (client *Client) UpdateEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
 	var responseBody EnvironmentVariables
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchEnvironmentVariableGroupRequest,
 		URIParams:    internal.Params{"group_name": string(group)},
 		RequestBody:  envVars,

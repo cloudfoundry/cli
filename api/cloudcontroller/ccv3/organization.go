@@ -54,7 +54,7 @@ func (client *Client) CreateOrganization(orgName string) (Organization, Warnings
 	org := Organization{Name: orgName}
 	var responseBody Organization
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationRequest,
 		RequestBody:  org,
 		ResponseBody: &responseBody,
@@ -65,7 +65,7 @@ func (client *Client) CreateOrganization(orgName string) (Organization, Warnings
 
 // DeleteOrganization deletes the organization with the given GUID.
 func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteOrganizationRequest,
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
@@ -77,7 +77,7 @@ func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, erro
 func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
 	var responseBody Domain
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDefaultDomainRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		ResponseBody: &responseBody,
@@ -91,7 +91,7 @@ func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error)
 func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]Organization, Warnings, error) {
 	var resources []Organization
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetIsolationSegmentOrganizationsRequest,
 		URIParams:    internal.Params{"isolation_segment_guid": isolationSegmentGUID},
 		ResponseBody: Organization{},
@@ -108,7 +108,7 @@ func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID stri
 func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, error) {
 	var responseBody Organization
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetOrganizationRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		ResponseBody: &responseBody,
@@ -121,7 +121,7 @@ func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, e
 func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
 	var resources []Organization
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetOrganizationsRequest,
 		Query:        query,
 		ResponseBody: Organization{},
@@ -141,7 +141,7 @@ func (client *Client) UpdateOrganization(org Organization) (Organization, Warnin
 
 	var responseBody Organization
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchOrganizationRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		RequestBody:  org,

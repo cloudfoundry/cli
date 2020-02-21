@@ -149,7 +149,7 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 		MatchingRoute bool `json:"matching_route"`
 	}
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDomainRouteReservationsRequest,
 		URIParams:    internal.Params{"domain_guid": domainGUID},
 		Query:        query,
@@ -162,7 +162,7 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 	var responseBody Domain
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostDomainRequest,
 		RequestBody:  domain,
 		ResponseBody: &responseBody,
@@ -172,7 +172,7 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 }
 
 func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteDomainRequest,
 		URIParams:   internal.Params{"domain_guid": domainGUID},
 	})
@@ -184,7 +184,7 @@ func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	var responseBody Domain
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDomainRequest,
 		URIParams:    internal.Params{"domain_guid": domainGUID},
 		ResponseBody: &responseBody,
@@ -196,7 +196,7 @@ func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 	var resources []Domain
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetDomainsRequest,
 		Query:        query,
 		ResponseBody: Domain{},
@@ -212,7 +212,7 @@ func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]Domain, Warnings, error) {
 	var resources []Domain
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		RequestName:  internal.GetOrganizationDomainsRequest,
 		Query:        query,
@@ -227,7 +227,7 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]D
 }
 
 func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.SharePrivateDomainRequest,
 		URIParams:   internal.Params{"domain_guid": domainGuid},
 		RequestBody: sharedOrgs,
@@ -237,7 +237,7 @@ func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs Shar
 }
 
 func (client Client) UnsharePrivateDomainFromOrg(domainGuid string, orgGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteSharedOrgFromDomainRequest,
 		URIParams:   internal.Params{"domain_guid": domainGuid, "org_guid": orgGUID},
 	})

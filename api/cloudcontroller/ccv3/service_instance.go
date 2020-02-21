@@ -16,7 +16,7 @@ type ServiceInstance struct {
 func (client *Client) GetServiceInstances(query ...Query) ([]ServiceInstance, Warnings, error) {
 	var resources []ServiceInstance
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceInstancesRequest,
 		Query:        query,
 		ResponseBody: ServiceInstance{},

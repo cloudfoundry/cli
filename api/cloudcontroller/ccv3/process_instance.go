@@ -83,7 +83,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 // DeleteApplicationProcessInstance deletes/stops a particular application's
 // process instance.
 func (client *Client) DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteApplicationProcessInstanceRequest,
 		URIParams: internal.Params{
 			"app_guid": appGUID,
@@ -99,7 +99,7 @@ func (client *Client) DeleteApplicationProcessInstance(appGUID string, processTy
 func (client *Client) GetProcessInstances(processGUID string) ([]ProcessInstance, Warnings, error) {
 	var resources []ProcessInstance
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetProcessStatsRequest,
 		URIParams:    internal.Params{"process_guid": processGUID},
 		ResponseBody: ProcessInstance{},

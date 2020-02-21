@@ -18,7 +18,7 @@ type ServicePlan struct {
 func (client *Client) GetServicePlans(query ...Query) ([]ServicePlan, Warnings, error) {
 	var resources []ServicePlan
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServicePlansRequest,
 		Query:        query,
 		ResponseBody: ServicePlan{},

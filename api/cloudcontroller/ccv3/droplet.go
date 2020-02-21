@@ -50,7 +50,7 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 
 	var responseBody Droplet
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostDropletRequest,
 		RequestBody:  requestBody,
 		ResponseBody: &responseBody,
@@ -64,7 +64,7 @@ func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, Warnings, error) {
 	var responseBody Droplet
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetApplicationDropletCurrentRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
@@ -77,7 +77,7 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, War
 func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
 	var responseBody Droplet
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDropletRequest,
 		URIParams:    internal.Params{"droplet_guid": dropletGUID},
 		ResponseBody: &responseBody,
@@ -90,7 +90,7 @@ func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) 
 func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 	var resources []Droplet
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetDropletsRequest,
 		Query:        query,
 		ResponseBody: Droplet{},
@@ -107,7 +107,7 @@ func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 func (client *Client) GetPackageDroplets(packageGUID string, query ...Query) ([]Droplet, Warnings, error) {
 	var resources []Droplet
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetPackageDropletsRequest,
 		URIParams:    internal.Params{"package_guid": packageGUID},
 		Query:        query,

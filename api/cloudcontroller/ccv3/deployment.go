@@ -72,7 +72,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 }
 
 func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostApplicationDeploymentActionCancelRequest,
 		URIParams:   internal.Params{"deployment_guid": deploymentGUID},
 	})
@@ -88,7 +88,7 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 
 	var responseBody Deployment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationDeploymentRequest,
 		RequestBody:  dep,
 		ResponseBody: &responseBody,
@@ -100,7 +100,7 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings, error) {
 	var responseBody Deployment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDeploymentRequest,
 		URIParams:    internal.Params{"deployment_guid": deploymentGUID},
 		ResponseBody: &responseBody,
@@ -112,7 +112,7 @@ func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings
 func (client *Client) GetDeployments(query ...Query) ([]Deployment, Warnings, error) {
 	var resources []Deployment
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetDeploymentsRequest,
 		Query:        query,
 		ResponseBody: Deployment{},

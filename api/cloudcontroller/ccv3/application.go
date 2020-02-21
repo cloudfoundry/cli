@@ -131,7 +131,7 @@ func (ccApp *ccApplication) setDockerLifecycle() {
 func (client *Client) CreateApplication(app Application) (Application, Warnings, error) {
 	var responseBody Application
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationRequest,
 		RequestBody:  app,
 		ResponseBody: &responseBody,
@@ -160,7 +160,7 @@ func (client *Client) GetApplicationByNameAndSpace(appName string, spaceGUID str
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	var resources []Application
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetApplicationsRequest,
 		Query:        query,
 		ResponseBody: Application{},
@@ -177,7 +177,7 @@ func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, 
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
 	var responseBody Application
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchApplicationRequest,
 		URIParams:    internal.Params{"app_guid": app.GUID},
 		RequestBody:  app,
@@ -191,7 +191,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 func (client *Client) UpdateApplicationRestart(appGUID string) (Application, Warnings, error) {
 	var responseBody Application
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationActionRestartRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
@@ -204,7 +204,7 @@ func (client *Client) UpdateApplicationRestart(appGUID string) (Application, War
 func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warnings, error) {
 	var responseBody Application
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationActionStartRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,
@@ -217,7 +217,7 @@ func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warni
 func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnings, error) {
 	var responseBody Application
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationActionStopRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,

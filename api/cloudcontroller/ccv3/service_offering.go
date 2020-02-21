@@ -18,7 +18,7 @@ type ServiceOffering struct {
 func (client *Client) GetServiceOfferings(query ...Query) ([]ServiceOffering, Warnings, error) {
 	var resources []ServiceOffering
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceOfferingsRequest,
 		Query:        query,
 		ResponseBody: ServiceOffering{},

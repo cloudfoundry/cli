@@ -29,7 +29,7 @@ type Environment struct {
 func (client *Client) GetApplicationEnvironment(appGUID string) (Environment, Warnings, error) {
 	var responseBody Environment
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetApplicationEnvRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: &responseBody,

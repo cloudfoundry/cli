@@ -118,7 +118,7 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 	var responseBody Package
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostPackageRequest,
 		RequestBody:  pkg,
 		ResponseBody: &responseBody,
@@ -131,7 +131,7 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
 	var responseBody Package
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetPackageRequest,
 		URIParams:    internal.Params{"package_guid": packageGUID},
 		ResponseBody: &responseBody,
@@ -144,7 +144,7 @@ func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) 
 func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 	var resources []Package
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetPackagesRequest,
 		Query:        query,
 		ResponseBody: Package{},

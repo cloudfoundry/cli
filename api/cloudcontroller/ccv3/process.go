@@ -79,7 +79,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Process, Warnings, error) {
 	var responseBody Process
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostApplicationProcessActionScaleRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "type": process.Type},
 		RequestBody:  process,
@@ -93,7 +93,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 func (client *Client) GetApplicationProcessByType(appGUID string, processType string) (Process, Warnings, error) {
 	var responseBody Process
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetApplicationProcessRequest,
 		URIParams:    internal.Params{"app_guid": appGUID, "type": processType},
 		ResponseBody: &responseBody,
@@ -107,7 +107,7 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnings, error) {
 	var resources []Process
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetApplicationProcessesRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		ResponseBody: Process{},
@@ -163,7 +163,7 @@ func (client *Client) GetNewApplicationProcesses(appGUID string, deploymentGUID 
 func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) {
 	var responseBody Process
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetProcessRequest,
 		URIParams:    internal.Params{"process_guid": processGUID},
 		ResponseBody: &responseBody,
@@ -178,7 +178,7 @@ func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) 
 func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) {
 	var responseBody Process
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PatchProcessRequest,
 		URIParams:   internal.Params{"process_guid": process.GUID},
 		RequestBody: Process{

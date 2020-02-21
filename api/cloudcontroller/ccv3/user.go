@@ -23,7 +23,7 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 	user := userRequestBody{GUID: uaaUserID}
 	var responseBody User
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostUserRequest,
 		RequestBody:  user,
 		ResponseBody: &responseBody,
@@ -33,7 +33,7 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 }
 
 func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteUserRequest,
 		URIParams:   internal.Params{"user_guid": uaaUserID},
 	})
@@ -44,7 +44,7 @@ func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {
 func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
 	var responseBody User
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetUserRequest,
 		URIParams:    internal.Params{"user_guid": userGUID},
 		ResponseBody: &responseBody,
@@ -56,7 +56,7 @@ func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
 func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
 	var resources []User
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetUsersRequest,
 		Query:        query,
 		ResponseBody: User{},

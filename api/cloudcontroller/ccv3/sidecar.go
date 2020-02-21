@@ -15,7 +15,7 @@ type Sidecar struct {
 func (client *Client) GetProcessSidecars(processGuid string) ([]Sidecar, Warnings, error) {
 	var resources []Sidecar
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetProcessSidecarsRequest,
 		URIParams:    internal.Params{"process_guid": processGuid},
 		ResponseBody: Sidecar{},

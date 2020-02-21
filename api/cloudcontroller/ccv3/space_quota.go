@@ -122,7 +122,7 @@ func (sq *SpaceQuota) UnmarshalJSON(data []byte) error {
 func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (RelationshipList, Warnings, error) {
 	var responseBody RelationshipList
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostSpaceQuotaRelationshipsRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGUID},
 		RequestBody:  RelationshipList{GUIDs: []string{spaceGUID}},
@@ -135,7 +135,7 @@ func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (Relati
 func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnings, error) {
 	var responseBody SpaceQuota
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostSpaceQuotaRequest,
 		RequestBody:  spaceQuota,
 		ResponseBody: &responseBody,
@@ -145,7 +145,7 @@ func (client Client) CreateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warnin
 }
 
 func (client Client) DeleteSpaceQuota(spaceQuotaGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteSpaceQuotaRequest,
 		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID},
 	})
@@ -156,7 +156,7 @@ func (client Client) DeleteSpaceQuota(spaceQuotaGUID string) (JobURL, Warnings, 
 func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings, error) {
 	var responseBody SpaceQuota
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetSpaceQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": spaceQuotaGUID},
 		ResponseBody: &responseBody,
@@ -168,7 +168,7 @@ func (client Client) GetSpaceQuota(spaceQuotaGUID string) (SpaceQuota, Warnings,
 func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, error) {
 	var resources []SpaceQuota
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetSpaceQuotasRequest,
 		Query:        query,
 		ResponseBody: SpaceQuota{},
@@ -182,7 +182,7 @@ func (client *Client) GetSpaceQuotas(query ...Query) ([]SpaceQuota, Warnings, er
 }
 
 func (client *Client) UnsetSpaceQuota(spaceQuotaGUID, spaceGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteSpaceQuotaFromSpaceRequest,
 		URIParams:   internal.Params{"quota_guid": spaceQuotaGUID, "space_guid": spaceGUID},
 	})
@@ -196,7 +196,7 @@ func (client *Client) UpdateSpaceQuota(spaceQuota SpaceQuota) (SpaceQuota, Warni
 
 	var responseBody SpaceQuota
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchSpaceQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": spaceQuotaGUID},
 		RequestBody:  spaceQuota,

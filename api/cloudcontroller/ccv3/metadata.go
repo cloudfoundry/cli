@@ -21,7 +21,7 @@ type ResourceMetadata struct {
 
 func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata Metadata) (ResourceMetadata, Warnings, error) {
 	var (
-		params           requestParams
+		params           RequestParams
 		err              error
 		responseMetadata ResourceMetadata
 		warnings         Warnings
@@ -32,63 +32,63 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 
 	switch resource {
 	case "app":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchApplicationRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"app_guid": resourceGUID},
 		}
 	case "buildpack":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchBuildpackRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"buildpack_guid": resourceGUID},
 		}
 	case "domain":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchDomainRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"domain_guid": resourceGUID},
 		}
 	case "org":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchOrganizationRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"organization_guid": resourceGUID},
 		}
 	case "route":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchRouteRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"route_guid": resourceGUID},
 		}
 	case "service-offering":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchServiceOfferingRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"service_offering_guid": resourceGUID},
 		}
 	case "service-plan":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchServicePlanRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"service_plan_guid": resourceGUID},
 		}
 	case "space":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchSpaceRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
 			URIParams:    internal.Params{"space_guid": resourceGUID},
 		}
 	case "stack":
-		params = requestParams{
+		params = RequestParams{
 			RequestName:  internal.PatchStackRequest,
 			RequestBody:  requestMetadata,
 			ResponseBody: &responseMetadata,
@@ -98,7 +98,7 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 		return ResourceMetadata{}, nil, fmt.Errorf("unknown resource type (%s) requested", resource)
 	}
 
-	_, warnings, err = client.makeRequest(params)
+	_, warnings, err = client.MakeRequest(params)
 
 	return responseMetadata, warnings, err
 }

@@ -49,7 +49,7 @@ func (r *RelationshipList) UnmarshalJSON(data []byte) error {
 func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUID string, organizationGUIDs []string) (RelationshipList, Warnings, error) {
 	var responseBody RelationshipList
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostIsolationSegmentRelationshipOrganizationsRequest,
 		URIParams:    internal.Params{"isolation_segment_guid": isolationSegmentGUID},
 		RequestBody:  RelationshipList{GUIDs: organizationGUIDs},
@@ -64,7 +64,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (RelationshipList, Warnings, error) {
 	var responseBody RelationshipList
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
 		URIParams:    internal.Params{"service_instance_guid": serviceInstanceGUID},
 		RequestBody:  RelationshipList{GUIDs: spaceGUIDs},

@@ -107,7 +107,7 @@ type serviceBrokerRelationshipsSpaceData struct {
 
 // CreateServiceBroker registers a new service broker.
 func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostServiceBrokerRequest,
 		RequestBody: newServiceBroker(serviceBroker),
 	})
@@ -117,7 +117,7 @@ func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (Job
 
 // DeleteServiceBroker deletes a named service broker
 func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteServiceBrokerRequest,
 		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
 	})
@@ -129,7 +129,7 @@ func (client *Client) DeleteServiceBroker(serviceBrokerGUID string) (JobURL, War
 func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnings, error) {
 	var resources []ServiceBroker
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceBrokersRequest,
 		Query:        query,
 		ResponseBody: serviceBrokerResponse{},
@@ -149,7 +149,7 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 		return "", nil, err
 	}
 
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PatchServiceBrokerRequest,
 		URIParams:   internal.Params{"service_broker_guid": serviceBrokerGUID},
 		RequestBody: brokerUpdateRequest,

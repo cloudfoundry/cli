@@ -19,7 +19,7 @@ type Space struct {
 func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
 	var responseBody Space
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostSpaceRequest,
 		RequestBody:  space,
 		ResponseBody: &responseBody,
@@ -29,7 +29,7 @@ func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {
 }
 
 func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteSpaceRequest,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 	})
@@ -41,7 +41,7 @@ func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
 func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
 	var resources []Space
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetSpacesRequest,
 		Query:        query,
 		ResponseBody: Space{},
@@ -61,7 +61,7 @@ func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {
 
 	var responseBody Space
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchSpaceRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		RequestBody:  space,

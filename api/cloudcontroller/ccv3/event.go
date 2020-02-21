@@ -48,7 +48,7 @@ func (client *Client) GetEvents(query ...Query) ([]Event, Warnings, error) {
 		Resources []Event `json:"resources"`
 	}
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetEventsRequest,
 		ResponseBody: &responseBody,
 		Query:        query,

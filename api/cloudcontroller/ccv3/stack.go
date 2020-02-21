@@ -20,7 +20,7 @@ type Stack struct {
 func (client *Client) GetStacks(query ...Query) ([]Stack, Warnings, error) {
 	var resources []Stack
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetStacksRequest,
 		Query:        query,
 		ResponseBody: Stack{},

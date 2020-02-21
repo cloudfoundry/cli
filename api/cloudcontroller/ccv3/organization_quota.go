@@ -12,7 +12,7 @@ type OrganizationQuota struct {
 func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (RelationshipList, Warnings, error) {
 	var responseBody RelationshipList
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationQuotaApplyRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGuid},
 		RequestBody:  RelationshipList{GUIDs: []string{orgGuid}},
@@ -25,7 +25,7 @@ func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (Relatio
 func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
 	var responseOrgQuota OrganizationQuota
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationQuotaRequest,
 		RequestBody:  orgQuota,
 		ResponseBody: &responseOrgQuota,
@@ -35,7 +35,7 @@ func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 }
 
 func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warnings, error) {
-	jobURL, warnings, err := client.makeRequest(requestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteOrganizationQuotaRequest,
 		URIParams:   internal.Params{"quota_guid": quotaGUID},
 	})
@@ -46,7 +46,7 @@ func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warning
 func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota, Warnings, error) {
 	var responseBody OrganizationQuota
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetOrganizationQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGUID},
 		ResponseBody: &responseBody,
@@ -58,7 +58,7 @@ func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota,
 func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota, Warnings, error) {
 	var resources []OrganizationQuota
 
-	_, warnings, err := client.makeListRequest(requestParams{
+	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetOrganizationQuotasRequest,
 		Query:        query,
 		ResponseBody: OrganizationQuota{},
@@ -77,7 +77,7 @@ func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (Organ
 
 	var responseBody OrganizationQuota
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchOrganizationQuotaRequest,
 		URIParams:    internal.Params{"quota_guid": orgQuotaGUID},
 		RequestBody:  orgQuota,

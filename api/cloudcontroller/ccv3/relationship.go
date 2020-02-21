@@ -50,7 +50,7 @@ func (r *Relationship) UnmarshalJSON(data []byte) error {
 // DeleteIsolationSegmentOrganization will delete the relationship between
 // the isolation segment and the organization provided.
 func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID string, orgGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
 		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID, "organization_guid": orgGUID},
 	})
@@ -61,7 +61,7 @@ func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID st
 // DeleteServiceInstanceRelationshipsSharedSpace will delete the sharing relationship
 // between the service instance and the shared-to space provided.
 func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID, "space_guid": spaceGUID},
 	})
@@ -74,7 +74,7 @@ func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInsta
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
 	var responseBody Relationship
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		ResponseBody: &responseBody,
@@ -88,7 +88,7 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, Warnings, error) {
 	var responseBody Relationship
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetSpaceRelationshipIsolationSegmentRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		ResponseBody: &responseBody,
@@ -101,7 +101,7 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (Relationship, Warnings, error) {
 	var responseBody Relationship
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchApplicationCurrentDropletRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
 		RequestBody:  Relationship{GUID: dropletGUID},
@@ -117,7 +117,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isoSegGUID string) (Relationship, Warnings, error) {
 	var responseBody Relationship
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		RequestBody:  Relationship{GUID: isoSegGUID},
@@ -132,7 +132,7 @@ func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgG
 func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (Relationship, Warnings, error) {
 	var responseBody Relationship
 
-	_, warnings, err := client.makeRequest(requestParams{
+	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchSpaceRelationshipIsolationSegmentRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
 		RequestBody:  Relationship{GUID: isolationSegmentGUID},

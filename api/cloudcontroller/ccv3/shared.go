@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-type requestParams struct {
+type RequestParams struct {
 	RequestName    string
 	URIParams      internal.Params
 	Query          []Query
@@ -19,7 +19,7 @@ type requestParams struct {
 	AppendToList   func(item interface{}) error
 }
 
-func (client *Client) buildRequest(requestParams requestParams) (*cloudcontroller.Request, error) {
+func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {
 	options := requestOptions{
 		RequestName: requestParams.RequestName,
 		URIParams:   requestParams.URIParams,
@@ -44,7 +44,7 @@ func (client *Client) buildRequest(requestParams requestParams) (*cloudcontrolle
 	return request, err
 }
 
-func (client *Client) makeListRequest(requestParams requestParams) (IncludedResources, Warnings, error) {
+func (client *Client) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {
 	request, err := client.buildRequest(requestParams)
 	if err != nil {
 		return IncludedResources{}, nil, err
@@ -53,7 +53,7 @@ func (client *Client) makeListRequest(requestParams requestParams) (IncludedReso
 	return client.paginate(request, requestParams.ResponseBody, requestParams.AppendToList)
 }
 
-func (client *Client) makeRequest(requestParams requestParams) (JobURL, Warnings, error) {
+func (client *Client) MakeRequest(requestParams RequestParams) (JobURL, Warnings, error) {
 	request, err := client.buildRequest(requestParams)
 	if err != nil {
 		return "", nil, err
