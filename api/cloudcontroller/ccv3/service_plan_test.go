@@ -36,36 +36,61 @@ var _ = Describe("Service Plan", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
 					{
-						 "pagination": {
-								"next": {
-									 "href": "%s/v3/service_plans?names=myServicePlan&service_broker_names=myServiceBroker&service_offering_names=someOffering&page=2"
+						"pagination": {
+							"next": {
+								"href": "%s/v3/service_plans?names=myServicePlan&service_broker_names=myServiceBroker&service_offering_names=someOffering&page=2"
+							}
+						},
+						"resources": [
+							{
+								"guid": "service-plan-1-guid",
+								"name": "service-plan-1-name",
+								"visibility_type": "public",
+								"relationships": {
+									"service_offering": {
+									   "data": {
+										  "guid": "79d428b9-75b4-44db-addf-19c85c7f0f1e"
+									   }
+									}
 								}
-						 },
-						 "resources": [
-								{
-									 "guid": "service-plan-1-guid",
-									 "name": "service-plan-1-name"
-								},
-								{
-									 "guid": "service-plan-2-guid",
-									 "name": "service-plan-2-name"
+							},
+							{
+								"guid": "service-plan-2-guid",
+								"name": "service-plan-2-name",
+								"visibility_type": "admin",
+								"relationships": {
+									"service_offering": {
+									   "data": {
+										  "guid": "69d428b9-75b4-44db-addf-19c85c7f0f1e"
+									   }
+									}
 								}
-						 ]
-					}`, server.URL())
+							}
+						]
+					}`,
+					server.URL())
 
 				response2 := `
 					{
-						 "pagination": {
-								"next": {
-									 "href": null
+						"pagination": {
+							"next": {
+								"href": null
+							}
+						},
+						"resources": [
+							{
+								"guid": "service-plan-3-guid",
+								"name": "service-plan-3-name",
+								"visibility_type": "organization",
+								"relationships": {
+									"service_offering": {
+									   "data": {
+										  "guid": "59d428b9-75b4-44db-addf-19c85c7f0f1e"
+									   }
+									}
 								}
-						 },
-						 "resources": [
-								{
-									 "guid": "service-plan-3-guid",
-									 "name": "service-plan-3-name"
-								}
-						 ]
+							}
+						]
 					}`
 
 				server.AppendHandlers(
@@ -100,16 +125,22 @@ var _ = Describe("Service Plan", func() {
 
 				Expect(plans).To(ConsistOf(
 					ServicePlan{
-						GUID: "service-plan-1-guid",
-						Name: "service-plan-1-name",
+						GUID:                "service-plan-1-guid",
+						Name:                "service-plan-1-name",
+						VisibilityType:      "public",
+						ServiceOfferingGUID: "79d428b9-75b4-44db-addf-19c85c7f0f1e",
 					},
 					ServicePlan{
-						GUID: "service-plan-2-guid",
-						Name: "service-plan-2-name",
+						GUID:                "service-plan-2-guid",
+						Name:                "service-plan-2-name",
+						VisibilityType:      "admin",
+						ServiceOfferingGUID: "69d428b9-75b4-44db-addf-19c85c7f0f1e",
 					},
 					ServicePlan{
-						GUID: "service-plan-3-guid",
-						Name: "service-plan-3-name",
+						GUID:                "service-plan-3-guid",
+						Name:                "service-plan-3-name",
+						VisibilityType:      "organization",
+						ServiceOfferingGUID: "59d428b9-75b4-44db-addf-19c85c7f0f1e",
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -119,19 +150,19 @@ var _ = Describe("Service Plan", func() {
 		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
-				"errors": [
-					{
-						"code": 42424,
-						"detail": "Some detailed error message",
-						"title": "CF-SomeErrorTitle"
-					},
-					{
-						"code": 11111,
-						"detail": "Some other detailed error message",
-						"title": "CF-SomeOtherErrorTitle"
-					}
-				]
-			}`
+					"errors": [
+						{
+							"code": 42424,
+							"detail": "Some detailed error message",
+							"title": "CF-SomeErrorTitle"
+						},
+						{
+							"code": 11111,
+							"detail": "Some other detailed error message",
+							"title": "CF-SomeOtherErrorTitle"
+						}
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/service_plans"),

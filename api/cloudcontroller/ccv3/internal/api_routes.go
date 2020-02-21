@@ -72,6 +72,7 @@ const (
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetServiceOfferingsRequest                                  = "GetServiceOfferings"
 	GetServicePlansRequest                                      = "GetServicePlans"
+	GetServicePlanVisibilityRequest                             = "GetServicePlanVisibility"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
 	GetSpacesRequest                                            = "GetSpaces"
@@ -247,6 +248,7 @@ var APIRoutes = []Route{
 	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodPatch, Name: PatchServiceOfferingRequest},
 	{Resource: ServicePlansResource, Path: "/", Method: http.MethodGet, Name: GetServicePlansRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid", Method: http.MethodPatch, Name: PatchServicePlanRequest},
+	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodGet, Name: GetServicePlanVisibilityRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodPost, Name: PostSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},

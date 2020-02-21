@@ -36,36 +36,58 @@ var _ = Describe("Service Offering", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
 					{
-						 "pagination": {
-								"next": {
-									 "href": "%s/v3/service_offerings?names=myServiceOffering&service_broker_names=myServiceBroker&page=2"
+						"pagination": {
+							"next": {
+								"href": "%s/v3/service_offerings?names=myServiceOffering&service_broker_names=myServiceBroker&page=2"
+							}
+						},
+						"resources": [
+							{
+								"guid": "service-offering-1-guid",
+								"name": "service-offering-1-name",
+								"relationships": {
+									"service_broker": {
+										"data": {
+											"name": "overview-broker"
+										}
+									}
 								}
-						 },
-						 "resources": [
-								{
-									 "guid": "service-offering-1-guid",
-									 "name": "service-offering-1-name"
-								},
-								{
-									 "guid": "service-offering-2-guid",
-									 "name": "service-offering-2-name"
+							},
+							{
+								"guid": "service-offering-2-guid",
+								"name": "service-offering-2-name",
+								"relationships": {
+									"service_broker": {
+										"data": {
+											"name": "overview-broker"
+										}
+									}
 								}
-						 ]
-					}`, server.URL())
+							}
+						]
+					}`,
+					server.URL())
 
 				response2 := `
 					{
-						 "pagination": {
-								"next": {
-									 "href": null
+						"pagination": {
+							"next": {
+								"href": null
+							}
+						},
+						"resources": [
+							{
+								"guid": "service-offering-3-guid",
+								"name": "service-offering-3-name",
+								"relationships": {
+									"service_broker": {
+										"data": {
+											"name": "other-broker"
+										}
+									}
 								}
-						 },
-						 "resources": [
-								{
-									 "guid": "service-offering-3-guid",
-									 "name": "service-offering-3-name"
-								}
-						 ]
+							}
+						]
 					}`
 
 				server.AppendHandlers(
@@ -96,16 +118,19 @@ var _ = Describe("Service Offering", func() {
 
 				Expect(offerings).To(ConsistOf(
 					ServiceOffering{
-						GUID: "service-offering-1-guid",
-						Name: "service-offering-1-name",
+						GUID:              "service-offering-1-guid",
+						Name:              "service-offering-1-name",
+						ServiceBrokerName: "overview-broker",
 					},
 					ServiceOffering{
-						GUID: "service-offering-2-guid",
-						Name: "service-offering-2-name",
+						GUID:              "service-offering-2-guid",
+						Name:              "service-offering-2-name",
+						ServiceBrokerName: "overview-broker",
 					},
 					ServiceOffering{
-						GUID: "service-offering-3-guid",
-						Name: "service-offering-3-name",
+						GUID:              "service-offering-3-guid",
+						Name:              "service-offering-3-name",
+						ServiceBrokerName: "other-broker",
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -115,19 +140,20 @@ var _ = Describe("Service Offering", func() {
 		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
-				"errors": [
-					{
-						"code": 42424,
-						"detail": "Some detailed error message",
-						"title": "CF-SomeErrorTitle"
-					},
-					{
-						"code": 11111,
-						"detail": "Some other detailed error message",
-						"title": "CF-SomeOtherErrorTitle"
-					}
-				]
-			}`
+					"errors": [
+						{
+							"code": 42424,
+							"detail": "Some detailed error message",
+							"title": "CF-SomeErrorTitle"
+						},
+						{
+							"code": 11111,
+							"detail": "Some other detailed error message",
+							"title": "CF-SomeOtherErrorTitle"
+						}
+					]
+				}`
+
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/service_offerings"),

@@ -144,7 +144,7 @@ type commandList struct {
 	SecurityGroup                      v6.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	SecurityGroups                     v6.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	Service                            v6.ServiceCommand                            `command:"service" description:"Show service instance info"`
-	ServiceAccess                      v6.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`
+	ServiceAccess                      v7.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`
 	ServiceBrokers                     v7.ServiceBrokersCommand                     `command:"service-brokers" description:"List service brokers"`
 	ServiceKey                         v6.ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
 	ServiceKeys                        v6.ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`

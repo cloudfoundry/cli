@@ -199,21 +199,21 @@ func (cmd *LabelUpdater) displayMessageWithStack() {
 }
 
 func (cmd *LabelUpdater) displayMessageForServiceCommands() {
-	var template string
-	template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}}"
+	template := "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}}"
 
 	if cmd.targetResource.ServiceOffering != "" || cmd.targetResource.ServiceBroker != "" {
 		template += " from"
-	}
-	if cmd.targetResource.ServiceOffering != "" {
-		template += " service offering {{.ServiceOffering}}"
-		if cmd.targetResource.ServiceBroker != "" {
-			template += " /"
-		}
-	}
 
-	if cmd.targetResource.ServiceBroker != "" {
-		template += " service broker {{.ServiceBroker}}"
+		if cmd.targetResource.ServiceOffering != "" {
+			template += " service offering {{.ServiceOffering}}"
+			if cmd.targetResource.ServiceBroker != "" {
+				template += " /"
+			}
+		}
+
+		if cmd.targetResource.ServiceBroker != "" {
+			template += " service broker {{.ServiceBroker}}"
+		}
 	}
 
 	template += " as {{.User}}..."
