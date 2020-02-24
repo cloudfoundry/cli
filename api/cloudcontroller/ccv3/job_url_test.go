@@ -194,8 +194,6 @@ var _ = Describe("Job URL", func() {
 		var (
 			manifestBody []byte
 
-			query Query
-
 			responseJobURL JobURL
 			warnings       Warnings
 			executeErr     error
@@ -207,7 +205,6 @@ var _ = Describe("Job URL", func() {
 			responseJobURL, warnings, executeErr = client.UpdateSpaceApplyManifest(
 				"some-space-guid",
 				manifestBody,
-				query,
 			)
 		})
 
@@ -218,10 +215,9 @@ var _ = Describe("Job URL", func() {
 
 		When("applying the manifest to the space succeeds", func() {
 			BeforeEach(func() {
-				query = Query{Key: NoRouteFilter, Values: []string{"true"}}
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/spaces/some-space-guid/actions/apply_manifest", "no_route=true"),
+						VerifyRequest(http.MethodPost, "/v3/spaces/some-space-guid/actions/apply_manifest"),
 						VerifyHeaderKV("Content-type", "application/x-yaml"),
 						VerifyBody(manifestBody),
 						RespondWith(http.StatusAccepted, "", http.Header{

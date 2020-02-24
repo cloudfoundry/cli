@@ -740,4 +740,110 @@ var _ = Describe("shared request helpers", func() {
 			})
 		})
 	})
+
+	Describe("MakeReceiveRawRequest", func() {
+		var (
+			requestParams RequestParams
+
+			rawResponseBody []byte
+			warnings        Warnings
+			executeErr      error
+		)
+
+		BeforeEach(func() {
+			requestParams = RequestParams{}
+		})
+
+		JustBeforeEach(func() {
+			rawResponseBody, warnings, executeErr = client.MakeReceiveRawRequest(requestParams)
+		})
+
+		Context("GET raw bytes (YAML data)", func() {
+			var (
+				expectedResponseBody []byte
+			)
+
+			BeforeEach(func() {
+				requestParams = RequestParams{
+					RequestName:    internal.GetApplicationManifestRequest,
+					URIParams:      internal.Params{"app_guid": "some-app-guid"},
+					AcceptMimeType: "application/x-yaml",
+				}
+			})
+
+			When("getting requested data is successful", func() {
+				BeforeEach(func() {
+					expectedResponseBody = []byte("---\n- banana")
+
+					server.AppendHandlers(
+						CombineHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/manifest"),
+								VerifyHeaderKV("Accept", "application/x-yaml"),
+								RespondWith(
+									http.StatusOK,
+									expectedResponseBody,
+									http.Header{
+										"Content-Type":  {"application/x-yaml"},
+										"X-Cf-Warnings": {"this is a warning"},
+									}),
+							),
+						),
+					)
+				})
+
+				It("returns the raw response body and all warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(rawResponseBody).To(Equal(expectedResponseBody))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+				  "errors": [
+					{
+					  "code": 10008,
+					  "detail": "The request is semantically invalid: command presence",
+					  "title": "CF-UnprocessableEntity"
+					},
+					{
+					  "code": 10010,
+					  "detail": "Org not found",
+					  "title": "CF-ResourceNotFound"
+					}
+				  ]
+				}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/manifest"),
+							VerifyHeaderKV("Accept", "application/x-yaml"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Org not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+	})
 })

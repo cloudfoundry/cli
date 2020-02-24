@@ -13,15 +13,28 @@ type JobURL string
 // DeleteApplication deletes the app with the given app GUID. Returns back a
 // resulting job URL to poll.
 func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error) {
-	return client.MakeRequest(RequestParams{
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteApplicationRequest,
 		URIParams:   internal.Params{"app_guid": appGUID},
 	})
+
+	return jobURL, warnings, err
 }
 
 // UpdateApplicationApplyManifest applies the manifest to the given
 // application. Returns back a resulting job URL to poll.
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (JobURL, Warnings, error) {
+	jobURL, warnings, err := client.MakeSendRawRequest(RequestParams{
+		RequestName: internal.PostApplicationActionApplyManifest,
+		URIParams:   internal.Params{"app_guid": appGUID},
+		RawBody:     rawManifest,
+		RequestHeaders: [][]string{
+			{"Accept", "application/x-yaml"},
+		},
+	})
+
+	return jobURL, warnings, err
+
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionApplyManifest,
 		URIParams:   internal.Params{"app_guid": appGUID},
@@ -50,10 +63,9 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 // (1) Finding or creating this app.
 // (2) Applying manifest properties to this app.
 
-func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...Query) (JobURL, Warnings, error) {
+func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (JobURL, Warnings, error) {
 	request, requestExecuteErr := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostSpaceActionApplyManifestRequest,
-		Query:       query,
 		URIParams:   internal.Params{"space_guid": spaceGUID},
 		Body:        bytes.NewReader(rawManifest),
 	})
