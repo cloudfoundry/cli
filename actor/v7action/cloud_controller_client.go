@@ -136,7 +136,7 @@ type CloudControllerClient interface {
 	UpdateResourceMetadata(resource string, resourceGUID string, metadata ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)
 	UpdateResourceMetadataAsync(resource string, resourceGUID string, metadata ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
-	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateSpaceFeature(spaceGUID string, enabled bool, featureName string) (ccv3.Warnings, error)
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateSpaceQuota(spaceQuota ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)

@@ -1593,16 +1593,6 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
-	UAAStub        func() string
-	uAAMutex       sync.RWMutex
-	uAAArgsForCall []struct {
-	}
-	uAAReturns struct {
-		result1 string
-	}
-	uAAReturnsOnCall map[int]struct {
-		result1 string
-	}
 	UnmapRouteStub        func(string, string) (ccv3.Warnings, error)
 	unmapRouteMutex       sync.RWMutex
 	unmapRouteArgsForCall []struct {
@@ -1924,12 +1914,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateSpaceApplyManifestStub        func(string, []byte, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateSpaceApplyManifestStub        func(string, []byte) (ccv3.JobURL, ccv3.Warnings, error)
 	updateSpaceApplyManifestMutex       sync.RWMutex
 	updateSpaceApplyManifestArgsForCall []struct {
 		arg1 string
 		arg2 []byte
-		arg3 []ccv3.Query
 	}
 	updateSpaceApplyManifestReturns struct {
 		result1 ccv3.JobURL
@@ -9024,58 +9013,6 @@ func (fake *FakeCloudControllerClient) TargetCFReturnsOnCall(i int, result1 ccv3
 	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) UAA() string {
-	fake.uAAMutex.Lock()
-	ret, specificReturn := fake.uAAReturnsOnCall[len(fake.uAAArgsForCall)]
-	fake.uAAArgsForCall = append(fake.uAAArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UAA", []interface{}{})
-	fake.uAAMutex.Unlock()
-	if fake.UAAStub != nil {
-		return fake.UAAStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.uAAReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeCloudControllerClient) UAACallCount() int {
-	fake.uAAMutex.RLock()
-	defer fake.uAAMutex.RUnlock()
-	return len(fake.uAAArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) UAACalls(stub func() string) {
-	fake.uAAMutex.Lock()
-	defer fake.uAAMutex.Unlock()
-	fake.UAAStub = stub
-}
-
-func (fake *FakeCloudControllerClient) UAAReturns(result1 string) {
-	fake.uAAMutex.Lock()
-	defer fake.uAAMutex.Unlock()
-	fake.UAAStub = nil
-	fake.uAAReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeCloudControllerClient) UAAReturnsOnCall(i int, result1 string) {
-	fake.uAAMutex.Lock()
-	defer fake.uAAMutex.Unlock()
-	fake.UAAStub = nil
-	if fake.uAAReturnsOnCall == nil {
-		fake.uAAReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.uAAReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeCloudControllerClient) UnmapRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {
 	fake.unmapRouteMutex.Lock()
 	ret, specificReturn := fake.unmapRouteReturnsOnCall[len(fake.unmapRouteArgsForCall)]
@@ -10469,7 +10406,7 @@ func (fake *FakeCloudControllerClient) UpdateSpaceReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg2 []byte, arg3 ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg2 []byte) (ccv3.JobURL, ccv3.Warnings, error) {
 	var arg2Copy []byte
 	if arg2 != nil {
 		arg2Copy = make([]byte, len(arg2))
@@ -10480,12 +10417,11 @@ func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg
 	fake.updateSpaceApplyManifestArgsForCall = append(fake.updateSpaceApplyManifestArgsForCall, struct {
 		arg1 string
 		arg2 []byte
-		arg3 []ccv3.Query
-	}{arg1, arg2Copy, arg3})
-	fake.recordInvocation("UpdateSpaceApplyManifest", []interface{}{arg1, arg2Copy, arg3})
+	}{arg1, arg2Copy})
+	fake.recordInvocation("UpdateSpaceApplyManifest", []interface{}{arg1, arg2Copy})
 	fake.updateSpaceApplyManifestMutex.Unlock()
 	if fake.UpdateSpaceApplyManifestStub != nil {
-		return fake.UpdateSpaceApplyManifestStub(arg1, arg2, arg3...)
+		return fake.UpdateSpaceApplyManifestStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -10500,17 +10436,17 @@ func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCallCount() int {
 	return len(fake.updateSpaceApplyManifestArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCalls(stub func(string, []byte, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCalls(stub func(string, []byte) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.updateSpaceApplyManifestMutex.Lock()
 	defer fake.updateSpaceApplyManifestMutex.Unlock()
 	fake.UpdateSpaceApplyManifestStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestArgsForCall(i int) (string, []byte, []ccv3.Query) {
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestArgsForCall(i int) (string, []byte) {
 	fake.updateSpaceApplyManifestMutex.RLock()
 	defer fake.updateSpaceApplyManifestMutex.RUnlock()
 	argsForCall := fake.updateSpaceApplyManifestArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
@@ -11300,8 +11236,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
-	fake.uAAMutex.RLock()
-	defer fake.uAAMutex.RUnlock()
 	fake.unmapRouteMutex.RLock()
 	defer fake.unmapRouteMutex.RUnlock()
 	fake.unsetSpaceQuotaMutex.RLock()

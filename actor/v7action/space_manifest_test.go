@@ -64,10 +64,9 @@ var _ = Describe("Application Manifest Actions", func() {
 					Expect(warnings).To(ConsistOf("apply-manifest-1-warning", "poll-1-warning"))
 
 					Expect(fakeCloudControllerClient.UpdateSpaceApplyManifestCallCount()).To(Equal(1))
-					guidInCall, appManifest, query := fakeCloudControllerClient.UpdateSpaceApplyManifestArgsForCall(0)
+					guidInCall, appManifest := fakeCloudControllerClient.UpdateSpaceApplyManifestArgsForCall(0)
 					Expect(guidInCall).To(Equal("some-space-guid"))
 					Expect(appManifest).To(Equal(rawManifest))
-					Expect(query).To(BeNil())
 
 					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
 					jobURL := fakeCloudControllerClient.PollJobArgsForCall(0)

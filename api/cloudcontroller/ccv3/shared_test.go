@@ -740,4 +740,224 @@ var _ = Describe("shared request helpers", func() {
 			})
 		})
 	})
+
+	Describe("MakeRequestReceiveRaw", func() {
+		var (
+			requestParams RequestParamsForReceiveRaw
+
+			rawResponseBody []byte
+			warnings        Warnings
+			executeErr      error
+		)
+
+		JustBeforeEach(func() {
+			rawResponseBody, warnings, executeErr = client.MakeRequestReceiveRaw(requestParams)
+		})
+
+		Context("GET raw bytes (YAML data)", func() {
+			var (
+				expectedResponseBody []byte
+			)
+
+			BeforeEach(func() {
+				requestParams = RequestParamsForReceiveRaw{
+					RequestName:          internal.GetApplicationManifestRequest,
+					URIParams:            internal.Params{"app_guid": "some-app-guid"},
+					ResponseBodyMimeType: "application/x-yaml",
+				}
+			})
+
+			When("getting requested data is successful", func() {
+				BeforeEach(func() {
+					expectedResponseBody = []byte("---\n- banana")
+
+					server.AppendHandlers(
+						CombineHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/manifest"),
+								VerifyHeaderKV("Accept", "application/x-yaml"),
+								RespondWith(
+									http.StatusOK,
+									expectedResponseBody,
+									http.Header{
+										"Content-Type":  {"application/x-yaml"},
+										"X-Cf-Warnings": {"this is a warning"},
+									}),
+							),
+						),
+					)
+				})
+
+				It("returns the raw response body and all warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(rawResponseBody).To(Equal(expectedResponseBody))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+
+			When("the cloud controller returns errors and warnings", func() {
+				BeforeEach(func() {
+					response := `{
+				  "errors": [
+					{
+					  "code": 10008,
+					  "detail": "The request is semantically invalid: command presence",
+					  "title": "CF-UnprocessableEntity"
+					},
+					{
+					  "code": 10010,
+					  "detail": "Org not found",
+					  "title": "CF-ResourceNotFound"
+					}
+				  ]
+				}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/manifest"),
+							VerifyHeaderKV("Accept", "application/x-yaml"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Org not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					}))
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+	})
+
+	Describe("MakeRequestSendRaw", func() {
+		var (
+			requestParams    RequestParamsForSendRaw
+			requestBody      []byte
+			responseBody     Package
+			expectedJobURL   string
+			responseLocation string
+			warnings         Warnings
+			executeErr       error
+		)
+
+		JustBeforeEach(func() {
+			responseLocation, warnings, executeErr = client.MakeRequestSendRaw(requestParams)
+		})
+
+		BeforeEach(func() {
+			requestBody = []byte("fake-package-file")
+			expectedJobURL = "apply-manifest-job-url"
+			responseBody = Package{}
+
+			requestParams = RequestParamsForSendRaw{
+				RequestName:         internal.PostPackageBitsRequest,
+				URIParams:           internal.Params{"package_guid": "package-guid"},
+				RequestBody:         requestBody,
+				RequestBodyMimeType: "multipart/form-data",
+				ResponseBody:        &responseBody,
+			}
+		})
+
+		When("the resource is successfully created", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-pkg-guid",
+					"type": "docker",
+					"state": "PROCESSING_UPLOAD",
+					"links": {
+						"upload": {
+							"href": "some-package-upload-url",
+							"method": "POST"
+						}
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
+						VerifyBody(requestBody),
+						VerifyHeaderKV("Content-Type", "multipart/form-data"),
+						RespondWith(http.StatusCreated, response, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {expectedJobURL},
+						}),
+					),
+				)
+			})
+
+			It("returns the resource and warnings", func() {
+				Expect(responseLocation).To(Equal(expectedJobURL))
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				expectedPackage := Package{
+					GUID:  "some-pkg-guid",
+					Type:  constant.PackageTypeDocker,
+					State: constant.PackageProcessingUpload,
+					Links: map[string]APILink{
+						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+					},
+				}
+				Expect(responseBody).To(Equal(expectedPackage))
+			})
+		})
+
+		When("the resource returns all errors and warnings", func() {
+			BeforeEach(func() {
+				response := ` {
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Hamster not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Hamster not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

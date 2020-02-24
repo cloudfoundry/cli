@@ -181,29 +181,21 @@ func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource
 // UploadPackage uploads a file to a given package's Upload resource. Note:
 // fileToUpload is read entirely into memory prior to sending data to CC.
 func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
-	body, contentType, err := client.createUploadStream(fileToUpload, "bits")
+	body, contentType, err := client.createUploadBuffer(fileToUpload, "bits")
 	if err != nil {
 		return Package{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostPackageBitsRequest,
-		URIParams:   internal.Params{"package_guid": pkg.GUID},
-		Body:        body,
+	responsePackage := Package{}
+	_, warnings, err := client.MakeRequestSendRaw(RequestParamsForSendRaw{
+		RequestName:         internal.PostPackageBitsRequest,
+		URIParams:           internal.Params{"package_guid": pkg.GUID},
+		RequestBody:         body.Bytes(),
+		RequestBodyMimeType: contentType,
+		ResponseBody:        &responsePackage,
 	})
-	if err != nil {
-		return Package{}, nil, err
-	}
 
-	request.Header.Set("Content-Type", contentType)
-
-	var responsePackage Package
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &responsePackage,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responsePackage, response.Warnings, err
+	return responsePackage, warnings, err
 }
 
 func (client *Client) calculateAppBitsRequestSize(matchedResources []Resource, newResourcesLength int64) (int64, error) {
@@ -275,27 +267,27 @@ func (client *Client) createMultipartBodyAndHeaderForAppBits(matchedResources []
 	return form.FormDataContentType(), writerOutput, writeErrors
 }
 
-func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {
+func (*Client) createUploadBuffer(path string, paramName string) (bytes.Buffer, string, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, "", err
+		return bytes.Buffer{}, "", err
 	}
 	defer file.Close()
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+	body := bytes.Buffer{}
+	writer := multipart.NewWriter(&body)
 	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
 	if err != nil {
-		return nil, "", err
+		return bytes.Buffer{}, "", err
 	}
 	_, err = io.Copy(part, file)
 	if err != nil {
-		return nil, "", err
+		return bytes.Buffer{}, "", err
 	}
 
 	err = writer.Close()
 
-	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), err
+	return body, writer.FormDataContentType(), err
 }
 
 func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Package, Warnings, error) {
@@ -369,24 +361,17 @@ func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedRes
 		return Package{}, nil, err
 	}
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostPackageBitsRequest,
-		URIParams:   internal.Params{"package_guid": packageGUID},
-		Body:        bytes.NewReader(body.Bytes()),
+	responsePackage := Package{}
+
+	_, warnings, err := client.MakeRequestSendRaw(RequestParamsForSendRaw{
+		RequestName:         internal.PostPackageBitsRequest,
+		URIParams:           internal.Params{"package_guid": packageGUID},
+		RequestBody:         body.Bytes(),
+		ResponseBody:        &responsePackage,
+		RequestBodyMimeType: form.FormDataContentType(),
 	})
-	if err != nil {
-		return Package{}, nil, err
-	}
 
-	request.Header.Set("Content-Type", form.FormDataContentType())
-
-	var pkg Package
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &pkg,
-	}
-
-	err = client.connection.Make(request, &response)
-	return pkg, response.Warnings, err
+	return responsePackage, warnings, err
 }
 
 func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
