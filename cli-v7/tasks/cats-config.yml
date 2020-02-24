@@ -84,8 +84,8 @@ run:
 
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
-      chmod +x cf-cli7_linux_x86-64
-      ln -s ${PWD}/cf-cli7_linux_x86-64 ${bindir}/cf
+      chmod +x cf7-cli_linux_x86-64
+      ln -s ${PWD}/cf7-cli_linux_x86-64 ${bindir}/cf
     popd
 
     export CF_USERNAME=${CF_INT_USERNAME}
