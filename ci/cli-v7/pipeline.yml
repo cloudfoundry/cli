@@ -43,6 +43,32 @@ resources:
   source:
     skip_check: true
 
+- name: cli-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    paths:
+    - bin
+    - ci
+
+- name: cf-deployment-concourse-tasks
+  type: git
+  icon: github-box
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks.git
+
+- name: cf-acceptance-tests-v7
+  type: git
+  icon: github-box
+  source:
+    branch: cli-v7-dev-4320018
+    uri: https://github.com/cloudfoundry/cf-acceptance-tests.git
+    ignore_paths:
+    - ci/*.yml
+    - .envrc
+
 - name: cf-deployment
   type: git
   source:
@@ -625,6 +651,66 @@ jobs:
     - put: edge-windows-installer-64
       params:
         file: winstallers/cf7-cli-installer_winx64.zip
+
+- name: cats
+  serial: true
+  plan:
+  - in_parallel:
+    - get: cli
+      passed:
+      - integration-linux
+      - integration-linux-client-creds
+      - integration-windows
+      - integration-windows-client-creds
+    - get: cf-acceptance-tests-v7
+    - get: cf-deployment-concourse-tasks
+    - get: cf-cli-binaries
+      passed:
+      - integration-linux
+      - integration-linux-client-creds
+      - integration-windows
+      - integration-windows-client-creds
+      trigger: true
+    - get: cli-ci
+    - get: vars-store
+    - put: bosh-lock
+      resource: gcp-bosh-pool
+      timeout: 2h
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: config
+      file: cli-ci/ci/cli-v7/tasks/cats-config.yml
+      params:
+        INCLUDE_V3: true
+        BROKER_START_TIMEOUT: 330
+        CF_PUSH_TIMEOUT: 210
+        DEFAULT_TIMEOUT: 60
+        LONG_CURL_TIMEOUT: 210
+    - task: extract-linux-binary
+      file: cli-ci/ci/cli/tasks/extract-linux-binary.yml
+    - task: run-tests
+      file: cf-deployment-concourse-tasks/run-cats-with-provided-cli/task.yml
+      input_mapping:
+        cf-acceptance-tests: cf-acceptance-tests-v7
+        integration-config: cats-config
+        cf-cli: linux-cf-binary
+      params:
+        NODES: 16
+        SKIP_REGEXP: "transparently proxies both reserved"
+        REPORTER_CONFIG_FILE_PATH: ""
+        FLAKE_ATTEMPTS: 2
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cats-cli-v7-migration'
+          text: *slack_notification_text
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
 
 - name: deliver-stories
   serial: true
