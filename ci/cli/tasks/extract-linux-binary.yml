@@ -25,5 +25,5 @@ run:
       rm cf-cli-binaries.tgz
     popd
 
-    mv cf-cli-binaries/cf-cli_linux_x86-64 linux-cf-binary/cf
+    mv cf-cli-binaries/cf7-cli_linux_x86-64 linux-cf-binary/cf
     chmod +x linux-cf-binary/cf
