@@ -61,52 +61,6 @@ var _ = Describe("target Command", func() {
 			fakeConfig.TargetReturns("some-api-target")
 		})
 
-		When("checking the cloud controller minimum version warning", func() {
-			var binaryVersion string
-
-			When("the CLI version is less than the recommended minimum", func() {
-				BeforeEach(func() {
-					binaryVersion = "0.0.0"
-					fakeConfig.BinaryVersionReturns(binaryVersion)
-				})
-
-				It("displays a recommendation to update the CLI version", func() {
-					Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
-				})
-			})
-
-			When("the CLI version is greater or equal to the recommended minimum", func() {
-				BeforeEach(func() {
-					binaryVersion = "1.0.0"
-					fakeConfig.BinaryVersionReturns(binaryVersion)
-				})
-
-				It("does not display a recommendation to update the CLI version", func() {
-					Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
-				})
-			})
-
-			When("an error is encountered while parsing the semver versions", func() {
-				BeforeEach(func() {
-					fakeConfig.BinaryVersionReturns("&#%")
-				})
-
-				It("does not recommend to update the CLI version", func() {
-					Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s.", apiVersion, minCLIVersion))
-				})
-			})
-
-			When("the CLI version is invalid", func() {
-				BeforeEach(func() {
-					fakeConfig.BinaryVersionReturns("&#%")
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr.Error()).To(Equal("No Major.Minor.Patch elements found"))
-				})
-			})
-		})
-
 		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})

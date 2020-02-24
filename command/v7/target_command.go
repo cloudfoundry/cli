@@ -48,12 +48,7 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *TargetCommand) Execute(args []string) error {
-	err := command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Actor.CloudControllerAPIVersion(), cmd.UI)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}

@@ -73,11 +73,6 @@ func (cmd AuthCommand) Execute(args []string) error {
 		}
 	}
 
-	err = command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Actor.CloudControllerAPIVersion(), cmd.UI)
-	if err != nil {
-		return err
-	}
-
 	cmd.UI.DisplayTextWithFlavor(
 		"API endpoint: {{.Endpoint}}",
 		map[string]interface{}{

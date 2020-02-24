@@ -174,59 +174,6 @@ var _ = Describe("auth Command", func() {
 		})
 	})
 
-	Describe("it checks the CLI version", func() {
-		var (
-			apiVersion    string
-			minCLIVersion string
-			binaryVersion string
-		)
-
-		BeforeEach(func() {
-			apiVersion = "1.2.3"
-			fakeActor.CloudControllerAPIVersionReturns(apiVersion)
-			minCLIVersion = "1.0.0"
-			fakeConfig.MinCLIVersionReturns(minCLIVersion)
-
-			cmd.RequiredArgs.Username = "user"
-			cmd.RequiredArgs.Password = "password"
-		})
-
-		Context("the CLI version is older than the minimum version required by the API", func() {
-			BeforeEach(func() {
-				binaryVersion = "0.0.0"
-				fakeConfig.BinaryVersionReturns(binaryVersion)
-			})
-
-			It("displays a recommendation to update the CLI version", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
-			})
-		})
-
-		Context("the CLI version satisfies the API's minimum version requirements", func() {
-			BeforeEach(func() {
-				binaryVersion = "1.0.0"
-				fakeConfig.BinaryVersionReturns(binaryVersion)
-			})
-
-			It("does not display a recommendation to update the CLI version", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Err).ToNot(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
-			})
-		})
-
-		When("the CLI version is invalid", func() {
-			BeforeEach(func() {
-				fakeConfig.BinaryVersionReturns("&#%")
-			})
-
-			It("returns an error", func() {
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("No Major.Minor.Patch elements found"))
-			})
-		})
-	})
-
 	When("there are no input errors", func() {
 		var (
 			testID     string
