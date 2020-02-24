@@ -115,10 +115,6 @@ var _ = Describe("services command", func() {
 		})
 
 		When("CAPI version is < 2.125.0", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionAtLeast(ccversion.MinVersionMultiServiceRegistrationV2)
-			})
-
 			It("displays all service information", func() {
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
@@ -132,10 +128,6 @@ var _ = Describe("services command", func() {
 		})
 
 		When("CAPI version is >= 2.125.0 (broker name is available in summary endpoint)", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
-			})
-
 			It("displays all service information", func() {
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))

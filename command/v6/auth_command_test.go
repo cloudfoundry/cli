@@ -52,13 +52,13 @@ var _ = Describe("auth Command", func() {
 
 		When("the UAA is below the minimum API version", func() {
 			BeforeEach(func() {
-				fakeActor.UAAAPIVersionReturns(uaaversion.MinUAAClientVersion)
+				fakeActor.UAAAPIVersionReturns(uaaversion.InvalidUAAClientVersion)
 			})
 
 			It("returns an API version error", func() {
 				Expect(err).To(MatchError(translatableerror.MinimumUAAAPIVersionNotMetError{
 					Command:        "Option '--origin'",
-					MinimumVersion: uaaversion.MinVersionOrigin,
+					MinimumVersion: uaaversion.MinUAAClientVersion,
 				}))
 			})
 		})
@@ -66,7 +66,7 @@ var _ = Describe("auth Command", func() {
 		When("--client-credentials set", func() {
 			BeforeEach(func() {
 				cmd.ClientCredentials = true
-				fakeActor.UAAAPIVersionReturns(uaaversion.MinVersionOrigin)
+				fakeActor.UAAAPIVersionReturns(uaaversion.MinUAAClientVersion)
 			})
 
 			It("returns an ArgumentCombinationError", func() {
@@ -80,7 +80,7 @@ var _ = Describe("auth Command", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.Username = "doesn't matter"
 				cmd.RequiredArgs.Password = "doesn't matter"
-				fakeActor.UAAAPIVersionReturns(uaaversion.MinVersionOrigin)
+				fakeActor.UAAAPIVersionReturns(uaaversion.MinUAAClientVersion)
 			})
 
 			It("authenticates with the values from the command line args", func() {

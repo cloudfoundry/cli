@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -59,12 +58,7 @@ func (cmd *UnshareServiceCommand) Setup(config command.Config, ui command.UI) er
 }
 
 func (cmd UnshareServiceCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionShareServiceV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

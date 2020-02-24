@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -41,10 +40,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	helpers.SetupSynchronizedSuite(func() {
 		helpers.EnableFeatureFlag("diego_docker")
-
-		if helpers.IsVersionMet(ccversion.MinVersionShareServiceV3) {
-			helpers.EnableFeatureFlag("service_instance_sharing")
-		}
+		helpers.EnableFeatureFlag("service_instance_sharing")
 	})
 
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()

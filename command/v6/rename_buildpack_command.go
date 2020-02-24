@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -57,10 +56,6 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 	}
 
 	if cmd.stackSpecified() {
-		err = command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionBuildpackStackAssociationV2, "Option '-s'")
-		if err != nil {
-			return err
-		}
 		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"OldName":     cmd.RequiredArgs.OldBuildpackName,
 			"NewName":     cmd.RequiredArgs.NewBuildpackName,

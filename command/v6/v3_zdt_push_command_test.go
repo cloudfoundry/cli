@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -90,7 +89,6 @@ var _ = Describe("v3-zdt-push Command", func() {
 			AppSummaryDisplayer: appSummaryDisplayer,
 			PackageDisplayer:    packageDisplayer,
 		}
-		fakeZdtActor.CloudControllerAPIVersionReturns(ccversion.MinVersionZeroDowntimePushV3)
 
 		// we stub out StagePackage out here so the happy paths below don't hang
 		fakeZdtActor.StagePackageStub = func(_ string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
@@ -112,40 +110,8 @@ var _ = Describe("v3-zdt-push Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	When("the API version is at the minimum documented version", func() {
-		const MinVersionDocumentedZDTPush = "3.55.0" // CAPI docs show that 3.55.0 should work, but it doesn't,
-		// so we're using 3.55 as the "version below the version we support" in this test to document this fact.
-		BeforeEach(func() {
-			fakeZdtActor.CloudControllerAPIVersionReturns(MinVersionDocumentedZDTPush)
-		})
-
-		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: MinVersionDocumentedZDTPush,
-				MinimumVersion: ccversion.MinVersionZeroDowntimePushV3,
-			}))
-		})
-
-		It("displays the experimental warning", func() {
-			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-		})
-	})
-
-	When("the API version is the oldest supported by the CLI", func() {
-		BeforeEach(func() {
-			fakeZdtActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV3ClientVersion)
-		})
-
-		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinSupportedV3ClientVersion,
-				MinimumVersion: ccversion.MinVersionZeroDowntimePushV3,
-			}))
-		})
-
-		It("displays the experimental warning", func() {
-			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-		})
+	It("displays the experimental warning", func() {
+		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 	})
 
 	DescribeTable("argument combinations",

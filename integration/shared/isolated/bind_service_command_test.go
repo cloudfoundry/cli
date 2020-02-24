@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -328,8 +327,6 @@ var _ = Describe("bind-service command", func() {
 
 				When("the service binding is asynchronous", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
-
 						broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 
 						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))

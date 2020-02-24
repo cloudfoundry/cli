@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -75,7 +74,6 @@ var _ = Describe("push with different buildpack values", func() {
 				)
 
 				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					nonDefaultStack = helpers.CreateStack()
 					buildpacks = []string{helpers.NewBuildpackName(), helpers.NewBuildpackName()}
 					for _, buildpack := range buildpacks {

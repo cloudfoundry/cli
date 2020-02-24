@@ -118,10 +118,6 @@ var _ = Describe("create-shared-domain command", func() {
 			})
 
 			When("the CC API version meets the minimum version requirement", func() {
-				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
-				})
-
 				When("things work as expected", func() {
 					It("creates a domain with internal flag", func() {
 						session := helpers.CF("create-shared-domain", domainName, "--internal")
@@ -243,10 +239,6 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 
 		When("with --internal flag", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
-			})
-
 			It("should fail and return an unauthorized message", func() {
 				session := helpers.CF("create-shared-domain", domainName, "--internal")
 				Eventually(session).Should(Say("FAILED"))

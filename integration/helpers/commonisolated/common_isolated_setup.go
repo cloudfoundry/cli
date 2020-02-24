@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -42,10 +41,6 @@ func CommonGinkgoSetup(
 
 		helpers.SetupSynchronizedSuite(func() {
 			helpers.EnableFeatureFlag("diego_docker")
-
-			if helpers.IsVersionMet(ccversion.MinVersionShareServiceV3) {
-				helpers.EnableFeatureFlag("service_instance_sharing")
-			}
 		})
 
 		fakeservicebroker.Setup()
