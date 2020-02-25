@@ -41,15 +41,13 @@ var _ = Describe("set-droplet Command", func() {
 		dropletGUID = "some-droplet-guid"
 
 		cmd = v7.SetDropletCommand{
-			RequiredArgs: flag.AppName{AppName: app},
-			DropletGUID:  dropletGUID,
+			RequiredArgs: flag.AppDroplet{AppName: app, DropletGUID: dropletGUID},
 
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 		}
-
 	})
 
 	JustBeforeEach(func() {

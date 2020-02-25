@@ -4,7 +4,6 @@ import (
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -39,9 +38,7 @@ var _ = Describe("set-droplet command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("set-droplet - Set the droplet used to run an app"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf set-droplet APP_NAME -d DROPLET_GUID"))
-				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say(`--droplet-guid, -d\s+The guid of the droplet to use`))
+				Eventually(session).Should(Say("cf set-droplet APP_NAME DROPLET_GUID"))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("app, create-package, droplets, packages, push, stage"))
 
@@ -52,28 +49,27 @@ var _ = Describe("set-droplet command", func() {
 
 	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("set-droplet", "-d", "some-droplet-guid")
+			session := helpers.CF("set-droplet")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `APP_NAME` and `DROPLET_GUID` were not provided"))
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
-	When("the package GUID flag is missing", func() {
+	When("the droplet GUID arg is missing", func() {
 		It("displays incorrect usage", func() {
 			session := helpers.CF("set-droplet", "some-app")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `-d, --droplet-guid' was not specified"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `DROPLET_GUID` was not provided"))
 			Eventually(session).Should(Say("NAME:"))
-
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "set-droplet", appName, "--droplet-guid", "some-droplet-guid")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "set-droplet", appName, "some-droplet-guid")
 		})
 	})
 
@@ -116,7 +112,7 @@ var _ = Describe("set-droplet command", func() {
 			It("sets the droplet for the app", func() {
 				userName, _ := helpers.GetCredentials()
 
-				session := helpers.CF("set-droplet", appName, "-d", dropletGUID)
+				session := helpers.CF("set-droplet", appName, dropletGUID)
 				Eventually(session).Should(Say(`Setting app %s to droplet %s in org %s / space %s as %s\.\.\.`, appName, dropletGUID, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 
@@ -126,7 +122,7 @@ var _ = Describe("set-droplet command", func() {
 			When("the app does not exist", func() {
 				It("displays app not found and exits 1", func() {
 					invalidAppName := "invalid-app-name"
-					session := helpers.CF("set-droplet", invalidAppName, "-d", dropletGUID)
+					session := helpers.CF("set-droplet", invalidAppName, dropletGUID)
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session).Should(Say(`Setting app %s to droplet %s in org %s / space %s as %s\.\.\.`, invalidAppName, dropletGUID, orgName, spaceName, userName))
@@ -140,7 +136,7 @@ var _ = Describe("set-droplet command", func() {
 			When("the droplet does not exist", func() {
 				It("displays droplet not found and exits 1", func() {
 					invalidDropletGUID := "some-droplet-guid"
-					session := helpers.CF("set-droplet", appName, "-d", invalidDropletGUID)
+					session := helpers.CF("set-droplet", appName, invalidDropletGUID)
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session).Should(Say(`Setting app %s to droplet %s in org %s / space %s as %s\.\.\.`, appName, invalidDropletGUID, orgName, spaceName, userName))

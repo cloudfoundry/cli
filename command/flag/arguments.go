@@ -8,6 +8,11 @@ type OptionalAppName struct {
 	AppName string `positional-arg-name:"APP_NAME" description:"The application name"`
 }
 
+type AppDroplet struct {
+	AppName     string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	DropletGUID string `positional-arg-name:"DROPLET_GUID" required:"true" description:"The droplet guid"`
+}
+
 type BuildpackName struct {
 	Buildpack string `positional-arg-name:"BUILDPACK" required:"true" description:"The buildpack"`
 }

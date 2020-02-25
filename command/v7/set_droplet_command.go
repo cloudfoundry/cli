@@ -16,11 +16,9 @@ type SetDropletActor interface {
 }
 
 type SetDropletCommand struct {
-	RequiredArgs    flag.AppName `positional-args:"yes"`
-	usage           interface{}  `usage:"CF_NAME set-droplet APP_NAME -d DROPLET_GUID"`
-	relatedCommands interface{}  `related_commands:"app, droplets, stage, push, packages, create-package"`
-
-	DropletGUID string `short:"d" long:"droplet-guid" description:"The guid of the droplet to use" required:"true"`
+	RequiredArgs    flag.AppDroplet `positional-args:"yes"`
+	usage           interface{}     `usage:"CF_NAME set-droplet APP_NAME DROPLET_GUID"`
+	relatedCommands interface{}     `related_commands:"app, droplets, stage, push, packages, create-package"`
 
 	UI          command.UI
 	Config      command.Config
@@ -53,19 +51,25 @@ func (cmd SetDropletCommand) Execute(args []string) error {
 		return err
 	}
 
+	appName := cmd.RequiredArgs.AppName
+	dropletGUID := cmd.RequiredArgs.DropletGUID
+	org := cmd.Config.TargetedOrganization()
+	space := cmd.Config.TargetedSpace()
+
 	cmd.UI.DisplayTextWithFlavor("Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":     cmd.RequiredArgs.AppName,
-		"DropletGUID": cmd.DropletGUID,
-		"OrgName":     cmd.Config.TargetedOrganization().Name,
-		"SpaceName":   cmd.Config.TargetedSpace().Name,
+		"AppName":     appName,
+		"DropletGUID": dropletGUID,
+		"OrgName":     org.Name,
+		"SpaceName":   space.Name,
 		"Username":    user.Name,
 	})
 
-	warnings, err := cmd.Actor.SetApplicationDropletByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.DropletGUID)
+	warnings, err := cmd.Actor.SetApplicationDropletByApplicationNameAndSpace(appName, space.GUID, dropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
+
 	cmd.UI.DisplayOK()
 
 	return nil
