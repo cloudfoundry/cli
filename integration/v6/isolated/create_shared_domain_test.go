@@ -109,7 +109,7 @@ var _ = Describe("create-shared-domain command", func() {
 					server.Close()
 				})
 
-				It("fails with error message that the minimum version is not met", func() {
+				XIt("fails with error message that the minimum version is not met", func() {
 					session := helpers.CF("create-shared-domain", domainName, "--internal", "-v")
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say(`Option '--internal' requires CF API version 2\.115\.0 or higher\. Your target is %s`, ccversion.MinSupportedV2ClientVersion))
