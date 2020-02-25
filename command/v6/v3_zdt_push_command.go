@@ -116,6 +116,11 @@ func (cmd V3ZeroDowntimePushCommand) Execute(args []string) error {
 		return err
 	}
 
+	err = command.MinimumCCAPIVersionCheck(cmd.ZdtActor.CloudControllerAPIVersion(), ccversion.MinSupportedV3ClientVersion)
+	if err != nil {
+		return err
+	}
+
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err

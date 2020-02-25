@@ -1,7 +1,6 @@
 package experimental
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -54,22 +53,22 @@ var _ = Describe("v3-zdt-restart command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	XWhen("the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinSupportedV3ClientVersion)
+				server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, "3.0.0")
 			})
 
 			AfterEach(func() {
 				server.Close()
 			})
 
-			XIt("fails with error message that the minimum version is not met", func() {
+			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-zdt-restart", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.57\.0 or higher\.`))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.63\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

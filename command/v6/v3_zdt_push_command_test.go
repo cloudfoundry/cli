@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"errors"
 	"time"
 
@@ -89,6 +90,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 			AppSummaryDisplayer: appSummaryDisplayer,
 			PackageDisplayer:    packageDisplayer,
 		}
+		fakeZdtActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 
 		// we stub out StagePackage out here so the happy paths below don't hang
 		fakeZdtActor.StagePackageStub = func(_ string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
@@ -108,6 +110,21 @@ var _ = Describe("v3-zdt-push Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	When("the API version is below the minimum", func() {
+		olderCurrentVersion := "3.0.1"
+
+		BeforeEach(func() {
+			fakeZdtActor.CloudControllerAPIVersionReturns(olderCurrentVersion)
+		})
+
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				CurrentVersion: olderCurrentVersion,
+				MinimumVersion: ccversion.MinSupportedV3ClientVersion,
+			}))
+		})
 	})
 
 	It("displays the experimental warning", func() {

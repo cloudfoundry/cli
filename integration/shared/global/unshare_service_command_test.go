@@ -1,7 +1,6 @@
 package global
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -78,17 +77,17 @@ var _ = Describe("unshare-service command", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinSupportedV3ClientVersion)
+				server = helpers.StartAndTargetMockServerWithAPIVersions(helpers.DefaultV2Version, "3.0.0")
 			})
 
 			AfterEach(func() {
 				server.Close()
 			})
 
-			XIt("fails with error message that the minimum version is not met", func() {
+			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.36\.0 or higher\.`))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.63\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -1,6 +1,8 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -45,10 +47,25 @@ var _ = Describe("unshare-service Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+		fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	When("the API version is below the minimum", func() {
+		olderCurrentVersion := "3.0.1"
+		BeforeEach(func() {
+			fakeActor.CloudControllerV3APIVersionReturns(olderCurrentVersion)
+		})
+
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				CurrentVersion: olderCurrentVersion,
+				MinimumVersion: ccversion.MinSupportedV3ClientVersion,
+			}))
+		})
 	})
 
 	When("checking target fails", func() {

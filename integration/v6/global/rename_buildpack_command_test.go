@@ -302,7 +302,7 @@ var _ = Describe("rename buildpack command", func() {
 					})
 				})
 
-				XWhen("The API version does not support stack association", func() {
+				When("The API version does not support stack association", func() {
 					When("renaming to the same name as an existing buildpack with no stack association", func() {
 						BeforeEach(func() {
 							helpers.SetupBuildpackWithoutStack(newBuildpackName)

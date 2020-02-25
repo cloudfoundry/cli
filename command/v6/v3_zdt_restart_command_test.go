@@ -1,6 +1,8 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -47,10 +49,26 @@ var _ = Describe("v3-zdt-restart Command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 		}
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	When("the API version is below the minimum", func() {
+		olderCurrentVersion := "3.0.1"
+
+		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(olderCurrentVersion)
+		})
+
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				CurrentVersion: olderCurrentVersion,
+				MinimumVersion: ccversion.MinSupportedV3ClientVersion,
+			}))
+		})
 	})
 
 	It("displays the experimental warning", func() {
