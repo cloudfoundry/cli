@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"regexp"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("create-shared-domain command", func() {
@@ -98,25 +96,6 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 
 		When("the --internal flag is specified", func() {
-			When("the CC API version is less than the minimum version specified", func() {
-				var server *Server
-
-				BeforeEach(func() {
-					server = helpers.StartAndTargetMockServerWithAPIVersions(ccversion.MinSupportedV2ClientVersion, ccversion.MinSupportedV3ClientVersion)
-				})
-
-				AfterEach(func() {
-					server.Close()
-				})
-
-				It("fails with error message that the minimum version is not met", func() {
-					session := helpers.CF("create-shared-domain", domainName, "--internal", "-v")
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say(`Option '--internal' requires CF API version 2\.115\.0 or higher\. Your target is %s`, ccversion.MinSupportedV2ClientVersion))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
 			When("the CC API version meets the minimum version requirement", func() {
 				When("things work as expected", func() {
 					It("creates a domain with internal flag", func() {
