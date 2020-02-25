@@ -177,7 +177,7 @@ type commandList struct {
 	Stop                               v7.StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
 	Target                             v7.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
 	Tasks                              v7.TasksCommand                              `command:"tasks" description:"List tasks of an app"`
-	TerminateTask                      v6.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
+	TerminateTask                      v7.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
 	UnbindRouteService                 v6.UnbindRouteServiceCommand                 `command:"unbind-route-service" alias:"urs" description:"Unbind a service instance from an HTTP route"`
 	UnbindRunningSecurityGroup         v6.UnbindRunningSecurityGroupCommand         `command:"unbind-running-security-group" description:"Unbind a security group from the set of security groups for running applications"`
 	UnbindSecurityGroup                v6.UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
