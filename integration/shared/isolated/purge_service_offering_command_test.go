@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -238,8 +237,6 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the service is provided by multiple brokers", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
-
 						buffer = NewBuffer()
 						_, err := buffer.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())

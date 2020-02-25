@@ -24,8 +24,6 @@ var _ = Describe("share-service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
-
 		sourceOrgName = helpers.NewOrgName()
 		sourceSpaceName = helpers.NewSpaceName()
 		sharedToOrgName = helpers.NewOrgName()

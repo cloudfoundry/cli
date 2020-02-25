@@ -1,7 +1,6 @@
 package global
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -23,8 +22,6 @@ var _ = Describe("service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
-
 		serviceInstanceName = helpers.PrefixedRandomName("SI")
 		orgName = helpers.NewOrgName()
 		sourceSpaceName = helpers.NewSpaceName()

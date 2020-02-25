@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -242,7 +241,6 @@ var _ = Describe("disable service access command", func() {
 				var secondBroker *fakeservicebroker.FakeServiceBroker
 
 				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 					secondBroker = fakeservicebroker.NewAlternate()
 					secondBroker.Services[0].Name = broker.ServiceName()
 					secondBroker.EnsureBrokerIsAvailable()
@@ -282,7 +280,6 @@ var _ = Describe("disable service access command", func() {
 			)
 
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)

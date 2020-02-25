@@ -8,7 +8,6 @@ import (
 	"os"
 	"regexp"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -461,10 +460,6 @@ var _ = Describe("update-buildpack command", func() {
 					var (
 						stacks []string
 					)
-
-					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-					})
 
 					When("the user assigns a stack that exists on the system", func() {
 						BeforeEach(func() {

@@ -8,7 +8,6 @@ import (
 	"os"
 	"regexp"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -93,7 +92,6 @@ var _ = Describe("update-buildpack command", func() {
 
 				BeforeEach(func() {
 					stacksBefore = helpers.FetchStacks()
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					stacks = helpers.EnsureMinimumNumberOfStacks(2)
 				})
 				AfterEach(func() {
@@ -371,28 +369,10 @@ var _ = Describe("update-buildpack command", func() {
 						session = helpers.CF("update-buildpack", buildpackName, "-s", stackName)
 					})
 
-					When("the targeted API does not support stack associations", func() {
-						BeforeEach(func() {
-							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
-						})
-
-						It("fails with a minimum version error", func() {
-							Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, helpers.GetAPIVersionV2()))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session).Should(Exit(1))
-						})
-					})
-
-					When("the targeted API supports stack associations", func() {
-						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-						})
-
-						It("returns a buildpack with stack not found error", func() {
-							Eventually(session.Err).Should(Say("Buildpack '%s' with stack '%s' not found", buildpackName, stackName))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session).Should(Exit(1))
-						})
+					It("returns a buildpack with stack not found error", func() {
+						Eventually(session.Err).Should(Say("Buildpack '%s' with stack '%s' not found", buildpackName, stackName))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 
@@ -582,10 +562,6 @@ var _ = Describe("update-buildpack command", func() {
 						stacks []string
 					)
 
-					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-					})
-
 					When("the user assigns a stack that exists on the system", func() {
 						BeforeEach(func() {
 							stacks = helpers.EnsureMinimumNumberOfStacks(2)
@@ -714,10 +690,6 @@ var _ = Describe("update-buildpack command", func() {
 					})
 
 					When("specifying -i and --assign-stack", func() {
-						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-						})
-
 						It("displays text that the stack is being assigned and the buildpack is being updated", func() {
 							stacks := helpers.EnsureMinimumNumberOfStacks(1)
 							newStack := stacks[0]

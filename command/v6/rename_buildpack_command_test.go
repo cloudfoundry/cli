@@ -3,10 +3,8 @@ package v6_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -126,92 +124,72 @@ var _ = Describe("rename buildpack command", func() {
 				cmd.Stack = stackName
 			})
 
-			When("the version of CC API is less than minimum version", func() {
+			When("the actor succeeds", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
+					fakeActor.RenameBuildpackReturns(v2action.Warnings{"warning1", "warning2"}, nil)
 				})
 
-				It("should warn the user that the version of CAPI is too low and exit with an error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-						Command:        "Option '-s'",
-						CurrentVersion: ccversion.MinSupportedV2ClientVersion,
-						MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
-					}))
+				It("successfully renames the buildpack and displays any warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.RenameBuildpackCallCount()).To(Equal(1))
+
+					oldBuildpackName, newBuildpackName, stack := fakeActor.RenameBuildpackArgsForCall(0)
+					Expect(oldBuildpackName).To(Equal(oldName))
+					Expect(newBuildpackName).To(Equal(newName))
+					Expect(stack).To(Equal(stackName))
+
+					Expect(testUI.Out).To(Say("Renaming buildpack %s to %s with stack %s as %s...",
+						oldName,
+						newName,
+						stackName,
+						userName,
+					))
+					Expect(testUI.Err).To(Say("warning1"))
+					Expect(testUI.Err).To(Say("warning2"))
 				})
 			})
 
-			When("the version of the CC API greater than/equal too the minimum version", func() {
-				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
-				})
-
-				When("the actor succeeds", func() {
+			When("the actor returns an error", func() {
+				When("BuildpackNameTakenError", func() {
 					BeforeEach(func() {
-						fakeActor.RenameBuildpackReturns(v2action.Warnings{"warning1", "warning2"}, nil)
+						fakeActor.RenameBuildpackReturns(
+							v2action.Warnings{"warning1", "warning2"},
+							actionerror.BuildpackNameTakenError{Name: newName})
 					})
 
-					It("successfully renames the buildpack and displays any warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(fakeActor.RenameBuildpackCallCount()).To(Equal(1))
-
-						oldBuildpackName, newBuildpackName, stack := fakeActor.RenameBuildpackArgsForCall(0)
-						Expect(oldBuildpackName).To(Equal(oldName))
-						Expect(newBuildpackName).To(Equal(newName))
-						Expect(stack).To(Equal(stackName))
-
-						Expect(testUI.Out).To(Say("Renaming buildpack %s to %s with stack %s as %s...",
-							oldName,
-							newName,
-							stackName,
-							userName,
-						))
+					It("returns an error and prints warnings", func() {
+						Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError{Name: newName}))
 						Expect(testUI.Err).To(Say("warning1"))
 						Expect(testUI.Err).To(Say("warning2"))
 					})
 				})
 
-				When("the actor returns an error", func() {
-					When("BuildpackNameTakenError", func() {
-						BeforeEach(func() {
-							fakeActor.RenameBuildpackReturns(
-								v2action.Warnings{"warning1", "warning2"},
-								actionerror.BuildpackNameTakenError{Name: newName})
-						})
-
-						It("returns an error and prints warnings", func() {
-							Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError{Name: newName}))
-							Expect(testUI.Err).To(Say("warning1"))
-							Expect(testUI.Err).To(Say("warning2"))
-						})
+				When("BuildpackInvalidError: name has invalid characters", func() {
+					BeforeEach(func() {
+						fakeActor.RenameBuildpackReturns(
+							v2action.Warnings{"warning1", "warning2"},
+							actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"})
 					})
 
-					When("BuildpackInvalidError: name has invalid characters", func() {
-						BeforeEach(func() {
-							fakeActor.RenameBuildpackReturns(
-								v2action.Warnings{"warning1", "warning2"},
-								actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"})
-						})
+					It("returns an error and prints warnings", func() {
+						Expect(executeErr).To(MatchError(actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"}))
+						Expect(testUI.Err).To(Say("warning1"))
+						Expect(testUI.Err).To(Say("warning2"))
+					})
+				})
 
-						It("returns an error and prints warnings", func() {
-							Expect(executeErr).To(MatchError(actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: name can only contain alphanumeric characters"}))
-							Expect(testUI.Err).To(Say("warning1"))
-							Expect(testUI.Err).To(Say("warning2"))
-						})
+				When("BuildpackInvalidError: stack non-unique", func() {
+					BeforeEach(func() {
+						fakeActor.RenameBuildpackReturns(
+							v2action.Warnings{"warning1", "warning2"},
+							actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: stack unique"})
 					})
 
-					When("BuildpackInvalidError: stack non-unique", func() {
-						BeforeEach(func() {
-							fakeActor.RenameBuildpackReturns(
-								v2action.Warnings{"warning1", "warning2"},
-								actionerror.BuildpackInvalidError{Message: "Buildpack is invalid: stack unique"})
-						})
-
-						It("returns an error and prints warnings", func() {
-							Expect(executeErr).To(MatchError("Buildpack some-new-name already exists without a stack"))
-							Expect(testUI.Err).To(Say("warning1"))
-							Expect(testUI.Err).To(Say("warning2"))
-						})
+					It("returns an error and prints warnings", func() {
+						Expect(executeErr).To(MatchError("Buildpack some-new-name already exists without a stack"))
+						Expect(testUI.Err).To(Say("warning1"))
+						Expect(testUI.Err).To(Say("warning2"))
 					})
 				})
 			})
