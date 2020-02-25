@@ -41,6 +41,7 @@ func CommonGinkgoSetup(
 
 		helpers.SetupSynchronizedSuite(func() {
 			helpers.EnableFeatureFlag("diego_docker")
+			helpers.EnableFeatureFlag("service_instance_sharing")
 		})
 
 		fakeservicebroker.Setup()
