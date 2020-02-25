@@ -54,7 +54,7 @@ var _ = Describe("v3-zdt-restart command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	When("the environment is not setup correctly", func() {
+	XWhen("the environment is not setup correctly", func() {
 		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
