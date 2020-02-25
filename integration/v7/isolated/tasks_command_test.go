@@ -75,10 +75,7 @@ var _ = Describe("tasks command", func() {
 			When("the application does not have associated tasks", func() {
 				It("displays an empty table", func() {
 					session := helpers.CF("tasks", appName)
-					Eventually(session).Should(Say(`
-id   name   state   start time   command
-`,
-					))
+					Eventually(session).Should(Say(`No tasks found for application\.`))
 					Consistently(session).ShouldNot(Say("1"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -94,7 +91,6 @@ id   name   state   start time   command
 					session := helpers.CF("tasks", appName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say(fmt.Sprintf("Getting tasks for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Eventually(session).Should(Say("OK\n"))
 					Eventually(session).Should(Say(`id\s+name\s+state\s+start time\s+command
 2\s+[a-zA-Z-0-9 ,:]+echo foo bar
 1\s+[a-zA-Z-0-9 ,:]+echo hello world`))
