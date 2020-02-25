@@ -109,7 +109,7 @@ var _ = Describe("start command", func() {
 					Expect(matches).To(HaveLen(2))
 
 					dropletGUID := matches[1]
-					setDropletSession := helpers.CF("set-droplet", appName, "--droplet-guid", dropletGUID)
+					setDropletSession := helpers.CF("set-droplet", appName, dropletGUID)
 					Eventually(setDropletSession).Should(Exit(0))
 				})
 

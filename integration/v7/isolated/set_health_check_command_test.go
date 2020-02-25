@@ -112,7 +112,7 @@ var _ = Describe("set-health-check command", func() {
 					Expect(matches).To(HaveLen(2))
 
 					dropletGUID := matches[1]
-					setDropletSession := helpers.CF("set-droplet", appName, "--droplet-guid", dropletGUID)
+					setDropletSession := helpers.CF("set-droplet", appName, dropletGUID)
 					Eventually(setDropletSession).Should(Exit(0))
 
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "console")
