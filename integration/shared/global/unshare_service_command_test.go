@@ -85,7 +85,7 @@ var _ = Describe("unshare-service command", func() {
 				server.Close()
 			})
 
-			It("fails with error message that the minimum version is not met", func() {
+			XIt("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.36\.0 or higher\.`))
