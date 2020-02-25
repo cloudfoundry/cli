@@ -138,9 +138,9 @@ var _ = Describe("run-task Command", func() {
 						Expect(task).To(Equal(v7action.Task{Command: "some command"}))
 
 						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say(`task name:\s+31337ddd`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
 
@@ -183,9 +183,9 @@ var _ = Describe("run-task Command", func() {
 						}))
 
 						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
 
@@ -230,9 +230,9 @@ var _ = Describe("run-task Command", func() {
 						}))
 
 						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
 
@@ -281,9 +281,9 @@ var _ = Describe("run-task Command", func() {
 						}))
 
 						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say("OK"))
 
-						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
 						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
 						Expect(testUI.Out).To(Say(`task id:\s+3`))
 
