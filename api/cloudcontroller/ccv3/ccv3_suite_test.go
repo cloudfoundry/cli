@@ -108,6 +108,9 @@ func SetupV3Response() {
 			"organization_quotas": {
 				"href": "SERVER_URL/v3/organization_quotas"
 			},
+			"security_groups": {
+				"href": "SERVER_URL/v3/security_groups"
+			},
 			"service_brokers": {
 				"href": "SERVER_URL/v3/service_brokers"
 			},

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeCloudControllerClient struct {
@@ -313,6 +314,21 @@ type FakeCloudControllerClient struct {
 	}
 	createRouteReturnsOnCall map[int]struct {
 		result1 ccv3.Route
+		result2 ccv3.Warnings
+		result3 error
+	}
+	CreateSecurityGroupStub        func(resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
+	createSecurityGroupMutex       sync.RWMutex
+	createSecurityGroupArgsForCall []struct {
+		arg1 resources.SecurityGroup
+	}
+	createSecurityGroupReturns struct {
+		result1 resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createSecurityGroupReturnsOnCall map[int]struct {
+		result1 resources.SecurityGroup
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -3408,6 +3424,72 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 c
 	}
 	fake.createRouteReturnsOnCall[i] = struct {
 		result1 ccv3.Route
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateSecurityGroup(arg1 resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error) {
+	fake.createSecurityGroupMutex.Lock()
+	ret, specificReturn := fake.createSecurityGroupReturnsOnCall[len(fake.createSecurityGroupArgsForCall)]
+	fake.createSecurityGroupArgsForCall = append(fake.createSecurityGroupArgsForCall, struct {
+		arg1 resources.SecurityGroup
+	}{arg1})
+	fake.recordInvocation("CreateSecurityGroup", []interface{}{arg1})
+	fake.createSecurityGroupMutex.Unlock()
+	if fake.CreateSecurityGroupStub != nil {
+		return fake.CreateSecurityGroupStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createSecurityGroupReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateSecurityGroupCallCount() int {
+	fake.createSecurityGroupMutex.RLock()
+	defer fake.createSecurityGroupMutex.RUnlock()
+	return len(fake.createSecurityGroupArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateSecurityGroupCalls(stub func(resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)) {
+	fake.createSecurityGroupMutex.Lock()
+	defer fake.createSecurityGroupMutex.Unlock()
+	fake.CreateSecurityGroupStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateSecurityGroupArgsForCall(i int) resources.SecurityGroup {
+	fake.createSecurityGroupMutex.RLock()
+	defer fake.createSecurityGroupMutex.RUnlock()
+	argsForCall := fake.createSecurityGroupArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateSecurityGroupReturns(result1 resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.createSecurityGroupMutex.Lock()
+	defer fake.createSecurityGroupMutex.Unlock()
+	fake.CreateSecurityGroupStub = nil
+	fake.createSecurityGroupReturns = struct {
+		result1 resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateSecurityGroupReturnsOnCall(i int, result1 resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.createSecurityGroupMutex.Lock()
+	defer fake.createSecurityGroupMutex.Unlock()
+	fake.CreateSecurityGroupStub = nil
+	if fake.createSecurityGroupReturnsOnCall == nil {
+		fake.createSecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 resources.SecurityGroup
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createSecurityGroupReturnsOnCall[i] = struct {
+		result1 resources.SecurityGroup
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11066,6 +11148,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createRoleMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.createSecurityGroupMutex.RLock()
+	defer fake.createSecurityGroupMutex.RUnlock()
 	fake.createServiceBrokerMutex.RLock()
 	defer fake.createServiceBrokerMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
