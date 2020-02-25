@@ -124,7 +124,7 @@ var _ = Describe("v3-zdt-push command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-zdt-push", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.57\.0 or higher\.`))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.63\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

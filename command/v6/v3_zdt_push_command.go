@@ -1,6 +1,7 @@
 package v6
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -72,6 +73,12 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	if err != nil {
 		return err
 	}
+	err = command.MinimumCCAPIVersionCheck(ccClient.CloudControllerAPIVersion(), ccversion.MinSupportedV3ClientVersion)
+	if err != nil {
+		// There is no v2 or legacy version of this command, so just return the Min not-met error
+		return err
+	}
+
 	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)
 	cmd.ZdtActor = v3actor
 	cmd.V3PushActor = v3actor
