@@ -15,7 +15,7 @@ import (
 
 const (
 	StagingLog      = "STG"
-	RecentLogsLines = 100
+	RecentLogsLines = 1000
 
 	retryCount    = 5
 	retryInterval = time.Millisecond * 250

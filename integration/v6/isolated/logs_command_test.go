@@ -3,6 +3,8 @@ package isolated
 import (
 	"fmt"
 	"net/http"
+	"os/exec"
+	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -108,6 +110,24 @@ var _ = Describe("Logs Command", func() {
 					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`%s \[API/\d+\]\s+OUT Created app with guid %s`, helpers.ISO8601Regex, helpers.GUIDRegex))
 					Eventually(session).Should(Exit(0))
+				})
+
+				It("it can get at least 1000 recent log messages", func() {
+					numLinesRead := 0
+					route := fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())
+					// 3 lines of logs for each call to curl + a few lines during the push
+					for i := 0; i < 333; i += 1 {
+						command := exec.Command("curl", route)
+						session, err := Start(command, GinkgoWriter, GinkgoWriter)
+						Expect(err).NotTo(HaveOccurred())
+						Eventually(session).Should(Exit(0))
+					}
+
+					session := helpers.CF("logs", appName, "--recent")
+					Eventually(session).Should(Exit(0))
+					output := session.Out.Contents()
+					numLinesRead = strings.Count(string(output), "\n")
+					Expect(numLinesRead).To(BeNumerically(">=", 1000))
 				})
 			})
 		})
