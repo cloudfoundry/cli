@@ -1,6 +1,7 @@
 package global
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -51,8 +52,23 @@ var _ = Describe("rename buildpack command", func() {
 			helpers.DeleteBuildpackIfOnOldCCAPI(newBuildpackName)
 		})
 
+		When("the user provides a stack in an unsupported version", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
+			})
+
+			It("should report that the version of CAPI is too low", func() {
+				session := helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
+				Eventually(session.Err).Should(Say(`Option '-s' requires CF API version %s or higher. Your target is 2\.\d+\.\d+`, ccversion.MinVersionBuildpackStackAssociationV2))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		Context("when the user provides a stack", func() {
 			var session *Session
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+			})
 
 			JustBeforeEach(func() {
 				session = helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
@@ -262,6 +278,10 @@ var _ = Describe("rename buildpack command", func() {
 				})
 
 				When("The API version supports stack association", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+					})
+
 					When("renaming to the same name as an existing buildpack with no stack association", func() {
 						BeforeEach(func() {
 							helpers.SetupBuildpackWithoutStack(newBuildpackName)
@@ -303,6 +323,10 @@ var _ = Describe("rename buildpack command", func() {
 				})
 
 				When("The API version does not support stack association", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
+					})
+
 					When("renaming to the same name as an existing buildpack with no stack association", func() {
 						BeforeEach(func() {
 							helpers.SetupBuildpackWithoutStack(newBuildpackName)
@@ -347,6 +371,10 @@ var _ = Describe("rename buildpack command", func() {
 			})
 
 			When("there are multiple existing buildpacks with the old name", func() {
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+				})
+
 				When("none of the buildpacks has an empty stack", func() {
 					BeforeEach(func() {
 						helpers.SetupBuildpackWithStack(oldBuildpackName, stacks[0])

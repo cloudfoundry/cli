@@ -3,6 +3,7 @@ package isolated
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
@@ -150,6 +151,10 @@ var _ = Describe("marketplace command", func() {
 					})
 
 					When("CC API does not return broker names in response", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionMultiServiceRegistrationV2)
+						})
+
 						It("displays a table and tip that does not include that service", func() {
 							session := helpers.CF("marketplace")
 							Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))
@@ -165,6 +170,10 @@ var _ = Describe("marketplace command", func() {
 					})
 
 					When("CC API returns broker names in response", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+						})
+
 						It("displays a table with broker name", func() {
 							session := helpers.CF("marketplace")
 							Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))

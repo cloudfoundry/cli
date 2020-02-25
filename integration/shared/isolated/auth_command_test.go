@@ -275,7 +275,7 @@ var _ = Describe("auth command", func() {
 	When("the origin flag is set", func() {
 		When("the UAA version is too low to use the --origin flag", func() {
 			BeforeEach(func() {
-				helpers.SkipIfUAAVersionAtLeast(uaaversion.MinUAAClientVersion)
+				helpers.SkipIfUAAVersionAtLeast(uaaversion.MinVersionOrigin)
 			})
 			It("prints an error message", func() {
 				session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "--origin", "garbaje")
@@ -287,7 +287,7 @@ var _ = Describe("auth command", func() {
 
 		When("the UAA version is recent enough to support the flag", func() {
 			BeforeEach(func() {
-				helpers.SkipIfUAAVersionLessThan(uaaversion.MinUAAClientVersion)
+				helpers.SkipIfUAAVersionLessThan(uaaversion.MinVersionOrigin)
 			})
 			When("--client-credentials is also set", func() {
 				It("displays the appropriate error message", func() {

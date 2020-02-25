@@ -9,6 +9,7 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -44,7 +45,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	helpers.SetupSynchronizedSuite(func() {
 		helpers.EnableFeatureFlag("diego_docker")
-		helpers.EnableFeatureFlag("service_instance_sharing")
+
+		if helpers.IsVersionMet(ccversion.MinVersionShareServiceV3) {
+			helpers.EnableFeatureFlag("service_instance_sharing")
+		}
 	})
 
 	fakeservicebroker.Setup()

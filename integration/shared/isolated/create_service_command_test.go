@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
@@ -324,6 +325,8 @@ var _ = Describe("create-service command", func() {
 				)
 
 				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+
 					broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
 					service = broker1.ServiceName()
 					servicePlan = broker1.ServicePlanName()

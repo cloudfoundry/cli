@@ -5,7 +5,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -51,8 +53,22 @@ var _ = Describe("unshare-service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
+	When("the API version is below the minimum", func() {
+		BeforeEach(func() {
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinSupportedV3ClientVersion)
+		})
+
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				CurrentVersion: ccversion.MinSupportedV3ClientVersion,
+				MinimumVersion: ccversion.MinVersionShareServiceV3,
+			}))
+		})
+	})
+
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionShareServiceV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -68,6 +84,7 @@ var _ = Describe("unshare-service Command", func() {
 
 	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionShareServiceV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
 				Name: "some-org",

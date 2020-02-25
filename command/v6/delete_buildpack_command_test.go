@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
@@ -48,8 +49,28 @@ var _ = Describe("DeleteBuildpackCommand", func() {
 			cmd.Stack = "some-stack"
 		})
 
-		It("returns the unrefactored command error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.UnrefactoredCommandError{}))
+		When("the api version is below minimum for stack association", func() {
+			BeforeEach(func() {
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
+			})
+
+			It("returns a version error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+					Command:        "Option '-s'",
+					CurrentVersion: ccversion.MinSupportedV2ClientVersion,
+					MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
+				}))
+			})
+		})
+
+		When("the api version is at or above minimum for stack association", func() {
+			BeforeEach(func() {
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
+			})
+
+			It("returns the unrefactored command error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.UnrefactoredCommandError{}))
+			})
 		})
 	})
 })

@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -124,6 +125,8 @@ var _ = Describe("unbind-service command", func() {
 
 			When("the unbinding is asynchronous", func() {
 				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
+
 					broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
 					service = broker.ServiceName()
 					servicePlan = broker.ServicePlanName()

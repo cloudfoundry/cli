@@ -5,9 +5,11 @@ import (
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v6"
@@ -271,6 +273,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			When("the --assign-stack flag is provided", func() {
 				BeforeEach(func() {
 					cmd.NewStack = "some-new-stack"
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
 				})
 
 				It("sets the new stack on the buildpack", func() {
@@ -379,14 +382,34 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 						cmd.CurrentStack = "some-stack"
 					})
 
-					It("attempts to retrieve buildpack by name and stack", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
+					When("The API does not support stack associations", func() {
+						BeforeEach(func() {
+							fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
+						})
 
-						Expect(testUI.Err).To(Say("update-bp-warning1"))
-						Expect(testUI.Err).To(Say("update-bp-warning2"))
-						Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s as %s...", args.Buildpack, cmd.CurrentStack, userName))
-						Expect(testUI.Out).To(Say("OK"))
+						It("returns an error about not supporting the stack association flag", func() {
+							Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+								Command:        "Option '-s'",
+								CurrentVersion: ccversion.MinSupportedV2ClientVersion,
+								MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
+							}))
+						})
+					})
+
+					When("the API supports stack associations", func() {
+						BeforeEach(func() {
+							fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
+						It("attempts to retrieve buildpack by name and stack", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
+
+							Expect(testUI.Err).To(Say("update-bp-warning1"))
+							Expect(testUI.Err).To(Say("update-bp-warning2"))
+							Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s as %s...", args.Buildpack, cmd.CurrentStack, userName))
+							Expect(testUI.Out).To(Say("OK"))
+						})
 					})
 				})
 

@@ -3,6 +3,7 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -56,6 +57,14 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 	if len(args) > 0 {
 		return translatableerror.TooManyArgumentsError{
 			ExtraArgument: args[0],
+		}
+	}
+
+	if cmd.Internal {
+		currentVersion := cmd.Actor.CloudControllerAPIVersion()
+		err := command.MinimumCCAPIVersionCheck(currentVersion, ccversion.MinVersionInternalDomainV2, "Option '--internal'")
+		if err != nil {
+			return err
 		}
 	}
 

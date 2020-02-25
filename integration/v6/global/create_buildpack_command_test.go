@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -170,6 +171,10 @@ var _ = Describe("create buildpack command", func() {
 					})
 
 					When("the new buildpack has a valid stack", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
 						It("successfully uploads a buildpack", func() {
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -191,6 +196,10 @@ var _ = Describe("create buildpack command", func() {
 				})
 
 				When("the new buildpack has an invalid stack", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+					})
+
 					It("returns the appropriate error", func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -213,6 +222,10 @@ var _ = Describe("create buildpack command", func() {
 					})
 
 					When("the new buildpack has a nil stack", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
 						When("the existing buildpack does not have a nil stack", func() {
 							BeforeEach(func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
@@ -263,6 +276,10 @@ var _ = Describe("create buildpack command", func() {
 					})
 
 					When("the new buildpack has a non-nil stack", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
 						When("the existing buildpack has a different non-nil stack", func() {
 							BeforeEach(func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
@@ -326,6 +343,26 @@ var _ = Describe("create buildpack command", func() {
 									Eventually(session).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 									Eventually(session).Should(Exit(0))
 								}, stacks[0])
+							})
+						})
+					})
+
+					When("the API doesn't support stack association", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
+
+							helpers.BuildpackWithoutStack(func(buildpackPath string) {
+								session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
+								Eventually(session).Should(Exit(0))
+							})
+						})
+
+						It("prints a warning but doesn't exit 1", func() {
+							helpers.BuildpackWithoutStack(func(buildpackPath string) {
+								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+								Eventually(session.Err).Should(Say("Buildpack %s already exists", buildpackName))
+								Eventually(session).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})

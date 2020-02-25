@@ -2,7 +2,9 @@ package v3action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/versioncheck"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 )
 
 // Organization represents a V3 actor organization.
@@ -25,8 +27,15 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 }
 
 func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, Warnings, error) {
+	currentV3Ver := actor.CloudControllerClient.CloudControllerAPIVersion()
+
+	guidsSupport, err := versioncheck.IsMinimumAPIVersionMet(currentV3Ver, ccversion.MinVersionSpacesGUIDsParamV3)
+	if err != nil {
+		guidsSupport = false
+	}
+
 	queries := []ccv3.Query{}
-	if len(guids) > 0 {
+	if guidsSupport {
 		queries = []ccv3.Query{ccv3.Query{Key: ccv3.GUIDFilter, Values: guids}}
 	}
 

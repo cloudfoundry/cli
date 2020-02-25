@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -18,6 +19,7 @@ var _ = Describe("push with symlinked resources", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionSymlinkedFilesV2)
 		appName = helpers.NewAppName()
 	})
 

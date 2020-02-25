@@ -5,9 +5,11 @@ import (
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -68,6 +70,11 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 	}
 
 	err = cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.minAPIVersionCheck()
 	if err != nil {
 		return err
 	}
@@ -137,6 +144,25 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 
 	}
 	return err
+}
+
+func (cmd UpdateBuildpackCommand) minAPIVersionCheck() error {
+	if cmd.CurrentStack != "" {
+		return command.MinimumCCAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionBuildpackStackAssociationV2,
+			"Option '-s'",
+		)
+	}
+
+	if cmd.NewStack != "" {
+		return command.MinimumCCAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionBuildpackStackAssociationV2,
+			"Option '--assign-stack'",
+		)
+	}
+	return nil
 }
 
 func (cmd UpdateBuildpackCommand) printInitialText(userName string) {

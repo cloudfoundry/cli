@@ -51,7 +51,7 @@ var _ = Describe("LogCacheURL", func() {
 				}, ccv3.ResourceLinks{}, ccv3.Warnings{}, nil)
 			})
 			It("uses the target", func() {
-				if ccversion.MinSupportedV2ClientVersion != "2.128.0" {
+				if ccversion.MinSupportedV2ClientVersion != "2.100.0" {
 					Fail("TIMEBOMB: This log-cache behavior should be removed in January 2021 when we no longer support cf-deployment 7.0.0")
 				}
 				Expect(actualLogCacheURL).To(Equal("https://log-cache.the-best-domain.com"))

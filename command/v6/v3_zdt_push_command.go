@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -105,6 +106,11 @@ func (cmd V3ZeroDowntimePushCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	err := cmd.validateArgs()
+	if err != nil {
+		return err
+	}
+
+	err = command.MinimumCCAPIVersionCheck(cmd.ZdtActor.CloudControllerAPIVersion(), ccversion.MinVersionZeroDowntimePushV3)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+
 	"code.cloudfoundry.org/cli/actor/v2action"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -135,6 +137,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 
 		When("--internal and --router-group are passed", func() {
 			BeforeEach(func() {
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionInternalDomainV2)
 				cmd.RouterGroup = "my-router-group"
 				cmd.Internal = true
 			})
@@ -151,13 +154,35 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 				cmd.Internal = true
 			})
 
-			It("should create a shared internal domain", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
-				domainNamePassed, routerGroup, isInternal := fakeActor.CreateSharedDomainArgsForCall(0)
-				Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
-				Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
-				Expect(isInternal).To(BeTrue())
+			When("the version is less than the minimum version", func() {
+				When("using the V2 API", func() {
+					BeforeEach(func() {
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+							Command:        "Option '--internal'",
+							CurrentVersion: ccversion.MinSupportedV2ClientVersion,
+							MinimumVersion: ccversion.MinVersionInternalDomainV2,
+						}))
+					})
+				})
+			})
+
+			When("the version is above the minimum version", func() {
+				BeforeEach(func() {
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionInternalDomainV2)
+				})
+
+				It("should create a shared internal domain", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
+					domainNamePassed, routerGroup, isInternal := fakeActor.CreateSharedDomainArgsForCall(0)
+					Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
+					Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
+					Expect(isInternal).To(BeTrue())
+				})
 			})
 		})
 

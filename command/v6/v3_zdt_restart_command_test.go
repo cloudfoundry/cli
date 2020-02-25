@@ -6,8 +6,10 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -53,12 +55,26 @@ var _ = Describe("v3-zdt-restart Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	It("displays the experimental warning", func() {
-		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+	When("the API version is below the minimum", func() {
+		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV3ClientVersion)
+		})
+
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+				CurrentVersion: ccversion.MinSupportedV3ClientVersion,
+				MinimumVersion: ccversion.MinVersionZeroDowntimePushV3,
+			}))
+		})
+
+		It("displays the experimental warning", func() {
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		})
 	})
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionZeroDowntimePushV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -76,6 +92,7 @@ var _ = Describe("v3-zdt-restart Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionZeroDowntimePushV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -87,6 +104,7 @@ var _ = Describe("v3-zdt-restart Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionZeroDowntimePushV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
