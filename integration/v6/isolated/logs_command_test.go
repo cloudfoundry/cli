@@ -113,7 +113,6 @@ var _ = Describe("Logs Command", func() {
 				})
 
 				It("it can get at least 1000 recent log messages", func() {
-					numLinesRead := 0
 					route := fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())
 					// 3 lines of logs for each call to curl + a few lines during the push
 					for i := 0; i < 333; i += 1 {
@@ -126,7 +125,7 @@ var _ = Describe("Logs Command", func() {
 					session := helpers.CF("logs", appName, "--recent")
 					Eventually(session).Should(Exit(0))
 					output := session.Out.Contents()
-					numLinesRead = strings.Count(string(output), "\n")
+					numLinesRead := strings.Count(string(output), "\n")
 					Expect(numLinesRead).To(BeNumerically(">=", 1000))
 				})
 			})
