@@ -75,7 +75,7 @@ var _ = Describe("service-access Command", func() {
 				"Getting service access for organization test-org as some-user\\.\\.\\."),
 		)
 
-		Describe("tabular output", func() {
+		When("there are service plans", func() {
 			BeforeEach(func() {
 				fakeActor.GetServiceAccessReturns(
 					fakeServiceAccessResult(),
@@ -101,6 +101,23 @@ var _ = Describe("service-access Command", func() {
 			})
 		})
 
+		When("there are no service plans", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceAccessReturns(
+					[]v7action.ServicePlanAccess{},
+					v7action.Warnings{"a warning"},
+					nil,
+				)
+			})
+
+			It("displays a message", func() {
+				executeErr := cmd.Execute(nil)
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("a warning"))
+				Expect(testUI.Out).To(Say("No service access found"))
+			})
+		})
+
 		When("resource flags are passed", func() {
 			BeforeEach(func() {
 				cmd.Broker = "test-broker"
@@ -120,19 +137,19 @@ var _ = Describe("service-access Command", func() {
 				Expect(actualOrg).To(Equal("test-organization"))
 			})
 
-			Context("when there is an error", func() {
-				BeforeEach(func() {
-					fakeActor.GetServiceAccessReturns(nil, v7action.Warnings{"warning"}, errors.New("explode"))
-				})
-
-				It("displays warnings and propagates the error", func() {
-					executeErr := cmd.Execute(nil)
-					Expect(testUI.Err).To(Say("warning"))
-					Expect(executeErr).To(MatchError("explode"))
-				})
-			})
 		})
 
+		When("the actor errors", func() {
+			BeforeEach(func() {
+				fakeActor.GetServiceAccessReturns(nil, v7action.Warnings{"warning"}, errors.New("explode"))
+			})
+
+			It("displays warnings and propagates the error", func() {
+				executeErr := cmd.Execute(nil)
+				Expect(testUI.Err).To(Say("warning"))
+				Expect(executeErr).To(MatchError("explode"))
+			})
+		})
 	})
 
 	When("checking target fails", func() {

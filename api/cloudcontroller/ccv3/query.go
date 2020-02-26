@@ -55,8 +55,12 @@ const (
 	StatesFilter QueryKey = "states"
 	// ServiceBrokerNamesFilter is a query parameter when getting plans or offerings according to the Service Brokers that it relates to
 	ServiceBrokerNamesFilter QueryKey = "service_broker_names"
+	// ServiceBrokerGUIDsFilter is a query parameter for getting according to the service broker GUID
+	ServiceBrokerGUIDsFilter QueryKey = "service_broker_guids"
 	// ServiceOfferingNamesFilter is a query parameter when getting a plan according to the Service Offerings that it relates to
 	ServiceOfferingNamesFilter QueryKey = "service_offering_names"
+	// ServiceOfferingGUIDsFilter is a query parameter when getting according to service offering GUIDs
+	ServiceOfferingGUIDsFilter QueryKey = "service_offering_guids"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"

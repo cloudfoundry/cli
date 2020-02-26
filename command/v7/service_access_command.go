@@ -60,6 +60,11 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
+	if len(servicePlanAccess) == 0 {
+		cmd.UI.DisplayText("No service access found.")
+		return nil
+	}
+
 	tableHeaders := []string{"service", "plan", "access", "orgs"}
 	data := [][]string{tableHeaders}
 
