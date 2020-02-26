@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -19,7 +20,7 @@ import (
 type LogsActor interface {
 	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
-	ScheduleTokenRefresh() (chan bool, error)
+	ScheduleTokenRefresh(func(time.Duration) <-chan time.Time, chan struct{}, chan struct{}) (<-chan error, error)
 }
 
 type LogsCommand struct {
@@ -75,13 +76,21 @@ func (cmd LogsCommand) Execute(args []string) error {
 	if cmd.Recent {
 		return cmd.displayRecentLogs()
 	}
-	quitNowChannel, err := cmd.Actor.ScheduleTokenRefresh()
+
+	stop := make(chan struct{})
+	stoppedRefreshing := make(chan struct{})
+	stoppedOutputtingRefreshErrors := make(chan struct{})
+	err = cmd.refreshTokenPeriodically(stop, stoppedRefreshing, stoppedOutputtingRefreshErrors)
 	if err != nil {
 		return err
 	}
 
 	err = cmd.streamLogs()
-	quitNowChannel <- true
+
+	close(stop)
+	<-stoppedRefreshing
+	<-stoppedOutputtingRefreshErrors
+
 	return err
 }
 
@@ -98,6 +107,32 @@ func (cmd LogsCommand) displayRecentLogs() error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	return err
+}
+
+func (cmd LogsCommand) refreshTokenPeriodically(
+	stop chan struct{},
+	stoppedRefreshing chan struct{},
+	stoppedOutputtingRefreshErrors chan struct{}) error {
+
+	tokenRefreshErrors, err := cmd.Actor.ScheduleTokenRefresh(time.After, stop, stoppedRefreshing)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		defer close(stoppedOutputtingRefreshErrors)
+
+		for {
+			select {
+			case err := <-tokenRefreshErrors:
+				cmd.UI.DisplayError(err)
+			case <-stop:
+				return
+			}
+		}
+	}()
+
+	return nil
 }
 
 func (cmd LogsCommand) streamLogs() error {

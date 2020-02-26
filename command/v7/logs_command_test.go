@@ -161,12 +161,15 @@ var _ = Describe("logs command", func() {
 		When("the --recent flag is not provided", func() {
 			BeforeEach(func() {
 				cmd.Recent = false
-				fakeActor.ScheduleTokenRefreshStub = func() (chan bool, error) {
-					quitNowChannel := make(chan bool, 1)
+				fakeActor.ScheduleTokenRefreshStub = func(
+					after func(time.Duration) <-chan time.Time,
+					stop chan struct{}, stoppedRefreshing chan struct{}) (<-chan error, error) {
+					errCh := make(chan error, 1)
 					go func() {
-						<-quitNowChannel
+						<-stop
+						close(stoppedRefreshing)
 					}()
-					return quitNowChannel, nil
+					return errCh, nil
 				}
 			})
 
@@ -284,6 +287,39 @@ var _ = Describe("logs command", func() {
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(client).To(Equal(logCacheClient))
+				})
+
+				When("scheduling a token refresh errors immediately", func() {
+					BeforeEach(func() {
+						cmd.Recent = false
+						fakeActor.ScheduleTokenRefreshReturns(nil, errors.New("fjords pining"))
+					})
+					It("displays the errors", func() {
+						Expect(executeErr).To(MatchError("fjords pining"))
+						Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(0))
+					})
+				})
+
+				When("there is an error refreshing a token sometime later", func() {
+					BeforeEach(func() {
+						cmd.Recent = false
+						fakeActor.ScheduleTokenRefreshStub = func(
+							after func(time.Duration) <-chan time.Time,
+							stop chan struct{}, stoppedRefreshing chan struct{}) (<-chan error, error) {
+							errCh := make(chan error, 1)
+							go func() {
+								errCh <- errors.New("fjords pining")
+								<-stop
+								close(stoppedRefreshing)
+							}()
+							return errCh, nil
+						}
+					})
+					It("displays the errors", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						Expect(testUI.Err).To(Say("fjords pining"))
+					})
 				})
 			})
 		})

@@ -47,42 +47,82 @@ func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spa
 	return logMessages, allWarnings, nil
 }
 
-func (actor Actor) ScheduleTokenRefresh() (chan bool, error) {
-	accessTokenString, err := actor.RefreshAccessToken()
+func (actor Actor) ScheduleTokenRefresh(
+	after func(time.Duration) <-chan time.Time,
+	stop chan struct{},
+	stoppedRefreshingToken chan struct{}) (<-chan error, error) {
+
+	timeToRefresh, err := actor.refreshAccessTokenIfNecessary()
 	if err != nil {
+		close(stoppedRefreshingToken)
 		return nil, err
 	}
-	accessTokenString = strings.TrimPrefix(accessTokenString, "bearer ")
-	token, err := jws.ParseJWT([]byte(accessTokenString))
+
+	refreshErrs := make(chan error)
+
+	go func() {
+		defer close(stoppedRefreshingToken)
+		for {
+			select {
+			case <-after(*timeToRefresh):
+				d, err := actor.refreshAccessTokenIfNecessary()
+				if err == nil {
+					timeToRefresh = d
+				} else {
+					refreshErrs <- err
+				}
+			case <-stop:
+				return
+			}
+		}
+	}()
+
+	return refreshErrs, nil
+}
+
+func (actor Actor) refreshAccessTokenIfNecessary() (*time.Duration, error) {
+	accessToken := actor.Config.AccessToken()
+
+	duration, err := actor.tokenExpiryTime(accessToken)
+	if err != nil || *duration < time.Minute {
+		accessToken, err = actor.RefreshAccessToken()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	accessToken = strings.TrimPrefix(accessToken, "bearer ")
+	token, err := jws.ParseJWT([]byte(accessToken))
 	if err != nil {
 		return nil, err
 	}
 
 	var timeToRefresh time.Duration
 	expiration, ok := token.Claims().Expiration()
-	if ok {
-		expiresIn := time.Until(expiration)
-		timeToRefresh = expiresIn * 9 / 10
-	} else {
+	if !ok {
 		return nil, errors.New("Failed to get an expiry time from the current access token")
 	}
-	quitNowChannel := make(chan bool, 1)
+	expiresIn := time.Until(expiration)
+	if expiresIn >= 2*time.Minute {
+		timeToRefresh = expiresIn - time.Minute
+	} else {
+		timeToRefresh = expiresIn * 9 / 10
+	}
+	return &timeToRefresh, nil
+}
 
-	go func() {
-		ticker := time.NewTicker(timeToRefresh)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ticker.C:
-				_, err := actor.RefreshAccessToken()
-				if err != nil {
-					panic(err)
-				}
-			case <-quitNowChannel:
-				return
-			}
-		}
-	}()
+func (actor Actor) tokenExpiryTime(accessToken string) (*time.Duration, error) {
+	var expiresIn time.Duration
 
-	return quitNowChannel, nil
+	accessTokenString := strings.TrimPrefix(accessToken, "bearer ")
+	token, err := jws.ParseJWT([]byte(accessTokenString))
+	if err != nil {
+		return nil, err
+	}
+
+	expiration, ok := token.Claims().Expiration()
+	if ok {
+		expiresIn = time.Until(expiration)
+	}
+	return &expiresIn, nil
 }
