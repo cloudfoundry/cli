@@ -3,7 +3,8 @@ package cfnetworkingaction
 import (
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type Policy struct {
@@ -19,13 +20,13 @@ type Policy struct {
 func (actor Actor) AddNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
+	srcApp, warnings, err := actor.CloudControllerClient.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
+	destApp, warnings, err := actor.CloudControllerClient.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
@@ -52,7 +53,10 @@ func (actor Actor) AddNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, des
 func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings, error) {
 	var allWarnings Warnings
 
-	applications, warnings, err := actor.V3Actor.GetApplicationsBySpace(spaceGUID)
+	applications, warnings, err := actor.CloudControllerClient.GetApplications(ccv3.Query{
+		Key:    ccv3.SpaceGUIDFilter,
+		Values: []string{spaceGUID},
+	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
@@ -70,13 +74,13 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]Policy, Warnings, error) {
 	var allWarnings Warnings
 
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
+	srcApp, warnings, err := actor.CloudControllerClient.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
 
-	policies, warnings, err := actor.getPoliciesForApplications([]v3action.Application{srcApp})
+	policies, warnings, err := actor.getPoliciesForApplications([]ccv3.Application{srcApp})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
@@ -88,13 +92,13 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 func (actor Actor) RemoveNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
+	srcApp, warnings, err := actor.CloudControllerClient.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
+	destApp, warnings, err := actor.CloudControllerClient.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
@@ -144,25 +148,29 @@ func filterPoliciesWithoutMatchingSourceGUIDs(v1Policies []cfnetv1.Policy, srcAp
 	return toReturn
 }
 
-func uniqueSpaceGUIDs(applications []v3action.Application) []string {
+func uniqueSpaceGUIDs(applications []ccv3.Application) []string {
 	var spaceGUIDs []string
-	occurances := map[string]struct{}{}
+	occurrences := map[string]struct{}{}
 	for _, app := range applications {
-		if _, ok := occurances[app.SpaceGUID]; !ok {
-			spaceGUIDs = append(spaceGUIDs, app.SpaceGUID)
-			occurances[app.SpaceGUID] = struct{}{}
+		spaceGUID := app.Relationships[constant.RelationshipTypeSpace].GUID
+
+		if _, ok := occurrences[spaceGUID]; !ok {
+			spaceGUIDs = append(spaceGUIDs, spaceGUID)
+			occurrences[spaceGUID] = struct{}{}
 		}
 	}
 	return spaceGUIDs
 }
 
-func uniqueOrgGUIDs(spaces []v3action.Space) []string {
+func uniqueOrgGUIDs(spaces []ccv3.Space) []string {
 	var orgGUIDs []string
-	occurances := map[string]struct{}{}
+	occurrences := map[string]struct{}{}
 	for _, space := range spaces {
-		if _, ok := occurances[space.OrganizationGUID]; !ok {
-			orgGUIDs = append(orgGUIDs, space.OrganizationGUID)
-			occurances[space.OrganizationGUID] = struct{}{}
+		orgGUID := space.Relationships[constant.RelationshipTypeOrganization].GUID
+
+		if _, ok := occurrences[orgGUID]; !ok {
+			orgGUIDs = append(orgGUIDs, orgGUID)
+			occurrences[orgGUID] = struct{}{}
 		}
 	}
 	return orgGUIDs
@@ -170,20 +178,21 @@ func uniqueOrgGUIDs(spaces []v3action.Space) []string {
 
 func uniqueDestGUIDs(policies []cfnetv1.Policy) []string {
 	var destAppGUIDs []string
-	occurances := map[string]struct{}{}
+	occurrences := map[string]struct{}{}
 	for _, policy := range policies {
-		if _, ok := occurances[policy.Destination.ID]; !ok {
+		if _, ok := occurrences[policy.Destination.ID]; !ok {
 			destAppGUIDs = append(destAppGUIDs, policy.Destination.ID)
-			occurances[policy.Destination.ID] = struct{}{}
+			occurrences[policy.Destination.ID] = struct{}{}
 		}
 	}
 	return destAppGUIDs
 }
 
-func (actor Actor) orgNamesBySpaceGUID(spaces []v3action.Space) (map[string]string, v3action.Warnings, error) {
-	orgGUIDs := uniqueOrgGUIDs(spaces)
-
-	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
+func (actor Actor) orgNamesBySpaceGUID(spaces []ccv3.Space) (map[string]string, ccv3.Warnings, error) {
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(ccv3.Query{
+		Key:    ccv3.GUIDFilter,
+		Values: uniqueOrgGUIDs(spaces),
+	})
 	if err != nil {
 		return nil, warnings, err
 	}
@@ -195,14 +204,15 @@ func (actor Actor) orgNamesBySpaceGUID(spaces []v3action.Space) (map[string]stri
 
 	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
 	for _, space := range spaces {
-		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[space.OrganizationGUID]
+		orgGUID := space.Relationships[constant.RelationshipTypeOrganization].GUID
+		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[orgGUID]
 	}
 
 	return orgNamesBySpaceGUID, warnings, nil
 }
 
-func (actor Actor) getPoliciesForApplications(applications []v3action.Application) ([]Policy, v3action.Warnings, error) {
-	var allWarnings v3action.Warnings
+func (actor Actor) getPoliciesForApplications(applications []ccv3.Application) ([]Policy, ccv3.Warnings, error) {
+	var allWarnings ccv3.Warnings
 
 	var srcAppGUIDs []string
 	for _, app := range applications {
@@ -220,16 +230,21 @@ func (actor Actor) getPoliciesForApplications(applications []v3action.Applicatio
 
 	destAppGUIDs := uniqueDestGUIDs(v1Policies)
 
-	destApplications, warnings, err := actor.V3Actor.GetApplicationsByGUIDs(destAppGUIDs...)
+	destApplications, warnings, err := actor.CloudControllerClient.GetApplications(ccv3.Query{
+		Key:    ccv3.GUIDFilter,
+		Values: destAppGUIDs,
+	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
 
 	applications = append(applications, destApplications...)
-	spaceGUIDs := uniqueSpaceGUIDs(applications)
 
-	spaces, warnings, err := actor.V3Actor.GetSpacesByGUIDs(spaceGUIDs...)
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+		Key:    ccv3.GUIDFilter,
+		Values: uniqueSpaceGUIDs(applications),
+	})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
@@ -246,7 +261,7 @@ func (actor Actor) getPoliciesForApplications(applications []v3action.Applicatio
 		return []Policy{}, allWarnings, err
 	}
 
-	appByGUID := map[string]v3action.Application{}
+	appByGUID := map[string]ccv3.Application{}
 	for _, app := range applications {
 		appByGUID[app.GUID] = app
 	}
@@ -254,14 +269,16 @@ func (actor Actor) getPoliciesForApplications(applications []v3action.Applicatio
 	var policies []Policy
 	for _, v1Policy := range v1Policies {
 		destination := appByGUID[v1Policy.Destination.ID]
+		spaceGUID := destination.Relationships[constant.RelationshipTypeSpace].GUID
+
 		policies = append(policies, Policy{
 			SourceName:           appByGUID[v1Policy.Source.ID].Name,
 			DestinationName:      destination.Name,
 			Protocol:             string(v1Policy.Destination.Protocol),
 			StartPort:            v1Policy.Destination.Ports.Start,
 			EndPort:              v1Policy.Destination.Ports.End,
-			DestinationSpaceName: spaceNamesByGUID[destination.SpaceGUID],
-			DestinationOrgName:   orgNamesBySpaceGUID[destination.SpaceGUID],
+			DestinationSpaceName: spaceNamesByGUID[spaceGUID],
+			DestinationOrgName:   orgNamesBySpaceGUID[spaceGUID],
 		})
 	}
 

@@ -1,26 +1,27 @@
-package v6
+package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
+
+//go:generate counterfeiter . NetworkingActor
+
+type NetworkingActor interface {
+	AddNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
+}
 
 //go:generate counterfeiter . AddNetworkPolicyActor
 
 type AddNetworkPolicyActor interface {
-	AddNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
-}
-
-//go:generate counterfeiter . MembershipActor
-
-type MembershipActor interface {
-	GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error)
-	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
+	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
 }
 
 type AddNetworkPolicyCommand struct {
@@ -35,31 +36,31 @@ type AddNetworkPolicyCommand struct {
 	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, remove-network-policy"`
 
-	UI                 command.UI
-	Config             command.Config
-	SharedActor        command.SharedActor
-	NetworkPolicyActor AddNetworkPolicyActor
-	MembershipActor    MembershipActor
+	UI              command.UI
+	Config          command.Config
+	SharedActor     command.SharedActor
+	Actor           AddNetworkPolicyActor
+	NetworkingActor NetworkingActor
 }
 
 func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
 
-	client, uaa, err := shared.NewV3BasedClients(config, ui, true)
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
+	actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	cmd.Actor = actor
 
-	v3Actor := v3action.NewActor(client, config, nil, nil)
-
-	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	networkingClient, err := shared.NewNetworkingClient(ccClient.NetworkPolicyV1(), config, uaaClient, ui)
 	if err != nil {
 		return err
 	}
-	cmd.NetworkPolicyActor = cfnetworkingaction.NewActor(networkingClient, client)
-	cmd.MembershipActor = v3Actor
+	cmd.NetworkingActor = cfnetworkingaction.NewActor(networkingClient, ccClient)
 
 	return nil
 }
@@ -87,9 +88,9 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 
 	displayDestinationOrg := cmd.Config.TargetedOrganization().Name
 	if cmd.DestinationOrg != "" {
-		var destOrg v3action.Organization
-		var warnings v3action.Warnings
-		destOrg, warnings, err = cmd.MembershipActor.GetOrganizationByName(cmd.DestinationOrg)
+		var destOrg v7action.Organization
+		var warnings v7action.Warnings
+		destOrg, warnings, err = cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -102,9 +103,9 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	destSpaceGUID := cmd.Config.TargetedSpace().GUID
 
 	if cmd.DestinationSpace != "" {
-		var destSpace v3action.Space
-		var warnings v3action.Warnings
-		destSpace, warnings, err = cmd.MembershipActor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
+		var destSpace v7action.Space
+		var warnings v7action.Warnings
+		destSpace, warnings, err = cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -138,7 +139,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 		})
 	}
 
-	warnings, err := cmd.NetworkPolicyActor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	warnings, err := cmd.NetworkingActor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -51,7 +51,7 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 	if err != nil {
 		return err
 	}
-	cmd.NetworkPolicyActor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
+	cmd.NetworkPolicyActor = cfnetworkingaction.NewActor(networkingClient, client)
 	cmd.MembershipActor = v3Actor
 
 	return nil

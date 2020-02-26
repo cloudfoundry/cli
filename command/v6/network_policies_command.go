@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -41,12 +40,11 @@ func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) e
 		return err
 	}
 
-	v3Actor := v3action.NewActor(client, config, nil, nil)
 	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
+	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, client)
 
 	return nil
 }
