@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"runtime"
 	"strings"
 	"time"
 
@@ -38,10 +39,12 @@ func (p *DebugPrinter) addOutput(output RequestLoggerOutput) {
 type tokenHTTPClient struct {
 	c           logcache.HTTPClient
 	accessToken func() string
+	userAgent   string
 }
 
 func (c *tokenHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", c.accessToken())
+	req.Header.Set("User-Agent", c.userAgent)
 	return c.c.Do(req)
 }
 
@@ -100,11 +103,13 @@ func NewLogCacheClient(logCacheEndpoint string, config Config, ui UI) *logcache.
 		client = &httpDebugClient{printer: printer, c: client}
 	}
 
+	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.BinaryName(), config.BinaryVersion(), runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return logcache.NewClient(
 		logCacheEndpoint,
 		logcache.WithHTTPClient(&tokenHTTPClient{
 			c:           client,
 			accessToken: config.AccessToken,
+			userAgent:   userAgent,
 		}),
 	)
 }
