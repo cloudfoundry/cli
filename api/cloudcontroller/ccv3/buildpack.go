@@ -160,75 +160,11 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "bits")
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostBuildpackBitsRequest,
-		URIParams:   internal.Params{"buildpack_guid": buildpackGUID},
-		Body:        body,
-	})
+	responseLocation, warnings, err := client.MakeRequestUploadAsync(RequestParamsForSendRaw{
+		RequestName:         internal.PostBuildpackBitsRequest,
+		URIParams:           internal.Params{"buildpack_guid": buildpackGUID},
+		RequestBodyMimeType: contentType,
+	}, body, contentLength, writeErrors)
 
-	if err != nil {
-		return "", nil, err
-	}
-
-	request.ContentLength = contentLength
-	request.Header.Set("Content-Type", contentType)
-
-	jobURL, warnings, err := client.uploadBuildpackAsynchronously(request, writeErrors)
-	if err != nil {
-		return "", warnings, err
-	}
-	return jobURL, warnings, nil
-}
-
-func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (JobURL, Warnings, error) {
-
-	var buildpack Buildpack
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &buildpack,
-	}
-
-	httpErrors := make(chan error)
-
-	go func() {
-		defer close(httpErrors)
-
-		err := client.connection.Make(request, &response)
-		if err != nil {
-			httpErrors <- err
-		}
-	}()
-
-	// The following section makes the following assumptions:
-	// 1) If an error occurs during file reading, an EOF is sent to the request
-	// object. Thus ending the request transfer.
-	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
-	// Thus ending the writing routine.
-	var firstError error
-	var writeClosed, httpClosed bool
-
-	for {
-		select {
-		case writeErr, ok := <-writeErrors:
-			if !ok {
-				writeClosed = true
-				break // for select
-			}
-			if firstError == nil {
-				firstError = writeErr
-			}
-		case httpErr, ok := <-httpErrors:
-			if !ok {
-				httpClosed = true
-				break // for select
-			}
-			if firstError == nil {
-				firstError = httpErr
-			}
-		}
-
-		if writeClosed && httpClosed {
-			break // for for
-		}
-	}
-	return JobURL(response.ResourceLocationURL), response.Warnings, firstError
+	return JobURL(responseLocation), warnings, err
 }

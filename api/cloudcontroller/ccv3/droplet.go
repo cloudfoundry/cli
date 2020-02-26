@@ -3,7 +3,6 @@ package ccv3
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
@@ -131,75 +130,11 @@ func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, 
 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(droplet, dropletPath, "bits")
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostDropletBitsRequest,
-		URIParams:   internal.Params{"droplet_guid": dropletGUID},
-		Body:        body,
-	})
-	if err != nil {
-		return "", nil, err
-	}
+	responseLocation, warnings, err := client.MakeRequestUploadAsync(RequestParamsForSendRaw{
+		RequestName:         internal.PostDropletBitsRequest,
+		URIParams:           internal.Params{"droplet_guid": dropletGUID},
+		RequestBodyMimeType: contentType,
+	}, body, contentLength, writeErrors)
 
-	request.ContentLength = contentLength
-	request.Header.Set("Content-Type", contentType)
-
-	jobURL, warnings, err := client.uploadDropletAsynchronously(request, writeErrors)
-	if err != nil {
-		return "", warnings, err
-	}
-
-	return jobURL, warnings, nil
-}
-
-func (client *Client) uploadDropletAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (JobURL, Warnings, error) {
-	var droplet Droplet
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &droplet,
-	}
-
-	httpErrors := make(chan error)
-
-	go func() {
-		defer close(httpErrors)
-
-		err := client.connection.Make(request, &response)
-		if err != nil {
-			httpErrors <- err
-		}
-	}()
-
-	// The following section makes the following assumptions:
-	// 1) If an error occurs during file reading, an EOF is sent to the request
-	// object. Thus ending the request transfer.
-	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
-	// Thus ending the writing routine.
-	var firstError error
-	var writeClosed, httpClosed bool
-
-	for {
-		select {
-		case writeErr, ok := <-writeErrors:
-			if !ok {
-				writeClosed = true
-				break // for select
-			}
-			if firstError == nil {
-				firstError = writeErr
-			}
-		case httpErr, ok := <-httpErrors:
-			if !ok {
-				httpClosed = true
-				break // for select
-			}
-			if firstError == nil {
-				firstError = httpErr
-			}
-		}
-
-		if writeClosed && httpClosed {
-			break // for for
-		}
-	}
-
-	return JobURL(response.ResourceLocationURL), response.Warnings, firstError
+	return JobURL(responseLocation), warnings, err
 }

@@ -1,8 +1,11 @@
 package ccv3_test
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
@@ -957,6 +960,100 @@ var _ = Describe("shared request helpers", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("MakeRequestUploadAsync", func() {
+		var (
+			requestParams RequestParamsForSendRaw
+			dataStream    io.ReadSeeker
+			dataLength    int64
+			writeErrors   chan error
+
+			responseLocation string
+			responseBody     Package
+			warning          string
+			warnings         Warnings
+			executeErr       error
+		)
+		BeforeEach(func() {
+			warning = "upload-async-warning"
+			content := "I love my cats!"
+			dataStream = strings.NewReader(content)
+			dataLength = int64(len(content))
+			writeErrors = make(chan error)
+
+			response := `{
+						"guid": "some-package-guid",
+						"type": "bits",
+						"state": "PROCESSING_UPLOAD"
+					}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
+					VerifyHeaderKV("Content-Type", "multipart/form-data"),
+					VerifyBody([]byte(content)),
+					RespondWith(http.StatusOK, response, http.Header{
+						"X-Cf-Warnings": {warning},
+						"Location":      {"something"},
+					}),
+				),
+			)
+		})
+		JustBeforeEach(func() {
+			responseBody = Package{}
+			requestParams = RequestParamsForSendRaw{
+				RequestName:         internal.PostPackageBitsRequest,
+				RequestBodyMimeType: "multipart/form-data",
+				URIParams:           internal.Params{"package_guid": "package-guid"},
+				ResponseBody:        &responseBody,
+			}
+			responseLocation, warnings, executeErr = client.MakeRequestUploadAsync(
+				requestParams, dataStream, dataLength, writeErrors,
+			)
+		})
+		When("there are no errors (happy path)", func() {
+			BeforeEach(func() {
+				go func() {
+					close(writeErrors)
+				}()
+			})
+			It("returns the location and any warnings and error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(responseLocation).To(Equal("something"))
+				Expect(responseBody).To(Equal(Package{
+					GUID:  "some-package-guid",
+					State: "PROCESSING_UPLOAD",
+					Type:  "bits",
+				}))
+				Expect(warnings).To(Equal(Warnings{warning}))
+			})
+		})
+
+		When("There are write errors", func() {
+			BeforeEach(func() {
+				go func() {
+					writeErrors <- errors.New("first-error")
+					writeErrors <- errors.New("second-error")
+					close(writeErrors)
+				}()
+			})
+			It("returns the first error", func() {
+				Expect(executeErr).To(MatchError("first-error"))
+			})
+		})
+
+		When("there are HTTP connection errors", func() {
+			BeforeEach(func() {
+				server.Close()
+				close(writeErrors)
+			})
+
+			It("returns the first error", func() {
+				_, ok := executeErr.(ccerror.RequestError)
+				Expect(ok).To(BeTrue())
 			})
 		})
 	})

@@ -290,59 +290,6 @@ func (*Client) createUploadBuffer(path string, paramName string) (bytes.Buffer, 
 	return body, writer.FormDataContentType(), err
 }
 
-func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Package, Warnings, error) {
-	var pkg Package
-	response := cloudcontroller.Response{
-		DecodeJSONResponseInto: &pkg,
-	}
-
-	httpErrors := make(chan error)
-
-	go func() {
-		defer close(httpErrors)
-
-		err := client.connection.Make(request, &response)
-		if err != nil {
-			httpErrors <- err
-		}
-	}()
-
-	// The following section makes the following assumptions:
-	// 1) If an error occurs during file reading, an EOF is sent to the request
-	// object. Thus ending the request transfer.
-	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
-	// Thus ending the writing routine.
-	var firstError error
-	var writeClosed, httpClosed bool
-
-	for {
-		select {
-		case writeErr, ok := <-writeErrors:
-			if !ok {
-				writeClosed = true
-				break // for select
-			}
-			if firstError == nil {
-				firstError = writeErr
-			}
-		case httpErr, ok := <-httpErrors:
-			if !ok {
-				httpClosed = true
-				break // for select
-			}
-			if firstError == nil {
-				firstError = httpErr
-			}
-		}
-
-		if writeClosed && httpClosed {
-			break // for for
-		}
-	}
-
-	return pkg, response.Warnings, firstError
-}
-
 func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedResources []Resource) (Package, Warnings, error) {
 	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
@@ -382,17 +329,12 @@ func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedR
 
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(matchedResources, newResources, newResourcesLength)
 
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostPackageBitsRequest,
-		URIParams:   internal.Params{"package_guid": packageGUID},
-		Body:        body,
-	})
-	if err != nil {
-		return Package{}, nil, err
-	}
-
-	request.Header.Set("Content-Type", contentType)
-	request.ContentLength = contentLength
-
-	return client.uploadAsynchronously(request, writeErrors)
+	responseBody := Package{}
+	_, warnings, err := client.MakeRequestUploadAsync(RequestParamsForSendRaw{
+		RequestName:         internal.PostPackageBitsRequest,
+		URIParams:           internal.Params{"package_guid": packageGUID},
+		ResponseBody:        &responseBody,
+		RequestBodyMimeType: contentType,
+	}, body, contentLength, writeErrors)
+	return responseBody, warnings, err
 }

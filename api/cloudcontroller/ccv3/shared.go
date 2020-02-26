@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -35,7 +36,6 @@ type RequestParamsForReceiveRaw struct {
 	URIParams            internal.Params
 	Query                []Query
 	RequestHeaders       [][]string
-	ResponseBody         interface{}
 	URL                  string
 	ResponseBodyMimeType string
 }
@@ -78,9 +78,6 @@ func (client *Client) MakeRequestReceiveRaw(requestParams RequestParamsForReceiv
 	}
 
 	response := cloudcontroller.Response{}
-	if requestParams.ResponseBody != nil {
-		response.DecodeJSONResponseInto = requestParams.ResponseBody
-	}
 
 	request.Header.Set("Accept", requestParams.ResponseBodyMimeType)
 
@@ -115,6 +112,27 @@ func (client *Client) MakeRequestSendRaw(requestParams RequestParamsForSendRaw) 
 	return response.ResourceLocationURL, response.Warnings, err
 }
 
+func (client *Client) MakeRequestUploadAsync(
+	requestParams RequestParamsForSendRaw,
+	dataStream io.ReadSeeker,
+	dataLength int64,
+	writeErrors <-chan error,
+) (string, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: requestParams.RequestName,
+		URIParams:   requestParams.URIParams,
+		Body:        dataStream,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	request.Header.Set("Content-Type", requestParams.RequestBodyMimeType)
+	request.ContentLength = dataLength
+
+	return client.uploadAsynchronously(request, requestParams.ResponseBody, writeErrors)
+}
+
 func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {
 	options := requestOptions{
 		RequestName: requestParams.RequestName,
@@ -138,4 +156,56 @@ func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontrolle
 	}
 
 	return request, err
+}
+
+func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, responseBody interface{}, writeErrors <-chan error) (string, Warnings, error) {
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: responseBody,
+	}
+
+	httpErrors := make(chan error)
+
+	go func() {
+		defer close(httpErrors)
+
+		err := client.connection.Make(request, &response)
+		if err != nil {
+			httpErrors <- err
+		}
+	}()
+
+	// The following section makes the following assumptions:
+	// 1) If an error occurs during file reading, an EOF is sent to the request
+	// object. Thus ending the request transfer.
+	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
+	// Thus ending the writing routine.
+	var firstError error
+	var writeClosed, httpClosed bool
+
+	for {
+		select {
+		case writeErr, ok := <-writeErrors:
+			if !ok {
+				writeClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = writeErr
+			}
+		case httpErr, ok := <-httpErrors:
+			if !ok {
+				httpClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = httpErr
+			}
+		}
+
+		if writeClosed && httpClosed {
+			break // for for
+		}
+	}
+
+	return response.ResourceLocationURL, response.Warnings, firstError
 }
