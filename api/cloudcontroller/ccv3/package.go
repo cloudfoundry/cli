@@ -187,13 +187,13 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	}
 
 	responsePackage := Package{}
-	_, warnings, err := client.MakeRequestSendRaw(RequestParamsForSendRaw{
-		RequestName:         internal.PostPackageBitsRequest,
-		URIParams:           internal.Params{"package_guid": pkg.GUID},
-		RequestBody:         body.Bytes(),
-		RequestBodyMimeType: contentType,
-		ResponseBody:        &responsePackage,
-	})
+	_, warnings, err := client.MakeRequestSendRaw(
+		internal.PostPackageBitsRequest,
+		internal.Params{"package_guid": pkg.GUID},
+		body.Bytes(),
+		contentType,
+		&responsePackage,
+	)
 
 	return responsePackage, warnings, err
 }
@@ -310,13 +310,13 @@ func (client *Client) uploadExistingResourcesOnly(packageGUID string, matchedRes
 
 	responsePackage := Package{}
 
-	_, warnings, err := client.MakeRequestSendRaw(RequestParamsForSendRaw{
-		RequestName:         internal.PostPackageBitsRequest,
-		URIParams:           internal.Params{"package_guid": packageGUID},
-		RequestBody:         body.Bytes(),
-		ResponseBody:        &responsePackage,
-		RequestBodyMimeType: form.FormDataContentType(),
-	})
+	_, warnings, err := client.MakeRequestSendRaw(
+		internal.PostPackageBitsRequest,
+		internal.Params{"package_guid": packageGUID},
+		body.Bytes(),
+		form.FormDataContentType(),
+		&responsePackage,
+	)
 
 	return responsePackage, warnings, err
 }
@@ -330,11 +330,14 @@ func (client *Client) uploadNewAndExistingResources(packageGUID string, matchedR
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(matchedResources, newResources, newResourcesLength)
 
 	responseBody := Package{}
-	_, warnings, err := client.MakeRequestUploadAsync(RequestParamsForSendRaw{
-		RequestName:         internal.PostPackageBitsRequest,
-		URIParams:           internal.Params{"package_guid": packageGUID},
-		ResponseBody:        &responseBody,
-		RequestBodyMimeType: contentType,
-	}, body, contentLength, writeErrors)
+	_, warnings, err := client.MakeRequestUploadAsync(
+		internal.PostPackageBitsRequest,
+		internal.Params{"package_guid": packageGUID},
+		contentType,
+		body,
+		contentLength,
+		&responseBody,
+		writeErrors,
+	)
 	return responseBody, warnings, err
 }

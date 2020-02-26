@@ -21,12 +21,13 @@ func (client *Client) DeleteApplication(appGUID string) (JobURL, Warnings, error
 // UpdateApplicationApplyManifest applies the manifest to the given
 // application. Returns back a resulting job URL to poll.
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (JobURL, Warnings, error) {
-	responseLocation, warnings, err := client.MakeRequestSendRaw(RequestParamsForSendRaw{
-		RequestName:         internal.PostApplicationActionApplyManifest,
-		URIParams:           internal.Params{"app_guid": appGUID},
-		RequestBody:         rawManifest,
-		RequestBodyMimeType: "application/x-yaml",
-	})
+	responseLocation, warnings, err := client.MakeRequestSendRaw(
+		internal.PostApplicationActionApplyManifest,
+		internal.Params{"app_guid": appGUID},
+		rawManifest,
+		"application/x-yaml",
+		nil,
+	)
 
 	return JobURL(responseLocation), warnings, err
 }
@@ -42,12 +43,13 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 // (2) Applying manifest properties to this app.
 
 func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (JobURL, Warnings, error) {
-	responseLocation, warnings, err := client.MakeRequestSendRaw(RequestParamsForSendRaw{
-		RequestName:         internal.PostSpaceActionApplyManifestRequest,
-		URIParams:           internal.Params{"space_guid": spaceGUID},
-		RequestBody:         rawManifest,
-		RequestBodyMimeType: "application/x-yaml",
-	})
+	responseLocation, warnings, err := client.MakeRequestSendRaw(
+		internal.PostSpaceActionApplyManifestRequest,
+		internal.Params{"space_guid": spaceGUID},
+		rawManifest,
+		"application/x-yaml",
+		nil,
+	)
 
 	return JobURL(responseLocation), warnings, err
 }

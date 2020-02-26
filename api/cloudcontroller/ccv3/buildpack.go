@@ -160,11 +160,15 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "bits")
 
-	responseLocation, warnings, err := client.MakeRequestUploadAsync(RequestParamsForSendRaw{
-		RequestName:         internal.PostBuildpackBitsRequest,
-		URIParams:           internal.Params{"buildpack_guid": buildpackGUID},
-		RequestBodyMimeType: contentType,
-	}, body, contentLength, writeErrors)
+	responseLocation, warnings, err := client.MakeRequestUploadAsync(
+		internal.PostBuildpackBitsRequest,
+		internal.Params{"buildpack_guid": buildpackGUID},
+		contentType,
+		body,
+		contentLength,
+		nil,
+		writeErrors,
+	)
 
 	return JobURL(responseLocation), warnings, err
 }

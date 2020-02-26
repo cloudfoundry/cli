@@ -20,26 +20,6 @@ type RequestParams struct {
 	AppendToList   func(item interface{}) error
 }
 
-type RequestParamsForSendRaw struct {
-	RequestName         string
-	URIParams           internal.Params
-	Query               []Query
-	RequestBody         []byte
-	RequestHeaders      [][]string
-	ResponseBody        interface{}
-	URL                 string
-	RequestBodyMimeType string
-}
-
-type RequestParamsForReceiveRaw struct {
-	RequestName          string
-	URIParams            internal.Params
-	Query                []Query
-	RequestHeaders       [][]string
-	URL                  string
-	ResponseBodyMimeType string
-}
-
 func (client *Client) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {
 	request, err := client.buildRequest(requestParams)
 	if err != nil {
@@ -65,46 +45,48 @@ func (client *Client) MakeRequest(requestParams RequestParams) (JobURL, Warnings
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
-func (client *Client) MakeRequestReceiveRaw(requestParams RequestParamsForReceiveRaw) ([]byte, Warnings, error) {
-	options := requestOptions{
-		RequestName: requestParams.RequestName,
-		URIParams:   requestParams.URIParams,
-		Query:       requestParams.Query,
-		URL:         requestParams.URL,
-	}
-	request, err := client.newHTTPRequest(options)
+func (client *Client) MakeRequestReceiveRaw(
+	requestName string,
+	uriParams internal.Params,
+	responseBodyMimeType string,
+) ([]byte, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: requestName,
+		URIParams:   uriParams,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
 
 	response := cloudcontroller.Response{}
 
-	request.Header.Set("Accept", requestParams.ResponseBodyMimeType)
+	request.Header.Set("Accept", responseBodyMimeType)
 
 	err = client.connection.Make(request, &response)
 
 	return response.RawResponse, response.Warnings, err
 }
 
-func (client *Client) MakeRequestSendRaw(requestParams RequestParamsForSendRaw) (string, Warnings, error) {
-	options := requestOptions{
-		RequestName: requestParams.RequestName,
-		URIParams:   requestParams.URIParams,
-		Query:       requestParams.Query,
-		URL:         requestParams.URL,
-		Body:        bytes.NewReader(requestParams.RequestBody),
-	}
-
-	request, err := client.newHTTPRequest(options)
+func (client *Client) MakeRequestSendRaw(
+	requestName string,
+	uriParams internal.Params,
+	requestBody []byte,
+	requestBodyMimeType string,
+	responseBody interface{},
+) (string, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: requestName,
+		URIParams:   uriParams,
+		Body:        bytes.NewReader(requestBody),
+	})
 	if err != nil {
 		return "", nil, err
 	}
 
-	request.Header.Set("Content-type", requestParams.RequestBodyMimeType)
+	request.Header.Set("Content-type", requestBodyMimeType)
 
-	response := cloudcontroller.Response{}
-	if requestParams.ResponseBody != nil {
-		response.DecodeJSONResponseInto = requestParams.ResponseBody
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: responseBody,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -113,24 +95,27 @@ func (client *Client) MakeRequestSendRaw(requestParams RequestParamsForSendRaw) 
 }
 
 func (client *Client) MakeRequestUploadAsync(
-	requestParams RequestParamsForSendRaw,
-	dataStream io.ReadSeeker,
+	requestName string,
+	uriParams internal.Params,
+	requestBodyMimeType string,
+	requestBody io.ReadSeeker,
 	dataLength int64,
+	responseBody interface{},
 	writeErrors <-chan error,
 ) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: requestParams.RequestName,
-		URIParams:   requestParams.URIParams,
-		Body:        dataStream,
+		RequestName: requestName,
+		URIParams:   uriParams,
+		Body:        requestBody,
 	})
 	if err != nil {
 		return "", nil, err
 	}
 
-	request.Header.Set("Content-Type", requestParams.RequestBodyMimeType)
+	request.Header.Set("Content-Type", requestBodyMimeType)
 	request.ContentLength = dataLength
 
-	return client.uploadAsynchronously(request, requestParams.ResponseBody, writeErrors)
+	return client.uploadAsynchronously(request, responseBody, writeErrors)
 }
 
 func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {

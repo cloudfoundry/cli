@@ -130,11 +130,15 @@ func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, 
 
 	contentType, body, writeErrors := uploads.CreateMultipartBodyAndHeader(droplet, dropletPath, "bits")
 
-	responseLocation, warnings, err := client.MakeRequestUploadAsync(RequestParamsForSendRaw{
-		RequestName:         internal.PostDropletBitsRequest,
-		URIParams:           internal.Params{"droplet_guid": dropletGUID},
-		RequestBodyMimeType: contentType,
-	}, body, contentLength, writeErrors)
+	responseLocation, warnings, err := client.MakeRequestUploadAsync(
+		internal.PostDropletBitsRequest,
+		internal.Params{"droplet_guid": dropletGUID},
+		contentType,
+		body,
+		contentLength,
+		nil,
+		writeErrors,
+	)
 
 	return JobURL(responseLocation), warnings, err
 }

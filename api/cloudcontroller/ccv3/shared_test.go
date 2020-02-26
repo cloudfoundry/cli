@@ -746,15 +746,17 @@ var _ = Describe("shared request helpers", func() {
 
 	Describe("MakeRequestReceiveRaw", func() {
 		var (
-			requestParams RequestParamsForReceiveRaw
+			requestName string
+			uriParams   internal.Params
 
-			rawResponseBody []byte
-			warnings        Warnings
-			executeErr      error
+			rawResponseBody      []byte
+			warnings             Warnings
+			executeErr           error
+			responseBodyMimeType string
 		)
 
 		JustBeforeEach(func() {
-			rawResponseBody, warnings, executeErr = client.MakeRequestReceiveRaw(requestParams)
+			rawResponseBody, warnings, executeErr = client.MakeRequestReceiveRaw(requestName, uriParams, responseBodyMimeType)
 		})
 
 		Context("GET raw bytes (YAML data)", func() {
@@ -763,11 +765,9 @@ var _ = Describe("shared request helpers", func() {
 			)
 
 			BeforeEach(func() {
-				requestParams = RequestParamsForReceiveRaw{
-					RequestName:          internal.GetApplicationManifestRequest,
-					URIParams:            internal.Params{"app_guid": "some-app-guid"},
-					ResponseBodyMimeType: "application/x-yaml",
-				}
+				requestName = internal.GetApplicationManifestRequest
+				responseBodyMimeType = "application/x-yaml"
+				uriParams = internal.Params{"app_guid": "some-app-guid"}
 			})
 
 			When("getting requested data is successful", func() {
@@ -848,7 +848,10 @@ var _ = Describe("shared request helpers", func() {
 
 	Describe("MakeRequestSendRaw", func() {
 		var (
-			requestParams    RequestParamsForSendRaw
+			requestName         string
+			uriParams           internal.Params
+			requestBodyMimeType string
+
 			requestBody      []byte
 			responseBody     Package
 			expectedJobURL   string
@@ -858,7 +861,7 @@ var _ = Describe("shared request helpers", func() {
 		)
 
 		JustBeforeEach(func() {
-			responseLocation, warnings, executeErr = client.MakeRequestSendRaw(requestParams)
+			responseLocation, warnings, executeErr = client.MakeRequestSendRaw(requestName, uriParams, requestBody, requestBodyMimeType, &responseBody)
 		})
 
 		BeforeEach(func() {
@@ -866,13 +869,9 @@ var _ = Describe("shared request helpers", func() {
 			expectedJobURL = "apply-manifest-job-url"
 			responseBody = Package{}
 
-			requestParams = RequestParamsForSendRaw{
-				RequestName:         internal.PostPackageBitsRequest,
-				URIParams:           internal.Params{"package_guid": "package-guid"},
-				RequestBody:         requestBody,
-				RequestBodyMimeType: "multipart/form-data",
-				ResponseBody:        &responseBody,
-			}
+			requestName = internal.PostPackageBitsRequest
+			uriParams = internal.Params{"package_guid": "package-guid"}
+			requestBodyMimeType = "multipart/form-data"
 		})
 
 		When("the resource is successfully created", func() {
@@ -966,10 +965,12 @@ var _ = Describe("shared request helpers", func() {
 
 	Describe("MakeRequestUploadAsync", func() {
 		var (
-			requestParams RequestParamsForSendRaw
-			dataStream    io.ReadSeeker
-			dataLength    int64
-			writeErrors   chan error
+			requestName         string
+			uriParams           internal.Params
+			requestBodyMimeType string
+			requestBody         io.ReadSeeker
+			dataLength          int64
+			writeErrors         chan error
 
 			responseLocation string
 			responseBody     Package
@@ -980,7 +981,7 @@ var _ = Describe("shared request helpers", func() {
 		BeforeEach(func() {
 			warning = "upload-async-warning"
 			content := "I love my cats!"
-			dataStream = strings.NewReader(content)
+			requestBody = strings.NewReader(content)
 			dataLength = int64(len(content))
 			writeErrors = make(chan error)
 
@@ -1004,14 +1005,18 @@ var _ = Describe("shared request helpers", func() {
 		})
 		JustBeforeEach(func() {
 			responseBody = Package{}
-			requestParams = RequestParamsForSendRaw{
-				RequestName:         internal.PostPackageBitsRequest,
-				RequestBodyMimeType: "multipart/form-data",
-				URIParams:           internal.Params{"package_guid": "package-guid"},
-				ResponseBody:        &responseBody,
-			}
+			requestName = internal.PostPackageBitsRequest
+			requestBodyMimeType = "multipart/form-data"
+			uriParams = internal.Params{"package_guid": "package-guid"}
+
 			responseLocation, warnings, executeErr = client.MakeRequestUploadAsync(
-				requestParams, dataStream, dataLength, writeErrors,
+				requestName,
+				uriParams,
+				requestBodyMimeType,
+				requestBody,
+				dataLength,
+				&responseBody,
+				writeErrors,
 			)
 		})
 		When("there are no errors (happy path)", func() {
