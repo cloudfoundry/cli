@@ -396,29 +396,6 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					When("the security group already exists", func() {
-						BeforeEach(func() {
-							serverResponse = `
-{
-  "errors": [
-    {
-      "detail": "Security group with name 'sec-group' already exists.",
-      "title": "CF-UnprocessableEntity",
-      "code": 10008
-    }
-  ]
-}`
-						})
-
-						It("returns a SecurityGroupAlreadyExists error", func() {
-							Expect(makeError).To(Equal(
-								ccerror.SecurityGroupAlreadyExists{
-									Message: "Security group with name 'sec-group' already exists.",
-								}),
-							)
-						})
-					})
-
 					When("the buildpack is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `

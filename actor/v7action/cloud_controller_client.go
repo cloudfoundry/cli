@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
 )
 
 //go:generate counterfeiter . CloudControllerClient
@@ -34,7 +33,6 @@ type CloudControllerClient interface {
 	CreateRole(role ccv3.Role) (ccv3.Role, ccv3.Warnings, error)
 	CreateRoute(route ccv3.Route) (ccv3.Route, ccv3.Warnings, error)
 	CreateServiceBroker(serviceBroker ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
-	CreateSecurityGroup(securityGroup resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
 	CreateSpace(space ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	CreateSpaceQuota(spaceQuota ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)
 	CreateUser(userGUID string) (ccv3.User, ccv3.Warnings, error)

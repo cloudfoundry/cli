@@ -37,9 +37,9 @@ var _ = Describe("NullString", func() {
 		})
 	})
 
-	Context("JSON unmarshaling", func() {
+	Context("JSON unmashalling", func() {
 		When("the JSON has a string value", func() {
-			It("unmarshals to a NullString with the correct value", func() {
+			It("unmarhsalls to a NullString with the correct value", func() {
 				toUnmarshal := []byte(`{"optionalField":"our-value"}`)
 				var samplePayload SamplePayload
 				err := json.Unmarshal(toUnmarshal, &samplePayload)
@@ -50,7 +50,7 @@ var _ = Describe("NullString", func() {
 		})
 
 		When("the JSON has a null value", func() {
-			It("unmarshals to a NullString with no value", func() {
+			It("unmarhsalls to a NullString with no value", func() {
 				toUnmarshal := []byte(`{"optionalField":null}`)
 				var samplePayload SamplePayload
 				err := json.Unmarshal(toUnmarshal, &samplePayload)
@@ -60,4 +60,5 @@ var _ = Describe("NullString", func() {
 			})
 		})
 	})
+
 })

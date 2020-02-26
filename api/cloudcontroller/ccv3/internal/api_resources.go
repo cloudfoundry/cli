@@ -17,7 +17,6 @@ const (
 	PackagesResource                  = "packages"
 	ProcessesResource                 = "processes"
 	ResourceMatches                   = "resource_matches"
-	SecurityGroupsResource            = "security_groups"
 	ServiceBrokersResource            = "service_brokers"
 	RolesResource                     = "roles"
 	RoutesResource                    = "routes"
