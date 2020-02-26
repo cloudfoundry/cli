@@ -3,11 +3,58 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"runtime"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
+
+//go:generate counterfeiter . Requester
+
+type Requester interface {
+	InitializeConnection(settings TargetSettings)
+
+	InitializeRouter(resources map[string]string)
+
+	MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error)
+
+	MakeRequest(requestParams RequestParams) (JobURL, Warnings, error)
+
+	MakeRequestReceiveRaw(
+		requestName string,
+		uriParams internal.Params,
+		responseBodyMimeType string,
+	) ([]byte, Warnings, error)
+
+	MakeRequestSendRaw(
+		requestName string,
+		uriParams internal.Params,
+		requestBody []byte,
+		requestBodyMimeType string,
+		responseBody interface{},
+	) (string, Warnings, error)
+
+	MakeRequestUploadAsync(
+		requestName string,
+		uriParams internal.Params,
+		requestBodyMimeType string,
+		requestBody io.ReadSeeker,
+		dataLength int64,
+		responseBody interface{},
+		writeErrors <-chan error,
+	) (string, Warnings, error)
+
+	WrapConnection(wrapper ConnectionWrapper)
+}
+
+type RealRequester struct {
+	connection cloudcontroller.Connection
+	router     *internal.Router
+	userAgent  string
+	wrappers   []ConnectionWrapper
+}
 
 type RequestParams struct {
 	RequestName    string
@@ -20,17 +67,52 @@ type RequestParams struct {
 	AppendToList   func(item interface{}) error
 }
 
-func (client *Client) MakeListRequest(requestParams RequestParams) (IncludedResources, Warnings, error) {
-	request, err := client.buildRequest(requestParams)
+func NewRequester(config Config) *RealRequester {
+	userAgent := fmt.Sprintf(
+		"%s/%s (%s; %s %s)",
+		config.AppName,
+		config.AppVersion,
+		runtime.Version(),
+		runtime.GOARCH,
+		runtime.GOOS,
+	)
+
+	return &RealRequester{
+		userAgent: userAgent,
+		wrappers:  append([]ConnectionWrapper{newErrorWrapper()}, config.Wrappers...),
+	}
+}
+
+func (requester *RealRequester) InitializeConnection(settings TargetSettings) {
+	requester.connection = cloudcontroller.NewConnection(cloudcontroller.Config{
+		DialTimeout:       settings.DialTimeout,
+		SkipSSLValidation: settings.SkipSSLValidation,
+	})
+
+	for _, wrapper := range requester.wrappers {
+		requester.connection = wrapper.Wrap(requester.connection)
+	}
+}
+
+func (requester *RealRequester) InitializeRouter(resources map[string]string) {
+	requester.router = internal.NewRouter(internal.APIRoutes, resources)
+}
+
+func (requester *RealRequester) MakeListRequest(
+	requestParams RequestParams,
+) (IncludedResources, Warnings, error) {
+	request, err := requester.buildRequest(requestParams)
 	if err != nil {
 		return IncludedResources{}, nil, err
 	}
 
-	return client.paginate(request, requestParams.ResponseBody, requestParams.AppendToList)
+	return requester.paginate(request, requestParams.ResponseBody, requestParams.AppendToList)
 }
 
-func (client *Client) MakeRequest(requestParams RequestParams) (JobURL, Warnings, error) {
-	request, err := client.buildRequest(requestParams)
+func (requester *RealRequester) MakeRequest(
+	requestParams RequestParams,
+) (JobURL, Warnings, error) {
+	request, err := requester.buildRequest(requestParams)
 	if err != nil {
 		return "", nil, err
 	}
@@ -40,17 +122,17 @@ func (client *Client) MakeRequest(requestParams RequestParams) (JobURL, Warnings
 		response.DecodeJSONResponseInto = requestParams.ResponseBody
 	}
 
-	err = client.connection.Make(request, &response)
+	err = requester.connection.Make(request, &response)
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
 
-func (client *Client) MakeRequestReceiveRaw(
+func (requester *RealRequester) MakeRequestReceiveRaw(
 	requestName string,
 	uriParams internal.Params,
 	responseBodyMimeType string,
 ) ([]byte, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := requester.newHTTPRequest(requestOptions{
 		RequestName: requestName,
 		URIParams:   uriParams,
 	})
@@ -62,19 +144,19 @@ func (client *Client) MakeRequestReceiveRaw(
 
 	request.Header.Set("Accept", responseBodyMimeType)
 
-	err = client.connection.Make(request, &response)
+	err = requester.connection.Make(request, &response)
 
 	return response.RawResponse, response.Warnings, err
 }
 
-func (client *Client) MakeRequestSendRaw(
+func (requester *RealRequester) MakeRequestSendRaw(
 	requestName string,
 	uriParams internal.Params,
 	requestBody []byte,
 	requestBodyMimeType string,
 	responseBody interface{},
 ) (string, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := requester.newHTTPRequest(requestOptions{
 		RequestName: requestName,
 		URIParams:   uriParams,
 		Body:        bytes.NewReader(requestBody),
@@ -89,12 +171,12 @@ func (client *Client) MakeRequestSendRaw(
 		DecodeJSONResponseInto: responseBody,
 	}
 
-	err = client.connection.Make(request, &response)
+	err = requester.connection.Make(request, &response)
 
 	return response.ResourceLocationURL, response.Warnings, err
 }
 
-func (client *Client) MakeRequestUploadAsync(
+func (requester *RealRequester) MakeRequestUploadAsync(
 	requestName string,
 	uriParams internal.Params,
 	requestBodyMimeType string,
@@ -103,7 +185,7 @@ func (client *Client) MakeRequestUploadAsync(
 	responseBody interface{},
 	writeErrors <-chan error,
 ) (string, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	request, err := requester.newHTTPRequest(requestOptions{
 		RequestName: requestName,
 		URIParams:   uriParams,
 		Body:        requestBody,
@@ -115,10 +197,10 @@ func (client *Client) MakeRequestUploadAsync(
 	request.Header.Set("Content-Type", requestBodyMimeType)
 	request.ContentLength = dataLength
 
-	return client.uploadAsynchronously(request, responseBody, writeErrors)
+	return requester.uploadAsynchronously(request, responseBody, writeErrors)
 }
 
-func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {
+func (requester *RealRequester) buildRequest(requestParams RequestParams) (*cloudcontroller.Request, error) {
 	options := requestOptions{
 		RequestName: requestParams.RequestName,
 		URIParams:   requestParams.URIParams,
@@ -135,7 +217,7 @@ func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontrolle
 		options.Body = bytes.NewReader(body)
 	}
 
-	request, err := client.newHTTPRequest(options)
+	request, err := requester.newHTTPRequest(options)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +225,7 @@ func (client *Client) buildRequest(requestParams RequestParams) (*cloudcontrolle
 	return request, err
 }
 
-func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, responseBody interface{}, writeErrors <-chan error) (string, Warnings, error) {
+func (requester *RealRequester) uploadAsynchronously(request *cloudcontroller.Request, responseBody interface{}, writeErrors <-chan error) (string, Warnings, error) {
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: responseBody,
 	}
@@ -153,7 +235,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, res
 	go func() {
 		defer close(httpErrors)
 
-		err := client.connection.Make(request, &response)
+		err := requester.connection.Make(request, &response)
 		if err != nil {
 			httpErrors <- err
 		}

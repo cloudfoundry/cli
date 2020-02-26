@@ -73,11 +73,8 @@
 package ccv3
 
 import (
-	"fmt"
-	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -90,10 +87,7 @@ type Client struct {
 	Info
 	cloudControllerURL string
 
-	connection cloudcontroller.Connection
-	router     *internal.Router
-	userAgent  string
-	wrappers   []ConnectionWrapper
+	Requester
 
 	jobPollingInterval time.Duration
 	jobPollingTimeout  time.Duration
@@ -121,13 +115,11 @@ type Config struct {
 
 // NewClient returns a new Client.
 func NewClient(config Config) *Client {
-	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.AppName, config.AppVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return &Client{
 		clock:              new(internal.RealTime),
-		userAgent:          userAgent,
 		jobPollingInterval: config.JobPollingInterval,
 		jobPollingTimeout:  config.JobPollingTimeout,
-		wrappers:           append([]ConnectionWrapper{newErrorWrapper()}, config.Wrappers...),
+		Requester:          NewRequester(config),
 	}
 }
 
