@@ -261,87 +261,42 @@ var _ = Describe("rename buildpack command", func() {
 					})
 				})
 
-				When("The API version supports stack association", func() {
-					When("renaming to the same name as an existing buildpack with no stack association", func() {
-						BeforeEach(func() {
-							helpers.SetupBuildpackWithoutStack(newBuildpackName)
-						})
-
-						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Exit(0))
-						})
-
+				When("renaming to the same name as an existing buildpack with no stack association", func() {
+					BeforeEach(func() {
+						helpers.SetupBuildpackWithoutStack(newBuildpackName)
 					})
 
-					When("renaming to the same name as an existing buildpack with a different stack association", func() {
-						BeforeEach(func() {
-							helpers.SetupBuildpackWithStack(newBuildpackName, stacks[1])
-						})
-
-						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Exit(0))
-						})
-
+					It("successfully renames the buildpack", func() {
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
 					})
 
-					When("renaming to the same name as an existing buildpack with the same stack assocation", func() {
-						BeforeEach(func() {
-							helpers.SetupBuildpackWithStack(newBuildpackName, stacks[0])
-						})
-
-						It("returns a buildpack name/stack taken error", func() {
-							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("The buildpack name %s is already in use for the stack %s", newBuildpackName, stacks[0]))
-							Eventually(session).Should(Exit(1))
-						})
-					})
 				})
 
-				When("The API version does not support stack association", func() {
-					When("renaming to the same name as an existing buildpack with no stack association", func() {
-						BeforeEach(func() {
-							helpers.SetupBuildpackWithoutStack(newBuildpackName)
-						})
-
-						It("returns a buildpack name taken error", func() {
-							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("The buildpack name is already in use: %s", newBuildpackName))
-							Eventually(session).Should(Exit(1))
-						})
-
+				When("renaming to the same name as an existing buildpack with a different stack association", func() {
+					BeforeEach(func() {
+						helpers.SetupBuildpackWithStack(newBuildpackName, stacks[1])
 					})
 
-					When("renaming to the same name as an existing buildpack with a different stack association", func() {
-						BeforeEach(func() {
-							helpers.SetupBuildpackWithStack(newBuildpackName, stacks[1])
-						})
-
-						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("The buildpack name is already in use: %s", newBuildpackName))
-							Eventually(session).Should(Exit(1))
-						})
-
+					It("successfully renames the buildpack", func() {
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
 					})
 
-					When("renaming to the same name as an existing buildpack with the same stack assocation", func() {
-						BeforeEach(func() {
-							helpers.SetupBuildpackWithStack(newBuildpackName, stacks[0])
-						})
+				})
 
-						It("returns a buildpack name/stack taken error", func() {
-							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("The buildpack name is already in use: %s", newBuildpackName))
-							Eventually(session).Should(Exit(1))
-						})
+				When("renaming to the same name as an existing buildpack with the same stack assocation", func() {
+					BeforeEach(func() {
+						helpers.SetupBuildpackWithStack(newBuildpackName, stacks[0])
+					})
+
+					It("returns a buildpack name/stack taken error", func() {
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("The buildpack name %s is already in use for the stack %s", newBuildpackName, stacks[0]))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 			})
