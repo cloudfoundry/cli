@@ -46,7 +46,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
 			Eventually(session).Should(Say(`\s+--broker, -b\s+Specify a service broker to disambiguate service offerings or service plans with the same name`))
-			Eventually(session).Should(Say(`\s+--offering, -o\s+Specify a service offering to disambiguate service plans with the same name`))
+			Eventually(session).Should(Say(`\s+--offering, -e\s+Specify a service offering to disambiguate service plans with the same name`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, unset-label`))
 			Eventually(session).Should(Exit(0))
@@ -728,7 +728,7 @@ var _ = Describe("labels command", func() {
 
 				When("the service offering and service broker are specified", func() {
 					It("returns the labels associated with the plan", func() {
-						session := helpers.CF("labels", "-o", serviceOfferingName, "-b", broker.Name(), "service-plan", servicePlanName)
+						session := helpers.CF("labels", "-e", serviceOfferingName, "-b", broker.Name(), "service-plan", servicePlanName)
 						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan %s from service offering %s / service broker %s as %s..."), servicePlanName, serviceOfferingName, broker.Name(), username))
 						Eventually(session).Should(Say(`key\s+value`))
 						Expect(session).To(Say(`some-other-key\s+some-other-value`))

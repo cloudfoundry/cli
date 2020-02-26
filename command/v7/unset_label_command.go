@@ -24,7 +24,7 @@ type UnsetLabelCommand struct {
 	relatedCommands interface{}         `related_commands:"labels, set-label"`
 	BuildpackStack  string              `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	ServiceBroker   string              `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
-	ServiceOffering string              `long:"offering" short:"o" description:"Specify a service offering to disambiguate service plans with the same name."`
+	ServiceOffering string              `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
 
 	LabelUnsetter LabelUnsetter
 }
