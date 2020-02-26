@@ -130,7 +130,7 @@ var _ = Describe("Logging Actions", func() {
 						return []*loggregator_v2.Envelope{}, ctx.Err()
 					}
 
-					if (start == time.Time{}) {
+					if start.IsZero() {
 						return []*loggregator_v2.Envelope{&mostRecentEnvelope}, ctx.Err()
 					}
 
@@ -164,7 +164,7 @@ var _ = Describe("Logging Actions", func() {
 					start time.Time,
 					opts ...logcache.ReadOption,
 				) ([]*loggregator_v2.Envelope, error) {
-					return nil, ctx.Err()
+					return []*loggregator_v2.Envelope{}, ctx.Err()
 				}
 			})
 
@@ -174,33 +174,76 @@ var _ = Describe("Logging Actions", func() {
 			})
 		})
 
-		Describe("log cache error", func() {
-			BeforeEach(func() {
-				fakeLogCacheClient.ReadStub = func(
-					ctx context.Context,
-					sourceID string,
-					start time.Time,
-					opts ...logcache.ReadOption,
-				) ([]*loggregator_v2.Envelope, error) {
-					return nil, fmt.Errorf("error number %d", fakeLogCacheClient.ReadCallCount())
-				}
+		Describe("error handling", func() {
+			When("there is an error 'peeking' at log-cache to determine the latest log", func() {
+				BeforeEach(func() {
+					fakeLogCacheClient.ReadStub = func(
+						ctx context.Context,
+						sourceID string,
+						start time.Time,
+						opts ...logcache.ReadOption,
+					) ([]*loggregator_v2.Envelope, error) {
+						return nil, fmt.Errorf("error number %d", fakeLogCacheClient.ReadCallCount())
+					}
+				})
+
+				AfterEach(func() {
+					stopStreaming()
+				})
+
+				It("passes 5 errors through the errors channel", func() {
+					Eventually(errs, 2*time.Second).Should(HaveLen(5))
+					Eventually(errs).Should(Receive(MatchError("error number 1")))
+					Eventually(errs).Should(Receive(MatchError("error number 2")))
+					Eventually(errs).Should(Receive(MatchError("error number 3")))
+					Eventually(errs).Should(Receive(MatchError("error number 4")))
+					Eventually(errs).Should(Receive(MatchError("error number 5")))
+					Consistently(errs).ShouldNot(Receive())
+				})
+
+				It("tries exactly 5 times", func() {
+					Eventually(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(5))
+					Consistently(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(5))
+				})
 			})
 
-			AfterEach(func() {
-				stopStreaming()
-			})
+			When("there is an error walking log-cache to retrieve logs", func() {
+				BeforeEach(func() {
+					fakeLogCacheClient.ReadStub = func(
+						ctx context.Context,
+						sourceID string,
+						start time.Time,
+						opts ...logcache.ReadOption,
+					) ([]*loggregator_v2.Envelope, error) {
+						if start.IsZero() {
+							return []*loggregator_v2.Envelope{&mostRecentEnvelope}, ctx.Err()
+						}
+						return nil, fmt.Errorf("error number %d", fakeLogCacheClient.ReadCallCount()-1)
+					}
+				})
 
-			// Error handling is now done by the initial client.Read() call
-			// Error handling used to be done by the client.Walk() function, which had retry logic
-			It("passes one error through the errors channel", func() {
-				Eventually(errs, 2*time.Second).Should(HaveLen(1))
-				Eventually(errs).Should(Receive(MatchError("error number 1")))
-				Eventually(errs).ShouldNot(Receive(MatchError("error number 2")))
-			})
+				AfterEach(func() {
+					stopStreaming()
+				})
 
-			It("retries exactly 1 times", func() {
-				Eventually(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(1))
-				Consistently(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(1))
+				It("passes 5 errors through the errors channel", func() {
+					Eventually(errs, 2*time.Second).Should(HaveLen(5))
+					Eventually(errs).Should(Receive(MatchError("error number 1")))
+					Eventually(errs).Should(Receive(MatchError("error number 2")))
+					Eventually(errs).Should(Receive(MatchError("error number 3")))
+					Eventually(errs).Should(Receive(MatchError("error number 4")))
+					Eventually(errs).Should(Receive(MatchError("error number 5")))
+					Consistently(errs).ShouldNot(Receive())
+				})
+
+				It("tries exactly 5 times", func() {
+					initialPeekingRead := 1
+					walkRetries := 5
+					expectedReadCallCount := initialPeekingRead + walkRetries
+
+					Eventually(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(expectedReadCallCount))
+					Consistently(fakeLogCacheClient.ReadCallCount, 2*time.Second).Should(Equal(expectedReadCallCount))
+				})
 			})
 		})
 	})

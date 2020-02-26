@@ -130,29 +130,15 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 		defer close(outgoingLogStream)
 		defer close(outgoingErrStream)
 
-		var (
-			mostRecentEnvelopes []*loggregator_v2.Envelope
-			err                 error
-		)
+		ts := latestEnvelopeTimestamp(client, outgoingErrStream, ctx, appGUID)
 
-		for len(mostRecentEnvelopes) == 0 {
-			mostRecentEnvelopes, err = client.Read(
-				ctx,
-				appGUID,
-				time.Time{},
-				logcache.WithLimit(1),
-				logcache.WithDescending(),
-			)
-			if err != nil {
-				outgoingErrStream <- err
-				return
-			}
-
-			if len(mostRecentEnvelopes) == 0 {
-				time.Sleep(time.Second)
-			}
+		// if the context was cancelled we may not have seen an envelope
+		if ts.IsZero() {
+			return
 		}
-		walkStartTime := mostRecentEnvelopes[0].Timestamp - time.Second.Nanoseconds()
+
+		const offset = 1 * time.Second
+		walkStartTime := ts.Add(-offset)
 
 		logcache.Walk(
 			ctx,
@@ -167,11 +153,10 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 						outgoingLogStream <- *logMessage
 					}
 				}
-
 				return true
 			}),
 			client.Read,
-			logcache.WithWalkStartTime(time.Unix(0, walkStartTime)),
+			logcache.WithWalkStartTime(walkStartTime),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
 			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 			logcache.WithWalkLogger(log.New(channelWriter{
@@ -181,6 +166,43 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 	}()
 
 	return outgoingLogStream, outgoingErrStream, cancelFunc
+}
+
+func latestEnvelopeTimestamp(client LogCacheClient, errs chan error, ctx context.Context, sourceID string) time.Time {
+
+	// Fetching the most recent timestamp could be implemented with client.Read directly rather than using logcache.Walk
+	// We use Walk because we want the extra retry behavior provided through Walk
+
+	// Wrap client.Read in our own function to allow us to specify our own read options
+	// https://github.com/cloudfoundry/go-log-cache/issues/27
+	r := func(ctx context.Context, sourceID string, _ time.Time, opts ...logcache.ReadOption) ([]*loggregator_v2.Envelope, error) {
+		os := []logcache.ReadOption{
+			logcache.WithLimit(1),
+			logcache.WithDescending(),
+		}
+		for _, o := range opts {
+			os = append(os, o)
+		}
+		return client.Read(ctx, sourceID, time.Time{}, os...)
+	}
+
+	var timestamp time.Time
+
+	logcache.Walk(
+		ctx,
+		sourceID,
+		logcache.Visitor(func(envelopes []*loggregator_v2.Envelope) bool {
+			timestamp = time.Unix(0, envelopes[0].Timestamp)
+			return false
+		}),
+		r,
+		logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
+		logcache.WithWalkLogger(log.New(channelWriter{
+			errChannel: errs,
+		}, "", 0)),
+	)
+
+	return timestamp
 }
 
 func GetRecentLogs(appGUID string, client LogCacheClient) ([]LogMessage, error) {
