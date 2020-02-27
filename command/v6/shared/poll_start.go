@@ -10,7 +10,13 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-func PollStart(ui command.UI, config command.Config, messages <-chan sharedaction.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationStateChange, apiWarnings <-chan string, apiErrs <-chan error, stopStreaming context.CancelFunc) (apiError error) {
+func PollStart(ui command.UI, config command.Config,
+	messages <-chan sharedaction.LogMessage,
+	logErrs <-chan error,
+	appState <-chan v2action.ApplicationStateChange,
+	apiWarnings <-chan string,
+	apiErrs <-chan error,
+	stopStreaming context.CancelFunc) (apiError error) {
 
 	handleMessage := func(message sharedaction.LogMessage) {
 		if message.Staging() {
