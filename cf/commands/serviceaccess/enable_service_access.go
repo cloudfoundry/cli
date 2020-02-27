@@ -90,41 +90,41 @@ func (cmd *EnableServiceAccess) Execute(c flags.FlagContext) error {
 
 func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, planName string, orgName string) error {
 	cmd.ui.Say(
-		T("Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...",
+		T("Enabling access to plan {{.PlanName}} of service {{.OfferingName}} for org {{.OrgName}} as {{.Username}}...",
 			map[string]interface{}{
-				"PlanName":    terminal.EntityNameColor(planName),
-				"ServiceName": terminal.EntityNameColor(serviceName),
-				"OrgName":     terminal.EntityNameColor(orgName),
-				"Username":    terminal.EntityNameColor(cmd.config.Username()),
+				"PlanName":     terminal.EntityNameColor(planName),
+				"OfferingName": terminal.EntityNameColor(serviceName),
+				"OrgName":      terminal.EntityNameColor(orgName),
+				"Username":     terminal.EntityNameColor(cmd.config.Username()),
 			}))
 	return cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
 }
 
 func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planName string) error {
-	cmd.ui.Say(T("Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
+	cmd.ui.Say(T("Enabling access of plan {{.PlanName}} for service {{.OfferingName}} as {{.Username}}...",
 		map[string]interface{}{
-			"PlanName":    terminal.EntityNameColor(planName),
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			"PlanName":     terminal.EntityNameColor(planName),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username()),
 		}))
 	return cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
 }
 
 func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) error {
-	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...",
+	cmd.ui.Say(T("Enabling access to all plans of service {{.OfferingName}} for all orgs as {{.Username}}...",
 		map[string]interface{}{
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username()),
 		}))
 	return cmd.actor.UpdateAllPlansForService(serviceName, true)
 }
 
 func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName string, orgName string) error {
-	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...",
+	cmd.ui.Say(T("Enabling access to all plans of service {{.OfferingName}} for the org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"OrgName":     terminal.EntityNameColor(orgName),
-			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"OrgName":      terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username()),
 		}))
 	return cmd.actor.UpdateOrgForService(serviceName, orgName, true)
 }

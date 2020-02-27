@@ -74,7 +74,7 @@ func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName,
 		}
 	}
 
-	return ServicePlan{}, allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, ServiceName: serviceName}
+	return ServicePlan{}, allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, OfferingName: serviceName}
 }
 
 func findServiceByBrokerName(services []Service, serviceName, brokerName string) (Service, error) {

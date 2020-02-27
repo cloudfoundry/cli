@@ -132,6 +132,7 @@ const (
 	PostSecurityGroupRequest                                    = "PostSecurityGroup"
 	PostServiceBrokerRequest                                    = "PostServiceBroker"
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
+	PostServicePlanVisibilityRequest                            = "PostServicePlanVisibility"
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PostSpaceRequest                                            = "PostSpace"
 	PostSpaceQuotaRequest                                       = "PostSpaceQuota"
@@ -251,6 +252,7 @@ var APIRoutes = []Route{
 	{Resource: ServicePlansResource, Path: "/", Method: http.MethodGet, Name: GetServicePlansRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid", Method: http.MethodPatch, Name: PatchServicePlanRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodGet, Name: GetServicePlanVisibilityRequest},
+	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodPost, Name: PostServicePlanVisibilityRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodPost, Name: PostSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},

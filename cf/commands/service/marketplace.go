@@ -87,18 +87,18 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) error {
 	var err error
 
 	if cmd.config.HasSpace() {
-		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}} as {{.CurrentUser}}...",
+		cmd.ui.Say(T("Getting service plan information for service {{.OfferingName}} as {{.CurrentUser}}...",
 			map[string]interface{}{
-				"ServiceName": terminal.EntityNameColor(serviceName),
-				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+				"OfferingName": terminal.EntityNameColor(serviceName),
+				"CurrentUser":  terminal.EntityNameColor(cmd.config.Username()),
 			}))
 		serviceOffering, err = cmd.serviceBuilder.GetServiceByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().GUID)
 	} else if !cmd.config.IsLoggedIn() {
-		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
+		cmd.ui.Say(T("Getting service plan information for service {{.OfferingName}}...", map[string]interface{}{"OfferingName": terminal.EntityNameColor(serviceName)}))
 		serviceOffering, err = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
 	} else {
-		err = errors.New(T("Cannot list plan information for {{.ServiceName}} without a targeted space",
-			map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
+		err = errors.New(T("Cannot list plan information for {{.OfferingName}} without a targeted space",
+			map[string]interface{}{"OfferingName": terminal.EntityNameColor(serviceName)}))
 	}
 	if err != nil {
 		return err

@@ -136,10 +136,10 @@ func (cmd *CreateService) Execute(c flags.FlagContext) error {
 
 		if !plan.Free {
 			cmd.ui.Say("")
-			cmd.ui.Say(T("Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
+			cmd.ui.Say(T("Attention: The plan `{{.PlanName}}` of service `{{.OfferingName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
 				map[string]interface{}{
 					"PlanName":            terminal.EntityNameColor(plan.Name),
-					"ServiceName":         terminal.EntityNameColor(serviceName),
+					"OfferingName":        terminal.EntityNameColor(serviceName),
 					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName),
 				}))
 			cmd.ui.Say("")

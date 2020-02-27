@@ -56,7 +56,7 @@ func (actor Actor) EnablePlanForAllOrgs(serviceName, servicePlanName, brokerName
 		}
 	}
 
-	return allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, ServiceName: serviceName}
+	return allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, OfferingName: serviceName}
 }
 
 // EnableServiceForOrg enables access for the given service in a specific org.
@@ -170,7 +170,7 @@ func (actor Actor) DisablePlanForAllOrgs(serviceName, servicePlanName, brokerNam
 	}
 
 	if planFound == false {
-		return allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, ServiceName: serviceName}
+		return allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, OfferingName: serviceName}
 	}
 	return allWarnings, nil
 }
@@ -225,7 +225,7 @@ func (actor Actor) DisablePlanForOrg(serviceName, servicePlanName, orgName, brok
 	}
 
 	if planFound == false {
-		return allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, ServiceName: serviceName}
+		return allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, OfferingName: serviceName}
 	}
 	return allWarnings, nil
 }

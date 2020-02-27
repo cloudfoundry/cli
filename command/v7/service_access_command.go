@@ -111,8 +111,7 @@ func (cmd ServiceAccessCommand) displayMessage() error {
 		return err
 	}
 
-	serviceAccessMessage{
-		Method:          "Getting",
+	getServiceAccessMessage{
 		Broker:          cmd.Broker,
 		ServiceOffering: cmd.ServiceOffering,
 		Organization:    cmd.Organization,
@@ -124,11 +123,11 @@ func (cmd ServiceAccessCommand) displayMessage() error {
 	return nil
 }
 
-type serviceAccessMessage struct {
-	Method, Broker, ServiceOffering, Organization, User string
+type getServiceAccessMessage struct {
+	Broker, ServiceOffering, Organization, User string
 }
 
-func (msg serviceAccessMessage) displayMessage(ui command.UI) {
+func (msg getServiceAccessMessage) displayMessage(ui command.UI) {
 	var resources []string
 
 	if msg.Broker != "" {
@@ -143,8 +142,7 @@ func (msg serviceAccessMessage) displayMessage(ui command.UI) {
 		resources = append(resources, "organization {{.Org}}")
 	}
 
-	// We don't want the method displayed with "flavor"
-	template := msg.Method + " service access"
+	template := "Getting service access"
 
 	if len(resources) != 0 {
 		template += " for " + strings.Join(resources, " and ")

@@ -72,7 +72,7 @@ var _ = Describe("Service Plan Visibility", func() {
 			}),
 			Entry("space", withSpace, ServicePlanVisibility{
 				Type:  "space",
-				Space: VisibilityDetail{Name: "space-1", GUID: "space-1-guid"},
+				Space: &VisibilityDetail{Name: "space-1", GUID: "space-1-guid"},
 			}),
 		)
 
@@ -97,6 +97,75 @@ var _ = Describe("Service Plan Visibility", func() {
 				)
 
 				_, warnings, err := client.GetServicePlanVisibility(guid)
+				Expect(err).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-2"))
+			})
+		})
+	})
+
+	Describe("UpdateServicePlanVisibility", func() {
+		It("sets the plan visibility", func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodPost, fmt.Sprintf("/v3/service_plans/%s/visibility", guid)),
+					VerifyBody([]byte(`{"type":"public"}`)),
+					RespondWith(http.StatusOK, `{"type":"public"}`, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+				),
+			)
+
+			result, warnings, err := client.UpdateServicePlanVisibility(
+				guid,
+				ServicePlanVisibility{
+					Type: "public",
+				},
+			)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf("warning-1"))
+			Expect(result).To(Equal(ServicePlanVisibility{
+				Type: "public",
+			}))
+		})
+
+		When("the the server responds with error", func() {
+			It("returns an error", func() {
+				response := `{
+					"errors": [
+						{
+							"code": 42424,
+							"detail": "Some detailed error message",
+							"title": "CF-SomeErrorTitle"
+						},
+						{
+							"code": 11111,
+							"detail": "Some other detailed error message",
+							"title": "CF-SomeOtherErrorTitle"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+				)
+
+				_, warnings, err := client.UpdateServicePlanVisibility(
+					guid,
+					ServicePlanVisibility{
+						Type: "public",
+					},
+				)
 				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{

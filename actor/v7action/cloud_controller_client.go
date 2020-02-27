@@ -102,7 +102,6 @@ type CloudControllerClient interface {
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetServiceOfferings(query ...ccv3.Query) ([]ccv3.ServiceOffering, ccv3.Warnings, error)
 	GetServicePlans(query ...ccv3.Query) ([]ccv3.ServicePlan, ccv3.Warnings, error)
-	GetServicePlanVisibility(servicePlanGUID string) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)
 	GetSpaceFeature(spaceGUID string, featureName string) (bool, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaceQuota(spaceQuotaGUID string) (ccv3.SpaceQuota, ccv3.Warnings, error)
@@ -150,6 +149,13 @@ type CloudControllerClient interface {
 	UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadDropletBits(dropletGUID string, dropletPath string, droplet io.Reader, dropletLength int64) (ccv3.JobURL, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
+
+	servicePlanVisibilityClient
+}
+
+type servicePlanVisibilityClient interface {
+	GetServicePlanVisibility(servicePlanGUID string) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)
+	UpdateServicePlanVisibility(servicePlanGUID string, visibility ccv3.ServicePlanVisibility) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)
 }
 
 // TODO: Split this enormous interface

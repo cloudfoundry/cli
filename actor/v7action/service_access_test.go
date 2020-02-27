@@ -19,20 +19,23 @@ var _ = Describe("service access actions", func() {
 
 	BeforeEach(func() {
 		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
-		fakeCloudControllerClient.GetServicePlansReturns(fakeServicePlans(), ccv3.Warnings{"plans warning"}, nil)
-		fakeCloudControllerClient.GetServiceOfferingsReturns(fakeServiceOfferings(), ccv3.Warnings{"offerings warning"}, nil)
-
-		visibility1 := ccv3.ServicePlanVisibility{
-			Organizations: []ccv3.VisibilityDetail{{Name: "org-3"}},
-		}
-		visibility2 := ccv3.ServicePlanVisibility{
-			Organizations: []ccv3.VisibilityDetail{{Name: "org-1"}, {Name: "org-2"}},
-		}
-		fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(0, visibility1, ccv3.Warnings{"visibility1 1 warning"}, nil)
-		fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(1, visibility2, ccv3.Warnings{"visibility1 2 warning"}, nil)
 	})
 
 	Describe("GetServiceAccess", func() {
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServicePlansReturns(fakeServicePlans(), ccv3.Warnings{"plans warning"}, nil)
+			fakeCloudControllerClient.GetServiceOfferingsReturns(fakeServiceOfferings(), ccv3.Warnings{"offerings warning"}, nil)
+
+			visibility1 := ccv3.ServicePlanVisibility{
+				Organizations: []ccv3.VisibilityDetail{{Name: "org-3"}},
+			}
+			visibility2 := ccv3.ServicePlanVisibility{
+				Organizations: []ccv3.VisibilityDetail{{Name: "org-1"}, {Name: "org-2"}},
+			}
+			fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(0, visibility1, ccv3.Warnings{"visibility1 1 warning"}, nil)
+			fakeCloudControllerClient.GetServicePlanVisibilityReturnsOnCall(1, visibility2, ccv3.Warnings{"visibility1 2 warning"}, nil)
+		})
+
 		It("produces a slice of ServicePlanAccess objects", func() {
 			access, warnings, err := actor.GetServiceAccess("", "", "")
 			Expect(err).NotTo(HaveOccurred())
@@ -331,6 +334,190 @@ var _ = Describe("service access actions", func() {
 				})
 			})
 		})
+	})
+
+	FDescribe("EnableServiceAccess", func() {
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceOfferingsReturns(
+				[]ccv3.ServiceOffering{{GUID: "fake-offering-guid"}},
+				ccv3.Warnings{"some warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetServicePlansReturns(
+				[]ccv3.ServicePlan{
+					{GUID: "fake-plan-guid-1"},
+					{GUID: "fake-plan-guid-2"},
+				},
+				ccv3.Warnings{"other warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.UpdateServicePlanVisibilityReturns(
+				ccv3.ServicePlanVisibility{},
+				ccv3.Warnings{"post warning"},
+				nil,
+			)
+		})
+
+		It("sets visibility to public", func() {
+			warnings, err := actor.EnableServiceAccess("fake-offering", "", "", "")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf("some warning", "other warning", "post warning", "post warning"))
+
+			Expect(fakeCloudControllerClient.UpdateServicePlanVisibilityCallCount()).To(Equal(2))
+
+			planGUID, actualVisibility := fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(0)
+			Expect(planGUID).To(Equal("fake-plan-guid-1"))
+			Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{Type: "public"}))
+
+			planGUID, actualVisibility = fakeCloudControllerClient.UpdateServicePlanVisibilityArgsForCall(1)
+			Expect(planGUID).To(Equal("fake-plan-guid-2"))
+			Expect(actualVisibility).To(Equal(ccv3.ServicePlanVisibility{Type: "public"}))
+		})
+
+		Describe("fetching service offering", func() {
+			It("filters by service offering name", func() {
+				_, err := actor.EnableServiceAccess("fake-offering", "", "", "")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ConsistOf(ccv3.Query{
+					Key:    ccv3.NameFilter,
+					Values: []string{"fake-offering"},
+				}))
+			})
+
+			When("the service broker name is specified", func() {
+				It("also filters by service broker name", func() {
+					_, err := actor.EnableServiceAccess("fake-offering", "", "", "fake-broker-name")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ContainElement(ccv3.Query{
+						Key:    ccv3.ServiceBrokerNamesFilter,
+						Values: []string{"fake-broker-name"},
+					}))
+				})
+			})
+
+			When("the service offering does not exist", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{}, ccv3.Warnings{"a warning"}, nil)
+				})
+
+				It("returns an error", func() {
+					warnings, err := actor.EnableServiceAccess("no-such-offering", "", "", "")
+					Expect(warnings).To(ContainElement("a warning"))
+					Expect(err).To(MatchError(actionerror.ServiceNotFoundError{Name: "no-such-offering"}))
+				})
+			})
+
+			When("the service offering name is ambiguous", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{}, {}}, ccv3.Warnings{"another warning"}, nil)
+				})
+
+				It("returns an error", func() {
+					warnings, err := actor.EnableServiceAccess("duplicate-offering", "", "", "")
+					Expect(warnings).To(ContainElement("another warning"))
+					Expect(err).To(MatchError(actionerror.DuplicateServiceError{Name: "duplicate-offering"}))
+				})
+			})
+		})
+
+		Describe("fetching service plans", func() {
+			It("gets all plans for the service offering", func() {
+				warnings, err := actor.EnableServiceAccess("fake-offering", "", "", "fake-broker-name")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ContainElements("some warning", "other warning"))
+
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(ccv3.Query{
+					Key:    ccv3.ServiceOfferingGUIDsFilter,
+					Values: []string{"fake-offering-guid"},
+				}))
+			})
+
+			When("a plan name is specified", func() {
+				It("filters by plan name and service offering GUID", func() {
+					warnings, err := actor.EnableServiceAccess("fake-offering", "fake-plan-name", "", "fake-broker-name")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ContainElements("some warning", "other warning"))
+
+					Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{
+							Key:    ccv3.ServiceOfferingGUIDsFilter,
+							Values: []string{"fake-offering-guid"},
+						},
+						ccv3.Query{
+							Key:    ccv3.NameFilter,
+							Values: []string{"fake-plan-name"},
+						},
+					))
+				})
+			})
+
+			When("no plans were found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{}, ccv3.Warnings{"other warning"}, nil)
+				})
+
+				It("fails", func() {
+					warnings, err := actor.EnableServiceAccess("fake-offering", "fake-plan-name", "", "fake-broker-name")
+					Expect(err).To(MatchError(actionerror.ServicePlanNotFoundError{
+						OfferingName: "fake-offering",
+						PlanName:     "fake-plan-name",
+					}))
+					Expect(warnings).To(ContainElements("some warning", "other warning"))
+				})
+			})
+
+			When("fetching the plans fail", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns([]ccv3.ServicePlan{}, ccv3.Warnings{"other warning"}, errors.New("fetch plans error"))
+				})
+
+				It("fails", func() {
+					warnings, err := actor.EnableServiceAccess("", "", "", "")
+					Expect(err).To(MatchError("fetch plans error"))
+					Expect(warnings).To(ContainElements("some warning", "other warning"))
+				})
+			})
+		})
+
+		Context("with org", func() {
+
+			When("the org does not exist", func() {
+
+			})
+
+			It("sets visibility to orgs", func() {})
+		})
+
+		When("setting visibility fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateServicePlanVisibilityReturns(
+					ccv3.ServicePlanVisibility{},
+					ccv3.Warnings{"post warning"},
+					errors.New("post error"),
+				)
+			})
+
+			It("returns error and stops setting visibility for the remaining plans", func() {
+				warnings, err := actor.EnableServiceAccess("fake-offering", "", "", "")
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError("post error"))
+
+				Expect(fakeCloudControllerClient.UpdateServicePlanVisibilityCallCount()).To(Equal(1))
+				Expect(warnings).To(ConsistOf("some warning", "other warning", "post warning"))
+			})
+		})
+
+		// simple happy case
+
+		// with org
+		// org does not exist
 	})
 })
 

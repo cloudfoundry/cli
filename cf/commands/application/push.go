@@ -483,17 +483,17 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) er
 		serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceName)
 
 		if err != nil {
-			return errors.New(T("Could not find service {{.ServiceName}} to bind to {{.AppName}}",
-				map[string]interface{}{"ServiceName": serviceName, "AppName": app.Name}))
+			return errors.New(T("Could not find service {{.OfferingName}} to bind to {{.AppName}}",
+				map[string]interface{}{"OfferingName": serviceName, "AppName": app.Name}))
 		}
 
-		cmd.ui.Say(T("Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		cmd.ui.Say(T("Binding service {{.OfferingName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 			map[string]interface{}{
-				"ServiceName": terminal.EntityNameColor(serviceInstance.Name),
-				"AppName":     terminal.EntityNameColor(app.Name),
-				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-				"Username":    terminal.EntityNameColor(cmd.config.Username())}))
+				"OfferingName": terminal.EntityNameColor(serviceInstance.Name),
+				"AppName":      terminal.EntityNameColor(app.Name),
+				"OrgName":      terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName":    terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"Username":     terminal.EntityNameColor(cmd.config.Username())}))
 
 		err = cmd.serviceBinder.BindApplication(app, serviceInstance, nil)
 
@@ -505,8 +505,8 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) er
 		}
 
 		if err != nil {
-			return errors.New(T("Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
-				map[string]interface{}{"ServiceName": serviceName, "Err": err.Error()}))
+			return errors.New(T("Could not bind to service {{.OfferingName}}\nError: {{.Err}}",
+				map[string]interface{}{"OfferingName": serviceName, "Err": err.Error()}))
 		}
 
 		cmd.ui.Ok()

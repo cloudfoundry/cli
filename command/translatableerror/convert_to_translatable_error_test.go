@@ -57,8 +57,8 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			AssignDropletError{Message: "some-message"}),
 
 		Entry("actionerror.ServicePlanNotFoundError -> ServicePlanNotFoundError",
-			actionerror.ServicePlanNotFoundError{PlanName: "some-plan", ServiceName: "some-service"},
-			ServicePlanNotFoundError{PlanName: "some-plan", ServiceName: "some-service"}),
+			actionerror.ServicePlanNotFoundError{PlanName: "some-plan", OfferingName: "some-service"},
+			ServicePlanNotFoundError{PlanName: "some-plan", OfferingName: "some-service"}),
 
 		Entry("actionerror.BuildpackNotFoundError -> BuildpackNotFoundError",
 			actionerror.BuildpackNotFoundError{},

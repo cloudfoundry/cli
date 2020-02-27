@@ -88,10 +88,10 @@ func (cmd *DisableServiceAccess) Execute(c flags.FlagContext) error {
 }
 
 func (cmd *DisableServiceAccess) disableServiceForAll(serviceName string) error {
-	cmd.ui.Say(T("Disabling access to all plans of service {{.ServiceName}} for all orgs as {{.UserName}}...",
+	cmd.ui.Say(T("Disabling access to all plans of service {{.OfferingName}} for all orgs as {{.UserName}}...",
 		map[string]interface{}{
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"UserName":    terminal.EntityNameColor(cmd.config.Username()),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"UserName":     terminal.EntityNameColor(cmd.config.Username()),
 		},
 	))
 
@@ -99,12 +99,12 @@ func (cmd *DisableServiceAccess) disableServiceForAll(serviceName string) error 
 }
 
 func (cmd *DisableServiceAccess) disablePlanAndOrgForService(serviceName string, planName string, orgName string) error {
-	cmd.ui.Say(T("Disabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...",
+	cmd.ui.Say(T("Disabling access to plan {{.PlanName}} of service {{.OfferingName}} for org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{
-			"PlanName":    terminal.EntityNameColor(planName),
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"OrgName":     terminal.EntityNameColor(orgName),
-			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			"PlanName":     terminal.EntityNameColor(planName),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"OrgName":      terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username()),
 		},
 	))
 
@@ -112,11 +112,11 @@ func (cmd *DisableServiceAccess) disablePlanAndOrgForService(serviceName string,
 }
 
 func (cmd *DisableServiceAccess) disableSinglePlanForService(serviceName string, planName string) error {
-	cmd.ui.Say(T("Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
+	cmd.ui.Say(T("Disabling access of plan {{.PlanName}} for service {{.OfferingName}} as {{.Username}}...",
 		map[string]interface{}{
-			"PlanName":    terminal.EntityNameColor(planName),
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			"PlanName":     terminal.EntityNameColor(planName),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username()),
 		},
 	))
 
@@ -124,11 +124,11 @@ func (cmd *DisableServiceAccess) disableSinglePlanForService(serviceName string,
 }
 
 func (cmd *DisableServiceAccess) disablePlansForSingleOrgForService(serviceName string, orgName string) error {
-	cmd.ui.Say(T("Disabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...",
+	cmd.ui.Say(T("Disabling access to all plans of service {{.OfferingName}} for the org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{
-			"ServiceName": terminal.EntityNameColor(serviceName),
-			"OrgName":     terminal.EntityNameColor(orgName),
-			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			"OfferingName": terminal.EntityNameColor(serviceName),
+			"OrgName":      terminal.EntityNameColor(orgName),
+			"Username":     terminal.EntityNameColor(cmd.config.Username()),
 		},
 	))
 

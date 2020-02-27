@@ -79,8 +79,8 @@ var _ = Describe("Service Plan Actions", func() {
 
 				It("returns an error and warnings", func() {
 					Expect(executionError).To(MatchError(actionerror.ServicePlanNotFoundError{
-						PlanName:    servicePlanName,
-						ServiceName: serviceOfferingName,
+						PlanName:     servicePlanName,
+						OfferingName: serviceOfferingName,
 					}))
 					Expect(warnings).To(ConsistOf("some-service-plan-warning"))
 				})

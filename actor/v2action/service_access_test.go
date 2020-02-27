@@ -180,7 +180,7 @@ var _ = Describe("Service Access", func() {
 			})
 
 			It("returns not found error", func() {
-				Expect(enablePlanErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "plan-2", ServiceName: "service-1"}))
+				Expect(enablePlanErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "plan-2", OfferingName: "service-1"}))
 			})
 
 			It("returns all warnings", func() {
@@ -1234,7 +1234,7 @@ var _ = Describe("Service Access", func() {
 			})
 
 			It("returns not found error", func() {
-				Expect(disablePlanErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "plan-2", ServiceName: "service-1"}))
+				Expect(disablePlanErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "plan-2", OfferingName: "service-1"}))
 			})
 
 			It("returns all warnings", func() {
@@ -1628,7 +1628,7 @@ var _ = Describe("Service Access", func() {
 			})
 
 			It("returns not found error", func() {
-				Expect(disablePlanForOrgErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "service-plan-1", ServiceName: "service-1"}))
+				Expect(disablePlanForOrgErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "service-plan-1", OfferingName: "service-1"}))
 			})
 
 			It("returns all warnings", func() {

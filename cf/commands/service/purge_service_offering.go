@@ -96,8 +96,8 @@ func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) error {
 	confirmed := c.Bool("f")
 	if !confirmed {
 		cmd.ui.Warn(scaryWarningMessage())
-		confirmed = cmd.ui.Confirm(T("Really purge service offering {{.ServiceName}} from Cloud Foundry?",
-			map[string]interface{}{"ServiceName": serviceName},
+		confirmed = cmd.ui.Confirm(T("Really purge service offering {{.OfferingName}} from Cloud Foundry?",
+			map[string]interface{}{"OfferingName": serviceName},
 		))
 	}
 
@@ -105,7 +105,7 @@ func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) error {
 		return nil
 	}
 
-	cmd.ui.Say(T("Purging service {{.ServiceName}}...", map[string]interface{}{"ServiceName": serviceName}))
+	cmd.ui.Say(T("Purging service {{.OfferingName}}...", map[string]interface{}{"OfferingName": serviceName}))
 
 	err := cmd.serviceRepo.PurgeServiceOffering(offering)
 	if err != nil {

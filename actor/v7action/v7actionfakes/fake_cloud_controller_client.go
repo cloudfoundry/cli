@@ -1932,6 +1932,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateServicePlanVisibilityStub        func(string, ccv3.ServicePlanVisibility) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)
+	updateServicePlanVisibilityMutex       sync.RWMutex
+	updateServicePlanVisibilityArgsForCall []struct {
+		arg1 string
+		arg2 ccv3.ServicePlanVisibility
+	}
+	updateServicePlanVisibilityReturns struct {
+		result1 ccv3.ServicePlanVisibility
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateServicePlanVisibilityReturnsOnCall map[int]struct {
+		result1 ccv3.ServicePlanVisibility
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateSpaceStub        func(ccv3.Space) (ccv3.Space, ccv3.Warnings, error)
 	updateSpaceMutex       sync.RWMutex
 	updateSpaceArgsForCall []struct {
@@ -10508,6 +10524,73 @@ func (fake *FakeCloudControllerClient) UpdateServiceBrokerReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateServicePlanVisibility(arg1 string, arg2 ccv3.ServicePlanVisibility) (ccv3.ServicePlanVisibility, ccv3.Warnings, error) {
+	fake.updateServicePlanVisibilityMutex.Lock()
+	ret, specificReturn := fake.updateServicePlanVisibilityReturnsOnCall[len(fake.updateServicePlanVisibilityArgsForCall)]
+	fake.updateServicePlanVisibilityArgsForCall = append(fake.updateServicePlanVisibilityArgsForCall, struct {
+		arg1 string
+		arg2 ccv3.ServicePlanVisibility
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateServicePlanVisibility", []interface{}{arg1, arg2})
+	fake.updateServicePlanVisibilityMutex.Unlock()
+	if fake.UpdateServicePlanVisibilityStub != nil {
+		return fake.UpdateServicePlanVisibilityStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateServicePlanVisibilityReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanVisibilityCallCount() int {
+	fake.updateServicePlanVisibilityMutex.RLock()
+	defer fake.updateServicePlanVisibilityMutex.RUnlock()
+	return len(fake.updateServicePlanVisibilityArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanVisibilityCalls(stub func(string, ccv3.ServicePlanVisibility) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)) {
+	fake.updateServicePlanVisibilityMutex.Lock()
+	defer fake.updateServicePlanVisibilityMutex.Unlock()
+	fake.UpdateServicePlanVisibilityStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanVisibilityArgsForCall(i int) (string, ccv3.ServicePlanVisibility) {
+	fake.updateServicePlanVisibilityMutex.RLock()
+	defer fake.updateServicePlanVisibilityMutex.RUnlock()
+	argsForCall := fake.updateServicePlanVisibilityArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanVisibilityReturns(result1 ccv3.ServicePlanVisibility, result2 ccv3.Warnings, result3 error) {
+	fake.updateServicePlanVisibilityMutex.Lock()
+	defer fake.updateServicePlanVisibilityMutex.Unlock()
+	fake.UpdateServicePlanVisibilityStub = nil
+	fake.updateServicePlanVisibilityReturns = struct {
+		result1 ccv3.ServicePlanVisibility
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanVisibilityReturnsOnCall(i int, result1 ccv3.ServicePlanVisibility, result2 ccv3.Warnings, result3 error) {
+	fake.updateServicePlanVisibilityMutex.Lock()
+	defer fake.updateServicePlanVisibilityMutex.Unlock()
+	fake.UpdateServicePlanVisibilityStub = nil
+	if fake.updateServicePlanVisibilityReturnsOnCall == nil {
+		fake.updateServicePlanVisibilityReturnsOnCall = make(map[int]struct {
+			result1 ccv3.ServicePlanVisibility
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateServicePlanVisibilityReturnsOnCall[i] = struct {
+		result1 ccv3.ServicePlanVisibility
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpace(arg1 ccv3.Space) (ccv3.Space, ccv3.Warnings, error) {
 	fake.updateSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSpaceReturnsOnCall[len(fake.updateSpaceArgsForCall)]
@@ -11448,6 +11531,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateResourceMetadataAsyncMutex.RUnlock()
 	fake.updateServiceBrokerMutex.RLock()
 	defer fake.updateServiceBrokerMutex.RUnlock()
+	fake.updateServicePlanVisibilityMutex.RLock()
+	defer fake.updateServicePlanVisibilityMutex.RUnlock()
 	fake.updateSpaceMutex.RLock()
 	defer fake.updateSpaceMutex.RUnlock()
 	fake.updateSpaceApplyManifestMutex.RLock()

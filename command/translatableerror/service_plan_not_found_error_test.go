@@ -11,10 +11,10 @@ var _ = Describe("ServicePlanNotFoundError", func() {
 		offeringName := "some-service-offering"
 		planName := "some-plan"
 		err := translatableerror.ServicePlanNotFoundError{
-			ServiceName: offeringName,
-			PlanName:    planName,
+			OfferingName: offeringName,
+			PlanName:     planName,
 		}
-		Expect(err.Error()).To(Equal("The plan {{.PlanName}} could not be found for service {{.ServiceName}}"))
+		Expect(err.Error()).To(Equal("The plan {{.PlanName}} could not be found for service {{.OfferingName}}"))
 	})
 
 	When("there is no service offering name", func() {

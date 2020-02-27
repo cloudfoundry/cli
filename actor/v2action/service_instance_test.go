@@ -232,7 +232,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 				It("returns the error and warnings", func() {
 					Expect(serviceInstance).To(Equal(ServiceInstance{}))
-					Expect(createServiceErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "service-plan", ServiceName: "service"}))
+					Expect(createServiceErr).To(MatchError(actionerror.ServicePlanNotFoundError{PlanName: "service-plan", OfferingName: "service"}))
 					Expect(createServiceWarnings).To(ConsistOf("get-plan-warning"))
 
 					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))

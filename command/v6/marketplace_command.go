@@ -93,10 +93,10 @@ func (cmd *MarketplaceCommand) marketplace() error {
 			return fmt.Errorf("Cannot list plan information for %s without a targeted space", cmd.ServiceName)
 		}
 
-		cmd.UI.DisplayTextWithFlavor("Getting service plan information for service {{.ServiceName}} as {{.Username}}...",
+		cmd.UI.DisplayTextWithFlavor("Getting service plan information for service {{.OfferingName}} as {{.Username}}...",
 			map[string]interface{}{
-				"ServiceName": cmd.ServiceName,
-				"Username":    user.Name,
+				"OfferingName": cmd.ServiceName,
+				"Username":     user.Name,
 			})
 
 		serviceSummary, warnings, err := cmd.Actor.GetServiceSummaryForSpaceByName(cmd.Config.TargetedSpace().GUID, cmd.ServiceName)
@@ -125,9 +125,9 @@ func (cmd *MarketplaceCommand) publicMarketplace() error {
 		cmd.UI.DisplayOK()
 		cmd.displayServiceSummaries(serviceSummaries)
 	} else {
-		cmd.UI.DisplayTextWithFlavor("Getting service plan information for service {{.ServiceName}}...",
+		cmd.UI.DisplayTextWithFlavor("Getting service plan information for service {{.OfferingName}}...",
 			map[string]interface{}{
-				"ServiceName": cmd.ServiceName,
+				"OfferingName": cmd.ServiceName,
 			})
 
 		serviceSummary, warnings, err := cmd.Actor.GetServiceSummaryByName(cmd.ServiceName)

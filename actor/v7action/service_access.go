@@ -68,6 +68,53 @@ func (actor *Actor) GetServiceAccess(broker, service, organization string) ([]Se
 	return result, allWarnings, err
 }
 
+func (actor *Actor) EnableServiceAccess(offeringName, planName, orgName, brokerName string) (Warnings, error) {
+	offering, allWarnings, err := actor.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	planQuery := []ccv3.Query{{
+		Key:    ccv3.ServiceOfferingGUIDsFilter,
+		Values: []string{offering.GUID},
+	}}
+
+	if planName != "" {
+		planQuery = append(planQuery, ccv3.Query{
+			Key:    ccv3.NameFilter,
+			Values: []string{planName},
+		})
+	}
+
+	plans, warnings, err := actor.CloudControllerClient.GetServicePlans(planQuery...)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if len(plans) == 0 {
+		return allWarnings, actionerror.ServicePlanNotFoundError{
+			PlanName:     planName,
+			OfferingName: offeringName,
+		}
+	}
+
+	for _, plan := range plans {
+		_, warnings, err = actor.CloudControllerClient.UpdateServicePlanVisibility(
+			plan.GUID,
+			ccv3.ServicePlanVisibility{
+				Type: "public",
+			},
+		)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return allWarnings, err
+		}
+	}
+
+	return allWarnings, nil
+}
+
 func (actor *Actor) buildPlansFilter(organization, broker, service string) ([]ccv3.Query, Warnings, error) {
 	var (
 		plansQuery []ccv3.Query
