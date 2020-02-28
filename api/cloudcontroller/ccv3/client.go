@@ -85,7 +85,7 @@ type Warnings []string
 // Client can be used to talk to a Cloud Controller's V3 Endpoints.
 type Client struct {
 	Info
-	cloudControllerURL string
+	CloudControllerURL string
 
 	Requester
 
@@ -125,8 +125,11 @@ func NewClient(config Config) *Client {
 
 // TestClient returns a new client explicitly meant for internal testing.  This
 // should not be used for production code.
-func TestClient(config Config, clock Clock) *Client {
-	client := NewClient(config)
-	client.clock = clock
-	return client
+func TestClient(config Config, clock Clock, requester Requester) *Client {
+	return &Client{
+		clock:              clock,
+		jobPollingInterval: config.JobPollingInterval,
+		jobPollingTimeout:  config.JobPollingTimeout,
+		Requester:          requester,
+	}
 }

@@ -124,6 +124,8 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 	})
 	warnings = append(warnings, v3Warnings...)
 
+	// root response -> targetcf as apiInfo
+	// info -> targetcf as resourcelinks
 	return rootResponse, info, warnings, err
 }
 
@@ -132,13 +134,13 @@ func (client *Client) RootResponse() (Info, Warnings, error) {
 	var responseBody Info
 
 	_, warnings, err := client.MakeRequest(RequestParams{
-		URL:          client.cloudControllerURL,
+		URL:          client.CloudControllerURL,
 		ResponseBody: &responseBody,
 	})
 
 	unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError)
 	if ok && unknownSourceErr.StatusCode == http.StatusNotFound {
-		return Info{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
+		return Info{}, nil, ccerror.APINotFoundError{URL: client.CloudControllerURL}
 	}
 
 	return responseBody, warnings, err

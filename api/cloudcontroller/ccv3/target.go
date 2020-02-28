@@ -27,7 +27,7 @@ type TargetSettings struct {
 // TargetCF sets the client to use the Cloud Controller specified in the
 // configuration. Any other configuration is also applied to the client.
 func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
-	client.cloudControllerURL = settings.URL
+	client.CloudControllerURL = settings.URL
 	client.InitializeConnection(settings)
 
 	apiInfo, resourceLinks, warnings, err := client.GetInfo()

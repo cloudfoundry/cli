@@ -1,11 +1,12 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"mime/multipart"
 	"net/http"
 	"strings"
 
@@ -22,10 +23,14 @@ import (
 )
 
 var _ = Describe("Droplet", func() {
-	var client *Client
+	var (
+		client    *Client
+		requester *ccv3fakes.FakeRequester
+	)
 
 	BeforeEach(func() {
-		client, _ = NewTestClient()
+		requester = new(ccv3fakes.FakeRequester)
+		client, _ = NewFakeRequesterTestClient(requester)
 	})
 
 	Describe("CreateDroplet", func() {
@@ -41,31 +46,27 @@ var _ = Describe("Droplet", func() {
 
 		When("the request succeeds", func() {
 			BeforeEach(func() {
-				response := `{
-					"guid": "some-guid",
-					"state": "AWAITING_UPLOAD",
-					"error": null,
-					"lifecycle": {
-						"type": "buildpack",
-						"data": {}
+				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+					requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
+					requestParams.ResponseBody.(*Droplet).State = "AWAITING_UPLOAD"
+					requestParams.ResponseBody.(*Droplet).Image = "docker/some-image"
+					requestParams.ResponseBody.(*Droplet).Stack = "some-stack"
+					requestParams.ResponseBody.(*Droplet).Buildpacks = []DropletBuildpack{{Name: "some-buildpack", DetectOutput: "detected-buildpack"}}
+					return "", Warnings{"warning-1"}, nil
+				})
+			})
+
+			It("makes the correct request", func() {
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				actualParams := requester.MakeRequestArgsForCall(0)
+				Expect(actualParams.RequestName).To(Equal(internal.PostDropletRequest))
+				Expect(actualParams.RequestBody).To(Equal(DropletCreateRequest{
+					Relationships: Relationships{
+						constant.RelationshipTypeApplication: Relationship{GUID: "app-guid"},
 					},
-					"buildpacks": [
-						{
-							"name": "some-buildpack",
-							"detect_output": "detected-buildpack"
-						}
-					],
-					"image": "docker/some-image",
-					"stack": "some-stack",
-					"created_at": "2016-03-28T23:39:34Z",
-					"updated_at": "2016-03-28T23:39:47Z"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
+				}))
+				_, ok := actualParams.ResponseBody.(*Droplet)
+				Expect(ok).To(BeTrue())
 			})
 
 			It("returns the given droplet and all warnings", func() {
@@ -82,7 +83,6 @@ var _ = Describe("Droplet", func() {
 						},
 					},
 					Image:     "docker/some-image",
-					CreatedAt: "2016-03-28T23:39:34Z",
 				}))
 				Expect(warnings).To(ConsistOf("warning-1"))
 			})
@@ -90,20 +90,10 @@ var _ = Describe("Droplet", func() {
 
 		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "Droplet not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
+				requester.MakeRequestReturns(
+					"",
+					Warnings{"warning-1"},
+					ccerror.DropletNotFoundError{},
 				)
 			})
 
@@ -586,7 +576,7 @@ var _ = Describe("Droplet", func() {
 		})
 	})
 
-	Describe("UploadDropletBits", func() {
+	FDescribe("UploadDropletBits", func() {
 		var (
 			dropletGUID     string
 			dropletFile     io.Reader
@@ -608,46 +598,26 @@ var _ = Describe("Droplet", func() {
 			jobURL, warnings, executeErr = client.UploadDropletBits(dropletGUID, dropletFilePath, dropletFile, int64(len(dropletContent)))
 		})
 
-		When("the upload is successful", func() {
+		FWhen("the upload is successful", func() {
 			BeforeEach(func() {
-				response := `{
-					"guid": "some-droplet-guid",
-					"state": "PROCESSING_UPLOAD"
-				}`
+				requester.MakeRequestUploadAsyncReturns("http://example.com/job-guid", Warnings{"this is a warning"}, nil)
+			})
 
-				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
-					contentType := req.Header.Get("Content-Type")
-					Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+			It("makes the correct request", func() {
+				contentLength, _ := uploads.CalculateRequestSize(int64(len(dropletContent)), dropletFilePath, "bits")
+				//_, _, writeErrors := uploads.CreateMultipartBodyAndHeader(dropletFile, dropletFilePath, "bits")
 
-					defer req.Body.Close()
-					requestReader := multipart.NewReader(req.Body, contentType[30:])
-
-					dropletPart, err := requestReader.NextPart()
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(dropletPart.FormName()).To(Equal("bits"))
-					Expect(dropletPart.FileName()).To(Equal("fake-droplet.tgz"))
-
-					defer dropletPart.Close()
-					partContents, err := ioutil.ReadAll(dropletPart)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(string(partContents)).To(Equal(dropletContent))
-				}
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
-						verifyHeaderAndBody,
-						RespondWith(
-							http.StatusAccepted,
-							response,
-							http.Header{
-								"X-Cf-Warnings": {"this is a warning"},
-								"Location":      {"http://example.com/job-guid"},
-							},
-						),
-					),
-				)
+				Expect(requester.MakeRequestUploadAsyncCallCount()).To(Equal(1))
+				requestName, requestParams, contentType, _, contentLen, responseBody, _ := requester.MakeRequestUploadAsyncArgsForCall(0)
+				Expect(requestName).To(Equal(internal.PostDropletBitsRequest))
+				Expect(requestParams).To(Equal(internal.Params{"droplet_guid": dropletGUID}))
+				Expect(contentType).To(MatchRegexp("multipart/form-data; boundary="))
+				// TODO: check pieces of body that match
+				//Expect(Body).To(Equal(body))
+				Expect(contentLen).To(Equal(contentLength))
+				Expect(responseBody).To(BeNil())
+				//TODO: consider how to test this
+				//Expect(writeErrs).To(Equal(writeErrors))
 			})
 
 			It("returns the processing job URL and warnings", func() {
@@ -657,7 +627,7 @@ var _ = Describe("Droplet", func() {
 			})
 		})
 
-		When("there is an error reading the buildpack", func() {
+		FWhen("there is an error reading the buildpack", func() {
 			var (
 				fakeReader  *ccv3fakes.FakeReader
 				expectedErr error
@@ -669,9 +639,9 @@ var _ = Describe("Droplet", func() {
 				fakeReader.ReadReturns(0, expectedErr)
 				dropletFile = fakeReader
 
-				server.AppendHandlers(
-					VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
-				)
+				//server.AppendHandlers(
+				//	VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
+				//)
 			})
 
 			It("returns the error", func() {
@@ -681,19 +651,12 @@ var _ = Describe("Droplet", func() {
 
 		When("the upload returns an error", func() {
 			BeforeEach(func() {
-				response := `{
-					"errors": [{
-                        "detail": "The droplet could not be found: some-droplet-guid",
-                        "title": "CF-ResourceNotFound",
-                        "code": 10010
-                    }]
-                }`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets/some-droplet-guid/upload"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
+				requester.MakeRequestUploadAsyncReturns(
+					"",
+					Warnings{"this is a warning"},
+					ccerror.ResourceNotFoundError{
+						Message: "The droplet could not be found: some-droplet-guid",
+					},
 				)
 			})
 
@@ -711,20 +674,10 @@ var _ = Describe("Droplet", func() {
 			BeforeEach(func() {
 				dropletGUID = "some-guid"
 
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "Droplet not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets/some-guid/upload"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
+				requester.MakeRequestUploadAsyncReturns(
+					"",
+					Warnings{"warning-1"},
+					ccerror.DropletNotFoundError{},
 				)
 			})
 
