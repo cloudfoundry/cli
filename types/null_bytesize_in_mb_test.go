@@ -10,7 +10,10 @@ var _ = Describe("NullByteSizeInMb", func() {
 	var nullByteSize NullByteSizeInMb
 
 	BeforeEach(func() {
-		nullByteSize = NullByteSizeInMb{}
+		nullByteSize = NullByteSizeInMb{
+			IsSet: true,
+			Value: 0xBAD,
+		}
 	})
 
 	Describe("String", func() {
@@ -47,7 +50,6 @@ var _ = Describe("NullByteSizeInMb", func() {
 			It("returns an error", func() {
 				err := nullByteSize.ParseStringValue("abcdef")
 				Expect(err).To(HaveOccurred())
-				Expect(nullByteSize).To(Equal(NullByteSizeInMb{Value: 0, IsSet: false}))
 			})
 		})
 
@@ -55,7 +57,6 @@ var _ = Describe("NullByteSizeInMb", func() {
 			It("returns an error", func() {
 				err := nullByteSize.ParseStringValue("1")
 				Expect(err).To(HaveOccurred())
-				Expect(nullByteSize).To(Equal(NullByteSizeInMb{Value: 0, IsSet: false}))
 			})
 		})
 
@@ -94,9 +95,17 @@ var _ = Describe("NullByteSizeInMb", func() {
 			})
 		})
 
-		When("empty json is provided", func() {
-			It("returns an unset NullUint64", func() {
-				err := nullByteSize.UnmarshalJSON([]byte(`""`))
+		When("a null value is provided", func() {
+			It("returns an unset NullByteSizeInMb", func() {
+				err := nullByteSize.UnmarshalJSON([]byte("null"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(nullByteSize).To(Equal(NullByteSizeInMb{Value: 0, IsSet: false}))
+			})
+		})
+
+		When("empty string is provided", func() {
+			It("returns an unset NullByteSizeInMb", func() {
+				err := nullByteSize.UnmarshalJSON([]byte(""))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(nullByteSize).To(Equal(NullByteSizeInMb{Value: 0, IsSet: false}))
 			})

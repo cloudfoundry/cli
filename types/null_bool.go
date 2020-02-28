@@ -65,5 +65,5 @@ func (n NullBool) MarshalJSON() ([]byte, error) {
 	if n.IsSet {
 		return []byte(fmt.Sprint(n.Value)), nil
 	}
-	return []byte("null"), nil
+	return []byte(JsonNull), nil
 }

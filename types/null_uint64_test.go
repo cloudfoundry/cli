@@ -10,7 +10,10 @@ var _ = Describe("NullUint64", func() {
 	var nullUint64 NullUint64
 
 	BeforeEach(func() {
-		nullUint64 = NullUint64{}
+		nullUint64 = NullUint64{
+			IsSet: true,
+			Value: 0xBAD,
+		}
 	})
 
 	Describe("ParseStringValue", func() {
@@ -55,9 +58,17 @@ var _ = Describe("NullUint64", func() {
 			})
 		})
 
-		When("empty json is provided", func() {
+		When("a null value is provided", func() {
 			It("returns an unset NullUint64", func() {
-				err := nullUint64.UnmarshalJSON([]byte(`""`))
+				err := nullUint64.UnmarshalJSON([]byte("null"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(nullUint64).To(Equal(NullUint64{Value: 0, IsSet: false}))
+			})
+		})
+
+		When("empty string is provided", func() {
+			It("returns an unset NullUint64", func() {
+				err := nullUint64.UnmarshalJSON([]byte(""))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(nullUint64).To(Equal(NullUint64{Value: 0, IsSet: false}))
 			})

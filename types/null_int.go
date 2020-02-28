@@ -1,10 +1,11 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 )
+
+const JsonNull = "null"
 
 // NullInt is a wrapper around integer values that can be null or an integer.
 // Use IsSet to check if the value is provided, instead of checking against 0.
@@ -16,11 +17,15 @@ type NullInt struct {
 // ParseStringValue is used to parse a user provided flag argument.
 func (n *NullInt) ParseStringValue(val string) error {
 	if val == "" {
+		n.IsSet = false
+		n.Value = 0
 		return nil
 	}
 
 	intVal, err := strconv.Atoi(val)
 	if err != nil {
+		n.IsSet = false
+		n.Value = 0
 		return err
 	}
 
@@ -53,32 +58,20 @@ func (n *NullInt) UnmarshalFlag(val string) error {
 }
 
 func (n *NullInt) UnmarshalJSON(rawJSON []byte) error {
-	var value json.Number
-	err := json.Unmarshal(rawJSON, &value)
-	if err != nil {
-		return err
-	}
+	stringValue := string(rawJSON)
 
-	if value.String() == "" {
+	if stringValue == JsonNull {
 		n.Value = 0
 		n.IsSet = false
 		return nil
 	}
 
-	valueInt, err := strconv.Atoi(value.String())
-	if err != nil {
-		return err
-	}
-
-	n.Value = valueInt
-	n.IsSet = true
-
-	return nil
+	return n.ParseStringValue(stringValue)
 }
 
 func (n NullInt) MarshalJSON() ([]byte, error) {
 	if n.IsSet {
 		return []byte(fmt.Sprint(n.Value)), nil
 	}
-	return []byte("null"), nil
+	return []byte(JsonNull), nil
 }

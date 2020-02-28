@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"strconv"
 )
 
@@ -15,11 +14,15 @@ type NullUint64 struct {
 // ParseStringValue is used to parse a user provided flag argument.
 func (n *NullUint64) ParseStringValue(val string) error {
 	if val == "" {
+		n.Value = 0
+		n.IsSet = false
 		return nil
 	}
 
 	uint64Val, err := strconv.ParseUint(val, 10, 64)
 	if err != nil {
+		n.Value = 0
+		n.IsSet = false
 		return err
 	}
 
@@ -30,25 +33,13 @@ func (n *NullUint64) ParseStringValue(val string) error {
 }
 
 func (n *NullUint64) UnmarshalJSON(rawJSON []byte) error {
-	var value json.Number
-	err := json.Unmarshal(rawJSON, &value)
-	if err != nil {
-		return err
-	}
+	stringValue := string(rawJSON)
 
-	if value.String() == "" {
+	if stringValue == JsonNull {
 		n.Value = 0
 		n.IsSet = false
 		return nil
 	}
 
-	valueInt, err := strconv.ParseUint(value.String(), 10, 64)
-	if err != nil {
-		return err
-	}
-
-	n.Value = valueInt
-	n.IsSet = true
-
-	return nil
+	return n.ParseStringValue(stringValue)
 }

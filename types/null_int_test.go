@@ -11,7 +11,10 @@ var _ = Describe("NullInt", func() {
 	var nullInt NullInt
 
 	BeforeEach(func() {
-		nullInt = NullInt{}
+		nullInt = NullInt{
+			IsSet: true,
+			Value: 0xBAD,
+		}
 	})
 
 	Describe("IsValidValue", func() {
@@ -107,9 +110,17 @@ var _ = Describe("NullInt", func() {
 			})
 		})
 
-		When("empty json is provided", func() {
+		When("a null value is provided", func() {
 			It("returns an unset NullInt", func() {
-				err := nullInt.UnmarshalJSON([]byte(`""`))
+				err := nullInt.UnmarshalJSON([]byte("null"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
+			})
+		})
+
+		When("an empty string is provided", func() {
+			It("returns an unset NullInt", func() {
+				err := nullInt.UnmarshalJSON([]byte(""))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
 			})

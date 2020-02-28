@@ -54,13 +54,19 @@ func (b *NullByteSizeInMb) ParseUint64Value(val *uint64) {
 }
 
 func (b *NullByteSizeInMb) UnmarshalJSON(rawJSON []byte) error {
+	if len(rawJSON) == 0 {
+		b.Value = 0
+		b.IsSet = false
+		return nil
+	}
+
 	var value json.Number
 	err := json.Unmarshal(rawJSON, &value)
 	if err != nil {
 		return err
 	}
 
-	if value.String() == "" {
+	if jsonNumberIsUninitialized(value) {
 		b.Value = 0
 		b.IsSet = false
 		return nil
@@ -75,4 +81,8 @@ func (b *NullByteSizeInMb) UnmarshalJSON(rawJSON []byte) error {
 	b.IsSet = true
 
 	return nil
+}
+
+func jsonNumberIsUninitialized(value json.Number) bool {
+	return value.String() == ""
 }
