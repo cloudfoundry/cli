@@ -333,11 +333,9 @@ var _ = Describe("Start Command", func() {
 					})
 
 					Context("an unexpected error occurs", func() {
-						var expectedErr error
 
 						BeforeEach(func() {
-							expectedErr = errors.New("err log message")
-							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{}, []string{expectedErr.Error()})
+							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{}, []string{"unexpected status code 404"})
 
 							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								appState := make(chan v2action.ApplicationStateChange)
@@ -357,7 +355,7 @@ var _ = Describe("Start Command", func() {
 
 						It("displays the error and continues to poll", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
-							Expect(testUI.Err).To(Say(expectedErr.Error()))
+							Expect(testUI.Err).To(Say("Failed to retrieve logs from Log Cache: unexpected status code 404"))
 						})
 					})
 				})

@@ -28,7 +28,9 @@ func PollStart(ui command.UI, config command.Config,
 		case actionerror.LogCacheTimeoutError:
 			ui.DisplayWarning("timeout connecting to log server, no log will be shown")
 		default:
-			ui.DisplayWarning(logErr.Error())
+			ui.DisplayWarning("Failed to retrieve logs from Log Cache: {{.Error}}", map[string]interface{}{
+				"Error": logErr,
+			})
 		}
 	}
 	for appState != nil || apiWarnings != nil || apiErrs != nil {
