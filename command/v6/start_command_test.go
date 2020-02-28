@@ -59,6 +59,7 @@ var _ = Describe("Start Command", func() {
 	var (
 		cmd                         StartCommand
 		testUI                      *ui.UI
+		stderr                      *Buffer
 		fakeConfig                  *commandfakes.FakeConfig
 		fakeSharedActor             *commandfakes.FakeSharedActor
 		fakeActor                   *v6fakes.FakeStartActor
@@ -70,7 +71,8 @@ var _ = Describe("Start Command", func() {
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		stderr = NewBuffer()
+		testUI = ui.NewTestUI(nil, NewBuffer(), stderr)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v6fakes.FakeStartActor)
@@ -270,7 +272,7 @@ var _ = Describe("Start Command", func() {
 				})
 
 				When("passed an log err", func() {
-					Context("NOAA connection times out/closes", func() {
+					Context("log server connection times out/closes", func() {
 						BeforeEach(func() {
 							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"message 1", "message 2", "message 3"},
 								[]string{"timeout connecting to log server, no log will be shown"},
@@ -361,7 +363,7 @@ var _ = Describe("Start Command", func() {
 				})
 
 				When("passed a warning", func() {
-					Context("while NOAA is still logging", func() {
+					When("there is no log server error", func() {
 						BeforeEach(func() {
 							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								appState := make(chan v2action.ApplicationStateChange)
@@ -388,7 +390,7 @@ var _ = Describe("Start Command", func() {
 						})
 					})
 
-					Context("while NOAA is no longer logging", func() {
+					When("there is a log server error", func() {
 						BeforeEach(func() {
 							fakeActor.StartApplicationStub = func(app v2action.Application) (<-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								appState := make(chan v2action.ApplicationStateChange)
@@ -399,6 +401,7 @@ var _ = Describe("Start Command", func() {
 									<-allLogsWritten
 									warnings <- "warning 1"
 									warnings <- "warning 2"
+									Eventually(fakeActor.GetStreamingLogsCallCount).Should(Equal(1))
 									warnings <- "warning 3"
 									warnings <- "warning 4"
 									close(appState)
@@ -408,14 +411,18 @@ var _ = Describe("Start Command", func() {
 
 								return appState, warnings, errs
 							}
+							allLogsWritten, fakeActor.GetStreamingLogsStub = GetStreamingLogsStub([]string{"message 1", "message 2", "message 3"},
+								[]string{"timeout connecting to log server, no log will be shown"},
+							)
 						})
 
 						It("displays the warnings to STDERR", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Err).To(Say("warning 1"))
-							Expect(testUI.Err).To(Say("warning 2"))
-							Expect(testUI.Err).To(Say("warning 3"))
-							Expect(testUI.Err).To(Say("warning 4"))
+							Expect(string(stderr.Contents())).To(ContainSubstring("warning 1"))
+							Expect(string(stderr.Contents())).To(ContainSubstring("warning 2"))
+							Expect(string(stderr.Contents())).To(ContainSubstring("timeout connecting to log server, no log will be shown"))
+							Expect(string(stderr.Contents())).To(ContainSubstring("warning 3"))
+							Expect(string(stderr.Contents())).To(ContainSubstring("warning 4"))
 						})
 					})
 				})

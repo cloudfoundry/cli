@@ -319,7 +319,7 @@ func Zipit(source, target, prefix string) error {
 	return err
 }
 
-// ConfirmStagingLogs checks session for output from NOAA client
+// ConfirmStagingLogs checks session for log output
 // indicating that staging is working.
 func ConfirmStagingLogs(session *Session) {
 	Eventually(session).Should(gbytes.Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
