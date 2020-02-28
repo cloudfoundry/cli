@@ -44,7 +44,7 @@ func (config *Config) CFUsername() string {
 
 // DialTimeout returns the timeout to use when dialing. This is based off of:
 //   1. The $CF_DIAL_TIMEOUT environment variable if set
-//   2. Defaults to 5 seconds
+//   2. Falling back to the default
 func (config *Config) DialTimeout() time.Duration {
 	if config.ENV.CFDialTimeout != "" {
 		envVal, err := strconv.ParseInt(config.ENV.CFDialTimeout, 10, 64)
