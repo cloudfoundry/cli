@@ -184,17 +184,17 @@ var _ = Describe("logs command", func() {
 			})
 
 			When("the logs stream returns an error", func() {
-				var expectedErr error
 
+				var expectedErrMessage string
 				BeforeEach(func() {
-					expectedErr = errors.New("some-error")
+					expectedErrMessage = "some-log-cache-error"
 
 					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v2action.Warnings, error) {
 						messages := make(chan sharedaction.LogMessage)
 						logErrs := make(chan error)
 
 						go func() {
-							logErrs <- expectedErr
+							logErrs <- errors.New(expectedErrMessage)
 							close(messages)
 							close(logErrs)
 						}()
@@ -204,7 +204,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("displays the error and all warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(executeErr).To(MatchError("Failed to retrieve logs from Log Cache: " + expectedErrMessage))
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 				})

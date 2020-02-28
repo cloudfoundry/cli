@@ -2,6 +2,7 @@ package v6
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -172,7 +173,7 @@ func (cmd LogsCommand) streamLogs() error {
 				break
 			}
 			stopStreaming()
-			return logErr
+			return fmt.Errorf("Failed to retrieve logs from Log Cache: %s", logErr)
 		case <-c:
 			stopStreaming()
 			return nil

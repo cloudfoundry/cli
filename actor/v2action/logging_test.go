@@ -272,7 +272,7 @@ var _ = Describe("Logging Actions", func() {
 
 				It("returns error and warnings", func() {
 					_, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeLogCacheClient)
-					Expect(err).To(MatchError(expectedErr))
+					Expect(err).To(MatchError("Failed to retrieve logs from Log Cache: ZOMG"))
 					Expect(warnings).To(ConsistOf("some-app-warnings"))
 				})
 			})

@@ -329,16 +329,13 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			When("Log Cache errors", func() {
-				var expectedErr error
-
 				BeforeEach(func() {
-					expectedErr = errors.New("ZOMG")
-					fakeLogCacheClient.ReadReturns(nil, expectedErr)
+					fakeLogCacheClient.ReadReturns(nil, errors.New("some-recent-logs-error"))
 				})
 
 				It("returns error and warnings", func() {
 					_, err := sharedaction.GetRecentLogs("some-app-guid", fakeLogCacheClient)
-					Expect(err).To(MatchError(expectedErr))
+					Expect(err).To(MatchError("Failed to retrieve logs from Log Cache: some-recent-logs-error"))
 				})
 			})
 		})

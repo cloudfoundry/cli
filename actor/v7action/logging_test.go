@@ -104,13 +104,13 @@ var _ = Describe("Logging Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = errors.New("ZOMG")
+					expectedErr = errors.New("failure-to-read-from-log-cache")
 					fakeLogCacheClient.ReadReturns(nil, expectedErr)
 				})
 
 				It("returns error and warnings", func() {
 					_, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeLogCacheClient)
-					Expect(err).To(MatchError(expectedErr))
+					Expect(err).To(MatchError("Failed to retrieve logs from Log Cache: failure-to-read-from-log-cache"))
 					Expect(warnings).To(ConsistOf("some-app-warnings"))
 				})
 			})

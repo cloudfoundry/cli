@@ -3,6 +3,7 @@ package sharedaction
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -215,7 +216,7 @@ func GetRecentLogs(appGUID string, client LogCacheClient) ([]LogMessage, error) 
 		logcache.WithDescending(),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to retrieve logs from Log Cache: %s", err)
 	}
 
 	logMessages := convertEnvelopesToLogMessages(envelopes)
