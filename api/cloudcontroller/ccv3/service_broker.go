@@ -3,6 +3,8 @@ package ccv3
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -19,6 +21,10 @@ type ServiceBroker struct {
 	Status string
 
 	Metadata *Metadata
+}
+
+func (s *ServiceBroker) UnmarshalJSON(data []byte) error {
+	return jsonry.Unmarshal(data, s)
 }
 
 type ServiceBrokerModel struct {
@@ -44,24 +50,6 @@ type serviceBrokerRequest struct {
 	URL string `json:"url,omitempty"`
 	// Authentication contains the authentication for authenticating with the service broker.
 	Authentication *serviceBrokerAuthentication `json:"authentication,omitempty"`
-	// This is the relationship for the space GUID
-	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
-}
-
-// serviceBrokerResponse represents a Cloud Controller V3 Service Broker (when reading).
-type serviceBrokerResponse struct {
-	// GUID is a unique service broker identifier.
-	GUID string `json:"guid,omitempty"`
-	// Name is the name of the service broker.
-	Name string `json:"name"`
-	// URL is the url of the service broker.
-	URL string `json:"url"`
-	// Status is the state of the service broker.
-	Status string `json:"status,omitempty"`
-	// Authentication contains the authentication for authenticating with the service broker.
-	Authentication serviceBrokerAuthentication `json:"authentication"`
-	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata
 	// This is the relationship for the space GUID
 	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
 }
@@ -132,9 +120,9 @@ func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnin
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetServiceBrokersRequest,
 		Query:        query,
-		ResponseBody: serviceBrokerResponse{},
+		ResponseBody: ServiceBroker{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, extractServiceBrokerData(item.(serviceBrokerResponse)))
+			resources = append(resources, item.(ServiceBroker))
 			return nil
 		},
 	})
@@ -208,14 +196,4 @@ func newUpdateServiceBroker(serviceBroker ServiceBrokerModel) (serviceBrokerRequ
 	}
 
 	return request, nil
-}
-
-func extractServiceBrokerData(response serviceBrokerResponse) ServiceBroker {
-	return ServiceBroker{
-		Name:     response.Name,
-		URL:      response.URL,
-		GUID:     response.GUID,
-		Status:   response.Status,
-		Metadata: response.Metadata,
-	}
 }
