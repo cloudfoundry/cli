@@ -97,7 +97,7 @@ var _ = Describe("enable-service-access command", func() {
 		cmd.ServicePlan = planName
 		cmd.RequiredArgs.Service = offeringName
 
-		fakeActor.EnableServiceAccessReturns(v7action.Warnings{"a warning"}, nil)
+		fakeActor.EnableServiceAccessReturns(v7action.SkippedPlans{}, v7action.Warnings{"a warning"}, nil)
 
 		err := cmd.Execute(nil)
 
@@ -114,9 +114,27 @@ var _ = Describe("enable-service-access command", func() {
 		Expect(actualBrokerName).To(Equal(brokerName))
 	})
 
+	It("reports on skipped plans", func() {
+		const offeringName = "some-offering"
+		cmd.RequiredArgs.Service = offeringName
+
+		fakeActor.EnableServiceAccessReturns(
+			v7action.SkippedPlans{"skipped_1", "skipped_2"},
+			v7action.Warnings{"a warning"},
+			nil,
+		)
+
+		err := cmd.Execute(nil)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(testUI.Out).To(Say("Did not update plan skipped_1 as it already has public visibility\\."))
+		Expect(testUI.Out).To(Say("Did not update plan skipped_2 as it already has public visibility\\."))
+		Expect(testUI.Out).To(Say("OK"))
+	})
+
 	When("the actor fails", func() {
 		It("prints the error", func() {
-			fakeActor.EnableServiceAccessReturns(v7action.Warnings{"a warning"}, errors.New("access error"))
+			fakeActor.EnableServiceAccessReturns(v7action.SkippedPlans{}, v7action.Warnings{"a warning"}, errors.New("access error"))
 
 			err := cmd.Execute(nil)
 			Expect(err).To(MatchError("access error"))

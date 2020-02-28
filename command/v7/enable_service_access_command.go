@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . EnableServiceAccessActor
 
 type EnableServiceAccessActor interface {
-	EnableServiceAccess(offeringName, planName, orgName, brokerName string) (v7action.Warnings, error)
+	EnableServiceAccess(offeringName, planName, orgName, brokerName string) (v7action.SkippedPlans, v7action.Warnings, error)
 }
 
 type EnableServiceAccessCommand struct {
@@ -53,10 +53,20 @@ func (cmd EnableServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
-	warnings, err := cmd.Actor.EnableServiceAccess(cmd.RequiredArgs.Service, cmd.ServicePlan, cmd.Organization, cmd.ServiceBroker)
+	skipped, warnings, err := cmd.Actor.EnableServiceAccess(cmd.RequiredArgs.Service, cmd.ServicePlan, cmd.Organization, cmd.ServiceBroker)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
+	}
+
+	for _, plan := range skipped {
+		cmd.UI.DisplayTextWithFlavor(
+			"Did not update plan {{.ServicePlan}} as it already has public visibility.",
+			map[string]interface{}{"ServicePlan": plan},
+		)
+	}
+	if len(skipped) > 0 {
+		cmd.UI.DisplayNewline()
 	}
 
 	cmd.UI.DisplayOK()

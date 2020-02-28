@@ -106,14 +106,25 @@ func setValue(fieldName string, store reflect.Value, value interface{}) error {
 
 	if store.Kind() == reflect.Ptr {
 		n := reflect.New(vv.Type())
-		if store.Type().AssignableTo(n.Type()) {
+		if n.Type().AssignableTo(store.Type()) {
 			n.Elem().Set(vv)
 			store.Set(n)
 			return nil
 		}
-	} else if store.Type().AssignableTo(vv.Type()) {
-		store.Set(vv)
-		return nil
+		if n.Type().ConvertibleTo(store.Type()) {
+			n.Elem().Set(vv)
+			store.Set(n.Convert(store.Type()))
+			return nil
+		}
+	} else {
+		if vv.Type().AssignableTo(store.Type()) {
+			store.Set(vv)
+			return nil
+		}
+		if vv.Type().ConvertibleTo(store.Type()) {
+			store.Set(vv.Convert(store.Type()))
+			return nil
+		}
 	}
 
 	return fmt.Errorf(

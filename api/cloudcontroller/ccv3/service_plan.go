@@ -12,7 +12,7 @@ type ServicePlan struct {
 	// Name is the name of the service plan.
 	Name string
 	// VisibilityType can be "public", "admin", "organization" or "space"
-	VisibilityType string `json:"visibility_type"`
+	VisibilityType VisibilityType `json:"visibility_type"`
 	// ServicePlanGUID is the GUID of the service offering
 	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid"`
 

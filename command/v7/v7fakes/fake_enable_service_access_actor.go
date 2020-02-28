@@ -9,7 +9,7 @@ import (
 )
 
 type FakeEnableServiceAccessActor struct {
-	EnableServiceAccessStub        func(string, string, string, string) (v7action.Warnings, error)
+	EnableServiceAccessStub        func(string, string, string, string) (v7action.SkippedPlans, v7action.Warnings, error)
 	enableServiceAccessMutex       sync.RWMutex
 	enableServiceAccessArgsForCall []struct {
 		arg1 string
@@ -18,18 +18,20 @@ type FakeEnableServiceAccessActor struct {
 		arg4 string
 	}
 	enableServiceAccessReturns struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 v7action.SkippedPlans
+		result2 v7action.Warnings
+		result3 error
 	}
 	enableServiceAccessReturnsOnCall map[int]struct {
-		result1 v7action.Warnings
-		result2 error
+		result1 v7action.SkippedPlans
+		result2 v7action.Warnings
+		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceAccess(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Warnings, error) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceAccess(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.SkippedPlans, v7action.Warnings, error) {
 	fake.enableServiceAccessMutex.Lock()
 	ret, specificReturn := fake.enableServiceAccessReturnsOnCall[len(fake.enableServiceAccessArgsForCall)]
 	fake.enableServiceAccessArgsForCall = append(fake.enableServiceAccessArgsForCall, struct {
@@ -44,10 +46,10 @@ func (fake *FakeEnableServiceAccessActor) EnableServiceAccess(arg1 string, arg2 
 		return fake.EnableServiceAccessStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.enableServiceAccessReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeEnableServiceAccessActor) EnableServiceAccessCallCount() int {
@@ -56,7 +58,7 @@ func (fake *FakeEnableServiceAccessActor) EnableServiceAccessCallCount() int {
 	return len(fake.enableServiceAccessArgsForCall)
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceAccessCalls(stub func(string, string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceAccessCalls(stub func(string, string, string, string) (v7action.SkippedPlans, v7action.Warnings, error)) {
 	fake.enableServiceAccessMutex.Lock()
 	defer fake.enableServiceAccessMutex.Unlock()
 	fake.EnableServiceAccessStub = stub
@@ -69,30 +71,33 @@ func (fake *FakeEnableServiceAccessActor) EnableServiceAccessArgsForCall(i int) 
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceAccessReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceAccessReturns(result1 v7action.SkippedPlans, result2 v7action.Warnings, result3 error) {
 	fake.enableServiceAccessMutex.Lock()
 	defer fake.enableServiceAccessMutex.Unlock()
 	fake.EnableServiceAccessStub = nil
 	fake.enableServiceAccessReturns = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v7action.SkippedPlans
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceAccessReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceAccessReturnsOnCall(i int, result1 v7action.SkippedPlans, result2 v7action.Warnings, result3 error) {
 	fake.enableServiceAccessMutex.Lock()
 	defer fake.enableServiceAccessMutex.Unlock()
 	fake.EnableServiceAccessStub = nil
 	if fake.enableServiceAccessReturnsOnCall == nil {
 		fake.enableServiceAccessReturnsOnCall = make(map[int]struct {
-			result1 v7action.Warnings
-			result2 error
+			result1 v7action.SkippedPlans
+			result2 v7action.Warnings
+			result3 error
 		})
 	}
 	fake.enableServiceAccessReturnsOnCall[i] = struct {
-		result1 v7action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v7action.SkippedPlans
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeEnableServiceAccessActor) Invocations() map[string][][]interface{} {

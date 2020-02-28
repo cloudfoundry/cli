@@ -72,7 +72,7 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 		data = append(data, []string{
 			plan.ServiceOfferingName,
 			plan.ServicePlanName,
-			accessFromVisibilityType(plan.VisibilityType),
+			accessFromVisibilityType(string(plan.VisibilityType)),
 			strings.Join(plan.VisibilityDetails, ","),
 		})
 

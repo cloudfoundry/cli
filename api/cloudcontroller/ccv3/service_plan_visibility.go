@@ -2,6 +2,8 @@ package ccv3
 
 import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
+type VisibilityType string
+
 type VisibilityDetail struct {
 	// Name is the organization name
 	Name string `json:"name,omitempty"`
@@ -12,7 +14,7 @@ type VisibilityDetail struct {
 // ServicePlanVisibility represents a Cloud Controller V3 Service Plan Visibility.
 type ServicePlanVisibility struct {
 	// Type is one of 'public', 'organization', 'space' or 'admin'
-	Type string `json:"type"`
+	Type VisibilityType `json:"type"`
 
 	// Organizations list of organizations for the service plan
 	Organizations []VisibilityDetail `json:"organizations,omitempty"`

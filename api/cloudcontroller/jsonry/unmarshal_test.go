@@ -69,6 +69,20 @@ var _ = Describe("Unmarshal", func() {
 		Expect(t.Bar.Foo).To(Equal("recursion works"))
 	})
 
+	It("unmarshals into aliased types", func() {
+		type rope string
+
+		var s struct {
+			A rope
+			B *rope
+		}
+
+		err := jsonry.Unmarshal([]byte(`{"a": "foo", "b": "bar"}`), &s)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(s.A).To(Equal(rope("foo")))
+		Expect(s.B).To(PointTo(Equal(rope("bar"))))
+	})
+
 	It("unmarshals a realistic object", func() {
 		type metadata struct {
 			Labels map[string]types.NullString `json:"labels,omitempty"`
@@ -135,9 +149,9 @@ var _ = Describe("Unmarshal", func() {
 
 	Context("when there is a type mismatch", func() {
 		It("fails", func() {
-			var s struct{ S string }
-			err := jsonry.Unmarshal([]byte(`{"s": 42}`), &s)
-			Expect(err).To(MatchError("could not convert value '42' type 'json.Number' to 'string' for field 'S'"))
+			var s struct{ S int }
+			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
+			Expect(err).To(MatchError("could not convert value 'hello' type 'string' to 'int' for field 'S'"))
 		})
 	})
 
