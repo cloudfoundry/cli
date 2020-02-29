@@ -240,7 +240,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("displays the error and all warnings", func() {
-					Expect(executeErr).To(MatchError("banana"))
+					Expect(executeErr).To(MatchError("Failed to retrieve logs from Log Cache: banana"))
 					Expect(testUI.Err).To(Say("steve for all I care"))
 					Expect(cancelFunctionHasBeenCalled).To(BeTrue())
 				})

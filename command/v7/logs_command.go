@@ -2,6 +2,7 @@ package v7
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -136,7 +137,7 @@ func (cmd LogsCommand) refreshTokenPeriodically(
 }
 
 func (cmd LogsCommand) streamLogs() error {
-	messages, logErrs, cancelFunc, warnings, err := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(
+	messages, logErrs, stopStreaming, warnings, err := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.LogCacheClient,
@@ -164,10 +165,10 @@ func (cmd LogsCommand) streamLogs() error {
 				errLogsClosed = true
 				break
 			}
-			cancelFunc()
-			return logErr
+			stopStreaming()
+			return fmt.Errorf("Failed to retrieve logs from Log Cache: %s", logErr)
 		case <-c:
-			cancelFunc()
+			stopStreaming()
 			return nil
 		}
 
