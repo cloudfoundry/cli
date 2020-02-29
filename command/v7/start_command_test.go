@@ -493,7 +493,7 @@ var _ = Describe("start Command", func() {
 			It("displays the errors and continues staging", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Err).To(Say("banana"))
+				Expect(testUI.Err).To(Say("Failed to retrieve logs from Log Cache: banana"))
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Err).To(Say("some-other-warning"))
 			})

@@ -41,7 +41,9 @@ func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7ac
 			case actionerror.LogCacheTimeoutError:
 				ui.DisplayWarning("timeout connecting to log server, no log will be shown")
 			default:
-				ui.DisplayWarning(logErr.Error())
+				ui.DisplayWarning("Failed to retrieve logs from Log Cache: {{.Error}}", map[string]interface{}{
+					"Error": logErr,
+				})
 			}
 		case err, ok := <-errStream:
 			if !ok {
