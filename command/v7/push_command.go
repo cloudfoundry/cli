@@ -605,7 +605,7 @@ func (cmd PushCommand) getLogs(logStream <-chan sharedaction.LogMessage, errStre
 			if ok {
 				cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
 			}
-			cmd.UI.DisplayWarning(err.Error())
+			cmd.UI.DisplayWarning("Failed to retrieve logs from Log Cache: " + err.Error())
 		}
 	}
 }

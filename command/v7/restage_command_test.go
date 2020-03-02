@@ -57,7 +57,6 @@ var _ = Describe("restage Command", func() {
 			Actor:          fakeActor,
 			LogCacheClient: fakeLogCacheClient,
 		}
-		expectedErr := errors.New("banana")
 		allLogsWritten = make(chan bool)
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -93,8 +92,9 @@ var _ = Describe("restage Command", func() {
 				close(errorStream)
 			}
 			go func() {
-				logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
-				errorStream <- expectedErr
+				logStream <- *sharedaction.NewLogMessage("Here's an output log!", "OUT", time.Now(), "OUT", "sourceInstance-1")
+				logStream <- *sharedaction.NewLogMessage("Here's a staging log!", sharedaction.StagingLog, time.Now(), sharedaction.StagingLog, "sourceInstance-2")
+				errorStream <- errors.New("something bad happened while trying to get staging logs")
 				allLogsWritten <- true
 			}()
 
@@ -144,6 +144,13 @@ var _ = Describe("restage Command", func() {
 			Expect(pkgGUID).To(Equal("earliest-package-guid"))
 			Expect(appName).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
+		})
+
+		It("displays the log messages", func() {
+			Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+			Expect(testUI.Out).To(Say("Here's a staging log!"))
+			Expect(testUI.Out).NotTo(Say("Here's an output log!"))
+			Eventually(testUI.Err).Should(Say("Failed to retrieve logs from Log Cache: something bad happened while trying to get staging logs"))
 		})
 
 		It("stops the app", func() {
@@ -322,7 +329,7 @@ var _ = Describe("restage Command", func() {
 
 	})
 
-	When("getting logs for the app fails", func() {
+	When("getting logs for the app fails because getting the app fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetStreamingLogsForApplicationByNameAndSpaceReturns(
 				nil, nil, nil, v7action.Warnings{"get-log-streaming-warning"}, errors.New("get-log-streaming-error"))

@@ -99,6 +99,7 @@ var _ = Describe("stage Command", func() {
 			go func() {
 				logStream <- *sharedaction.NewLogMessage("Here are some staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
 				logStream <- *sharedaction.NewLogMessage("Here are some other staging logs!", "OUT", time.Now(), sharedaction.StagingLog, "sourceInstance")
+				errorStream <- errors.New("problem getting more staging logs")
 				allLogsWritten <- true
 			}()
 
@@ -360,6 +361,7 @@ var _ = Describe("stage Command", func() {
 		Expect(testUI.Out).To(Say("Here are some other staging logs!"))
 
 		Expect(testUI.Err).To(Say("steve for all I care"))
+		Eventually(testUI.Err).Should(Say("Failed to retrieve logs from Log Cache: problem getting more staging logs"))
 
 		Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
 		appNameArg, spaceGUID, logCacheClient := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)

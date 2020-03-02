@@ -531,7 +531,7 @@ var _ = Describe("push Command", func() {
 
 														Expect(testUI.Err).To(Say("log-warning-1"))
 														Expect(testUI.Err).To(Say("log-warning-2"))
-														Eventually(testUI.Err).Should(Say("some-random-err"))
+														Eventually(testUI.Err).Should(Say("Failed to retrieve logs from Log Cache: some-random-err"))
 														Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 
 														Eventually(testUI.Out).Should(Say("log-message-1"))
