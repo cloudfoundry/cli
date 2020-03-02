@@ -121,7 +121,7 @@ var _ = Describe("logs Command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				XIt("it can get at least 1000 recent log messages", func() {
+				It("it can get at least 1000 recent log messages", func() {
 					route := fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())
 					// 3 lines of logs for each call to curl + a few lines during the push
 					for i := 0; i < 333; i += 1 {
@@ -135,7 +135,7 @@ var _ = Describe("logs Command", func() {
 						Eventually(session).Should(Exit(0))
 						output := session.Out.Contents()
 						return strings.Count(string(output), "\n")
-					}.Should(BeNumerically(">=", 1000)))
+					}).Should(BeNumerically(">=", 1000))
 				})
 			})
 		})
