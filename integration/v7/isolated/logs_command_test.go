@@ -130,7 +130,7 @@ var _ = Describe("logs Command", func() {
 						Expect(err).NotTo(HaveOccurred())
 						Eventually(session).Should(Exit(0))
 					}
-					Eventually(func() {
+					Eventually(func() int {
 						session := helpers.CF("logs", appName, "--recent")
 						Eventually(session).Should(Exit(0))
 						output := session.Out.Contents()
