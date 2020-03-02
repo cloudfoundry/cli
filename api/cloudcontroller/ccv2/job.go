@@ -3,15 +3,19 @@ package ccv2
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/url"
+	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"github.com/sirupsen/logrus"
 )
 
 //go:generate counterfeiter . Reader
@@ -271,46 +275,61 @@ func (*Client) calculateDropletRequestSize(dropletSize int64) (int64, error) {
 }
 
 func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
-	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
-	form := multipart.NewWriter(writerInput)
+	writerOutput, err := ioutil.TempFile("", "request-body-")
+	if err != nil {
+		panic(err)
+	}
+	logrus.Debug(fmt.Sprintf("Request body on disk: %s", writerOutput.Name()))
+
+	form := multipart.NewWriter(writerOutput)
 
 	writeErrors := make(chan error)
 
-	go func() {
-		defer close(writeErrors)
-		defer writerInput.Close()
+	//go func() {
+	defer close(writeErrors)
 
-		jsonResources, err := json.Marshal(existingResources)
-		if err != nil {
-			writeErrors <- err
-			return
-		}
+	jsonResources, err := json.Marshal(existingResources)
+	if err != nil {
+		writeErrors <- err
+	}
 
-		err = form.WriteField("resources", string(jsonResources))
-		if err != nil {
-			writeErrors <- err
-			return
-		}
+	err = form.WriteField("resources", string(jsonResources))
+	if err != nil {
+		writeErrors <- err
+	}
 
-		writer, err := form.CreateFormFile("application", "application.zip")
-		if err != nil {
-			writeErrors <- err
-			return
-		}
+	writer, err := form.CreateFormFile("application", "application.zip")
+	if err != nil {
+		writeErrors <- err
+	}
 
-		if newResourcesLength != 0 {
-			_, err = io.Copy(writer, newResources)
-			if err != nil {
-				writeErrors <- err
-				return
-			}
-		}
-
-		err = form.Close()
+	if newResourcesLength != 0 {
+		_, err = io.Copy(writer, newResources)
 		if err != nil {
 			writeErrors <- err
 		}
-	}()
+	}
+
+	err = form.Close()
+	if err != nil {
+		writeErrors <- err
+	}
+	//}()
+
+	err = writerOutput.Sync()
+	if err != nil {
+		panic(err)
+	}
+
+	err = writerOutput.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	writerOutput, err = os.Open(writerOutput.Name())
+	if err != nil {
+		panic(err)
+	}
 
 	return form.FormDataContentType(), writerOutput, writeErrors
 }

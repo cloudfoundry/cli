@@ -2,15 +2,18 @@ package cloudcontroller
 
 import (
 	"crypto/x509"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/util"
+	log "github.com/sirupsen/logrus"
 )
 
 // Config is for configuring a CloudControllerConnection.
@@ -50,6 +53,12 @@ func (connection *CloudControllerConnection) Make(request *Request, passedRespon
 	// error and we don't repopulate it in populateResponse.
 	passedResponse.reset()
 
+	if request.Request.Method == "PUT" {
+		r := regexp.MustCompile(`Authorization:\[[^\]]+\]`)
+		s := fmt.Sprintf("Making PUT request: %+v", request.Request)
+		s = r.ReplaceAllString(s, "Authorization: [REDACTED]")
+		log.Debug(s)
+	}
 	response, err := connection.HTTPClient.Do(request.Request)
 	if err != nil {
 		return connection.processRequestErrors(request.Request, err)

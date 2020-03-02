@@ -18,6 +18,11 @@ func main() {
 	var exitCode int
 	defer panichandler.HandlePanic()
 
+	fmt.Println("This is a custom build of the cf CLI.")
+	fmt.Println("It is intended only for use in reproducing a specific issue.")
+	fmt.Println("Do not use it for other purposes.")
+	fmt.Println()
+
 	config, err := configv3.GetCFConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
