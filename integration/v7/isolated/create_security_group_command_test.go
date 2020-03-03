@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -111,7 +112,7 @@ var _ = Describe("create-security-group command", func() {
 			It("tells the user that the security group path is required, prints help text, and exits 1", func() {
 				session := helpers.CF("create-security-group", securityGroupName, tempPath)
 				Eventually(session).Should(Say("Creating security group %s as %s...", securityGroupName, userName))
-				Eventually(session.Err).Should(Say("Incorrect json format: %s", tempPath))
+				Eventually(session.Err).Should(Say("Incorrect json format: %s", strings.ReplaceAll(tempPath, "\\", "\\\\")))
 
 				Eventually(session.Err).Should(Say("Valid json file example:"))
 				Eventually(session.Err).Should(Say(`\[`))
