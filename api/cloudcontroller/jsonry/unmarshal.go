@@ -111,11 +111,9 @@ func setValue(fieldName string, store reflect.Value, value interface{}) error {
 			store.Set(n)
 			return nil
 		}
-	} else {
-		if store.Type().AssignableTo(vv.Type()) {
-			store.Set(vv)
-			return nil
-		}
+	} else if store.Type().AssignableTo(vv.Type()) {
+		store.Set(vv)
+		return nil
 	}
 
 	return fmt.Errorf(
