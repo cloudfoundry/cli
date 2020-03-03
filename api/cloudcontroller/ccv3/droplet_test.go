@@ -10,19 +10,21 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Droplet", func() {
-	var client *Client
+	var (
+		client *Client
+	)
 
 	BeforeEach(func() {
 		client, _ = NewTestClient()
@@ -32,8 +34,14 @@ var _ = Describe("Droplet", func() {
 		var (
 			droplet    Droplet
 			warnings   Warnings
+			requester  *ccv3fakes.FakeRequester
 			executeErr error
 		)
+
+		BeforeEach(func() {
+			requester = new(ccv3fakes.FakeRequester)
+			client, _ = NewFakeRequesterTestClient(requester)
+		})
 
 		JustBeforeEach(func() {
 			droplet, warnings, executeErr = client.CreateDroplet("app-guid")
@@ -41,31 +49,27 @@ var _ = Describe("Droplet", func() {
 
 		When("the request succeeds", func() {
 			BeforeEach(func() {
-				response := `{
-					"guid": "some-guid",
-					"state": "AWAITING_UPLOAD",
-					"error": null,
-					"lifecycle": {
-						"type": "buildpack",
-						"data": {}
+				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+					requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
+					requestParams.ResponseBody.(*Droplet).State = "AWAITING_UPLOAD"
+					requestParams.ResponseBody.(*Droplet).Image = "docker/some-image"
+					requestParams.ResponseBody.(*Droplet).Stack = "some-stack"
+					requestParams.ResponseBody.(*Droplet).Buildpacks = []DropletBuildpack{{Name: "some-buildpack", DetectOutput: "detected-buildpack"}}
+					return "", Warnings{"warning-1"}, nil
+				})
+			})
+
+			It("makes the correct request", func() {
+				Expect(requester.MakeRequestCallCount()).To(Equal(1))
+				actualParams := requester.MakeRequestArgsForCall(0)
+				Expect(actualParams.RequestName).To(Equal(internal.PostDropletRequest))
+				Expect(actualParams.RequestBody).To(Equal(DropletCreateRequest{
+					Relationships: Relationships{
+						constant.RelationshipTypeApplication: Relationship{GUID: "app-guid"},
 					},
-					"buildpacks": [
-						{
-							"name": "some-buildpack",
-							"detect_output": "detected-buildpack"
-						}
-					],
-					"image": "docker/some-image",
-					"stack": "some-stack",
-					"created_at": "2016-03-28T23:39:34Z",
-					"updated_at": "2016-03-28T23:39:47Z"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
+				}))
+				_, ok := actualParams.ResponseBody.(*Droplet)
+				Expect(ok).To(BeTrue())
 			})
 
 			It("returns the given droplet and all warnings", func() {
@@ -81,8 +85,7 @@ var _ = Describe("Droplet", func() {
 							DetectOutput: "detected-buildpack",
 						},
 					},
-					Image:     "docker/some-image",
-					CreatedAt: "2016-03-28T23:39:34Z",
+					Image: "docker/some-image",
 				}))
 				Expect(warnings).To(ConsistOf("warning-1"))
 			})
@@ -90,20 +93,10 @@ var _ = Describe("Droplet", func() {
 
 		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "Droplet not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/droplets"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
+				requester.MakeRequestReturns(
+					"",
+					Warnings{"warning-1"},
+					ccerror.DropletNotFoundError{},
 				)
 			})
 

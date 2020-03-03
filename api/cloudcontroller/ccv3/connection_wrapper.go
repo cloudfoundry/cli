@@ -12,6 +12,6 @@ type ConnectionWrapper interface {
 }
 
 // WrapConnection wraps the current Client connection in the wrapper.
-func (client *Client) WrapConnection(wrapper ConnectionWrapper) {
-	client.connection = wrapper.Wrap(client.connection)
+func (requester *RealRequester) WrapConnection(wrapper ConnectionWrapper) {
+	requester.connection = wrapper.Wrap(requester.connection)
 }

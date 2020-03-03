@@ -73,11 +73,8 @@
 package ccv3
 
 import (
-	"fmt"
-	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -88,12 +85,9 @@ type Warnings []string
 // Client can be used to talk to a Cloud Controller's V3 Endpoints.
 type Client struct {
 	Info
-	cloudControllerURL string
+	CloudControllerURL string
 
-	connection cloudcontroller.Connection
-	router     *internal.Router
-	userAgent  string
-	wrappers   []ConnectionWrapper
+	Requester
 
 	jobPollingInterval time.Duration
 	jobPollingTimeout  time.Duration
@@ -121,20 +115,21 @@ type Config struct {
 
 // NewClient returns a new Client.
 func NewClient(config Config) *Client {
-	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.AppName, config.AppVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return &Client{
 		clock:              new(internal.RealTime),
-		userAgent:          userAgent,
 		jobPollingInterval: config.JobPollingInterval,
 		jobPollingTimeout:  config.JobPollingTimeout,
-		wrappers:           append([]ConnectionWrapper{newErrorWrapper()}, config.Wrappers...),
+		Requester:          NewRequester(config),
 	}
 }
 
 // TestClient returns a new client explicitly meant for internal testing.  This
 // should not be used for production code.
-func TestClient(config Config, clock Clock) *Client {
-	client := NewClient(config)
-	client.clock = clock
-	return client
+func TestClient(config Config, clock Clock, requester Requester) *Client {
+	return &Client{
+		clock:              clock,
+		jobPollingInterval: config.JobPollingInterval,
+		jobPollingTimeout:  config.JobPollingTimeout,
+		Requester:          requester,
+	}
 }

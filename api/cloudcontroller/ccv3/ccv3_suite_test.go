@@ -33,15 +33,38 @@ var _ = AfterEach(func() {
 	server.Close()
 })
 
+func NewFakeRequesterTestClient(requester Requester, config ...Config) (*Client, *ccv3fakes.FakeClock) {
+	SetupV3Response()
+	var client *Client
+	fakeClock := new(ccv3fakes.FakeClock)
+
+	if config != nil {
+		client = TestClient(config[0], fakeClock, requester)
+	} else {
+		client = TestClient(
+			Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"},
+			fakeClock,
+			requester,
+		)
+	}
+
+	return client, fakeClock
+}
+
 func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
 	SetupV3Response()
 	var client *Client
 	fakeClock := new(ccv3fakes.FakeClock)
 
 	if config != nil {
-		client = TestClient(config[0], fakeClock)
+		client = TestClient(config[0], fakeClock, NewRequester(config[0]))
 	} else {
-		client = TestClient(Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"}, fakeClock)
+		singleConfig := Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"}
+		client = TestClient(
+			singleConfig,
+			fakeClock,
+			NewRequester(singleConfig),
+		)
 	}
 	warnings, err := client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,

@@ -31,7 +31,7 @@ type requestOptions struct {
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request options are not filled in.
-func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontroller.Request, error) {
+func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*cloudcontroller.Request, error) {
 	var request *http.Request
 	var err error
 	if passedRequest.URL != "" {
@@ -41,7 +41,7 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 			passedRequest.Body,
 		)
 	} else {
-		request, err = client.router.CreateRequest(
+		request, err = requester.router.CreateRequest(
 			passedRequest.RequestName,
 			map[string]string(passedRequest.URIParams),
 			passedRequest.Body,
@@ -56,7 +56,7 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 
 	request.Header = http.Header{}
 	request.Header.Set("Accept", "application/json")
-	request.Header.Set("User-Agent", client.userAgent)
+	request.Header.Set("User-Agent", requester.userAgent)
 
 	if passedRequest.Body != nil {
 		request.Header.Set("Content-Type", "application/json")

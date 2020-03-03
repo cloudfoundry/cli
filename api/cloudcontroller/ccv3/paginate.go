@@ -10,12 +10,12 @@ type IncludedResources struct {
 	Users []User
 }
 
-func (client Client) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
+func (requester RealRequester) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
 	fullWarningsList := Warnings{}
 	var includes IncludedResources
 
 	for {
-		wrapper, warnings, err := client.wrapFirstPage(request, obj, appendToExternalList)
+		wrapper, warnings, err := requester.wrapFirstPage(request, obj, appendToExternalList)
 		fullWarningsList = append(fullWarningsList, warnings...)
 		if err != nil {
 			return IncludedResources{}, fullWarningsList, err
@@ -27,7 +27,7 @@ func (client Client) paginate(request *cloudcontroller.Request, obj interface{},
 			break
 		}
 
-		request, err = client.newHTTPRequest(requestOptions{
+		request, err = requester.newHTTPRequest(requestOptions{
 			URL:    wrapper.NextPage(),
 			Method: http.MethodGet,
 		})
@@ -39,14 +39,14 @@ func (client Client) paginate(request *cloudcontroller.Request, obj interface{},
 	return includes, fullWarningsList, nil
 }
 
-func (client Client) wrapFirstPage(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (*PaginatedResources, Warnings, error) {
+func (requester RealRequester) wrapFirstPage(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (*PaginatedResources, Warnings, error) {
 	warnings := Warnings{}
 	wrapper := NewPaginatedResources(obj)
 	response := cloudcontroller.Response{
 		DecodeJSONResponseInto: &wrapper,
 	}
 
-	err := client.connection.Make(request, &response)
+	err := requester.connection.Make(request, &response)
 	warnings = append(warnings, response.Warnings...)
 	if err != nil {
 		return nil, warnings, err
