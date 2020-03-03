@@ -33,20 +33,15 @@ var _ = AfterEach(func() {
 	server.Close()
 })
 
-func NewFakeRequesterTestClient(requester Requester, config ...Config) (*Client, *ccv3fakes.FakeClock) {
-	SetupV3Response()
+func NewFakeRequesterTestClient(requester Requester) (*Client, *ccv3fakes.FakeClock) {
 	var client *Client
 	fakeClock := new(ccv3fakes.FakeClock)
 
-	if config != nil {
-		client = TestClient(config[0], fakeClock, requester)
-	} else {
-		client = TestClient(
-			Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"},
-			fakeClock,
-			requester,
-		)
-	}
+	client = TestClient(
+		Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"},
+		fakeClock,
+		requester,
+	)
 
 	return client, fakeClock
 }

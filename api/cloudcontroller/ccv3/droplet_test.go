@@ -2,7 +2,6 @@ package ccv3_test
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -23,87 +22,50 @@ import (
 
 var _ = Describe("Droplet", func() {
 	var (
-		client *Client
+		client    *Client
+		requester *ccv3fakes.FakeRequester
 	)
 
 	BeforeEach(func() {
-		client, _ = NewTestClient()
+		requester = new(ccv3fakes.FakeRequester)
+		client, _ = NewFakeRequesterTestClient(requester)
 	})
 
 	Describe("CreateDroplet", func() {
 		var (
 			droplet    Droplet
 			warnings   Warnings
-			requester  *ccv3fakes.FakeRequester
 			executeErr error
 		)
-
-		BeforeEach(func() {
-			requester = new(ccv3fakes.FakeRequester)
-			client, _ = NewFakeRequesterTestClient(requester)
-		})
 
 		JustBeforeEach(func() {
 			droplet, warnings, executeErr = client.CreateDroplet("app-guid")
 		})
 
-		When("the request succeeds", func() {
-			BeforeEach(func() {
-				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
-					requestParams.ResponseBody.(*Droplet).State = "AWAITING_UPLOAD"
-					requestParams.ResponseBody.(*Droplet).Image = "docker/some-image"
-					requestParams.ResponseBody.(*Droplet).Stack = "some-stack"
-					requestParams.ResponseBody.(*Droplet).Buildpacks = []DropletBuildpack{{Name: "some-buildpack", DetectOutput: "detected-buildpack"}}
-					return "", Warnings{"warning-1"}, nil
-				})
-			})
-
-			It("makes the correct request", func() {
-				Expect(requester.MakeRequestCallCount()).To(Equal(1))
-				actualParams := requester.MakeRequestArgsForCall(0)
-				Expect(actualParams.RequestName).To(Equal(internal.PostDropletRequest))
-				Expect(actualParams.RequestBody).To(Equal(DropletCreateRequest{
-					Relationships: Relationships{
-						constant.RelationshipTypeApplication: Relationship{GUID: "app-guid"},
-					},
-				}))
-				_, ok := actualParams.ResponseBody.(*Droplet)
-				Expect(ok).To(BeTrue())
-			})
-
-			It("returns the given droplet and all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(droplet).To(Equal(Droplet{
-					GUID:  "some-guid",
-					Stack: "some-stack",
-					State: constant.DropletAwaitingUpload,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack",
-							DetectOutput: "detected-buildpack",
-						},
-					},
-					Image: "docker/some-image",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1"))
+		BeforeEach(func() {
+			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+				requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
+				return "", Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
 
-		When("cloud controller returns an error", func() {
-			BeforeEach(func() {
-				requester.MakeRequestReturns(
-					"",
-					Warnings{"warning-1"},
-					ccerror.DropletNotFoundError{},
-				)
-			})
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.PostDropletRequest))
+			Expect(actualParams.RequestBody).To(Equal(DropletCreateRequest{
+				Relationships: Relationships{
+					constant.RelationshipTypeApplication: Relationship{GUID: "app-guid"},
+				},
+			}))
+			_, ok := actualParams.ResponseBody.(*Droplet)
+			Expect(ok).To(BeTrue())
+		})
 
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(ccerror.DropletNotFoundError{}))
-				Expect(warnings).To(ConsistOf("warning-1"))
-			})
+		It("returns the given droplet and all warnings", func() {
+			Expect(droplet).To(Equal(Droplet{GUID: "some-guid"}))
+			Expect(warnings).To(ConsistOf("some-warning"))
+			Expect(executeErr).To(MatchError("some-error"))
 		})
 	})
 
@@ -115,81 +77,29 @@ var _ = Describe("Droplet", func() {
 		)
 
 		JustBeforeEach(func() {
-			droplet, warnings, executeErr = client.GetApplicationDropletCurrent("some-guid")
+			droplet, warnings, executeErr = client.GetApplicationDropletCurrent("some-app-guid")
 		})
 
-		When("the request succeeds", func() {
-			BeforeEach(func() {
-				response := `{
-					"guid": "some-guid",
-					"state": "STAGED",
-					"error": null,
-					"lifecycle": {
-						"type": "buildpack",
-						"data": {}
-					},
-					"buildpacks": [
-						{
-							"name": "some-buildpack",
-							"detect_output": "detected-buildpack"
-						}
-					],
-					"image": "docker/some-image",
-					"stack": "some-stack",
-					"created_at": "2016-03-28T23:39:34Z",
-					"updated_at": "2016-03-28T23:39:47Z"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-guid/droplets/current"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-			})
-
-			It("returns the given droplet and all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(droplet).To(Equal(Droplet{
-					GUID:  "some-guid",
-					Stack: "some-stack",
-					State: constant.DropletStaged,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack",
-							DetectOutput: "detected-buildpack",
-						},
-					},
-					Image:     "docker/some-image",
-					CreatedAt: "2016-03-28T23:39:34Z",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1"))
+		BeforeEach(func() {
+			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+				requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
+				return "", Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
 
-		When("cloud controller returns an error", func() {
-			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "Droplet not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-guid/droplets/current"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-			})
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.GetApplicationDropletCurrentRequest))
+			Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
+			_, ok := actualParams.ResponseBody.(*Droplet)
+			Expect(ok).To(BeTrue())
+		})
 
-			It("returns the error and all given warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.DropletNotFoundError{}))
-				Expect(warnings).To(ConsistOf("warning-1"))
-			})
+		It("returns the given droplet and all warnings", func() {
+			Expect(droplet).To(Equal(Droplet{GUID: "some-guid"}))
+			Expect(warnings).To(ConsistOf("some-warning"))
+			Expect(executeErr).To(MatchError("some-error"))
 		})
 	})
 
@@ -207,140 +117,27 @@ var _ = Describe("Droplet", func() {
 			)
 		})
 
-		When("the request succeeds", func() {
-			BeforeEach(func() {
-				response1 := fmt.Sprintf(`{
-					"pagination": {
-						"next": {
-							"href": "%s/v3/packages/package-guid/droplets?per_page=2&page=2"
-						}
-					},
-					"resources": [
-						{
-							"guid": "some-guid-1",
-							"stack": "some-stack-1",
-							"buildpacks": [{
-								"name": "some-buildpack-1",
-								"detect_output": "detected-buildpack-1"
-							}],
-							"state": "STAGED",
-							"created_at": "2017-08-16T00:18:24Z",
-							"links": {
-								"package": "https://api.com/v3/packages/package-guid"
-							}
-						},
-						{
-							"guid": "some-guid-2",
-							"stack": "some-stack-2",
-							"buildpacks": [{
-								"name": "some-buildpack-2",
-								"detect_output": "detected-buildpack-2"
-							}],
-							"state": "COPYING",
-							"created_at": "2017-08-16T00:19:05Z"
-						}
-					]
-				}`, server.URL())
-				response2 := `{
-					"pagination": {
-						"next": null
-					},
-					"resources": [
-						{
-							"guid": "some-guid-3",
-							"stack": "some-stack-3",
-							"buildpacks": [{
-								"name": "some-buildpack-3",
-								"detect_output": "detected-buildpack-3"
-							}],
-							"state": "FAILED",
-							"created_at": "2017-08-22T17:55:02Z"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages/package-guid/droplets", "per_page=2"),
-						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages/package-guid/droplets", "per_page=2&page=2"),
-						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-					),
-				)
-			})
-
-			It("returns the droplets", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(droplets).To(HaveLen(3))
-
-				Expect(droplets[0]).To(Equal(Droplet{
-					GUID:  "some-guid-1",
-					Stack: "some-stack-1",
-					State: constant.DropletStaged,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack-1",
-							DetectOutput: "detected-buildpack-1",
-						},
-					},
-					CreatedAt: "2017-08-16T00:18:24Z",
-				}))
-				Expect(droplets[1]).To(Equal(Droplet{
-					GUID:  "some-guid-2",
-					Stack: "some-stack-2",
-					State: constant.DropletCopying,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack-2",
-							DetectOutput: "detected-buildpack-2",
-						},
-					},
-					CreatedAt: "2017-08-16T00:19:05Z",
-				}))
-				Expect(droplets[2]).To(Equal(Droplet{
-					GUID:  "some-guid-3",
-					Stack: "some-stack-3",
-					State: constant.DropletFailed,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack-3",
-							DetectOutput: "detected-buildpack-3",
-						},
-					},
-					CreatedAt: "2017-08-22T17:55:02Z",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+		BeforeEach(func() {
+			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
+				err := requestParams.AppendToList(Droplet{GUID: "some-droplet-guid"})
+				Expect(err).NotTo(HaveOccurred())
+				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
 
-		When("the cloud controller returns an error", func() {
-			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "Package not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages/package-guid/droplets"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-			})
+		It("makes the correct request", func() {
+			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeListRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.GetPackageDropletsRequest))
+			Expect(actualParams.URIParams).To(Equal(internal.Params{"package_guid": "package-guid"}))
+			_, ok := actualParams.ResponseBody.(Droplet)
+			Expect(ok).To(BeTrue())
+		})
 
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "Package not found",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1"))
-			})
+		It("returns the given droplet and all warnings", func() {
+			Expect(droplets).To(Equal([]Droplet{{GUID: "some-droplet-guid"}}))
+			Expect(warnings).To(ConsistOf("some-warning"))
+			Expect(executeErr).To(MatchError("some-error"))
 		})
 	})
 
@@ -355,78 +152,26 @@ var _ = Describe("Droplet", func() {
 			droplet, warnings, executeErr = client.GetDroplet("some-guid")
 		})
 
-		When("the request succeeds", func() {
-			BeforeEach(func() {
-				response := `{
-					"guid": "some-guid",
-					"state": "STAGED",
-					"error": null,
-					"lifecycle": {
-						"type": "buildpack",
-						"data": {}
-					},
-					"buildpacks": [
-						{
-							"name": "some-buildpack",
-							"detect_output": "detected-buildpack"
-						}
-					],
-					"image": "docker/some-image",
-					"stack": "some-stack",
-					"created_at": "2016-03-28T23:39:34Z",
-					"updated_at": "2016-03-28T23:39:47Z"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets/some-guid"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-			})
-
-			It("returns the given droplet and all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(droplet).To(Equal(Droplet{
-					GUID:  "some-guid",
-					Stack: "some-stack",
-					State: constant.DropletStaged,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack",
-							DetectOutput: "detected-buildpack",
-						},
-					},
-					Image:     "docker/some-image",
-					CreatedAt: "2016-03-28T23:39:34Z",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1"))
+		BeforeEach(func() {
+			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+				requestParams.ResponseBody.(*Droplet).GUID = "some-droplet-guid"
+				return "", Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
 
-		When("cloud controller returns an error", func() {
-			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "Droplet not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets/some-guid"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-			})
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.GetDropletRequest))
+			Expect(actualParams.URIParams).To(Equal(internal.Params{"droplet_guid": "some-guid"}))
+			_, ok := actualParams.ResponseBody.(*Droplet)
+			Expect(ok).To(BeTrue())
+		})
 
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(ccerror.DropletNotFoundError{}))
-				Expect(warnings).To(ConsistOf("warning-1"))
-			})
+		It("returns the given droplet and all warnings", func() {
+			Expect(droplet).To(Equal(Droplet{GUID: "some-droplet-guid"}))
+			Expect(warnings).To(ConsistOf("some-warning"))
+			Expect(executeErr).To(MatchError("some-error"))
 		})
 	})
 
@@ -444,138 +189,30 @@ var _ = Describe("Droplet", func() {
 			)
 		})
 
-		When("the CC returns back droplets", func() {
-			BeforeEach(func() {
-				response1 := fmt.Sprintf(`{
-					"pagination": {
-						"next": {
-							"href": "%s/v3/droplets?app_guids=some-app-guid&per_page=2&page=2"
-						}
-					},
-					"resources": [
-						{
-							"guid": "some-guid-1",
-							"stack": "some-stack-1",
-							"buildpacks": [{
-								"name": "some-buildpack-1",
-								"detect_output": "detected-buildpack-1"
-							}],
-							"state": "STAGED",
-							"created_at": "2017-08-16T00:18:24Z",
-							"links": {
-								"package": "https://api.com/v3/packages/some-package-guid"
-							}
-						},
-						{
-							"guid": "some-guid-2",
-							"stack": "some-stack-2",
-							"buildpacks": [{
-								"name": "some-buildpack-2",
-								"detect_output": "detected-buildpack-2"
-							}],
-							"state": "COPYING",
-							"created_at": "2017-08-16T00:19:05Z"
-						}
-					]
-				}`, server.URL())
-				response2 := `{
-					"pagination": {
-						"next": null
-					},
-					"resources": [
-						{
-							"guid": "some-guid-3",
-							"stack": "some-stack-3",
-							"buildpacks": [{
-								"name": "some-buildpack-3",
-								"detect_output": "detected-buildpack-3"
-							}],
-							"state": "FAILED",
-							"created_at": "2017-08-22T17:55:02Z"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&per_page=2"),
-						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&per_page=2&page=2"),
-						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
-					),
-				)
-			})
-
-			It("returns the droplets and all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(droplets).To(HaveLen(3))
-
-				Expect(droplets[0]).To(Equal(Droplet{
-					GUID:  "some-guid-1",
-					Stack: "some-stack-1",
-					State: constant.DropletStaged,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack-1",
-							DetectOutput: "detected-buildpack-1",
-						},
-					},
-					CreatedAt: "2017-08-16T00:18:24Z",
-				}))
-				Expect(droplets[1]).To(Equal(Droplet{
-					GUID:  "some-guid-2",
-					Stack: "some-stack-2",
-					State: constant.DropletCopying,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack-2",
-							DetectOutput: "detected-buildpack-2",
-						},
-					},
-					CreatedAt: "2017-08-16T00:19:05Z",
-				}))
-				Expect(droplets[2]).To(Equal(Droplet{
-					GUID:  "some-guid-3",
-					Stack: "some-stack-3",
-					State: constant.DropletFailed,
-					Buildpacks: []DropletBuildpack{
-						{
-							Name:         "some-buildpack-3",
-							DetectOutput: "detected-buildpack-3",
-						},
-					},
-					CreatedAt: "2017-08-22T17:55:02Z",
-				}))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+		BeforeEach(func() {
+			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
+				err := requestParams.AppendToList(Droplet{GUID: "some-droplet-guid"})
+				Expect(err).NotTo(HaveOccurred())
+				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
 
-		When("cloud controller returns an error", func() {
-			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10010,
-							"detail": "App not found",
-							"title": "CF-ResourceNotFound"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&per_page=2"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
-					),
-				)
-			})
+		It("makes the correct request", func() {
+			Expect(requester.MakeListRequestCallCount()).To(Equal(1))
+			actualParams := requester.MakeListRequestArgsForCall(0)
+			Expect(actualParams.RequestName).To(Equal(internal.GetDropletsRequest))
+			Expect(actualParams.Query).To(Equal([]Query{
+				{Key: AppGUIDFilter, Values: []string{"some-app-guid"}},
+				{Key: PerPage, Values: []string{"2"}},
+			}))
+			_, ok := actualParams.ResponseBody.(Droplet)
+			Expect(ok).To(BeTrue())
+		})
 
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(ccerror.ApplicationNotFoundError{}))
-				Expect(warnings).To(ConsistOf("warning-1"))
-			})
+		It("returns the given droplet and all warnings", func() {
+			Expect(droplets).To(Equal([]Droplet{{GUID: "some-droplet-guid"}}))
+			Expect(warnings).To(ConsistOf("some-warning"))
+			Expect(executeErr).To(MatchError("some-error"))
 		})
 	})
 
@@ -595,6 +232,8 @@ var _ = Describe("Droplet", func() {
 			dropletContent = "some-content"
 			dropletFile = strings.NewReader(dropletContent)
 			dropletFilePath = "some/fake-droplet.tgz"
+
+			client, _ = NewTestClient()
 		})
 
 		JustBeforeEach(func() {
