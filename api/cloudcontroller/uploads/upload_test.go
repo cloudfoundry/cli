@@ -1,11 +1,9 @@
 package uploads_test
 
 import (
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 )
 
 var _ = Describe("Upload", func() {
@@ -30,3 +28,24 @@ var _ = Describe("Upload", func() {
 
 	})
 })
+
+/*
+Possibly helpful code taken from ccv3/droplet
+	FWhen("there is an error reading the buildpack", func() {
+			var (
+				fakeReader  *ccv3fakes.FakeReader
+				expectedErr error
+			)
+
+			BeforeEach(func() {
+				expectedErr = errors.New("droplet read error")
+				fakeReader = new(ccv3fakes.FakeReader)
+				fakeReader.ReadReturns(0, expectedErr)
+				dropletFile = fakeReader
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+			})
+		})
+ */

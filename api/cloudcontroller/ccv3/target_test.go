@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Target", func() {
 	var (
-		client *Client
+ 		client *Client
 	)
 
 	BeforeEach(func() {

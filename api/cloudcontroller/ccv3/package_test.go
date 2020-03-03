@@ -2,6 +2,7 @@ package ccv3_test
 
 import (
 	"bytes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"encoding/json"
 	"errors"
 	"io"
@@ -24,12 +25,15 @@ import (
 )
 
 var _ = Describe("Package", func() {
-	var client *Client
+	var (
+		client    *Client
+		requester *ccv3fakes.FakeRequester
+	)
 
 	BeforeEach(func() {
-		client, _ = NewTestClient()
+		requester = new(ccv3fakes.FakeRequester)
+		client, _ = NewFakeRequesterTestClient(requester)
 	})
-
 	Describe("CreatePackage", func() {
 		var (
 			inputPackage Package
@@ -671,6 +675,133 @@ var _ = Describe("Package", func() {
 				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
+		})
+	})
+
+	Describe("UploadPackage", func() {
+		var (
+			inputPackage Package
+			fileToUpload string
+
+			pkg        Package
+			returnPkg  Package
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			pkg = Package{GUID: "pkg-guid"}
+		})
+
+		JustBeforeEach(func() {
+			returnPkg, warnings, executeErr = client.UploadPackage(inputPackage, fileToUpload)
+		})
+
+		When("the package successfully is created", func() {
+			var tempFile *os.File
+
+			BeforeEach(func() {
+				requester.MakeRequestSendRawCalls(func(
+					requestName string,
+					uriParams internal.Params,
+					requestBody []byte,
+					requestBodyMimeType string,
+					responseBody interface{},
+				) (string, Warnings, error) {
+					responseBody = pkg
+					return "", nil, nil
+				})
+			})
+
+			It("makes the correct call", func() {
+
+			})
+
+			It("returns the created package and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				expectedPackage := Package{
+					GUID:  "some-pkg-guid",
+					State: constant.PackageProcessingUpload,
+					Links: map[string]APILink{
+						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+					},
+				}
+				Expect(pkg).To(Equal(expectedPackage))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("cc returns back an error or warnings", func() {
+			var tempFile *os.File
+
+			BeforeEach(func() {
+				var err error
+
+				inputPackage = Package{
+					GUID:  "package-guid",
+					State: constant.PackageAwaitingUpload,
+				}
+
+				tempFile, err = ioutil.TempFile("", "package-upload")
+				Expect(err).ToNot(HaveOccurred())
+				defer tempFile.Close()
+
+				fileToUpload = tempFile.Name()
+
+				fileSize := 1024
+				contents := strings.Repeat("A", fileSize)
+				err = ioutil.WriteFile(tempFile.Name(), []byte(contents), 0666)
+				Expect(err).NotTo(HaveOccurred())
+
+				response := ` {
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/packages/package-guid/upload"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			AfterEach(func() {
+				if tempFile != nil {
+					Expect(os.RemoveAll(tempFile.Name())).ToNot(HaveOccurred())
+				}
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+
 		})
 	})
 

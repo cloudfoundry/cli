@@ -1,9 +1,12 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -18,7 +21,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("shared request helpers", func() {
+var _ = FDescribe("shared request helpers", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -965,6 +968,7 @@ var _ = Describe("shared request helpers", func() {
 
 	Describe("MakeRequestUploadAsync", func() {
 		var (
+			content				string
 			requestName         string
 			uriParams           internal.Params
 			requestBodyMimeType string
@@ -980,7 +984,7 @@ var _ = Describe("shared request helpers", func() {
 		)
 		BeforeEach(func() {
 			warning = "upload-async-warning"
-			content := "I love my cats!"
+			content = "I love my cats!"
 			requestBody = strings.NewReader(content)
 			dataLength = int64(len(content))
 			writeErrors = make(chan error)
@@ -1059,6 +1063,59 @@ var _ = Describe("shared request helpers", func() {
 			It("returns the first error", func() {
 				_, ok := executeErr.(ccerror.RequestError)
 				Expect(ok).To(BeTrue())
+			})
+		})
+
+		When("a retryable error occurs", func() {
+			BeforeEach(func() {
+				wrapper := &wrapper.CustomWrapper{
+					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
+						defer GinkgoRecover() // Since this will be running in a thread
+
+						if strings.HasSuffix(request.URL.String(), "/v3/droplets/some-droplet-guid/upload") {
+							_, err := ioutil.ReadAll(request.Body)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(request.Body.Close()).ToNot(HaveOccurred())
+							return request.ResetBody()
+						}
+						return connection.Make(request, response)
+					},
+				}
+
+				client, _ = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+			})
+
+			It("returns the PipeSeekError", func() {
+				Expect(executeErr).To(MatchError(ccerror.PipeSeekError{}))
+			})
+		})
+
+		When("an http error occurs mid-transfer", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some read error")
+
+				wrapper := &wrapper.CustomWrapper{
+					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
+						defer GinkgoRecover() // Since this will be running in a thread
+
+						if strings.HasSuffix(request.URL.String(), "/v3/droplets/some-droplet-guid/upload") {
+							defer request.Body.Close()
+							readBytes, err := ioutil.ReadAll(request.Body)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(len(readBytes)).To(BeNumerically(">", len(content)))
+							return expectedErr
+						}
+						return connection.Make(request, response)
+					},
+				}
+
+				client, _ = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+			})
+
+			It("returns the http error", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
 			})
 		})
 	})
