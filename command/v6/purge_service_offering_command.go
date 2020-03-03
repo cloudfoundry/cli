@@ -61,14 +61,14 @@ func (cmd *PurgeServiceOfferingCommand) Execute(args []string) error {
 		return translatableerror.FlagNoLongerSupportedError{Flag: "-p"}
 	}
 
-	service, warnings, err := cmd.Actor.GetServiceByNameAndBrokerName(cmd.RequiredArgs.Service, cmd.ServiceBroker)
+	service, warnings, err := cmd.Actor.GetServiceByNameAndBrokerName(cmd.RequiredArgs.ServiceOffering, cmd.ServiceBroker)
 	if err != nil {
 		cmd.UI.DisplayWarnings(warnings)
 
 		switch err.(type) {
 		case actionerror.ServiceNotFoundError:
 			cmd.UI.DisplayText("Service offering '{{.ServiceOffering}}' not found", map[string]interface{}{
-				"ServiceOffering": cmd.RequiredArgs.Service,
+				"ServiceOffering": cmd.RequiredArgs.ServiceOffering,
 			})
 			cmd.UI.DisplayOK()
 			return nil
@@ -88,7 +88,7 @@ func (cmd *PurgeServiceOfferingCommand) Execute(args []string) error {
 		}
 
 		purgeServiceOffering, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{
-			"ServiceOffering": cmd.RequiredArgs.Service,
+			"ServiceOffering": cmd.RequiredArgs.ServiceOffering,
 			"ServiceBroker":   cmd.ServiceBroker,
 		})
 		if promptErr != nil {
@@ -102,7 +102,7 @@ func (cmd *PurgeServiceOfferingCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayText("Purging service {{.ServiceOffering}}...", map[string]interface{}{
-		"ServiceOffering": cmd.RequiredArgs.Service,
+		"ServiceOffering": cmd.RequiredArgs.ServiceOffering,
 	})
 
 	purgeWarnings, err := cmd.Actor.PurgeServiceOffering(service)

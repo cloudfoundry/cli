@@ -65,7 +65,7 @@ func (cmd EnableServiceAccessCommand) Execute(args []string) error {
 	}
 
 	serviceBrokerName := cmd.ServiceBroker
-	serviceName := cmd.RequiredArgs.Service
+	serviceName := cmd.RequiredArgs.ServiceOffering
 	servicePlanName := cmd.ServicePlan
 	orgName := cmd.Organization
 	var warnings v2action.Warnings

@@ -64,7 +64,7 @@ func (cmd DisableServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
-	serviceName := cmd.RequiredArgs.Service
+	serviceName := cmd.RequiredArgs.ServiceOffering
 	servicePlanName := cmd.ServicePlan
 	orgName := cmd.Organization
 	serviceBrokerName := cmd.ServiceBroker

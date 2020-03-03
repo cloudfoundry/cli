@@ -583,6 +583,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	DeleteServicePlanVisibilityStub        func(string, string) (ccv3.Warnings, error)
+	deleteServicePlanVisibilityMutex       sync.RWMutex
+	deleteServicePlanVisibilityArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	deleteServicePlanVisibilityReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	deleteServicePlanVisibilityReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	DeleteSpaceStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteSpaceMutex       sync.RWMutex
 	deleteSpaceArgsForCall []struct {
@@ -4637,6 +4651,70 @@ func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedS
 		})
 	}
 	fake.deleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibility(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	ret, specificReturn := fake.deleteServicePlanVisibilityReturnsOnCall[len(fake.deleteServicePlanVisibilityArgsForCall)]
+	fake.deleteServicePlanVisibilityArgsForCall = append(fake.deleteServicePlanVisibilityArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("DeleteServicePlanVisibility", []interface{}{arg1, arg2})
+	fake.deleteServicePlanVisibilityMutex.Unlock()
+	if fake.DeleteServicePlanVisibilityStub != nil {
+		return fake.DeleteServicePlanVisibilityStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteServicePlanVisibilityReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityCallCount() int {
+	fake.deleteServicePlanVisibilityMutex.RLock()
+	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
+	return len(fake.deleteServicePlanVisibilityArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	defer fake.deleteServicePlanVisibilityMutex.Unlock()
+	fake.DeleteServicePlanVisibilityStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityArgsForCall(i int) (string, string) {
+	fake.deleteServicePlanVisibilityMutex.RLock()
+	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
+	argsForCall := fake.deleteServicePlanVisibilityArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityReturns(result1 ccv3.Warnings, result2 error) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	defer fake.deleteServicePlanVisibilityMutex.Unlock()
+	fake.DeleteServicePlanVisibilityStub = nil
+	fake.deleteServicePlanVisibilityReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	defer fake.deleteServicePlanVisibilityMutex.Unlock()
+	fake.DeleteServicePlanVisibilityStub = nil
+	if fake.deleteServicePlanVisibilityReturnsOnCall == nil {
+		fake.deleteServicePlanVisibilityReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.deleteServicePlanVisibilityReturnsOnCall[i] = struct {
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
@@ -11353,6 +11431,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteServiceBrokerMutex.RUnlock()
 	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
 	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
+	fake.deleteServicePlanVisibilityMutex.RLock()
+	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
 	fake.deleteSpaceMutex.RLock()
 	defer fake.deleteSpaceMutex.RUnlock()
 	fake.deleteSpaceQuotaMutex.RLock()

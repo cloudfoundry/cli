@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"errors"
 	"sort"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -18,18 +19,19 @@ type ServicePlanAccess struct {
 type SkippedPlans []string
 
 const (
-	VisiblePublic       = ccv3.VisibilityType("public")
-	VisibleOrganization = ccv3.VisibilityType("organization")
-	VisibleSpace        = ccv3.VisibilityType("space")
+	visibleAdmin        = ccv3.VisibilityType("admin")
+	visiblePublic       = ccv3.VisibilityType("public")
+	visibleOrganization = ccv3.VisibilityType("organization")
+	visibleSpace        = ccv3.VisibilityType("space")
 )
 
 type offeringDetails struct{ offeringName, brokerName string }
 
-func (actor *Actor) GetServiceAccess(brokerName, offeringName, organizationName string) ([]ServicePlanAccess, Warnings, error) {
+func (actor *Actor) GetServiceAccess(offeringName, brokerName, orgName string) ([]ServicePlanAccess, Warnings, error) {
 	var orgGUID string
 	var allWarnings Warnings
-	if organizationName != "" {
-		org, orgWarnings, err := actor.GetOrganizationByName(organizationName)
+	if orgName != "" {
+		org, orgWarnings, err := actor.GetOrganizationByName(orgName)
 		if err != nil {
 			return nil, orgWarnings, err
 		}
@@ -84,7 +86,7 @@ func (actor *Actor) GetServiceAccess(brokerName, offeringName, organizationName 
 	return result, allWarnings, err
 }
 
-func (actor *Actor) EnableServiceAccess(offeringName, planName, orgName, brokerName string) (SkippedPlans, Warnings, error) {
+func (actor *Actor) EnableServiceAccess(offeringName, brokerName, orgName, planName string) (SkippedPlans, Warnings, error) {
 	var allWarnings Warnings
 
 	offering, offeringWarnings, err := actor.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
@@ -93,7 +95,7 @@ func (actor *Actor) EnableServiceAccess(offeringName, planName, orgName, brokerN
 		return nil, allWarnings, err
 	}
 
-	plansQuery := buildPlansFilterForSet(offering.GUID, planName)
+	plansQuery := buildPlansFilterForUpdate(offering.GUID, planName)
 	plans, planWarnings, err := actor.CloudControllerClient.GetServicePlans(plansQuery...)
 	allWarnings = append(allWarnings, planWarnings...)
 	if err != nil {
@@ -111,21 +113,21 @@ func (actor *Actor) EnableServiceAccess(offeringName, planName, orgName, brokerN
 		return nil, allWarnings, actionerror.ServicePlanVisibilityTypeError{}
 	}
 
-	visibility := ccv3.ServicePlanVisibility{Type: VisiblePublic}
+	visibility := ccv3.ServicePlanVisibility{Type: visiblePublic}
 	if orgName != "" {
 		org, orgWarnings, err := actor.GetOrganizationByName(orgName)
-		if err != nil {
-			return nil, orgWarnings, err
-		}
 		allWarnings = append(allWarnings, orgWarnings...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
 
-		visibility.Type = VisibleOrganization
+		visibility.Type = visibleOrganization
 		visibility.Organizations = []ccv3.VisibilityDetail{{GUID: org.GUID}}
 	}
 
 	var skipped SkippedPlans
 	for _, plan := range plans {
-		if plan.VisibilityType == VisiblePublic && visibility.Type == VisibleOrganization {
+		if plan.VisibilityType == visiblePublic && visibility.Type == visibleOrganization {
 			skipped = append(skipped, plan.Name)
 			continue
 		}
@@ -143,45 +145,103 @@ func (actor *Actor) EnableServiceAccess(offeringName, planName, orgName, brokerN
 	return skipped, allWarnings, nil
 }
 
-func buildPlansFilterForGet(offeringName, brokerName, orgGUID string) (query []ccv3.Query) {
-	if offeringName != "" {
-		query = append(query, ccv3.Query{
-			Key:    ccv3.ServiceOfferingNamesFilter,
-			Values: []string{offeringName},
-		})
+func (actor *Actor) DisableServiceAccess(offeringName, brokerName, orgName, planName string) (SkippedPlans, Warnings, error) {
+	var allWarnings Warnings
+
+	offering, offeringWarnings, err := actor.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
+	allWarnings = append(allWarnings, offeringWarnings...)
+	if err != nil {
+		return SkippedPlans{}, allWarnings, err
 	}
 
-	if brokerName != "" {
-		query = append(query, ccv3.Query{
-			Key:    ccv3.ServiceBrokerNamesFilter,
-			Values: []string{brokerName},
-		})
+	plansQuery := buildPlansFilterForUpdate(offering.GUID, planName)
+	plans, planWarnings, err := actor.CloudControllerClient.GetServicePlans(plansQuery...)
+	allWarnings = append(allWarnings, planWarnings...)
+	if err != nil {
+		return SkippedPlans{}, allWarnings, err
 	}
 
-	if orgGUID != "" {
-		query = append(query, ccv3.Query{
-			Key:    ccv3.OrganizationGUIDFilter,
-			Values: []string{orgGUID},
-		})
+	if len(plans) == 0 {
+		return SkippedPlans{}, allWarnings, actionerror.ServicePlanNotFoundError{
+			PlanName:     planName,
+			OfferingName: offeringName,
+		}
 	}
 
-	return query
+	if offeringIsSpaceScoped(plans) {
+		return SkippedPlans{}, allWarnings, actionerror.ServicePlanVisibilityTypeError{}
+	}
+
+	var (
+		disableWarnings Warnings
+		skipped         SkippedPlans
+	)
+
+	if orgName != "" {
+		skipped, disableWarnings, err = actor.disableOrganizationServiceAccess(plans, orgName)
+	} else {
+		skipped, disableWarnings, err = actor.disableAllServiceAccess(plans)
+	}
+
+	allWarnings = append(allWarnings, disableWarnings...)
+	return skipped, allWarnings, err
 }
 
-func buildPlansFilterForSet(offeringGUID, planName string) []ccv3.Query {
-	plansQuery := []ccv3.Query{{
-		Key:    ccv3.ServiceOfferingGUIDsFilter,
-		Values: []string{offeringGUID},
-	}}
+func (actor *Actor) disableAllServiceAccess(plans []ccv3.ServicePlan) (SkippedPlans, Warnings, error) {
+	var (
+		allWarnings Warnings
+		skipped     SkippedPlans
+	)
 
-	if planName != "" {
-		plansQuery = append(plansQuery, ccv3.Query{
-			Key:    ccv3.NameFilter,
-			Values: []string{planName},
-		})
+	visibility := ccv3.ServicePlanVisibility{Type: visibleAdmin}
+	for _, plan := range plans {
+		if plan.VisibilityType == visibleAdmin {
+			skipped = append(skipped, plan.Name)
+			continue
+		}
+
+		_, visibilityWarnings, err := actor.CloudControllerClient.UpdateServicePlanVisibility(
+			plan.GUID,
+			visibility,
+		)
+		allWarnings = append(allWarnings, visibilityWarnings...)
+		if err != nil {
+			return skipped, allWarnings, err
+		}
+	}
+	return skipped, allWarnings, nil
+}
+
+func (actor *Actor) disableOrganizationServiceAccess(plans []ccv3.ServicePlan, orgName string) (SkippedPlans, Warnings, error) {
+	var allWarnings Warnings
+
+	org, orgWarnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, orgWarnings...)
+	if err != nil {
+		return nil, allWarnings, err
 	}
 
-	return plansQuery
+	for _, plan := range plans {
+		if plan.VisibilityType == visiblePublic {
+			return nil, allWarnings, errors.New("Cannot remove organization level access for public plans.")
+		}
+	}
+
+	var skipped SkippedPlans
+	for _, plan := range plans {
+		if plan.VisibilityType == visibleAdmin {
+			skipped = append(skipped, plan.Name)
+			continue
+		}
+
+		deleteWarnings, err := actor.CloudControllerClient.DeleteServicePlanVisibility(plan.GUID, org.GUID)
+		allWarnings = append(allWarnings, deleteWarnings...)
+		if err != nil {
+			return skipped, allWarnings, err
+		}
+	}
+
+	return skipped, allWarnings, nil
 }
 
 func (actor *Actor) getServiceOfferings(service, broker string) (map[string]offeringDetails, Warnings, error) {
@@ -220,7 +280,7 @@ func (actor *Actor) getServiceOfferings(service, broker string) (map[string]offe
 }
 
 func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlan) (names []string, warnings Warnings, err error) {
-	if plan.VisibilityType == VisibleOrganization {
+	if plan.VisibilityType == visibleOrganization {
 		result, vwarn, err := actor.CloudControllerClient.GetServicePlanVisibility(plan.GUID)
 		warnings = Warnings(vwarn)
 		if err != nil {
@@ -235,7 +295,48 @@ func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlan) (names []s
 	return names, warnings, nil
 }
 
+func buildPlansFilterForGet(offeringName, brokerName, orgGUID string) (query []ccv3.Query) {
+	if offeringName != "" {
+		query = append(query, ccv3.Query{
+			Key:    ccv3.ServiceOfferingNamesFilter,
+			Values: []string{offeringName},
+		})
+	}
+
+	if brokerName != "" {
+		query = append(query, ccv3.Query{
+			Key:    ccv3.ServiceBrokerNamesFilter,
+			Values: []string{brokerName},
+		})
+	}
+
+	if orgGUID != "" {
+		query = append(query, ccv3.Query{
+			Key:    ccv3.OrganizationGUIDFilter,
+			Values: []string{orgGUID},
+		})
+	}
+
+	return query
+}
+
+func buildPlansFilterForUpdate(offeringGUID, planName string) []ccv3.Query {
+	plansQuery := []ccv3.Query{{
+		Key:    ccv3.ServiceOfferingGUIDsFilter,
+		Values: []string{offeringGUID},
+	}}
+
+	if planName != "" {
+		plansQuery = append(plansQuery, ccv3.Query{
+			Key:    ccv3.NameFilter,
+			Values: []string{planName},
+		})
+	}
+
+	return plansQuery
+}
+
 func offeringIsSpaceScoped(plans []ccv3.ServicePlan) bool {
 	// All plans from a space scoped offering will have the same visibility type
-	return plans[0].VisibilityType == VisibleSpace
+	return plans[0].VisibilityType == visibleSpace
 }

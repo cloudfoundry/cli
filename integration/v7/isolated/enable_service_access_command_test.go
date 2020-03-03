@@ -190,8 +190,8 @@ var _ = Describe("enable service access command", func() {
 					It("should still be enabled only globally", func() {
 						session := helpers.CF("enable-service-access", serviceOffering, "-o", orgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Did not update plan %s as it already has public visibility\\.", broker.Services[0].Plans[0].Name))
-						Expect(session).To(Say("Did not update plan %s as it already has public visibility\\.", broker.Services[0].Plans[1].Name))
+						Expect(session).To(Say("Did not update plan %s as it already has visibility all\\.", broker.Services[0].Plans[0].Name))
+						Expect(session).To(Say("Did not update plan %s as it already has visibility all\\.", broker.Services[0].Plans[1].Name))
 						Expect(session).To(Say("OK"))
 
 						session = helpers.CF("service-access", "-e", serviceOffering)
@@ -209,7 +209,7 @@ var _ = Describe("enable service access command", func() {
 					It("should still be enabled only globally", func() {
 						session := helpers.CF("enable-service-access", serviceOffering, "-o", orgName, "-p", servicePlan)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Did not update plan %s as it already has public visibility\\.", servicePlan))
+						Expect(session).To(Say("Did not update plan %s as it already has visibility all\\.", servicePlan))
 						Expect(session).To(Say("OK"))
 
 						session = helpers.CF("service-access", "-e", serviceOffering)

@@ -156,6 +156,7 @@ type CloudControllerClient interface {
 type servicePlanVisibilityClient interface {
 	GetServicePlanVisibility(servicePlanGUID string) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)
 	UpdateServicePlanVisibility(servicePlanGUID string, visibility ccv3.ServicePlanVisibility) (ccv3.ServicePlanVisibility, ccv3.Warnings, error)
+	DeleteServicePlanVisibility(servicePlanGUID, organizationGUID string) (ccv3.Warnings, error)
 }
 
 // TODO: Split this enormous interface

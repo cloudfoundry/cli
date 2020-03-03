@@ -37,7 +37,7 @@ var _ = Describe("enable-service-access command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 			RequiredArgs: flag.Service{
-				Service: "some-service",
+				ServiceOffering: "some-service",
 			},
 		}
 	})
@@ -55,7 +55,7 @@ var _ = Describe("enable-service-access command", func() {
 	DescribeTable(
 		"message text",
 		func(plan, org, broker, expected string) {
-			cmd.RequiredArgs = flag.Service{Service: "fake-service"}
+			cmd.RequiredArgs = flag.Service{ServiceOffering: "fake-service"}
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
 			cmd.ServicePlan = plan
@@ -95,7 +95,7 @@ var _ = Describe("enable-service-access command", func() {
 		cmd.ServiceBroker = brokerName
 		cmd.Organization = orgName
 		cmd.ServicePlan = planName
-		cmd.RequiredArgs.Service = offeringName
+		cmd.RequiredArgs.ServiceOffering = offeringName
 
 		fakeActor.EnableServiceAccessReturns(v7action.SkippedPlans{}, v7action.Warnings{"a warning"}, nil)
 
@@ -107,7 +107,7 @@ var _ = Describe("enable-service-access command", func() {
 
 		Expect(fakeActor.EnableServiceAccessCallCount()).To(Equal(1))
 
-		actualOfferingName, actualPlanName, actualOrgName, actualBrokerName := fakeActor.EnableServiceAccessArgsForCall(0)
+		actualOfferingName, actualBrokerName, actualOrgName, actualPlanName := fakeActor.EnableServiceAccessArgsForCall(0)
 		Expect(actualOfferingName).To(Equal(offeringName))
 		Expect(actualPlanName).To(Equal(planName))
 		Expect(actualOrgName).To(Equal(orgName))
@@ -116,7 +116,7 @@ var _ = Describe("enable-service-access command", func() {
 
 	It("reports on skipped plans", func() {
 		const offeringName = "some-offering"
-		cmd.RequiredArgs.Service = offeringName
+		cmd.RequiredArgs.ServiceOffering = offeringName
 
 		fakeActor.EnableServiceAccessReturns(
 			v7action.SkippedPlans{"skipped_1", "skipped_2"},
@@ -127,8 +127,8 @@ var _ = Describe("enable-service-access command", func() {
 		err := cmd.Execute(nil)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(testUI.Out).To(Say("Did not update plan skipped_1 as it already has public visibility\\."))
-		Expect(testUI.Out).To(Say("Did not update plan skipped_2 as it already has public visibility\\."))
+		Expect(testUI.Out).To(Say("Did not update plan skipped_1 as it already has visibility all\\."))
+		Expect(testUI.Out).To(Say("Did not update plan skipped_2 as it already has visibility all\\."))
 		Expect(testUI.Out).To(Say("OK"))
 	})
 

@@ -14,7 +14,7 @@ import (
 //go:generate counterfeiter . ServiceAccessActor
 
 type ServiceAccessActor interface {
-	GetServiceAccess(broker, service, organization string) ([]v7action.ServicePlanAccess, v7action.Warnings, error)
+	GetServiceAccess(offeringName, brokerName, orgName string) ([]v7action.ServicePlanAccess, v7action.Warnings, error)
 }
 
 type ServiceAccessCommand struct {
@@ -54,7 +54,7 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
-	servicePlanAccess, warnings, err := cmd.Actor.GetServiceAccess(cmd.Broker, cmd.ServiceOffering, cmd.Organization)
+	servicePlanAccess, warnings, err := cmd.Actor.GetServiceAccess(cmd.ServiceOffering, cmd.Broker, cmd.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

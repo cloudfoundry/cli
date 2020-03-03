@@ -34,7 +34,7 @@ type ParamsAsJSON struct {
 }
 
 type Service struct {
-	Service string `positional-arg-name:"SERVICE" required:"true" description:"The service offering name"`
+	ServiceOffering string `positional-arg-name:"SERVICE" required:"true" description:"The service offering name"`
 }
 
 type ServiceInstance struct {

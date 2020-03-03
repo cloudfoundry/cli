@@ -47,3 +47,13 @@ func (client *Client) UpdateServicePlanVisibility(servicePlanGUID string, planVi
 
 	return result, warnings, err
 }
+
+func (client *Client) DeleteServicePlanVisibility(servicePlanGUID, organizationGUID string) (Warnings, error) {
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.DeleteServicePlanVisibilityRequest,
+		URIParams:   internal.Params{"service_plan_guid": servicePlanGUID, "organization_guid": organizationGUID},
+	})
+
+	return warnings, err
+}

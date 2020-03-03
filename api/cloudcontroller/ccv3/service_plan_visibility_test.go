@@ -14,7 +14,7 @@ import (
 )
 
 var _ = Describe("Service Plan Visibility", func() {
-	const guid = "fake-service-plan-guid"
+	const planGUID = "fake-service-plan-guid"
 	var client *Client
 
 	BeforeEach(func() {
@@ -51,12 +51,12 @@ var _ = Describe("Service Plan Visibility", func() {
 			func(response string, expected ServicePlanVisibility) {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/service_plans/%s/visibility", guid)),
+						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/service_plans/%s/visibility", planGUID)),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 				)
 
-				result, warnings, err := client.GetServicePlanVisibility(guid)
+				result, warnings, err := client.GetServicePlanVisibility(planGUID)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning-1"))
 				Expect(result).To(Equal(expected))
@@ -96,7 +96,7 @@ var _ = Describe("Service Plan Visibility", func() {
 					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 				)
 
-				_, warnings, err := client.GetServicePlanVisibility(guid)
+				_, warnings, err := client.GetServicePlanVisibility(planGUID)
 				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{
@@ -121,14 +121,14 @@ var _ = Describe("Service Plan Visibility", func() {
 		It("sets the plan visibility", func() {
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest(http.MethodPost, fmt.Sprintf("/v3/service_plans/%s/visibility", guid)),
+					VerifyRequest(http.MethodPost, fmt.Sprintf("/v3/service_plans/%s/visibility", planGUID)),
 					VerifyBody([]byte(`{"type":"public"}`)),
 					RespondWith(http.StatusOK, `{"type":"public"}`, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 				),
 			)
 
 			result, warnings, err := client.UpdateServicePlanVisibility(
-				guid,
+				planGUID,
 				ServicePlanVisibility{
 					Type: "public",
 				},
@@ -161,11 +161,68 @@ var _ = Describe("Service Plan Visibility", func() {
 				)
 
 				_, warnings, err := client.UpdateServicePlanVisibility(
-					guid,
+					planGUID,
 					ServicePlanVisibility{
 						Type: "public",
 					},
 				)
+				Expect(err).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-2"))
+			})
+		})
+	})
+
+	Describe("DeleteServicePlanVisibility", func() {
+		const orgGUID = "org-guid"
+
+		It("deletes the org visibility", func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodDelete, fmt.Sprintf("/v3/service_plans/%s/visibility/%s", planGUID, orgGUID)),
+					RespondWith(http.StatusNoContent, nil, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+				),
+			)
+
+			warnings, err := client.DeleteServicePlanVisibility(planGUID, orgGUID)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf("warning-1"))
+		})
+
+		When("the the server responds with error", func() {
+			It("returns an error", func() {
+				response := `{
+					"errors": [
+						{
+							"code": 42424,
+							"detail": "Some detailed error message",
+							"title": "CF-SomeErrorTitle"
+						},
+						{
+							"code": 11111,
+							"detail": "Some other detailed error message",
+							"title": "CF-SomeOtherErrorTitle"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+				)
+
+				warnings, err := client.DeleteServicePlanVisibility(planGUID, orgGUID)
 				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{

@@ -44,7 +44,7 @@ var _ = Describe("purge-service-offering command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakePurgeServiceActor,
 			RequiredArgs: flag.Service{
-				Service: "some-service",
+				ServiceOffering: "some-service",
 			},
 		}
 	})

@@ -131,7 +131,7 @@ var _ = Describe("service-access Command", func() {
 
 				Expect(fakeActor.GetServiceAccessCallCount()).To(Equal(1))
 
-				actualBroker, actualService, actualOrg := fakeActor.GetServiceAccessArgsForCall(0)
+				actualService, actualBroker, actualOrg := fakeActor.GetServiceAccessArgsForCall(0)
 				Expect(actualBroker).To(Equal("test-broker"))
 				Expect(actualService).To(Equal("test-service"))
 				Expect(actualOrg).To(Equal("test-organization"))

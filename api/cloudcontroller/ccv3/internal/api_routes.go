@@ -22,6 +22,7 @@ const (
 	DeleteRoleRequest                                           = "DeleteRoleRequest"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
+	DeleteServicePlanVisibilityRequest                          = "DeleteServicePlanVisibility"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
 	DeleteSpaceQuotaRequest                                     = "DeleteSpaceQuota"
 	DeleteSpaceRequest                                          = "DeleteSpace"
@@ -253,6 +254,7 @@ var APIRoutes = []Route{
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid", Method: http.MethodPatch, Name: PatchServicePlanRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodGet, Name: GetServicePlanVisibilityRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodPost, Name: PostServicePlanVisibilityRequest},
+	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility/:organization_guid", Method: http.MethodDelete, Name: DeleteServicePlanVisibilityRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
 	{Resource: SpacesResource, Path: "/", Method: http.MethodPost, Name: PostSpaceRequest},
 	{Resource: SpacesResource, Path: "/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},

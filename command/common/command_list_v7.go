@@ -81,7 +81,7 @@ type commandList struct {
 	DisableFeatureFlag                 v7.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
 	DisableOrgIsolation                v6.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
 	DisableSSH                         v7.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
-	DisableServiceAccess               v6.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
+	DisableServiceAccess               v7.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
 	DisallowSpaceSSH                   v7.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
 	Domains                            v7.DomainsCommand                            `command:"domains" description:"List domains in the target org"`
 	Droplets                           v7.DropletsCommand                           `command:"droplets" description:"List droplets of an app"`

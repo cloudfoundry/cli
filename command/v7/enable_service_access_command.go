@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . EnableServiceAccessActor
 
 type EnableServiceAccessActor interface {
-	EnableServiceAccess(offeringName, planName, orgName, brokerName string) (v7action.SkippedPlans, v7action.Warnings, error)
+	EnableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 }
 
 type EnableServiceAccessCommand struct {
@@ -53,21 +53,13 @@ func (cmd EnableServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
-	skipped, warnings, err := cmd.Actor.EnableServiceAccess(cmd.RequiredArgs.Service, cmd.ServicePlan, cmd.Organization, cmd.ServiceBroker)
+	skipped, warnings, err := cmd.Actor.EnableServiceAccess(cmd.RequiredArgs.ServiceOffering, cmd.ServiceBroker, cmd.Organization, cmd.ServicePlan)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
-	for _, plan := range skipped {
-		cmd.UI.DisplayTextWithFlavor(
-			"Did not update plan {{.ServicePlan}} as it already has public visibility.",
-			map[string]interface{}{"ServicePlan": plan},
-		)
-	}
-	if len(skipped) > 0 {
-		cmd.UI.DisplayNewline()
-	}
+	displaySkippedPlans(cmd.UI, "all", skipped)
 
 	cmd.UI.DisplayOK()
 
@@ -80,8 +72,9 @@ func (cmd EnableServiceAccessCommand) displayMessage() error {
 		return err
 	}
 
-	enableServiceAccessMessage{
-		ServiceOffering: cmd.RequiredArgs.Service,
+	setServiceAccessMessage{
+		Operation:       "Enabling",
+		ServiceOffering: cmd.RequiredArgs.ServiceOffering,
 		ServicePlan:     cmd.ServicePlan,
 		Organization:    cmd.Organization,
 		ServiceBroker:   cmd.ServiceBroker,
@@ -93,12 +86,12 @@ func (cmd EnableServiceAccessCommand) displayMessage() error {
 	return nil
 }
 
-type enableServiceAccessMessage struct {
-	ServiceOffering, ServicePlan, Organization, ServiceBroker, User string
+type setServiceAccessMessage struct {
+	Operation, ServiceOffering, ServicePlan, Organization, ServiceBroker, User string
 }
 
-func (msg enableServiceAccessMessage) displayMessage(ui command.UI) {
-	template := "Enabling access to "
+func (msg setServiceAccessMessage) displayMessage(ui command.UI) {
+	template := msg.Operation + " access to "
 
 	if msg.ServicePlan != "" {
 		template += "plan {{.ServicePlan}} "
@@ -127,4 +120,19 @@ func (msg enableServiceAccessMessage) displayMessage(ui command.UI) {
 		"Organization":    msg.Organization,
 		"CurrentUser":     msg.User,
 	})
+}
+
+func displaySkippedPlans(ui command.UI, visibility string, skipped v7action.SkippedPlans) {
+	for _, plan := range skipped {
+		ui.DisplayTextWithFlavor(
+			"Did not update plan {{.ServicePlan}} as it already has visibility {{.Visibility}}.",
+			map[string]interface{}{
+				"ServicePlan": plan,
+				"Visibility":  visibility,
+			},
+		)
+	}
+	if len(skipped) > 0 {
+		ui.DisplayNewline()
+	}
 }

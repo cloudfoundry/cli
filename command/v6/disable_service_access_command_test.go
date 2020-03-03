@@ -42,7 +42,7 @@ var _ = Describe("disable-service-access Command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 			RequiredArgs: flag.Service{
-				Service: "some-service",
+				ServiceOffering: "some-service",
 			},
 		}
 
