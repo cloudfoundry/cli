@@ -131,11 +131,11 @@ var _ = Describe("Verbose", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+				Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+				Expect(string(contents)).NotTo(MatchRegexp("HTTP REQUEST:"))
+				Expect(string(contents)).NotTo(MatchRegexp("HTTP RESPONSE:"))
 				Expect(string(contents)).To(MatchRegexp("GET /v3/apps"))
-				Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
-				Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 				Expect(string(contents)).To(MatchRegexp("POST /oauth/token"))
-				Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
 
 				stat, err := os.Stat(tmpDir + filePath)
 				Expect(err).ToNot(HaveOccurred())
@@ -216,7 +216,8 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say(`GET /\s+`))
-				Eventually(session).Should(Say("HOST: https://log-cache"))
+				Eventually(session).Should(Say(`GET /api/v1/read/.*\?\w+`))
+				Eventually(session).Should(Say(`Host: log-cache\.`))
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Eventually(session.Kill()).Should(Exit())
 			},
@@ -266,17 +267,21 @@ var _ = Describe("Verbose", func() {
 				}
 
 				session := helpers.CFWithEnv(envMap, "logs", "-v", appName)
-
-				Eventually(session).Should(Say("HTTP RESPONSE"))
-				Eventually(session.Kill()).Should(Exit())
+				Eventually(session).Should(Say("RESPONSE:"))
+				Eventually(session).Should(Say("GET /api/v1/info HTTP/1.1"))
+				Eventually(session).Should(Say("GET /api/v1/read/"))
+				session.Kill()
+				Eventually(session).Should(Exit())
 
 				for _, filePath := range location {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
-
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+					Expect(string(contents)).NotTo(MatchRegexp("HTTP REQUEST:"))
+					Expect(string(contents)).NotTo(MatchRegexp("HTTP RESPONSE:"))
 					Expect(string(contents)).To(MatchRegexp(`GET /\s+`))
-					Expect(string(contents)).To(MatchRegexp("HOST: https://log-cache"))
+					Expect(string(contents)).To(MatchRegexp(`Host: log-cache\.`))
 					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 
 					stat, err := os.Stat(tmpDir + filePath)

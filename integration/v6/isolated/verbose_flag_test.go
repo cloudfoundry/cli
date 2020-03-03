@@ -388,11 +388,15 @@ var _ = Describe("Verbose", func() {
 				session := helpers.CFWithEnv(envMap, command...)
 
 				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say("GET /v2/info"))
+				Eventually(session).Should(Say("GET /v2/info "))
 				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
-				Eventually(session).Should(Say("HTTP REQUEST:"))
+				Eventually(session).Should(Say("REQUEST:"))
+				Eventually(session).Should(Say(`GET /api/v1/read/.*\?\w+`))
+				Eventually(session).Should(Say(`Host: log-cache\.`))
+
 				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Eventually(session.Kill()).Should(Exit())
+				Expect(session).NotTo(Say("HTTP REQUEST:"))
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
@@ -441,8 +445,16 @@ var _ = Describe("Verbose", func() {
 
 				session := helpers.CFWithEnv(envMap, "logs", "-v", appName)
 
-				Eventually(session).Should(Say("HTTP RESPONSE:"))
-				Eventually(session.Kill()).Should(Exit())
+				Eventually(session).Should(Say("REQUEST:"))
+				Eventually(session).Should(Say("GET /api/v1/info HTTP/1.1"))
+				Eventually(session).Should(Say("RESPONSE:"))
+				Eventually(session).Should(Say("REQUEST:"))
+				Eventually(session).Should(Say("GET /api/v1/read/"))
+				Eventually(session).Should(Say("RESPONSE:"))
+				session.Kill()
+				Eventually(session).Should(Exit())
+				Expect(session).NotTo(Say("HTTP REQUEST:"))
+				Expect(session).NotTo(Say("HTTP RESPONSE:"))
 
 				for _, filePath := range location {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
@@ -451,7 +463,9 @@ var _ = Describe("Verbose", func() {
 					Expect(string(contents)).To(MatchRegexp("GET /v2/apps"))
 					Expect(string(contents)).To(MatchRegexp("GET /v2/info"))
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp("HTTP RESPONSE:"))
+					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+					Expect(string(contents)).NotTo(MatchRegexp("HTTP REQUEST:"))
+					Expect(string(contents)).NotTo(MatchRegexp("HTTP RESPONSE:"))
 
 					stat, err := os.Stat(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())

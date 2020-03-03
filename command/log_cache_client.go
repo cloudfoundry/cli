@@ -15,20 +15,46 @@ import (
 type RequestLoggerOutput interface {
 	Start() error
 	Stop() error
+
 	DisplayType(name string, requestDate time.Time) error
 	DisplayDump(dump string) error
+
+	DisplayHost(name string) error
+	DisplayRequestHeader(method string, uri string, httpProtocol string) error
+	DisplayResponseHeader(httpProtocol string, status string) error
 }
 
 type DebugPrinter struct {
 	outputs []RequestLoggerOutput
 }
 
-func (p DebugPrinter) Print(title, dump string) {
+func (p DebugPrinter) PrintError(err error) {
 	for _, output := range p.outputs {
-		_ = output.Start()                        //nolint
-		_ = output.DisplayType(title, time.Now()) //nolint
-		_ = output.DisplayDump(dump)              //nolint
-		_ = output.Stop()                         //nolint
+		_ = output.Start()                          //nolint
+		_ = output.DisplayType("ERROR", time.Now()) //nolint
+		_ = output.DisplayDump(err.Error())         //nolint
+		_ = output.Stop()                           //nolint
+	}
+}
+
+func (p DebugPrinter) PrintRequest(req *http.Request) {
+	for _, output := range p.outputs {
+		_ = output.Start()                                                           //nolint
+		_ = output.DisplayType("REQUEST", time.Now())                                //nolint
+		_ = output.DisplayRequestHeader(req.Method, req.URL.RequestURI(), req.Proto) //nolint
+		_ = output.DisplayHost(req.URL.Host)                                         //nolint
+		_ = output.DisplayDump(headersString(req.Header))                            //nolint
+		_ = output.Stop()                                                            //nolint
+	}
+}
+
+func (p DebugPrinter) PrintResponse(resp *http.Response) {
+	for _, output := range p.outputs {
+		_ = output.Start()                                        //nolint
+		_ = output.DisplayType("RESPONSE", time.Now())            //nolint
+		_ = output.DisplayResponseHeader(resp.Proto, resp.Status) //nolint
+		_ = output.DisplayDump(headersString(resp.Header))        //nolint
+		_ = output.Stop()                                         //nolint
 	}
 }
 
@@ -54,26 +80,15 @@ type httpDebugClient struct {
 }
 
 func (c *httpDebugClient) Do(req *http.Request) (*http.Response, error) {
-	c.printer.Print("HTTP REQUEST",
-		fmt.Sprintf("GET %s HTTP/1.1\nHOST: %s://%s\nQUERY: %s\n%s",
-			req.URL.Path,
-			req.URL.Scheme,
-			req.URL.Host,
-			req.URL.RawQuery,
-			headersString(req.Header)),
-	)
+	c.printer.PrintRequest(req)
 
 	resp, err := c.c.Do(req)
 	if err != nil {
-		c.printer.Print("HTTP ERROR", err.Error())
+		c.printer.PrintError(err)
 		return nil, err
 	}
 
-	c.printer.Print("HTTP RESPONSE",
-		fmt.Sprintf("%s\n%s",
-			resp.Status,
-			headersString(resp.Header)),
-	)
+	c.printer.PrintResponse(resp)
 
 	return resp, err
 }
