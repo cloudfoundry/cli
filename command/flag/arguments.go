@@ -4,6 +4,9 @@ type AppName struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 }
 
+type RevisionNumber struct {
+	RevisionNumber string `positional-arg-name:"REVISION_NUMBER" required:"false" description:"The application name"`
+}
 type OptionalAppName struct {
 	AppName string `positional-arg-name:"APP_NAME" description:"The application name"`
 }
