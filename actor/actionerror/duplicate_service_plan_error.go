@@ -10,7 +10,7 @@ type DuplicateServicePlanError struct {
 
 func (e DuplicateServicePlanError) Error() string {
 	base := fmt.Sprintf("Service plan '%s' is provided by multiple service offerings", e.Name)
-	requiredFlag := "Specify an offering by using the '-o' flag"
+	requiredFlag := "Specify an offering by using the '-e' flag"
 	if e.ServiceOfferingName != "" {
 		base = fmt.Sprintf("%s. "+
 			"Service offering '%s' is provided by multiple service brokers", base, e.ServiceOfferingName)

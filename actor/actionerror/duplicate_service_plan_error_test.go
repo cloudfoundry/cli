@@ -14,7 +14,7 @@ var _ = Describe("DuplicateServicePlanError", func() {
 					Name: "some-service-plan-name",
 				}
 				Expect(err.Error()).To(
-					Equal("Service plan 'some-service-plan-name' is provided by multiple service offerings. Specify an offering by using the '-o' flag."))
+					Equal("Service plan 'some-service-plan-name' is provided by multiple service offerings. Specify an offering by using the '-e' flag."))
 			})
 		})
 		When("Name and ServiceOfferingName are specified", func() {
@@ -34,7 +34,7 @@ var _ = Describe("DuplicateServicePlanError", func() {
 					ServiceBrokerName: "some-broker-name",
 				}
 				Expect(err.Error()).To(
-					Equal("Service plan 'some-service-plan-name' is provided by multiple service offerings. Specify an offering by using the '-o' flag."))
+					Equal("Service plan 'some-service-plan-name' is provided by multiple service offerings. Specify an offering by using the '-e' flag."))
 			})
 		})
 	})
