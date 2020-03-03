@@ -32,42 +32,6 @@ func Unmarshal(data []byte, store interface{}) error {
 	return unmarshal(storeValue, tree)
 }
 
-func unmarshal(storeValue reflect.Value, tree interface{}) error {
-	if storeValue.Kind() == reflect.Ptr {
-		n := reflect.New(storeValue.Type().Elem())
-		storeValue.Set(n)
-		storeValue = n.Elem()
-	}
-
-	storeType := storeValue.Type()
-	for i := 0; i < storeType.NumField(); i++ {
-		field := storeType.Field(i)
-		path := computePath(field)
-		if value, ok := navigateAndFetch(path, tree); ok {
-			if fieldIsStruct(field.Type) {
-				if err := unmarshal(storeValue.Field(i), value); err != nil {
-					return err
-				}
-			} else {
-				if err := setValue(field.Name, storeValue.Field(i), value); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func fieldIsStruct(field reflect.Type) bool {
-	kind := field.Kind()
-	if kind == reflect.Ptr {
-		kind = field.Elem().Kind()
-	}
-
-	return kind == reflect.Struct
-}
-
 func computePath(field reflect.StructField) []string {
 	if tag := field.Tag.Get("jsonry"); tag != "" {
 		return strings.Split(tag, ".")
@@ -81,6 +45,15 @@ func computePath(field reflect.StructField) []string {
 	}
 
 	return []string{strings.ToLower(field.Name)}
+}
+
+func fieldIsStruct(field reflect.Type) bool {
+	kind := field.Kind()
+	if kind == reflect.Ptr {
+		kind = field.Elem().Kind()
+	}
+
+	return kind == reflect.Struct
 }
 
 func navigateAndFetch(path []string, tree interface{}) (interface{}, bool) {
@@ -101,10 +74,18 @@ func navigateAndFetch(path []string, tree interface{}) (interface{}, bool) {
 	return val, true
 }
 
-func unmarshalJSON(data []byte, store interface{}) error {
-	d := json.NewDecoder(bytes.NewBuffer(data))
-	d.UseNumber()
-	return d.Decode(store)
+func relectOnAndCheck(store interface{}) (reflect.Value, error) {
+	p := reflect.ValueOf(store)
+	if kind := p.Kind(); kind != reflect.Ptr {
+		return reflect.Value{}, errors.New("the storage object must be a pointer")
+	}
+
+	v := p.Elem()
+	if kind := v.Kind(); kind != reflect.Struct {
+		return reflect.Value{}, errors.New("the storage object pointer must point to a struct")
+	}
+
+	return v, nil
 }
 
 func setValue(fieldName string, store reflect.Value, value interface{}) error {
@@ -146,15 +127,6 @@ func setValue(fieldName string, store reflect.Value, value interface{}) error {
 	)
 }
 
-func tryToConvertNumber(num json.Number) (reflect.Value, bool) {
-	// Extend to support other number types as needed
-	if i64, err := num.Int64(); err == nil {
-		return reflect.ValueOf(int(i64)), true
-	}
-
-	return reflect.Value{}, false
-}
-
 func tryToConvertMapOfNullStrings(value interface{}) (reflect.Value, bool) {
 	if source, ok := value.(map[string]interface{}); ok {
 		destination := reflect.MakeMap(mapOfNullStringType)
@@ -173,16 +145,44 @@ func tryToConvertMapOfNullStrings(value interface{}) (reflect.Value, bool) {
 	return reflect.Value{}, false
 }
 
-func relectOnAndCheck(store interface{}) (reflect.Value, error) {
-	p := reflect.ValueOf(store)
-	if kind := p.Kind(); kind != reflect.Ptr {
-		return reflect.Value{}, errors.New("the storage object must be a pointer")
+func tryToConvertNumber(num json.Number) (reflect.Value, bool) {
+	// Extend to support other number types as needed
+	if i64, err := num.Int64(); err == nil {
+		return reflect.ValueOf(int(i64)), true
 	}
 
-	v := p.Elem()
-	if kind := v.Kind(); kind != reflect.Struct {
-		return reflect.Value{}, errors.New("the storage object pointer must point to a struct")
+	return reflect.Value{}, false
+}
+
+func unmarshal(storeValue reflect.Value, tree interface{}) error {
+	if storeValue.Kind() == reflect.Ptr {
+		n := reflect.New(storeValue.Type().Elem())
+		storeValue.Set(n)
+		storeValue = n.Elem()
 	}
 
-	return v, nil
+	storeType := storeValue.Type()
+	for i := 0; i < storeType.NumField(); i++ {
+		field := storeType.Field(i)
+		path := computePath(field)
+		if value, ok := navigateAndFetch(path, tree); ok {
+			if fieldIsStruct(field.Type) {
+				if err := unmarshal(storeValue.Field(i), value); err != nil {
+					return err
+				}
+			} else {
+				if err := setValue(field.Name, storeValue.Field(i), value); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func unmarshalJSON(data []byte, store interface{}) error {
+	d := json.NewDecoder(bytes.NewBuffer(data))
+	d.UseNumber()
+	return d.Decode(store)
 }
