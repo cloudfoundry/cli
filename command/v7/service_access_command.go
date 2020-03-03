@@ -61,7 +61,7 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 	}
 
 	if len(servicePlanAccess) == 0 {
-		cmd.UI.DisplayText("No service access found.")
+		cmd.UI.DisplayText("No service plans found.")
 		return nil
 	}
 

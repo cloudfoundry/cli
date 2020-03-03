@@ -114,7 +114,7 @@ var _ = Describe("service-access Command", func() {
 				executeErr := cmd.Execute(nil)
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Err).To(Say("a warning"))
-				Expect(testUI.Out).To(Say("No service access found"))
+				Expect(testUI.Out).To(Say("No service plans found."))
 			})
 		})
 
