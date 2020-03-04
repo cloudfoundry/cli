@@ -32,6 +32,61 @@ func Unmarshal(data []byte, store interface{}) error {
 	return unmarshal(storeValue, tree)
 }
 
+func relectOnAndCheck(store interface{}) (reflect.Value, error) {
+	p := reflect.ValueOf(store)
+	if kind := p.Kind(); kind != reflect.Ptr {
+		return reflect.Value{}, errors.New("the storage object must be a pointer")
+	}
+
+	v := p.Elem()
+	if kind := v.Kind(); kind != reflect.Struct {
+		return reflect.Value{}, errors.New("the storage object pointer must point to a struct")
+	}
+
+	return v, nil
+}
+
+func unmarshalJSON(data []byte, store interface{}) error {
+	d := json.NewDecoder(bytes.NewBuffer(data))
+	d.UseNumber()
+	return d.Decode(store)
+}
+
+func unmarshal(storeValue reflect.Value, tree interface{}) error {
+	storeValue = depointerify(storeValue)
+	storeType := storeValue.Type()
+
+	for i := 0; i < storeType.NumField(); i++ {
+		field := storeType.Field(i)
+		path := computePath(field)
+		if value, ok := navigateAndFetch(path, tree); ok {
+			if err := set(field, storeValue.Field(i), value); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func depointerify(v reflect.Value) reflect.Value {
+	if v.Kind() != reflect.Ptr {
+		return v
+	}
+
+	n := reflect.New(v.Type().Elem())
+	v.Set(n)
+	return n.Elem()
+}
+
+func actualKind(t reflect.Type) reflect.Kind {
+	if k := t.Kind(); k != reflect.Ptr {
+		return k
+	}
+
+	return t.Elem().Kind()
+}
+
 func computePath(field reflect.StructField) []string {
 	if tag := field.Tag.Get("jsonry"); tag != "" {
 		return strings.Split(tag, ".")
@@ -47,84 +102,70 @@ func computePath(field reflect.StructField) []string {
 	return []string{strings.ToLower(field.Name)}
 }
 
-func fieldIsStruct(field reflect.Type) bool {
-	kind := field.Kind()
-	if kind == reflect.Ptr {
-		kind = field.Elem().Kind()
-	}
-
-	return kind == reflect.Struct
-}
-
 func navigateAndFetch(path []string, tree interface{}) (interface{}, bool) {
+	branch := path[0]
+
 	node, ok := tree.(map[string]interface{})
 	if !ok {
 		return nil, false
 	}
 
-	val, ok := node[path[0]]
+	val, ok := node[branch]
 	if !ok {
 		return nil, false
 	}
 
 	if len(path) > 1 {
+		if vals, ok := val.([]interface{}); ok {
+			return iterateAndFetch(path, vals), true
+		}
+
 		return navigateAndFetch(path[1:], val)
 	}
 
 	return val, true
 }
 
-func relectOnAndCheck(store interface{}) (reflect.Value, error) {
-	p := reflect.ValueOf(store)
-	if kind := p.Kind(); kind != reflect.Ptr {
-		return reflect.Value{}, errors.New("the storage object must be a pointer")
+func iterateAndFetch(path []string, vals []interface{}) interface{} {
+	var results []interface{}
+
+	for _, v := range vals {
+		r, _ := navigateAndFetch(path[1:], v)
+		results = append(results, r)
 	}
 
-	v := p.Elem()
-	if kind := v.Kind(); kind != reflect.Struct {
-		return reflect.Value{}, errors.New("the storage object pointer must point to a struct")
-	}
+	return results
+}
 
-	return v, nil
+func set(field reflect.StructField, fieldValue reflect.Value, value interface{}) error {
+	switch actualKind(field.Type) {
+	case reflect.Struct:
+		return unmarshal(fieldValue, value)
+	case reflect.Slice:
+		return setSlice(field.Name, fieldValue, value)
+	default:
+		return setValue(field.Name, fieldValue, value)
+	}
 }
 
 func setValue(fieldName string, store reflect.Value, value interface{}) error {
-	// Special case: JSON numbers
-	vv := reflect.ValueOf(value)
-	if vv.Type() == jsonNumberType {
-		if nv, ok := tryToConvertNumber(value.(json.Number)); ok {
-			vv = nv
-		}
-	}
+	vv := valueOfWithDenumberification(value)
 
 	// Special case: map[string]types.NullString
-	if store.Type().AssignableTo(mapOfNullStringType) || store.Type().AssignableTo(mapOfNullStringPointerType) {
+	store = depointerify(store)
+	if store.Type().AssignableTo(mapOfNullStringType) {
 		if mv, ok := tryToConvertMapOfNullStrings(value); ok {
 			vv = mv
 		}
 	}
 
-	if store.Kind() == reflect.Ptr {
-		n := reflect.New(vv.Type())
-		if n.Type().AssignableTo(store.Type()) {
-			n.Elem().Set(vv)
-			store.Set(n)
-			return nil
-		}
-		if n.Type().ConvertibleTo(store.Type()) {
-			n.Elem().Set(vv)
-			store.Set(n.Convert(store.Type()))
-			return nil
-		}
-	} else {
-		if vv.Type().AssignableTo(store.Type()) {
-			store.Set(vv)
-			return nil
-		}
-		if vv.Type().ConvertibleTo(store.Type()) {
-			store.Set(vv.Convert(store.Type()))
-			return nil
-		}
+	if vv.Type().AssignableTo(store.Type()) {
+		store.Set(vv)
+		return nil
+	}
+	if vv.Type().ConvertibleTo(store.Type()) {
+		store.Set(vv.Convert(store.Type()))
+		return nil
 	}
 
 	return fmt.Errorf(
@@ -134,6 +175,47 @@ func setValue(fieldName string, store reflect.Value, value interface{}) error {
 		store.Type(),
 		fieldName,
 	)
+}
+
+func setSlice(fieldName string, store reflect.Value, value interface{}) error {
+	vs, ok := value.([]interface{})
+	if !ok {
+		return fmt.Errorf(
+			"could not convert value '%v' type '%s' to '%s' for field '%s' because it is not a list type",
+			value,
+			reflect.TypeOf(value),
+			store.Type(),
+			fieldName,
+		)
+	}
+
+	store = depointerify(store)
+	elemType := store.Type().Elem()
+	arr := reflect.MakeSlice(reflect.SliceOf(elemType), len(vs), len(vs))
+	for i, v := range vs {
+		vv := valueOfWithDenumberification(v)
+
+		if vv.Type().AssignableTo(elemType) {
+			arr.Index(i).Set(vv)
+			continue
+		}
+		if vv.Type().ConvertibleTo(elemType) {
+			arr.Index(i).Set(vv.Convert(elemType))
+			continue
+		}
+
+		return fmt.Errorf(
+			"could not convert value '%v' type '%s' to '%s' for field '%s' index %d",
+			v,
+			vv.Type(),
+			elemType,
+			fieldName,
+			i,
+		)
+	}
+
+	store.Set(arr.Slice(0, arr.Len()))
+	return nil
 }
 
 func tryToConvertMapOfNullStrings(value interface{}) (reflect.Value, bool) {
@@ -154,44 +236,16 @@ func tryToConvertMapOfNullStrings(value interface{}) (reflect.Value, bool) {
 	return reflect.Value{}, false
 }
 
-func tryToConvertNumber(num json.Number) (reflect.Value, bool) {
-	// Extend to support other number types as needed
-	if i64, err := num.Int64(); err == nil {
-		return reflect.ValueOf(int(i64)), true
-	}
+func valueOfWithDenumberification(v interface{}) reflect.Value {
+	vv := reflect.ValueOf(v)
 
-	return reflect.Value{}, false
-}
-
-func unmarshal(storeValue reflect.Value, tree interface{}) error {
-	if storeValue.Kind() == reflect.Ptr {
-		n := reflect.New(storeValue.Type().Elem())
-		storeValue.Set(n)
-		storeValue = n.Elem()
-	}
-
-	storeType := storeValue.Type()
-	for i := 0; i < storeType.NumField(); i++ {
-		field := storeType.Field(i)
-		path := computePath(field)
-		if value, ok := navigateAndFetch(path, tree); ok {
-			if fieldIsStruct(field.Type) {
-				if err := unmarshal(storeValue.Field(i), value); err != nil {
-					return err
-				}
-			} else {
-				if err := setValue(field.Name, storeValue.Field(i), value); err != nil {
-					return err
-				}
-			}
+	if vv.Type() == jsonNumberType {
+		num := json.Number(vv.String())
+		// Extend to support other number types as needed
+		if i64, err := num.Int64(); err == nil {
+			return reflect.ValueOf(int(i64))
 		}
 	}
 
-	return nil
-}
-
-func unmarshalJSON(data []byte, store interface{}) error {
-	d := json.NewDecoder(bytes.NewBuffer(data))
-	d.UseNumber()
-	return d.Decode(store)
+	return vv
 }

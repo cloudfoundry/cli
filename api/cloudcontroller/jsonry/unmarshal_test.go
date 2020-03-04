@@ -41,7 +41,22 @@ var _ = Describe("Unmarshal", func() {
 		Expect(s.A).To(PointTo(Equal("pointer works")))
 	})
 
-	It("unmarshals a deep JSONry reference", func() {
+	It("unmarshals arrays", func() {
+		var s struct {
+			A []string
+			B *[]string
+			C []int
+		}
+
+		data := `{"a": ["q", "w", "e"], "b": ["r", "t", "y"], "c": [1, 2, 3]}`
+		err := jsonry.Unmarshal([]byte(data), &s)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(s.A).To(Equal([]string{"q", "w", "e"}))
+		Expect(s.B).To(PointTo(Equal([]string{"r", "t", "y"})))
+		Expect(s.C).To(Equal([]int{1, 2, 3}))
+	})
+
+	It("unmarshals reference to nested JSON", func() {
 		var s struct {
 			A string `jsonry:"aa.bb.cccc.d.e7.foo"`
 		}
@@ -50,6 +65,17 @@ var _ = Describe("Unmarshal", func() {
 		err := jsonry.Unmarshal([]byte(data), &s)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(s.A).To(Equal("deep JSONry works!"))
+	})
+
+	It("unmarshals reference to nested JSON lists", func() {
+		var s struct {
+			G []int `jsonry:"aa.g"`
+		}
+		data := `{"aa": [{"g": 4}, {"g": 8}, {"g": 7}]}`
+
+		err := jsonry.Unmarshal([]byte(data), &s)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(s.G).To(Equal([]int{4, 8, 7}))
 	})
 
 	It("unmarshals recursively", func() {
@@ -148,10 +174,22 @@ var _ = Describe("Unmarshal", func() {
 	})
 
 	Context("when there is a type mismatch", func() {
-		It("fails", func() {
+		It("fails for simple types", func() {
 			var s struct{ S int }
 			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
 			Expect(err).To(MatchError("could not convert value 'hello' type 'string' to 'int' for field 'S'"))
+		})
+
+		It("fails when the field expects a list", func() {
+			var s struct{ S []string }
+			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
+			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to '[]string' for field 'S' because it is not a list type`))
+		})
+
+		It("fails for elements in a list", func() {
+			var s struct{ S []int }
+			err := jsonry.Unmarshal([]byte(`{"s": [4, "hello"]}`), &s)
+			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to 'int' for field 'S' index 1`))
 		})
 	})
 
