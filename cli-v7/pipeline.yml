@@ -63,7 +63,7 @@ resources:
   type: git
   icon: github-box
   source:
-    branch: cli-v7-dev-4320018
+    branch: cli-v7-capi-v3
     uri: https://github.com/cloudfoundry/cf-acceptance-tests.git
     ignore_paths:
     - ci/*.yml
@@ -690,7 +690,7 @@ jobs:
         DEFAULT_TIMEOUT: 60
         LONG_CURL_TIMEOUT: 210
     - task: extract-linux-binary
-      file: cli-ci/ci/cli/tasks/extract-linux-binary.yml
+      file: cli-ci/ci/cli-v7/tasks/extract-linux-binary.yml
     - task: run-tests
       file: cf-deployment-concourse-tasks/run-cats-with-provided-cli/task.yml
       input_mapping:

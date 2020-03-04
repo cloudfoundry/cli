@@ -1,0 +1,29 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
+
+inputs:
+- name: cf-cli-binaries
+
+outputs:
+- name: linux-cf-binary
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+    set -o pipefail
+
+    pushd cf-cli-binaries
+      tar xvf cf-cli-binaries.tgz
+      rm cf-cli-binaries.tgz
+    popd
+
+    mv cf-cli-binaries/cf7-cli_linux_x86-64 linux-cf-binary/cf
+    chmod +x linux-cf-binary/cf
