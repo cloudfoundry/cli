@@ -525,9 +525,10 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c9e88e22b9a5074663a75bea1d2d1bc5124b08e565eccd293ff2143aace953ba"
+  digest = "1:58a33fa2506eac8e60164d6d12ef7be636e32842870ccb8114a5a16c065b234f"
   name = "golang.org/x/crypto"
   packages = [
+    "blowfish",
     "chacha20",
     "curve25519",
     "ed25519",
@@ -535,14 +536,15 @@
     "internal/subtle",
     "poly1305",
     "ssh",
+    "ssh/internal/bcrypt_pbkdf",
     "ssh/terminal",
   ]
   pruneopts = "NUT"
-  revision = "e9b2fee46413994441b28dfca259d911d963dfed"
+  revision = "78000ba7a073cafc0278790f6bce552a0f25850e"
 
 [[projects]]
   branch = "master"
-  digest = "1:f700dcf8319612c1ff156ea66d794489293309e0a2a8e70fdbf05754632a8d01"
+  digest = "1:3683f156c9be8a14a7c4920d091eea9c6f31bd803f367ddf0cc352302a997787"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -560,11 +562,11 @@
     "websocket",
   ]
   pruneopts = "NUT"
-  revision = "c0dbc17a35534bf2e581d7a942408dc936316da4"
+  revision = "244492dfa37ae2ce87222fd06250a03160745faa"
 
 [[projects]]
   branch = "master"
-  digest = "1:c5b1f2a8e46e1d9d2a3dc42c42fd278b0845094b4fae69845a6f399429601b5e"
+  digest = "1:25e0e4b581c92dd8f9f56dbc547f4f445c12b61f4ef8898709c43274b3a19aea"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -572,7 +574,7 @@
     "windows",
   ]
   pruneopts = "NUT"
-  revision = "ac6580df4449443a05718fd7858c1f91ad5f8d20"
+  revision = "5c8b2ff67527cb88b770f693cebf3799036d8bc0"
 
 [[projects]]
   branch = "master"
@@ -609,7 +611,7 @@
     "unicode/rangetable",
   ]
   pruneopts = "NUT"
-  revision = "cbf43d21aaebfdfeb81d91a5f444d13a3046e686"
+  revision = "929e72ca90deac4784bbe451caf10faa5b256ebe"
 
 [[projects]]
   branch = "master"
