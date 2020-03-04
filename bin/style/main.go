@@ -144,10 +144,6 @@ func (v *visitor) checkFunc(node *ast.FuncDecl) {
 			return
 		}
 
-		if strings.Compare(funcName, v.lastFuncDecl) == -1 {
-			v.addWarning(node.Pos(), "Alphabetical Ordering: function %s defined after function %s", funcName, v.lastFuncDecl)
-		}
-
 		v.lastFuncDecl = funcName
 	}
 }
@@ -169,11 +165,6 @@ func (v *visitor) checkFuncWithReceiver(node *ast.FuncDecl) {
 		lastTypeSpec := v.typeSpecs[len(v.typeSpecs)-1]
 		if v.typeDefinedInFile(receiver) && receiver != lastTypeSpec {
 			v.addWarning(node.Pos(), "method %s.%s should be defined immediately after type %s", receiver, funcName, receiver)
-		}
-	}
-	if receiver == v.lastReceiver {
-		if strings.Compare(lowerSansFirst(funcName), lowerSansFirst(v.lastReceiverFunc)) == -1 {
-			v.addWarning(node.Pos(), "Alphabetical Ordering: method %s.%s defined after method %s.%s", receiver, funcName, receiver, v.lastReceiverFunc)
 		}
 	}
 
