@@ -30,7 +30,7 @@ Currently, there are two versions of the cf CLI in development:
 - v7 beta cf CLI which is currently in development and will be in beta mode until it is completely backed by the [v3 API](http://v3-apidocs.cloudfoundry.org/version/3.75.0/index.html). See [here](https://docs.cloudfoundry.org/cf-cli/v7.html) for more information. 
 
 
-**Important Note**: The v6 CF CLI supports as far back as CF Deployment v6.9.0, CAPI Release: 1.74.0 (APIs 2.128.0 and 3.63.0). See our [Versioning Policy](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version) for more information. If you are on an older version of CF Deployment, we recommend you upgrade to a supported version. 
+**Important Note**: The v6 CF CLI supports as far back as CF Deployment v7.0.0, CAPI Release: 1.74.0 (APIs 2.128.0 and 3.63.0). See our [Versioning Policy](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version) for more information. If you are on an older version of CF Deployment, we recommend you upgrade to a supported version.
 
 **Important Note**: The v7 CF CLI beta under rapid development and as such is tested only against CC API v3 Release Candidate.
 
