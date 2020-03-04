@@ -25,12 +25,20 @@ UNAME_S := $(shell uname -s)
 ifndef TARGET_V7
 TARGET = v6
 export GOFLAGS =
-ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
+SLOW_SPEC_THRESHOLD=60
 else
 TARGET = v7
 export GOFLAGS = -tags=V7
-ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 120
+SLOW_SPEC_THRESHOLD=120
 endif
+
+GINKGO_FLAGS=-r -randomizeAllSpecs -requireSuite
+GINKGO_INT_FLAGS=$(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
+ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
+
+GINKGO_UNITS_FLAGS=$(GINKGO_FLAGS) -randomizeSuites -p
+ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
+
 
 all: lint test build
 
@@ -231,14 +239,14 @@ test: units ## (synonym for units)
 units: units-full ## (synonym for units-full)
 
 units-plugin:
-	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes 1 -randomizeAllSpecs -randomizeSuites -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
+	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -nodes 1 -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
 
 units-non-plugin:
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
+	CF_HOME=$(PWD)/fixtures CF_USERNAME="" CF_PASSWORD="" $(ginkgo_units) \
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
-	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
+	CF_HOME=$(PWD)/fixtures $(ginkgo_units) -flakeAttempts 3 cf/ssh
 
 units-full: build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"
