@@ -178,6 +178,12 @@ var _ = Describe("Paginated Resources", func() {
 							"username": "user-name-1",
 							"origin": "uaa"
 						}
+					],
+      				"organizations": [
+						{
+							"guid": "org-guid-1",
+							"name": "org-name-1"
+						}
 					]
 				}
 			}`)
@@ -187,8 +193,11 @@ var _ = Describe("Paginated Resources", func() {
 		})
 
 		It("can unmarshal the list of included resources into an appropriate struct", func() {
-			Expect(page.IncludedResources.UserResource).To(ConsistOf(
+			Expect(page.IncludedResources.Users).To(ConsistOf(
 				User{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
+			))
+			Expect(page.IncludedResources.Organizations).To(ConsistOf(
+				Organization{GUID: "org-guid-1", Name: "org-name-1"},
 			))
 		})
 	})

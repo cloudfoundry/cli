@@ -117,15 +117,16 @@ var _ = Describe("Spaces", func() {
 
 	Describe("GetSpaces", func() {
 		var (
-			query Query
+			query []Query
 
+			includes   IncludedResources
 			spaces     []Space
 			warnings   Warnings
 			executeErr error
 		)
 
 		JustBeforeEach(func() {
-			spaces, warnings, executeErr = client.GetSpaces(query)
+			spaces, includes, warnings, executeErr = client.GetSpaces(query...)
 		})
 
 		When("spaces exist", func() {
@@ -187,10 +188,10 @@ var _ = Describe("Spaces", func() {
 					),
 				)
 
-				query = Query{
+				query = []Query{{
 					Key:    NameFilter,
 					Values: []string{"some-space-name"},
-				}
+				}}
 			})
 
 			It("returns the queried spaces and all warnings", func() {
@@ -208,6 +209,118 @@ var _ = Describe("Spaces", func() {
 					}},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
+			})
+		})
+
+		When("the request uses the `include` query key", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+	"pagination": {
+		"next": {
+			"href": "%s/v3/spaces?names=some-space-name&include=organizations&page=2&per_page=2"
+		}
+	},
+  "resources": [
+    {
+      "name": "space-name-1",
+      "guid": "space-guid-1",
+      "relationships": {
+        "organization": {
+          "data": { "guid": "org-guid-1" }
+        }
+      }
+    },
+    {
+      "name": "space-name-2",
+      "guid": "space-guid-2",
+      "relationships": {
+        "organization": {
+          "data": { "guid": "org-guid-2" }
+        }
+      }
+    }
+  ],
+  "included": {
+  		"organizations": [
+	  {
+		  "guid": "org-guid-1",
+		  "name": "org-name-1"
+	  }
+      ]
+  }
+}`, server.URL())
+				response2 := `{
+  "pagination": {
+    "next": null
+  },
+  "resources": [
+    {
+      "name": "space-name-3",
+      "guid": "space-guid-3",
+      "relationships": {
+        "organization": {
+          "data": { "guid": "org-guid-3" }
+        }
+      }
+    }
+  ],
+"included": {
+	"organizations": [
+		{
+			"guid": "org-guid-2",
+			"name": "org-name-2"
+		}
+	]
+}
+}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces", "names=some-space-name&include=organizations"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces", "names=some-space-name&page=2&per_page=2&include=organizations"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+
+				query = []Query{
+					{
+						Key:    NameFilter,
+						Values: []string{"some-space-name"},
+					},
+					{
+						Key:    Include,
+						Values: []string{"organizations"},
+					},
+				}
+			})
+
+			It("returns the given route and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(spaces).To(ConsistOf(
+					Space{Name: "space-name-1", GUID: "space-guid-1", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-1"},
+					}},
+					Space{Name: "space-name-2", GUID: "space-guid-2", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-2"},
+					}},
+					Space{Name: "space-name-3", GUID: "space-guid-3", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-3"},
+					}},
+				))
+
+				Expect(includes).To(Equal(IncludedResources{
+					Organizations: []Organization{
+						{GUID: "org-guid-1", Name: "org-name-1"},
+						{GUID: "org-guid-2", Name: "org-name-2"},
+					},
+				}))
 			})
 		})
 

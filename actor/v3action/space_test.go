@@ -162,6 +162,7 @@ var _ = Describe("Space", func() {
 							Name: "space-2",
 						},
 					},
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
@@ -201,6 +202,7 @@ var _ = Describe("Space", func() {
 				returnedErr = errors.New("cc-get-spaces-error")
 				fakeCloudControllerClient.GetSpacesReturns(
 					[]ccv3.Space{},
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					returnedErr,
 				)
@@ -239,6 +241,7 @@ var _ = Describe("Space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName}},
+						ccv3.IncludedResources{},
 						ccv3.Warnings{"some-space-warning"}, nil)
 				})
 
@@ -262,7 +265,7 @@ var _ = Describe("Space", func() {
 			When("the cloud controller returns back no spaces", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						nil, ccv3.Warnings{"some-space-warning"}, nil)
+						nil, ccv3.IncludedResources{}, ccv3.Warnings{"some-space-warning"}, nil)
 				})
 
 				It("returns a SpaceNotFoundError and warnings", func() {
@@ -277,6 +280,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					nil,
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-space-warning"},
 					errors.New("cannot get space"))
 			})
@@ -310,6 +314,7 @@ var _ = Describe("Space", func() {
 								},
 							},
 						},
+						ccv3.IncludedResources{},
 						ccv3.Warnings{"space-warning-1", "space-warning-2"}, nil)
 				})
 
@@ -343,6 +348,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					nil,
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"space-warning-1", "space-warning-2"},
 					errors.New("cannot get space"))
 			})

@@ -6,10 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
-type IncludedResources struct {
-	Users []User
-}
-
 func (requester RealRequester) paginate(request *cloudcontroller.Request, obj interface{}, appendToExternalList func(interface{}) error) (IncludedResources, Warnings, error) {
 	fullWarningsList := Warnings{}
 	var includes IncludedResources
@@ -21,7 +17,8 @@ func (requester RealRequester) paginate(request *cloudcontroller.Request, obj in
 			return IncludedResources{}, fullWarningsList, err
 		}
 
-		includes.Users = append(includes.Users, wrapper.IncludedResources.UserResource...)
+		includes.Users = append(includes.Users, wrapper.IncludedResources.Users...)
+		includes.Organizations = append(includes.Organizations, wrapper.IncludedResources.Organizations...)
 
 		if wrapper.NextPage() == "" {
 			break

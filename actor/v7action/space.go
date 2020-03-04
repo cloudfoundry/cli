@@ -77,7 +77,7 @@ func (actor Actor) ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) 
 }
 
 func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (Space, Warnings, error) {
-	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+	ccv3Spaces, _, warnings, err := actor.CloudControllerClient.GetSpaces(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
 		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
 	)
@@ -207,7 +207,7 @@ func (actor Actor) GetOrganizationSpacesWithLabelSelector(orgGUID string, labelS
 		queries = append(queries, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
 	}
 
-	ccv3Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(queries...)
+	ccv3Spaces, _, warnings, err := actor.CloudControllerClient.GetSpaces(queries...)
 	if err != nil {
 		return []Space{}, Warnings(warnings), err
 	}

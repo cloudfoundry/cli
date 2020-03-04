@@ -38,10 +38,10 @@ func (client *Client) DeleteSpace(spaceGUID string) (JobURL, Warnings, error) {
 }
 
 // GetSpaces lists spaces with optional filters.
-func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
+func (client *Client) GetSpaces(query ...Query) ([]Space, IncludedResources, Warnings, error) {
 	var resources []Space
 
-	_, warnings, err := client.MakeListRequest(RequestParams{
+	includedResources, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetSpacesRequest,
 		Query:        query,
 		ResponseBody: Space{},
@@ -51,7 +51,7 @@ func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
 		},
 	})
 
-	return resources, warnings, err
+	return resources, includedResources, warnings, err
 }
 
 func (client *Client) UpdateSpace(space Space) (Space, Warnings, error) {

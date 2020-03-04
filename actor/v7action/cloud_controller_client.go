@@ -106,7 +106,7 @@ type CloudControllerClient interface {
 	GetSpaceFeature(spaceGUID string, featureName string) (bool, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaceQuota(spaceQuotaGUID string) (ccv3.SpaceQuota, ccv3.Warnings, error)
-	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
+	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.IncludedResources, ccv3.Warnings, error)
 	GetSpaceQuotas(query ...ccv3.Query) ([]ccv3.SpaceQuota, ccv3.Warnings, error)
 	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, ccv3.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, ccv3.Warnings, error)

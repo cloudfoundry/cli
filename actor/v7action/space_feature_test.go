@@ -46,6 +46,7 @@ var _ = Describe("space features", func() {
 						GUID: "some-space-guid",
 					},
 				},
+				ccv3.IncludedResources{},
 				ccv3.Warnings{"get-space-warning"},
 				nil,
 			)
@@ -83,6 +84,7 @@ var _ = Describe("space features", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					[]ccv3.Space{},
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-space-warning"},
 					nil,
 				)
@@ -137,6 +139,7 @@ var _ = Describe("space features", func() {
 						GUID: spaceGUID,
 					},
 				},
+				ccv3.IncludedResources{},
 				ccv3.Warnings{"get-space-warning"},
 				nil,
 			)

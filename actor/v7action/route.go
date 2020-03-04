@@ -401,7 +401,7 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 		}
 	}
 
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(spacesQuery)
+	spaces, _, warnings, err := actor.CloudControllerClient.GetSpaces(spacesQuery)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err

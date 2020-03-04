@@ -100,6 +100,7 @@ var _ = Describe("Route Actions", func() {
 						[]ccv3.Space{
 							{Name: "space-name", GUID: "space-guid"},
 						},
+						ccv3.IncludedResources{},
 						ccv3.Warnings{"get-spaces-warning"},
 						nil,
 					)
@@ -166,6 +167,7 @@ var _ = Describe("Route Actions", func() {
 				[]ccv3.Space{
 					{Name: "space-name", GUID: "space-guid"},
 				},
+				ccv3.IncludedResources{},
 				ccv3.Warnings{"get-spaces-warning"},
 				nil,
 			)
@@ -249,6 +251,7 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					nil,
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-spaces-warning"},
 					err,
 				)
@@ -276,6 +279,7 @@ var _ = Describe("Route Actions", func() {
 				[]ccv3.Space{
 					{Name: "space-name", GUID: "space-guid"},
 				},
+				ccv3.IncludedResources{},
 				ccv3.Warnings{"get-spaces-warning"},
 				nil,
 			)
@@ -458,6 +462,7 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					nil,
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-route-space-warning-1", "get-route-space-warning-2"},
 					err)
 			})
@@ -495,6 +500,7 @@ var _ = Describe("Route Actions", func() {
 					{Name: "space1-name", GUID: "space1-guid"},
 					{Name: "space2-name", GUID: "space2-guid"},
 				},
+				ccv3.IncludedResources{},
 				ccv3.Warnings{"get-spaces-warning"},
 				nil,
 			)
@@ -604,6 +610,7 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					nil,
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-spaces-warning"},
 					err,
 				)
@@ -1335,6 +1342,7 @@ var _ = Describe("Route Actions", func() {
 							Name: "space-name",
 						},
 					},
+					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-spaces-warning"},
 					nil,
 				)
@@ -1394,6 +1402,7 @@ var _ = Describe("Route Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						nil,
+						ccv3.IncludedResources{},
 						ccv3.Warnings{"get-spaces-warning"},
 						err,
 					)
