@@ -83,6 +83,16 @@ var _ = Describe("Unmarshal", func() {
 		Expect(s.B).To(PointTo(Equal(rope("bar"))))
 	})
 
+	FIt("unmarshals array paths", func() {
+		var s struct {
+			GUIDs []string `jsonry:"a.b.[]data.guid"`
+		}
+
+		err := jsonry.Unmarshal([]byte(`{"a": {"b": {"data": [{"guid": "g1"}, {"guid": "g2"}, {"guid": "g3"}]}}}`), &s)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(s.GUIDs).To(Equal([]string{"g1", "g2", "g3"}))
+	})
+
 	It("unmarshals a realistic object", func() {
 		type metadata struct {
 			Labels map[string]types.NullString `json:"labels,omitempty"`

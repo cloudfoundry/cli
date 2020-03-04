@@ -56,22 +56,42 @@ func fieldIsStruct(field reflect.Type) bool {
 	return kind == reflect.Struct
 }
 
-func navigateAndFetch(path []string, tree interface{}) (interface{}, bool) {
+func navigateAndFetch(path []string, tree interface{}, handleValue func(interface{}) error) error {
 	node, ok := tree.(map[string]interface{})
+	fmt.Printf("tree: %v\n\n", tree)
+	fmt.Printf("path2: %v\n\n", path)
 	if !ok {
-		return nil, false
+		return nil
+	}
+
+	if strings.HasPrefix(path[0], "[]") {
+		trimmedPath := strings.TrimPrefix(path[0], "[]")
+
+		val, ok := node[trimmedPath]
+		if !ok {
+			return nil
+		}
+
+		array, isArray := val.([]interface{})
+		if isArray {
+			for _, element := range array {
+				if err := navigateAndFetch(path[1:], element, handleValue); err != nil {
+					return err
+				}
+			}
+		}
 	}
 
 	val, ok := node[path[0]]
 	if !ok {
-		return nil, false
+		return nil
 	}
 
 	if len(path) > 1 {
-		return navigateAndFetch(path[1:], val)
+		return navigateAndFetch(path[1:], val, handleValue)
 	}
 
-	return val, true
+	return handleValue(val)
 }
 
 func relectOnAndCheck(store interface{}) (reflect.Value, error) {
@@ -174,7 +194,10 @@ func unmarshal(storeValue reflect.Value, tree interface{}) error {
 	for i := 0; i < storeType.NumField(); i++ {
 		field := storeType.Field(i)
 		path := computePath(field)
-		if value, ok := navigateAndFetch(path, tree); ok {
+
+		fmt.Printf("path: %v\n\n", path)
+
+		err := navigateAndFetch(path, tree, func(value interface{}) error {
 			if fieldIsStruct(field.Type) {
 				if err := unmarshal(storeValue.Field(i), value); err != nil {
 					return err
@@ -184,6 +207,12 @@ func unmarshal(storeValue reflect.Value, tree interface{}) error {
 					return err
 				}
 			}
+
+			return nil
+		})
+
+		if err != nil {
+			return err
 		}
 	}
 
