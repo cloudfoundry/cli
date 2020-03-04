@@ -331,9 +331,3 @@ func walkFile(fileSet *token.FileSet, file *ast.File) []warning {
 
 	return v.warnings
 }
-
-// lowerSansFirst is used to keep the precedence order of public (uppercased)
-// methods over private (lowercased) methods.
-func lowerSansFirst(str string) string {
-	return str[0:1] + strings.ToLower(str[1:])
-}
