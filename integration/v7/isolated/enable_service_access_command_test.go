@@ -24,7 +24,7 @@ var _ = Describe("enable service access command", func() {
 				Expect(session).To(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("\\s+marketplace, service-access, service-brokers"))
+				Expect(session).To(Say("\\s+disable-service-access, marketplace, service-access, service-brokers"))
 			})
 		})
 
@@ -42,7 +42,7 @@ var _ = Describe("enable service access command", func() {
 				Expect(session).To(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("\\s+marketplace, service-access, service-brokers"))
+				Expect(session).To(Say("\\s+disable-service-access, marketplace, service-access, service-brokers"))
 			})
 		})
 
@@ -61,7 +61,7 @@ var _ = Describe("enable service access command", func() {
 				Expect(session).To(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("\\s+marketplace, service-access, service-brokers"))
+				Expect(session).To(Say("\\s+disable-service-access, marketplace, service-access, service-brokers"))
 			})
 		})
 	})

@@ -21,7 +21,7 @@ type EnableServiceAccessCommand struct {
 	Organization    string       `short:"o" description:"Enable access for a specified organization"`
 	ServicePlan     string       `short:"p" description:"Enable access to a specified service plan"`
 	usage           interface{}  `usage:"CF_NAME enable-service-access SERVICE [-b BROKER] [-p PLAN] [-o ORG]"`
-	relatedCommands interface{}  `related_commands:"marketplace, service-access, service-brokers"`
+	relatedCommands interface{}  `related_commands:"disable-service-access, marketplace, service-access, service-brokers"`
 
 	UI          command.UI
 	SharedActor command.SharedActor

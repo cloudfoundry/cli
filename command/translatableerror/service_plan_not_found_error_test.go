@@ -14,7 +14,7 @@ var _ = Describe("ServicePlanNotFoundError", func() {
 			OfferingName: offeringName,
 			PlanName:     planName,
 		}
-		Expect(err.Error()).To(Equal("The plan {{.PlanName}} could not be found for service {{.OfferingName}}"))
+		Expect(err.Error()).To(Equal("The plan {{.PlanName}} could not be found for service {{.OfferingName}}."))
 	})
 
 	When("there is no service offering name", func() {
