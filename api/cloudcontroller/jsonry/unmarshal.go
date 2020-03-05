@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	jsonNumberType             = reflect.TypeOf(json.Number("0"))
-	mapOfNullStringType        = reflect.TypeOf(map[string]types.NullString{})
-	mapOfNullStringPointerType = reflect.PtrTo(mapOfNullStringType)
+	jsonNumberType      = reflect.TypeOf(json.Number("0"))
+	mapOfNullStringType = reflect.TypeOf(map[string]types.NullString{})
 )
 
 func Unmarshal(data []byte, store interface{}) error {
