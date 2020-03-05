@@ -99,10 +99,16 @@ var _ = Describe("bind-security-group command", func() {
 	})
 
 	When("the security group exists", func() {
-		var someSecurityGroup helpers.SecurityGroup
+		var (
+			someSecurityGroup helpers.SecurityGroup
+			ports             string
+			description       string
+		)
 
 		BeforeEach(func() {
-			someSecurityGroup = helpers.NewSecurityGroup(secGroupName, "tcp", "0.0.0.0/0", "53", "")
+			ports = "53"
+			description = "SG"
+			someSecurityGroup = helpers.NewSecurityGroup(secGroupName, "tcp", "0.0.0.0/0", &ports, &description)
 			someSecurityGroup.Create()
 		})
 

@@ -1327,6 +1327,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetSecurityGroupsStub        func(...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
+	getSecurityGroupsMutex       sync.RWMutex
+	getSecurityGroupsArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getSecurityGroupsReturns struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getSecurityGroupsReturnsOnCall map[int]struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetServiceBrokersStub        func(...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	getServiceBrokersMutex       sync.RWMutex
 	getServiceBrokersArgsForCall []struct {
@@ -7891,6 +7906,72 @@ func (fake *FakeCloudControllerClient) GetSSHEnabledReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSecurityGroups(arg1 ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error) {
+	fake.getSecurityGroupsMutex.Lock()
+	ret, specificReturn := fake.getSecurityGroupsReturnsOnCall[len(fake.getSecurityGroupsArgsForCall)]
+	fake.getSecurityGroupsArgsForCall = append(fake.getSecurityGroupsArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetSecurityGroups", []interface{}{arg1})
+	fake.getSecurityGroupsMutex.Unlock()
+	if fake.GetSecurityGroupsStub != nil {
+		return fake.GetSecurityGroupsStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSecurityGroupsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSecurityGroupsCallCount() int {
+	fake.getSecurityGroupsMutex.RLock()
+	defer fake.getSecurityGroupsMutex.RUnlock()
+	return len(fake.getSecurityGroupsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSecurityGroupsCalls(stub func(...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)) {
+	fake.getSecurityGroupsMutex.Lock()
+	defer fake.getSecurityGroupsMutex.Unlock()
+	fake.GetSecurityGroupsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetSecurityGroupsArgsForCall(i int) []ccv3.Query {
+	fake.getSecurityGroupsMutex.RLock()
+	defer fake.getSecurityGroupsMutex.RUnlock()
+	argsForCall := fake.getSecurityGroupsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetSecurityGroupsReturns(result1 []resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.getSecurityGroupsMutex.Lock()
+	defer fake.getSecurityGroupsMutex.Unlock()
+	fake.GetSecurityGroupsStub = nil
+	fake.getSecurityGroupsReturns = struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSecurityGroupsReturnsOnCall(i int, result1 []resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.getSecurityGroupsMutex.Lock()
+	defer fake.getSecurityGroupsMutex.Unlock()
+	fake.GetSecurityGroupsStub = nil
+	if fake.getSecurityGroupsReturnsOnCall == nil {
+		fake.getSecurityGroupsReturnsOnCall = make(map[int]struct {
+			result1 []resources.SecurityGroup
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getSecurityGroupsReturnsOnCall[i] = struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceBrokers(arg1 ...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error) {
 	fake.getServiceBrokersMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokersReturnsOnCall[len(fake.getServiceBrokersArgsForCall)]
@@ -11529,6 +11610,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getRoutesMutex.RUnlock()
 	fake.getSSHEnabledMutex.RLock()
 	defer fake.getSSHEnabledMutex.RUnlock()
+	fake.getSecurityGroupsMutex.RLock()
+	defer fake.getSecurityGroupsMutex.RUnlock()
 	fake.getServiceBrokersMutex.RLock()
 	defer fake.getServiceBrokersMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()

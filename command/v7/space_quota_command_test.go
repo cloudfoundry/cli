@@ -118,7 +118,6 @@ var _ = Describe("Space Quota Command", func() {
 		It("displays the quota and all warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeActor.GetSpaceQuotaByNameCallCount()).To(Equal(1))
-			Expect(fakeActor.GetSpaceQuotaByNameCallCount()).To(Equal(1))
 			quotaName, orgGUID := fakeActor.GetSpaceQuotaByNameArgsForCall(0)
 			Expect(quotaName).To(Equal("some-space-quota"))
 			Expect(orgGUID).To(Equal("some-org-guid"))

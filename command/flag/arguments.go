@@ -66,7 +66,7 @@ type Quota struct {
 }
 
 type SecurityGroup struct {
-	ServiceGroup string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group"`
+	SecurityGroup string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group"`
 }
 
 type Space struct {

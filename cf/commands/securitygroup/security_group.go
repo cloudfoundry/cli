@@ -57,7 +57,7 @@ func (cmd *ShowSecurityGroup) SetDependency(deps commandregistry.Dependency, plu
 func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 
-	cmd.ui.Say(T("Getting info for security group {{.security_group}} as {{.username}}",
+	cmd.ui.Say(T("Getting info for security group {{.security_group}} as {{.username}}...",
 		map[string]interface{}{
 			"security_group": terminal.EntityNameColor(name),
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),

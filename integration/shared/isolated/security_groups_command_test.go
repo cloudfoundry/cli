@@ -71,6 +71,22 @@ var _ = Describe("security-groups command", func() {
 				space31 string
 				space32 string
 				space33 string
+
+				ports1 string
+				ports2 string
+				ports3 string
+				ports4 string
+				ports5 string
+				ports6 string
+				ports7 string
+
+				description1 string
+				description2 string
+				description3 string
+				description4 string
+				description5 string
+				description6 string
+				description7 string
 			)
 
 			BeforeEach(func() {
@@ -78,20 +94,36 @@ var _ = Describe("security-groups command", func() {
 
 				username, _ = helpers.GetCredentials()
 
+				ports1 = "81,443"
+				ports2 = "82,444"
+				ports3 = "83,445"
+				ports4 = "84,446"
+				ports5 = "85,447"
+				ports6 = "86,448"
+				ports7 = "87,449"
+
+				description1 = "SG1"
+				description2 = "SG2"
+				description3 = "SG3"
+				description4 = "SG4"
+				description5 = "SG5"
+				description6 = "SG6"
+				description7 = "SG7"
+
 				// Create Security Groups, Organizations, and Spaces with predictable and unique names for testing sorting
-				securityGroup1 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-1"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup1 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-1"), "tcp", "11.1.1.0/24", &ports1, &description1)
 				securityGroup1.Create()
-				securityGroup2 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-2"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup2 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-2"), "tcp", "11.1.1.0/24", &ports2, &description2)
 				securityGroup2.Create()
-				securityGroup3 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-3"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup3 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-3"), "tcp", "11.1.1.0/24", &ports3, &description3)
 				securityGroup3.Create()
-				securityGroup4 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-4"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup4 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-4"), "tcp", "11.1.1.0/24", &ports4, &description4)
 				securityGroup4.Create()
-				securityGroup5 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-5"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup5 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-5"), "tcp", "11.1.1.0/24", &ports5, &description5)
 				securityGroup5.Create()
-				securityGroup6 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-6"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup6 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-6"), "tcp", "11.1.1.0/24", &ports6, &description6)
 				securityGroup6.Create()
-				securityGroup7 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-7"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup7 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-7"), "tcp", "11.1.1.0/24", &ports7, &description7)
 				securityGroup7.Create()
 
 				org11 = helpers.PrefixedRandomName("INTEGRATION-ORG-11")

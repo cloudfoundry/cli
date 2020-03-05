@@ -16,3 +16,19 @@ func (client *Client) CreateSecurityGroup(securityGroup resources.SecurityGroup)
 
 	return responseBody, warnings, err
 }
+
+func (client *Client) GetSecurityGroups(queries ...Query) ([]resources.SecurityGroup, Warnings, error) {
+	var securityGroups []resources.SecurityGroup
+
+	_, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetSecurityGroupsRequest,
+		Query:        queries,
+		ResponseBody: resources.SecurityGroup{},
+		AppendToList: func(item interface{}) error {
+			securityGroups = append(securityGroups, item.(resources.SecurityGroup))
+			return nil
+		},
+	})
+
+	return securityGroups, warnings, err
+}

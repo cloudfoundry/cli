@@ -141,7 +141,7 @@ type commandList struct {
 	SSHCode                            v6.SSHCodeCommand                            `command:"ssh-code" description:"Get a one time password for ssh clients"`
 	SSHEnabled                         v7.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
 	Scale                              v7.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
-	SecurityGroup                      v6.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
+	SecurityGroup                      v7.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	SecurityGroups                     v6.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	Service                            v6.ServiceCommand                            `command:"service" description:"Show service instance info"`
 	ServiceAccess                      v7.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`

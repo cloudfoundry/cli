@@ -6,6 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -145,6 +149,187 @@ var _ = Describe("Security Group Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"a-warning"}))
 			})
 
+		})
+	})
+
+	Describe("GetSecurityGroup", func() {
+		const securityGroupName = "security-group-name"
+		var (
+			securityGroupSummary SecurityGroupSummary
+			description          string
+			port                 string
+		)
+
+		BeforeEach(func() {
+			description = "Top 8 Friends Only"
+			port = "9000"
+		})
+
+		When("the request succeeds", func() {
+			JustBeforeEach(func() {
+				securityGroupSummary, warnings, executeErr = actor.GetSecurityGroup(securityGroupName)
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			When("the security group is not associated with spaces or rules", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						[]resources.SecurityGroup{
+							{
+								GUID:  "some-app-guid-1",
+								Name:  "some-app-1",
+								Rules: []resources.Rule{},
+							},
+						},
+						ccv3.Warnings{"warning-1"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{},
+						ccv3.IncludedResources{},
+						ccv3.Warnings{"warning-2"},
+						nil,
+					)
+				})
+
+				It("returns the security group summary and warnings", func() {
+					Expect(securityGroupSummary).To(Equal(
+						SecurityGroupSummary{
+							Name:                "security-group-name",
+							Rules:               []resources.Rule{},
+							SecurityGroupSpaces: []SecurityGroupSpace{},
+						},
+					))
+					Expect(warnings).To(ConsistOf("warning-1"))
+
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"security-group-name"}},
+					))
+
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(0))
+				})
+			})
+
+			When("the security group is associated with spaces and rules", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						[]resources.SecurityGroup{
+							{
+								GUID: "some-app-guid-1",
+								Name: "some-app-1",
+								Rules: []resources.Rule{{
+									Destination: "127.0.0.1",
+									Description: &description,
+									Ports:       &port,
+									Protocol:    "tcp",
+								}},
+								RunningSpaceGUIDs: []string{"space-guid-1"},
+								StagingSpaceGUIDs: []string{"space-guid-2"},
+							},
+						},
+						ccv3.Warnings{"warning-1"},
+						nil,
+					)
+
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{{
+							Name: "my-space",
+							GUID: "space-guid-1",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
+							},
+						}, {
+							Name: "your-space",
+							GUID: "space-guid-2",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
+							},
+						}},
+						ccv3.IncludedResources{Organizations: []ccv3.Organization{{
+							Name: "obsolete-social-networks",
+							GUID: "org-guid-1",
+						}, {
+							Name: "revived-social-networks",
+							GUID: "org-guid-2",
+						}}},
+						ccv3.Warnings{"warning-2"},
+						nil,
+					)
+				})
+
+				It("returns the security group summary and warnings", func() {
+					Expect(securityGroupSummary).To(Equal(
+						SecurityGroupSummary{
+							Name: "security-group-name",
+							Rules: []resources.Rule{{
+								Destination: "127.0.0.1",
+								Description: &description,
+								Ports:       &port,
+								Protocol:    "tcp",
+							}},
+							SecurityGroupSpaces: []SecurityGroupSpace{{
+								SpaceName: "my-space",
+								OrgName:   "obsolete-social-networks",
+							}, {
+								SpaceName: "your-space",
+								OrgName:   "revived-social-networks",
+							}},
+						},
+					))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"security-group-name"}},
+					))
+
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"space-guid-1", "space-guid-2"}},
+						ccv3.Query{Key: ccv3.Include, Values: []string{"organization"}},
+					))
+				})
+			})
+		})
+
+		When("the request errors", func() {
+			var expectedError error
+			JustBeforeEach(func() {
+				securityGroupSummary, warnings, executeErr = actor.GetSecurityGroup(securityGroupName)
+			})
+
+			When("the security group does not exist", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						[]resources.SecurityGroup{},
+						ccv3.Warnings{"some-warning"},
+						nil,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ConsistOf("some-warning"))
+					Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: securityGroupName}))
+				})
+			})
+
+			When("the cloud controller client errors", func() {
+				BeforeEach(func() {
+					expectedError = errors.New("I am a CloudControllerClient Error")
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						nil,
+						ccv3.Warnings{"some-warning"},
+						expectedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ConsistOf("some-warning"))
+					Expect(executeErr).To(MatchError(expectedError))
+				})
+			})
 		})
 	})
 })
