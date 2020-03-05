@@ -2,11 +2,14 @@ package v7action
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
+
+type ServicePlanWithSpaceAndOrganization ccv3.ServicePlanWithSpaceAndOrganization
 
 type ServicePlanAccess struct {
 	BrokerName          string
@@ -48,7 +51,7 @@ func (actor *Actor) GetServiceAccess(offeringName, brokerName, orgName string) (
 		return nil, allWarnings, err
 	}
 
-	plans, plansWarnings, err := actor.CloudControllerClient.GetServicePlans(plansQuery...)
+	plans, plansWarnings, err := actor.CloudControllerClient.GetServicePlansWithSpaceAndOrganization(plansQuery...)
 	allWarnings = append(allWarnings, plansWarnings...)
 	if err != nil {
 		return nil, allWarnings, err
@@ -57,7 +60,7 @@ func (actor *Actor) GetServiceAccess(offeringName, brokerName, orgName string) (
 	var result []ServicePlanAccess
 	for _, plan := range plans {
 		if offering, ok := offerings[plan.ServiceOfferingGUID]; ok {
-			visibilityDetails, warnings, err := actor.getServicePlanVisibilityDetails(ServicePlan(plan))
+			visibilityDetails, warnings, err := actor.getServicePlanVisibilityDetails(ServicePlanWithSpaceAndOrganization(plan))
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return nil, allWarnings, err
@@ -279,7 +282,7 @@ func (actor *Actor) getServiceOfferings(service, broker string) (map[string]offe
 	return offerings, Warnings(warnings), err
 }
 
-func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlan) (names []string, warnings Warnings, err error) {
+func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlanWithSpaceAndOrganization) (names []string, warnings Warnings, err error) {
 	if plan.VisibilityType == visibleOrganization {
 		result, vwarn, err := actor.CloudControllerClient.GetServicePlanVisibility(plan.GUID)
 		warnings = Warnings(vwarn)
@@ -290,6 +293,10 @@ func (actor *Actor) getServicePlanVisibilityDetails(plan ServicePlan) (names []s
 		for _, organization := range result.Organizations {
 			names = append(names, organization.Name)
 		}
+	}
+
+	if plan.VisibilityType == visibleSpace {
+		names = []string{fmt.Sprintf("%s (org: %s)", plan.SpaceName, plan.OrganizationName)}
 	}
 
 	return names, warnings, nil

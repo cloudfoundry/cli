@@ -190,6 +190,212 @@ var _ = Describe("Service Plan", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
+	})
 
+	Describe("GetServicePlansWithSpaceAndOrganization", func() {
+		var (
+			plans      []ServicePlanWithSpaceAndOrganization
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			plans, warnings, executeErr = client.GetServicePlansWithSpaceAndOrganization(query...)
+		})
+
+		When("when the query succeeds", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`
+					{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/service_plans?include=space.organization&service_offering_names=someOffering&page=2"
+							}
+						},
+						"resources": [
+							{
+								"guid": "service-plan-1-guid",
+								"name": "service-plan-1-name",
+								"visibility_type": "public",
+								"relationships": {
+									"service_offering": {
+									   "data": {
+										  "guid": "79d428b9-75b4-44db-addf-19c85c7f0f1e"
+									   }
+									}
+								}
+							},
+							{
+								"guid": "service-plan-2-guid",
+								"name": "service-plan-2-name",
+								"visibility_type": "space",
+								"relationships": {
+									"service_offering": {
+									   "data": {
+										  "guid": "69d428b9-75b4-44db-addf-19c85c7f0f1e"
+									   }
+									},
+									"space": {
+										"data": {
+											"guid": "fake-space-guid"
+										}
+									}
+								}
+							}
+						],
+						"included": {
+							"spaces": [
+								{
+									"name": "matching-space",
+									"guid": "fake-space-guid",
+									"relationships": {
+										"organization": {
+											"data": {
+												"guid": "matching-org-guid"
+											}
+										}
+									}
+								},
+								{
+									"name": "non-matching-space",
+									"guid": "fake-other-space-guid",
+									"relationships": {
+										"organization": {
+											"data": {
+												"guid": "other-org-guid"
+											}
+										}
+									}
+								}
+							],
+							"organizations": [
+								{
+									"name": "matching-org",
+									"guid": "matching-org-guid"
+								},
+								{
+									"name": "non-matching-org",
+									"guid": "other-org-guid"
+								}
+							]
+						}
+					}`,
+					server.URL())
+
+				response2 := `
+					{
+						"pagination": {
+							"next": {
+								"href": null
+							}
+						},
+						"resources": [
+							{
+								"guid": "service-plan-3-guid",
+								"name": "service-plan-3-name",
+								"visibility_type": "organization",
+								"relationships": {
+									"service_offering": {
+									   "data": {
+										  "guid": "59d428b9-75b4-44db-addf-19c85c7f0f1e"
+									   }
+									}
+								}
+							}
+						]
+					}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization&service_offering_names=someOffering"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization&service_offering_names=someOffering&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+
+				query = []Query{
+					{
+						Key:    ServiceOfferingNamesFilter,
+						Values: []string{"someOffering"},
+					},
+				}
+			})
+
+			It("returns space and org name for space-scoped plans", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(plans).To(ConsistOf(
+					ServicePlanWithSpaceAndOrganization{
+						GUID:                "service-plan-1-guid",
+						Name:                "service-plan-1-name",
+						VisibilityType:      "public",
+						ServiceOfferingGUID: "79d428b9-75b4-44db-addf-19c85c7f0f1e",
+					},
+					ServicePlanWithSpaceAndOrganization{
+						GUID:                "service-plan-2-guid",
+						Name:                "service-plan-2-name",
+						VisibilityType:      "space",
+						ServiceOfferingGUID: "69d428b9-75b4-44db-addf-19c85c7f0f1e",
+						SpaceGUID:           "fake-space-guid",
+						SpaceName:           "matching-space",
+						OrganizationName:    "matching-org",
+					},
+					ServicePlanWithSpaceAndOrganization{
+						GUID:                "service-plan-3-guid",
+						Name:                "service-plan-3-name",
+						VisibilityType:      "organization",
+						ServiceOfferingGUID: "59d428b9-75b4-44db-addf-19c85c7f0f1e",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		When("the query fails", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 42424,
+							"detail": "Some detailed error message",
+							"title": "CF-SomeErrorTitle"
+						},
+						{
+							"code": 11111,
+							"detail": "Some other detailed error message",
+							"title": "CF-SomeOtherErrorTitle"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=space.organization"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
 	})
 })

@@ -54,6 +54,7 @@ type FakeServiceBroker struct {
 	domain        string
 	behaviors     behaviors
 	reusable      bool
+	spaceScoped   bool
 	catalogStatus int
 }
 
@@ -88,6 +89,11 @@ func (f *FakeServiceBroker) WithAsyncBehaviour() *FakeServiceBroker {
 	f.behaviors.Deprovision["default"] = asyncResponse()
 	f.behaviors.Bind["default"] = asyncResponse().asyncOnly()
 	f.behaviors.Unbind["default"] = asyncResponse().asyncOnly()
+	return f
+}
+
+func (f *FakeServiceBroker) WithSpaceScoped() *FakeServiceBroker {
+	f.spaceScoped = true
 	return f
 }
 

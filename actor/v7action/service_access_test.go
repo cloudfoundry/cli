@@ -23,7 +23,7 @@ var _ = Describe("service access actions", func() {
 
 	Describe("GetServiceAccess", func() {
 		BeforeEach(func() {
-			fakeCloudControllerClient.GetServicePlansReturns(fakeServicePlans(), ccv3.Warnings{"plans warning"}, nil)
+			fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationReturns(fakeServicePlans(), ccv3.Warnings{"plans warning"}, nil)
 			fakeCloudControllerClient.GetServiceOfferingsReturns(fakeServiceOfferings(), ccv3.Warnings{"offerings warning"}, nil)
 
 			visibility1 := ccv3.ServicePlanVisibility{
@@ -40,57 +40,57 @@ var _ = Describe("service access actions", func() {
 			access, warnings, err := actor.GetServiceAccess("", "", "")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf("plans warning", "offerings warning", "visibility1 1 warning", "visibility1 2 warning"))
-			Expect(access).To(Equal([]ServicePlanAccess{
-				{
+			Expect(access).To(ConsistOf(
+				ServicePlanAccess{
 					BrokerName:          "land-broker",
 					ServiceOfferingName: "yellow",
 					ServicePlanName:     "orange",
 					VisibilityType:      "organization",
 					VisibilityDetails:   []string{"org-1", "org-2"},
 				},
-				{
+				ServicePlanAccess{
 					BrokerName:          "land-broker",
 					ServiceOfferingName: "yellow",
 					ServicePlanName:     "yellow",
 					VisibilityType:      "organization",
 					VisibilityDetails:   []string{"org-3"},
 				},
-				{
+				ServicePlanAccess{
 					BrokerName:          "sea-broker",
 					ServiceOfferingName: "magenta",
 					ServicePlanName:     "red",
 					VisibilityType:      "public",
 					VisibilityDetails:   nil,
 				},
-				{
+				ServicePlanAccess{
 					BrokerName:          "sea-broker",
 					ServiceOfferingName: "magenta",
 					ServicePlanName:     "violet",
 					VisibilityType:      "public",
 					VisibilityDetails:   nil,
 				},
-				{
+				ServicePlanAccess{
 					BrokerName:          "sky-broker",
 					ServiceOfferingName: "cyan",
 					ServicePlanName:     "blue",
-					VisibilityType:      "admin",
-					VisibilityDetails:   nil,
+					VisibilityType:      "space",
+					VisibilityDetails:   []string{"some-space (org: some-org)"},
 				},
-				{
+				ServicePlanAccess{
 					BrokerName:          "sky-broker",
 					ServiceOfferingName: "cyan",
 					ServicePlanName:     "green",
 					VisibilityType:      "space",
-					VisibilityDetails:   nil,
+					VisibilityDetails:   []string{"some-space (org: some-org)"},
 				},
-				{
+				ServicePlanAccess{
 					BrokerName:          "sky-broker",
 					ServiceOfferingName: "key",
 					ServicePlanName:     "indigo",
 					VisibilityType:      "space",
-					VisibilityDetails:   nil,
+					VisibilityDetails:   []string{"some-space (org: some-org)"},
 				},
-			}))
+			))
 		})
 
 		When("there are no service offerings", func() {
@@ -128,8 +128,8 @@ var _ = Describe("service access actions", func() {
 					Values: []string{name},
 				}))
 
-				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ContainElement(ccv3.Query{
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationArgsForCall(0)).To(ContainElement(ccv3.Query{
 					Key:    ccv3.OrganizationGUIDFilter,
 					Values: []string{guid},
 				}))
@@ -174,8 +174,8 @@ var _ = Describe("service access actions", func() {
 					Values: []string{name},
 				}))
 
-				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ContainElement(ccv3.Query{
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationArgsForCall(0)).To(ContainElement(ccv3.Query{
 					Key:    ccv3.ServiceOfferingNamesFilter,
 					Values: []string{name},
 				}))
@@ -207,8 +207,8 @@ var _ = Describe("service access actions", func() {
 					Values: []string{name},
 				}))
 
-				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ContainElement(ccv3.Query{
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationArgsForCall(0)).To(ContainElement(ccv3.Query{
 					Key:    ccv3.ServiceBrokerNamesFilter,
 					Values: []string{name},
 				}))
@@ -266,8 +266,8 @@ var _ = Describe("service access actions", func() {
 					},
 				))
 
-				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ContainElements(
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationArgsForCall(0)).To(ContainElements(
 					ccv3.Query{
 						Key:    ccv3.OrganizationGUIDFilter,
 						Values: []string{orgGUID},
@@ -287,7 +287,7 @@ var _ = Describe("service access actions", func() {
 		When("the client fails to get resources", func() {
 			Context("service plans", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServicePlansReturns(
+					fakeCloudControllerClient.GetServicePlansWithSpaceAndOrganizationReturns(
 						nil,
 						ccv3.Warnings{"plans warning"},
 						errors.New("fake plans error"),
@@ -898,8 +898,8 @@ var _ = Describe("service access actions", func() {
 	})
 })
 
-func fakeServicePlans() []ccv3.ServicePlan {
-	return []ccv3.ServicePlan{
+func fakeServicePlans() []ccv3.ServicePlanWithSpaceAndOrganization {
+	return []ccv3.ServicePlanWithSpaceAndOrganization{
 		{
 			Name:                "violet",
 			ServiceOfferingGUID: "magenta-offering-guid",
@@ -909,11 +909,15 @@ func fakeServicePlans() []ccv3.ServicePlan {
 			Name:                "green",
 			ServiceOfferingGUID: "cyan-offering-guid",
 			VisibilityType:      "space",
+			SpaceName:           "some-space",
+			OrganizationName:    "some-org",
 		},
 		{
 			Name:                "indigo",
 			ServiceOfferingGUID: "key-offering-guid",
 			VisibilityType:      "space",
+			SpaceName:           "some-space",
+			OrganizationName:    "some-org",
 		},
 		{
 			Name:                "red",
@@ -933,7 +937,9 @@ func fakeServicePlans() []ccv3.ServicePlan {
 		{
 			Name:                "blue",
 			ServiceOfferingGUID: "cyan-offering-guid",
-			VisibilityType:      "admin",
+			VisibilityType:      "space",
+			SpaceName:           "some-space",
+			OrganizationName:    "some-org",
 		},
 	}
 }

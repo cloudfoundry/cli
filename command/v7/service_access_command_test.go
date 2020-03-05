@@ -94,10 +94,15 @@ var _ = Describe("service-access Command", func() {
 				Expect(testUI.Out).To(Say(tableHeaders))
 				Expect(testUI.Out).To(Say(`service-one\s+plan-one\s+all`))
 				Expect(testUI.Out).To(Say(`service-two\s+plan-two\s+none`))
+
 				Expect(testUI.Out).To(Say(`broker:\s+broker-two`))
 				Expect(testUI.Out).To(Say(tableHeaders))
 				Expect(testUI.Out).To(Say(`service-three\s+plan-three\s+limited\s+org-1,org-2`))
 				Expect(testUI.Out).To(Say(`service-four\s+plan-four\s+limited\s+org-1,org-3`))
+
+				Expect(testUI.Out).To(Say(`broker:\s+broker-three`))
+				Expect(testUI.Out).To(Say(`service\s+plan\s+access\s+space`))
+				Expect(testUI.Out).To(Say(`service-five\s+plan-five\s+limited\s+space-1 in org org-1`))
 			})
 		})
 
@@ -209,6 +214,13 @@ func fakeServiceAccessResult() []v7action.ServicePlanAccess {
 			ServicePlanName:     "plan-four",
 			VisibilityType:      "organization",
 			VisibilityDetails:   []string{"org-1", "org-3"},
+		},
+		{
+			BrokerName:          "broker-three",
+			ServiceOfferingName: "service-five",
+			ServicePlanName:     "plan-five",
+			VisibilityType:      "space",
+			VisibilityDetails:   []string{"space-1 in org org-1"},
 		},
 	}
 }

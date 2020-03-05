@@ -456,7 +456,7 @@ var _ = Describe("shared request helpers", func() {
 			includedResources, warnings, executeErr = client.MakeListRequest(requestParams)
 		})
 
-		Context("With query params and incldued resources", func() {
+		Context("with query params and included resources", func() {
 			var (
 				resources []Role
 				query     []Query
@@ -539,7 +539,7 @@ var _ = Describe("shared request helpers", func() {
 				})
 			})
 
-			When("the request uses the `include` query key", func() {
+			When("the response includes other resources", func() {
 				BeforeEach(func() {
 					response1 := fmt.Sprintf(`{
 						"pagination": {
@@ -565,9 +565,22 @@ var _ = Describe("shared request helpers", func() {
 									"username": "user-name-1",
 									"origin": "uaa"
 							  	}
+							],
+							"spaces": [
+								{
+									"guid": "space-guid-1",
+									"name": "space-name-1"
+							  	}
+							],
+							"organizations": [
+								{
+									"guid": "org-guid-1",
+									"name": "org-name-1"
+							  	}
 							]
 						}
-}`, server.URL())
+					}`, server.URL())
+
 					response2 := `{
 							"pagination": {
 								"next": null
@@ -590,6 +603,18 @@ var _ = Describe("shared request helpers", func() {
 								"username": "user-name-2",
 								"origin": "uaa"
 							  }
+							],
+							"spaces": [
+								{
+									"guid": "space-guid-2",
+									"name": "space-name-2"
+							  	}
+							],
+							"organizations": [
+								{
+									"guid": "org-guid-2",
+									"name": "org-name-2"
+							  	}
 							]
 						  }
 						}`
@@ -608,7 +633,7 @@ var _ = Describe("shared request helpers", func() {
 					)
 				})
 
-				It("returns the given route and all warnings", func() {
+				It("returns the queried and additional resources", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
@@ -626,6 +651,14 @@ var _ = Describe("shared request helpers", func() {
 						Users: []User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
+						},
+						Spaces: []Space{
+							{GUID: "space-guid-1", Name: "space-name-1"},
+							{GUID: "space-guid-2", Name: "space-name-2"},
+						},
+						Organizations: []Organization{
+							{GUID: "org-guid-1", Name: "org-name-1"},
+							{GUID: "org-guid-2", Name: "org-name-2"},
 						},
 					}))
 				})

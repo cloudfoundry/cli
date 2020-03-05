@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -65,10 +64,13 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 		return nil
 	}
 
-	tableHeaders := []string{"service", "plan", "access", "orgs"}
-	data := [][]string{tableHeaders}
+	var data [][]string
 
 	for index, plan := range servicePlanAccess {
+		if len(data) == 0 {
+			data = [][]string{getTableHeaders(plan)}
+		}
+
 		data = append(data, []string{
 			plan.ServiceOfferingName,
 			plan.ServicePlanName,
@@ -87,11 +89,18 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 			cmd.UI.DisplayTableWithHeader("   ", data, 3)
 			cmd.UI.DisplayNewline()
 
-			data = [][]string{tableHeaders}
+			data = nil
 		}
 	}
 
 	return nil
+}
+
+func getTableHeaders(plan v7action.ServicePlanAccess) []string {
+	if string(plan.VisibilityType) == "space" {
+		return []string{"service", "plan", "access", "space"}
+	}
+	return []string{"service", "plan", "access", "orgs"}
 }
 
 func accessFromVisibilityType(visibilityType string) string {

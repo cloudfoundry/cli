@@ -94,7 +94,12 @@ func (f *FakeServiceBroker) register() {
 		f.deregister()
 	}
 
-	Eventually(helpers.CF("create-service-broker", f.name, f.username, f.password, f.URL())).Should(Exit(0))
+	params := []string{"create-service-broker", f.name, f.username, f.password, f.URL()}
+	if f.spaceScoped {
+		params = append(params, "--space-scoped")
+	}
+
+	Eventually(helpers.CF(params...)).Should(Exit(0))
 
 	f.waitForBrokerToBeRegistered()
 }
