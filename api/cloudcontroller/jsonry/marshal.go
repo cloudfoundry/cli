@@ -12,12 +12,7 @@ func Marshal(source interface{}) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	tree, err := marshal(make(map[string]interface{}), sourceValue)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	return json.Marshal(tree)
+	return json.Marshal(marshal(make(map[string]interface{}), sourceValue))
 }
 
 func relectOnAndCheckStruct(store interface{}) (reflect.Value, error) {
@@ -33,7 +28,7 @@ func relectOnAndCheckStruct(store interface{}) (reflect.Value, error) {
 	return v, nil
 }
 
-func marshal(tree map[string]interface{}, sourceValue reflect.Value) (map[string]interface{}, error) {
+func marshal(tree map[string]interface{}, sourceValue reflect.Value) map[string]interface{} {
 	if sourceValue.Kind() == reflect.Ptr {
 		sourceValue = sourceValue.Elem()
 	}
@@ -46,7 +41,7 @@ func marshal(tree map[string]interface{}, sourceValue reflect.Value) (map[string
 		navigateAndSet(path, tree, sourceValue.Field(i))
 	}
 
-	return tree, nil
+	return tree
 }
 
 func navigateAndSet(path jsonryPath, tree map[string]interface{}, value reflect.Value) {
