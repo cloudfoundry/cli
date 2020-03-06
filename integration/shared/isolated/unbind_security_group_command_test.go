@@ -104,7 +104,9 @@ var _ = Describe("unbind-security-group command", func() {
 
 	When("the security group exists", func() {
 		BeforeEach(func() {
-			someSecurityGroup := helpers.NewSecurityGroup(securityGroupName, "tcp", "127.0.0.1", "8443", "some-description")
+			port := "8443"
+			description := "some-description"
+			someSecurityGroup := helpers.NewSecurityGroup(securityGroupName, "tcp", "127.0.0.1", &port, &description)
 			someSecurityGroup.Create()
 		})
 

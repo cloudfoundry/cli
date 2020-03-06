@@ -89,11 +89,14 @@ var _ = Describe("space command", func() {
 				)
 
 				BeforeEach(func() {
-					securityGroup0 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("0"), "tcp", "4.3.2.1/24", "80,443", "foo security group")
+					ports := "80,443"
+					description1 := "foo security group"
+					description2 := "some security group"
+					securityGroup0 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("0"), "tcp", "4.3.2.1/24", &ports, &description1)
 					securityGroup0.Create()
 					Eventually(helpers.CF("bind-security-group", securityGroup0.Name, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 
-					securityGroup1 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("1"), "tcp", "1.2.3.4/24", "80,443", "some security group")
+					securityGroup1 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("1"), "tcp", "1.2.3.4/24", &ports, &description2)
 					securityGroup1.Create()
 					Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
 
