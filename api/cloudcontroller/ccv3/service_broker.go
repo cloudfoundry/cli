@@ -29,75 +29,42 @@ func (s *ServiceBroker) UnmarshalJSON(data []byte) error {
 
 type ServiceBrokerModel struct {
 	// Name is the name of the service broker.
-	Name string
+	Name string `jsonry:"name,omitempty"`
 	// URL is the url of the service broker.
-	URL string
+	URL string `jsonry:"url,omitempty"`
+	// CredentialsType is always "basic"
+	CredentialsType constant.ServiceBrokerCredentialsType `jsonry:"authentication.type,omitempty"`
 	// Username is the Basic Auth username for the service broker.
-	Username string
+	Username string `jsonry:"authentication.credentials.username,omitempty"`
 	// Password is the Basic Auth password for the service broker.
-	Password string
+	Password string `jsonry:"authentication.credentials.password,omitempty"`
 	// Space GUID for the space that the broker is in. Empty when not a space-scoped service broker.
-	SpaceGUID string
+	SpaceGUID string `jsonry:"relationships.space.data.guid,omitempty"`
 }
 
-// serviceBrokerRequest represents a Cloud Controller V3 Service Broker (when creating and updating).
-type serviceBrokerRequest struct {
-	// GUID is a unique service broker identifier.
-	GUID string `json:"guid,omitempty"`
-	// Name is the name of the service broker.
-	Name string `json:"name,omitempty"`
-	// URL is the url of the service broker.
-	URL string `json:"url,omitempty"`
-	// Authentication contains the authentication for authenticating with the service broker.
-	Authentication *serviceBrokerAuthentication `json:"authentication,omitempty"`
-	// This is the relationship for the space GUID
-	Relationships *serviceBrokerRelationships `json:"relationships,omitempty"`
+func (s ServiceBrokerModel) MarshalJSON() ([]byte, error) {
+	return jsonry.Marshal(s)
 }
 
-// serviceBrokerAuthentication represents a data structure for the Credentials
-// of V3 Service Broker.
-type serviceBrokerAuthentication struct {
-	// Type is the type of authentication for the service broker, e.g. "basic"
-	Type constant.ServiceBrokerCredentialsType `json:"type"`
-	// Data is the authentication data of the service broker of a particular type.
-	Credentials serviceBrokerBasicAuthCredentials `json:"credentials"`
-}
+func (s ServiceBrokerModel) check() (ServiceBrokerModel, error) {
+	if (s.Username == "" && s.Password != "") || (s.Username != "" && s.Password == "") {
+		return s, errors.New("Incorrect usage: both username and password must be defined in order to do an update")
+	}
 
-// serviceBrokerBasicAuthCredentials represents a data structure for the Credentials Data
-// of V3 Service Broker Credentials.
-type serviceBrokerBasicAuthCredentials struct {
-	// Username is the Basic Auth username for the service broker.
-	Username string `json:"username"`
-	// Password is the Basic Auth password for the service broker.
-	Password string `json:"password"`
-}
+	if s.Username != "" && s.Password != "" {
+		s.CredentialsType = constant.BasicCredentials
+	}
 
-// serviceBrokerRelationships represents a data structure for the relationships data
-// of V3 Service Broker Relationships.
-type serviceBrokerRelationships struct {
-	// Space represents the space that a space-scoped broker is in
-	Space serviceBrokerRelationshipsSpace `json:"space"`
-}
-
-// serviceBrokerRelationshipsSpace represents a data structure for the relationships space data
-// of V3 Service Broker Relationships.
-type serviceBrokerRelationshipsSpace struct {
-	// Data holds the space GUID object
-	Data serviceBrokerRelationshipsSpaceData `json:"data"`
-}
-
-// serviceBrokerRelationshipsSpaceData represents a data structure for the relationships space GUID data
-// of V3 Service Broker Relationships.
-type serviceBrokerRelationshipsSpaceData struct {
-	// GUID is the space guid associated with a space-scoped broker
-	GUID string `json:"guid"`
+	return s, nil
 }
 
 // CreateServiceBroker registers a new service broker.
 func (client *Client) CreateServiceBroker(serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
+	serviceBroker.CredentialsType = constant.BasicCredentials
+
 	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostServiceBrokerRequest,
-		RequestBody: newServiceBroker(serviceBroker),
+		RequestBody: serviceBroker,
 	})
 
 	return jobURL, warnings, err
@@ -132,7 +99,7 @@ func (client *Client) GetServiceBrokers(query ...Query) ([]ServiceBroker, Warnin
 
 // UpdateServiceBroker updates an existing service broker.
 func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroker ServiceBrokerModel) (JobURL, Warnings, error) {
-	brokerUpdateRequest, err := newUpdateServiceBroker(serviceBroker)
+	brokerUpdateRequest, err := serviceBroker.check()
 	if err != nil {
 		return "", nil, err
 	}
@@ -144,56 +111,4 @@ func (client *Client) UpdateServiceBroker(serviceBrokerGUID string, serviceBroke
 	})
 
 	return jobURL, warnings, err
-}
-
-func newServiceBroker(serviceBroker ServiceBrokerModel) serviceBrokerRequest {
-	serviceBrokerRequest := serviceBrokerRequest{
-		Name: serviceBroker.Name,
-		URL:  serviceBroker.URL,
-		Authentication: &serviceBrokerAuthentication{
-			Type: constant.BasicCredentials,
-			Credentials: serviceBrokerBasicAuthCredentials{
-				Username: serviceBroker.Username,
-				Password: serviceBroker.Password,
-			},
-		},
-	}
-
-	if serviceBroker.SpaceGUID != "" {
-		serviceBrokerRequest.Relationships = &serviceBrokerRelationships{
-			Space: serviceBrokerRelationshipsSpace{
-				Data: serviceBrokerRelationshipsSpaceData{
-					GUID: serviceBroker.SpaceGUID,
-				},
-			},
-		}
-	}
-
-	return serviceBrokerRequest
-}
-
-func newUpdateServiceBroker(serviceBroker ServiceBrokerModel) (serviceBrokerRequest, error) {
-	name := serviceBroker.Name
-	username := serviceBroker.Username
-	password := serviceBroker.Password
-	brokerURL := serviceBroker.URL
-	if (username == "" && password != "") || (username != "" && password == "") {
-		return serviceBrokerRequest{}, errors.New("Incorrect usage: both username and password must be defined in order to do an update")
-	}
-	request := serviceBrokerRequest{
-		Name: name,
-		URL:  brokerURL,
-	}
-
-	if username != "" && password != "" {
-		request.Authentication = &serviceBrokerAuthentication{
-			Type: constant.BasicCredentials,
-			Credentials: serviceBrokerBasicAuthCredentials{
-				Username: username,
-				Password: password,
-			},
-		}
-	}
-
-	return request, nil
 }

@@ -41,7 +41,7 @@ var _ = Describe("Unmarshal", func() {
 		Expect(s.A).To(PointTo(Equal("pointer works")))
 	})
 
-	It("unmarshals arrays", func() {
+	It("unmarshals lists", func() {
 		var s struct {
 			A []string
 			B *[]string
@@ -173,7 +173,7 @@ var _ = Describe("Unmarshal", func() {
 		}))
 	})
 
-	Context("when there is a type mismatch", func() {
+	When("there is a type mismatch", func() {
 		It("fails for simple types", func() {
 			var s struct{ S int }
 			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
@@ -239,6 +239,17 @@ var _ = Describe("Unmarshal", func() {
 			err := jsonry.Unmarshal([]byte(`{}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.A).To(Equal(""))
+		})
+
+		It("leaves zero value in a list", func() {
+			var s struct {
+				T []string `jsonry:"t.a"`
+			}
+
+			data := `{"t": [{"a": "foo"}, {}, {"a": "bar"}]}`
+			err := jsonry.Unmarshal([]byte(data), &s)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(s.T).To(Equal([]string{"foo", "", "bar"}))
 		})
 	})
 

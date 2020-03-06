@@ -2,14 +2,12 @@ package jsonry
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 
 	"code.cloudfoundry.org/cli/types"
-
-	"encoding/json"
-	"reflect"
-	"strings"
 )
 
 var (
@@ -18,7 +16,7 @@ var (
 )
 
 func Unmarshal(data []byte, store interface{}) error {
-	storeValue, err := relectOnAndCheck(store)
+	storeValue, err := relectOnAndCheckStructPointer(store)
 	if err != nil {
 		return err
 	}
@@ -31,7 +29,7 @@ func Unmarshal(data []byte, store interface{}) error {
 	return unmarshal(storeValue, tree)
 }
 
-func relectOnAndCheck(store interface{}) (reflect.Value, error) {
+func relectOnAndCheckStructPointer(store interface{}) (reflect.Value, error) {
 	p := reflect.ValueOf(store)
 	if kind := p.Kind(); kind != reflect.Ptr {
 		return reflect.Value{}, errors.New("the storage object must be a pointer")
@@ -78,58 +76,35 @@ func depointerify(v reflect.Value) reflect.Value {
 	return n.Elem()
 }
 
-func actualKind(t reflect.Type) reflect.Kind {
-	if k := t.Kind(); k != reflect.Ptr {
-		return k
-	}
-
-	return t.Elem().Kind()
-}
-
-func computePath(field reflect.StructField) []string {
-	if tag := field.Tag.Get("jsonry"); tag != "" {
-		return strings.Split(tag, ".")
-	}
-
-	if tag := field.Tag.Get("json"); tag != "" {
-		parts := strings.Split(tag, ",")
-		if parts[0] != "" {
-			return []string{parts[0]}
-		}
-	}
-
-	return []string{strings.ToLower(field.Name)}
-}
-
-func navigateAndFetch(path []string, tree interface{}) (interface{}, bool) {
-	branch := path[0]
+func navigateAndFetch(path jsonryPath, tree interface{}) (interface{}, bool) {
+	branch := path.elements[0]
 
 	node, ok := tree.(map[string]interface{})
 	if !ok {
 		return nil, false
 	}
 
-	val, ok := node[branch]
+	val, ok := node[branch.name]
 	if !ok {
 		return nil, false
 	}
 
-	if len(path) > 1 {
+	if path.len() > 1 {
 		if vals, ok := val.([]interface{}); ok {
 			return iterateAndFetch(path, vals), true
 		}
 
-		return navigateAndFetch(path[1:], val)
+		return navigateAndFetch(path.chop(), val)
 	}
 
 	return val, true
 }
 
-func iterateAndFetch(path []string, vals []interface{}) interface{} {
+func iterateAndFetch(path jsonryPath, vals []interface{}) interface{} {
 	var results []interface{}
 
 	for _, v := range vals {
-		r, _ := navigateAndFetch(path[1:], v)
+		r, _ := navigateAndFetch(path.chop(), v)
 		results = append(results, r)
 	}
 
@@ -193,11 +168,15 @@ func setSlice(fieldName string, store reflect.Value, value interface{}) error {
 	arr := reflect.MakeSlice(reflect.SliceOf(elemType), len(vs), len(vs))
 	for i, v := range vs {
 		vv := valueOfWithDenumberification(v)
+		if !vv.IsValid() {
+			continue
+		}
 
 		if vv.Type().AssignableTo(elemType) {
 			arr.Index(i).Set(vv)
 			continue
 		}
+
 		if vv.Type().ConvertibleTo(elemType) {
 			arr.Index(i).Set(vv.Convert(elemType))
 			continue
@@ -238,7 +217,7 @@ func tryToConvertMapOfNullStrings(value interface{}) (reflect.Value, bool) {
 func valueOfWithDenumberification(v interface{}) reflect.Value {
 	vv := reflect.ValueOf(v)
 
-	if vv.Type() == jsonNumberType {
+	if vv.IsValid() && vv.Type() == jsonNumberType {
 		num := json.Number(vv.String())
 		// Extend to support other number types as needed
 		if i64, err := num.Int64(); err == nil {
