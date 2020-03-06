@@ -5,14 +5,6 @@ import (
 	"strings"
 )
 
-func actualKind(t reflect.Type) reflect.Kind {
-	if k := t.Kind(); k != reflect.Ptr {
-		return k
-	}
-
-	return t.Elem().Kind()
-}
-
 type pathElement struct {
 	name string
 	list bool
@@ -32,6 +24,14 @@ func (p jsonryPath) chop() jsonryPath {
 
 func (p jsonryPath) len() int {
 	return len(p.elements)
+}
+
+func actualKind(t reflect.Type) reflect.Kind {
+	if k := t.Kind(); k != reflect.Ptr {
+		return k
+	}
+
+	return t.Elem().Kind()
 }
 
 func computePath(field reflect.StructField) jsonryPath {
