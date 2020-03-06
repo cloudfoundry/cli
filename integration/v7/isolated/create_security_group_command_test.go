@@ -134,7 +134,7 @@ var _ = Describe("create-security-group command", func() {
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("security-group", securityGroupName)
-				Eventually(session).Should(Say(`Name\s+%s`, securityGroupName))
+				Eventually(session).Should(Say(`name:\s+%s`, securityGroupName))
 			})
 		})
 
