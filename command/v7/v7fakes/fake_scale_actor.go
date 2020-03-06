@@ -42,11 +42,12 @@ type FakeScaleActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollStartStub        func(string, bool) (v7action.Warnings, error)
+	PollStartStub        func(string, bool, func(string)) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
 	pollStartArgsForCall []struct {
 		arg1 string
 		arg2 bool
+		arg3 func(string)
 	}
 	pollStartReturns struct {
 		result1 v7action.Warnings
@@ -235,17 +236,18 @@ func (fake *FakeScaleActor) GetDetailedAppSummaryReturnsOnCall(i int, result1 v7
 	}{result1, result2, result3}
 }
 
-func (fake *FakeScaleActor) PollStart(arg1 string, arg2 bool) (v7action.Warnings, error) {
+func (fake *FakeScaleActor) PollStart(arg1 string, arg2 bool, arg3 func(string)) (v7action.Warnings, error) {
 	fake.pollStartMutex.Lock()
 	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
 	fake.pollStartArgsForCall = append(fake.pollStartArgsForCall, struct {
 		arg1 string
 		arg2 bool
-	}{arg1, arg2})
-	fake.recordInvocation("PollStart", []interface{}{arg1, arg2})
+		arg3 func(string)
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("PollStart", []interface{}{arg1, arg2, arg3})
 	fake.pollStartMutex.Unlock()
 	if fake.PollStartStub != nil {
-		return fake.PollStartStub(arg1, arg2)
+		return fake.PollStartStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -260,17 +262,17 @@ func (fake *FakeScaleActor) PollStartCallCount() int {
 	return len(fake.pollStartArgsForCall)
 }
 
-func (fake *FakeScaleActor) PollStartCalls(stub func(string, bool) (v7action.Warnings, error)) {
+func (fake *FakeScaleActor) PollStartCalls(stub func(string, bool, func(string)) (v7action.Warnings, error)) {
 	fake.pollStartMutex.Lock()
 	defer fake.pollStartMutex.Unlock()
 	fake.PollStartStub = stub
 }
 
-func (fake *FakeScaleActor) PollStartArgsForCall(i int) (string, bool) {
+func (fake *FakeScaleActor) PollStartArgsForCall(i int) (string, bool, func(string)) {
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	argsForCall := fake.pollStartArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeScaleActor) PollStartReturns(result1 v7action.Warnings, result2 error) {

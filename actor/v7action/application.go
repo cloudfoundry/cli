@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -283,7 +284,7 @@ func (actor Actor) GetUnstagedNewestPackageGUID(appGUID string) (string, Warning
 // PollStart polls an application's processes until some are started. If noWait is false,
 // it waits for at least one instance of all processes to be running. If noWait is true,
 // it only waits for an instance of the web process to be running.
-func (actor Actor) PollStart(appGUID string, noWait bool) (Warnings, error) {
+func (actor Actor) PollStart(appGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var allWarnings Warnings
 	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
 	allWarnings = append(allWarnings, warnings...)
@@ -311,7 +312,7 @@ func (actor Actor) PollStart(appGUID string, noWait bool) (Warnings, error) {
 		case <-timeout:
 			return allWarnings, actionerror.StartupTimeoutError{}
 		case <-timer.C():
-			stopPolling, warnings, err := actor.PollProcesses(filteredProcesses)
+			stopPolling, warnings, err := actor.PollProcesses(filteredProcesses, handleInstanceDetails)
 			allWarnings = append(allWarnings, warnings...)
 			if stopPolling || err != nil {
 				return allWarnings, err
@@ -324,7 +325,7 @@ func (actor Actor) PollStart(appGUID string, noWait bool) (Warnings, error) {
 
 // PollStartForRolling polls a deploying application's processes until some are started. It does the same thing as PollStart, except it accounts for rolling deployments and whether
 // they have failed or been canceled during polling.
-func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, noWait bool) (Warnings, error) {
+func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var (
 		deployment  ccv3.Deployment
 		processes   []ccv3.Process
@@ -355,7 +356,7 @@ func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, no
 			}
 
 			if noWait || isDeployed(deployment) {
-				stopPolling, warnings, err := actor.PollProcesses(processes)
+				stopPolling, warnings, err := actor.PollProcesses(processes, handleInstanceDetails)
 				allWarnings = append(allWarnings, warnings...)
 				if stopPolling || err != nil {
 					return allWarnings, err
@@ -372,7 +373,7 @@ func isDeployed(d ccv3.Deployment) bool {
 }
 
 // PollProcesses - return true if there's no need to keep polling
-func (actor Actor) PollProcesses(processes []ccv3.Process) (bool, Warnings, error) {
+func (actor Actor) PollProcesses(processes []ccv3.Process, handleInstanceDetails func(string)) (bool, Warnings, error) {
 	numProcesses := len(processes)
 	numStableProcesses := 0
 	var allWarnings Warnings
@@ -382,6 +383,10 @@ func (actor Actor) PollProcesses(processes []ccv3.Process) (bool, Warnings, erro
 		allWarnings = append(allWarnings, ccWarnings...)
 		if err != nil {
 			return true, allWarnings, err
+		}
+
+		for _, instance := range instances {
+			handleInstanceDetails(formatInstanceDetails(instance.Details))
 		}
 
 		if instances.Empty() || instances.AnyRunning() {
@@ -483,4 +488,12 @@ func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spac
 	}
 
 	return application, allWarnings, nil
+}
+
+func formatInstanceDetails(details string) string {
+	if details == "" {
+		return "Instances starting..."
+	}
+
+	return fmt.Sprintf("Error starting instances: '%s'", details)
 }

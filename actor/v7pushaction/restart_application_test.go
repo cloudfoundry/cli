@@ -47,6 +47,11 @@ var _ = Describe("RestartApplication", func() {
 
 	When("Restarting the app succeeds", func() {
 		BeforeEach(func() {
+			fakeV7Actor.PollStartCalls(func(s string, b bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+				handleInstanceDetails("instance details")
+				return nil, nil
+			})
+
 			fakeV7Actor.RestartApplicationReturns(v7action.Warnings{"some-restarting-warning"}, nil)
 			paramPlan.Application.State = constant.ApplicationStarted
 		})
@@ -58,7 +63,7 @@ var _ = Describe("RestartApplication", func() {
 
 			It("calls PollStart with true", func() {
 				Expect(fakeV7Actor.PollStartCallCount()).To(Equal(1))
-				actualAppGUID, givenNoWait := fakeV7Actor.PollStartArgsForCall(0)
+				actualAppGUID, givenNoWait, _ := fakeV7Actor.PollStartArgsForCall(0)
 				Expect(givenNoWait).To(Equal(true))
 				Expect(actualAppGUID).To(Equal("some-app-guid"))
 			})
@@ -66,9 +71,10 @@ var _ = Describe("RestartApplication", func() {
 
 		It("calls pollStart", func() {
 			Expect(fakeV7Actor.PollStartCallCount()).To(Equal(1))
-			actualAppGUID, givenNoWait := fakeV7Actor.PollStartArgsForCall(0)
+			actualAppGUID, givenNoWait, _ := fakeV7Actor.PollStartArgsForCall(0)
 			Expect(givenNoWait).To(Equal(false))
 			Expect(actualAppGUID).To(Equal("some-app-guid"))
+			Expect(events).To(ConsistOf(RestartingApplication, Event("instance details"), RestartingApplicationComplete))
 		})
 
 		When("pollStart errors", func() {

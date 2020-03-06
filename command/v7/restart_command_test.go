@@ -170,19 +170,25 @@ var _ = Describe("restart Command", func() {
 
 						It("calls poll start for rolling with no wait true", func() {
 							Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
-							actualAppGUID, actualDeploymentGUID, actualNoWait := fakeActor.PollStartForRollingArgsForCall(0)
+							actualAppGUID, actualDeploymentGUID, actualNoWait, handleInstanceDetails := fakeActor.PollStartForRollingArgsForCall(0)
 							Expect(actualAppGUID).To(Equal("app-guid"))
 							Expect(actualDeploymentGUID).To(Equal("deployment-guid"))
 							Expect(actualNoWait).To(BeTrue())
+
+							handleInstanceDetails("instance details")
+							Expect(testUI.Out).To(Say("instance details"))
 						})
 					})
 
 					It("calls poll start for rolling with no wait true", func() {
 						Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
-						actualAppGUID, actualDeploymentGUID, actualNoWait := fakeActor.PollStartForRollingArgsForCall(0)
+						actualAppGUID, actualDeploymentGUID, actualNoWait, handleInstanceDetails := fakeActor.PollStartForRollingArgsForCall(0)
 						Expect(actualAppGUID).To(Equal("app-guid"))
 						Expect(actualDeploymentGUID).To(Equal("deployment-guid"))
 						Expect(actualNoWait).To(BeFalse())
+
+						handleInstanceDetails("instance details")
+						Expect(testUI.Out).To(Say("instance details"))
 					})
 
 					When("polling start fails", func() {
@@ -275,9 +281,12 @@ var _ = Describe("restart Command", func() {
 									Expect(appGUID).To(Equal("some-app-guid"))
 
 									Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-									appGUID, noWait := fakeActor.PollStartArgsForCall(0)
+									appGUID, noWait, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
 									Expect(appGUID).To(Equal("some-app-guid"))
 									Expect(noWait).To(Equal(false))
+
+									handleInstanceDetails("instance details")
+									Expect(testUI.Out).To(Say("instance details"))
 								})
 							})
 
@@ -315,9 +324,12 @@ var _ = Describe("restart Command", func() {
 									Expect(appGUID).To(Equal("some-app-guid"))
 
 									Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-									appGUID, noWait := fakeActor.PollStartArgsForCall(0)
+									appGUID, noWait, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
 									Expect(appGUID).To(Equal("some-app-guid"))
 									Expect(noWait).To(Equal(false))
+
+									handleInstanceDetails("instance details")
+									Expect(testUI.Out).To(Say("instance details"))
 								})
 							})
 						})

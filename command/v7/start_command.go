@@ -16,7 +16,7 @@ import (
 type StartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
-	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
+	PollStart(appGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
@@ -127,7 +127,11 @@ func (cmd StartCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayNewline()
 
-	warnings, err = cmd.Actor.PollStart(app.GUID, false)
+	handleInstanceDetails := func(instanceDetails string) {
+		cmd.UI.DisplayText(instanceDetails)
+	}
+
+	warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

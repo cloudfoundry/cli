@@ -170,8 +170,11 @@ var _ = Describe("restage Command", func() {
 			Expect(appGUID).To(Equal("app-guid"))
 
 			Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-			appGUID, _ = fakeActor.PollStartArgsForCall(0)
+			appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
 			Expect(appGUID).To(Equal("app-guid"))
+
+			handleInstanceDetails("instance details")
+			Expect(testUI.Out).To(Say("instance details"))
 		})
 
 		It("prints the app summary", func() {
@@ -212,10 +215,13 @@ var _ = Describe("restage Command", func() {
 				Expect(dropletGUID).To(Equal("some-droplet-guid"))
 
 				Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
-				appGUID, deploymentGUID, noWait := fakeActor.PollStartForRollingArgsForCall(0)
+				appGUID, deploymentGUID, noWait, handleInstanceDetails := fakeActor.PollStartForRollingArgsForCall(0)
 				Expect(appGUID).To(Equal("app-guid"))
 				Expect(deploymentGUID).To(Equal("deployment-guid"))
 				Expect(noWait).To(BeFalse())
+
+				handleInstanceDetails("instance details")
+				Expect(testUI.Out).To(Say("instance details"))
 			})
 
 			It("print deployment output and the app summary", func() {
@@ -240,16 +246,20 @@ var _ = Describe("restage Command", func() {
 			It("respects the no-wait value and polls appropriately", func() {
 				// deployment strategy is null
 				Expect(fakeActor.PollStartCallCount()).To(Equal(1))
-				_, noWait := fakeActor.PollStartArgsForCall(0)
+				_, noWait, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
 				Expect(noWait).To(BeTrue())
+				handleInstanceDetails("instance details")
+				Expect(testUI.Out).To(Say("instance details"))
 
 				// deployment strategy is rolling
 				cmd.Strategy.Name = constant.DeploymentStrategyRolling
 				executeErr = cmd.Execute(nil)
 
 				Expect(fakeActor.PollStartForRollingCallCount()).To(Equal(1))
-				_, _, noWait = fakeActor.PollStartForRollingArgsForCall(0)
+				_, _, noWait, handleInstanceDetailsRolling := fakeActor.PollStartForRollingArgsForCall(0)
 				Expect(noWait).To(BeTrue())
+				handleInstanceDetailsRolling("instance details rolling")
+				Expect(testUI.Out).To(Say("instance details rolling"))
 			})
 		})
 	})

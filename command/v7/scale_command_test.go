@@ -347,7 +347,10 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
+								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(appGUID).To(Equal("some-app-guid"))
+								handleInstanceDetails("instance details")
+								Expect(testUI.Out).To(Say("instance details"))
 							})
 
 							When("Restarting the app fails to stop the app", func() {
@@ -454,7 +457,10 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
+								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(appGUID).To(Equal("some-app-guid"))
+								handleInstanceDetails("instance details")
+								Expect(testUI.Out).To(Say("instance details"))
 							})
 
 							It("displays the process table", func() {
@@ -478,7 +484,10 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
+								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(appGUID).To(Equal("some-app-guid"))
+								handleInstanceDetails("instance details")
+								Expect(testUI.Out).To(Say("instance details"))
 							})
 
 							It("displays all warnings and fails", func() {
@@ -495,7 +504,10 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
+								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(appGUID).To(Equal("some-app-guid"))
+								handleInstanceDetails("instance details")
+								Expect(testUI.Out).To(Say("instance details"))
 							})
 
 							It("returns the StartupTimeoutError", func() {

@@ -25,9 +25,9 @@ type RestageActor interface {
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
-	PollStart(appGUID string, noWait bool) (v7action.Warnings, error)
+	PollStart(appGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	CreateDeployment(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
-	PollStartForRolling(appGUID string, deploymentGUID string, noWait bool) (v7action.Warnings, error)
+	PollStartForRolling(appGUID string, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 }
 
 type RestageCommand struct {
@@ -130,7 +130,12 @@ func (cmd RestageCommand) Execute(args []string) error {
 		}
 
 		cmd.UI.DisplayText("Waiting for app to deploy...\n")
-		warnings, err = cmd.Actor.PollStartForRolling(app.GUID, deploymentGUID, cmd.NoWait)
+
+		handleInstanceDetails := func(instanceDetails string) {
+			cmd.UI.DisplayText(instanceDetails)
+		}
+
+		warnings, err = cmd.Actor.PollStartForRolling(app.GUID, deploymentGUID, cmd.NoWait, handleInstanceDetails)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return cmd.mapErr(cmd.RequiredArgs.AppName, err)
@@ -160,7 +165,11 @@ func (cmd RestageCommand) Execute(args []string) error {
 			return err
 		}
 
-		warnings, err = cmd.Actor.PollStart(app.GUID, cmd.NoWait)
+		handleInstanceDetails := func(instanceDetails string) {
+			cmd.UI.DisplayText(instanceDetails)
+		}
+
+		warnings, err = cmd.Actor.PollStart(app.GUID, cmd.NoWait, handleInstanceDetails)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return cmd.mapErr(cmd.RequiredArgs.AppName, err)

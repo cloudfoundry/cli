@@ -736,13 +736,15 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("PollStart", func() {
 		var (
-			appGUID string
-			noWait  bool
+			appGUID               string
+			noWait                bool
+			handleInstanceDetails func(string)
 
 			done chan bool
 
-			warnings   Warnings
-			executeErr error
+			warnings                Warnings
+			executeErr              error
+			reportedInstanceDetails []string
 		)
 
 		BeforeEach(func() {
@@ -751,12 +753,17 @@ var _ = Describe("Application Actions", func() {
 			fakeConfig.PollingIntervalReturns(1 * time.Second)
 			appGUID = "some-guid"
 			noWait = false
+
+			reportedInstanceDetails = []string{}
+			handleInstanceDetails = func(instanceDetails string) {
+				reportedInstanceDetails = append(reportedInstanceDetails, instanceDetails)
+			}
 		})
 
 		JustBeforeEach(func() {
 			go func() {
 				defer close(done)
-				warnings, executeErr = actor.PollStart(appGUID, noWait)
+				warnings, executeErr = actor.PollStart(appGUID, noWait, handleInstanceDetails)
 				done <- true
 			}()
 		})
@@ -919,17 +926,24 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("PollStartForRolling", func() {
 		var (
-			appGUID        string
-			deploymentGUID string
-			noWait         bool
+			appGUID               string
+			deploymentGUID        string
+			noWait                bool
+			handleInstanceDetails func(string)
 
 			done chan bool
 
-			warnings   Warnings
-			executeErr error
+			warnings                Warnings
+			executeErr              error
+			reportedInstanceDetails []string
 		)
 
 		BeforeEach(func() {
+			reportedInstanceDetails = []string{}
+			handleInstanceDetails = func(instanceDetails string) {
+				reportedInstanceDetails = append(reportedInstanceDetails, instanceDetails)
+			}
+
 			appGUID = "some-rolling-app-guid"
 			deploymentGUID = "some-deployment-guid"
 			noWait = false
@@ -942,7 +956,7 @@ var _ = Describe("Application Actions", func() {
 
 		JustBeforeEach(func() {
 			go func() {
-				warnings, executeErr = actor.PollStartForRolling(appGUID, deploymentGUID, noWait)
+				warnings, executeErr = actor.PollStartForRolling(appGUID, deploymentGUID, noWait, handleInstanceDetails)
 				done <- true
 			}()
 		})
@@ -1635,7 +1649,9 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("PollProcesses", func() {
 		var (
-			processes []ccv3.Process
+			processes               []ccv3.Process
+			handleInstanceDetails   func(string)
+			reportedInstanceDetails []string
 
 			keepPolling bool
 			warnings    Warnings
@@ -1643,6 +1659,11 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		BeforeEach(func() {
+			reportedInstanceDetails = []string{}
+			handleInstanceDetails = func(instanceDetails string) {
+				reportedInstanceDetails = append(reportedInstanceDetails, instanceDetails)
+			}
+
 			processes = []ccv3.Process{
 				{GUID: "process-1"},
 				{GUID: "process-2"},
@@ -1650,7 +1671,7 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			keepPolling, warnings, executeErr = actor.PollProcesses(processes)
+			keepPolling, warnings, executeErr = actor.PollProcesses(processes, handleInstanceDetails)
 		})
 
 		It("gets process instances for each process", func() {
@@ -1680,11 +1701,17 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetProcessInstancesReturns(
 						[]ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceCrashed},
+							{State: constant.ProcessInstanceCrashed, Details: "details1"},
 						},
 						ccv3.Warnings{"get-process1-instances-warning"},
 						nil,
 					)
+				})
+
+				It("calls the callback function with the retrieved instances", func() {
+					Expect(reportedInstanceDetails).To(Equal([]string{
+						"Error starting instances: 'details1'",
+					}))
 				})
 
 				It("returns an all instances crashed error", func() {
@@ -1706,11 +1733,18 @@ var _ = Describe("Application Actions", func() {
 
 					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(1,
 						[]ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceStarting},
+							{State: constant.ProcessInstanceStarting, Details: "details2"},
 						},
 						ccv3.Warnings{"get-process2-instances-warning"},
 						nil,
 					)
+				})
+
+				It("calls the callback function with the retrieved instances", func() {
+					Expect(reportedInstanceDetails).To(Equal([]string{
+						"Instances starting...",
+						"Error starting instances: 'details2'",
+					}))
 				})
 
 				It("returns success and that we should keep polling", func() {
@@ -1724,7 +1758,7 @@ var _ = Describe("Application Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(0,
 						[]ccv3.ProcessInstance{
-							{State: constant.ProcessInstanceRunning},
+							{State: constant.ProcessInstanceRunning, Details: "details1"},
 						},
 						ccv3.Warnings{"get-process1-instances-warning"},
 						nil,
@@ -1737,6 +1771,13 @@ var _ = Describe("Application Actions", func() {
 						ccv3.Warnings{"get-process2-instances-warning"},
 						nil,
 					)
+				})
+
+				It("calls the callback function with the retrieved instances", func() {
+					Expect(reportedInstanceDetails).To(Equal([]string{
+						"Error starting instances: 'details1'",
+						"Instances starting...",
+					}))
 				})
 
 				It("returns success and that we should keep polling", func() {
