@@ -207,14 +207,24 @@ func latestEnvelopeTimestamp(client LogCacheClient, errs chan error, ctx context
 }
 
 func GetRecentLogs(appGUID string, client LogCacheClient) ([]LogMessage, error) {
-	envelopes, err := client.Read(
-		context.Background(),
-		appGUID,
-		time.Time{},
-		logcache.WithEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
-		logcache.WithLimit(RecentLogsLines),
-		logcache.WithDescending(),
-	)
+	logLineRequestCount := RecentLogsLines
+	var envelopes []*loggregator_v2.Envelope
+	var err error
+
+	for logLineRequestCount >= 1 {
+		envelopes, err = client.Read(
+			context.Background(),
+			appGUID,
+			time.Time{},
+			logcache.WithEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
+			logcache.WithLimit(logLineRequestCount),
+			logcache.WithDescending(),
+		)
+		if err == nil || err.Error() != "unexpected status code 429" {
+			break
+		}
+		logLineRequestCount /= 2
+	}
 	if err != nil {
 		return nil, fmt.Errorf("Failed to retrieve logs from Log Cache: %s", err)
 	}

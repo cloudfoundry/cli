@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 	logcache "code.cloudfoundry.org/log-cache/pkg/client"
@@ -336,6 +335,19 @@ var _ = Describe("Logging Actions", func() {
 				It("returns error and warnings", func() {
 					_, err := sharedaction.GetRecentLogs("some-app-guid", fakeLogCacheClient)
 					Expect(err).To(MatchError("Failed to retrieve logs from Log Cache: some-recent-logs-error"))
+				})
+			})
+
+			When("Log Cache returns a resource-exhausted error from grpc", func() {
+				resourceExhaustedErr := errors.New("unexpected status code 429")
+				BeforeEach(func() {
+					fakeLogCacheClient.ReadReturns([]*loggregator_v2.Envelope{}, resourceExhaustedErr)
+				})
+
+				It("returns error and warnings", func() {
+					_, err := sharedaction.GetRecentLogs("some-app-guid", fakeLogCacheClient)
+					Expect(fakeLogCacheClient.ReadCallCount()).To(Equal(10))
+					Expect(err).To(MatchError("Failed to retrieve logs from Log Cache: unexpected status code 429"))
 				})
 			})
 		})
