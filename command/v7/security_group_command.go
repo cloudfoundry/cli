@@ -78,7 +78,7 @@ func (cmd SecurityGroupCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText(string(jsonRules))
+	cmd.UI.DisplayText("\t" + string(jsonRules))
 
 	cmd.UI.DisplayNewline()
 
