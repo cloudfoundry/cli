@@ -110,7 +110,7 @@ var _ = Describe("Routing", func() {
 				When("the resource exists exists", func() {
 					It("returns an error", func() {
 						_, err := router.CreateRequest(badRouteName, nil, nil)
-						Expect(err).To(MatchError("no resource exists with the name fake-resource"))
+						Expect(err).To(MatchError("no resource exists with the name fake-resource, did you add it to 'api/cloudcontroller/ccv3/internal/api_routes.go'? "))
 					})
 				})
 			})

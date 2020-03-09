@@ -77,6 +77,10 @@ var _ = Describe("SecurityGroup", func() {
 `, securityGroupName)
 
 				expectedBody := `{
+						"globally_enabled": {
+						  "running": false,
+						  "staging": false
+						},
 						"name": "some-group-name",
 						"rules": [
 							{

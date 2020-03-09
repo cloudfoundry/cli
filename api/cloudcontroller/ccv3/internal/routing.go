@@ -126,7 +126,7 @@ func (router Router) CreateRequest(name string, params Params, body io.Reader) (
 
 	resource, ok := router.resources[route.Resource]
 	if !ok {
-		return &http.Request{}, fmt.Errorf("no resource exists with the name %s", route.Resource)
+		return &http.Request{}, fmt.Errorf("no resource exists with the name %s, did you add it to 'api/cloudcontroller/ccv3/internal/api_routes.go'? ", route.Resource)
 	}
 
 	url, err := router.urlFrom(resource, uri)

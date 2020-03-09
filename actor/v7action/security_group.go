@@ -23,6 +23,7 @@ type SecurityGroupSummary struct {
 type SecurityGroupSpace struct {
 	SpaceName string
 	OrgName   string
+	Lifecycle string
 }
 
 func (actor Actor) CreateSecurityGroup(name, filePath string) (Warnings, error) {
@@ -66,11 +67,81 @@ func (actor Actor) GetSecurityGroup(securityGroupName string) (SecurityGroupSumm
 	securityGroupSummary.Name = securityGroupName
 	securityGroupSummary.Rules = securityGroups[0].Rules
 
-	associatedSpaceGuids := securityGroups[0].RunningSpaceGUIDs
-	associatedSpaceGuids = append(associatedSpaceGuids, securityGroups[0].StagingSpaceGUIDs...)
+	var noSecurityGroupSpaces = len(securityGroups[0].StagingSpaceGUIDs) == 0 && len(securityGroups[0].RunningSpaceGUIDs) == 0
+	if noSecurityGroupSpaces {
+		securityGroupSummary.SecurityGroupSpaces = []SecurityGroupSpace{}
+	} else {
+		secGroupSpaces, warnings, err := getSecurityGroupSpaces(actor, securityGroups[0].StagingSpaceGUIDs, securityGroups[0].RunningSpaceGUIDs)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return securityGroupSummary, allWarnings, err
+		}
+		securityGroupSummary.SecurityGroupSpaces = secGroupSpaces
+	}
 
+	return securityGroupSummary, allWarnings, nil
+}
+
+func (actor Actor) GetSecurityGroups() ([]SecurityGroupSummary, Warnings, error) {
+	allWarnings := Warnings{}
+	securityGroupSummaries := []SecurityGroupSummary{}
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups()
+
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return securityGroupSummaries, allWarnings, err
+	}
+
+	for _, securityGroup := range securityGroups {
+		var securityGroupSummary SecurityGroupSummary
+		securityGroupSummary.Name = securityGroup.Name
+		securityGroupSummary.Rules = securityGroup.Rules
+
+		var securityGroupSpaces []SecurityGroupSpace
+		var noSecurityGroupSpaces = !securityGroup.StagingGloballyEnabled && !securityGroup.RunningGloballyEnabled && len(securityGroup.StagingSpaceGUIDs) == 0 && len(securityGroup.RunningSpaceGUIDs) == 0
+		if noSecurityGroupSpaces {
+			securityGroupSpaces = []SecurityGroupSpace{}
+		}
+
+		if securityGroup.StagingGloballyEnabled {
+			securityGroupSpaces = append(securityGroupSpaces, SecurityGroupSpace{
+				SpaceName: "<all>",
+				OrgName:   "<all>",
+				Lifecycle: "staging",
+			})
+		}
+
+		if securityGroup.RunningGloballyEnabled {
+			securityGroupSpaces = append(securityGroupSpaces, SecurityGroupSpace{
+				SpaceName: "<all>",
+				OrgName:   "<all>",
+				Lifecycle: "running",
+			})
+		}
+
+		secGroupSpaces, warnings, err := getSecurityGroupSpaces(actor, securityGroup.StagingSpaceGUIDs, securityGroup.RunningSpaceGUIDs)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return securityGroupSummaries, allWarnings, err
+		}
+		securityGroupSpaces = append(securityGroupSpaces, secGroupSpaces...)
+		securityGroupSummary.SecurityGroupSpaces = securityGroupSpaces
+
+		securityGroupSummaries = append(securityGroupSummaries, securityGroupSummary)
+	}
+
+	return securityGroupSummaries, allWarnings, nil
+}
+
+func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpaceGUIDs []string) ([]SecurityGroupSpace, ccv3.Warnings, error) {
+	var warnings ccv3.Warnings
+	associatedSpaceGuids := runningSpaceGUIDs
+	associatedSpaceGuids = append(associatedSpaceGuids, stagingSpaceGUIDs...)
+
+	var securityGroupSpaces []SecurityGroupSpace
 	if len(associatedSpaceGuids) > 0 {
-		spaces, includes, warnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
+		spaces, includes, newWarnings, err := actor.CloudControllerClient.GetSpaces(ccv3.Query{
 			Key:    ccv3.GUIDFilter,
 			Values: associatedSpaceGuids,
 		}, ccv3.Query{
@@ -78,9 +149,9 @@ func (actor Actor) GetSecurityGroup(securityGroupName string) (SecurityGroupSumm
 			Values: []string{"organization"},
 		})
 
-		allWarnings = append(allWarnings, warnings...)
+		warnings = newWarnings
 		if err != nil {
-			return securityGroupSummary, allWarnings, err
+			return securityGroupSpaces, warnings, err
 		}
 
 		orgsByGuid := make(map[string]ccv3.Organization)
@@ -88,20 +159,32 @@ func (actor Actor) GetSecurityGroup(securityGroupName string) (SecurityGroupSumm
 			orgsByGuid[org.GUID] = org
 		}
 
-		var securityGroupSpaces []SecurityGroupSpace
+		spacesByGuid := make(map[string]ccv3.Space)
 		for _, space := range spaces {
+			spacesByGuid[space.GUID] = space
+		}
+
+		for _, runningSpaceGUID := range runningSpaceGUIDs {
+			space := spacesByGuid[runningSpaceGUID]
 			orgGuid := space.Relationships[constant.RelationshipTypeOrganization].GUID
 			securityGroupSpaces = append(securityGroupSpaces, SecurityGroupSpace{
 				SpaceName: space.Name,
 				OrgName:   orgsByGuid[orgGuid].Name,
+				Lifecycle: "running",
 			})
 		}
-		securityGroupSummary.SecurityGroupSpaces = securityGroupSpaces
-	} else {
-		securityGroupSummary.SecurityGroupSpaces = []SecurityGroupSpace{}
-	}
 
-	return securityGroupSummary, allWarnings, nil
+		for _, stagingSpaceGUID := range stagingSpaceGUIDs {
+			space := spacesByGuid[stagingSpaceGUID]
+			orgGuid := space.Relationships[constant.RelationshipTypeOrganization].GUID
+			securityGroupSpaces = append(securityGroupSpaces, SecurityGroupSpace{
+				SpaceName: space.Name,
+				OrgName:   orgsByGuid[orgGuid].Name,
+				Lifecycle: "staging",
+			})
+		}
+	}
+	return securityGroupSpaces, warnings, nil
 }
 
 func parsePath(path string) ([]byte, error) {

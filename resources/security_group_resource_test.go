@@ -66,6 +66,25 @@ var _ = Describe("Security group resource", func() {
 			},
 		),
 		Entry(
+			"globally enabled",
+			[]byte(`{
+				"name": "security-group-name",
+				"guid": "security-group-guid",
+				"rules": [],
+				"globally_enabled": {
+					"running": true,
+					"staging": false
+				}
+			}`),
+			SecurityGroup{
+				Name:                   "security-group-name",
+				GUID:                   "security-group-guid",
+				Rules:                  []Rule{},
+				StagingGloballyEnabled: false,
+				RunningGloballyEnabled: true,
+			},
+		),
+		Entry(
 			"relationships",
 			[]byte(`{
 				"name": "security-group-name",
@@ -105,8 +124,10 @@ var _ = Describe("Security group resource", func() {
 		Entry(
 			"name and empty rules",
 			SecurityGroup{
-				Name: "security-group-name",
-				GUID: "security-group-guid",
+				Name:                   "security-group-name",
+				GUID:                   "security-group-guid",
+				RunningGloballyEnabled: true,
+				StagingGloballyEnabled: false,
 				Rules: []Rule{
 					{
 						Protocol:    "udp",
@@ -114,13 +135,15 @@ var _ = Describe("Security group resource", func() {
 					},
 				},
 			},
-			[]byte(`{"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"udp","destination":"another-destination"}]}`),
+			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"udp","destination":"another-destination"}]}`),
 		),
 		Entry(
 			"name and rules",
 			SecurityGroup{
-				Name: "security-group-name",
-				GUID: "security-group-guid",
+				Name:                   "security-group-name",
+				GUID:                   "security-group-guid",
+				RunningGloballyEnabled: true,
+				StagingGloballyEnabled: false,
 				Rules: []Rule{
 					{
 						Protocol:    "all",
@@ -133,17 +156,31 @@ var _ = Describe("Security group resource", func() {
 					},
 				},
 			},
-			[]byte(`{"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"all","destination":"some-Destination","ports":"some-Ports","type":1,"code":0,"description":"some-Description","log":false}]}`),
+			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"all","destination":"some-Destination","ports":"some-Ports","type":1,"code":0,"description":"some-Description","log":false}]}`),
+		),
+		Entry(
+			"globally enabled",
+			SecurityGroup{
+				Name:                   "security-group-name",
+				GUID:                   "security-group-guid",
+				StagingGloballyEnabled: false,
+				RunningGloballyEnabled: true,
+				StagingSpaceGUIDs:      []string{"space-guid-1", "space-guid-2"},
+				RunningSpaceGUIDs:      []string{"space-guid-3"},
+			},
+			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}},"rules":[]}`),
 		),
 		Entry(
 			"relationships",
 			SecurityGroup{
-				Name:              "security-group-name",
-				GUID:              "security-group-guid",
-				StagingSpaceGUIDs: []string{"space-guid-1", "space-guid-2"},
-				RunningSpaceGUIDs: []string{"space-guid-3"},
+				Name:                   "security-group-name",
+				GUID:                   "security-group-guid",
+				RunningGloballyEnabled: true,
+				StagingGloballyEnabled: false,
+				StagingSpaceGUIDs:      []string{"space-guid-1", "space-guid-2"},
+				RunningSpaceGUIDs:      []string{"space-guid-3"},
 			},
-			[]byte(`{"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}},"rules":[]}`),
+			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}},"rules":[]}`),
 		),
 	)
 })

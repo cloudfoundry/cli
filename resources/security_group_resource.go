@@ -5,11 +5,13 @@ import (
 )
 
 type SecurityGroup struct {
-	Name              string `json:"name"`
-	GUID              string `json:"guid,omitempty"`
-	Rules             []Rule `json:"rules"`
-	StagingSpaceGUIDs []string
-	RunningSpaceGUIDs []string
+	Name                   string `json:"name"`
+	GUID                   string `json:"guid,omitempty"`
+	Rules                  []Rule `json:"rules"`
+	StagingGloballyEnabled bool
+	RunningGloballyEnabled bool
+	StagingSpaceGUIDs      []string
+	RunningSpaceGUIDs      []string
 }
 
 func (sg SecurityGroup) MarshalJSON() ([]byte, error) {
@@ -45,9 +47,15 @@ func (sg SecurityGroup) MarshalJSON() ([]byte, error) {
 		rules = sg.Rules
 	}
 
+	globallyEnabled := map[string]bool{
+		"running": sg.RunningGloballyEnabled,
+		"staging": sg.StagingGloballyEnabled,
+	}
+
 	jsonMap := map[string]interface{}{
-		"name":  sg.Name,
-		"rules": rules,
+		"name":             sg.Name,
+		"rules":            rules,
+		"globally_enabled": globallyEnabled,
 	}
 
 	if sg.GUID != "" {
@@ -72,6 +80,10 @@ func (sg *SecurityGroup) UnmarshalJSON(data []byte) error {
 	*sg = SecurityGroup(defaultUnmarshalledSecurityGroup)
 
 	type RemainingFieldsStruct struct {
+		GloballyEnabled struct {
+			Staging bool
+			Running bool
+		} `json:"globally_enabled"`
 		Relationships struct {
 			StagingSpaces struct {
 				Data []struct {
@@ -99,6 +111,9 @@ func (sg *SecurityGroup) UnmarshalJSON(data []byte) error {
 	for _, runningSpace := range remainingFields.Relationships.RunningSpaces.Data {
 		sg.RunningSpaceGUIDs = append(sg.RunningSpaceGUIDs, runningSpace.Guid)
 	}
+
+	sg.StagingGloballyEnabled = remainingFields.GloballyEnabled.Staging
+	sg.RunningGloballyEnabled = remainingFields.GloballyEnabled.Running
 
 	return nil
 }
