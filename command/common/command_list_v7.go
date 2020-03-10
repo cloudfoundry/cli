@@ -129,6 +129,7 @@ type commandList struct {
 	ResetOrgDefaultIsolationSegment    v6.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v6.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v7.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)."`
+	Revisions                          v7.RevisionsCommand                                 `command:"revisions" description:"Lists revisions for an app"`
 	Stage                              v7.StageCommand                              `command:"stage" description:"Create a new droplet for an app, defaults to the newest package"`
 	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`

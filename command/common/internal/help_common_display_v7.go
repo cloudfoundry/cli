@@ -19,7 +19,7 @@ var CommonHelpCategoryList = []HelpCategory{
 			{"start", "ssh", "create-app-manifest"},
 			{"stop", "app", "delete"},
 			{"restart", "env", "apply-manifest"},
-			{"restage", "scale", ""},
+			{"restage", "scale", "revisions"},
 		},
 	},
 

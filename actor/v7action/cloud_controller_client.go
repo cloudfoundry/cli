@@ -62,6 +62,7 @@ type CloudControllerClient interface {
 	GetApplicationProcessByType(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error)
 	GetApplicationProcesses(appGUID string) ([]ccv3.Process, ccv3.Warnings, error)
 	GetApplicationRoutes(appGUID string) ([]ccv3.Route, ccv3.Warnings, error)
+	GetApplicationRevisions(appGUID string) ([]ccv3.Revision, ccv3.Warnings, error)
 	GetApplicationTasks(appGUID string, query ...ccv3.Query) ([]ccv3.Task, ccv3.Warnings, error)
 	GetApplications(query ...ccv3.Query) ([]ccv3.Application, ccv3.Warnings, error)
 	GetBuild(guid string) (ccv3.Build, ccv3.Warnings, error)
