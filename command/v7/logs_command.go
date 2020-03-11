@@ -2,11 +2,11 @@ package v7
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -136,6 +136,17 @@ func (cmd LogsCommand) refreshTokenPeriodically(
 	return nil
 }
 
+func (cmd LogsCommand) handleLogErr(logErr error) {
+	switch logErr.(type) {
+	case actionerror.LogCacheTimeoutError:
+		cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
+	default:
+		cmd.UI.DisplayWarning("Failed to retrieve logs from Log Cache: {{.Error}}", map[string]interface{}{
+			"Error": logErr,
+		})
+	}
+}
+
 func (cmd LogsCommand) streamLogs() error {
 	messages, logErrs, stopStreaming, warnings, err := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(
 		cmd.RequiredArgs.AppName,
@@ -150,6 +161,7 @@ func (cmd LogsCommand) streamLogs() error {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 
+	defer stopStreaming()
 	var messagesClosed, errLogsClosed bool
 	for {
 		select {
@@ -158,17 +170,14 @@ func (cmd LogsCommand) streamLogs() error {
 				messagesClosed = true
 				break
 			}
-
 			cmd.UI.DisplayLogMessage(message, true)
 		case logErr, ok := <-logErrs:
 			if !ok {
 				errLogsClosed = true
 				break
 			}
-			stopStreaming()
-			return fmt.Errorf("Failed to retrieve logs from Log Cache: %s", logErr)
+			cmd.handleLogErr(logErr)
 		case <-c:
-			stopStreaming()
 			return nil
 		}
 
