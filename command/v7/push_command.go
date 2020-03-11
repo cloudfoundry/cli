@@ -570,6 +570,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 				"AppName": appName,
 			},
 		)
+		cmd.UI.DisplayNewline()
 	case v7pushaction.StartingDeployment:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayTextWithFlavor(
@@ -580,6 +581,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 		)
 	case v7pushaction.WaitingForDeployment:
 		cmd.UI.DisplayText("Waiting for app to deploy...")
+		cmd.UI.DisplayNewline()
 	default:
 		log.WithField("event", event).Debug("ignoring event")
 	}

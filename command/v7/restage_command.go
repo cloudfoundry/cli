@@ -136,6 +136,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		}
 
 		warnings, err = cmd.Actor.PollStartForRolling(app.GUID, deploymentGUID, cmd.NoWait, handleInstanceDetails)
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return cmd.mapErr(cmd.RequiredArgs.AppName, err)
@@ -170,6 +171,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		}
 
 		warnings, err = cmd.Actor.PollStart(app.GUID, cmd.NoWait, handleInstanceDetails)
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return cmd.mapErr(cmd.RequiredArgs.AppName, err)

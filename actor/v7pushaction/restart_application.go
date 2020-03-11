@@ -18,7 +18,11 @@ func (actor Actor) RestartApplication(pushPlan PushPlan, eventStream chan<- *Pus
 	}
 
 	handleInstanceDetails := func(instanceDetails string) {
-		eventStream <- &PushEvent{Plan: pushPlan, Event: Event(instanceDetails)}
+		eventStream <- &PushEvent{
+			Plan:     pushPlan,
+			Warnings: Warnings{instanceDetails},
+			Event:    InstanceDetails,
+		}
 	}
 
 	warnings, err = actor.V7Actor.PollStart(pushPlan.Application.GUID, pushPlan.NoWait, handleInstanceDetails)
