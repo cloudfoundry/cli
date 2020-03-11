@@ -103,8 +103,8 @@ var _ = Describe("space command", func() {
 						Eventually(session).Should(Say(`services:`))
 						Eventually(session).Should(Say("isolation segment:"))
 						Eventually(session).Should(Say("quota:"))
-						Eventually(session).Should(Say(`running security groups:\s+(\w+,\s+)dns`))
-						Eventually(session).Should(Say(`staging security groups:\s+(\w+,\s+)dns`))
+						Eventually(session).Should(Say(`running security groups:\s+(.*)dns`))
+						Eventually(session).Should(Say(`staging security groups:\s+(.*)dns`))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -167,8 +167,8 @@ var _ = Describe("space command", func() {
 
 					It("shows the security groups applied to that space", func() {
 						session := helpers.CF("space", spaceName, "--security-group-rules")
-						Eventually(session).Should(Say(`running security groups:\s+(\w+,\s+)+%s`, runningSecurityGroup.Name))
-						Eventually(session).Should(Say(`staging security groups:\s+(\w+,\s+)+%s`, stagingSecurityGroup.Name))
+						Eventually(session).Should(Say(`running security groups:\s+(.*)+%s`, runningSecurityGroup.Name))
+						Eventually(session).Should(Say(`staging security groups:\s+(.*)+%s`, stagingSecurityGroup.Name))
 
 						Eventually(session).Should(Say(`security group\s+destination\s+ports\s+protocol\s+lifecycle\s+description`))
 						Eventually(session).Should(Say(`%s\s+0.0.0.0/0\s+%s\s+tcp\s+running\s+%s`, runningSecurityGroup.Name, ports, description))
