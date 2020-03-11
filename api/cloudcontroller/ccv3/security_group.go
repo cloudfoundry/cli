@@ -32,3 +32,37 @@ func (client *Client) GetSecurityGroups(queries ...Query) ([]resources.SecurityG
 
 	return securityGroups, warnings, err
 }
+
+func (client *Client) GetRunningSecurityGroups(spaceGUID string, queries ...Query) ([]resources.SecurityGroup, Warnings, error) {
+	var securityGroups []resources.SecurityGroup
+
+	_, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetSpaceRunningSecurityGroupsRequest,
+		URIParams:    internal.Params{"space_guid": spaceGUID},
+		Query:        queries,
+		ResponseBody: resources.SecurityGroup{},
+		AppendToList: func(item interface{}) error {
+			securityGroups = append(securityGroups, item.(resources.SecurityGroup))
+			return nil
+		},
+	})
+
+	return securityGroups, warnings, err
+}
+
+func (client *Client) GetStagingSecurityGroups(spaceGUID string, queries ...Query) ([]resources.SecurityGroup, Warnings, error) {
+	var securityGroups []resources.SecurityGroup
+
+	_, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetSpaceStagingSecurityGroupsRequest,
+		URIParams:    internal.Params{"space_guid": spaceGUID},
+		Query:        queries,
+		ResponseBody: resources.SecurityGroup{},
+		AppendToList: func(item interface{}) error {
+			securityGroups = append(securityGroups, item.(resources.SecurityGroup))
+			return nil
+		},
+	})
+
+	return securityGroups, warnings, err
+}

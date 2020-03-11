@@ -10,41 +10,56 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("security-groups command", func() {
+var _ = Describe("security group-related command", func() {
 	When("there are no security groups", func() {
 		var (
 			unprivilegedUsername string
 			password             string
+			orgName              string
+			spaceName            string
 			runningGroups        []string
 			stagingGroups        []string
 		)
 
 		BeforeEach(func() {
 			helpers.LoginCF()
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+
 			session := helpers.CF("running-security-groups")
 			Eventually(session).Should(Exit(0))
 			runningGroups = strings.Split(string(session.Out.Contents()), "\n")[2:]
 			for _, runningGroup := range runningGroups {
-				helpers.CF(`unbind-running-security-group`, runningGroup)
+				if runningGroup != "" {
+					helpers.CF(`unbind-running-security-group`, runningGroup)
+				}
 			}
 			session = helpers.CF("staging-security-groups")
 			Eventually(session).Should(Exit(0))
 			stagingGroups = strings.Split(string(session.Out.Contents()), "\n")[2:]
 			for _, stagingGroup := range stagingGroups {
-				helpers.CF(`unbind-staging-security-group`, stagingGroup)
+				if stagingGroup != "" {
+					helpers.CF(`unbind-staging-security-group`, stagingGroup)
+				}
 			}
-			unprivilegedUsername, password = helpers.CreateUser()
+			unprivilegedUsername, password = helpers.CreateUserInSpaceRole(orgName, spaceName, "SpaceDeveloper")
 			helpers.LogoutCF()
 			helpers.LoginAs(unprivilegedUsername, password)
+			helpers.TargetOrg(orgName)
 		})
 
 		AfterEach(func() {
 			helpers.LoginCF()
 			for _, runningGroup := range runningGroups {
-				helpers.CF(`bind-running-security-group`, runningGroup)
+				if runningGroup != "" {
+					helpers.CF(`bind-running-security-group`, runningGroup)
+				}
 			}
 			for _, stagingGroup := range stagingGroups {
-				helpers.CF(`bind-staging-security-group`, stagingGroup)
+				if stagingGroup != "" {
+					helpers.CF(`bind-staging-security-group`, stagingGroup)
+				}
 			}
 			helpers.DeleteUser(unprivilegedUsername)
 		})
@@ -52,7 +67,16 @@ var _ = Describe("security-groups command", func() {
 		It("displays no security groups found and exits 0", func() {
 			session := helpers.CF("security-groups")
 			Eventually(session).Should(Say(`Getting security groups as %s\.\.\.`, unprivilegedUsername))
-			Eventually(session.Out).Should(Say("No security groups found."))
+			Eventually(session).Should(Say("No security groups found."))
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("displays no security groups found on the space and exits 0", func() {
+			session := helpers.CF("space", spaceName, "--security-group-rules")
+			Eventually(session).Should(Say(`name:\s+%s`, spaceName))
+			Eventually(session).Should(Say(`running security groups:\s*\n`))
+			Eventually(session).Should(Say(`staging security groups:\s*\n`))
+			Eventually(session).Should(Say("No security group rules found."))
 			Eventually(session).Should(Exit(0))
 		})
 	})

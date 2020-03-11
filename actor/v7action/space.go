@@ -8,18 +8,21 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Space ccv3.Space
 
 type SpaceSummary struct {
 	Space
-	Name                 string
-	OrgName              string
-	AppNames             []string
-	ServiceInstanceNames []string
-	IsolationSegmentName string
-	QuotaName            string
+	Name                  string
+	OrgName               string
+	AppNames              []string
+	ServiceInstanceNames  []string
+	IsolationSegmentName  string
+	QuotaName             string
+	RunningSecurityGroups []resources.SecurityGroup
+	StagingSecurityGroups []resources.SecurityGroup
 }
 
 func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, error) {
@@ -183,14 +186,28 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		}
 	}
 
+	runningSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	stagingSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
 	spaceSummary := SpaceSummary{
-		OrgName:              org.Name,
-		Name:                 space.Name,
-		Space:                space,
-		AppNames:             appNames,
-		ServiceInstanceNames: serviceInstanceNames,
-		IsolationSegmentName: isoSegName,
-		QuotaName:            ccv3SpaceQuota.Name,
+		OrgName:               org.Name,
+		Name:                  space.Name,
+		Space:                 space,
+		AppNames:              appNames,
+		ServiceInstanceNames:  serviceInstanceNames,
+		IsolationSegmentName:  isoSegName,
+		QuotaName:             ccv3SpaceQuota.Name,
+		RunningSecurityGroups: runningSecurityGroups,
+		StagingSecurityGroups: stagingSecurityGroups,
 	}
 
 	return spaceSummary, allWarnings, nil

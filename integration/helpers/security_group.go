@@ -13,15 +13,9 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-// SecurityGroup represents a security group API resource
-type SecurityGroup struct {
-	Name  string `json:"-"`
-	Rules []resources.Rule
-}
-
 // NewSecurityGroup returns a new security group with the given attributes
-func NewSecurityGroup(name string, protocol string, destination string, ports *string, description *string) SecurityGroup {
-	return SecurityGroup{
+func NewSecurityGroup(name string, protocol string, destination string, ports *string, description *string) resources.SecurityGroup {
+	return resources.SecurityGroup{
 		Name: name,
 		Rules: []resources.Rule{{
 			Protocol:    protocol,
@@ -32,8 +26,8 @@ func NewSecurityGroup(name string, protocol string, destination string, ports *s
 	}
 }
 
-// Create Creates a new security group on the API using the 'cf create-security-group'
-func (s SecurityGroup) Create() {
+// CreateSecurityGroup Creates a new security group on the API using the 'cf create-security-group'
+func CreateSecurityGroup(s resources.SecurityGroup) {
 	dir, err := ioutil.TempDir("", "simple-security-group")
 	Expect(err).ToNot(HaveOccurred())
 	defer os.RemoveAll(dir)
@@ -48,8 +42,8 @@ func (s SecurityGroup) Create() {
 	Eventually(CF("create-security-group", s.Name, tempfile)).Should(Exit(0))
 }
 
-// Delete Deletes a security group on the API using the 'cf delete-security-group'
-func (s SecurityGroup) Delete() {
+// DeleteSecurityGroup Deletes a security group on the API using the 'cf delete-security-group'
+func DeleteSecurityGroup(s resources.SecurityGroup) {
 	if s.Name == "" {
 		fmt.Println("Empty security group name. Skipping deletion.")
 		return

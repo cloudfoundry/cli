@@ -107,7 +107,7 @@ var _ = Describe("unbind-security-group command", func() {
 			port := "8443"
 			description := "some-description"
 			someSecurityGroup := helpers.NewSecurityGroup(securityGroupName, "tcp", "127.0.0.1", &port, &description)
-			someSecurityGroup.Create()
+			helpers.CreateSecurityGroup(someSecurityGroup)
 		})
 
 		When("the org doesn't exist", func() {

@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -100,7 +101,7 @@ var _ = Describe("bind-security-group command", func() {
 
 	When("the security group exists", func() {
 		var (
-			someSecurityGroup helpers.SecurityGroup
+			someSecurityGroup resources.SecurityGroup
 			ports             string
 			description       string
 		)
@@ -109,7 +110,7 @@ var _ = Describe("bind-security-group command", func() {
 			ports = "53"
 			description = "SG"
 			someSecurityGroup = helpers.NewSecurityGroup(secGroupName, "tcp", "0.0.0.0/0", &ports, &description)
-			someSecurityGroup.Create()
+			helpers.CreateSecurityGroup(someSecurityGroup)
 		})
 
 		When("the org doesn't exist", func() {

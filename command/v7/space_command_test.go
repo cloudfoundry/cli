@@ -3,6 +3,10 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/integration/helpers"
+
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/command/flag"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -18,7 +22,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("space Command", func() {
+var _ = Describe("space command", func() {
 	var (
 		cmd             SpaceCommand
 		testUI          *ui.UI
@@ -126,15 +130,99 @@ var _ = Describe("space Command", func() {
 	})
 
 	When("the --guid flag is not passed", func() {
+		var (
+			runningSecurityGroup1 resources.SecurityGroup
+			runningSecurityGroup2 resources.SecurityGroup
+			stagingSecurityGroup  resources.SecurityGroup
+			description           string
+			ports                 string
+		)
+
+		BeforeEach(func() {
+			ports = "8080"
+			description = "Test security group"
+			runningSecurityGroup1 = helpers.NewSecurityGroup(
+				"dns",
+				"tcp",
+				"10.244.1.18",
+				&ports,
+				&description,
+			)
+			runningSecurityGroup2 = helpers.NewSecurityGroup(
+				"credhub",
+				"all",
+				"0.0.0.0-5.6.7.8",
+				nil,
+				&description,
+			)
+			stagingSecurityGroup = helpers.NewSecurityGroup(
+				"sarah",
+				"udp",
+				"127.0.0.1",
+				&ports,
+				nil,
+			)
+		})
+
+		When("the --security-group-rules flag is passed", func() {
+			BeforeEach(func() {
+				cmd.SecurityGroupRules = true
+
+				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
+					v7action.SpaceSummary{
+						Name:                  "some-space",
+						OrgName:               "some-org",
+						AppNames:              []string{"app1", "app2", "app3"},
+						ServiceInstanceNames:  []string{"instance1", "instance2"},
+						RunningSecurityGroups: []resources.SecurityGroup{runningSecurityGroup1, runningSecurityGroup2},
+						StagingSecurityGroups: []resources.SecurityGroup{stagingSecurityGroup},
+					},
+					v7action.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("displays flavor text", func() {
+				Expect(testUI.Out).To(Say("Getting info for space some-space in org some-org as steve..."))
+			})
+
+			It("displays warnings", func() {
+				Expect(testUI.Err).To(Say("some-warning"))
+			})
+
+			It("displays a table of values and security group rules", func() {
+				Expect(testUI.Out).To(Say(`name:\s+some-space`))
+				Expect(testUI.Out).To(Say(`org:\s+some-org`))
+				Expect(testUI.Out).To(Say(`apps:\s+app1, app2, app3`))
+				Expect(testUI.Out).To(Say(`services:\s+instance1, instance2`))
+				Expect(testUI.Out).To(Say(`isolation segment:`))
+				Expect(testUI.Out).To(Say(`running security groups:\s+%s, %s`, runningSecurityGroup1.Name, runningSecurityGroup2.Name))
+				Expect(testUI.Out).To(Say(`staging security groups:\s+%s`, stagingSecurityGroup.Name))
+
+				Expect(testUI.Out).To(Say(`security group\s+destination\s+ports\s+protocol\s+lifecycle\s+description`))
+				Expect(testUI.Out).To(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+					runningSecurityGroup2.Name, runningSecurityGroup2.Rules[0].Destination, "", runningSecurityGroup2.Rules[0].Protocol, "running", description,
+				))
+				Expect(testUI.Out).To(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+					runningSecurityGroup1.Name, runningSecurityGroup1.Rules[0].Destination, ports, runningSecurityGroup1.Rules[0].Protocol, "running", description,
+				))
+				Expect(testUI.Out).To(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`,
+					stagingSecurityGroup.Name, stagingSecurityGroup.Rules[0].Destination, ports, stagingSecurityGroup.Rules[0].Protocol, "staging", "",
+				))
+			})
+		})
+
 		When("fetching the space summary succeeds with an isolation segment", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
 					v7action.SpaceSummary{
-						Name:                 "some-space",
-						OrgName:              "some-org",
-						AppNames:             []string{"app1", "app2", "app3"},
-						ServiceInstanceNames: []string{"instance1", "instance2"},
-						IsolationSegmentName: "iso-seg-name",
+						Name:                  "some-space",
+						OrgName:               "some-org",
+						AppNames:              []string{"app1", "app2", "app3"},
+						ServiceInstanceNames:  []string{"instance1", "instance2"},
+						IsolationSegmentName:  "iso-seg-name",
+						RunningSecurityGroups: []resources.SecurityGroup{runningSecurityGroup1, runningSecurityGroup2},
+						StagingSecurityGroups: []resources.SecurityGroup{stagingSecurityGroup},
 					},
 					v7action.Warnings{"some-warning"},
 					nil,
@@ -155,6 +243,8 @@ var _ = Describe("space Command", func() {
 				Expect(testUI.Out).To(Say(`apps:\s+app1, app2, app3`))
 				Expect(testUI.Out).To(Say(`services:\s+instance1, instance2`))
 				Expect(testUI.Out).To(Say(`isolation segment:\s+iso-seg-name`))
+				Expect(testUI.Out).To(Say(`running security groups:\s+%s, %s`, runningSecurityGroup1.Name, runningSecurityGroup2.Name))
+				Expect(testUI.Out).To(Say(`staging security groups:\s+%s`, stagingSecurityGroup.Name))
 			})
 		})
 
@@ -162,10 +252,12 @@ var _ = Describe("space Command", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
 					v7action.SpaceSummary{
-						Name:                 "some-space",
-						OrgName:              "some-org",
-						AppNames:             []string{"app1", "app2", "app3"},
-						ServiceInstanceNames: []string{"instance1", "instance2"},
+						Name:                  "some-space",
+						OrgName:               "some-org",
+						AppNames:              []string{"app1", "app2", "app3"},
+						ServiceInstanceNames:  []string{"instance1", "instance2"},
+						RunningSecurityGroups: []resources.SecurityGroup{runningSecurityGroup1, runningSecurityGroup2},
+						StagingSecurityGroups: []resources.SecurityGroup{stagingSecurityGroup},
 					},
 					v7action.Warnings{"some-warning"},
 					nil,
@@ -186,6 +278,8 @@ var _ = Describe("space Command", func() {
 				Expect(testUI.Out).To(Say(`apps:\s+app1, app2, app3`))
 				Expect(testUI.Out).To(Say(`services:\s+instance1, instance2`))
 				Expect(testUI.Out).To(Say(`isolation segment:`))
+				Expect(testUI.Out).To(Say(`running security groups:\s+%s, %s`, runningSecurityGroup1.Name, runningSecurityGroup2.Name))
+				Expect(testUI.Out).To(Say(`staging security groups:\s+%s`, stagingSecurityGroup.Name))
 			})
 		})
 
@@ -223,8 +317,9 @@ var _ = Describe("space Command", func() {
 					nil,
 				)
 			})
+
 			It("displays a quota row with no value", func() {
-				Expect(testUI.Out).To(Say(`quota:\s+$`))
+				Expect(testUI.Out).To(Say(`quota:\s*\n`))
 			})
 		})
 

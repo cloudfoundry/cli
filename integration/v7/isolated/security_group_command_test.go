@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -50,7 +51,7 @@ var _ = Describe("security-group command", func() {
 
 		When("the security group exists", func() {
 			var (
-				securityGroup helpers.SecurityGroup
+				securityGroup resources.SecurityGroup
 				orgName       string
 				spaceName     string
 				ports         string
@@ -73,11 +74,11 @@ var _ = Describe("security-group command", func() {
 					&ports,
 					&description,
 				)
-				securityGroup.Create()
+				helpers.CreateSecurityGroup(securityGroup)
 			})
 
 			AfterEach(func() {
-				securityGroup.Delete()
+				helpers.DeleteSecurityGroup(securityGroup)
 				helpers.QuickDeleteOrg(orgName)
 			})
 

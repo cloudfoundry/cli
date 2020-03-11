@@ -1312,6 +1312,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetRunningSecurityGroupsStub        func(string, ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
+	getRunningSecurityGroupsMutex       sync.RWMutex
+	getRunningSecurityGroupsArgsForCall []struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}
+	getRunningSecurityGroupsReturns struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getRunningSecurityGroupsReturnsOnCall map[int]struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetSSHEnabledStub        func(string) (ccv3.SSHEnabled, ccv3.Warnings, error)
 	getSSHEnabledMutex       sync.RWMutex
 	getSSHEnabledArgsForCall []struct {
@@ -1522,6 +1538,22 @@ type FakeCloudControllerClient struct {
 	}
 	getStacksReturnsOnCall map[int]struct {
 		result1 []ccv3.Stack
+		result2 ccv3.Warnings
+		result3 error
+	}
+	GetStagingSecurityGroupsStub        func(string, ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
+	getStagingSecurityGroupsMutex       sync.RWMutex
+	getStagingSecurityGroupsArgsForCall []struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}
+	getStagingSecurityGroupsReturns struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getStagingSecurityGroupsReturnsOnCall map[int]struct {
+		result1 []resources.SecurityGroup
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -7855,6 +7887,73 @@ func (fake *FakeCloudControllerClient) GetRoutesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetRunningSecurityGroups(arg1 string, arg2 ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error) {
+	fake.getRunningSecurityGroupsMutex.Lock()
+	ret, specificReturn := fake.getRunningSecurityGroupsReturnsOnCall[len(fake.getRunningSecurityGroupsArgsForCall)]
+	fake.getRunningSecurityGroupsArgsForCall = append(fake.getRunningSecurityGroupsArgsForCall, struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}{arg1, arg2})
+	fake.recordInvocation("GetRunningSecurityGroups", []interface{}{arg1, arg2})
+	fake.getRunningSecurityGroupsMutex.Unlock()
+	if fake.GetRunningSecurityGroupsStub != nil {
+		return fake.GetRunningSecurityGroupsStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRunningSecurityGroupsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetRunningSecurityGroupsCallCount() int {
+	fake.getRunningSecurityGroupsMutex.RLock()
+	defer fake.getRunningSecurityGroupsMutex.RUnlock()
+	return len(fake.getRunningSecurityGroupsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetRunningSecurityGroupsCalls(stub func(string, ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)) {
+	fake.getRunningSecurityGroupsMutex.Lock()
+	defer fake.getRunningSecurityGroupsMutex.Unlock()
+	fake.GetRunningSecurityGroupsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetRunningSecurityGroupsArgsForCall(i int) (string, []ccv3.Query) {
+	fake.getRunningSecurityGroupsMutex.RLock()
+	defer fake.getRunningSecurityGroupsMutex.RUnlock()
+	argsForCall := fake.getRunningSecurityGroupsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetRunningSecurityGroupsReturns(result1 []resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.getRunningSecurityGroupsMutex.Lock()
+	defer fake.getRunningSecurityGroupsMutex.Unlock()
+	fake.GetRunningSecurityGroupsStub = nil
+	fake.getRunningSecurityGroupsReturns = struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetRunningSecurityGroupsReturnsOnCall(i int, result1 []resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.getRunningSecurityGroupsMutex.Lock()
+	defer fake.getRunningSecurityGroupsMutex.Unlock()
+	fake.GetRunningSecurityGroupsStub = nil
+	if fake.getRunningSecurityGroupsReturnsOnCall == nil {
+		fake.getRunningSecurityGroupsReturnsOnCall = make(map[int]struct {
+			result1 []resources.SecurityGroup
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getRunningSecurityGroupsReturnsOnCall[i] = struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSSHEnabled(arg1 string) (ccv3.SSHEnabled, ccv3.Warnings, error) {
 	fake.getSSHEnabledMutex.Lock()
 	ret, specificReturn := fake.getSSHEnabledReturnsOnCall[len(fake.getSSHEnabledArgsForCall)]
@@ -8778,6 +8877,73 @@ func (fake *FakeCloudControllerClient) GetStacksReturnsOnCall(i int, result1 []c
 	}
 	fake.getStacksReturnsOnCall[i] = struct {
 		result1 []ccv3.Stack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetStagingSecurityGroups(arg1 string, arg2 ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error) {
+	fake.getStagingSecurityGroupsMutex.Lock()
+	ret, specificReturn := fake.getStagingSecurityGroupsReturnsOnCall[len(fake.getStagingSecurityGroupsArgsForCall)]
+	fake.getStagingSecurityGroupsArgsForCall = append(fake.getStagingSecurityGroupsArgsForCall, struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}{arg1, arg2})
+	fake.recordInvocation("GetStagingSecurityGroups", []interface{}{arg1, arg2})
+	fake.getStagingSecurityGroupsMutex.Unlock()
+	if fake.GetStagingSecurityGroupsStub != nil {
+		return fake.GetStagingSecurityGroupsStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getStagingSecurityGroupsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetStagingSecurityGroupsCallCount() int {
+	fake.getStagingSecurityGroupsMutex.RLock()
+	defer fake.getStagingSecurityGroupsMutex.RUnlock()
+	return len(fake.getStagingSecurityGroupsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetStagingSecurityGroupsCalls(stub func(string, ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)) {
+	fake.getStagingSecurityGroupsMutex.Lock()
+	defer fake.getStagingSecurityGroupsMutex.Unlock()
+	fake.GetStagingSecurityGroupsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetStagingSecurityGroupsArgsForCall(i int) (string, []ccv3.Query) {
+	fake.getStagingSecurityGroupsMutex.RLock()
+	defer fake.getStagingSecurityGroupsMutex.RUnlock()
+	argsForCall := fake.getStagingSecurityGroupsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetStagingSecurityGroupsReturns(result1 []resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.getStagingSecurityGroupsMutex.Lock()
+	defer fake.getStagingSecurityGroupsMutex.Unlock()
+	fake.GetStagingSecurityGroupsStub = nil
+	fake.getStagingSecurityGroupsReturns = struct {
+		result1 []resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetStagingSecurityGroupsReturnsOnCall(i int, result1 []resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.getStagingSecurityGroupsMutex.Lock()
+	defer fake.getStagingSecurityGroupsMutex.Unlock()
+	fake.GetStagingSecurityGroupsStub = nil
+	if fake.getStagingSecurityGroupsReturnsOnCall == nil {
+		fake.getStagingSecurityGroupsReturnsOnCall = make(map[int]struct {
+			result1 []resources.SecurityGroup
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getStagingSecurityGroupsReturnsOnCall[i] = struct {
+		result1 []resources.SecurityGroup
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11689,6 +11855,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getRouteDestinationsMutex.RUnlock()
 	fake.getRoutesMutex.RLock()
 	defer fake.getRoutesMutex.RUnlock()
+	fake.getRunningSecurityGroupsMutex.RLock()
+	defer fake.getRunningSecurityGroupsMutex.RUnlock()
 	fake.getSSHEnabledMutex.RLock()
 	defer fake.getSSHEnabledMutex.RUnlock()
 	fake.getSecurityGroupsMutex.RLock()
@@ -11717,6 +11885,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpacesMutex.RUnlock()
 	fake.getStacksMutex.RLock()
 	defer fake.getStacksMutex.RUnlock()
+	fake.getStagingSecurityGroupsMutex.RLock()
+	defer fake.getStagingSecurityGroupsMutex.RUnlock()
 	fake.getUserMutex.RLock()
 	defer fake.getUserMutex.RUnlock()
 	fake.getUsersMutex.RLock()

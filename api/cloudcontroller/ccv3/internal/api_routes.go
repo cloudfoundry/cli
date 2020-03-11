@@ -77,9 +77,11 @@ const (
 	GetServicePlanVisibilityRequest                             = "GetServicePlanVisibility"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
+	GetSpaceRunningSecurityGroupsRequest                        = "GetSpaceRunningSecurityGroups"
 	GetSpacesRequest                                            = "GetSpaces"
 	GetSpaceQuotaRequest                                        = "GetSpaceQuota"
 	GetSpaceQuotasRequest                                       = "GetSpaceQuotas"
+	GetSpaceStagingSecurityGroupsRequest                        = "GetSpaceStagingSecurityGroups"
 	GetSSHEnabled                                               = "GetSSHEnabled"
 	GetStacksRequest                                            = "GetStacks"
 	GetUserRequest                                              = "GetUser"
@@ -265,6 +267,8 @@ var APIRoutes = []Route{
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/routes", Method: http.MethodDelete, Name: DeleteOrphanedRoutesRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/running_security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodPatch, Name: PatchSpaceFeaturesRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodGet, Name: GetSpaceFeatureRequest},
 	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodPost, Name: PostSpaceQuotaRequest},

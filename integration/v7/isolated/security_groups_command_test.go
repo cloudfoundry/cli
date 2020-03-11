@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -39,11 +40,11 @@ var _ = Describe("security-groups command", func() {
 
 		When("security groups exists", func() {
 			var (
-				securityGroup1 helpers.SecurityGroup
-				securityGroup2 helpers.SecurityGroup
-				securityGroup3 helpers.SecurityGroup
-				securityGroup4 helpers.SecurityGroup
-				securityGroup5 helpers.SecurityGroup
+				securityGroup1 resources.SecurityGroup
+				securityGroup2 resources.SecurityGroup
+				securityGroup3 resources.SecurityGroup
+				securityGroup4 resources.SecurityGroup
+				securityGroup5 resources.SecurityGroup
 				orgName        string
 				spaceName      string
 				ports          string
@@ -94,11 +95,11 @@ var _ = Describe("security-groups command", func() {
 					&ports,
 					&description,
 				)
-				securityGroup1.Create()
-				securityGroup2.Create()
-				securityGroup3.Create()
-				securityGroup4.Create()
-				securityGroup5.Create()
+				helpers.CreateSecurityGroup(securityGroup1)
+				helpers.CreateSecurityGroup(securityGroup2)
+				helpers.CreateSecurityGroup(securityGroup3)
+				helpers.CreateSecurityGroup(securityGroup4)
+				helpers.CreateSecurityGroup(securityGroup5)
 
 				session1 := helpers.CF(`bind-running-security-group`, securityGroup1.Name)
 				session2 := helpers.CF("bind-security-group", securityGroup2.Name, orgName, spaceName)
@@ -112,11 +113,11 @@ var _ = Describe("security-groups command", func() {
 			})
 
 			AfterEach(func() {
-				securityGroup1.Delete()
-				securityGroup2.Delete()
-				securityGroup3.Delete()
-				securityGroup4.Delete()
-				securityGroup5.Delete()
+				helpers.DeleteSecurityGroup(securityGroup1)
+				helpers.DeleteSecurityGroup(securityGroup2)
+				helpers.DeleteSecurityGroup(securityGroup3)
+				helpers.DeleteSecurityGroup(securityGroup4)
+				helpers.DeleteSecurityGroup(securityGroup5)
 			})
 
 			It("displays the security groups exits 0", func() {

@@ -163,14 +163,14 @@ var _ = Describe("SecurityGroup", func() {
 
 	Describe("GetSecurityGroups", func() {
 		var (
-			returnedSecurityGroup []resources.SecurityGroup
-			query                 Query
-			warnings              Warnings
-			executeErr            error
+			returnedSecurityGroups []resources.SecurityGroup
+			query                  Query
+			warnings               Warnings
+			executeErr             error
 		)
 
 		JustBeforeEach(func() {
-			returnedSecurityGroup, warnings, executeErr = client.GetSecurityGroups(query)
+			returnedSecurityGroups, warnings, executeErr = client.GetSecurityGroups(query)
 		})
 
 		When("the request succeeds", func() {
@@ -227,7 +227,7 @@ var _ = Describe("SecurityGroup", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(Equal(Warnings{"this is a warning", "this is another warning"}))
 
-				Expect(returnedSecurityGroup).To(Equal([]resources.SecurityGroup{{
+				Expect(returnedSecurityGroups).To(Equal([]resources.SecurityGroup{{
 					GUID: "security-group-guid-1",
 					Name: "security-group-name-1",
 				}, {
@@ -259,6 +259,246 @@ var _ = Describe("SecurityGroup", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/security_groups"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetRunningSecurityGroups", func() {
+		var (
+			spaceGUID              = "some-space-guid"
+			returnedSecurityGroups []resources.SecurityGroup
+			query                  Query
+			warnings               Warnings
+			executeErr             error
+		)
+
+		JustBeforeEach(func() {
+			returnedSecurityGroups, warnings, executeErr = client.GetRunningSecurityGroups(spaceGUID, query)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+	"pagination": {
+		"next": {
+			"href": "%s/v3/spaces/some-space-guid/running_security_groups?page=2&per_page=2"
+		}
+	},
+  "resources": [
+    {
+      	"name": "security-group-name-1",
+      	"guid": "security-group-guid-1"
+    },
+    {
+      	"name": "security-group-name-2",
+      	"guid": "security-group-guid-2"
+    }
+  ]
+}`, server.URL())
+				response2 := `{
+	"pagination": {
+		"next": null
+	},
+	"resources": [
+	  {
+		"name": "security-group-name-3",
+		  "guid": "security-group-guid-3"
+		}
+	]
+}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/running_security_groups"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/running_security_groups", "page=2&per_page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the given role and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(Equal(Warnings{"this is a warning", "this is another warning"}))
+
+				Expect(returnedSecurityGroups).To(Equal([]resources.SecurityGroup{{
+					GUID: "security-group-guid-1",
+					Name: "security-group-name-1",
+				}, {
+					GUID: "security-group-guid-2",
+					Name: "security-group-name-2",
+				}, {
+					GUID: "security-group-guid-3",
+					Name: "security-group-name-3",
+				}}))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+		"errors": [
+			{
+				"code": 10008,
+				"detail": "The request is semantically invalid: command presence",
+				"title": "CF-UnprocessableEntity"
+			},
+			{
+				"code": 10010,
+				"detail": "Isolation segment not found",
+				"title": "CF-ResourceNotFound"
+			}
+		]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/running_security_groups"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetStagingSecurityGroups", func() {
+		var (
+			spaceGUID              = "some-space-guid"
+			returnedSecurityGroups []resources.SecurityGroup
+			query                  Query
+			warnings               Warnings
+			executeErr             error
+		)
+
+		JustBeforeEach(func() {
+			returnedSecurityGroups, warnings, executeErr = client.GetStagingSecurityGroups(spaceGUID, query)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+	"pagination": {
+		"next": {
+			"href": "%s/v3/spaces/some-space-guid/staging_security_groups?page=2&per_page=2"
+		}
+	},
+  "resources": [
+    {
+      	"name": "security-group-name-1",
+      	"guid": "security-group-guid-1"
+    },
+    {
+      	"name": "security-group-name-2",
+      	"guid": "security-group-guid-2"
+    }
+  ]
+}`, server.URL())
+				response2 := `{
+	"pagination": {
+		"next": null
+	},
+	"resources": [
+	  {
+		"name": "security-group-name-3",
+		  "guid": "security-group-guid-3"
+		}
+	]
+}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/staging_security_groups"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/staging_security_groups", "page=2&per_page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the given role and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(Equal(Warnings{"this is a warning", "this is another warning"}))
+
+				Expect(returnedSecurityGroups).To(Equal([]resources.SecurityGroup{{
+					GUID: "security-group-guid-1",
+					Name: "security-group-name-1",
+				}, {
+					GUID: "security-group-guid-2",
+					Name: "security-group-name-2",
+				}, {
+					GUID: "security-group-guid-3",
+					Name: "security-group-name-3",
+				}}))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+		"errors": [
+			{
+				"code": 10008,
+				"detail": "The request is semantically invalid: command presence",
+				"title": "CF-UnprocessableEntity"
+			},
+			{
+				"code": 10010,
+				"detail": "Isolation segment not found",
+				"title": "CF-ResourceNotFound"
+			}
+		]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/staging_security_groups"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

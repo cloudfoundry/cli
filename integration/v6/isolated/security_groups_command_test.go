@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,13 +48,13 @@ var _ = Describe("security-groups command", func() {
 			var (
 				username string
 
-				securityGroup1 helpers.SecurityGroup
-				securityGroup2 helpers.SecurityGroup
-				securityGroup3 helpers.SecurityGroup
-				securityGroup4 helpers.SecurityGroup
-				securityGroup5 helpers.SecurityGroup
-				securityGroup6 helpers.SecurityGroup
-				securityGroup7 helpers.SecurityGroup
+				securityGroup1 resources.SecurityGroup
+				securityGroup2 resources.SecurityGroup
+				securityGroup3 resources.SecurityGroup
+				securityGroup4 resources.SecurityGroup
+				securityGroup5 resources.SecurityGroup
+				securityGroup6 resources.SecurityGroup
+				securityGroup7 resources.SecurityGroup
 
 				org11 string
 				org12 string
@@ -112,19 +113,19 @@ var _ = Describe("security-groups command", func() {
 
 				// Create Security Groups, Organizations, and Spaces with predictable and unique names for testing sorting
 				securityGroup1 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-1"), "tcp", "11.1.1.0/24", &ports1, &description1)
-				securityGroup1.Create()
+				helpers.CreateSecurityGroup(securityGroup1)
 				securityGroup2 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-2"), "tcp", "11.1.1.0/24", &ports2, &description2)
-				securityGroup2.Create()
+				helpers.CreateSecurityGroup(securityGroup2)
 				securityGroup3 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-3"), "tcp", "11.1.1.0/24", &ports3, &description3)
-				securityGroup3.Create()
+				helpers.CreateSecurityGroup(securityGroup3)
 				securityGroup4 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-4"), "tcp", "11.1.1.0/24", &ports4, &description4)
-				securityGroup4.Create()
+				helpers.CreateSecurityGroup(securityGroup4)
 				securityGroup5 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-5"), "tcp", "11.1.1.0/24", &ports5, &description5)
-				securityGroup5.Create()
+				helpers.CreateSecurityGroup(securityGroup5)
 				securityGroup6 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-6"), "tcp", "11.1.1.0/24", &ports6, &description6)
-				securityGroup6.Create()
+				helpers.CreateSecurityGroup(securityGroup6)
 				securityGroup7 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-7"), "tcp", "11.1.1.0/24", &ports7, &description7)
-				securityGroup7.Create()
+				helpers.CreateSecurityGroup(securityGroup7)
 
 				org11 = helpers.PrefixedRandomName("INTEGRATION-ORG-11")
 				org12 = helpers.PrefixedRandomName("INTEGRATION-ORG-12")

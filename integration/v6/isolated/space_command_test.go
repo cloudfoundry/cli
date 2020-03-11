@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -81,8 +82,8 @@ var _ = Describe("space command", func() {
 
 			When("the --guid flag is not used", func() {
 				var (
-					securityGroup0      helpers.SecurityGroup
-					securityGroup1      helpers.SecurityGroup
+					securityGroup0      resources.SecurityGroup
+					securityGroup1      resources.SecurityGroup
 					securityGroupName2  string
 					securityGroupRules2 *os.File
 					err                 error
@@ -93,11 +94,11 @@ var _ = Describe("space command", func() {
 					description1 := "foo security group"
 					description2 := "some security group"
 					securityGroup0 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("0"), "tcp", "4.3.2.1/24", &ports, &description1)
-					securityGroup0.Create()
+					helpers.CreateSecurityGroup(securityGroup0)
 					Eventually(helpers.CF("bind-security-group", securityGroup0.Name, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 
 					securityGroup1 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("1"), "tcp", "1.2.3.4/24", &ports, &description2)
-					securityGroup1.Create()
+					helpers.CreateSecurityGroup(securityGroup1)
 					Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
 
 					securityGroupName2 = helpers.NewSecurityGroupName("2")
