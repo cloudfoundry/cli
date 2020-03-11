@@ -80,6 +80,8 @@ func (cmd RestartCommand) Execute(args []string) error {
 	default:
 		err = cmd.downtimeRestart(app)
 	}
+
+	cmd.UI.DisplayNewline()
 	if err != nil {
 		return err
 	}

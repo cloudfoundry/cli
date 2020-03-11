@@ -15,6 +15,7 @@ const (
 	CreatingArchive                 Event = "creating archive"
 	CreatingDroplet                 Event = "creating droplet"
 	CreatingPackage                 Event = "creating package"
+	InstanceDetails                 Event = "instance details"
 	PollingBuild                    Event = "polling build"
 	ReadingArchive                  Event = "reading archive"
 	ResourceMatching                Event = "resource matching"

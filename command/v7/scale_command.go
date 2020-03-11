@@ -88,6 +88,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 	}
 
 	warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
+	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayWarnings(warnings)
 
 	showErr := cmd.showCurrentScale(user.Name, err)

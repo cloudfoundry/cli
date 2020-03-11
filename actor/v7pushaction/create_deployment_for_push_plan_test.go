@@ -47,7 +47,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 		When("creating the deployment is successful", func() {
 			BeforeEach(func() {
 				fakeV7Actor.PollStartForRollingCalls(func(_ string, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
-					handleInstanceDetails("instance details")
+					handleInstanceDetails("Instances starting...")
 					return nil, nil
 				})
 
@@ -64,7 +64,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 				Expect(givenAppGUID).To(Equal("some-app-guid"))
 				Expect(givenDeploymentGUID).To(Equal("some-deployment-guid"))
 				Expect(noWait).To(Equal(false))
-				Expect(events).To(ConsistOf(StartingDeployment, Event("instance details"), WaitingForDeployment))
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
 			})
 
 			It("returns errors and warnings", func() {
@@ -74,7 +74,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("records deployment events", func() {
-				Expect(events).To(ConsistOf(StartingDeployment, Event("instance details"), WaitingForDeployment))
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
 			})
 		})
 
