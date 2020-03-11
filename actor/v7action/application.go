@@ -385,9 +385,7 @@ func (actor Actor) PollProcesses(processes []ccv3.Process, handleInstanceDetails
 			return true, allWarnings, err
 		}
 
-		for _, instance := range instances {
-			handleInstanceDetails(formatInstanceDetails(instance.Details))
-		}
+		handleInstanceDetails(formatInstanceDetails(instances))
 
 		if instances.Empty() || instances.AnyRunning() {
 			numStableProcesses += 1
@@ -490,10 +488,11 @@ func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spac
 	return application, allWarnings, nil
 }
 
-func formatInstanceDetails(details string) string {
-	if details == "" {
-		return "Instances starting..."
+func formatInstanceDetails(instances ProcessInstances) string {
+	for _, instance := range instances {
+		if instance.Details != "" {
+			return fmt.Sprintf("Error starting instances: '%s'", instance.Details)
+		}
 	}
-
-	return fmt.Sprintf("Error starting instances: '%s'", details)
+	return "Instances starting..."
 }
