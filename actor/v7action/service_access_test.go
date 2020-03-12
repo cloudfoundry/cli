@@ -420,13 +420,21 @@ var _ = Describe("service access actions", func() {
 
 			When("the service offering name is ambiguous", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{}, {}}, ccv3.Warnings{"another warning"}, nil)
+					fakeCloudControllerClient.GetServiceOfferingsReturns(
+						[]ccv3.ServiceOffering{
+							{ServiceBrokerName: "a-broker"},
+							{ServiceBrokerName: "another-broker"}},
+						ccv3.Warnings{"another warning"},
+						nil)
 				})
 
 				It("returns an error", func() {
 					_, warnings, err := actor.EnableServiceAccess("duplicate-offering", "", "", "")
 					Expect(warnings).To(ContainElement("another warning"))
-					Expect(err).To(MatchError(actionerror.DuplicateServiceError{Name: "duplicate-offering"}))
+					Expect(err).To(MatchError(actionerror.DuplicateServiceError{
+						Name:           "duplicate-offering",
+						ServiceBrokers: []string{"a-broker", "another-broker"},
+					}))
 				})
 			})
 		})
@@ -670,13 +678,24 @@ var _ = Describe("service access actions", func() {
 
 			When("the service offering name is ambiguous", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{}, {}}, ccv3.Warnings{"another warning"}, nil)
+					fakeCloudControllerClient.GetServiceOfferingsReturns(
+						[]ccv3.ServiceOffering{
+							{ServiceBrokerName: "a-broker"},
+							{ServiceBrokerName: "another-broker"},
+						},
+						ccv3.Warnings{"another warning"},
+						nil)
 				})
 
 				It("returns an error", func() {
 					_, warnings, err := actor.DisableServiceAccess("duplicate-offering", "", "", "")
 					Expect(warnings).To(ContainElement("another warning"))
-					Expect(err).To(MatchError(actionerror.DuplicateServiceError{Name: "duplicate-offering"}))
+					Expect(err).To(MatchError(
+						actionerror.DuplicateServiceError{
+							Name:           "duplicate-offering",
+							ServiceBrokers: []string{"a-broker", "another-broker"},
+						},
+					))
 				})
 			})
 		})

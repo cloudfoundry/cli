@@ -265,7 +265,12 @@ var _ = Describe("disable service access command", func() {
 						session := helpers.CF("disable-service-access", broker.ServiceName())
 						Eventually(session).Should(Exit(1))
 						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.ServiceName(), username))
-						Expect(session.Err).To(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", broker.ServiceName()))
+						Expect(session.Err).To(Say(
+							"Service '%s' is provided by multiple service brokers.\nSpecify a broker from available brokers '%s', '%s' by using the '-b' flag.",
+							broker.ServiceName(),
+							broker.Name(),
+							secondBroker.Name(),
+						))
 					})
 				})
 

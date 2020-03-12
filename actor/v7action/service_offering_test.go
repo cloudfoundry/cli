@@ -96,16 +96,18 @@ var _ = Describe("Service Offering Actions", func() {
 						{
 							Name: "some-service-offering-1",
 							GUID: "some-service-offering-guid-1",
+							ServiceBrokerName: "a-service-broker",
 						},
 						{
 							Name: "some-service-offering-2",
 							GUID: "some-service-offering-guid-2",
+							ServiceBrokerName: "another-service-broker",
 						},
 					}, ccv3.Warnings{"some-service-offering-warning"}, nil)
 				})
 
 				It("returns an error and warnings", func() {
-					Expect(executionError).To(MatchError(actionerror.DuplicateServiceError{Name: serviceOfferingName}))
+					Expect(executionError).To(MatchError(actionerror.DuplicateServiceError{Name: serviceOfferingName, ServiceBrokers: []string{"a-service-broker", "another-service-broker"}}))
 					Expect(warnings).To(ConsistOf("some-service-offering-warning"))
 				})
 			})

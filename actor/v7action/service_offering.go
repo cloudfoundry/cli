@@ -24,6 +24,10 @@ func (actor Actor) GetServiceOfferingByNameAndBroker(serviceOfferingName, servic
 	case 1:
 		return ServiceOffering(serviceOfferings[0]), Warnings(warnings), nil
 	default:
-		return ServiceOffering{}, Warnings(warnings), actionerror.DuplicateServiceError{Name: serviceOfferingName}
+		var serviceBrokers []string
+		for _, offering := range serviceOfferings {
+			serviceBrokers = append(serviceBrokers, offering.ServiceBrokerName)
+		}
+		return ServiceOffering{}, Warnings(warnings), actionerror.DuplicateServiceError{Name: serviceOfferingName, ServiceBrokers: serviceBrokers}
 	}
 }
