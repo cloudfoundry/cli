@@ -134,6 +134,12 @@ func (actor Actor) GetSecurityGroups() ([]SecurityGroupSummary, Warnings, error)
 	return securityGroupSummaries, allWarnings, nil
 }
 
+func (actor Actor) GetGlobalStagingSecurityGroups() ([]resources.SecurityGroup, Warnings, error) {
+	stagingSecurityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.GloballyEnabledStaging, Values: []string{"true"}})
+
+	return stagingSecurityGroups, Warnings(warnings), err
+}
+
 func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpaceGUIDs []string) ([]SecurityGroupSpace, ccv3.Warnings, error) {
 	var warnings ccv3.Warnings
 	associatedSpaceGuids := runningSpaceGUIDs

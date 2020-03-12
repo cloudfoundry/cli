@@ -172,7 +172,7 @@ type commandList struct {
 	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	Stacks                             v7.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StagingEnvironmentVariableGroup    v7.StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
-	StagingSecurityGroups              v6.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups in the staging set for applications"`
+	StagingSecurityGroups              v7.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups globally configured for staging applications"`
 	Start                              v7.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
 	Stop                               v7.StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
 	Target                             v7.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`

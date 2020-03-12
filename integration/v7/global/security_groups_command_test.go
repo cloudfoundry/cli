@@ -71,6 +71,13 @@ var _ = Describe("security group-related command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
+		It("displays no global staging security groups found and exits 0", func() {
+			session := helpers.CF("staging-security-groups")
+			Eventually(session).Should(Say(`Getting global staging security groups as %s\.\.\.`, unprivilegedUsername))
+			Eventually(session).Should(Say("No global staging security groups found."))
+			Eventually(session).Should(Exit(0))
+		})
+
 		It("displays no security groups found on the space and exits 0", func() {
 			session := helpers.CF("space", spaceName, "--security-group-rules")
 			Eventually(session).Should(Say(`name:\s+%s`, spaceName))
