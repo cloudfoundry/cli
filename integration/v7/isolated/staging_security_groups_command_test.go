@@ -79,7 +79,6 @@ var _ = Describe("staging-security-groups command", func() {
 				Eventually(session).Should(Say(`name`))
 				Eventually(session).Should(Say(`public_networks`))
 				Eventually(session).Should(Say(`dns`))
-				//Eventually(session).Should(Say(`credhub`))
 				Eventually(session).Should(Say(securityGroup.Name))
 
 				Eventually(session).Should(Exit(0))
