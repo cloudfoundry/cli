@@ -157,6 +157,7 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 				return true
 			}),
 			client.Read,
+			logcache.WithWalkDelay(2*time.Second),
 			logcache.WithWalkStartTime(walkStartTime),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
 			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),

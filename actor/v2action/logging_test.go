@@ -92,7 +92,7 @@ var _ = Describe("Logging Actions", func() {
 
 					return []*loggregator_v2.Envelope{{
 							// 3 seconds in the past to get past Walk delay
-							Timestamp:  time.Now().Add(-3 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-4 * time.Second).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -106,7 +106,7 @@ var _ = Describe("Logging Actions", func() {
 							},
 						}, {
 							// 2 seconds in the past to get past Walk delay
-							Timestamp:  time.Now().Add(-2 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-3 * time.Second).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -119,7 +119,7 @@ var _ = Describe("Logging Actions", func() {
 								"source_type": "some-source-type",
 							},
 						}, {
-							Timestamp:  time.Now().Add(-4 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-2005 * time.Millisecond).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -132,7 +132,7 @@ var _ = Describe("Logging Actions", func() {
 								"source_type": "some-source-type",
 							},
 						}, {
-							Timestamp:  time.Now().Add(-1 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-1900 * time.Millisecond).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -166,9 +166,8 @@ var _ = Describe("Logging Actions", func() {
 				Expect(message.SourceType()).To(Equal("some-source-type"))
 				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
 
-				Eventually(messages).Should(Receive(&message))
-				Expect(message.Message()).To(Equal("message-4"))
-				Expect(message.Type()).To(Equal("OUT"))
+				// The last message in the list is ignored because of the new WalkDelay of 2 seconds
+				Consistently(messages).ShouldNot(Receive(&message))
 			})
 		})
 	})
