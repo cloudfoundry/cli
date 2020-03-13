@@ -94,13 +94,13 @@ var _ = Describe("Service Offering Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{
 						{
-							Name: "some-service-offering-1",
-							GUID: "some-service-offering-guid-1",
+							Name:              "some-service-offering-1",
+							GUID:              "some-service-offering-guid-1",
 							ServiceBrokerName: "a-service-broker",
 						},
 						{
-							Name: "some-service-offering-2",
-							GUID: "some-service-offering-guid-2",
+							Name:              "some-service-offering-2",
+							GUID:              "some-service-offering-guid-2",
 							ServiceBrokerName: "another-service-broker",
 						},
 					}, ccv3.Warnings{"some-service-offering-warning"}, nil)
