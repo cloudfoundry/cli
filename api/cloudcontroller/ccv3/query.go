@@ -73,6 +73,9 @@ const (
 	// GloballyEnabledStaging is the query parameter for getting only security groups that are globally enabled for staging
 	GloballyEnabledStaging QueryKey = "globally_enabled_staging"
 
+	// GloballyEnabledRunning is the query parameter for getting only security groups that are globally enabled for running
+	GloballyEnabledRunning QueryKey = "globally_enabled_running"
+
 	// NameOrder is a query value for ordering by name. This value is used in
 	// conjunction with the OrderBy QueryKey.
 	NameOrder = "name"

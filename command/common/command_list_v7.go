@@ -136,7 +136,7 @@ type commandList struct {
 	Routes                             v7.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
 	RunTask                            v7.RunTaskCommand                            `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`
 	RunningEnvironmentVariableGroup    v7.RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group" alias:"revg" description:"Retrieve the contents of the running environment variable group"`
-	RunningSecurityGroups              v6.RunningSecurityGroupsCommand              `command:"running-security-groups" description:"List security groups in the set of security groups for running applications"`
+	RunningSecurityGroups              v7.RunningSecurityGroupsCommand              `command:"running-security-groups" description:"List security groups globally configured for running applications"`
 	SSH                                v7.SSHCommand                                `command:"ssh" description:"SSH to an application container instance"`
 	SSHCode                            v6.SSHCodeCommand                            `command:"ssh-code" description:"Get a one time password for ssh clients"`
 	SSHEnabled                         v7.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`

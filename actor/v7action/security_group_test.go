@@ -609,4 +609,93 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 	})
+	Describe("GetGlobalRunningingSecurityGroups", func() {
+		var (
+			securityGroups []resources.SecurityGroup
+		)
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{{
+						Name: "security-group-name-1",
+						GUID: "security-group-guid-1",
+					}, {
+						Name: "security-group-name-2",
+						GUID: "security-group-guid-2",
+					}},
+					ccv3.Warnings{"security-group-warning"},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				securityGroups, warnings, executeErr = actor.GetGlobalRunningSecurityGroups()
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("returns the security groups and warnings", func() {
+				Expect(securityGroups).To(Equal(
+					[]resources.SecurityGroup{{
+						Name: "security-group-name-1",
+						GUID: "security-group-guid-1",
+					}, {
+						Name: "security-group-name-2",
+						GUID: "security-group-guid-2",
+					}},
+				))
+				Expect(warnings).To(ConsistOf("security-group-warning"))
+
+				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.GloballyEnabledRunning, Values: []string{"true"}},
+				))
+			})
+		})
+
+		When("the request errors", func() {
+			var expectedError error
+			JustBeforeEach(func() {
+				securityGroups, warnings, executeErr = actor.GetGlobalRunningSecurityGroups()
+			})
+
+			When("there are no security groups", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						[]resources.SecurityGroup{},
+						ccv3.Warnings{"security-group-warning"},
+						nil,
+					)
+				})
+
+				It("returns an empty list of security group summaries and warnings", func() {
+					Expect(securityGroups).To(Equal(
+						[]resources.SecurityGroup{},
+					))
+					Expect(warnings).To(ConsistOf("security-group-warning"))
+
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.GloballyEnabledRunning, Values: []string{"true"}},
+					))
+				})
+			})
+
+			When("the cloud controller client errors", func() {
+				BeforeEach(func() {
+					expectedError = errors.New("I am a CloudControllerClient Error")
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						nil,
+						ccv3.Warnings{"security-group-warning"},
+						expectedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ConsistOf("security-group-warning"))
+					Expect(executeErr).To(MatchError(expectedError))
+				})
+			})
+		})
+	})
 })
