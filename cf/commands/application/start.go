@@ -11,8 +11,6 @@ import (
 
 	"sync"
 
-	"sync/atomic"
-
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/appinstances"
 	"code.cloudfoundry.org/cli/cf/api/applications"
@@ -160,15 +158,10 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 func (cmd *Start) WatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (models.Application, error) {
 	stopChan := make(chan bool, 1)
 
-	loggingStartedWait := new(sync.WaitGroup)
-	loggingStartedWait.Add(1)
-
 	loggingDoneWait := new(sync.WaitGroup)
 	loggingDoneWait.Add(1)
 
-	go cmd.TailStagingLogs(app, stopChan, loggingStartedWait, loggingDoneWait)
-
-	loggingStartedWait.Wait()
+	go cmd.TailStagingLogs(app, stopChan, loggingDoneWait)
 
 	updatedApp, err := start(app)
 	if err != nil {
@@ -243,42 +236,19 @@ const (
 	StoppedTrying
 )
 
-func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, startWait, doneWait *sync.WaitGroup) {
-	var connectionStatus atomic.Value
-	connectionStatus.Store(NoConnection)
-
-	var once sync.Once
-	startWaitDone := func() {
-		startWait.Done()
-	}
-
-	onConnect := func() {
-		if connectionStatus.Load() != StoppedTrying {
-			connectionStatus.Store(ConnectionWasEstablished)
-			once.Do(startWaitDone)
-		}
-	}
-
-	timer := time.NewTimer(cmd.LogServerConnectionTimeout)
-
+func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, doneWait *sync.WaitGroup) {
 	c := make(chan logs.Loggable)
 	e := make(chan error)
 
 	defer doneWait.Done()
 
-	go cmd.logRepo.TailLogsFor(app.GUID, onConnect, c, e)
+	go cmd.logRepo.TailLogsFor(app.GUID, func() {}, c, e)
 
 	for {
 		select {
-		case <-timer.C:
-			if connectionStatus.Load() == NoConnection {
-				connectionStatus.Store(StoppedTrying)
-				cmd.ui.Warn("timeout connecting to log server, no log will be shown")
-				once.Do(startWaitDone)
-				return
-			}
 		case msg, ok := <-c:
 			if !ok {
+				cmd.logRepo.Close()
 				return
 			} else if msg.GetSourceName() == LogMessageTypeStaging {
 				cmd.ui.Say(msg.ToSimpleLog())
@@ -286,21 +256,13 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 
 		case err, ok := <-e:
 			if ok {
-				if connectionStatus.Load() != ConnectionWasClosed {
-					cmd.ui.Warn(T("Warning: error tailing logs"))
-					cmd.ui.Say("%s", err)
-					once.Do(startWaitDone)
-					return
-				}
+				cmd.ui.Warn(T("Warning: error tailing logs"))
+				cmd.ui.Say("%s", err)
 			}
 
 		case <-stopChan:
-			if connectionStatus.Load() == ConnectionWasEstablished {
-				connectionStatus.Store(ConnectionWasClosed)
-				cmd.logRepo.Close()
-			} else {
-				return
-			}
+			cmd.logRepo.Close()
+			return
 		}
 	}
 }

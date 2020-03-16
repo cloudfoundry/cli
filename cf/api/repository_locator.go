@@ -2,7 +2,7 @@ package api
 
 import (
 	"net/http"
-	"strconv"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/api/appevents"
@@ -30,7 +30,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
@@ -102,17 +104,16 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 
 	tlsConfig := util.NewTLSConfig(nil, config.IsSSLDisabled())
 
-	var noaaRetryTimeout time.Duration
-	convertedTime, err := strconv.Atoi(envDialTimeout)
-	if err != nil {
-		noaaRetryTimeout = noaaRetryDefaultTimeout
-	} else {
-		noaaRetryTimeout = time.Duration(convertedTime) * 3 * time.Second
-	}
-
 	consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-	loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo, noaaRetryTimeout)
+
+	configV3, err := configv3.GetCFConfig()
+	if err != nil {
+		panic("handle this error!")
+	}
+	logCacheURL := strings.Replace(configV3.ConfigFile.Target, "api", "log-cache", 1)
+	logCacheClient := command.NewLogCacheClient(logCacheURL, configV3, nil)
+	loc.logsRepo = logs.NewLogCacheRepository(logCacheClient)
 
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerRepository(config, uaaGateway)

@@ -105,6 +105,12 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		fmt.Println("Done GetService:", result)
 	case "TestPluginCommandWithAlias", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF":
 		fmt.Println("You called Test Plugin Command With Alias!")
+	case "RecentLogs":
+		result, _ := cliConnection.CliCommand("logs", "--recent", args[1])
+		fmt.Println("Done RecentLogs:", result)
+	case "Logs":
+		result, _ := cliConnection.CliCommand("logs", args[1])
+		fmt.Println("Done Logs:", result)
 	}
 }
 
@@ -149,6 +155,8 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{Name: "GetSpaceUsers"},
 			{Name: "GetServices"},
 			{Name: "GetService"},
+			{Name: "RecentLogs"},
+			{Name: "Logs"},
 			{
 				Name:     "TestPluginCommandWithAlias",
 				Alias:    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
