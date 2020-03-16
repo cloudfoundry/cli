@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("running-security-groups command", func() {
+var _ = Describe("running-security-groups command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
