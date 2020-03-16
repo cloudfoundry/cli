@@ -1958,7 +1958,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateResourceMetadataStub        func(string, string, ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)
+	UpdateResourceMetadataStub        func(string, string, ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error)
 	updateResourceMetadataMutex       sync.RWMutex
 	updateResourceMetadataArgsForCall []struct {
 		arg1 string
@@ -1966,28 +1966,11 @@ type FakeCloudControllerClient struct {
 		arg3 ccv3.Metadata
 	}
 	updateResourceMetadataReturns struct {
-		result1 ccv3.ResourceMetadata
-		result2 ccv3.Warnings
-		result3 error
-	}
-	updateResourceMetadataReturnsOnCall map[int]struct {
-		result1 ccv3.ResourceMetadata
-		result2 ccv3.Warnings
-		result3 error
-	}
-	UpdateResourceMetadataAsyncStub        func(string, string, ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error)
-	updateResourceMetadataAsyncMutex       sync.RWMutex
-	updateResourceMetadataAsyncArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 ccv3.Metadata
-	}
-	updateResourceMetadataAsyncReturns struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}
-	updateResourceMetadataAsyncReturnsOnCall map[int]struct {
+	updateResourceMetadataReturnsOnCall map[int]struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -10727,7 +10710,7 @@ func (fake *FakeCloudControllerClient) UpdateProcessReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateResourceMetadata(arg1 string, arg2 string, arg3 ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateResourceMetadata(arg1 string, arg2 string, arg3 ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.updateResourceMetadataMutex.Lock()
 	ret, specificReturn := fake.updateResourceMetadataReturnsOnCall[len(fake.updateResourceMetadataArgsForCall)]
 	fake.updateResourceMetadataArgsForCall = append(fake.updateResourceMetadataArgsForCall, struct {
@@ -10753,7 +10736,7 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataCallCount() int {
 	return len(fake.updateResourceMetadataArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataCalls(stub func(string, string, ccv3.Metadata) (ccv3.ResourceMetadata, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataCalls(stub func(string, string, ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.updateResourceMetadataMutex.Lock()
 	defer fake.updateResourceMetadataMutex.Unlock()
 	fake.UpdateResourceMetadataStub = stub
@@ -10766,97 +10749,29 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataArgsForCall(i int) 
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturns(result1 ccv3.ResourceMetadata, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.updateResourceMetadataMutex.Lock()
 	defer fake.updateResourceMetadataMutex.Unlock()
 	fake.UpdateResourceMetadataStub = nil
 	fake.updateResourceMetadataReturns = struct {
-		result1 ccv3.ResourceMetadata
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int, result1 ccv3.ResourceMetadata, result2 ccv3.Warnings, result3 error) {
-	fake.updateResourceMetadataMutex.Lock()
-	defer fake.updateResourceMetadataMutex.Unlock()
-	fake.UpdateResourceMetadataStub = nil
-	if fake.updateResourceMetadataReturnsOnCall == nil {
-		fake.updateResourceMetadataReturnsOnCall = make(map[int]struct {
-			result1 ccv3.ResourceMetadata
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.updateResourceMetadataReturnsOnCall[i] = struct {
-		result1 ccv3.ResourceMetadata
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataAsync(arg1 string, arg2 string, arg3 ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error) {
-	fake.updateResourceMetadataAsyncMutex.Lock()
-	ret, specificReturn := fake.updateResourceMetadataAsyncReturnsOnCall[len(fake.updateResourceMetadataAsyncArgsForCall)]
-	fake.updateResourceMetadataAsyncArgsForCall = append(fake.updateResourceMetadataAsyncArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 ccv3.Metadata
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("UpdateResourceMetadataAsync", []interface{}{arg1, arg2, arg3})
-	fake.updateResourceMetadataAsyncMutex.Unlock()
-	if fake.UpdateResourceMetadataAsyncStub != nil {
-		return fake.UpdateResourceMetadataAsyncStub(arg1, arg2, arg3)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.updateResourceMetadataAsyncReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataAsyncCallCount() int {
-	fake.updateResourceMetadataAsyncMutex.RLock()
-	defer fake.updateResourceMetadataAsyncMutex.RUnlock()
-	return len(fake.updateResourceMetadataAsyncArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataAsyncCalls(stub func(string, string, ccv3.Metadata) (ccv3.JobURL, ccv3.Warnings, error)) {
-	fake.updateResourceMetadataAsyncMutex.Lock()
-	defer fake.updateResourceMetadataAsyncMutex.Unlock()
-	fake.UpdateResourceMetadataAsyncStub = stub
-}
-
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataAsyncArgsForCall(i int) (string, string, ccv3.Metadata) {
-	fake.updateResourceMetadataAsyncMutex.RLock()
-	defer fake.updateResourceMetadataAsyncMutex.RUnlock()
-	argsForCall := fake.updateResourceMetadataAsyncArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
-}
-
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataAsyncReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
-	fake.updateResourceMetadataAsyncMutex.Lock()
-	defer fake.updateResourceMetadataAsyncMutex.Unlock()
-	fake.UpdateResourceMetadataAsyncStub = nil
-	fake.updateResourceMetadataAsyncReturns = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateResourceMetadataAsyncReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
-	fake.updateResourceMetadataAsyncMutex.Lock()
-	defer fake.updateResourceMetadataAsyncMutex.Unlock()
-	fake.UpdateResourceMetadataAsyncStub = nil
-	if fake.updateResourceMetadataAsyncReturnsOnCall == nil {
-		fake.updateResourceMetadataAsyncReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateResourceMetadataMutex.Lock()
+	defer fake.updateResourceMetadataMutex.Unlock()
+	fake.UpdateResourceMetadataStub = nil
+	if fake.updateResourceMetadataReturnsOnCall == nil {
+		fake.updateResourceMetadataReturnsOnCall = make(map[int]struct {
 			result1 ccv3.JobURL
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
-	fake.updateResourceMetadataAsyncReturnsOnCall[i] = struct {
+	fake.updateResourceMetadataReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -11943,8 +11858,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateProcessMutex.RUnlock()
 	fake.updateResourceMetadataMutex.RLock()
 	defer fake.updateResourceMetadataMutex.RUnlock()
-	fake.updateResourceMetadataAsyncMutex.RLock()
-	defer fake.updateResourceMetadataAsyncMutex.RUnlock()
 	fake.updateServiceBrokerMutex.RLock()
 	defer fake.updateServiceBrokerMutex.RUnlock()
 	fake.updateServicePlanVisibilityMutex.RLock()

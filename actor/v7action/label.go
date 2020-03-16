@@ -128,7 +128,7 @@ func (actor *Actor) UpdateServiceBrokerLabelsByServiceBrokerName(serviceBrokerNa
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadataAsync("service-broker", serviceBroker.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("service-broker", serviceBroker.GUID, ccv3.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
@@ -148,17 +148,19 @@ func (actor *Actor) UpdateServicePlanLabels(servicePlanName string, serviceOffer
 }
 
 func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
-	return append(warnings, updateWarnings...), err
-}
-
-func (actor *Actor) updateResourceMetadataAsync(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
-	jobURL, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadataAsync(resourceType, resourceGUID, payload)
+	jobURL, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
 	warnings = append(warnings, updateWarnings...)
 	if err != nil {
 		return warnings, err
 	}
-	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-	warnings = append(warnings, pollWarnings...)
-	return warnings, err
+
+	if jobURL != "" {
+		pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+		warnings = append(warnings, pollWarnings...)
+		if err != nil {
+			return warnings, err
+		}
+	}
+
+	return warnings, nil
 }

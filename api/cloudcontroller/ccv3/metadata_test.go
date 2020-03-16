@@ -34,7 +34,7 @@ var _ = Describe("Metadata", func() {
 		var (
 			metadataToUpdate Metadata
 			resourceGUID     string
-			updatedMetadata  ResourceMetadata
+			jobURL           JobURL
 			warnings         Warnings
 			executeErr       error
 		)
@@ -47,22 +47,11 @@ var _ = Describe("Metadata", func() {
 
 				JustBeforeEach(func() {
 					resourceGUID = "some-guid"
-					updatedMetadata, warnings, executeErr = client.UpdateResourceMetadata(resourceType, resourceGUID, metadataToUpdate)
+					jobURL, warnings, executeErr = client.UpdateResourceMetadata(resourceType, resourceGUID, metadataToUpdate)
 				})
 
 				When(fmt.Sprintf("the %s is updated successfully", resourceType), func() {
 					BeforeEach(func() {
-						response := fmt.Sprintf(`{
-							"guid": "some-guid",
-							"name": "some-%s-type",
-							"metadata": {
-								"labels": {
-									"k1":"v1",
-									"k2":"v2"
-								}
-							}
-						}`, resourceType)
-
 						expectedBody := map[string]interface{}{
 							"metadata": map[string]interface{}{
 								"labels": map[string]string{
@@ -76,7 +65,10 @@ var _ = Describe("Metadata", func() {
 							CombineHandlers(
 								VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/%ss/some-guid", resourceTypeNameForURI)),
 								VerifyJSONRepresenting(expectedBody),
-								RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+								RespondWith(http.StatusOK, nil, http.Header{
+									"X-Cf-Warnings": {"this is a warning"},
+									"Location":      {"fake-job-url"},
+								}),
 							),
 						)
 
@@ -92,11 +84,7 @@ var _ = Describe("Metadata", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 						Expect(server.ReceivedRequests()).To(HaveLen(3))
-						Expect(updatedMetadata.Metadata.Labels).To(BeEquivalentTo(
-							map[string]types.NullString{
-								"k1": types.NewNullString("v1"),
-								"k2": types.NewNullString("v2"),
-							}))
+						Expect(jobURL).To(Equal(JobURL("fake-job-url")))
 					})
 				})
 
@@ -146,65 +134,12 @@ var _ = Describe("Metadata", func() {
 		testForResourceType("stack", "")
 		testForResourceType("service-offering", "service_offering")
 		testForResourceType("service-plan", "service_plan")
+		testForResourceType("service-broker", "service_broker")
 
 		When("updating metadata on an unsupported resource", func() {
 			It("returns an error", func() {
 				_, _, err := client.UpdateResourceMetadata("anything", "fake-guid", Metadata{})
 				Expect(err).To(MatchError("unknown resource type (anything) requested"))
-			})
-		})
-	})
-
-	Describe("UpdateResourceMetadataAsync", func() {
-		When("updating metadata on service-broker", func() {
-			When("the service-broker is updated successfully", func() {
-				It("sends the correct data and returns the job URL", func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodPatch, "/v3/service_brokers/some-guid"),
-							VerifyJSON(`{"metadata":{"labels":{"k1":"v1","k2":"v2"}}}`),
-							RespondWith(http.StatusAccepted, "", http.Header{"X-Cf-Warnings": {"this is a warning"}, "Location": {"fake-job-url"}}),
-						),
-					)
-
-					metadataToUpdate := Metadata{
-						Labels: map[string]types.NullString{
-							"k1": types.NewNullString("v1"),
-							"k2": types.NewNullString("v2"),
-						},
-					}
-
-					jobURL, warnings, err := client.UpdateResourceMetadataAsync("service-broker", "some-guid", metadataToUpdate)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(jobURL).To(BeEquivalentTo("fake-job-url"))
-					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-				})
-			})
-
-			When("Cloud Controller returns errors and warnings", func() {
-				It("returns the error and all warnings", func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodPatch, "/v3/service_brokers/some-guid"),
-							RespondWith(http.StatusUnprocessableEntity, errorResponse, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
-						),
-					)
-
-					_, warnings, err := client.UpdateResourceMetadataAsync("service-broker", "some-guid", Metadata{})
-
-					Expect(err).To(MatchError(ccerror.UnprocessableEntityError{
-						Message: "Metadata label key error: 'invalid*key' contains invalid characters",
-					}))
-					Expect(warnings).To(ConsistOf(Warnings{"this is another warning"}))
-				})
-			})
-		})
-
-		When("updating metadata on an unsupported resource", func() {
-			It("returns an error", func() {
-				_, _, err := client.UpdateResourceMetadataAsync("anything", "fake-guid", Metadata{})
-				Expect(err).To(MatchError("unknown async resource type (anything) requested"))
 			})
 		})
 	})

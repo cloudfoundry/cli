@@ -48,7 +48,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-app-labels-warnings"},
 					nil,
 				)
@@ -101,7 +101,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-app-labels-warnings"},
 						errors.New("update-application-error"),
 					)
@@ -113,7 +113,6 @@ var _ = Describe("labels", func() {
 					Expect(executeErr).To(MatchError("update-application-error"))
 				})
 			})
-
 		})
 	})
 
@@ -130,7 +129,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"warning-updating-metadata"},
 					nil,
 				)
@@ -182,7 +181,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"warning-updating-metadata"},
 						errors.New("update-domain-error"),
 					)
@@ -209,7 +208,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-org"},
 					nil,
 				)
@@ -261,7 +260,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-org"},
 						errors.New("update-orgs-error"),
 					)
@@ -299,7 +298,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-route-warning"},
 					nil,
 				)
@@ -372,7 +371,7 @@ var _ = Describe("labels", func() {
 					)
 
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-route-warning"},
 						errors.New("update-route-error"),
 					)
@@ -400,7 +399,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-space-metadata"},
 					nil,
 				)
@@ -455,7 +454,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-space"},
 						errors.New("update-space-error"),
 					)
@@ -482,7 +481,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-stack-metadata"},
 					nil,
 				)
@@ -534,7 +533,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-stack"},
 						errors.New("update-stack-error"),
 					)
@@ -561,7 +560,7 @@ var _ = Describe("labels", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.UpdateResourceMetadataAsyncReturns(
+				fakeCloudControllerClient.UpdateResourceMetadataReturns(
 					ccv3.JobURL("fake-job-url"),
 					ccv3.Warnings{"set-service-broker-metadata"},
 					nil,
@@ -577,8 +576,8 @@ var _ = Describe("labels", func() {
 
 			It("sets the service-broker labels", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeCloudControllerClient.UpdateResourceMetadataAsyncCallCount()).To(Equal(1))
-				resourceType, serviceBrokerGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataAsyncArgsForCall(0)
+				Expect(fakeCloudControllerClient.UpdateResourceMetadataCallCount()).To(Equal(1))
+				resourceType, serviceBrokerGUID, sentMetadata := fakeCloudControllerClient.UpdateResourceMetadataArgsForCall(0)
 				Expect(resourceType).To(BeEquivalentTo("service-broker"))
 				Expect(serviceBrokerGUID).To(BeEquivalentTo("some-broker-guid"))
 				Expect(sentMetadata.Labels).To(BeEquivalentTo(labels))
@@ -619,7 +618,7 @@ var _ = Describe("labels", func() {
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
-					fakeCloudControllerClient.UpdateResourceMetadataAsyncReturns(
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
 						ccv3.JobURL(""),
 						ccv3.Warnings{"set-service-broker"},
 						errors.New("update-service-broker-error"),
@@ -639,7 +638,7 @@ var _ = Describe("labels", func() {
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
-					fakeCloudControllerClient.UpdateResourceMetadataAsyncReturns(
+					fakeCloudControllerClient.UpdateResourceMetadataReturns(
 						ccv3.JobURL("fake-job-url"),
 						ccv3.Warnings{"set-service-broker-metadata"},
 						nil,
@@ -675,7 +674,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-service-offering-metadata"},
 					nil,
 				)
@@ -729,7 +728,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-service-offering"},
 						errors.New("update-service-offering-error"),
 					)
@@ -760,7 +759,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.UpdateResourceMetadataReturns(
-					ccv3.ResourceMetadata{},
+					"",
 					ccv3.Warnings{"set-service-plan-metadata"},
 					nil,
 				)
@@ -815,7 +814,7 @@ var _ = Describe("labels", func() {
 						nil,
 					)
 					fakeCloudControllerClient.UpdateResourceMetadataReturns(
-						ccv3.ResourceMetadata{},
+						"",
 						ccv3.Warnings{"set-service-plan"},
 						errors.New("update-service-plan-error"),
 					)
