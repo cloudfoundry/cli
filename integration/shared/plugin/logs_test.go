@@ -1,8 +1,6 @@
 package plugin
 
 import (
-	"runtime"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -61,12 +59,7 @@ var _ = FDescribe("logs", func() {
 			Eventually(restageSession).Should(Exit(0))
 
 			Eventually(logSession).Should(Say("Staticfile Buildpack version"))
-
-			if runtime.GOOS == "windows" {
-				logSession.Kill()
-			} else {
-				logSession.Interrupt()
-			}
+			logSession.Kill()
 
 			Eventually(logSession).Should(Exit())
 		})
