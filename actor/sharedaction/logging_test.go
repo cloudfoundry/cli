@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -340,14 +341,26 @@ var _ = Describe("Logging Actions", func() {
 
 			When("Log Cache returns a resource-exhausted error from grpc", func() {
 				resourceExhaustedErr := errors.New("unexpected status code 429")
+				u := new(url.URL)
+				v := make(url.Values)
+
 				BeforeEach(func() {
 					fakeLogCacheClient.ReadReturns([]*loggregator_v2.Envelope{}, resourceExhaustedErr)
 				})
 
-				It("returns error and warnings", func() {
+				It("attempts to halve numbber of requested logs, and eventually returns error and warnings", func() {
 					_, err := sharedaction.GetRecentLogs("some-app-guid", fakeLogCacheClient)
-					Expect(fakeLogCacheClient.ReadCallCount()).To(Equal(10))
+
 					Expect(err).To(MatchError("Failed to retrieve logs from Log Cache: unexpected status code 429"))
+					Expect(fakeLogCacheClient.ReadCallCount()).To(Equal(10))
+
+					_, _, _, readOptions := fakeLogCacheClient.ReadArgsForCall(0)
+					readOptions[1](u, v)
+					Expect(v.Get("limit")).To(Equal("1000"))
+
+					_, _, _, readOptions = fakeLogCacheClient.ReadArgsForCall(1)
+					readOptions[1](u, v)
+					Expect(v.Get("limit")).To(Equal("500"))
 				})
 			})
 		})
