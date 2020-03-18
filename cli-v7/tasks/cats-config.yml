@@ -74,7 +74,7 @@ run:
       "include_sso": false,
       "include_tasks": true,
       "include_v3": ${INCLUDE_V3},
-      "include_zipkin": false
+      "include_zipkin": true
     }
     EOF
 
