@@ -68,6 +68,7 @@ run:
       "include_routing_isolation_segments": false,
       "include_security_groups": true,
       "include_services": true,
+      "include_service_instance_sharing": true,
       "include_ssh": true,
       "include_sso": false,
       "include_tasks": true,
