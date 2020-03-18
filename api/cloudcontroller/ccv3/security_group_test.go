@@ -79,7 +79,8 @@ var _ = Describe("SecurityGroup", func() {
 
 		BeforeEach(func() {
 			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-				requestParams.AppendToList(resources.SecurityGroup{Name: "security-group-name-1", GUID: "security-group-guid-1"})
+				err := requestParams.AppendToList(resources.SecurityGroup{Name: "security-group-name-1", GUID: "security-group-guid-1"})
+				Expect(err).NotTo(HaveOccurred())
 				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
@@ -118,7 +119,8 @@ var _ = Describe("SecurityGroup", func() {
 
 		BeforeEach(func() {
 			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-				requestParams.AppendToList(resources.SecurityGroup{Name: "security-group-name-1", GUID: "security-group-guid-1"})
+				err := requestParams.AppendToList(resources.SecurityGroup{Name: "security-group-name-1", GUID: "security-group-guid-1"})
+				Expect(err).NotTo(HaveOccurred())
 				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
@@ -158,7 +160,8 @@ var _ = Describe("SecurityGroup", func() {
 
 		BeforeEach(func() {
 			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-				requestParams.AppendToList(resources.SecurityGroup{Name: "security-group-name-1", GUID: "security-group-guid-1"})
+				err := requestParams.AppendToList(resources.SecurityGroup{Name: "security-group-name-1", GUID: "security-group-guid-1"})
+				Expect(err).NotTo(HaveOccurred())
 				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
