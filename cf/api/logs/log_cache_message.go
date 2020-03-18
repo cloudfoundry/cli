@@ -2,6 +2,7 @@ package logs
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -48,23 +49,23 @@ func (m *logCacheMessage) ToLog(loc *time.Location) string {
 	// // Calculate padding
 	// longestHeader := fmt.Sprintf("%s  [HEALTH/10] ", timeFormat)
 	// expectedHeaderLength := utf8.RuneCountInString(longestHeader)
-	// headerPadding := strings.Repeat(" ", max(0, expectedHeaderLength-utf8.RuneCountInString(logHeader)))
+	// headerPadding := strings.Repeat(" ", max(0, expectedHeaderLength - utf8.RuneCountInString(logHeader)))
 
 	// logHeader += headerPadding
 	// coloredLogHeader += headerPadding
 
-	// msgText := logMsg.Message()
-	// msgText = strings.TrimRight(msgText, "\r\n")
+	msgText := logMsg.Message()
+	msgText = strings.TrimRight(msgText, "\r\n")
 
 	// msgLines := strings.Split(msgText, "\n")
 	// contentPadding := strings.Repeat(" ", utf8.RuneCountInString(logHeader))
 	// coloringFunc := terminal.LogStdoutColor
 
-	// logType := logMsg.Type()
+	logType := logMsg.Type()
 	// if logType == "ERR" {
-	//     coloringFunc = terminal.LogStderrColor
+	// coloringFunc = terminal.LogStderrColor
 	// } else {
-	//     logType = "OUT"
+	// logType = "OUT"
 	// }
 
 	// logContent := fmt.Sprintf("%s %s", logType, msgLines[0])
@@ -75,5 +76,5 @@ func (m *logCacheMessage) ToLog(loc *time.Location) string {
 	// logContent = coloringFunc(logContent)
 
 	// return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
-	return fmt.Sprintf("%s", logHeader)
+	return fmt.Sprintf("%s %s %s", logHeader, logType, msgText)
 }
