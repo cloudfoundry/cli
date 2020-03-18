@@ -66,3 +66,27 @@ func (client *Client) GetStagingSecurityGroups(spaceGUID string, queries ...Quer
 
 	return securityGroups, warnings, err
 }
+
+func (client *Client) UpdateSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.PostSecurityGroupRunningSpaceRequest,
+		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
+		RequestBody: RelationshipList{
+			GUIDs: []string{spaceGUID},
+		},
+	})
+
+	return warnings, err
+}
+
+func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.PostSecurityGroupStagingSpaceRequest,
+		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
+		RequestBody: RelationshipList{
+			GUIDs: []string{spaceGUID},
+		},
+	})
+
+	return warnings, err
+}

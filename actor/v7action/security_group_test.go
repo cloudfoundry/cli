@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -30,6 +31,108 @@ var _ = Describe("Security Group Actions", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
 
+	})
+
+	Describe("BindSecurityGroupToSpace", func() {
+		var (
+			lifecycle constant.SecurityGroupLifecycle
+			err       error
+			warnings  []string
+		)
+
+		JustBeforeEach(func() {
+			warnings, err = actor.BindSecurityGroupToSpace("some-security-group-guid", "some-space-guid", lifecycle)
+		})
+
+		When("the lifecycle is neither running nor staging", func() {
+			BeforeEach(func() {
+				lifecycle = "bill & ted"
+			})
+
+			It("returns and appropriate error", func() {
+				Expect(err).To(MatchError(fmt.Sprintf("Invalid lifecycle: %s", lifecycle)))
+			})
+		})
+
+		When("the lifecycle is running", func() {
+			BeforeEach(func() {
+				lifecycle = constant.SecurityGroupLifecycleRunning
+			})
+
+			When("binding the space does not return an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSecurityGroupRunningSpaceReturns(
+						ccv3.Warnings{"warning-1"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1"))
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupRunningSpaceCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeCloudControllerClient.UpdateSecurityGroupRunningSpaceArgsForCall(0)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+			})
+
+			When("binding the space returns an error", func() {
+				var returnedError error
+				BeforeEach(func() {
+					returnedError = errors.New("associate-space-error")
+					fakeCloudControllerClient.UpdateSecurityGroupRunningSpaceReturns(
+						ccv3.Warnings{"warning-1", "warning-2"},
+						returnedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(err).To(Equal(returnedError))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+		})
+
+		When("the lifecycle is staging", func() {
+			BeforeEach(func() {
+				lifecycle = constant.SecurityGroupLifecycleStaging
+			})
+
+			When("binding the space does not return an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceReturns(
+						ccv3.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceArgsForCall(0)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+			})
+
+			When("binding the space returns an error", func() {
+				var returnedError error
+				BeforeEach(func() {
+					returnedError = errors.New("associate-space-error")
+					fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceReturns(
+						ccv3.Warnings{"warning-1", "warning-2"},
+						returnedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(err).To(Equal(returnedError))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+		})
 	})
 
 	Describe("CreateSecurityGroup", func() {
@@ -152,7 +255,7 @@ var _ = Describe("Security Group Actions", func() {
 		})
 	})
 
-	Describe("GetSecurityGroup", func() {
+	Describe("GetSecurityGroupSummary", func() {
 		const securityGroupName = "security-group-name"
 		var (
 			securityGroupSummary SecurityGroupSummary
@@ -167,7 +270,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request succeeds", func() {
 			JustBeforeEach(func() {
-				securityGroupSummary, warnings, executeErr = actor.GetSecurityGroup(securityGroupName)
+				securityGroupSummary, warnings, executeErr = actor.GetSecurityGroupSummary(securityGroupName)
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
 
@@ -299,7 +402,7 @@ var _ = Describe("Security Group Actions", func() {
 		When("the request errors", func() {
 			var expectedError error
 			JustBeforeEach(func() {
-				securityGroupSummary, warnings, executeErr = actor.GetSecurityGroup(securityGroupName)
+				securityGroupSummary, warnings, executeErr = actor.GetSecurityGroupSummary(securityGroupName)
 			})
 
 			When("the security group does not exist", func() {
@@ -499,6 +602,86 @@ var _ = Describe("Security Group Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(0))
+				})
+			})
+
+			When("the cloud controller client errors", func() {
+				BeforeEach(func() {
+					expectedError = errors.New("I am a CloudControllerClient Error")
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						nil,
+						ccv3.Warnings{"some-warning"},
+						expectedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ConsistOf("some-warning"))
+					Expect(executeErr).To(MatchError(expectedError))
+				})
+			})
+		})
+	})
+
+	Describe("GetSecurityGroup", func() {
+		var (
+			securityGroupName = "tom"
+			securityGroup     resources.SecurityGroup
+		)
+
+		When("the request succeeds", func() {
+			JustBeforeEach(func() {
+				securityGroup, warnings, executeErr = actor.GetSecurityGroup(securityGroupName)
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{
+						{
+							GUID: "some-security-group-guid-1",
+							Name: "some-security-group-1",
+						},
+					},
+					ccv3.Warnings{"warning-1"},
+					nil,
+				)
+			})
+
+			It("returns the security group and warnings", func() {
+				Expect(securityGroup).To(Equal(
+					resources.SecurityGroup{
+						Name: "some-security-group-1",
+						GUID: "some-security-group-guid-1",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1"))
+
+				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+			})
+		})
+
+		When("the request errors", func() {
+			var expectedError error
+
+			JustBeforeEach(func() {
+				securityGroup, warnings, executeErr = actor.GetSecurityGroup(securityGroupName)
+			})
+
+			When("there are no security groups", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						[]resources.SecurityGroup{},
+						ccv3.Warnings{"warning-1"},
+						nil,
+					)
+				})
+
+				It("returns an empty security group and warnings", func() {
+					Expect(securityGroup).To(Equal(resources.SecurityGroup{}))
+					Expect(warnings).To(ConsistOf("warning-1"))
+
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 				})
 			})
 

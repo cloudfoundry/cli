@@ -1975,6 +1975,34 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateSecurityGroupRunningSpaceStub        func(string, string) (ccv3.Warnings, error)
+	updateSecurityGroupRunningSpaceMutex       sync.RWMutex
+	updateSecurityGroupRunningSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	updateSecurityGroupRunningSpaceReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	updateSecurityGroupRunningSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	UpdateSecurityGroupStagingSpaceStub        func(string, string) (ccv3.Warnings, error)
+	updateSecurityGroupStagingSpaceMutex       sync.RWMutex
+	updateSecurityGroupStagingSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	updateSecurityGroupStagingSpaceReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	updateSecurityGroupStagingSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UpdateServiceBrokerStub        func(string, ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error)
 	updateServiceBrokerMutex       sync.RWMutex
 	updateServiceBrokerArgsForCall []struct {
@@ -10778,6 +10806,134 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.updateSecurityGroupRunningSpaceMutex.Lock()
+	ret, specificReturn := fake.updateSecurityGroupRunningSpaceReturnsOnCall[len(fake.updateSecurityGroupRunningSpaceArgsForCall)]
+	fake.updateSecurityGroupRunningSpaceArgsForCall = append(fake.updateSecurityGroupRunningSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateSecurityGroupRunningSpace", []interface{}{arg1, arg2})
+	fake.updateSecurityGroupRunningSpaceMutex.Unlock()
+	if fake.UpdateSecurityGroupRunningSpaceStub != nil {
+		return fake.UpdateSecurityGroupRunningSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateSecurityGroupRunningSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceCallCount() int {
+	fake.updateSecurityGroupRunningSpaceMutex.RLock()
+	defer fake.updateSecurityGroupRunningSpaceMutex.RUnlock()
+	return len(fake.updateSecurityGroupRunningSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.updateSecurityGroupRunningSpaceMutex.Lock()
+	defer fake.updateSecurityGroupRunningSpaceMutex.Unlock()
+	fake.UpdateSecurityGroupRunningSpaceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceArgsForCall(i int) (string, string) {
+	fake.updateSecurityGroupRunningSpaceMutex.RLock()
+	defer fake.updateSecurityGroupRunningSpaceMutex.RUnlock()
+	argsForCall := fake.updateSecurityGroupRunningSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceReturns(result1 ccv3.Warnings, result2 error) {
+	fake.updateSecurityGroupRunningSpaceMutex.Lock()
+	defer fake.updateSecurityGroupRunningSpaceMutex.Unlock()
+	fake.UpdateSecurityGroupRunningSpaceStub = nil
+	fake.updateSecurityGroupRunningSpaceReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.updateSecurityGroupRunningSpaceMutex.Lock()
+	defer fake.updateSecurityGroupRunningSpaceMutex.Unlock()
+	fake.UpdateSecurityGroupRunningSpaceStub = nil
+	if fake.updateSecurityGroupRunningSpaceReturnsOnCall == nil {
+		fake.updateSecurityGroupRunningSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.updateSecurityGroupRunningSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.updateSecurityGroupStagingSpaceMutex.Lock()
+	ret, specificReturn := fake.updateSecurityGroupStagingSpaceReturnsOnCall[len(fake.updateSecurityGroupStagingSpaceArgsForCall)]
+	fake.updateSecurityGroupStagingSpaceArgsForCall = append(fake.updateSecurityGroupStagingSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateSecurityGroupStagingSpace", []interface{}{arg1, arg2})
+	fake.updateSecurityGroupStagingSpaceMutex.Unlock()
+	if fake.UpdateSecurityGroupStagingSpaceStub != nil {
+		return fake.UpdateSecurityGroupStagingSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateSecurityGroupStagingSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceCallCount() int {
+	fake.updateSecurityGroupStagingSpaceMutex.RLock()
+	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
+	return len(fake.updateSecurityGroupStagingSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.updateSecurityGroupStagingSpaceMutex.Lock()
+	defer fake.updateSecurityGroupStagingSpaceMutex.Unlock()
+	fake.UpdateSecurityGroupStagingSpaceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceArgsForCall(i int) (string, string) {
+	fake.updateSecurityGroupStagingSpaceMutex.RLock()
+	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
+	argsForCall := fake.updateSecurityGroupStagingSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceReturns(result1 ccv3.Warnings, result2 error) {
+	fake.updateSecurityGroupStagingSpaceMutex.Lock()
+	defer fake.updateSecurityGroupStagingSpaceMutex.Unlock()
+	fake.UpdateSecurityGroupStagingSpaceStub = nil
+	fake.updateSecurityGroupStagingSpaceReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.updateSecurityGroupStagingSpaceMutex.Lock()
+	defer fake.updateSecurityGroupStagingSpaceMutex.Unlock()
+	fake.UpdateSecurityGroupStagingSpaceStub = nil
+	if fake.updateSecurityGroupStagingSpaceReturnsOnCall == nil {
+		fake.updateSecurityGroupStagingSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.updateSecurityGroupStagingSpaceReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateServiceBroker(arg1 string, arg2 ccv3.ServiceBrokerModel) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.updateServiceBrokerMutex.Lock()
 	ret, specificReturn := fake.updateServiceBrokerReturnsOnCall[len(fake.updateServiceBrokerArgsForCall)]
@@ -11858,6 +12014,10 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateProcessMutex.RUnlock()
 	fake.updateResourceMetadataMutex.RLock()
 	defer fake.updateResourceMetadataMutex.RUnlock()
+	fake.updateSecurityGroupRunningSpaceMutex.RLock()
+	defer fake.updateSecurityGroupRunningSpaceMutex.RUnlock()
+	fake.updateSecurityGroupStagingSpaceMutex.RLock()
+	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
 	fake.updateServiceBrokerMutex.RLock()
 	defer fake.updateServiceBrokerMutex.RUnlock()
 	fake.updateServicePlanVisibilityMutex.RLock()

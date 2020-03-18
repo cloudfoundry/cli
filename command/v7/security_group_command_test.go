@@ -69,7 +69,7 @@ var _ = Describe("Security Group Command", func() {
 				},
 				nil)
 
-			fakeActor.GetSecurityGroupReturns(
+			fakeActor.GetSecurityGroupSummaryReturns(
 				v7action.SecurityGroupSummary{},
 				v7action.Warnings{"warning-1", "warning-2"},
 				actionerror.SecurityGroupNotFoundError{})
@@ -79,7 +79,7 @@ var _ = Describe("Security Group Command", func() {
 			Expect(testUI.Out).To(Say("Getting info for security group some-security-group as some-user..."))
 
 			Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{}))
-			Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
+			Expect(fakeActor.GetSecurityGroupSummaryCallCount()).To(Equal(1))
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
 		})
@@ -93,7 +93,7 @@ var _ = Describe("Security Group Command", func() {
 
 		When("the security group does not have associated rules or spaces", func() {
 			BeforeEach(func() {
-				fakeActor.GetSecurityGroupReturns(
+				fakeActor.GetSecurityGroupSummaryReturns(
 					v7action.SecurityGroupSummary{
 						Name:                "some-security-group",
 						Rules:               []resources.Rule{},
@@ -105,8 +105,8 @@ var _ = Describe("Security Group Command", func() {
 
 			It("displays the security group and all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
-				securityGroupName := fakeActor.GetSecurityGroupArgsForCall(0)
+				Expect(fakeActor.GetSecurityGroupSummaryCallCount()).To(Equal(1))
+				securityGroupName := fakeActor.GetSecurityGroupSummaryArgsForCall(0)
 				Expect(securityGroupName).To(Equal("some-security-group"))
 
 				Expect(testUI.Out).To(Say("Getting info for security group some-security-group as some-user..."))
@@ -125,7 +125,7 @@ var _ = Describe("Security Group Command", func() {
 				port := "4747"
 				description := "Top 8 Friends Only"
 
-				fakeActor.GetSecurityGroupReturns(
+				fakeActor.GetSecurityGroupSummaryReturns(
 					v7action.SecurityGroupSummary{
 						Name: "some-security-group",
 						Rules: []resources.Rule{{
@@ -145,8 +145,8 @@ var _ = Describe("Security Group Command", func() {
 
 			It("displays the security group and all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
-				securityGroupName := fakeActor.GetSecurityGroupArgsForCall(0)
+				Expect(fakeActor.GetSecurityGroupSummaryCallCount()).To(Equal(1))
+				securityGroupName := fakeActor.GetSecurityGroupSummaryArgsForCall(0)
 				Expect(securityGroupName).To(Equal("some-security-group"))
 
 				Expect(testUI.Out).To(Say("Getting info for security group some-security-group as some-user..."))

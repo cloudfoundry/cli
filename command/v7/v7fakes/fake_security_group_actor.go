@@ -9,17 +9,17 @@ import (
 )
 
 type FakeSecurityGroupActor struct {
-	GetSecurityGroupStub        func(string) (v7action.SecurityGroupSummary, v7action.Warnings, error)
-	getSecurityGroupMutex       sync.RWMutex
-	getSecurityGroupArgsForCall []struct {
+	GetSecurityGroupSummaryStub        func(string) (v7action.SecurityGroupSummary, v7action.Warnings, error)
+	getSecurityGroupSummaryMutex       sync.RWMutex
+	getSecurityGroupSummaryArgsForCall []struct {
 		arg1 string
 	}
-	getSecurityGroupReturns struct {
+	getSecurityGroupSummaryReturns struct {
 		result1 v7action.SecurityGroupSummary
 		result2 v7action.Warnings
 		result3 error
 	}
-	getSecurityGroupReturnsOnCall map[int]struct {
+	getSecurityGroupSummaryReturnsOnCall map[int]struct {
 		result1 v7action.SecurityGroupSummary
 		result2 v7action.Warnings
 		result3 error
@@ -28,66 +28,66 @@ type FakeSecurityGroupActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSecurityGroupActor) GetSecurityGroup(arg1 string) (v7action.SecurityGroupSummary, v7action.Warnings, error) {
-	fake.getSecurityGroupMutex.Lock()
-	ret, specificReturn := fake.getSecurityGroupReturnsOnCall[len(fake.getSecurityGroupArgsForCall)]
-	fake.getSecurityGroupArgsForCall = append(fake.getSecurityGroupArgsForCall, struct {
+func (fake *FakeSecurityGroupActor) GetSecurityGroupSummary(arg1 string) (v7action.SecurityGroupSummary, v7action.Warnings, error) {
+	fake.getSecurityGroupSummaryMutex.Lock()
+	ret, specificReturn := fake.getSecurityGroupSummaryReturnsOnCall[len(fake.getSecurityGroupSummaryArgsForCall)]
+	fake.getSecurityGroupSummaryArgsForCall = append(fake.getSecurityGroupSummaryArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("GetSecurityGroup", []interface{}{arg1})
-	fake.getSecurityGroupMutex.Unlock()
-	if fake.GetSecurityGroupStub != nil {
-		return fake.GetSecurityGroupStub(arg1)
+	fake.recordInvocation("GetSecurityGroupSummary", []interface{}{arg1})
+	fake.getSecurityGroupSummaryMutex.Unlock()
+	if fake.GetSecurityGroupSummaryStub != nil {
+		return fake.GetSecurityGroupSummaryStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getSecurityGroupReturns
+	fakeReturns := fake.getSecurityGroupSummaryReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeSecurityGroupActor) GetSecurityGroupCallCount() int {
-	fake.getSecurityGroupMutex.RLock()
-	defer fake.getSecurityGroupMutex.RUnlock()
-	return len(fake.getSecurityGroupArgsForCall)
+func (fake *FakeSecurityGroupActor) GetSecurityGroupSummaryCallCount() int {
+	fake.getSecurityGroupSummaryMutex.RLock()
+	defer fake.getSecurityGroupSummaryMutex.RUnlock()
+	return len(fake.getSecurityGroupSummaryArgsForCall)
 }
 
-func (fake *FakeSecurityGroupActor) GetSecurityGroupCalls(stub func(string) (v7action.SecurityGroupSummary, v7action.Warnings, error)) {
-	fake.getSecurityGroupMutex.Lock()
-	defer fake.getSecurityGroupMutex.Unlock()
-	fake.GetSecurityGroupStub = stub
+func (fake *FakeSecurityGroupActor) GetSecurityGroupSummaryCalls(stub func(string) (v7action.SecurityGroupSummary, v7action.Warnings, error)) {
+	fake.getSecurityGroupSummaryMutex.Lock()
+	defer fake.getSecurityGroupSummaryMutex.Unlock()
+	fake.GetSecurityGroupSummaryStub = stub
 }
 
-func (fake *FakeSecurityGroupActor) GetSecurityGroupArgsForCall(i int) string {
-	fake.getSecurityGroupMutex.RLock()
-	defer fake.getSecurityGroupMutex.RUnlock()
-	argsForCall := fake.getSecurityGroupArgsForCall[i]
+func (fake *FakeSecurityGroupActor) GetSecurityGroupSummaryArgsForCall(i int) string {
+	fake.getSecurityGroupSummaryMutex.RLock()
+	defer fake.getSecurityGroupSummaryMutex.RUnlock()
+	argsForCall := fake.getSecurityGroupSummaryArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSecurityGroupActor) GetSecurityGroupReturns(result1 v7action.SecurityGroupSummary, result2 v7action.Warnings, result3 error) {
-	fake.getSecurityGroupMutex.Lock()
-	defer fake.getSecurityGroupMutex.Unlock()
-	fake.GetSecurityGroupStub = nil
-	fake.getSecurityGroupReturns = struct {
+func (fake *FakeSecurityGroupActor) GetSecurityGroupSummaryReturns(result1 v7action.SecurityGroupSummary, result2 v7action.Warnings, result3 error) {
+	fake.getSecurityGroupSummaryMutex.Lock()
+	defer fake.getSecurityGroupSummaryMutex.Unlock()
+	fake.GetSecurityGroupSummaryStub = nil
+	fake.getSecurityGroupSummaryReturns = struct {
 		result1 v7action.SecurityGroupSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSecurityGroupActor) GetSecurityGroupReturnsOnCall(i int, result1 v7action.SecurityGroupSummary, result2 v7action.Warnings, result3 error) {
-	fake.getSecurityGroupMutex.Lock()
-	defer fake.getSecurityGroupMutex.Unlock()
-	fake.GetSecurityGroupStub = nil
-	if fake.getSecurityGroupReturnsOnCall == nil {
-		fake.getSecurityGroupReturnsOnCall = make(map[int]struct {
+func (fake *FakeSecurityGroupActor) GetSecurityGroupSummaryReturnsOnCall(i int, result1 v7action.SecurityGroupSummary, result2 v7action.Warnings, result3 error) {
+	fake.getSecurityGroupSummaryMutex.Lock()
+	defer fake.getSecurityGroupSummaryMutex.Unlock()
+	fake.GetSecurityGroupSummaryStub = nil
+	if fake.getSecurityGroupSummaryReturnsOnCall == nil {
+		fake.getSecurityGroupSummaryReturnsOnCall = make(map[int]struct {
 			result1 v7action.SecurityGroupSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getSecurityGroupReturnsOnCall[i] = struct {
+	fake.getSecurityGroupSummaryReturnsOnCall[i] = struct {
 		result1 v7action.SecurityGroupSummary
 		result2 v7action.Warnings
 		result3 error
@@ -97,8 +97,8 @@ func (fake *FakeSecurityGroupActor) GetSecurityGroupReturnsOnCall(i int, result1
 func (fake *FakeSecurityGroupActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getSecurityGroupMutex.RLock()
-	defer fake.getSecurityGroupMutex.RUnlock()
+	fake.getSecurityGroupSummaryMutex.RLock()
+	defer fake.getSecurityGroupSummaryMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

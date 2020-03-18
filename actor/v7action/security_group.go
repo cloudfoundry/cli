@@ -26,6 +26,24 @@ type SecurityGroupSpace struct {
 	Lifecycle string
 }
 
+func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+	var (
+		warnings ccv3.Warnings
+		err      error
+	)
+
+	switch lifecycle {
+	case constant.SecurityGroupLifecycleRunning:
+		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupRunningSpace(securityGroupGUID, spaceGUID)
+	case constant.SecurityGroupLifecycleStaging:
+		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUID)
+	default:
+		err = actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
+	}
+
+	return Warnings(warnings), err
+}
+
 func (actor Actor) CreateSecurityGroup(name, filePath string) (Warnings, error) {
 	allWarnings := Warnings{}
 	bytes, err := parsePath(filePath)
@@ -50,7 +68,24 @@ func (actor Actor) CreateSecurityGroup(name, filePath string) (Warnings, error) 
 	return allWarnings, nil
 }
 
-func (actor Actor) GetSecurityGroup(securityGroupName string) (SecurityGroupSummary, Warnings, error) {
+func (actor Actor) GetSecurityGroup(securityGroupName string) (resources.SecurityGroup, Warnings, error) {
+	allWarnings := Warnings{}
+
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}})
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return resources.SecurityGroup{}, allWarnings, err
+	}
+
+	if len(securityGroups) == 0 {
+		return resources.SecurityGroup{}, allWarnings, actionerror.SecurityGroupNotFoundError{Name: securityGroupName}
+	}
+
+	return securityGroups[0], allWarnings, err
+}
+
+func (actor Actor) GetSecurityGroupSummary(securityGroupName string) (SecurityGroupSummary, Warnings, error) {
 	allWarnings := Warnings{}
 	securityGroupSummary := SecurityGroupSummary{}
 	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}})

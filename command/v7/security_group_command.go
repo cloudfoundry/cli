@@ -16,7 +16,7 @@ import (
 //go:generate counterfeiter . SecurityGroupActor
 
 type SecurityGroupActor interface {
-	GetSecurityGroup(securityGroupName string) (v7action.SecurityGroupSummary, v7action.Warnings, error)
+	GetSecurityGroupSummary(securityGroupName string) (v7action.SecurityGroupSummary, v7action.Warnings, error)
 }
 
 type SecurityGroupCommand struct {
@@ -62,7 +62,7 @@ func (cmd SecurityGroupCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	securityGroupSummary, warnings, err := cmd.Actor.GetSecurityGroup(cmd.RequiredArgs.SecurityGroup)
+	securityGroupSummary, warnings, err := cmd.Actor.GetSecurityGroupSummary(cmd.RequiredArgs.SecurityGroup)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
