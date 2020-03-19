@@ -93,7 +93,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/kr/pty"
-  version = ">=1.0.1"
+  version = ">=1.1.8"
 
 [[constraint]]
   branch = "master"
