@@ -140,7 +140,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = ">=1.0.3"
+  version = ">=1.4.2"
 
 [[constraint]]
   branch = "master"
