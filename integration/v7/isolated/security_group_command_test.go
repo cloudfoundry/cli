@@ -105,7 +105,7 @@ var _ = Describe("security-group command", func() {
 
 			When("the security group has assigned spaces", func() {
 				BeforeEach(func() {
-					session := helpers.CF("bind-security-group", securityGroup.Name, orgName, spaceName)
+					session := helpers.CF("bind-security-group", securityGroup.Name, orgName, "--space", spaceName)
 					Eventually(session).Should(Exit(0))
 				})
 

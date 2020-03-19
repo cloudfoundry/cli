@@ -102,9 +102,9 @@ var _ = Describe("security-groups command", func() {
 				helpers.CreateSecurityGroup(securityGroup5)
 
 				session1 := helpers.CF(`bind-running-security-group`, securityGroup1.Name)
-				session2 := helpers.CF("bind-security-group", securityGroup2.Name, orgName, spaceName)
+				session2 := helpers.CF("bind-security-group", securityGroup2.Name, orgName, "--space", spaceName)
 				session3 := helpers.CF(`bind-staging-security-group`, securityGroup4.Name)
-				session4 := helpers.CF("bind-security-group", securityGroup5.Name, orgName, spaceName, "--lifecycle", "staging")
+				session4 := helpers.CF("bind-security-group", securityGroup5.Name, orgName, "--space", spaceName, "--lifecycle", "staging")
 
 				Eventually(session1).Should(Exit(0))
 				Eventually(session2).Should(Exit(0))
