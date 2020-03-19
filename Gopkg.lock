@@ -24,6 +24,22 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:601471cd657f291ba99a3bfdd2e27e9ef7dc585389343accd4bb715afc9eedd8"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "4f0c3a2ce92986be5856c297c26eab3acc262009"
+  version = "v6.50.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -680,12 +696,12 @@
   version = "v1.24.0"
 
 [[projects]]
-  digest = "1:30f55ee34f367e29620faaae69dcdf6b78a86348f3a1472cf63f2dbba0f9d4f7"
+  digest = "1:21562b59c496f4cbd7a40beaa257ac6761002dd3e36259f532216082abace8b1"
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "1cc5bbe20449079337944d56292c7383510c534c"
-  version = "v1.0.27"
+  revision = "f907f6f5dd81f77c2bbc1cde92e4c5a04720cb11"
+  version = "v1.0.28"
 
 [[projects]]
   digest = "1:1b91ae0dc69a41d4c2ed23ea5cffb721ea63f5037ca4b81e6d6771fbb8f45129"

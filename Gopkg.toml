@@ -164,7 +164,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "gopkg.in/cheggaaa/pb.v1"
-  version = ">=1.0.18"
+  version = ">=1.0.28"
 
 [[constraint]]
   name = "gopkg.in/yaml.v2"
