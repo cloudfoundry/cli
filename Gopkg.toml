@@ -61,7 +61,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   branch = "master"
-  name = "github.com/cloudfoundry/cli-plugin-repo"
+  name = "code.cloudfoundry.org/cli-plugin-repo"
 
 [[constraint]]
   branch = "master"
