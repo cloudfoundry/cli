@@ -24,6 +24,22 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:601471cd657f291ba99a3bfdd2e27e9ef7dc585389343accd4bb715afc9eedd8"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "4f0c3a2ce92986be5856c297c26eab3acc262009"
+  version = "v6.50.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -411,7 +427,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:9c88c09de47a47bbc7e7d1cad7dbe963edc6b2f27b89ac8591ea7cc60cd376d3"
+  digest = "1:5488cbdfc05eb1e4ce42308df7f4fec4b118232055b9bffef890b1277818ea1c"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -435,8 +451,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "2e1be8f7d90e9d3e3e58b0ce470f2f14d075406f"
-  version = "v1.7.0"
+  revision = "40598150331533e3cd497f21dcce387dae84b561"
+  version = "v1.12.0"
 
 [[projects]]
   digest = "1:95f09e7b02ad73c56c05479182dba9de59a5576e2acaff2f0b2532369fe14ea0"
