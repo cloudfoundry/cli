@@ -24,6 +24,22 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:601471cd657f291ba99a3bfdd2e27e9ef7dc585389343accd4bb715afc9eedd8"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "4f0c3a2ce92986be5856c297c26eab3acc262009"
+  version = "v6.50.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -521,7 +537,7 @@
     "interact/terminal",
   ]
   pruneopts = "NUT"
-  revision = "fa338ed9e9ecbb0e9c2e6c7a0160d9fc9b0efbd9"
+  revision = "4f1a3a40eb4d79b8b1bca90afecaac6c0cb06925"
 
 [[projects]]
   branch = "master"
