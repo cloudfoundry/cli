@@ -24,7 +24,7 @@ var _ = Describe("space-quotas command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeSpaceQuotasActor
 		executeErr      error
 		args            []string
 		binaryName      string
@@ -36,16 +36,14 @@ var _ = Describe("space-quotas command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeSpaceQuotasActor)
 		args = nil
 
 		cmd = SpaceQuotasCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"

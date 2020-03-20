@@ -1,11 +1,16 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
+
+//go:generate counterfeiter . RestartActor
 
 type RestartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
@@ -18,8 +23,6 @@ type RestartActor interface {
 }
 
 type RestartCommand struct {
-	BaseCommand
-
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null."`
 	NoWait              bool                    `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
@@ -27,6 +30,26 @@ type RestartCommand struct {
 	relatedCommands     interface{}             `related_commands:"restage, restart-app-instance"`
 	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       RestartActor
+}
+
+func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd RestartCommand) Execute(args []string) error {

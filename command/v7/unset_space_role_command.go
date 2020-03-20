@@ -1,19 +1,51 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/clock"
+
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-type UnsetSpaceRoleCommand struct {
-	BaseCommand
+//go:generate counterfeiter . UnsetSpaceRoleActor
 
+type UnsetSpaceRoleActor interface {
+	DeleteSpaceRole(roleType constant.RoleType, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
+	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
+	GetUser(username, origin string) (v7action.User, error)
+}
+
+type UnsetSpaceRoleCommand struct {
 	Args            flag.SpaceRoleArgs `positional-args:"yes"`
 	IsClient        bool               `long:"client" description:"Remove space role from a client-id of a (non-user) service account"`
 	Origin          string             `long:"origin" description:"Indicates the identity provider to be used for authentication"`
 	usage           interface{}        `usage:"CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n   CF_NAME unset-space-role USERNAME ORG SPACE ROLE [--client]\n   CF_NAME unset-space-role USERNAME ORG SPACE ROLE [--origin ORIGIN]\n\nROLES:\n   SpaceManager - Invite and manage users, and enable features for a given space\n   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n   SpaceAuditor - View logs, reports, and settings on this space"`
 	relatedCommands interface{}        `related_commands:"set-space-role, space-users"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       UnsetSpaceRoleActor
+}
+
+func (cmd *UnsetSpaceRoleCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd *UnsetSpaceRoleCommand) Execute(args []string) error {

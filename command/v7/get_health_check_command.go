@@ -3,16 +3,44 @@ package v7
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type GetHealthCheckCommand struct {
-	BaseCommand
+//go:generate counterfeiter . GetHealthCheckActor
 
+type GetHealthCheckActor interface {
+	CloudControllerAPIVersion() string
+	GetApplicationProcessHealthChecksByNameAndSpace(appName string, spaceGUID string) ([]v7action.ProcessHealthCheck, v7action.Warnings, error)
+}
+
+type GetHealthCheckCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
 	usage        interface{}  `usage:"CF_NAME get-health-check APP_NAME"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       GetHealthCheckActor
+}
+
+func (cmd *GetHealthCheckCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd GetHealthCheckCommand) Execute(args []string) error {

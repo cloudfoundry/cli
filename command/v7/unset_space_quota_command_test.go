@@ -21,7 +21,7 @@ var _ = Describe("unset-space-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeUnsetSpaceQuotaActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -35,16 +35,14 @@ var _ = Describe("unset-space-quota Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeUnsetSpaceQuotaActor)
 		unsetQuotaWarning = RandomString("unset-quota-warning")
 
 		cmd = UnsetSpaceQuotaCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"

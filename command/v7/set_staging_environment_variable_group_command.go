@@ -4,18 +4,47 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type SetStagingEnvironmentVariableGroupCommand struct {
-	BaseCommand
+//go:generate counterfeiter . SetStagingEnvironmentVariableGroupActor
 
+type SetStagingEnvironmentVariableGroupActor interface {
+	SetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName, envVars ccv3.EnvironmentVariables) (v7action.Warnings, error)
+}
+
+type SetStagingEnvironmentVariableGroupCommand struct {
 	RequiredArgs    flag.SetEnvVarGroup `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
 	relatedCommands interface{}         `related_commands:"set-env, staging-environment-variable-group"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       SetStagingEnvironmentVariableGroupActor
+}
+
+func (cmd *SetStagingEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd SetStagingEnvironmentVariableGroupCommand) Execute(args []string) error {

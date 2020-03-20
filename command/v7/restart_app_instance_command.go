@@ -1,16 +1,44 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type RestartAppInstanceCommand struct {
-	BaseCommand
+//go:generate counterfeiter . RestartAppInstanceActor
 
+type RestartAppInstanceActor interface {
+	DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, instanceIndex int) (v7action.Warnings, error)
+}
+
+type RestartAppInstanceCommand struct {
 	RequiredArgs    flag.AppInstance `positional-args:"yes"`
 	ProcessType     string           `long:"process" default:"web" description:"Process to restart"`
 	usage           interface{}      `usage:"CF_NAME restart-app-instance APP_NAME INDEX [--process PROCESS]"`
 	relatedCommands interface{}      `related_commands:"restart"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       RestartAppInstanceActor
+}
+
+func (cmd *RestartAppInstanceCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd RestartAppInstanceCommand) Execute(args []string) error {

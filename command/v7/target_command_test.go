@@ -23,7 +23,7 @@ var _ = Describe("target Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeTargetActor
 		binaryName      string
 		apiVersion      string
 		minCLIVersion   string
@@ -34,15 +34,13 @@ var _ = Describe("target Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeTargetActor)
 
 		cmd = v7.TargetCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"

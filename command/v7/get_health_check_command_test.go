@@ -23,7 +23,7 @@ var _ = Describe("get-health-check Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeGetHealthCheckActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -33,7 +33,7 @@ var _ = Describe("get-health-check Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeGetHealthCheckActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -42,12 +42,10 @@ var _ = Describe("get-health-check Command", func() {
 		cmd = GetHealthCheckCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

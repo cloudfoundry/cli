@@ -20,7 +20,7 @@ var _ = Describe("rename Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeRenameActor
 		cmd             RenameCommand
 		executeErr      error
 	)
@@ -30,15 +30,13 @@ var _ = Describe("rename Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeRenameActor)
 
 		cmd = RenameCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		cmd.RequiredArgs.OldAppName = "old-app-name"

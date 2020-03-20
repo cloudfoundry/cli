@@ -4,16 +4,44 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type PackagesCommand struct {
-	BaseCommand
+//go:generate counterfeiter . PackagesActor
 
+type PackagesActor interface {
+	GetApplicationPackages(appName string, spaceGUID string) ([]v7action.Package, v7action.Warnings, error)
+}
+
+type PackagesCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME packages APP_NAME"`
 	relatedCommands interface{}  `related_commands:"droplets, create-package, app, push"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       PackagesActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *PackagesCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd PackagesCommand) Execute(args []string) error {

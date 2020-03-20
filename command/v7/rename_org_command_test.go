@@ -20,7 +20,7 @@ var _ = Describe("rename-org Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeRenameOrganizationActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -31,15 +31,13 @@ var _ = Describe("rename-org Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeRenameOrganizationActor)
 
 		cmd = RenameOrgCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		cmd.RequiredArgs.OldOrgName = "old-org-name"

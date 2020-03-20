@@ -3,17 +3,48 @@ package v7
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/clock"
 )
 
-type TargetCommand struct {
-	BaseCommand
+//go:generate counterfeiter . TargetActor
 
+type TargetActor interface {
+	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
+	GetOrganizationSpaces(orgGUID string) ([]v7action.Space, v7action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
+	CloudControllerAPIVersion() string
+}
+
+type TargetCommand struct {
 	Organization    string      `short:"o" description:"Organization"`
 	Space           string      `short:"s" description:"Space"`
 	usage           interface{} `usage:"CF_NAME target [-o ORG] [-s SPACE]"`
 	relatedCommands interface{} `related_commands:"create-org, create-space, login, orgs, spaces"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       TargetActor
+}
+
+func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.Config = config
+	cmd.UI = ui
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd *TargetCommand) Execute(args []string) error {

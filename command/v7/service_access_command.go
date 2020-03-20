@@ -3,18 +3,45 @@ package v7
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type ServiceAccessCommand struct {
-	BaseCommand
+//go:generate counterfeiter . ServiceAccessActor
 
+type ServiceAccessActor interface {
+	GetServiceAccess(offeringName, brokerName, orgName string) ([]v7action.ServicePlanAccess, v7action.Warnings, error)
+}
+
+type ServiceAccessCommand struct {
 	Broker          string      `short:"b" description:"Access for plans of a particular broker"`
 	ServiceOffering string      `short:"e" description:"Access for service name of a particular service offering"`
 	Organization    string      `short:"o" description:"Plans accessible by a particular organization"`
 	usage           interface{} `usage:"CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]"`
 	relatedCommands interface{} `related_commands:"marketplace, disable-service-access, enable-service-access, service-brokers"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       ServiceAccessActor
+}
+
+func (cmd *ServiceAccessCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd ServiceAccessCommand) Execute(args []string) error {

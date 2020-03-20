@@ -1,16 +1,42 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type FeatureFlagsCommand struct {
-	BaseCommand
+//go:generate counterfeiter . FeatureFlagsActor
 
+type FeatureFlagsActor interface {
+	GetFeatureFlags() ([]v7action.FeatureFlag, v7action.Warnings, error)
+}
+
+type FeatureFlagsCommand struct {
 	usage           interface{} `usage:"CF_NAME feature-flags"`
 	relatedCommands interface{} `related_commands:"disable-feature-flag, enable-feature-flag"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       FeatureFlagsActor
+}
+
+func (cmd *FeatureFlagsCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd FeatureFlagsCommand) Execute(args []string) error {

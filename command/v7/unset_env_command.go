@@ -2,15 +2,43 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type UnsetEnvCommand struct {
-	BaseCommand
+//go:generate counterfeiter . UnsetEnvActor
 
+type UnsetEnvActor interface {
+	UnsetEnvironmentVariableByApplicationNameAndSpace(appName string, spaceGUID string, EnvironmentVariableName string) (v7action.Warnings, error)
+}
+
+type UnsetEnvCommand struct {
 	RequiredArgs    flag.UnsetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}               `usage:"CF_NAME unset-env APP_NAME ENV_VAR_NAME"`
 	relatedCommands interface{}               `related_commands:"apps, env, restart, set-env, stage"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       UnsetEnvActor
+}
+
+func (cmd *UnsetEnvCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd UnsetEnvCommand) Execute(args []string) error {

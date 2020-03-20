@@ -23,7 +23,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeDeletePrivateDomainActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -35,7 +35,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeDeletePrivateDomainActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -44,12 +44,10 @@ var _ = Describe("delete-private-domain Command", func() {
 		cmd = DeletePrivateDomainCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
 
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

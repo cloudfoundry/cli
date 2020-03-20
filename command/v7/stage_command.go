@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -9,11 +10,19 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type StageCommand struct {
-	BaseCommand
+//go:generate counterfeiter . StageActor
 
+type StageActor interface {
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
+	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	GetNewestReadyPackageForApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
+}
+
+type StageCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage (default: latest package)"`
 	usage           interface{}  `usage:"CF_NAME stage APP_NAME [--package-guid PACKAGE_GUID]"`
@@ -21,20 +30,25 @@ type StageCommand struct {
 
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 
+	UI             command.UI
+	Config         command.Config
 	LogCacheClient sharedaction.LogCacheClient
+	SharedActor    command.SharedActor
+	Actor          StageActor
 }
 
 func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
-	err := cmd.BaseCommand.Setup(config, ui)
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
-	if err != nil {
-		return err
-	}
-	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	return nil
 }

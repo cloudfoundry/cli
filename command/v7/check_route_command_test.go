@@ -21,7 +21,7 @@ var _ = Describe("check-route Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeCheckRouteActor
 		binaryName      string
 		executeErr      error
 	)
@@ -30,18 +30,16 @@ var _ = Describe("check-route Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeCheckRouteActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v7.CheckRouteCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
 			RequiredArgs: flag.Domain{Domain: "some-domain.com"},
 		}
 	})

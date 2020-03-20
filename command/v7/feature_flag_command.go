@@ -1,18 +1,45 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type FeatureFlagCommand struct {
-	BaseCommand
+//go:generate counterfeiter . FeatureFlagActor
 
+type FeatureFlagActor interface {
+	GetFeatureFlagByName(featureFlagName string) (v7action.FeatureFlag, v7action.Warnings, error)
+}
+
+type FeatureFlagCommand struct {
 	RequiredArgs    flag.Feature `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME feature-flag FEATURE_FLAG_NAME"`
 	relatedCommands interface{}  `related_commands:"disable-feature-flag, enable-feature-flag, feature-flags"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       FeatureFlagActor
+}
+
+func (cmd *FeatureFlagCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd FeatureFlagCommand) Execute(args []string) error {

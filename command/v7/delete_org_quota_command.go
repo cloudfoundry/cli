@@ -2,16 +2,45 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type DeleteOrgQuotaCommand struct {
-	BaseCommand
+//go:generate counterfeiter . DeleteOrgQuotaActor
 
+type DeleteOrgQuotaActor interface {
+	DeleteOrganizationQuota(quotaName string) (v7action.Warnings, error)
+}
+
+type DeleteOrgQuotaCommand struct {
 	RequiredArgs    flag.Quota  `positional-args:"yes"`
 	Force           bool        `long:"force" short:"f" description:"Force deletion without confirmation"`
 	usage           interface{} `usage:"CF_NAME delete-org-quota QUOTA [-f]"`
 	relatedCommands interface{} `related_commands:"org-quotas"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       DeleteOrgQuotaActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *DeleteOrgQuotaCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd DeleteOrgQuotaCommand) Execute(args []string) error {

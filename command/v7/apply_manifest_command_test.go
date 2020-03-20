@@ -26,7 +26,7 @@ var _ = Describe("apply-manifest Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeApplyManifestActor
 		fakeParser      *v7fakes.FakeManifestParser
 		fakeLocator     *v7fakes.FakeManifestLocator
 		binaryName      string
@@ -37,7 +37,7 @@ var _ = Describe("apply-manifest Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeApplyManifestActor)
 		fakeParser = new(v7fakes.FakeManifestParser)
 		fakeLocator = new(v7fakes.FakeManifestLocator)
 
@@ -45,12 +45,10 @@ var _ = Describe("apply-manifest Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = ApplyManifestCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:              testUI,
+			Config:          fakeConfig,
+			SharedActor:     fakeSharedActor,
+			Actor:           fakeActor,
 			ManifestParser:  fakeParser,
 			ManifestLocator: fakeLocator,
 			CWD:             "fake-directory",

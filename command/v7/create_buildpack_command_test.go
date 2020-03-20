@@ -27,7 +27,7 @@ var _ = Describe("create buildpack Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeCreateBuildpackActor
 		executeErr      error
 		args            []string
 		binaryName      string
@@ -39,7 +39,7 @@ var _ = Describe("create buildpack Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeCreateBuildpackActor)
 		args = nil
 		buildpackName = "some-buildpack"
 		buildpackPath = "/path/to/buildpack.zip"
@@ -50,12 +50,10 @@ var _ = Describe("create buildpack Command", func() {
 				Path:      flag.PathWithExistenceCheckOrURL(buildpackPath),
 				Position:  7,
 			},
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"

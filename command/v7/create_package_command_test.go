@@ -24,7 +24,7 @@ var _ = Describe("create-package Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeCreatePackageActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -34,7 +34,7 @@ var _ = Describe("create-package Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeCreatePackageActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -46,12 +46,10 @@ var _ = Describe("create-package Command", func() {
 		)
 
 		cmd = v7.CreatePackageCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:               testUI,
+			Config:           fakeConfig,
+			SharedActor:      fakeSharedActor,
+			Actor:            fakeActor,
 			RequiredArgs:     flag.AppName{AppName: app},
 			PackageDisplayer: packageDisplayer,
 		}

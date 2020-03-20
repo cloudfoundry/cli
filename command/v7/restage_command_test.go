@@ -29,7 +29,7 @@ var _ = Describe("restage Command", func() {
 		testUI             *ui.UI
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
-		fakeActor          *v7fakes.FakeActor
+		fakeActor          *v7fakes.FakeRestageActor
 		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
 		executeErr       error
@@ -46,16 +46,15 @@ var _ = Describe("restage Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("some-binary-name")
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeRestageActor)
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		cmd = v7.RestageCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+
+			UI:             testUI,
+			Config:         fakeConfig,
+			SharedActor:    fakeSharedActor,
+			Actor:          fakeActor,
 			LogCacheClient: fakeLogCacheClient,
 		}
 		allLogsWritten = make(chan bool)

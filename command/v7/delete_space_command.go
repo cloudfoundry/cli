@@ -2,16 +2,45 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type DeleteSpaceCommand struct {
-	BaseCommand
+//go:generate counterfeiter . DeleteSpaceActor
 
+type DeleteSpaceActor interface {
+	DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (v7action.Warnings, error)
+}
+
+type DeleteSpaceCommand struct {
 	RequiredArgs flag.Space  `positional-args:"yes"`
 	Force        bool        `short:"f" description:"Force deletion without confirmation"`
 	Org          string      `short:"o" description:"Delete space within specified org"`
 	usage        interface{} `usage:"CF_NAME delete-space SPACE [-o ORG] [-f]"`
+
+	Config      command.Config
+	UI          command.UI
+	SharedActor command.SharedActor
+	Actor       DeleteSpaceActor
+}
+
+func (cmd *DeleteSpaceCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.Config = config
+	cmd.UI = ui
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd DeleteSpaceCommand) Execute(args []string) error {

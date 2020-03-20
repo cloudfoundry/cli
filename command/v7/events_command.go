@@ -1,16 +1,44 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type EventsCommand struct {
-	BaseCommand
+//go:generate counterfeiter . EventsActor
 
+type EventsActor interface {
+	GetRecentEventsByApplicationNameAndSpace(appName string, spaceGUID string) ([]v7action.Event, v7action.Warnings, error)
+}
+
+type EventsCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME events APP_NAME"`
 	relatedCommands interface{}  `related_commands:"app, logs, map-route, unmap-route"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       EventsActor
+}
+
+func (cmd *EventsCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd EventsCommand) Execute(_ []string) error {

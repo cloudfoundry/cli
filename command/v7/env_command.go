@@ -5,16 +5,44 @@ import (
 	"fmt"
 	"sort"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 	log "github.com/sirupsen/logrus"
 )
 
-type EnvCommand struct {
-	BaseCommand
+//go:generate counterfeiter . EnvActor
 
+type EnvActor interface {
+	GetEnvironmentVariablesByApplicationNameAndSpace(appName string, spaceGUID string) (v7action.EnvironmentVariableGroups, v7action.Warnings, error)
+}
+
+type EnvCommand struct {
 	RequiredArgs    flag.EnvironmentArgs `positional-args:"yes"`
 	usage           interface{}          `usage:"CF_NAME env APP_NAME"`
 	relatedCommands interface{}          `related_commands:"app, apps, set-env, unset-env, running-environment-variable-group, staging-environment-variable-group"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       EnvActor
+}
+
+func (cmd *EnvCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd EnvCommand) Execute(_ []string) error {

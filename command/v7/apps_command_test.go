@@ -23,7 +23,7 @@ var _ = Describe("apps Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeAppsActor
 		binaryName      string
 		executeErr      error
 	)
@@ -32,18 +32,16 @@ var _ = Describe("apps Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeAppsActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v7.AppsCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				Actor:       fakeActor,
-				SharedActor: fakeSharedActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			Actor:       fakeActor,
+			SharedActor: fakeSharedActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

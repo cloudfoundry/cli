@@ -1,14 +1,22 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type UpdateSpaceQuotaCommand struct {
-	BaseCommand
+//go:generate counterfeiter . UpdateSpaceQuotaActor
 
+type UpdateSpaceQuotaActor interface {
+	UpdateSpaceQuota(quotaName, orgGUID, newName string, limits v7action.QuotaLimits) (v7action.Warnings, error)
+}
+
+type UpdateSpaceQuotaCommand struct {
 	RequiredArgs          flag.SpaceQuota          `positional-args:"Yes"`
 	NumAppInstances       flag.IntegerLimit        `short:"a" description:"Total number of application instances. -1 represents an unlimited amount."`
 	PaidServicePlans      bool                     `long:"allow-paid-service-plans" description:"Allow provisioning instances of paid service plans."`
@@ -21,6 +29,28 @@ type UpdateSpaceQuotaCommand struct {
 	TotalServiceInstances flag.IntegerLimit        `short:"s" description:"Total number of service instances. -1 represents an unlimited amount."`
 	usage                 interface{}              `usage:"CF_NAME update-space-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
 	relatedCommands       interface{}              `related_commands:"space, space-quota, space-quotas"`
+
+	UI          command.UI
+	Config      command.Config
+	ProgressBar v7action.SimpleProgressBar
+	SharedActor command.SharedActor
+	Actor       UpdateSpaceQuotaActor
+}
+
+func (cmd *UpdateSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	cmd.ProgressBar = v7action.NewProgressBar()
+
+	return nil
 }
 
 func (cmd UpdateSpaceQuotaCommand) Execute(args []string) error {

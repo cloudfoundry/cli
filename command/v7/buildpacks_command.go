@@ -3,16 +3,44 @@ package v7
 import (
 	"strconv"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type BuildpacksCommand struct {
-	BaseCommand
+//go:generate counterfeiter . BuildpacksActor
 
+type BuildpacksActor interface {
+	GetBuildpacks(labelSelector string) ([]v7action.Buildpack, v7action.Warnings, error)
+}
+
+type BuildpacksCommand struct {
 	usage           interface{} `usage:"CF_NAME buildpacks [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME buildpacks\n   CF_NAME buildpacks --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME buildpacks --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
 	relatedCommands interface{} `related_commands:"create-buildpack, delete-buildpack, rename-buildpack, update-buildpack"`
-	Labels          string      `long:"labels" description:"Selector to filter buildpacks by labels"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       BuildpacksActor
+	Labels      string `long:"labels" description:"Selector to filter buildpacks by labels"`
+}
+
+func (cmd *BuildpacksCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd BuildpacksCommand) Execute(args []string) error {

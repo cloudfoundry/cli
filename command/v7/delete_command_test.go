@@ -22,7 +22,7 @@ var _ = Describe("delete Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeDeleteActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -34,7 +34,7 @@ var _ = Describe("delete Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeDeleteActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -43,12 +43,10 @@ var _ = Describe("delete Command", func() {
 		cmd = DeleteCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

@@ -2,9 +2,15 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
+
+//go:generate counterfeiter . UnmapRouteActor
 
 type UnmapRouteActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
@@ -15,13 +21,30 @@ type UnmapRouteActor interface {
 }
 
 type UnmapRouteCommand struct {
-	BaseCommand
-
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
 	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
 	usage           interface{}      `usage:"CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
 	relatedCommands interface{}      `related_commands:"delete-route, map-route, routes"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       UnmapRouteActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *UnmapRouteCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd UnmapRouteCommand) Execute(args []string) error {

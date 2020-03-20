@@ -26,14 +26,14 @@ var _ = Describe("update-service-broker command", func() {
 
 	var (
 		cmd                          *v7.UpdateServiceBrokerCommand
-		fakeUpdateServiceBrokerActor *v7fakes.FakeActor
+		fakeUpdateServiceBrokerActor *v7fakes.FakeUpdateServiceBrokerActor
 		fakeSharedActor              *commandfakes.FakeSharedActor
 		fakeConfig                   *commandfakes.FakeConfig
 		testUI                       *ui.UI
 	)
 
 	BeforeEach(func() {
-		fakeUpdateServiceBrokerActor = &v7fakes.FakeActor{}
+		fakeUpdateServiceBrokerActor = &v7fakes.FakeUpdateServiceBrokerActor{}
 		fakeSharedActor = &commandfakes.FakeSharedActor{}
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
@@ -44,12 +44,10 @@ var _ = Describe("update-service-broker command", func() {
 				Password:      password,
 				URL:           url,
 			},
-			BaseCommand: v7.BaseCommand{
-				Actor:       fakeUpdateServiceBrokerActor,
-				SharedActor: fakeSharedActor,
-				UI:          testUI,
-				Config:      fakeConfig,
-			},
+			Actor:       fakeUpdateServiceBrokerActor,
+			SharedActor: fakeSharedActor,
+			UI:          testUI,
+			Config:      fakeConfig,
 		}
 	})
 

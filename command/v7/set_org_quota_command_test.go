@@ -20,7 +20,7 @@ var _ = Describe("set-org-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeSetOrgQuotaActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -35,17 +35,15 @@ var _ = Describe("set-org-quota Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeSetOrgQuotaActor)
 		getOrgWarning = RandomString("get-org-warning")
 		applyQuotaWarning = RandomString("apply-quota-warning")
 
 		cmd = SetOrgQuotaCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"

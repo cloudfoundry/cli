@@ -23,7 +23,7 @@ var _ = Describe("create-org-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeCreateOrgQuotaActor
 		orgQuotaName    string
 		executeErr      error
 
@@ -34,16 +34,14 @@ var _ = Describe("create-org-quota Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeCreateOrgQuotaActor)
 		orgQuotaName = "new-org-quota-name"
 
 		cmd = v7.CreateOrgQuotaCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
 			RequiredArgs: flag.OrganizationQuota{OrganizationQuotaName: orgQuotaName},
 		}
 

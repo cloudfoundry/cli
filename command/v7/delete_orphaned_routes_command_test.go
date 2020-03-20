@@ -22,7 +22,7 @@ var _ = Describe("delete-orphaned-routes Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeDeleteOrphanedRoutesActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -33,18 +33,16 @@ var _ = Describe("delete-orphaned-routes Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeDeleteOrphanedRoutesActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = DeleteOrphanedRoutesCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

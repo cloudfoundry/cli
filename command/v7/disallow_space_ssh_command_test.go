@@ -20,7 +20,7 @@ var _ = Describe("disallow-space-ssh Command", func() {
 		testUI                *ui.UI
 		fakeConfig            *commandfakes.FakeConfig
 		fakeSharedActor       *commandfakes.FakeSharedActor
-		disallowSpaceSSHActor *v7fakes.FakeActor
+		disallowSpaceSSHActor *v7fakes.FakeDisallowSpaceSSHActor
 
 		binaryName      string
 		currentUserName string
@@ -31,15 +31,13 @@ var _ = Describe("disallow-space-ssh Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		disallowSpaceSSHActor = new(v7fakes.FakeActor)
+		disallowSpaceSSHActor = new(v7fakes.FakeDisallowSpaceSSHActor)
 
 		cmd = DisallowSpaceSSHCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       disallowSpaceSSHActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       disallowSpaceSSHActor,
 		}
 
 		cmd.RequiredArgs.Space = "some-space"

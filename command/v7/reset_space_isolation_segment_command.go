@@ -1,11 +1,21 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
+
+//go:generate counterfeiter . ResetSpaceIsolationSegmentActor
+
+type ResetSpaceIsolationSegmentActor interface {
+	ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) (string, v7action.Warnings, error)
+}
 
 //go:generate counterfeiter . ResetSpaceIsolationSegmentActorV2
 
@@ -14,20 +24,27 @@ type ResetSpaceIsolationSegmentActorV2 interface {
 }
 
 type ResetSpaceIsolationSegmentCommand struct {
-	BaseCommand
-
 	RequiredArgs    flag.ResetSpaceIsolationArgs `positional-args:"yes"`
 	usage           interface{}                  `usage:"CF_NAME reset-space-isolation-segment SPACE_NAME"`
 	relatedCommands interface{}                  `related_commands:"org, restart, space"`
 
-	ActorV2 ResetSpaceIsolationSegmentActorV2
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       ResetSpaceIsolationSegmentActor
+	ActorV2     ResetSpaceIsolationSegmentActorV2
 }
 
 func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui command.UI) error {
-	err := cmd.BaseCommand.Setup(config, ui)
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
 
 	ccClientV2, uaaClientV2, err := sharedV2.GetNewClientsAndConnectToCF(config, ui)
 	if err != nil {

@@ -24,7 +24,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeUpdateSpaceQuotaActor
 		spaceQuotaName  string
 		executeErr      error
 		orgName         = "some-org"
@@ -36,16 +36,14 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeUpdateSpaceQuotaActor)
 		spaceQuotaName = "old-space-quota-name"
 
 		cmd = v7.UpdateSpaceQuotaCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
 			RequiredArgs: flag.SpaceQuota{SpaceQuota: spaceQuotaName},
 		}
 

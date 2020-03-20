@@ -4,16 +4,45 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type CreateSecurityGroupCommand struct {
-	BaseCommand
+//go:generate counterfeiter . CreateSecurityGroupActor
 
+type CreateSecurityGroupActor interface {
+	CreateSecurityGroup(name, filePath string) (v7action.Warnings, error)
+}
+
+type CreateSecurityGroupCommand struct {
 	RequiredArgs    flag.SecurityGroupArgs `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE\n\n   The provided path can be an absolute or relative path to a file. The file should have\n   a single array with JSON objects inside describing the rules. The JSON Base Object is\n   omitted and only the square brackets and associated child object are required in the file.\n\n   Valid json file example:\n   [\n     {\n       \"protocol\": \"tcp\",\n       \"destination\": \"10.0.11.0/24\",\n       \"ports\": \"80,443\",\n       \"description\": \"Allow http and https traffic from ZoneA\"\n     }\n   ]"`
 	relatedCommands interface{}            `related_commands:"bind-running-security-group, bind-security-group, bind-staging-security-group, security-groups"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       CreateSecurityGroupActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *CreateSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+	cmd.usage = ``
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd CreateSecurityGroupCommand) Execute(args []string) error {

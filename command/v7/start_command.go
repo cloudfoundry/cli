@@ -1,35 +1,55 @@
 package v7
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type StartCommand struct {
-	BaseCommand
+//go:generate counterfeiter . StartActor
 
+type StartActor interface {
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
+	PollStart(appGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
+	StartApplication(appGUID string) (v7action.Warnings, error)
+	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
+	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
+	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
+}
+
+type StartCommand struct {
 	RequiredArgs        flag.AppName `positional-args:"yes"`
 	usage               interface{}  `usage:"CF_NAME start APP_NAME"`
 	relatedCommands     interface{}  `related_commands:"apps, logs, scale, ssh, stop, restart, run-task"`
 	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
+	UI             command.UI
+	Config         command.Config
 	LogCacheClient sharedaction.LogCacheClient
+	SharedActor    command.SharedActor
+	Actor          StartActor
 }
 
 func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
-	err := cmd.BaseCommand.Setup(config, ui)
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 
-	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
-	if err != nil {
-		return err
-	}
-	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
 
 	return nil
 }

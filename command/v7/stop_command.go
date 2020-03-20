@@ -1,15 +1,44 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type StopCommand struct {
-	BaseCommand
+//go:generate counterfeiter . StopActor
 
+type StopActor interface {
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	StopApplication(appGUID string) (v7action.Warnings, error)
+}
+
+type StopCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME stop APP_NAME"`
 	relatedCommands interface{}  `related_commands:"restart, scale, start"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       StopActor
+}
+
+func (cmd *StopCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd StopCommand) Execute(args []string) error {

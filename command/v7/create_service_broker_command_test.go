@@ -21,7 +21,7 @@ var _ = Describe("create-service-broker Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeCreateServiceBrokerActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -39,19 +39,17 @@ var _ = Describe("create-service-broker Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeCreateServiceBrokerActor)
 		fakeActor.CreateServiceBrokerReturns(v7action.Warnings{"some default warning"}, nil)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = &v7.CreateServiceBrokerCommand{
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 
 			RequiredArgs: args,
 		}

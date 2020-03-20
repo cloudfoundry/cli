@@ -2,15 +2,20 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
+//go:generate counterfeiter . ScaleActor
+
 type ScaleActor interface {
-	GetApplicationByNameAndSpace(name string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
+	AppActor
+
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
@@ -18,8 +23,6 @@ type ScaleActor interface {
 }
 
 type ScaleCommand struct {
-	BaseCommand
-
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
 	Force               bool           `short:"f" description:"Force restart of app without prompt"`
 	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
@@ -29,6 +32,26 @@ type ScaleCommand struct {
 	usage               interface{}    `usage:"CF_NAME scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"`
 	relatedCommands     interface{}    `related_commands:"push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       ScaleActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *ScaleCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd ScaleCommand) Execute(args []string) error {

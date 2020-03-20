@@ -3,17 +3,46 @@ package v7
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type RoutesCommand struct {
-	BaseCommand
+//go:generate counterfeiter . RoutesActor
 
+type RoutesActor interface {
+	GetRoutesBySpace(spaceGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)
+	GetRoutesByOrg(orgGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)
+	GetRouteSummaries([]v7action.Route) ([]v7action.RouteSummary, v7action.Warnings, error)
+}
+
+type RoutesCommand struct {
 	usage           interface{} `usage:"CF_NAME routes [--orglevel]"`
 	relatedCommands interface{} `related_commands:"check-route, domains, map-route, unmap-route"`
 	Orglevel        bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
 	Labels          string      `long:"labels" description:"Selector to filter routes by labels"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       RoutesActor
+}
+
+func (cmd *RoutesCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd RoutesCommand) Execute(args []string) error {

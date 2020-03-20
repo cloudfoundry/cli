@@ -1,15 +1,45 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type CancelDeploymentCommand struct {
-	BaseCommand
+//go:generate counterfeiter . CancelDeploymentActor
 
+type CancelDeploymentActor interface {
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
+	CancelDeployment(deploymentGUID string) (v7action.Warnings, error)
+}
+
+type CancelDeploymentCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME cancel-deployment APP_NAME\n\nEXAMPLES:\n   cf cancel-deployment my-app"`
 	relatedCommands interface{}  `related_commands:"app, push"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       CancelDeploymentActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *CancelDeploymentCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd *CancelDeploymentCommand) Execute(args []string) error {

@@ -28,7 +28,7 @@ var _ = Describe("start Command", func() {
 		testUI             *ui.UI
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
-		fakeActor          *v7fakes.FakeActor
+		fakeActor          *v7fakes.FakeStartActor
 		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
 		binaryName  string
@@ -41,7 +41,7 @@ var _ = Describe("start Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeStartActor)
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		binaryName = "faceman"
@@ -51,12 +51,11 @@ var _ = Describe("start Command", func() {
 
 		cmd = v7.StartCommand{
 			RequiredArgs: flag.AppName{AppName: app},
-			BaseCommand: v7.BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+
+			UI:             testUI,
+			Config:         fakeConfig,
+			SharedActor:    fakeSharedActor,
+			Actor:          fakeActor,
 			LogCacheClient: fakeLogCacheClient,
 		}
 	})

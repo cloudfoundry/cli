@@ -21,7 +21,7 @@ var _ = Describe("delete-space-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeDeleteSpaceQuotaActor
 		input           *Buffer
 		binaryName      string
 		quotaName       string
@@ -30,7 +30,7 @@ var _ = Describe("delete-space-quota Command", func() {
 
 	BeforeEach(func() {
 		input = NewBuffer()
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeDeleteSpaceQuotaActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
@@ -42,12 +42,10 @@ var _ = Describe("delete-space-quota Command", func() {
 		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = DeleteSpaceQuotaCommand{
-			BaseCommand: BaseCommand{
-				Actor:       fakeActor,
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-			},
+			Actor:       fakeActor,
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
 		}
 
 		quotaName = "some-quota"

@@ -23,7 +23,7 @@ import (
 var _ = Describe("labels command", func() {
 	var (
 		cmd             LabelsCommand
-		fakeLabelsActor *v7fakes.FakeActor
+		fakeLabelsActor *v7fakes.FakeLabelsActor
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
@@ -33,16 +33,14 @@ var _ = Describe("labels command", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeLabelsActor = new(v7fakes.FakeActor)
+		fakeLabelsActor = new(v7fakes.FakeLabelsActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		cmd = LabelsCommand{
-			BaseCommand: BaseCommand{
-				Actor:       fakeLabelsActor,
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-			},
+			Actor:       fakeLabelsActor,
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
 		}
 	})
 

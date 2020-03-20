@@ -23,7 +23,7 @@ var _ = Describe("set-health-check Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeSetHealthCheckActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -34,7 +34,7 @@ var _ = Describe("set-health-check Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeSetHealthCheckActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -47,12 +47,10 @@ var _ = Describe("set-health-check Command", func() {
 			ProcessType:       "some-process-type",
 			InvocationTimeout: flag.PositiveInteger{Value: 42},
 
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

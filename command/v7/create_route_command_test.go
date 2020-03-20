@@ -23,7 +23,7 @@ var _ = Describe("create-route Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeCreateRouteActor
 
 		executeErr error
 
@@ -40,7 +40,7 @@ var _ = Describe("create-route Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeCreateRouteActor)
 
 		domainName = "example.com"
 		spaceName = "space"
@@ -58,14 +58,12 @@ var _ = Describe("create-route Command", func() {
 			RequiredArgs: flag.Domain{
 				Domain: domainName,
 			},
-			Hostname: hostname,
-			Path:     flag.V7RoutePath{Path: path},
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			Hostname:    hostname,
+			Path:        flag.V7RoutePath{Path: path},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 		executeErr = cmd.Execute(nil)
 	})

@@ -27,7 +27,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
 		input           *Buffer
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeUpdateBuildpackActor
 		fakeConfig      *commandfakes.FakeConfig
 		buildpackGUID   = "buildpack-guid"
 		buildpackName   = "some-bp"
@@ -41,18 +41,16 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeUpdateBuildpackActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		buildpackGUID = "some guid"
 
 		cmd = UpdateBuildpackCommand{
 			RequiredArgs: flag.BuildpackName{Buildpack: buildpackName},
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-				Config:      fakeConfig,
-			},
+			UI:           testUI,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
+			Config:       fakeConfig,
 		}
 	})
 

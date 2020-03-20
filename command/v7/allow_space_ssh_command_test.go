@@ -16,11 +16,11 @@ import (
 
 var _ = Describe("allow-space-ssh Command", func() {
 	var (
-		cmd             AllowSpaceSSHCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		cmd                AllowSpaceSSHCommand
+		testUI             *ui.UI
+		fakeConfig         *commandfakes.FakeConfig
+		fakeSharedActor    *commandfakes.FakeSharedActor
+		allowSpaceSSHActor *v7fakes.FakeAllowSpaceSSHActor
 
 		binaryName      string
 		currentUserName string
@@ -31,15 +31,13 @@ var _ = Describe("allow-space-ssh Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		allowSpaceSSHActor = new(v7fakes.FakeAllowSpaceSSHActor)
 
 		cmd = AllowSpaceSSHCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       allowSpaceSSHActor,
 		}
 
 		cmd.RequiredArgs.Space = "some-space"
@@ -82,7 +80,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 	When("the user is logged in", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
-				fakeActor.UpdateSpaceFeatureReturns(
+				allowSpaceSSHActor.UpdateSpaceFeatureReturns(
 					v7action.Warnings{"some-warning"},
 					nil,
 				)
@@ -91,7 +89,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 			It("allows ssh for the space", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeActor.UpdateSpaceFeatureCallCount()).To(Equal(1))
+				Expect(allowSpaceSSHActor.UpdateSpaceFeatureCallCount()).To(Equal(1))
 
 				Expect(testUI.Out).To(Say("Enabling ssh support for space %s as %s...", cmd.RequiredArgs.Space, currentUserName))
 				Expect(testUI.Out).To(Say("OK"))
@@ -101,7 +99,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 
 		When("ssh is already allowed", func() {
 			BeforeEach(func() {
-				fakeActor.UpdateSpaceFeatureReturns(
+				allowSpaceSSHActor.UpdateSpaceFeatureReturns(
 					v7action.Warnings{"some-warning"},
 					actionerror.SpaceSSHAlreadyEnabledError{Space: "some-space"},
 				)
@@ -110,7 +108,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 			It("allows ssh for the space", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeActor.UpdateSpaceFeatureCallCount()).To(Equal(1))
+				Expect(allowSpaceSSHActor.UpdateSpaceFeatureCallCount()).To(Equal(1))
 
 				Expect(testUI.Out).To(Say("Enabling ssh support for space %s as %s...", cmd.RequiredArgs.Space, currentUserName))
 				Expect(testUI.Out).To(Say("ssh support for space '%s' is already enabled.", cmd.RequiredArgs.Space))
@@ -121,7 +119,7 @@ var _ = Describe("allow-space-ssh Command", func() {
 
 		When("an error occurs while enabling SSH", func() {
 			BeforeEach(func() {
-				fakeActor.UpdateSpaceFeatureReturns(
+				allowSpaceSSHActor.UpdateSpaceFeatureReturns(
 					v7action.Warnings{"some-warning"},
 					errors.New("allow-ssh-error"),
 				)

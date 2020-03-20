@@ -18,22 +18,20 @@ var _ = Describe("api Command", func() {
 	var (
 		cmd        APICommand
 		testUI     *ui.UI
-		fakeActor  *v7fakes.FakeActor
+		fakeActor  *v7fakes.FakeAPIActor
 		fakeConfig *commandfakes.FakeConfig
 		err        error
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeAPIActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = APICommand{
-			BaseCommand: BaseCommand{
-				UI:     testUI,
-				Actor:  fakeActor,
-				Config: fakeConfig,
-			},
+			UI:     testUI,
+			Actor:  fakeActor,
+			Config: fakeConfig,
 		}
 
 		fakeConfig.BinaryNameReturns("faceman")

@@ -1,15 +1,43 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type SharePrivateDomainCommand struct {
-	BaseCommand
+//go:generate counterfeiter . SharePrivateDomainActor
 
+type SharePrivateDomainActor interface {
+	SharePrivateDomain(domainName string, orgName string) (v7action.Warnings, error)
+}
+
+type SharePrivateDomainCommand struct {
 	RequiredArgs    flag.OrgDomain `positional-args:"yes"`
 	usage           interface{}    `usage:"CF_NAME share-private-domain ORG DOMAIN"`
 	relatedCommands interface{}    `related_commands:"create-private-domain, domains, unshare-private-domain"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       SharePrivateDomainActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *SharePrivateDomainCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd SharePrivateDomainCommand) Execute(args []string) error {

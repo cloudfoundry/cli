@@ -1,16 +1,46 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type TerminateTaskCommand struct {
-	BaseCommand
+//go:generate counterfeiter . TerminateTaskActor
 
+type TerminateTaskActor interface {
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+	GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v7action.Task, v7action.Warnings, error)
+	TerminateTask(taskGUID string) (v7action.Task, v7action.Warnings, error)
+}
+
+type TerminateTaskCommand struct {
 	RequiredArgs    flag.TerminateTaskArgs `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME terminate-task APP_NAME TASK_ID\n\nEXAMPLES:\n   CF_NAME terminate-task my-app 3"`
 	relatedCommands interface{}            `related_commands:"tasks"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       TerminateTaskActor
+}
+
+func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	client, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(client, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd TerminateTaskCommand) Execute(args []string) error {

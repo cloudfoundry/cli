@@ -1,17 +1,46 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type SpaceUsersCommand struct {
-	BaseCommand
+//go:generate counterfeiter . SpaceUsersActor
 
+type SpaceUsersActor interface {
+	GetOrganizationByName(name string) (v7action.Organization, v7action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error)
+	GetSpaceUsersByRoleType(spaceGuid string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
+}
+
+type SpaceUsersCommand struct {
 	RequiredArgs    flag.SpaceUsersArgs `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME space-users ORG SPACE"`
 	relatedCommands interface{}         `related_commands:"org-users, orgs, set-space-role, spaces, unset-space-role"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       SpaceUsersActor
+}
+
+func (cmd *SpaceUsersCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd *SpaceUsersCommand) Execute(args []string) error {

@@ -24,7 +24,7 @@ var _ = Describe("unmap-route Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeUnmapRouteActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -44,7 +44,7 @@ var _ = Describe("unmap-route Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeUnmapRouteActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -62,12 +62,10 @@ var _ = Describe("unmap-route Command", func() {
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

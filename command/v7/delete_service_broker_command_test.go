@@ -23,7 +23,7 @@ var _ = Describe("delete-service-broker Command", func() {
 		testUI            *ui.UI
 		fakeConfig        *commandfakes.FakeConfig
 		fakeSharedActor   *commandfakes.FakeSharedActor
-		fakeActor         *v7fakes.FakeActor
+		fakeActor         *v7fakes.FakeDeleteServiceBrokerActor
 		input             *Buffer
 		binaryName        string
 		executeErr        error
@@ -36,7 +36,7 @@ var _ = Describe("delete-service-broker Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeDeleteServiceBrokerActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -45,11 +45,10 @@ var _ = Describe("delete-service-broker Command", func() {
 
 		cmd = DeleteServiceBrokerCommand{
 			RequiredArgs: flag.ServiceBroker{ServiceBroker: serviceBrokerName},
-			BaseCommand: BaseCommand{UI: testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
 		}
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)

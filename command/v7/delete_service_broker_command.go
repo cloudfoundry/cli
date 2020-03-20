@@ -2,16 +2,45 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type DeleteServiceBrokerCommand struct {
-	BaseCommand
+//go:generate counterfeiter . UpdateServiceBrokerActor
 
+type DeleteServiceBrokerActor interface {
+	GetServiceBrokerByName(serviceBrokerName string) (v7action.ServiceBroker, v7action.Warnings, error)
+	DeleteServiceBroker(serviceBrokerGUID string) (v7action.Warnings, error)
+}
+
+type DeleteServiceBrokerCommand struct {
 	RequiredArgs    flag.ServiceBroker `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME delete-service-broker SERVICE_BROKER [-f]\n\n"`
 	Force           bool               `short:"f" description:"Force deletion without confirmation"`
 	relatedCommands interface{}        `related_commands:"delete-service, purge-service-offering, service-brokers"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       DeleteServiceBrokerActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *DeleteServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd DeleteServiceBrokerCommand) Execute(args []string) error {

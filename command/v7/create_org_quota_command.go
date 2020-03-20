@@ -1,15 +1,23 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/clock"
 )
 
-type CreateOrgQuotaCommand struct {
-	BaseCommand
+//go:generate counterfeiter . CreateOrgQuotaActor
 
+type CreateOrgQuotaActor interface {
+	CreateOrganizationQuota(name string, limits v7action.QuotaLimits) (v7action.Warnings, error)
+}
+
+type CreateOrgQuotaCommand struct {
 	RequiredArgs          flag.OrganizationQuota   `positional-args:"yes"`
 	NumAppInstances       flag.IntegerLimit        `short:"a" description:"Total number of application instances. (Default: unlimited)."`
 	PaidServicePlans      bool                     `long:"allow-paid-service-plans" description:"Allow provisioning instances of paid service plans. (Default: disallowed)."`
@@ -20,6 +28,25 @@ type CreateOrgQuotaCommand struct {
 	TotalServiceInstances flag.IntegerLimit        `short:"s" description:"Total number of service instances. -1 represents an unlimited amount. (Default: 0)."`
 	usage                 interface{}              `usage:"CF_NAME create-org-quota ORG_QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
 	relatedCommands       interface{}              `related_commands:"create-org, org-quotas, set-org-quota"`
+
+	UI          command.UI
+	Config      command.Config
+	Actor       CreateOrgQuotaActor
+	SharedActor command.SharedActor
+}
+
+func (cmd *CreateOrgQuotaCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	return nil
 }
 
 func (cmd CreateOrgQuotaCommand) Execute(args []string) error {

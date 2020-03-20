@@ -1,14 +1,44 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock"
 )
 
-type StagingSecurityGroupsCommand struct {
-	BaseCommand
+//go:generate counterfeiter . StagingSecurityGroupsActor
 
+type StagingSecurityGroupsActor interface {
+	GetGlobalStagingSecurityGroups() ([]resources.SecurityGroup, v7action.Warnings, error)
+}
+
+type StagingSecurityGroupsCommand struct {
 	usage           interface{} `usage:"CF_NAME staging-security-groups"`
 	relatedCommands interface{} `related_commands:"bind-staging-security-group, security-group, unbind-staging-security-group"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       StagingSecurityGroupsActor
+}
+
+func (cmd *StagingSecurityGroupsCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+
+	return nil
 }
 
 func (cmd StagingSecurityGroupsCommand) Execute(args []string) error {

@@ -25,7 +25,7 @@ var _ = Describe("set-running-environment-variable-group Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
+		fakeActor       *v7fakes.FakeSetRunningEnvironmentVariableGroupActor
 		executeErr      error
 		binaryName      string
 	)
@@ -34,15 +34,13 @@ var _ = Describe("set-running-environment-variable-group Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeSetRunningEnvironmentVariableGroupActor)
 
 		cmd = SetRunningEnvironmentVariableGroupCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		cmd.RequiredArgs.EnvVarGroupJson = `{"key1":"val1", "key2":"val2"}`

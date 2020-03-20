@@ -1,19 +1,46 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
-type CreateAppCommand struct {
-	BaseCommand
+//go:generate counterfeiter . CreateAppActor
 
+type CreateAppActor interface {
+	CreateApplicationInSpace(app v7action.Application, spaceGUID string) (v7action.Application, v7action.Warnings, error)
+}
+
+type CreateAppCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	AppType         flag.AppType `long:"app-type" choice:"buildpack" choice:"docker" description:"App lifecycle type to stage and run the app" default:"buildpack"`
 	usage           interface{}  `usage:"CF_NAME create-app APP_NAME [--app-type (buildpack | docker)]"`
 	relatedCommands interface{}  `related_commands:"app, apps, push"`
+
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       CreateAppActor
+}
+
+func (cmd *CreateAppCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	client, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v7action.NewActor(client, config, nil, nil, clock.NewClock())
+
+	return nil
 }
 
 func (cmd CreateAppCommand) Execute(args []string) error {
