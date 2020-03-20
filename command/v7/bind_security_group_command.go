@@ -95,7 +95,8 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	}
 
 	for _, space := range spacesToBind {
-		cmd.UI.DisplayTextWithFlavor("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+			"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
 			"security_group": securityGroup.Name,
 			"space":          space.Name,
 			"organization":   org.Name,

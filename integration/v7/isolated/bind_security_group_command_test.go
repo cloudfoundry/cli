@@ -136,6 +136,7 @@ var _ = Describe("bind-security-group command", func() {
 			When("the space doesn't exist", func() {
 				It("fails with a space not found message", func() {
 					session := helpers.CF("bind-security-group", secGroupName, orgName, "--space", "space-doesnt-exist")
+					Eventually(session).Should(Say("Assigning running security group my-group to space space-doesnt-exist in org %s as admin...", orgName))
 					Eventually(session.Err).Should(Say("Space 'space-doesnt-exist' not found."))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -145,7 +146,7 @@ var _ = Describe("bind-security-group command", func() {
 			When("there are no spaces in this org", func() {
 				It("does not bind the security group to any space", func() {
 					session := helpers.CF("bind-security-group", secGroupName, orgName)
-					Consistently(session).ShouldNot(Say("Assigning security group"))
+					Consistently(session).Should(Say("Assigning running security group my-group to all spaces in org %s as admin...", orgName))
 					Consistently(session).ShouldNot(Say("OK"))
 					Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 					Eventually(session).Should(Exit(0))
@@ -163,9 +164,9 @@ var _ = Describe("bind-security-group command", func() {
 						It("binds the security group to each space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName)
 							userName, _ := helpers.GetCredentials()
-							Eventually(session).Should(Say(`Assigning security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
+							Eventually(session).Should(Say(`Assigning running security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
 							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say(`Assigning security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
+							Eventually(session).Should(Say(`Assigning running security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 							Eventually(session).Should(Exit(0))
@@ -177,7 +178,7 @@ var _ = Describe("bind-security-group command", func() {
 					It("binds the security group to the space", func() {
 						session := helpers.CF("bind-security-group", secGroupName, orgName, "--space", spaceName1)
 						userName, _ := helpers.GetCredentials()
-						Eventually(session).Should(Say(`Assigning security group %s to space %s in org %s as %s\.\.\.`, secGroupName, spaceName1, orgName, userName))
+						Eventually(session).Should(Say(`Assigning running security group %s to space %s in org %s as %s\.\.\.`, secGroupName, spaceName1, orgName, userName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 						Eventually(session).Should(Exit(0))
@@ -189,7 +190,7 @@ var _ = Describe("bind-security-group command", func() {
 						It("binds the security group to the space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName, "--space", spaceName1, "--lifecycle", "running")
 							userName, _ := helpers.GetCredentials()
-							Eventually(session).Should(Say(`Assigning security group %s to space %s in org %s as %s\.\.\.`, secGroupName, spaceName1, orgName, userName))
+							Eventually(session).Should(Say(`Assigning running security group %s to space %s in org %s as %s\.\.\.`, secGroupName, spaceName1, orgName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 							Eventually(session).Should(Exit(0))
@@ -202,9 +203,9 @@ var _ = Describe("bind-security-group command", func() {
 						It("binds the security group to each space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName, "--lifecycle", "staging")
 							userName, _ := helpers.GetCredentials()
-							Eventually(session).Should(Say(`Assigning security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
+							Eventually(session).Should(Say(`Assigning staging security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
 							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say(`Assigning security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
+							Eventually(session).Should(Say(`Assigning staging security group %s to space INTEGRATION-SPACE.* in org %s as %s\.\.\.`, secGroupName, orgName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 							Eventually(session).Should(Exit(0))
@@ -215,7 +216,7 @@ var _ = Describe("bind-security-group command", func() {
 						It("binds the security group to the space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName, "--space", spaceName1, "--lifecycle", "staging")
 							userName, _ := helpers.GetCredentials()
-							Eventually(session).Should(Say(`Assigning security group %s to space %s in org %s as %s\.\.\.`, secGroupName, spaceName1, orgName, userName))
+							Eventually(session).Should(Say(`Assigning staging security group %s to space %s in org %s as %s\.\.\.`, secGroupName, spaceName1, orgName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 							Eventually(session).Should(Exit(0))
