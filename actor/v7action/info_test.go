@@ -48,23 +48,23 @@ var _ = Describe("Info Actions", func() {
 		})
 
 		When("the cloud controller client returns an error", func() {
-				var expectedErr error
+			var expectedErr error
 
-				BeforeEach(func() {
-					expectedErr = errors.New("I am a CloudControllerClient Error")
-					fakeCloudControllerClient.GetInfoReturns(
-						ccv3.Info{},
-						nil,
-						ccv3.Warnings{"warning-1", "warning-2"},
-						expectedErr,
-					)
-				})
+			BeforeEach(func() {
+				expectedErr = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetInfoReturns(
+					ccv3.Info{},
+					nil,
+					ccv3.Warnings{"warning-1", "warning-2"},
+					expectedErr,
+				)
+			})
 
-				It("returns the same error and all warnings", func() {
+			It("returns the same error and all warnings", func() {
 				_, warnings, err := actor.GetLogCacheEndpoint()
-					Expect(err).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				})
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
 
 		})
 	})
