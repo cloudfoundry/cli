@@ -16,7 +16,8 @@ import (
 
 var _ = Describe("Target", func() {
 	var (
-		client *Client
+		client    *Client
+		serverURL string
 	)
 
 	BeforeEach(func() {
@@ -27,7 +28,7 @@ var _ = Describe("Target", func() {
 		BeforeEach(func() {
 			server.Reset()
 
-			serverURL := server.URL()
+			serverURL = server.URL()
 			rootResponse := fmt.Sprintf(`{
 				"links": {
 					"self": {
@@ -109,7 +110,7 @@ var _ = Describe("Target", func() {
 			})
 
 			It("calls wrap on all the wrappers", func() {
-				_, err := client.TargetCF(TargetSettings{
+				_, _, err := client.TargetCF(TargetSettings{
 					SkipSSLValidation: true,
 					URL:               server.URL(),
 				})
@@ -125,7 +126,7 @@ var _ = Describe("Target", func() {
 			When("the server has unverified SSL", func() {
 				When("setting the skip ssl flag", func() {
 					It("sets all the endpoints on the client and returns all warnings", func() {
-						warnings, err := client.TargetCF(TargetSettings{
+						rootInfo, warnings, err := client.TargetCF(TargetSettings{
 							SkipSSLValidation: true,
 							URL:               server.URL(),
 						})
@@ -134,6 +135,7 @@ var _ = Describe("Target", func() {
 
 						Expect(client.UAA()).To(Equal("https://uaa.bosh-lite.com"))
 						Expect(client.CloudControllerAPIVersion()).To(Equal("3.0.0-alpha.5"))
+						Expect(rootInfo.Links.CCV3.HREF).To(Equal(fmt.Sprintf("%s/v3", serverURL)))
 					})
 				})
 			})
@@ -153,12 +155,13 @@ var _ = Describe("Target", func() {
 			})
 
 			It("returns the same error", func() {
-				warnings, err := client.TargetCF(TargetSettings{
+				rootInfo, warnings, err := client.TargetCF(TargetSettings{
 					SkipSSLValidation: true,
 					URL:               server.URL(),
 				})
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
+				Expect(rootInfo).To(Equal(Info{}))
 			})
 		})
 	})

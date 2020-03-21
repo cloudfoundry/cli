@@ -12,20 +12,12 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
 	}
-	var allWarnings Warnings
 
-	warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
+	info, warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
 	if err != nil {
 		return Warnings(warnings), err
 	}
-	allWarnings = Warnings(warnings)
-	var info ccv3.Info
 
-	info, _, warnings, err = actor.CloudControllerClient.GetInfo()
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		return allWarnings, err
-	}
 	actor.Config.SetTargetInformation(settings.URL,
 		info.CloudControllerAPIVersion(),
 		info.UAA(),

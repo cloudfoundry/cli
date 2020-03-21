@@ -83,7 +83,7 @@ func connectToCF(config command.Config, ui command.UI, ccClient *ccv3.Client, mi
 		}
 	}
 
-	_, err := ccClient.TargetCF(ccv3.TargetSettings{
+	_, _, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),

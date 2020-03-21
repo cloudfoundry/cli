@@ -13,29 +13,21 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		return nil, nil
 	}
 
-	var allWarnings Warnings
-	warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
-	allWarnings = Warnings(warnings)
+	rootInfo, warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
 	if err != nil {
-		return allWarnings, err
+		return Warnings(warnings), err
 	}
 
-	var info ccv3.Info
-	info, warnings, err = actor.CloudControllerClient.RootResponse()
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		return allWarnings, err
-	}
 	actor.Config.SetTargetInformation(settings.URL,
-		info.CloudControllerAPIVersion(),
-		info.UAA(),
+		rootInfo.CloudControllerAPIVersion(),
+		rootInfo.UAA(),
 		"", // Oldest supported V3 version should be OK
-		info.Logging(),
-		info.Routing(),
+		rootInfo.Logging(),
+		rootInfo.Routing(),
 		settings.SkipSSLValidation,
 	)
 	actor.Config.SetTokenInformation("", "", "")
-	return allWarnings, nil
+	return Warnings(warnings), nil
 }
 
 // ClearTarget clears target information from the actor.

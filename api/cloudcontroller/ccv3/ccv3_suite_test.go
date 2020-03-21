@@ -61,7 +61,7 @@ func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
 			NewRequester(singleConfig),
 		)
 	}
-	warnings, err := client.TargetCF(TargetSettings{
+	_, warnings, err := client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,
 		URL:               server.URL(),
 	})

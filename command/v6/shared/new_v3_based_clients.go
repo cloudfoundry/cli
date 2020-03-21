@@ -51,7 +51,7 @@ func NewV3BasedClientsWithAuthorizationEndpoint(config command.Config, ui comman
 		}
 	}
 
-	_, err := ccClient.TargetCF(ccv3.TargetSettings{
+	_, _, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),

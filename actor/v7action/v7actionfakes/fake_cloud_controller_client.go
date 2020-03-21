@@ -1689,18 +1689,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	TargetCFStub        func(ccv3.TargetSettings) (ccv3.Warnings, error)
+	TargetCFStub        func(ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
 		arg1 ccv3.TargetSettings
 	}
 	targetCFReturns struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.Info
+		result2 ccv3.Warnings
+		result3 error
 	}
 	targetCFReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.Info
+		result2 ccv3.Warnings
+		result3 error
 	}
 	UnmapRouteStub        func(string, string) (ccv3.Warnings, error)
 	unmapRouteMutex       sync.RWMutex
@@ -9551,7 +9553,7 @@ func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) TargetCF(arg1 ccv3.TargetSettings) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) TargetCF(arg1 ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error) {
 	fake.targetCFMutex.Lock()
 	ret, specificReturn := fake.targetCFReturnsOnCall[len(fake.targetCFArgsForCall)]
 	fake.targetCFArgsForCall = append(fake.targetCFArgsForCall, struct {
@@ -9563,10 +9565,10 @@ func (fake *FakeCloudControllerClient) TargetCF(arg1 ccv3.TargetSettings) (ccv3.
 		return fake.TargetCFStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.targetCFReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) TargetCFCallCount() int {
@@ -9575,7 +9577,7 @@ func (fake *FakeCloudControllerClient) TargetCFCallCount() int {
 	return len(fake.targetCFArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) TargetCFCalls(stub func(ccv3.TargetSettings) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) TargetCFCalls(stub func(ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)) {
 	fake.targetCFMutex.Lock()
 	defer fake.targetCFMutex.Unlock()
 	fake.TargetCFStub = stub
@@ -9588,30 +9590,33 @@ func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) ccv3.TargetSet
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) TargetCFReturns(result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) TargetCFReturns(result1 ccv3.Info, result2 ccv3.Warnings, result3 error) {
 	fake.targetCFMutex.Lock()
 	defer fake.targetCFMutex.Unlock()
 	fake.TargetCFStub = nil
 	fake.targetCFReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.Info
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) TargetCFReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) TargetCFReturnsOnCall(i int, result1 ccv3.Info, result2 ccv3.Warnings, result3 error) {
 	fake.targetCFMutex.Lock()
 	defer fake.targetCFMutex.Unlock()
 	fake.TargetCFStub = nil
 	if fake.targetCFReturnsOnCall == nil {
 		fake.targetCFReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
+			result1 ccv3.Info
+			result2 ccv3.Warnings
+			result3 error
 		})
 	}
 	fake.targetCFReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.Info
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) UnmapRoute(arg1 string, arg2 string) (ccv3.Warnings, error) {

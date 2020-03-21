@@ -53,7 +53,7 @@ type CloudControllerClient interface {
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
-	TargetCF(settings ccv3.TargetSettings) (ccv3.Warnings, error)
+	TargetCF(settings ccv3.TargetSettings) (ccv3.Info, ccv3.Warnings, error)
 	UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateApplicationEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)

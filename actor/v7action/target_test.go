@@ -54,9 +54,8 @@ var _ = Describe("Targeting", func() {
 				OAuthClient        string `json:"oath_client"`
 			}
 			meta.Version = expectedAPIVersion
-			fakeCloudControllerClient.TargetCFReturns(ccv3.Warnings{"info-warning"}, nil)
 
-			fakeCloudControllerClient.RootResponseReturns(ccv3.Info{
+			rootResponse := ccv3.Info{
 				Links: ccv3.InfoLinks{
 					CCV3: ccv3.APILink{
 						Meta: meta,
@@ -71,7 +70,8 @@ var _ = Describe("Targeting", func() {
 						HREF: expectedAuth,
 					},
 				},
-			}, ccv3.Warnings{"root-response-warning"}, nil)
+			}
+			fakeCloudControllerClient.TargetCFReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -105,7 +105,7 @@ var _ = Describe("Targeting", func() {
 
 		When("targeting CF fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.TargetCFReturns(ccv3.Warnings{"info-warning"}, errors.New("target-error"))
+				fakeCloudControllerClient.TargetCFReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("target-error"))
 			})
 
 			It("returns an error and all warnings", func() {
@@ -114,31 +114,6 @@ var _ = Describe("Targeting", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
 
 				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(0))
-			})
-		})
-
-		It("queries the API root to get the target information", func() {
-			Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(1))
-		})
-
-		When("getting the API root response fails", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.RootResponseReturns(
-					ccv3.Info{},
-					ccv3.Warnings{"root-response-warning"},
-					errors.New("root-error"),
-				)
-			})
-
-			It("returns an error and all warnings", func() {
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("root-error"))
-				Expect(warnings).To(ConsistOf(Warnings{"info-warning", "root-response-warning"}))
-
-				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(0))
 			})
 		})
 
@@ -165,7 +140,7 @@ var _ = Describe("Targeting", func() {
 
 		It("succeeds and returns all warnings", func() {
 			Expect(err).ToNot(HaveOccurred())
-			Expect(warnings).To(ConsistOf(Warnings{"info-warning", "root-response-warning"}))
+			Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
 		})
 	})
 
