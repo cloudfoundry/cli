@@ -5,12 +5,17 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("log messages", func() {
+
+	var fakeColorLogger *logsfakes.FakeColorLogger
+
 	// TODO: review if that is the only way to initialize variables of these types
+
 	message := *sharedaction.NewLogMessage(
 		"some-message",
 		"OUT",
@@ -18,9 +23,12 @@ var _ = Describe("log messages", func() {
 		"APP/PROC/WEB",
 		"0",
 	)
-	logCacheMessage := logs.NewLogCacheMessage(message)
+
+	logCacheMessage := logs.NewLogCacheMessage(fakeColorLogger, message)
+	fakeColorLogger = new(logsfakes.FakeColorLogger)
 
 	BeforeEach(func() {
+		fakeColorLogger := new(logsfakes.FakeColorLogger)
 		message = *sharedaction.NewLogMessage(
 			"some-message",
 			"OUT",
@@ -28,7 +36,7 @@ var _ = Describe("log messages", func() {
 			"APP/PROC/WEB",
 			"0",
 		)
-		logCacheMessage = logs.NewLogCacheMessage(message)
+		logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
 	})
 
 	Describe("ToSimpleLog", func() {
@@ -59,7 +67,7 @@ var _ = Describe("log messages", func() {
 					"APP/PROC/WEB",
 					"",
 				)
-				logCacheMessage = logs.NewLogCacheMessage(message)
+				logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
 
 				Expect(logCacheMessage.ToLog(time.UTC)).To(ContainSubstring("[APP/PROC/WEB]"))
 
@@ -68,7 +76,6 @@ var _ = Describe("log messages", func() {
 				Expect(logCacheMessage.ToLog(time.UTC)).To(ContainSubstring("[APP/PROC/WEB/0]"))
 			})
 		})
-		// coloring of log header on logType value
 		Context("trimming of message text", func() {
 			It("trims newlines from the end of the message", func() {
 				message = *sharedaction.NewLogMessage(
@@ -78,20 +85,84 @@ var _ = Describe("log messages", func() {
 					"APP/PROC/WEB",
 					"",
 				)
-				logCacheMessage = logs.NewLogCacheMessage(message)
+				logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
 				Expect(logCacheMessage.ToLog(time.UTC)).To(HaveSuffix("some-message"), "invisible characters present")
 			})
 		})
 		Context("padding calculation", func() {
-			It("prepending output with padding", func() {
-				Expect(logCacheMessage.ToLog(time.UTC)).To(HavePrefix("    1970-01-01"))
+			Context("with a short source type empty source instance id", func() {
+				It("prepending output with long padding", func() {
+					message = *sharedaction.NewLogMessage(
+						"some-message",
+						"OUT",
+						time.Unix(0, 0),
+						"STG",
+						"",
+					)
+					logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
+					Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("1970-01-01T00:00:00.00+0000 [STG]        OUT some-message"))
+				})
+			})
+
+			Context("with a short source type and an instance id", func() {
+				It("prepending output with medium padding", func() {
+					message = *sharedaction.NewLogMessage(
+						"some-message",
+						"OUT",
+						time.Unix(0, 0),
+						"STG",
+						"1",
+					)
+					logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
+					Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("1970-01-01T00:00:00.00+0000 [STG/1]      OUT some-message"))
+				})
+			})
+
+			Context("with a long source type and a source instance id", func() {
+				It("prepending output with no padding", func() {
+					Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("1970-01-01T00:00:00.00+0000 [APP/PROC/WEB/0]OUT some-message"))
+				})
 			})
 		})
-		// multi-line log messages
-		// handles both STDERR and STDOUT differently
+
+		Context("multi-line log messages", func() {
+			It("splits the message into multiple lines", func() {
+				message = *sharedaction.NewLogMessage(
+					"some-message1\nsome-message2",
+					"OUT",
+					time.Unix(0, 0),
+					"STG",
+					"1",
+				)
+				logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
+				Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("1970-01-01T00:00:00.00+0000 [STG/1]      OUT some-message1\n" +
+					"                                         some-message2"))
+			})
+		})
+
+		FContext("handles both STDERR and STDOUT", func() {
+			It("correctly colors the STDOUT log message", func() {
+				message = *sharedaction.NewLogMessage(
+					"some-message",
+					"OUT",
+					time.Unix(0, 0),
+					"STG",
+					"1",
+				)
+				logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
+				fakeColorLogger.LogSysHeaderColorReturns("colorized-header")
+				fakeColorLogger.LogStdoutColorReturns("colorized-message")
+				Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("colorized-header      colorized-message"))
+				Expect(fakeColorLogger.LogSysHeaderColorCallCount()).To(Equal(1))
+				Expect(fakeColorLogger.LogStdoutColorCallCount()).To(Equal(1))
+				Expect(fakeColorLogger.LogStderrColorCallCount()).To(Equal(0))
+			})
+			It("correctly colors the STDERR log message", func() {
+			})
+		})
 
 		It("correctly formats the log", func() {
-			Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("1970-01-01T00:00:00.00+0000 [APP/PROC/WEB/0] OUT some-message"))
+			Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("1970-01-01T00:00:00.00+0000 [APP/PROC/WEB/0]OUT some-message"))
 		})
 	})
 })

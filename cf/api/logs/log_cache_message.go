@@ -4,17 +4,27 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
-type logCacheMessage struct {
-	msg sharedaction.LogMessage
+//go:generate counterfeiter . ColorLogger
+type ColorLogger interface {
+	LogSysHeaderColor(string) string
+	LogStdoutColor(string) string
+	LogStderrColor(string) string
 }
 
-func NewLogCacheMessage(m sharedaction.LogMessage) *logCacheMessage {
+type logCacheMessage struct {
+	colorLogger ColorLogger
+	msg         sharedaction.LogMessage
+}
+
+func NewLogCacheMessage(c ColorLogger, m sharedaction.LogMessage) *logCacheMessage {
 	return &logCacheMessage{
-		msg: m,
+		colorLogger: c,
+		msg:         m,
 	}
 }
 
@@ -27,7 +37,6 @@ func (m *logCacheMessage) GetSourceName() string {
 }
 
 func (m *logCacheMessage) ToLog(loc *time.Location) string {
-
 	logMsg := m.msg
 
 	sourceName := logMsg.SourceType()
@@ -44,37 +53,37 @@ func (m *logCacheMessage) ToLog(loc *time.Location) string {
 		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceName, sourceID)
 	}
 
-	// coloredLogHeader := terminal.LogSysHeaderColor(logHeader)
+	coloredLogHeader := m.colorLogger.LogSysHeaderColor(logHeader)
 
-	// // Calculate padding
-	// longestHeader := fmt.Sprintf("%s  [HEALTH/10] ", timeFormat)
-	// expectedHeaderLength := utf8.RuneCountInString(longestHeader)
-	// headerPadding := strings.Repeat(" ", max(0, expectedHeaderLength - utf8.RuneCountInString(logHeader)))
+	// Calculate padding
+	longestHeader := fmt.Sprintf("%s  [HEALTH/10] ", timeFormat)
+	expectedHeaderLength := utf8.RuneCountInString(longestHeader)
+	headerPadding := strings.Repeat(" ", max(0, expectedHeaderLength-utf8.RuneCountInString(logHeader)))
 
-	// logHeader += headerPadding
-	// coloredLogHeader += headerPadding
+	logHeader += headerPadding
+	coloredLogHeader += headerPadding
 
 	msgText := logMsg.Message()
 	msgText = strings.TrimRight(msgText, "\r\n")
 
-	// msgLines := strings.Split(msgText, "\n")
-	// contentPadding := strings.Repeat(" ", utf8.RuneCountInString(logHeader))
-	// coloringFunc := terminal.LogStdoutColor
+	msgLines := strings.Split(msgText, "\n")
+	contentPadding := strings.Repeat(" ", utf8.RuneCountInString(logHeader))
 
 	logType := logMsg.Type()
-	// if logType == "ERR" {
-	// coloringFunc = terminal.LogStderrColor
-	// } else {
-	// logType = "OUT"
-	// }
+	if logType != "ERR" {
+		logType = "OUT"
+	}
 
-	// logContent := fmt.Sprintf("%s %s", logType, msgLines[0])
-	// for _, msgLine := range msgLines[1:] {
-	//     logContent = fmt.Sprintf("%s\n%s%s", logContent, contentPadding, msgLine)
-	// }
+	logContent := fmt.Sprintf("%s %s", logType, msgLines[0])
+	for _, msgLine := range msgLines[1:] {
+		logContent = fmt.Sprintf("%s\n%s%s", logContent, contentPadding, msgLine)
+	}
 
-	// logContent = coloringFunc(logContent)
+	if logType == "ERR" {
+		logContent = m.colorLogger.LogStderrColor(logContent)
+	} else {
+		logContent = m.colorLogger.LogStdoutColor(logContent)
+	}
 
-	// return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
-	return fmt.Sprintf("%s %s %s", logHeader, logType, msgText)
+	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }
