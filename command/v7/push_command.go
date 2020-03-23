@@ -17,7 +17,6 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
-	"code.cloudfoundry.org/clock"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 )
@@ -63,6 +62,8 @@ type ManifestLocator interface {
 }
 
 type PushCommand struct {
+	BaseCommand
+
 	OptionalArgs            flag.OptionalAppName                `positional-args:"yes"`
 	HealthCheckTimeout      flag.PositiveInteger                `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	Buildpacks              []string                            `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
@@ -92,12 +93,9 @@ type PushCommand struct {
 	envCFStagingTimeout     interface{}                         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	Config          command.Config
-	UI              command.UI
 	LogCacheClient  sharedaction.LogCacheClient
-	Actor           PushActor
+	PushActor       PushActor
 	VersionActor    V7ActorForPush
-	SharedActor     command.SharedActor
 	ProgressBar     ProgressBar
 	CWD             string
 	ManifestLocator ManifestLocator
@@ -107,23 +105,20 @@ type PushCommand struct {
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	cmd.ProgressBar = progressbar.NewProgressBar()
-
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}
 
-	v7actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	cmd.VersionActor = v7actor
-	cmd.Actor = v7pushaction.NewActor(v7actor, sharedActor)
+	cmd.ProgressBar = progressbar.NewProgressBar()
+	cmd.VersionActor = cmd.Actor
+	cmd.PushActor = v7pushaction.NewActor(cmd.Actor, sharedaction.NewActor(config))
 
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
+	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
+	if err != nil {
+		return err
+	}
+	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir
@@ -161,7 +156,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	transformedManifest, err := cmd.Actor.HandleFlagOverrides(baseManifest, flagOverrides)
+	transformedManifest, err := cmd.PushActor.HandleFlagOverrides(baseManifest, flagOverrides)
 	if err != nil {
 		return err
 	}
@@ -199,7 +194,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("Manifest applied")
 	}
 
-	pushPlans, warnings, err := cmd.Actor.CreatePushPlans(
+	pushPlans, warnings, err := cmd.PushActor.CreatePushPlans(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
 		transformedManifest,
@@ -219,7 +214,7 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	for _, plan := range pushPlans {
 		log.WithField("app_name", plan.Application.Name).Info("actualizing")
-		eventStream := cmd.Actor.Actualize(plan, cmd.ProgressBar)
+		eventStream := cmd.PushActor.Actualize(plan, cmd.ProgressBar)
 		err := cmd.eventStreamHandler(eventStream)
 
 		if cmd.shouldDisplaySummary(err) {

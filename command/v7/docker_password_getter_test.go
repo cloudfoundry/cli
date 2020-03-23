@@ -31,8 +31,10 @@ var _ = Describe("GetDockerPassword", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = PushCommand{
-			Config: fakeConfig,
-			UI:     testUI,
+			BaseCommand: BaseCommand{
+				Config: fakeConfig,
+				UI:     testUI,
+			},
 		}
 	})
 
