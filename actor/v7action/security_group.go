@@ -134,12 +134,12 @@ func (actor Actor) GetSecurityGroups() ([]SecurityGroupSummary, Warnings, error)
 		securityGroupSummary.Rules = securityGroup.Rules
 
 		var securityGroupSpaces []SecurityGroupSpace
-		var noSecurityGroupSpaces = !securityGroup.StagingGloballyEnabled && !securityGroup.RunningGloballyEnabled && len(securityGroup.StagingSpaceGUIDs) == 0 && len(securityGroup.RunningSpaceGUIDs) == 0
+		var noSecurityGroupSpaces = !*securityGroup.StagingGloballyEnabled && !*securityGroup.RunningGloballyEnabled && len(securityGroup.StagingSpaceGUIDs) == 0 && len(securityGroup.RunningSpaceGUIDs) == 0
 		if noSecurityGroupSpaces {
 			securityGroupSpaces = []SecurityGroupSpace{}
 		}
 
-		if securityGroup.StagingGloballyEnabled {
+		if *securityGroup.StagingGloballyEnabled {
 			securityGroupSpaces = append(securityGroupSpaces, SecurityGroupSpace{
 				SpaceName: "<all>",
 				OrgName:   "<all>",
@@ -147,7 +147,7 @@ func (actor Actor) GetSecurityGroups() ([]SecurityGroupSummary, Warnings, error)
 			})
 		}
 
-		if securityGroup.RunningGloballyEnabled {
+		if *securityGroup.RunningGloballyEnabled {
 			securityGroupSpaces = append(securityGroupSpaces, SecurityGroupSpace{
 				SpaceName: "<all>",
 				OrgName:   "<all>",
@@ -179,6 +179,48 @@ func (actor Actor) GetGlobalRunningSecurityGroups() ([]resources.SecurityGroup, 
 	runningSecurityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.GloballyEnabledRunning, Values: []string{"true"}})
 
 	return runningSecurityGroups, Warnings(warnings), err
+}
+
+func (actor Actor) UpdateSecurityGroup(name, filePath string) (Warnings, error) {
+	allWarnings := Warnings{}
+
+	// parse input file
+	bytes, err := parsePath(filePath)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	var rules []resources.Rule
+	err = json.Unmarshal(bytes, &rules)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	// fetch security group from API
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv3.Query{Key: ccv3.NameFilter, Values: []string{name}})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if len(securityGroups) == 0 {
+		return allWarnings, actionerror.SecurityGroupNotFoundError{Name: name}
+	}
+
+	securityGroup := resources.SecurityGroup{
+		Name:  name,
+		GUID:  securityGroups[0].GUID,
+		Rules: rules,
+	}
+
+	// update security group
+	_, warnings, err = actor.CloudControllerClient.UpdateSecurityGroup(securityGroup)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	return allWarnings, nil
 }
 
 func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpaceGUIDs []string) ([]SecurityGroupSpace, ccv3.Warnings, error) {

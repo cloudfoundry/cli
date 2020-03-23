@@ -1977,6 +1977,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateSecurityGroupStub        func(resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)
+	updateSecurityGroupMutex       sync.RWMutex
+	updateSecurityGroupArgsForCall []struct {
+		arg1 resources.SecurityGroup
+	}
+	updateSecurityGroupReturns struct {
+		result1 resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateSecurityGroupReturnsOnCall map[int]struct {
+		result1 resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateSecurityGroupRunningSpaceStub        func(string, string) (ccv3.Warnings, error)
 	updateSecurityGroupRunningSpaceMutex       sync.RWMutex
 	updateSecurityGroupRunningSpaceArgsForCall []struct {
@@ -10811,6 +10826,72 @@ func (fake *FakeCloudControllerClient) UpdateResourceMetadataReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSecurityGroup(arg1 resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error) {
+	fake.updateSecurityGroupMutex.Lock()
+	ret, specificReturn := fake.updateSecurityGroupReturnsOnCall[len(fake.updateSecurityGroupArgsForCall)]
+	fake.updateSecurityGroupArgsForCall = append(fake.updateSecurityGroupArgsForCall, struct {
+		arg1 resources.SecurityGroup
+	}{arg1})
+	fake.recordInvocation("UpdateSecurityGroup", []interface{}{arg1})
+	fake.updateSecurityGroupMutex.Unlock()
+	if fake.UpdateSecurityGroupStub != nil {
+		return fake.UpdateSecurityGroupStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateSecurityGroupReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupCallCount() int {
+	fake.updateSecurityGroupMutex.RLock()
+	defer fake.updateSecurityGroupMutex.RUnlock()
+	return len(fake.updateSecurityGroupArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupCalls(stub func(resources.SecurityGroup) (resources.SecurityGroup, ccv3.Warnings, error)) {
+	fake.updateSecurityGroupMutex.Lock()
+	defer fake.updateSecurityGroupMutex.Unlock()
+	fake.UpdateSecurityGroupStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupArgsForCall(i int) resources.SecurityGroup {
+	fake.updateSecurityGroupMutex.RLock()
+	defer fake.updateSecurityGroupMutex.RUnlock()
+	argsForCall := fake.updateSecurityGroupArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupReturns(result1 resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.updateSecurityGroupMutex.Lock()
+	defer fake.updateSecurityGroupMutex.Unlock()
+	fake.UpdateSecurityGroupStub = nil
+	fake.updateSecurityGroupReturns = struct {
+		result1 resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupReturnsOnCall(i int, result1 resources.SecurityGroup, result2 ccv3.Warnings, result3 error) {
+	fake.updateSecurityGroupMutex.Lock()
+	defer fake.updateSecurityGroupMutex.Unlock()
+	fake.UpdateSecurityGroupStub = nil
+	if fake.updateSecurityGroupReturnsOnCall == nil {
+		fake.updateSecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 resources.SecurityGroup
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateSecurityGroupReturnsOnCall[i] = struct {
+		result1 resources.SecurityGroup
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
 	fake.updateSecurityGroupRunningSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSecurityGroupRunningSpaceReturnsOnCall[len(fake.updateSecurityGroupRunningSpaceArgsForCall)]
@@ -12019,6 +12100,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateProcessMutex.RUnlock()
 	fake.updateResourceMetadataMutex.RLock()
 	defer fake.updateResourceMetadataMutex.RUnlock()
+	fake.updateSecurityGroupMutex.RLock()
+	defer fake.updateSecurityGroupMutex.RUnlock()
 	fake.updateSecurityGroupRunningSpaceMutex.RLock()
 	defer fake.updateSecurityGroupRunningSpaceMutex.RUnlock()
 	fake.updateSecurityGroupStagingSpaceMutex.RLock()

@@ -2,71 +2,22 @@ package resources
 
 import (
 	"encoding/json"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
 )
 
 type SecurityGroup struct {
-	Name                   string `json:"name"`
-	GUID                   string `json:"guid,omitempty"`
-	Rules                  []Rule `json:"rules"`
-	StagingGloballyEnabled bool
-	RunningGloballyEnabled bool
-	StagingSpaceGUIDs      []string
-	RunningSpaceGUIDs      []string
+	Name                   string   `jsonry:"name,omitempty"`
+	GUID                   string   `jsonry:"guid,omitempty"`
+	Rules                  []Rule   `jsonry:"rules,omitempty"`
+	StagingGloballyEnabled *bool    `jsonry:"globally_enabled.staging,omitempty"`
+	RunningGloballyEnabled *bool    `jsonry:"globally_enabled.running,omitempty"`
+	StagingSpaceGUIDs      []string `jsonry:"relationships.staging_spaces.data[].guid,omitempty"`
+	RunningSpaceGUIDs      []string `jsonry:"relationships.running_spaces.data[].guid,omitempty"`
 }
 
 func (sg SecurityGroup) MarshalJSON() ([]byte, error) {
-	relationships := map[string]interface{}{}
-	if len(sg.StagingSpaceGUIDs) > 0 {
-		stagingSpaceData := make([]map[string]interface{}, len(sg.StagingSpaceGUIDs))
-		for i, spaceGUID := range sg.StagingSpaceGUIDs {
-			stagingSpaceData[i] = map[string]interface{}{
-				"guid": spaceGUID,
-			}
-		}
-
-		relationships["staging_spaces"] = map[string]interface{}{
-			"data": stagingSpaceData,
-		}
-	}
-
-	if len(sg.RunningSpaceGUIDs) > 0 {
-		runningSpaceData := make([]map[string]interface{}, len(sg.RunningSpaceGUIDs))
-		for i, spaceGUID := range sg.RunningSpaceGUIDs {
-			runningSpaceData[i] = map[string]interface{}{
-				"guid": spaceGUID,
-			}
-		}
-
-		relationships["running_spaces"] = map[string]interface{}{
-			"data": runningSpaceData,
-		}
-	}
-
-	var rules = make([]Rule, 0)
-	if sg.Rules != nil {
-		rules = sg.Rules
-	}
-
-	globallyEnabled := map[string]bool{
-		"running": sg.RunningGloballyEnabled,
-		"staging": sg.StagingGloballyEnabled,
-	}
-
-	jsonMap := map[string]interface{}{
-		"name":             sg.Name,
-		"rules":            rules,
-		"globally_enabled": globallyEnabled,
-	}
-
-	if sg.GUID != "" {
-		jsonMap["guid"] = sg.GUID
-	}
-
-	if len(relationships) != 0 {
-		jsonMap["relationships"] = relationships
-	}
-
-	return json.Marshal(jsonMap)
+	return jsonry.Marshal(sg)
 }
 
 func (sg *SecurityGroup) UnmarshalJSON(data []byte) error {
@@ -81,8 +32,8 @@ func (sg *SecurityGroup) UnmarshalJSON(data []byte) error {
 
 	type RemainingFieldsStruct struct {
 		GloballyEnabled struct {
-			Staging bool
-			Running bool
+			Staging *bool
+			Running *bool
 		} `json:"globally_enabled"`
 		Relationships struct {
 			StagingSpaces struct {

@@ -90,3 +90,20 @@ func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, 
 
 	return warnings, err
 }
+
+func (client *Client) UpdateSecurityGroup(securityGroup resources.SecurityGroup) (resources.SecurityGroup, Warnings, error) {
+	var responseBody resources.SecurityGroup
+
+	securityGroupGUID := securityGroup.GUID
+	securityGroup.GUID = ""
+	securityGroup.Name = ""
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName:  internal.PatchSecurityGroupRequest,
+		URIParams:    internal.Params{"security_group_guid": securityGroupGUID},
+		RequestBody:  securityGroup,
+		ResponseBody: &responseBody,
+	})
+
+	return responseBody, warnings, err
+}

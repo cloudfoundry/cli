@@ -16,6 +16,8 @@ var _ = Describe("Security group resource", func() {
 		typeInt           = 1
 		codeInt           = 0
 		logBool           = false
+		trueBool          = true
+		falseBool         = false
 	)
 
 	DescribeTable("UnmarshalJSON",
@@ -26,29 +28,22 @@ var _ = Describe("Security group resource", func() {
 			Expect(actualStruct).To(Equal(expectedStruct))
 		},
 		Entry(
-			"name and guid",
-			[]byte(`{"name": "security-group-name","guid": "security-group-guid","rules":[]}`),
-			SecurityGroup{
-				Name:  "security-group-name",
-				GUID:  "security-group-guid",
-				Rules: []Rule{},
-			},
-		),
-		Entry(
-			"full rules",
-			[]byte(`{"name": "security-group-name",
-"guid": "security-group-guid",
-"rules":[
-	{
-		"protocol":"all",
-		"destination":"some-Destination",
-		"ports":"some-Ports",
-		"type":1,
-		"code":0,
-		"description":"some-Description",
-		"log":false
-     }
-]}`),
+			"name, guid, and rules",
+			[]byte(`{
+				"name": "security-group-name",
+				"guid": "security-group-guid",
+				"rules":[
+					{
+						"protocol":"all",
+						"destination":"some-Destination",
+						"ports":"some-Ports",
+						"type":1,
+						"code":0,
+						"description":"some-Description",
+						"log":false
+					}
+				]
+			}`),
 			SecurityGroup{
 				Name: "security-group-name",
 				GUID: "security-group-guid",
@@ -70,7 +65,6 @@ var _ = Describe("Security group resource", func() {
 			[]byte(`{
 				"name": "security-group-name",
 				"guid": "security-group-guid",
-				"rules": [],
 				"globally_enabled": {
 					"running": true,
 					"staging": false
@@ -79,9 +73,8 @@ var _ = Describe("Security group resource", func() {
 			SecurityGroup{
 				Name:                   "security-group-name",
 				GUID:                   "security-group-guid",
-				Rules:                  []Rule{},
-				StagingGloballyEnabled: false,
-				RunningGloballyEnabled: true,
+				StagingGloballyEnabled: &falseBool,
+				RunningGloballyEnabled: &trueBool,
 			},
 		),
 		Entry(
@@ -89,7 +82,6 @@ var _ = Describe("Security group resource", func() {
 			[]byte(`{
 				"name": "security-group-name",
 				"guid": "security-group-guid",
-				"rules": [],
 				"relationships": {
 					"staging_spaces": {
 					  "data": [
@@ -107,7 +99,6 @@ var _ = Describe("Security group resource", func() {
 			SecurityGroup{
 				Name:              "security-group-name",
 				GUID:              "security-group-guid",
-				Rules:             []Rule{},
 				StagingSpaceGUIDs: []string{"space-guid-1", "space-guid-2"},
 				RunningSpaceGUIDs: []string{"space-guid-3"},
 			},
@@ -126,8 +117,8 @@ var _ = Describe("Security group resource", func() {
 			SecurityGroup{
 				Name:                   "security-group-name",
 				GUID:                   "security-group-guid",
-				RunningGloballyEnabled: true,
-				StagingGloballyEnabled: false,
+				RunningGloballyEnabled: &trueBool,
+				StagingGloballyEnabled: &falseBool,
 				Rules: []Rule{
 					{
 						Protocol:    "udp",
@@ -138,12 +129,24 @@ var _ = Describe("Security group resource", func() {
 			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"udp","destination":"another-destination"}]}`),
 		),
 		Entry(
+			"only rules",
+			SecurityGroup{
+				Rules: []Rule{
+					{
+						Protocol:    "udp",
+						Destination: "another-destination",
+					},
+				},
+			},
+			[]byte(`{"rules":[{"protocol":"udp","destination":"another-destination"}]}`),
+		),
+		Entry(
 			"name and rules",
 			SecurityGroup{
 				Name:                   "security-group-name",
 				GUID:                   "security-group-guid",
-				RunningGloballyEnabled: true,
-				StagingGloballyEnabled: false,
+				RunningGloballyEnabled: &trueBool,
+				StagingGloballyEnabled: &falseBool,
 				Rules: []Rule{
 					{
 						Protocol:    "all",
@@ -163,24 +166,24 @@ var _ = Describe("Security group resource", func() {
 			SecurityGroup{
 				Name:                   "security-group-name",
 				GUID:                   "security-group-guid",
-				StagingGloballyEnabled: false,
-				RunningGloballyEnabled: true,
+				RunningGloballyEnabled: &trueBool,
+				StagingGloballyEnabled: &falseBool,
 				StagingSpaceGUIDs:      []string{"space-guid-1", "space-guid-2"},
 				RunningSpaceGUIDs:      []string{"space-guid-3"},
 			},
-			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}},"rules":[]}`),
+			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}}}`),
 		),
 		Entry(
 			"relationships",
 			SecurityGroup{
 				Name:                   "security-group-name",
 				GUID:                   "security-group-guid",
-				RunningGloballyEnabled: true,
-				StagingGloballyEnabled: false,
+				RunningGloballyEnabled: &trueBool,
+				StagingGloballyEnabled: &falseBool,
 				StagingSpaceGUIDs:      []string{"space-guid-1", "space-guid-2"},
 				RunningSpaceGUIDs:      []string{"space-guid-3"},
 			},
-			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}},"rules":[]}`),
+			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}}}`),
 		),
 	)
 })

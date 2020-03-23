@@ -255,4 +255,50 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(warnings).To(Equal(Warnings{"some-warning"}))
 		})
 	})
+
+	Describe("UpdateSecurityGroup", func() {
+		var (
+			securityGroup         resources.SecurityGroup
+			returnedSecurityGroup resources.SecurityGroup
+			warnings              Warnings
+			executeErr            error
+			trueValue             = true
+		)
+
+		BeforeEach(func() {
+			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
+				requestParams.ResponseBody.(*resources.SecurityGroup).GUID = "returned-group-guid"
+				return "", Warnings{"some-warning"}, errors.New("some-error")
+			})
+
+			securityGroup = resources.SecurityGroup{
+				Name:                   "some-security-group-name",
+				GUID:                   "some-security-group-guid",
+				StagingGloballyEnabled: &trueValue,
+			}
+		})
+
+		JustBeforeEach(func() {
+			returnedSecurityGroup, warnings, executeErr = client.UpdateSecurityGroup(securityGroup)
+		})
+
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			params := requester.MakeRequestArgsForCall(0)
+
+			Expect(params.RequestName).To(Equal(internal.PatchSecurityGroupRequest))
+			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroup.GUID}))
+			Expect(params.RequestBody).To(Equal(resources.SecurityGroup{
+				StagingGloballyEnabled: &trueValue,
+			}))
+		})
+
+		It("returns the resource and all warnings", func() {
+			Expect(returnedSecurityGroup).To(Equal(resources.SecurityGroup{
+				GUID: "returned-group-guid",
+			}))
+			Expect(executeErr).To(MatchError("some-error"))
+			Expect(warnings).To(Equal(Warnings{"some-warning"}))
+		})
+	})
 })

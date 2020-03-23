@@ -100,6 +100,7 @@ const (
 	PatchOrganizationQuotaRequest                               = "PatchOrganizationQuota"
 	PatchProcessRequest                                         = "PatchProcess"
 	PatchRouteRequest                                           = "PatchRoute"
+	PatchSecurityGroupRequest                                   = "PatchSecurityGroup"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
 	PatchServiceOfferingRequest                                 = "PatchServiceOfferingRequest"
 	PatchServicePlanRequest                                     = "PatchServicePlanRequest"
@@ -249,6 +250,7 @@ var APIRoutes = []Route{
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodPost, Name: PostSecurityGroupRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces", Method: http.MethodPost, Name: PostSecurityGroupStagingSpaceRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces", Method: http.MethodPost, Name: PostSecurityGroupRunningSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodPatch, Name: PatchSecurityGroupRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodDelete, Name: DeleteServiceBrokerRequest},

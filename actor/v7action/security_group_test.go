@@ -443,11 +443,15 @@ var _ = Describe("Security Group Actions", func() {
 			securityGroupSummaries []SecurityGroupSummary
 			description            string
 			port                   string
+			trueVal                bool
+			falseVal               bool
 		)
 
 		BeforeEach(func() {
 			description = "Top 8 Friends Only"
 			port = "9000"
+			trueVal = true
+			falseVal = false
 		})
 
 		When("the request succeeds", func() {
@@ -468,8 +472,8 @@ var _ = Describe("Security Group Actions", func() {
 								Ports:       &port,
 								Protocol:    "tcp",
 							}},
-							RunningGloballyEnabled: true,
-							StagingGloballyEnabled: false,
+							RunningGloballyEnabled: &trueVal,
+							StagingGloballyEnabled: &falseVal,
 							RunningSpaceGUIDs:      []string{"space-guid-1"},
 							StagingSpaceGUIDs:      []string{"space-guid-2"},
 						},
@@ -482,8 +486,8 @@ var _ = Describe("Security Group Actions", func() {
 								Ports:       &port,
 								Protocol:    "udp",
 							}},
-							RunningGloballyEnabled: false,
-							StagingGloballyEnabled: true,
+							RunningGloballyEnabled: &falseVal,
+							StagingGloballyEnabled: &trueVal,
 							RunningSpaceGUIDs:      []string{"space-guid-2"},
 							StagingSpaceGUIDs:      []string{"space-guid-1"},
 						},
@@ -792,6 +796,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 	})
+
 	Describe("GetGlobalRunningingSecurityGroups", func() {
 		var (
 			securityGroups []resources.SecurityGroup
@@ -878,6 +883,134 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(warnings).To(ConsistOf("security-group-warning"))
 					Expect(executeErr).To(MatchError(expectedError))
 				})
+			})
+		})
+	})
+
+	Describe("UpdateSecurityGroup", func() {
+		const securityGroupName = "security-group-name"
+		var (
+			filePath              string
+			fileContents          []byte
+			tempFile              *os.File
+			originalSecurityGroup resources.SecurityGroup
+			updatedSecurityGroup  resources.SecurityGroup
+		)
+
+		BeforeEach(func() {
+			originalSecurityGroup = resources.SecurityGroup{
+				Name:  securityGroupName,
+				GUID:  "some-sec-grp-guid",
+				Rules: []resources.Rule{},
+			}
+			fakeCloudControllerClient.GetSecurityGroupsReturns(
+				[]resources.SecurityGroup{originalSecurityGroup},
+				ccv3.Warnings{"get-security-group-warning"},
+				nil,
+			)
+
+			fileContents = []byte(`[
+	{
+      "protocol": "tcp",
+      "destination": "10.10.10.0/24"
+    }
+]`)
+			tempFile, executeErr = ioutil.TempFile("", "")
+			Expect(executeErr).ToNot(HaveOccurred())
+			filePath = tempFile.Name()
+
+			updatedSecurityGroup = resources.SecurityGroup{
+				Name: securityGroupName,
+				GUID: "some-sec-grp-guid",
+				Rules: []resources.Rule{
+					{
+						Protocol:    "tcp",
+						Destination: "10.10.10.0/24",
+					},
+				},
+			}
+			fakeCloudControllerClient.UpdateSecurityGroupReturns(updatedSecurityGroup, ccv3.Warnings{"update-warning"}, nil)
+		})
+
+		JustBeforeEach(func() {
+			_, err := tempFile.Write(fileContents)
+			Expect(err).ToNot(HaveOccurred())
+
+			warnings, executeErr = actor.UpdateSecurityGroup(securityGroupName, filePath)
+		})
+
+		AfterEach(func() {
+			os.Remove(filePath)
+		})
+
+		It("parses the input file, finds the requested security group, and updates it", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(warnings).To(Equal(Warnings{"get-security-group-warning", "update-warning"}))
+
+			givenQuery := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
+			Expect(givenQuery).To(ConsistOf(
+				ccv3.Query{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+			))
+
+			givenSecurityGroup := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
+			Expect(givenSecurityGroup).To(Equal(updatedSecurityGroup))
+		})
+
+		When("the path does not exist", func() {
+			BeforeEach(func() {
+				filePath = "does-not-exist"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				_, ok := executeErr.(*os.PathError)
+				Expect(ok).To(BeTrue())
+				Expect(warnings).To(Equal(Warnings{}))
+			})
+		})
+
+		When("Unmarshaling fails", func() {
+			BeforeEach(func() {
+				fileContents = []byte("not-valid-json")
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				_, ok := executeErr.(*json.SyntaxError)
+				Expect(ok).To(BeTrue())
+				Expect(warnings).To(Equal(Warnings{}))
+			})
+		})
+
+		When("the security group does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{},
+					ccv3.Warnings{"get-security-group-warning"},
+					nil,
+				)
+			})
+
+			It("returns a security group not found error and warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: securityGroupName}))
+				Expect(warnings).To(Equal(Warnings{"get-security-group-warning"}))
+			})
+		})
+
+		When("the security group can't be updated", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateSecurityGroupReturns(
+					resources.SecurityGroup{},
+					ccv3.Warnings{"a-warning"},
+					errors.New("update-error"),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError("update-error"))
+				Expect(warnings).To(Equal(Warnings{"get-security-group-warning", "a-warning"}))
 			})
 		})
 	})
