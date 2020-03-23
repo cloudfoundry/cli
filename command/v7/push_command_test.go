@@ -124,10 +124,9 @@ var _ = Describe("push Command", func() {
 
 		cmd = PushCommand{
 			BaseCommand: BaseCommand{
-				SharedActor:     fakeSharedActor,
-				UI:              testUI,
-				Config:          fakeConfig,
-
+				SharedActor: fakeSharedActor,
+				UI:          testUI,
+				Config:      fakeConfig,
 			},
 			PushActor:       fakeActor,
 			VersionActor:    fakeVersionActor,
