@@ -53,7 +53,6 @@ run:
       "default_timeout": ${DEFAULT_TIMEOUT},
       "long_curl_timeout": ${LONG_CURL_TIMEOUT},
       "skip_ssl_validation": true,
-      "use_http": false,
       "include_apps": true,
       "include_backend_compatibility": false,
       "include_container_networking": true,
@@ -74,7 +73,9 @@ run:
       "include_sso": false,
       "include_tasks": true,
       "include_v3": ${INCLUDE_V3},
-      "include_zipkin": false
+      "include_zipkin": false,
+      "use_http": false,
+      "use_log_cache": false
     }
     EOF
 
