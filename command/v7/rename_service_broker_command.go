@@ -1,38 +1,16 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
 type RenameServiceBrokerCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.RenameServiceBrokerArgs `positional-args:"yes"`
 	usage           interface{}                  `usage:"CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"`
 	relatedCommands interface{}                  `related_commands:"service-brokers, update-service-broker"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       UpdateServiceBrokerActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *RenameServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
-	sharedActor := sharedaction.NewActor(config)
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedActor
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd *RenameServiceBrokerCommand) Execute(args []string) error {

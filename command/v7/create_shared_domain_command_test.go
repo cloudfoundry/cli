@@ -23,7 +23,7 @@ var _ = Describe("create-shared-domain Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateSharedDomainActor
+		fakeActor       *v7fakes.FakeActor
 
 		executeErr error
 
@@ -35,7 +35,7 @@ var _ = Describe("create-shared-domain Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateSharedDomainActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		domainName = "example.com"
 
@@ -43,10 +43,12 @@ var _ = Describe("create-shared-domain Command", func() {
 			RequiredArgs: flag.Domain{
 				Domain: domainName,
 			},
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"

@@ -23,7 +23,7 @@ var _ = Describe("create-private-domain Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreatePrivateDomainActor
+		fakeActor       *v7fakes.FakeActor
 
 		executeErr error
 
@@ -36,7 +36,7 @@ var _ = Describe("create-private-domain Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreatePrivateDomainActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		domainName = "example.com"
 		orgName = "my-org"
@@ -45,10 +45,12 @@ var _ = Describe("create-private-domain Command", func() {
 				Organization: orgName,
 				Domain:       domainName,
 			},
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"

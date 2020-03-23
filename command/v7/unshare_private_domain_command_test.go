@@ -24,7 +24,7 @@ var _ = Describe("unshare-private-domain command", func() {
 		cmd             UnsharePrivateDomainCommand
 		DomainName      = "some-domain-name"
 		OrgName         = "some-org-name"
-		fakeActor       *v7fakes.FakeUnsharePrivateDomainActor
+		fakeActor       *v7fakes.FakeActor
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
@@ -37,14 +37,16 @@ var _ = Describe("unshare-private-domain command", func() {
 
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
-		fakeActor = new(v7fakes.FakeUnsharePrivateDomainActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		cmd = UnsharePrivateDomainCommand{
-			Actor:       fakeActor,
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
+			BaseCommand: BaseCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			},
 		}
 		cmd.RequiredArgs = flag.OrgDomain{
 			Organization: OrgName,

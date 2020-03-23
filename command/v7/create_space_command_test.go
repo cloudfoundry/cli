@@ -23,7 +23,7 @@ var _ = Describe("create-space Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateSpaceActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 
@@ -39,7 +39,7 @@ var _ = Describe("create-space Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateSpaceActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -67,10 +67,12 @@ var _ = Describe("create-space Command", func() {
 
 	JustBeforeEach(func() {
 		cmd = v7.CreateSpaceCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			RequiredArgs: flag.Space{Space: spaceName},
 			Organization: orgName,
 			Quota:        quotaName,

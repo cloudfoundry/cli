@@ -2,45 +2,16 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeleteOrganizationActor
-
-type DeleteOrganizationActor interface {
-	DeleteOrganization(orgName string) (v7action.Warnings, error)
-}
-
 type DeleteOrgCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	Force           bool              `short:"f" description:"Force deletion without confirmation"`
 	usage           interface{}       `usage:"CF_NAME delete-org ORG [-f]"`
 	relatedCommands interface{}       `related_commands:"create-org, orgs, quotas, set-org-role"`
-
-	Config      command.Config
-	UI          command.UI
-	SharedActor command.SharedActor
-	Actor       DeleteOrganizationActor
-}
-
-func (cmd *DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd *DeleteOrgCommand) Execute(args []string) error {

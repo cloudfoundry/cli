@@ -1,43 +1,15 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . RenameActor
-
-type RenameActor interface {
-	RenameApplicationByNameAndSpaceGUID(oldAppName, newAppName, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-}
-
 type RenameCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Rename `positional-args:"yes"`
 	usage           interface{} `usage:"CF_NAME rename APP_NAME NEW_APP_NAME"`
 	relatedCommands interface{} `related_commands:"apps, delete"`
-	UI              command.UI
-	Config          command.Config
-	SharedActor     command.SharedActor
-	Actor           RenameActor
-}
-
-func (cmd *RenameCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd RenameCommand) Execute(args []string) error {

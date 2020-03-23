@@ -2,46 +2,17 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeleteActor
-
-type DeleteActor interface {
-	CloudControllerAPIVersion() string
-	DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (v7action.Warnings, error)
-}
-
 type DeleteCommand struct {
+	BaseCommand
+
 	RequiredArgs       flag.AppName `positional-args:"yes"`
 	Force              bool         `short:"f" description:"Force deletion without confirmation"`
 	DeleteMappedRoutes bool         `short:"r" description:"Also delete any mapped routes"`
 	usage              interface{}  `usage:"CF_NAME delete APP_NAME [-r] [-f]"`
 	relatedCommands    interface{}  `related_commands:"apps, scale, stop"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       DeleteActor
-}
-
-func (cmd *DeleteCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd DeleteCommand) Execute(args []string) error {

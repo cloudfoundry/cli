@@ -22,7 +22,7 @@ var _ = Describe("set-droplet Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSetDropletActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -33,7 +33,7 @@ var _ = Describe("set-droplet Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetDropletActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -43,10 +43,12 @@ var _ = Describe("set-droplet Command", func() {
 		cmd = v7.SetDropletCommand{
 			RequiredArgs: flag.AppDroplet{AppName: app, DropletGUID: dropletGUID},
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 	})
 

@@ -20,7 +20,7 @@ var _ = Describe("auth Command", func() {
 	var (
 		cmd        AuthCommand
 		testUI     *ui.UI
-		fakeActor  *v7fakes.FakeAuthActor
+		fakeActor  *v7fakes.FakeActor
 		fakeConfig *commandfakes.FakeConfig
 		binaryName string
 		err        error
@@ -28,13 +28,15 @@ var _ = Describe("auth Command", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v7fakes.FakeAuthActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = AuthCommand{
-			UI:     testUI,
-			Config: fakeConfig,
-			Actor:  fakeActor,
+			BaseCommand: BaseCommand{
+				UI:     testUI,
+				Config: fakeConfig,
+				Actor:  fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
