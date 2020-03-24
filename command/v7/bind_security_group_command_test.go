@@ -112,6 +112,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 
 			It("returns a SecurityGroupNotFoundError and displays all warnings", func() {
+				Expect(testUI.Out).To(Say("Assigning running security group %s to all spaces in org %s as some-user...", cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName))
 				Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 				Expect(testUI.Err).To(Say("get security group warning"))
 			})
@@ -182,6 +183,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 				It("returns a SpaceNotFoundError", func() {
 					Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
+					Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
 					Expect(testUI.Err).To(Say("get space warning"))
@@ -209,7 +211,7 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to the space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
@@ -261,25 +263,6 @@ var _ = Describe("bind-security-group Command", func() {
 					})
 				})
 			})
-
-			When("an error is encountered getting the space", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("get org error")
-					fakeActor.GetSpaceByNameAndOrganizationReturns(
-						v7action.Space{},
-						v7action.Warnings{"get space by org warning"},
-						expectedErr)
-				})
-
-				It("returns the error and displays all warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(testUI.Err).To(Say("get security group warning"))
-					Expect(testUI.Err).To(Say("get org warning"))
-					Expect(testUI.Err).To(Say("get space by org warning"))
-				})
-			})
 		})
 
 		When("a space is not provided", func() {
@@ -294,8 +277,10 @@ var _ = Describe("bind-security-group Command", func() {
 				It("does not perform any bindings and displays all warnings", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(testUI.Out).NotTo(Say("Assigning security group"))
+					Expect(testUI.Out).To(Say("Assigning running security group %s to all spaces in org %s as some-user...", cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName))
+					Expect(testUI.Out).To(Say("No spaces in org %s.", cmd.RequiredArgs.OrganizationName))
 					Expect(testUI.Out).NotTo(Say("OK"))
+					Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
@@ -335,9 +320,9 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to each space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
@@ -440,7 +425,7 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to the space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
@@ -469,29 +454,24 @@ var _ = Describe("bind-security-group Command", func() {
 					})
 				})
 			})
+
+			When("the space does not exist", func() {
+				BeforeEach(func() {
+					fakeActor.GetSpaceByNameAndOrganizationReturns(
+						v7action.Space{},
+						v7action.Warnings{},
+						actionerror.SpaceNotFoundError{Name: "some-space"},
+					)
+				})
+
+				It("error and displays all warnings after displaying the flavor text", func() {
+					Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
+					Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
+				})
+			})
 		})
 
 		When("a space is not provided", func() {
-			When("there are no spaces in the org", func() {
-				BeforeEach(func() {
-					fakeActor.GetOrganizationSpacesReturns(
-						[]v7action.Space{},
-						v7action.Warnings{"get org spaces warning"},
-						nil)
-				})
-
-				It("does not perform any bindings and displays all warnings", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-
-					Expect(testUI.Out).NotTo(Say("Assigning security group"))
-					Expect(testUI.Out).NotTo(Say("OK"))
-
-					Expect(testUI.Err).To(Say("get security group warning"))
-					Expect(testUI.Err).To(Say("get org warning"))
-					Expect(testUI.Err).To(Say("get org spaces warning"))
-				})
-			})
-
 			When("there are spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
@@ -524,9 +504,9 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to each space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 

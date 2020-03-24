@@ -29,6 +29,23 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		return err
 	}
 
+	if cmd.Space == "" {
+		cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to all spaces in org {{.organization}} as {{.username}}...", map[string]interface{}{
+			"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
+			"security_group": cmd.RequiredArgs.SecurityGroupName,
+			"organization":   cmd.RequiredArgs.OrganizationName,
+			"username":       user.Name,
+		})
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+			"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
+			"security_group": cmd.RequiredArgs.SecurityGroupName,
+			"space":          cmd.Space,
+			"organization":   cmd.RequiredArgs.OrganizationName,
+			"username":       user.Name,
+		})
+	}
+
 	securityGroup, warnings, err := cmd.Actor.GetSecurityGroup(cmd.RequiredArgs.SecurityGroupName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -60,8 +77,15 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		spacesToBind = append(spacesToBind, spaces...)
 	}
 
+	if len(spacesToBind) == 0 {
+		cmd.UI.DisplayText("No spaces in org {{.organization}}.", map[string]interface{}{
+			"organization": org.Name,
+		})
+	}
+
 	for _, space := range spacesToBind {
-		cmd.UI.DisplayTextWithFlavor("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+			"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
 			"security_group": securityGroup.Name,
 			"space":          space.Name,
 			"organization":   org.Name,
