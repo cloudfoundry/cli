@@ -182,6 +182,7 @@ type Actor interface {
 	UpdateOrganizationQuota(quotaName string, newName string, limits v7action.QuotaLimits) (v7action.Warnings, error)
 	UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess v7action.Process) (v7action.Warnings, error)
 	UpdateRouteLabels(string, string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateSecurityGroupGloballyEnabled(securityGroupName string, lifecycle constant.SecurityGroupLifecycle, enabled bool) (v7action.Warnings, error)
 	UpdateServiceBroker(serviceBrokerGUID string, model v7action.ServiceBrokerModel) (v7action.Warnings, error)
 	UpdateServiceBrokerLabelsByServiceBrokerName(string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (v7action.Warnings, error)

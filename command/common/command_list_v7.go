@@ -182,7 +182,7 @@ type commandList struct {
 	UnbindRunningSecurityGroup         v6.UnbindRunningSecurityGroupCommand         `command:"unbind-running-security-group" description:"Unbind a security group from the set of security groups for running applications"`
 	UnbindSecurityGroup                v6.UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
 	UnbindService                      v6.UnbindServiceCommand                      `command:"unbind-service" alias:"us" description:"Unbind a service instance from an app"`
-	UnbindStagingSecurityGroup         v6.UnbindStagingSecurityGroupCommand         `command:"unbind-staging-security-group" description:"Unbind a security group from the set of security groups for staging applications"`
+	UnbindStagingSecurityGroup         v7.UnbindStagingSecurityGroupCommand         `command:"unbind-staging-security-group" description:"Unbind a security group from the set of security groups for staging applications globally"`
 	UninstallPlugin                    plugin.UninstallPluginCommand                `command:"uninstall-plugin" description:"Uninstall CLI plugin"`
 	UnmapRoute                         v7.UnmapRouteCommand                         `command:"unmap-route" description:"Remove a route from an app"`
 	UnsetEnv                           v7.UnsetEnvCommand                           `command:"unset-env" alias:"ue" description:"Remove an env variable from an app"`
