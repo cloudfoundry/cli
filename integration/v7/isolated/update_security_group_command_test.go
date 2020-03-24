@@ -125,7 +125,7 @@ var _ = Describe("update-security-group command", func() {
 		It("displays a an incorrect JSON format message and fails", func() {
 			session := helpers.CF("update-security-group", securityGroupName, updatedRulesPath)
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Incorrect json format: %s", updatedRulesPath))
+			Eventually(session.Err).Should(helpers.SayPath("Incorrect json format: %s", updatedRulesPath))
 			Eventually(session).Should(Exit(1))
 		})
 	})
