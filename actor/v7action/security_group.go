@@ -223,6 +223,31 @@ func (actor Actor) UpdateSecurityGroup(name, filePath string) (Warnings, error) 
 	return allWarnings, nil
 }
 
+func (actor Actor) UpdateSecurityGroupGloballyEnabled(securityGroupName string, lifecycle constant.SecurityGroupLifecycle, enabled bool) (Warnings, error) {
+	var allWarnings Warnings
+
+	securityGroup, warnings, err := actor.GetSecurityGroup(securityGroupName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	requestBody := resources.SecurityGroup{GUID: securityGroup.GUID}
+	switch lifecycle {
+	case constant.SecurityGroupLifecycleRunning:
+		requestBody.RunningGloballyEnabled = &enabled
+	case constant.SecurityGroupLifecycleStaging:
+		requestBody.StagingGloballyEnabled = &enabled
+	default:
+		return allWarnings, actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
+	}
+
+	_, ccv3Warnings, err := actor.CloudControllerClient.UpdateSecurityGroup(requestBody)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+
+	return allWarnings, err
+}
+
 func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpaceGUIDs []string) ([]SecurityGroupSpace, ccv3.Warnings, error) {
 	var warnings ccv3.Warnings
 	associatedSpaceGuids := runningSpaceGUIDs

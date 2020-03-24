@@ -1014,4 +1014,188 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 	})
+
+	Describe("UpdateSecurityGroupGloballyEnabled", func() {
+		var (
+			securityGroupName = "tom"
+			globallyEnabled   bool
+			lifeycle          constant.SecurityGroupLifecycle
+			executeErr        error
+
+			trueValue  = true
+			falseValue = false
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UpdateSecurityGroupGloballyEnabled(securityGroupName, lifeycle, globallyEnabled)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{
+						{
+							GUID: "some-security-group-guid",
+							Name: securityGroupName,
+						},
+					},
+					ccv3.Warnings{"warning-1"},
+					nil,
+				)
+
+				fakeCloudControllerClient.UpdateSecurityGroupReturns(
+					resources.SecurityGroup{},
+					ccv3.Warnings{"warning-2"},
+					nil,
+				)
+			})
+
+			When("updating staging to true", func() {
+				BeforeEach(func() {
+					lifeycle = constant.SecurityGroupLifecycleStaging
+					globallyEnabled = true
+				})
+
+				It("returns the warnings", func() {
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
+					Expect(query).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+					}))
+
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
+					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
+					Expect(args).To(Equal(resources.SecurityGroup{
+						GUID:                   "some-security-group-guid",
+						StagingGloballyEnabled: &trueValue,
+					}))
+
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(executeErr).NotTo(HaveOccurred())
+				})
+			})
+
+			When("updating staging to false", func() {
+				BeforeEach(func() {
+					lifeycle = constant.SecurityGroupLifecycleStaging
+					globallyEnabled = false
+				})
+
+				It("returns the warnings", func() {
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
+					Expect(query).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+					}))
+
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
+					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
+					Expect(args).To(Equal(resources.SecurityGroup{
+						GUID:                   "some-security-group-guid",
+						StagingGloballyEnabled: &falseValue,
+					}))
+
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(executeErr).NotTo(HaveOccurred())
+				})
+			})
+
+			When("updating running to true", func() {
+				BeforeEach(func() {
+					lifeycle = constant.SecurityGroupLifecycleRunning
+					globallyEnabled = true
+				})
+
+				It("returns the warnings", func() {
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
+					Expect(query).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+					}))
+
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
+					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
+					Expect(args).To(Equal(resources.SecurityGroup{
+						GUID:                   "some-security-group-guid",
+						RunningGloballyEnabled: &trueValue,
+					}))
+
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(executeErr).NotTo(HaveOccurred())
+				})
+			})
+
+			When("updating running to false", func() {
+				BeforeEach(func() {
+					lifeycle = constant.SecurityGroupLifecycleRunning
+					globallyEnabled = false
+				})
+
+				It("returns the warnings", func() {
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
+					Expect(query).To(Equal([]ccv3.Query{
+						{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+					}))
+
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
+					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
+					Expect(args).To(Equal(resources.SecurityGroup{
+						GUID:                   "some-security-group-guid",
+						RunningGloballyEnabled: &falseValue,
+					}))
+
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(executeErr).NotTo(HaveOccurred())
+				})
+			})
+		})
+
+		When("the request to get the security group errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					nil,
+					ccv3.Warnings{"warning-1"},
+					errors.New("get-group-error"),
+				)
+
+				fakeCloudControllerClient.UpdateSecurityGroupReturns(
+					resources.SecurityGroup{},
+					ccv3.Warnings{"warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(warnings).To(ConsistOf("warning-1"))
+				Expect(executeErr).To(MatchError("get-group-error"))
+			})
+		})
+
+		When("the request to update the security group errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{
+						{
+							GUID: "some-security-group-guid",
+							Name: securityGroupName,
+						},
+					},
+					ccv3.Warnings{"warning-1"},
+					nil,
+				)
+
+				fakeCloudControllerClient.UpdateSecurityGroupReturns(
+					resources.SecurityGroup{},
+					ccv3.Warnings{"warning-2"},
+					errors.New("update-group-error"),
+				)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(executeErr).To(MatchError("update-group-error"))
+			})
+		})
+	})
 })
