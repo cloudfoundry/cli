@@ -1153,6 +1153,9 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request to get the security group errors", func() {
 			BeforeEach(func() {
+				lifeycle = constant.SecurityGroupLifecycleRunning
+				globallyEnabled = false
+
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					nil,
 					ccv3.Warnings{"warning-1"},
@@ -1174,6 +1177,9 @@ var _ = Describe("Security Group Actions", func() {
 
 		When("the request to update the security group errors", func() {
 			BeforeEach(func() {
+				lifeycle = constant.SecurityGroupLifecycleRunning
+				globallyEnabled = false
+
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]resources.SecurityGroup{
 						{
