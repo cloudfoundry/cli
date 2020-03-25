@@ -63,7 +63,10 @@ resources:
   type: git
   icon: github-box
   source:
-    branch: cli-v7-capi-v3
+    # This branch should be a superset of the `cli-v7-capi-v3` branch
+    # It also contains test coverage for new v7 features
+    # Keep using this branch until those new tests are merged into master
+    branch: cli-v7-cats-new-features
     uri: https://github.com/cloudfoundry/cf-acceptance-tests.git
     ignore_paths:
     - ci/*.yml
