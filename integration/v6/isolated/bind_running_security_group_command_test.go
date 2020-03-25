@@ -36,12 +36,6 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
-	When("the environment is not setup correctly", func() {
-		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "bind-security-group", "security-group-name", "org-name", "space-name")
-		})
-	})
-
 	When("the input is invalid", func() {
 		When("the security group is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
@@ -78,7 +72,7 @@ var _ = Describe("bind-security-group command", func() {
 
 		It("binds the security group to the list of security groups for running apps", func() {
 			session := helpers.CF("bind-running-security-group", secGroupName)
-			Eventually(session).Should(Say(`Binding security group %s to defaults for running as admin`, secGroupName))
+			Eventually(session).Should(Say(`Binding security group %s to defaults for running`, secGroupName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Say(`TIP: Changes will not apply to existing running applications until they are restarted.`))
 			Eventually(session).Should(Exit(0))

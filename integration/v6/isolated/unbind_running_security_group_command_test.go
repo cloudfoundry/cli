@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("bind-security-group command", func() {
+var _ = Describe("unbind-security-group command", func() {
 	var (
 		secGroupName string
 	)
@@ -72,7 +72,7 @@ var _ = Describe("bind-security-group command", func() {
 
 		It("unbinds the security group to the list of security groups for running apps", func() {
 			session := helpers.CF("unbind-running-security-group", secGroupName)
-			Eventually(session).Should(Say(`Unbinding security group %s from defaults for running as admin`, secGroupName))
+			Eventually(session).Should(Say(`Unbinding security group %s from defaults for running`, secGroupName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Say(`TIP: Changes will not apply to existing running applications until they are restarted.`))
 			Eventually(session).Should(Exit(0))
