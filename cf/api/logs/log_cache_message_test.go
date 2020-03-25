@@ -25,10 +25,9 @@ var _ = Describe("log messages", func() {
 	)
 
 	logCacheMessage := logs.NewLogCacheMessage(fakeColorLogger, message)
-	fakeColorLogger = new(logsfakes.FakeColorLogger)
 
 	BeforeEach(func() {
-		fakeColorLogger := new(logsfakes.FakeColorLogger)
+		fakeColorLogger = new(logsfakes.FakeColorLogger)
 		message = *sharedaction.NewLogMessage(
 			"some-message",
 			"OUT",
@@ -37,6 +36,19 @@ var _ = Describe("log messages", func() {
 			"0",
 		)
 		logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
+
+		fakeColorLogger.LogStdoutColorCalls(func(data string) string {
+			return data
+		})
+
+		fakeColorLogger.LogStderrColorCalls(func(data string) string {
+			return data
+		})
+
+		fakeColorLogger.LogSysHeaderColorCalls(func(data string) string {
+			return data
+		})
+
 	})
 
 	Describe("ToSimpleLog", func() {
@@ -58,6 +70,7 @@ var _ = Describe("log messages", func() {
 				Expect(logCacheMessage.ToLog(time.FixedZone("TST", 1*60*60))).To(ContainSubstring("1970-01-01T01:00:00.00+0100"))
 			})
 		})
+
 		Context("sourceID sets the logHeader format", func() {
 			It("omits sourceID from the header when sourceID is empty", func() {
 				message = *sharedaction.NewLogMessage(
@@ -140,7 +153,7 @@ var _ = Describe("log messages", func() {
 			})
 		})
 
-		FContext("handles both STDERR and STDOUT", func() {
+		Context("handles both STDERR and STDOUT", func() {
 			It("correctly colors the STDOUT log message", func() {
 				message = *sharedaction.NewLogMessage(
 					"some-message",
@@ -158,6 +171,20 @@ var _ = Describe("log messages", func() {
 				Expect(fakeColorLogger.LogStderrColorCallCount()).To(Equal(0))
 			})
 			It("correctly colors the STDERR log message", func() {
+				message = *sharedaction.NewLogMessage(
+					"some-message",
+					"ERR",
+					time.Unix(0, 0),
+					"STG",
+					"1",
+				)
+				logCacheMessage = logs.NewLogCacheMessage(fakeColorLogger, message)
+				fakeColorLogger.LogSysHeaderColorReturns("colorized-header")
+				fakeColorLogger.LogStderrColorReturns("colorized-message")
+				Expect(logCacheMessage.ToLog(time.UTC)).To(Equal("colorized-header      colorized-message"))
+				Expect(fakeColorLogger.LogSysHeaderColorCallCount()).To(Equal(1))
+				Expect(fakeColorLogger.LogStdoutColorCallCount()).To(Equal(0))
+				Expect(fakeColorLogger.LogStderrColorCallCount()).To(Equal(1))
 			})
 		})
 
