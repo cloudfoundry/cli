@@ -1,6 +1,8 @@
 package logs
 
 import (
+	"context"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
@@ -21,15 +23,17 @@ func (t terminalColorLogger) LogStderrColor(message string) string {
 }
 
 type logCacheRepository struct {
-	client         sharedaction.LogCacheClient
-	recentLogsFunc func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error)
+	client               sharedaction.LogCacheClient
+	recentLogsFunc       func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error)
+	getStreamingLogsFunc func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc)
 }
 
 func NewLogCacheRepository(
 	client sharedaction.LogCacheClient,
 	recentLogsFunc func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error),
+	getStreamingLogsFunc func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc),
 ) *logCacheRepository {
-	return &logCacheRepository{client: client, recentLogsFunc: recentLogsFunc}
+	return &logCacheRepository{client: client, recentLogsFunc: recentLogsFunc, getStreamingLogsFunc: getStreamingLogsFunc}
 }
 
 func (r *logCacheRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
@@ -46,3 +50,39 @@ func (r *logCacheRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
 
 	return loggables, nil
 }
+
+func (r *logCacheRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
+	sharedaction.GetStreamingLogs(appGUID, r.client)
+}
+
+// func (repo *LogCacheRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
+//  messages, logErrs, stopStreaming := sharedaction.GetStreamingLogs(appGUID, repo.logCacheClient)
+// 	repo.cancelFunc = stopStreaming
+
+// 	defer close(logChan)
+// 	defer close(errChan)
+
+// 	c := make(chan os.Signal, 1)
+// 	signal.Notify(c, os.Interrupt)
+
+// 	for {
+// 		select {
+// 		case message, ok := <-messages:
+// 			if !ok {
+// 				return
+// 			}
+// 			logChan <- NewLogCacheMessage(&message)
+// 		case logErr, ok := <-logErrs:
+// 			if !ok {
+// 				return
+// 			}
+// 			errChan <- logErr
+// 		case <-c:
+// 			repo.cancelFunc()
+// 		}
+// 	}
+// }
+
+// func (repo *LogCacheRepository) Close() {
+// 	repo.cancelFunc()
+// }
