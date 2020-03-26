@@ -666,6 +666,7 @@ jobs:
       - integration-windows
       - integration-windows-client-creds
     - get: cf-acceptance-tests-v7
+      trigger: true
     - get: cf-deployment-concourse-tasks
     - get: cf-cli-binaries
       passed:
