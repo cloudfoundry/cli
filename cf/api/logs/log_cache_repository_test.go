@@ -79,8 +79,12 @@ var _ = Describe("logs with log cache", func() {
 			}
 
 			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
-				logMessages = make(chan sharedaction.LogMessage)
-				errors = make(chan error)
+				logMessages = make(chan sharedaction.LogMessage, 2)
+				errors = make(chan error, 2)
+
+				defer close(logMessages)
+				defer close(errors)
+
 				message := *sharedaction.NewLogMessage(
 					"some-message",
 					"OUT",
@@ -103,8 +107,8 @@ var _ = Describe("logs with log cache", func() {
 
 			client := sharedactionfakes.FakeLogCacheClient{}
 			repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
-			logChan := make(chan logs.Loggable)
-			errChan := make(chan error)
+			logChan := make(chan logs.Loggable, 2)
+			errChan := make(chan error, 2)
 			repository.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
 			fakeColorLogger := new(logsfakes.FakeColorLogger)

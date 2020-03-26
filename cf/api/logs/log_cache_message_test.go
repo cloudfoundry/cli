@@ -58,7 +58,7 @@ var _ = Describe("log messages", func() {
 	})
 
 	Describe("GetSourceName", func() {
-		It("returns the message", func() {
+		It("returns the source name", func() {
 			// TODO: reconsider whether this should return SourceType or SourceInstance
 			Expect(logCacheMessage.GetSourceName()).To(Equal("APP/PROC/WEB"))
 		})
