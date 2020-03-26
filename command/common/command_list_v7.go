@@ -34,7 +34,7 @@ type commandList struct {
 	Apps                               v7.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	Auth                               v7.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
-	BindRunningSecurityGroup           v6.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
+	BindRunningSecurityGroup           v7.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
 	BindSecurityGroup                  v7.BindSecurityGroupCommand                  `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`
 	BindService                        v6.BindServiceCommand                        `command:"bind-service" alias:"bs" description:"Bind a service instance to an app"`
 	BindStagingSecurityGroup           v7.BindStagingSecurityGroupCommand           `command:"bind-staging-security-group" description:"Bind a security group to the list of security groups to be used for staging applications globally"`
