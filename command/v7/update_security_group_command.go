@@ -73,5 +73,7 @@ func (cmd UpdateSecurityGroupCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
 	return nil
 }

@@ -77,6 +77,8 @@ var _ = Describe("update-security-group command", func() {
 	It("updates the security group", func() {
 		session := helpers.CF("update-security-group", securityGroupName, updatedRulesPath)
 		Eventually(session).Should(Say(`Updating security group %s as %s`, securityGroupName, username))
+		Eventually(session).Should(Say("OK"))
+		Eventually(session).Should(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications.`))
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("security-group", securityGroupName)
