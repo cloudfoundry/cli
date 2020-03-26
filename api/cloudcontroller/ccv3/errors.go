@@ -166,6 +166,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 		return ccerror.QuotaAlreadyExists{Message: err.Message}
 	case securityGroupExistsRegexp.MatchString(errorString):
 		return ccerror.SecurityGroupAlreadyExists{Message: err.Message}
+	case strings.Contains(errorString,
+		"Ensure the space is bound to this security group."):
+		return ccerror.SecurityGroupNotBound{Message: err.Message}
 	default:
 		return err
 	}

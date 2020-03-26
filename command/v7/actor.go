@@ -168,6 +168,7 @@ type Actor interface {
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	TerminateTask(taskGUID string) (v7action.Task, v7action.Warnings, error)
 	UAAAPIVersion() string
+	UnbindSecurityGroup(securityGroupName string, orgGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v7action.Warnings, error)
 	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
 	UnsetEnvironmentVariableByApplicationNameAndSpace(appName string, spaceGUID string, EnvironmentVariableName string) (v7action.Warnings, error)
 	UnsetSpaceQuota(spaceQuotaName, spaceName, orgGUID string) (v7action.Warnings, error)

@@ -2305,6 +2305,22 @@ type FakeActor struct {
 	uAAAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
+	UnbindSecurityGroupStub        func(string, string, string, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
+	unbindSecurityGroupMutex       sync.RWMutex
+	unbindSecurityGroupArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 constanta.SecurityGroupLifecycle
+	}
+	unbindSecurityGroupReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	unbindSecurityGroupReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UnmapRouteStub        func(string, string) (v7action.Warnings, error)
 	unmapRouteMutex       sync.RWMutex
 	unmapRouteArgsForCall []struct {
@@ -12570,6 +12586,72 @@ func (fake *FakeActor) UAAAPIVersionReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeActor) UnbindSecurityGroup(arg1 string, arg2 string, arg3 string, arg4 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
+	fake.unbindSecurityGroupMutex.Lock()
+	ret, specificReturn := fake.unbindSecurityGroupReturnsOnCall[len(fake.unbindSecurityGroupArgsForCall)]
+	fake.unbindSecurityGroupArgsForCall = append(fake.unbindSecurityGroupArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 constanta.SecurityGroupLifecycle
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UnbindSecurityGroup", []interface{}{arg1, arg2, arg3, arg4})
+	fake.unbindSecurityGroupMutex.Unlock()
+	if fake.UnbindSecurityGroupStub != nil {
+		return fake.UnbindSecurityGroupStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unbindSecurityGroupReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UnbindSecurityGroupCallCount() int {
+	fake.unbindSecurityGroupMutex.RLock()
+	defer fake.unbindSecurityGroupMutex.RUnlock()
+	return len(fake.unbindSecurityGroupArgsForCall)
+}
+
+func (fake *FakeActor) UnbindSecurityGroupCalls(stub func(string, string, string, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)) {
+	fake.unbindSecurityGroupMutex.Lock()
+	defer fake.unbindSecurityGroupMutex.Unlock()
+	fake.UnbindSecurityGroupStub = stub
+}
+
+func (fake *FakeActor) UnbindSecurityGroupArgsForCall(i int) (string, string, string, constanta.SecurityGroupLifecycle) {
+	fake.unbindSecurityGroupMutex.RLock()
+	defer fake.unbindSecurityGroupMutex.RUnlock()
+	argsForCall := fake.unbindSecurityGroupArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeActor) UnbindSecurityGroupReturns(result1 v7action.Warnings, result2 error) {
+	fake.unbindSecurityGroupMutex.Lock()
+	defer fake.unbindSecurityGroupMutex.Unlock()
+	fake.UnbindSecurityGroupStub = nil
+	fake.unbindSecurityGroupReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UnbindSecurityGroupReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.unbindSecurityGroupMutex.Lock()
+	defer fake.unbindSecurityGroupMutex.Unlock()
+	fake.UnbindSecurityGroupStub = nil
+	if fake.unbindSecurityGroupReturnsOnCall == nil {
+		fake.unbindSecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.unbindSecurityGroupReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UnmapRoute(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.unmapRouteMutex.Lock()
 	ret, specificReturn := fake.unmapRouteReturnsOnCall[len(fake.unmapRouteArgsForCall)]
@@ -14578,6 +14660,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.terminateTaskMutex.RUnlock()
 	fake.uAAAPIVersionMutex.RLock()
 	defer fake.uAAAPIVersionMutex.RUnlock()
+	fake.unbindSecurityGroupMutex.RLock()
+	defer fake.unbindSecurityGroupMutex.RUnlock()
 	fake.unmapRouteMutex.RLock()
 	defer fake.unmapRouteMutex.RUnlock()
 	fake.unsetEnvironmentVariableByApplicationNameAndSpaceMutex.RLock()
