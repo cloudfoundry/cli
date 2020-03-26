@@ -36,6 +36,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 			"organization":   cmd.RequiredArgs.OrganizationName,
 			"username":       user.Name,
 		})
+		cmd.UI.DisplayNewline()
 	} else {
 		cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
 			"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
@@ -84,13 +85,15 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	}
 
 	for _, space := range spacesToBind {
-		cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
-			"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
-			"security_group": securityGroup.Name,
-			"space":          space.Name,
-			"organization":   org.Name,
-			"username":       user.Name,
-		})
+		if len(spacesToBind) != 1 {
+			cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+				"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
+				"security_group": securityGroup.Name,
+				"space":          space.Name,
+				"organization":   org.Name,
+				"username":       user.Name,
+			})
+		}
 
 		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, constant.SecurityGroupLifecycle(cmd.Lifecycle))
 		cmd.UI.DisplayWarnings(warnings)
