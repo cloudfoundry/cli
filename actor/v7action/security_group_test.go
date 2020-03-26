@@ -9,6 +9,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -883,6 +884,146 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(warnings).To(ConsistOf("security-group-warning"))
 					Expect(executeErr).To(MatchError(expectedError))
 				})
+			})
+		})
+	})
+
+	Describe("UnbindSecurityGroup", func() {
+		var (
+			securityGroupName = "some-security-group"
+			orgName           = "some-org"
+			spaceName         = "some-space"
+			lifecycle         = constant.SecurityGroupLifecycleStaging
+			warnings          Warnings
+			executeErr        error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UnbindSecurityGroup(securityGroupName, orgName, spaceName, lifecycle)
+		})
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetOrganizationsReturns(
+				[]ccv3.Organization{{GUID: "some-org-guid"}},
+				ccv3.Warnings{"get-org-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]ccv3.Space{{GUID: "some-space-guid"}},
+				ccv3.IncludedResources{},
+				ccv3.Warnings{"get-space-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetSecurityGroupsReturns(
+				[]resources.SecurityGroup{{GUID: "some-security-group-guid"}},
+				ccv3.Warnings{"get-security-group-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceReturns(
+				ccv3.Warnings{"unbind-security-group-warning"},
+				nil,
+			)
+		})
+
+		When("all requests succeed", func() {
+			It("returns warnings and no error", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-org-warning", "get-space-warning", "get-security-group-warning", "unbind-security-group-warning"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				orgsQuery := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(orgsQuery).To(Equal([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{orgName}},
+				}))
+
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				spacesQuery := fakeCloudControllerClient.GetSpacesArgsForCall(0)
+				Expect(spacesQuery).To(Equal([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{spaceName}},
+					{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+				}))
+
+				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+				securityGroupsQuery := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
+				Expect(securityGroupsQuery).To(Equal([]ccv3.Query{
+					{Key: ccv3.NameFilter, Values: []string{securityGroupName}},
+				}))
+
+				Expect(fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceCallCount()).To(Equal(1))
+				givenSecurityGroupGUID, givenSpaceGUID := fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceArgsForCall(0)
+				Expect(givenSecurityGroupGUID).To(Equal("some-security-group-guid"))
+				Expect(givenSpaceGUID).To(Equal("some-space-guid"))
+			})
+		})
+
+		When("the seurity group is not bound to the space", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceReturns(
+					ccv3.Warnings{"get-security-group-warning"},
+					ccerror.SecurityGroupNotBound{},
+				)
+			})
+
+			It("returns warnings and an appropriate error", func() {
+				Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotBoundToSpaceError{
+					Name:      securityGroupName,
+					Lifecycle: lifecycle,
+				}))
+			})
+		})
+
+		When("getting the org fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{{}},
+					ccv3.Warnings{"get-org-warning"},
+					errors.New("org error"),
+				)
+			})
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("org error"))
+			})
+		})
+
+		When("getting the space fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]ccv3.Space{{}},
+					ccv3.IncludedResources{},
+					ccv3.Warnings{"get-space-warning"},
+					errors.New("space error"),
+				)
+			})
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("space error"))
+			})
+		})
+
+		When("getting the security group fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{{}},
+					ccv3.Warnings{"get-security-group-warning"},
+					errors.New("security group error"),
+				)
+			})
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("security group error"))
+			})
+		})
+
+		When("binding the security group fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UnbindSecurityGroupStagingSpaceReturns(
+					ccv3.Warnings{"get-security-group-warning"},
+					errors.New("security group unbind error"),
+				)
+			})
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("security group unbind error"))
 			})
 		})
 	})

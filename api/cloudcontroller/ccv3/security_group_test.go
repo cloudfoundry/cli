@@ -190,6 +190,70 @@ var _ = Describe("SecurityGroup", func() {
 		})
 	})
 
+	Describe("UnbindSecurityGroupRunningSpace", func() {
+		var (
+			spaceGUID         = "some-space-guid"
+			securityGroupGUID = "some-security-group-guid"
+			warnings          Warnings
+			executeErr        error
+		)
+
+		BeforeEach(func() {
+			requester.MakeRequestReturns(JobURL(""), Warnings{"some-warning"}, errors.New("some-error"))
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.UnbindSecurityGroupRunningSpace(securityGroupGUID, spaceGUID)
+		})
+
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			params := requester.MakeRequestArgsForCall(0)
+
+			Expect(params.RequestName).To(Equal(internal.DeleteSecurityGroupRunningSpaceRequest))
+			Expect(params.URIParams).To(Equal(internal.Params{
+				"security_group_guid": securityGroupGUID, "space_guid": spaceGUID,
+			}))
+		})
+
+		It("returns the resources and all warnings", func() {
+			Expect(executeErr).To(MatchError("some-error"))
+			Expect(warnings).To(Equal(Warnings{"some-warning"}))
+		})
+	})
+
+	Describe("UnbindSecurityGroupStagingSpace", func() {
+		var (
+			spaceGUID         = "some-space-guid"
+			securityGroupGUID = "some-security-group-guid"
+			warnings          Warnings
+			executeErr        error
+		)
+
+		BeforeEach(func() {
+			requester.MakeRequestReturns(JobURL(""), Warnings{"some-warning"}, errors.New("some-error"))
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.UnbindSecurityGroupStagingSpace(securityGroupGUID, spaceGUID)
+		})
+
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestCallCount()).To(Equal(1))
+			params := requester.MakeRequestArgsForCall(0)
+
+			Expect(params.RequestName).To(Equal(internal.DeleteSecurityGroupStagingSpaceRequest))
+			Expect(params.URIParams).To(Equal(internal.Params{
+				"security_group_guid": securityGroupGUID, "space_guid": spaceGUID,
+			}))
+		})
+
+		It("returns the resources and all warnings", func() {
+			Expect(executeErr).To(MatchError("some-error"))
+			Expect(warnings).To(Equal(Warnings{"some-warning"}))
+		})
+	})
+
 	Describe("UpdateSecurityGroupRunningSpace", func() {
 		var (
 			spaceGUID         = "some-space-guid"

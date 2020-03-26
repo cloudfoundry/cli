@@ -20,6 +20,8 @@ const (
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
 	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteRoleRequest                                           = "DeleteRoleRequest"
+	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
+	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
 	DeleteServicePlanVisibilityRequest                          = "DeleteServicePlanVisibility"
@@ -250,6 +252,8 @@ var APIRoutes = []Route{
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodPost, Name: PostSecurityGroupRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces", Method: http.MethodPost, Name: PostSecurityGroupStagingSpaceRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces", Method: http.MethodPost, Name: PostSecurityGroupRunningSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRunningSpaceRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodPatch, Name: PatchSecurityGroupRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},

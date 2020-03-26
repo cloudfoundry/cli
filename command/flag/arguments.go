@@ -161,6 +161,12 @@ type UnbindSecurityGroupArgs struct {
 	SpaceName         string `positional-arg-name:"SPACE" description:"The space name"`
 }
 
+type UnbindSecurityGroupV7Args struct {
+	SecurityGroupName string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group name"`
+	OrganizationName  string `positional-arg-name:"ORG" required:"true" description:"The organization group name"`
+	SpaceName         string `positional-arg-name:"SPACE" required:"true" description:"The space name"`
+}
+
 type FilesArgs struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	Path    string `positional-arg-name:"PATH" description:"The file path"`

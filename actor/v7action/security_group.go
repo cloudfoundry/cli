@@ -6,11 +6,9 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 )
 
@@ -167,6 +165,51 @@ func (actor Actor) GetSecurityGroups() ([]SecurityGroupSummary, Warnings, error)
 	}
 
 	return securityGroupSummaries, allWarnings, nil
+}
+
+func (actor Actor) UnbindSecurityGroup(securityGroupName string, orgName string, spaceName string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+	var allWarnings Warnings
+
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, org.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	securityGroup, warnings, err := actor.GetSecurityGroup(securityGroupName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	var ccv3Warnings ccv3.Warnings
+	switch lifecycle {
+	case constant.SecurityGroupLifecycleRunning:
+		ccv3Warnings, err = actor.CloudControllerClient.UnbindSecurityGroupRunningSpace(securityGroup.GUID, space.GUID)
+	case constant.SecurityGroupLifecycleStaging:
+		ccv3Warnings, err = actor.CloudControllerClient.UnbindSecurityGroupStagingSpace(securityGroup.GUID, space.GUID)
+	default:
+		return allWarnings, actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
+	}
+
+	allWarnings = append(allWarnings, ccv3Warnings...)
+
+	if err != nil {
+		if _, isNotBoundError := err.(ccerror.SecurityGroupNotBound); isNotBoundError {
+			return allWarnings, actionerror.SecurityGroupNotBoundToSpaceError{
+				Name:      securityGroupName,
+				Lifecycle: lifecycle,
+			}
+		}
+	}
+
+	return allWarnings, err
 }
 
 func (actor Actor) GetGlobalStagingSecurityGroups() ([]resources.SecurityGroup, Warnings, error) {
