@@ -1,4 +1,4 @@
-package isolated
+package global
 
 import (
 	"encoding/json"
