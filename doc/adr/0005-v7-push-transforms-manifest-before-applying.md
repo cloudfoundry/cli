@@ -1,4 +1,4 @@
-# 4. V7 `cf push` Transforms Manifest Before Applying
+# 5. V7 `cf push` Transforms Manifest Before Applying
 
 Date: 2019-09-16
 
