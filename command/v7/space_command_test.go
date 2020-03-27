@@ -212,6 +212,22 @@ var _ = Describe("space command", func() {
 					stagingSecurityGroup.Name, stagingSecurityGroup.Rules[0].Destination, ports, stagingSecurityGroup.Rules[0].Protocol, "staging", "",
 				))
 			})
+
+			When("there are no security groups to show", func() {
+				BeforeEach(func() {
+					fakeActor.GetSpaceSummaryByNameAndOrganizationReturns(
+						v7action.SpaceSummary{},
+						v7action.Warnings{"some-warning"},
+						nil,
+					)
+				})
+
+				It("displays an empty message", func() {
+					Expect(testUI.Out).To(Say(`running security groups:\s*\n`))
+					Expect(testUI.Out).To(Say(`staging security groups:\s*\n`))
+					Expect(testUI.Out).To(Say("No security group rules found."))
+				})
+			})
 		})
 
 		When("fetching the space summary succeeds with an isolation segment", func() {
