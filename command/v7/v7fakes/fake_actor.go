@@ -246,6 +246,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	CreateIsolationSegmentByNameStub        func(v7action.IsolationSegment) (v7action.Warnings, error)
+	createIsolationSegmentByNameMutex       sync.RWMutex
+	createIsolationSegmentByNameArgsForCall []struct {
+		arg1 v7action.IsolationSegment
+	}
+	createIsolationSegmentByNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	createIsolationSegmentByNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	CreateOrgRoleStub        func(constanta.RoleType, string, string, string, bool) (v7action.Warnings, error)
 	createOrgRoleMutex       sync.RWMutex
 	createOrgRoleArgsForCall []struct {
@@ -3714,6 +3727,69 @@ func (fake *FakeActor) CreateDockerPackageByApplicationNameAndSpaceReturnsOnCall
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CreateIsolationSegmentByName(arg1 v7action.IsolationSegment) (v7action.Warnings, error) {
+	fake.createIsolationSegmentByNameMutex.Lock()
+	ret, specificReturn := fake.createIsolationSegmentByNameReturnsOnCall[len(fake.createIsolationSegmentByNameArgsForCall)]
+	fake.createIsolationSegmentByNameArgsForCall = append(fake.createIsolationSegmentByNameArgsForCall, struct {
+		arg1 v7action.IsolationSegment
+	}{arg1})
+	fake.recordInvocation("CreateIsolationSegmentByName", []interface{}{arg1})
+	fake.createIsolationSegmentByNameMutex.Unlock()
+	if fake.CreateIsolationSegmentByNameStub != nil {
+		return fake.CreateIsolationSegmentByNameStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createIsolationSegmentByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) CreateIsolationSegmentByNameCallCount() int {
+	fake.createIsolationSegmentByNameMutex.RLock()
+	defer fake.createIsolationSegmentByNameMutex.RUnlock()
+	return len(fake.createIsolationSegmentByNameArgsForCall)
+}
+
+func (fake *FakeActor) CreateIsolationSegmentByNameCalls(stub func(v7action.IsolationSegment) (v7action.Warnings, error)) {
+	fake.createIsolationSegmentByNameMutex.Lock()
+	defer fake.createIsolationSegmentByNameMutex.Unlock()
+	fake.CreateIsolationSegmentByNameStub = stub
+}
+
+func (fake *FakeActor) CreateIsolationSegmentByNameArgsForCall(i int) v7action.IsolationSegment {
+	fake.createIsolationSegmentByNameMutex.RLock()
+	defer fake.createIsolationSegmentByNameMutex.RUnlock()
+	argsForCall := fake.createIsolationSegmentByNameArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) CreateIsolationSegmentByNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.createIsolationSegmentByNameMutex.Lock()
+	defer fake.createIsolationSegmentByNameMutex.Unlock()
+	fake.CreateIsolationSegmentByNameStub = nil
+	fake.createIsolationSegmentByNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) CreateIsolationSegmentByNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.createIsolationSegmentByNameMutex.Lock()
+	defer fake.createIsolationSegmentByNameMutex.Unlock()
+	fake.CreateIsolationSegmentByNameStub = nil
+	if fake.createIsolationSegmentByNameReturnsOnCall == nil {
+		fake.createIsolationSegmentByNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.createIsolationSegmentByNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) CreateOrgRole(arg1 constanta.RoleType, arg2 string, arg3 string, arg4 string, arg5 bool) (v7action.Warnings, error) {
@@ -14390,6 +14466,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
 	defer fake.createDockerPackageByApplicationNameAndSpaceMutex.RUnlock()
+	fake.createIsolationSegmentByNameMutex.RLock()
+	defer fake.createIsolationSegmentByNameMutex.RUnlock()
 	fake.createOrgRoleMutex.RLock()
 	defer fake.createOrgRoleMutex.RUnlock()
 	fake.createOrganizationMutex.RLock()

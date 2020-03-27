@@ -47,7 +47,7 @@ type commandList struct {
 	CreateAppManifest                  v7.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	CreateBuildpack                    v7.CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
 	CreatePackage                      v7.CreatePackageCommand                      `command:"create-package" description:"Uploads a Package"`
-	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
+	CreateIsolationSegment             v7.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
 	CreateOrg                          v7.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
 	CreateOrgQuota                     v7.CreateOrgQuotaCommand                     `command:"create-org-quota" description:"Define a new quota for an organization"`
 	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" description:"Create a private domain for a specific org"`
