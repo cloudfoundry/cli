@@ -20,13 +20,14 @@ import (
 
 var _ = Describe("bind-security-group Command", func() {
 	var (
-		cmd             BindSecurityGroupCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeActor
-		binaryName      string
-		executeErr      error
+		cmd                     BindSecurityGroupCommand
+		testUI                  *ui.UI
+		fakeConfig              *commandfakes.FakeConfig
+		fakeSharedActor         *commandfakes.FakeSharedActor
+		fakeActor               *v7fakes.FakeActor
+		binaryName              string
+		executeErr              error
+		getSecurityGroupWarning v7action.Warnings
 	)
 
 	BeforeEach(func() {
@@ -34,6 +35,7 @@ var _ = Describe("bind-security-group Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
+		getSecurityGroupWarning = v7action.Warnings{"get security group warning"}
 
 		cmd = BindSecurityGroupCommand{
 			BaseCommand: BaseCommand{
@@ -56,7 +58,7 @@ var _ = Describe("bind-security-group Command", func() {
 			nil)
 		fakeActor.GetSecurityGroupReturns(
 			resources.SecurityGroup{Name: "some-security-group", GUID: "some-security-group-guid"},
-			v7action.Warnings{"get security group warning"},
+			getSecurityGroupWarning,
 			nil)
 		fakeActor.GetOrganizationByNameReturns(
 			v7action.Organization{Name: "some-org", GUID: "some-org-guid"},
@@ -103,19 +105,14 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		When("the provided security group does not exist", func() {
-			BeforeEach(func() {
-				fakeActor.GetSecurityGroupReturns(
-					resources.SecurityGroup{},
-					v7action.Warnings{"get security group warning"},
-					actionerror.SecurityGroupNotFoundError{Name: "some-security-group"})
-			})
+		It("Retrieves the security group information", func() {
+			Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
+			securityGroupName := fakeActor.GetSecurityGroupArgsForCall(0)
+			Expect(securityGroupName).To(Equal(cmd.RequiredArgs.SecurityGroupName))
+		})
 
-			It("returns a SecurityGroupNotFoundError and displays all warnings", func() {
-				Expect(testUI.Out).To(Say("Assigning running security group %s to all spaces in org %s as some-user...", cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName))
-				Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
-				Expect(testUI.Err).To(Say("get security group warning"))
-			})
+		It("prints the warnings", func() {
+			Expect(testUI.Err).To(Say(getSecurityGroupWarning[0]))
 		})
 
 		When("an error is encountered getting the provided security group", func() {
@@ -131,7 +128,6 @@ var _ = Describe("bind-security-group Command", func() {
 
 			It("returns the error and displays all warnings", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(testUI.Err).To(Say("get security group warning"))
 			})
 		})
 
