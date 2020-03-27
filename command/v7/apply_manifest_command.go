@@ -34,7 +34,8 @@ func (cmd *ApplyManifestCommand) Setup(config command.Config, ui command.UI) err
 	}
 	cmd.CWD = currentDir
 
-	return cmd.BaseCommand.Setup(config, ui)
+	_, _, err = cmd.BaseCommand.Setup(config, ui)
+	return err
 }
 
 func (cmd ApplyManifestCommand) Execute(args []string) error {

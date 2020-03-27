@@ -27,7 +27,8 @@ type CreateBuildpackCommand struct {
 
 func (cmd *CreateBuildpackCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.ProgressBar = v7action.NewProgressBar()
-	return cmd.BaseCommand.Setup(config, ui)
+	_, _, err := cmd.BaseCommand.Setup(config, ui)
+	return err
 }
 
 func (cmd CreateBuildpackCommand) Execute(args []string) error {

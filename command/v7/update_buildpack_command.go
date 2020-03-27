@@ -44,7 +44,8 @@ type UpdateBuildpackCommand struct {
 
 func (cmd *UpdateBuildpackCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.ProgressBar = v7action.NewProgressBar()
-	return cmd.BaseCommand.Setup(config, ui)
+	_, _, err := cmd.BaseCommand.Setup(config, ui)
+	return err
 }
 
 func (cmd UpdateBuildpackCommand) Execute(args []string) error {

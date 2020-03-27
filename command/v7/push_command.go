@@ -105,7 +105,7 @@ type PushCommand struct {
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
-	err := cmd.BaseCommand.Setup(config, ui)
+	_, _, err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}
