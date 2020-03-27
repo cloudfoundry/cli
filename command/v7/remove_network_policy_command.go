@@ -3,10 +3,13 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . RemoveNetworkPolicyActor
@@ -16,8 +19,6 @@ type RemoveNetworkPolicyActor interface {
 }
 
 type RemoveNetworkPolicyCommand struct {
-	BaseCommand
-
 	RequiredArgs     flag.RemoveNetworkPolicyArgs `positional-args:"yes"`
 	DestinationApp   string                       `long:"destination-app" required:"true" description:"Name of app to connect to"`
 	Port             flag.NetworkPort             `long:"port" required:"true" description:"Port or range of ports that destination app is connected with"`
@@ -28,14 +29,25 @@ type RemoveNetworkPolicyCommand struct {
 	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend --destination-app backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, add-network-policy"`
 
+	UI              command.UI
+	Config          command.Config
+	SharedActor     command.SharedActor
 	NetworkingActor RemoveNetworkPolicyActor
+	Actor           Actor
 }
 
 func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, uaaClient, err := cmd.BaseCommand.Setup(config, ui)
+	cmd.UI = ui
+	cmd.Config = config
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
+	actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	cmd.Actor = actor
 
 	networkingClient, err := shared.NewNetworkingClient(ccClient.NetworkPolicyV1(), config, uaaClient, ui)
 	if err != nil {

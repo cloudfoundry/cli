@@ -17,32 +17,30 @@ import (
 
 var _ = Describe("network-policies Command", func() {
 	var (
-		cmd                 NetworkPoliciesCommand
-		testUI              *ui.UI
-		fakeConfig          *commandfakes.FakeConfig
-		fakeSharedActor     *commandfakes.FakeSharedActor
-		fakeNetworkingActor *v7fakes.FakeNetworkPoliciesActor
-		binaryName          string
-		executeErr          error
-		srcApp              string
+		cmd             NetworkPoliciesCommand
+		testUI          *ui.UI
+		fakeConfig      *commandfakes.FakeConfig
+		fakeSharedActor *commandfakes.FakeSharedActor
+		fakeActor       *v7fakes.FakeNetworkPoliciesActor
+		binaryName      string
+		executeErr      error
+		srcApp          string
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeNetworkingActor = new(v7fakes.FakeNetworkPoliciesActor)
+		fakeActor = new(v7fakes.FakeNetworkPoliciesActor)
 
 		srcApp = ""
 
 		cmd = NetworkPoliciesCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-			},
-			SourceApp:       srcApp,
-			NetworkingActor: fakeNetworkingActor,
+			UI:          testUI,
+			SourceApp:   srcApp,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"
@@ -91,7 +89,7 @@ var _ = Describe("network-policies Command", func() {
 
 		When("listing policies is successful", func() {
 			BeforeEach(func() {
-				fakeNetworkingActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{
+				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{
 					{
 						SourceName:           "app1",
 						DestinationName:      "app2",
@@ -114,8 +112,8 @@ var _ = Describe("network-policies Command", func() {
 
 			It("lists the policies when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeNetworkingActor.NetworkPoliciesBySpaceCallCount()).To(Equal(1))
-				passedSpaceGuid := fakeNetworkingActor.NetworkPoliciesBySpaceArgsForCall(0)
+				Expect(fakeActor.NetworkPoliciesBySpaceCallCount()).To(Equal(1))
+				passedSpaceGuid := fakeActor.NetworkPoliciesBySpaceArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 
 				Expect(testUI.Out).To(Say(`Listing network policies in org some-org / space some-space as some-user\.\.\.`))
@@ -131,7 +129,7 @@ var _ = Describe("network-policies Command", func() {
 			When("a source app name is passed", func() {
 				BeforeEach(func() {
 					cmd.SourceApp = "some-app"
-					fakeNetworkingActor.NetworkPoliciesBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
+					fakeActor.NetworkPoliciesBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
 						{
 							SourceName:           "app1",
 							DestinationName:      "app2",
@@ -154,8 +152,8 @@ var _ = Describe("network-policies Command", func() {
 
 				It("lists the policies when no error occurs", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeNetworkingActor.NetworkPoliciesBySpaceAndAppNameCallCount()).To(Equal(1))
-					passedSpaceGuid, passedSrcAppName := fakeNetworkingActor.NetworkPoliciesBySpaceAndAppNameArgsForCall(0)
+					Expect(fakeActor.NetworkPoliciesBySpaceAndAppNameCallCount()).To(Equal(1))
+					passedSpaceGuid, passedSrcAppName := fakeActor.NetworkPoliciesBySpaceAndAppNameArgsForCall(0)
 					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 					Expect(passedSrcAppName).To(Equal("some-app"))
 
@@ -173,7 +171,7 @@ var _ = Describe("network-policies Command", func() {
 
 		When("listing the policies is not successful", func() {
 			BeforeEach(func() {
-				fakeNetworkingActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
+				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("displays warnings and returns the error", func() {

@@ -22,8 +22,7 @@ type CreatePackageCommand struct {
 
 func (cmd *CreatePackageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.PackageDisplayer = shared.NewPackageDisplayer(ui, config)
-	_, _, err := cmd.BaseCommand.Setup(config, ui)
-	return err
+	return cmd.BaseCommand.Setup(config, ui)
 }
 
 func (cmd CreatePackageCommand) Execute(args []string) error {

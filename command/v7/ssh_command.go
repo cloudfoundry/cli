@@ -37,7 +37,7 @@ type SSHCommand struct {
 }
 
 func (cmd *SSHCommand) Setup(config command.Config, ui command.UI) error {
-	_, _, err := cmd.BaseCommand.Setup(config, ui)
+	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}

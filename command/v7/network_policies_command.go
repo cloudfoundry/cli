@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -18,18 +19,24 @@ type NetworkPoliciesActor interface {
 }
 
 type NetworkPoliciesCommand struct {
-	BaseCommand
-
 	SourceApp string `long:"source" required:"false" description:"Source app to filter results by"`
 
 	usage           interface{} `usage:"CF_NAME network-policies [--source SOURCE_APP]"`
 	relatedCommands interface{} `related_commands:"add-network-policy, apps, remove-network-policy"`
 
-	NetworkingActor NetworkPoliciesActor
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+
+	Actor NetworkPoliciesActor
 }
 
 func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient, uaaClient, err := cmd.BaseCommand.Setup(config, ui)
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor(config)
+
+	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
@@ -38,7 +45,7 @@ func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) e
 	if err != nil {
 		return err
 	}
-	cmd.NetworkingActor = cfnetworkingaction.NewActor(networkingClient, ccClient)
+	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, ccClient)
 
 	return nil
 }
@@ -64,14 +71,14 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 			"Space":      cmd.Config.TargetedSpace().Name,
 			"User":       user.Name,
 		})
-		policies, warnings, err = cmd.NetworkingActor.NetworkPoliciesBySpaceAndAppName(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
+		policies, warnings, err = cmd.Actor.NetworkPoliciesBySpaceAndAppName(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
 	} else {
 		cmd.UI.DisplayTextWithFlavor("Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
 			"Org":   cmd.Config.TargetedOrganization().Name,
 			"Space": cmd.Config.TargetedSpace().Name,
 			"User":  user.Name,
 		})
-		policies, warnings, err = cmd.NetworkingActor.NetworkPoliciesBySpace(cmd.Config.TargetedSpace().GUID)
+		policies, warnings, err = cmd.Actor.NetworkPoliciesBySpace(cmd.Config.TargetedSpace().GUID)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)

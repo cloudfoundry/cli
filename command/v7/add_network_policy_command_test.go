@@ -23,7 +23,7 @@ var _ = Describe("add-network-policy Command", func() {
 		fakeConfig          *commandfakes.FakeConfig
 		fakeSharedActor     *commandfakes.FakeSharedActor
 		fakeNetworkingActor *v7fakes.FakeNetworkingActor
-		fakeActor           *v7fakes.FakeActor
+		fakeActor           *v7fakes.FakeAddNetworkPolicyActor
 		binaryName          string
 		executeErr          error
 		srcApp              string
@@ -38,7 +38,7 @@ var _ = Describe("add-network-policy Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeNetworkingActor = new(v7fakes.FakeNetworkingActor)
-		fakeActor = new(v7fakes.FakeActor)
+		fakeActor = new(v7fakes.FakeAddNetworkPolicyActor)
 
 		srcApp = "some-app"
 		destApp = "some-other-app"
@@ -47,13 +47,11 @@ var _ = Describe("add-network-policy Command", func() {
 		space = ""
 
 		cmd = AddNetworkPolicyCommand{
-			BaseCommand: BaseCommand{
-				UI:          testUI,
-				Config:      fakeConfig,
-				SharedActor: fakeSharedActor,
-				Actor:       fakeActor,
-			},
+			UI:               testUI,
+			Config:           fakeConfig,
+			SharedActor:      fakeSharedActor,
 			NetworkingActor:  fakeNetworkingActor,
+			Actor:            fakeActor,
 			RequiredArgs:     flag.AddNetworkPolicyArgs{SourceApp: srcApp},
 			DestinationApp:   destApp,
 			DestinationSpace: space,
