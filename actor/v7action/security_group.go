@@ -292,6 +292,21 @@ func (actor Actor) UpdateSecurityGroupGloballyEnabled(securityGroupName string, 
 	return allWarnings, err
 }
 
+func (actor Actor) DeleteSecurityGroup(securityGroupName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	securityGroup, warnings, err := actor.GetSecurityGroup(securityGroupName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	ccv3Warnings, err := actor.CloudControllerClient.DeleteSecurityGroup(securityGroup.GUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+
+	return allWarnings, err
+}
+
 func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpaceGUIDs []string) ([]SecurityGroupSpace, ccv3.Warnings, error) {
 	var warnings ccv3.Warnings
 	associatedSpaceGuids := runningSpaceGUIDs

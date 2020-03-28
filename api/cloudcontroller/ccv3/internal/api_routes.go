@@ -20,6 +20,7 @@ const (
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
 	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteRoleRequest                                           = "DeleteRoleRequest"
+	DeleteSecurityGroupRequest                                  = "DeleteSecurityGroup"
 	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
 	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
@@ -250,6 +251,7 @@ var APIRoutes = []Route{
 	{Resource: RolesResource, Path: "/:role_guid", Method: http.MethodDelete, Name: DeleteRoleRequest},
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodPost, Name: PostSecurityGroupRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces", Method: http.MethodPost, Name: PostSecurityGroupStagingSpaceRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces", Method: http.MethodPost, Name: PostSecurityGroupRunningSpaceRequest},
 	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},

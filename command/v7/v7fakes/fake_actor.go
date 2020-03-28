@@ -573,6 +573,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	DeleteSecurityGroupStub        func(string) (v7action.Warnings, error)
+	deleteSecurityGroupMutex       sync.RWMutex
+	deleteSecurityGroupArgsForCall []struct {
+		arg1 string
+	}
+	deleteSecurityGroupReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	deleteSecurityGroupReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	DeleteServiceBrokerStub        func(string) (v7action.Warnings, error)
 	deleteServiceBrokerMutex       sync.RWMutex
 	deleteServiceBrokerArgsForCall []struct {
@@ -5155,6 +5168,69 @@ func (fake *FakeActor) DeleteRouteReturnsOnCall(i int, result1 v7action.Warnings
 		})
 	}
 	fake.deleteRouteReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteSecurityGroup(arg1 string) (v7action.Warnings, error) {
+	fake.deleteSecurityGroupMutex.Lock()
+	ret, specificReturn := fake.deleteSecurityGroupReturnsOnCall[len(fake.deleteSecurityGroupArgsForCall)]
+	fake.deleteSecurityGroupArgsForCall = append(fake.deleteSecurityGroupArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteSecurityGroup", []interface{}{arg1})
+	fake.deleteSecurityGroupMutex.Unlock()
+	if fake.DeleteSecurityGroupStub != nil {
+		return fake.DeleteSecurityGroupStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteSecurityGroupReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) DeleteSecurityGroupCallCount() int {
+	fake.deleteSecurityGroupMutex.RLock()
+	defer fake.deleteSecurityGroupMutex.RUnlock()
+	return len(fake.deleteSecurityGroupArgsForCall)
+}
+
+func (fake *FakeActor) DeleteSecurityGroupCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.deleteSecurityGroupMutex.Lock()
+	defer fake.deleteSecurityGroupMutex.Unlock()
+	fake.DeleteSecurityGroupStub = stub
+}
+
+func (fake *FakeActor) DeleteSecurityGroupArgsForCall(i int) string {
+	fake.deleteSecurityGroupMutex.RLock()
+	defer fake.deleteSecurityGroupMutex.RUnlock()
+	argsForCall := fake.deleteSecurityGroupArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) DeleteSecurityGroupReturns(result1 v7action.Warnings, result2 error) {
+	fake.deleteSecurityGroupMutex.Lock()
+	defer fake.deleteSecurityGroupMutex.Unlock()
+	fake.DeleteSecurityGroupStub = nil
+	fake.deleteSecurityGroupReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteSecurityGroupReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.deleteSecurityGroupMutex.Lock()
+	defer fake.deleteSecurityGroupMutex.Unlock()
+	fake.DeleteSecurityGroupStub = nil
+	if fake.deleteSecurityGroupReturnsOnCall == nil {
+		fake.deleteSecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.deleteSecurityGroupReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -14510,6 +14586,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteOrphanedRoutesMutex.RUnlock()
 	fake.deleteRouteMutex.RLock()
 	defer fake.deleteRouteMutex.RUnlock()
+	fake.deleteSecurityGroupMutex.RLock()
+	defer fake.deleteSecurityGroupMutex.RUnlock()
 	fake.deleteServiceBrokerMutex.RLock()
 	defer fake.deleteServiceBrokerMutex.RUnlock()
 	fake.deleteSpaceByNameAndOrganizationNameMutex.RLock()

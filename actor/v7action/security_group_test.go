@@ -1346,4 +1346,77 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 	})
+
+	Describe("DeleteSecurityGroup", func() {
+		var securityGroupName = "elsa"
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DeleteSecurityGroup(securityGroupName)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{
+						{
+							GUID: "some-security-group-guid",
+							Name: securityGroupName,
+						},
+					},
+					ccv3.Warnings{"warning-1"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteSecurityGroupReturns(
+					ccv3.Warnings{"warning-2"},
+					nil,
+				)
+			})
+
+			When("the request to get the security group errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSecurityGroupsReturns(
+						nil,
+						ccv3.Warnings{"warning-1"},
+						errors.New("get-group-error"),
+					)
+
+					fakeCloudControllerClient.DeleteSecurityGroupReturns(
+						ccv3.Warnings{"warning-2"},
+						nil,
+					)
+				})
+
+				It("returns the warnings and error", func() {
+					Expect(warnings).To(ConsistOf("warning-1"))
+					Expect(executeErr).To(MatchError("get-group-error"))
+				})
+			})
+		})
+
+		When("the request to delete the security group errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]resources.SecurityGroup{
+						{
+							GUID: "some-security-group-guid",
+							Name: securityGroupName,
+						},
+					},
+					ccv3.Warnings{"warning-1"},
+					nil,
+				)
+
+				fakeCloudControllerClient.DeleteSecurityGroupReturns(
+					ccv3.Warnings{"warning-2"},
+					errors.New("delete-group-error"),
+				)
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(executeErr).To(MatchError("delete-group-error"))
+			})
+		})
+	})
 })
