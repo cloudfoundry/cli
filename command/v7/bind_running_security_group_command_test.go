@@ -104,7 +104,7 @@ var _ = Describe("bind-running-security-group Command", func() {
 
 	It("signals that the security group is bound and provides a helpful tip", func() {
 		Expect(testUI.Out).To(Say("OK"))
-		Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for running\) to apply to existing applications\.`))
+		Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 		Expect(testUI.Err).To(Say("globally bind security group warning"))
 		Expect(executeErr).NotTo(HaveOccurred())
 	})
