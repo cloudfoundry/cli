@@ -301,9 +301,14 @@ func (actor Actor) DeleteSecurityGroup(securityGroupName string) (Warnings, erro
 		return allWarnings, err
 	}
 
-	ccv3Warnings, err := actor.CloudControllerClient.DeleteSecurityGroup(securityGroup.GUID)
+	jobURL, ccv3Warnings, err := actor.CloudControllerClient.DeleteSecurityGroup(securityGroup.GUID)
 	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
 
+	pollingWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, pollingWarnings...)
 	return allWarnings, err
 }
 

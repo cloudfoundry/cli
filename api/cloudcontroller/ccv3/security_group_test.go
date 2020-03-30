@@ -369,16 +369,17 @@ var _ = Describe("SecurityGroup", func() {
 	Describe("DeleteSecurityGroup", func() {
 		var (
 			securityGroupGUID = "some-security-group-guid"
+			jobURL            JobURL
 			warnings          Warnings
 			executeErr        error
 		)
 
 		BeforeEach(func() {
-			requester.MakeRequestReturns(JobURL(""), Warnings{"some-warning"}, errors.New("some-error"))
+			requester.MakeRequestReturns(JobURL("some-job-url"), Warnings{"some-warning"}, errors.New("some-error"))
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.DeleteSecurityGroup(securityGroupGUID)
+			jobURL, warnings, executeErr = client.DeleteSecurityGroup(securityGroupGUID)
 		})
 
 		It("makes the correct request", func() {
@@ -389,9 +390,10 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
 		})
 
-		It("returns all warnings", func() {
+		It("returns all warnings and a job url", func() {
 			Expect(executeErr).To(MatchError("some-error"))
 			Expect(warnings).To(Equal(Warnings{"some-warning"}))
+			Expect(jobURL).To(Equal(JobURL("some-job-url")))
 		})
 	})
 })

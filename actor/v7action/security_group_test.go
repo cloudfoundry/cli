@@ -1368,29 +1368,53 @@ var _ = Describe("Security Group Actions", func() {
 				)
 
 				fakeCloudControllerClient.DeleteSecurityGroupReturns(
+					ccv3.JobURL("https://jobs/job_guid"),
+					ccv3.Warnings{"warning-2"},
+					nil,
+				)
+
+				fakeCloudControllerClient.PollJobReturns(
+					ccv3.Warnings{"warning-3"},
+					nil,
+				)
+			})
+
+			It("deletes the security group asynchronously", func() {
+				// Delete the security group asynchronously
+				Expect(fakeCloudControllerClient.DeleteSecurityGroupCallCount()).To(Equal(1))
+				passedSecurityGroupGuid := fakeCloudControllerClient.DeleteSecurityGroupArgsForCall(0)
+				Expect(passedSecurityGroupGuid).To(Equal("some-security-group-guid"))
+
+				// Poll the delete job
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				responseJobUrl := fakeCloudControllerClient.PollJobArgsForCall(0)
+				Expect(responseJobUrl).To(Equal(ccv3.JobURL("https://jobs/job_guid")))
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3"))
+				Expect(executeErr).To(BeNil())
+			})
+		})
+
+		When("the request to get the security group errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					nil,
+					ccv3.Warnings{"warning-1"},
+					errors.New("get-group-error"),
+				)
+
+				fakeCloudControllerClient.DeleteSecurityGroupReturns(
+					ccv3.JobURL(""),
 					ccv3.Warnings{"warning-2"},
 					nil,
 				)
 			})
 
-			When("the request to get the security group errors", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetSecurityGroupsReturns(
-						nil,
-						ccv3.Warnings{"warning-1"},
-						errors.New("get-group-error"),
-					)
-
-					fakeCloudControllerClient.DeleteSecurityGroupReturns(
-						ccv3.Warnings{"warning-2"},
-						nil,
-					)
-				})
-
-				It("returns the warnings and error", func() {
-					Expect(warnings).To(ConsistOf("warning-1"))
-					Expect(executeErr).To(MatchError("get-group-error"))
-				})
+			It("returns the warnings and error", func() {
+				Expect(warnings).To(ConsistOf("warning-1"))
+				Expect(executeErr).To(MatchError("get-group-error"))
 			})
 		})
 
@@ -1408,6 +1432,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 
 				fakeCloudControllerClient.DeleteSecurityGroupReturns(
+					ccv3.JobURL(""),
 					ccv3.Warnings{"warning-2"},
 					errors.New("delete-group-error"),
 				)

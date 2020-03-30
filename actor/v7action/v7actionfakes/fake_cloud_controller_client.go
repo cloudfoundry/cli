@@ -554,18 +554,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	DeleteSecurityGroupStub        func(string) (ccv3.Warnings, error)
+	DeleteSecurityGroupStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteSecurityGroupMutex       sync.RWMutex
 	deleteSecurityGroupArgsForCall []struct {
 		arg1 string
 	}
 	deleteSecurityGroupReturns struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	deleteSecurityGroupReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
 	}
 	DeleteServiceBrokerStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteServiceBrokerMutex       sync.RWMutex
@@ -4657,7 +4659,7 @@ func (fake *FakeCloudControllerClient) DeleteRouteReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteSecurityGroup(arg1 string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) DeleteSecurityGroup(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.deleteSecurityGroupMutex.Lock()
 	ret, specificReturn := fake.deleteSecurityGroupReturnsOnCall[len(fake.deleteSecurityGroupArgsForCall)]
 	fake.deleteSecurityGroupArgsForCall = append(fake.deleteSecurityGroupArgsForCall, struct {
@@ -4669,10 +4671,10 @@ func (fake *FakeCloudControllerClient) DeleteSecurityGroup(arg1 string) (ccv3.Wa
 		return fake.DeleteSecurityGroupStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
 	fakeReturns := fake.deleteSecurityGroupReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) DeleteSecurityGroupCallCount() int {
@@ -4681,7 +4683,7 @@ func (fake *FakeCloudControllerClient) DeleteSecurityGroupCallCount() int {
 	return len(fake.deleteSecurityGroupArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) DeleteSecurityGroupCalls(stub func(string) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) DeleteSecurityGroupCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.deleteSecurityGroupMutex.Lock()
 	defer fake.deleteSecurityGroupMutex.Unlock()
 	fake.DeleteSecurityGroupStub = stub
@@ -4694,30 +4696,33 @@ func (fake *FakeCloudControllerClient) DeleteSecurityGroupArgsForCall(i int) str
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) DeleteSecurityGroupReturns(result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteSecurityGroupReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.deleteSecurityGroupMutex.Lock()
 	defer fake.deleteSecurityGroupMutex.Unlock()
 	fake.DeleteSecurityGroupStub = nil
 	fake.deleteSecurityGroupReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteSecurityGroupReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteSecurityGroupReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.deleteSecurityGroupMutex.Lock()
 	defer fake.deleteSecurityGroupMutex.Unlock()
 	fake.DeleteSecurityGroupStub = nil
 	if fake.deleteSecurityGroupReturnsOnCall == nil {
 		fake.deleteSecurityGroupReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
 		})
 	}
 	fake.deleteSecurityGroupReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteServiceBroker(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {

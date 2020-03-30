@@ -132,11 +132,11 @@ func (client *Client) UpdateSecurityGroup(securityGroup resources.SecurityGroup)
 	return responseBody, warnings, err
 }
 
-func (client *Client) DeleteSecurityGroup(securityGroupGUID string) (Warnings, error) {
-	_, warnings, err := client.MakeRequest(RequestParams{
+func (client *Client) DeleteSecurityGroup(securityGroupGUID string) (JobURL, Warnings, error) {
+	jobURL, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.DeleteSecurityGroupRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
 	})
 
-	return warnings, err
+	return jobURL, warnings, err
 }
