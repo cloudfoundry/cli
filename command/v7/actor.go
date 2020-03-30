@@ -65,6 +65,7 @@ type Actor interface {
 	DisableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 	EnableFeatureFlag(flagName string) (v7action.Warnings, error)
 	EnableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
+	EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (v7action.Warnings, error)
 	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, v7action.Warnings, error)
 	GetAppSummariesForSpace(spaceGUID string, labels string) ([]v7action.ApplicationSummary, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)

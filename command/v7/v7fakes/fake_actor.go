@@ -719,6 +719,20 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	EntitleIsolationSegmentToOrganizationByNameStub        func(string, string) (v7action.Warnings, error)
+	entitleIsolationSegmentToOrganizationByNameMutex       sync.RWMutex
+	entitleIsolationSegmentToOrganizationByNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	entitleIsolationSegmentToOrganizationByNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	entitleIsolationSegmentToOrganizationByNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	GetAppFeatureStub        func(string, string) (ccv3.ApplicationFeature, v7action.Warnings, error)
 	getAppFeatureMutex       sync.RWMutex
 	getAppFeatureArgsForCall []struct {
@@ -5833,6 +5847,70 @@ func (fake *FakeActor) EnableServiceAccessReturnsOnCall(i int, result1 v7action.
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByName(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.Lock()
+	ret, specificReturn := fake.entitleIsolationSegmentToOrganizationByNameReturnsOnCall[len(fake.entitleIsolationSegmentToOrganizationByNameArgsForCall)]
+	fake.entitleIsolationSegmentToOrganizationByNameArgsForCall = append(fake.entitleIsolationSegmentToOrganizationByNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("EntitleIsolationSegmentToOrganizationByName", []interface{}{arg1, arg2})
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.Unlock()
+	if fake.EntitleIsolationSegmentToOrganizationByNameStub != nil {
+		return fake.EntitleIsolationSegmentToOrganizationByNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.entitleIsolationSegmentToOrganizationByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameCallCount() int {
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.RLock()
+	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.RUnlock()
+	return len(fake.entitleIsolationSegmentToOrganizationByNameArgsForCall)
+}
+
+func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.Lock()
+	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.Unlock()
+	fake.EntitleIsolationSegmentToOrganizationByNameStub = stub
+}
+
+func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameArgsForCall(i int) (string, string) {
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.RLock()
+	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.RUnlock()
+	argsForCall := fake.entitleIsolationSegmentToOrganizationByNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.Lock()
+	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.Unlock()
+	fake.EntitleIsolationSegmentToOrganizationByNameStub = nil
+	fake.entitleIsolationSegmentToOrganizationByNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) EntitleIsolationSegmentToOrganizationByNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.Lock()
+	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.Unlock()
+	fake.EntitleIsolationSegmentToOrganizationByNameStub = nil
+	if fake.entitleIsolationSegmentToOrganizationByNameReturnsOnCall == nil {
+		fake.entitleIsolationSegmentToOrganizationByNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.entitleIsolationSegmentToOrganizationByNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) GetAppFeature(arg1 string, arg2 string) (ccv3.ApplicationFeature, v7action.Warnings, error) {
@@ -14678,6 +14756,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.enableFeatureFlagMutex.RUnlock()
 	fake.enableServiceAccessMutex.RLock()
 	defer fake.enableServiceAccessMutex.RUnlock()
+	fake.entitleIsolationSegmentToOrganizationByNameMutex.RLock()
+	defer fake.entitleIsolationSegmentToOrganizationByNameMutex.RUnlock()
 	fake.getAppFeatureMutex.RLock()
 	defer fake.getAppFeatureMutex.RUnlock()
 	fake.getAppSummariesForSpaceMutex.RLock()
