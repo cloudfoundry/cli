@@ -39,7 +39,7 @@ var _ = Describe("isolation-segments Command", func() {
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			},
-	}
+		}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
