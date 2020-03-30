@@ -17,15 +17,16 @@ import (
 
 var _ = Describe("disable-org-isolation Command", func() {
 	var (
-		cmd              DisableOrgIsolationCommand
-		testUI           *ui.UI
-		fakeConfig       *commandfakes.FakeConfig
-		fakeSharedActor  *commandfakes.FakeSharedActor
-		fakeActor        *v6fakes.FakeDisableOrgIsolationActor
-		binaryName       string
-		executeErr       error
-		isolationSegment string
-		org              string
+		cmd                  DisableOrgIsolationCommand
+		testUI               *ui.UI
+		fakeConfig           *commandfakes.FakeConfig
+		fakeSharedActor      *commandfakes.FakeSharedActor
+		fakeActor            *v6fakes.FakeDisableOrgIsolationActor
+		binaryName           string
+		executeErr           error
+		isolationSegment     string
+		org                  string
+		deleteIsoSegWarnings v3action.Warnings
 	)
 
 	BeforeEach(func() {
@@ -45,6 +46,14 @@ var _ = Describe("disable-org-isolation Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		org = "org1"
 		isolationSegment = "segment1"
+
+		fakeConfig.CurrentUserReturns(configv3.User{Name: "admin"}, nil)
+		cmd.RequiredArgs.OrganizationName = org
+		cmd.RequiredArgs.IsolationSegmentName = isolationSegment
+
+		deleteIsoSegWarnings = v3action.Warnings{"delete-isolation-segment-warning"}
+
+		fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(deleteIsoSegWarnings, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -66,49 +75,44 @@ var _ = Describe("disable-org-isolation Command", func() {
 		})
 	})
 
-	When("user is logged in", func() {
+	When("user is not logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "admin"}, nil)
+			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("user-not-logged-in"))
 			cmd.RequiredArgs.OrganizationName = org
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
-		It("Outputs a mesaage", func() {
-			Expect(testUI.Out).To(Say("Removing entitlement to isolation segment segment1 from org org1 as admin..."))
+		It("returns the error", func() {
+			Expect(executeErr).To(MatchError("user-not-logged-in"))
+		})
+	})
+
+	It("prints out that it will remove the entitlement", func() {
+		Expect(testUI.Out).To(Say("Removing entitlement to isolation segment segment1 from org org1 as admin..."))
+	})
+
+	It("prints out warnings", func() {
+		Expect(testUI.Err).To(Say(deleteIsoSegWarnings[0]))
+	})
+
+	It("Isolation segment is revoked from org", func() {
+		Expect(executeErr).ToNot(HaveOccurred())
+		Expect(testUI.Out).To(Say("OK"))
+
+		Expect(fakeActor.DeleteIsolationSegmentOrganizationByNameCallCount()).To(Equal(1))
+		actualIsolationSegmentName, actualOrgName := fakeActor.DeleteIsolationSegmentOrganizationByNameArgsForCall(0)
+		Expect(actualIsolationSegmentName).To(Equal(isolationSegment))
+		Expect(actualOrgName).To(Equal(org))
+	})
+
+	When("revoking fails", func() {
+		BeforeEach(func() {
+			fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(deleteIsoSegWarnings, errors.New("delete failed boring message"))
 		})
 
-		When("revoking is successful", func() {
-			BeforeEach(func() {
-				fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, nil)
-			})
-
-			It("Isolation segnment is revoked from org", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Err).To(Say("warning 1"))
-				Expect(testUI.Err).To(Say("warning 2"))
-
-				Expect(fakeActor.DeleteIsolationSegmentOrganizationByNameCallCount()).To(Equal(1))
-				actualIsolationSegmentName, actualOrgName := fakeActor.DeleteIsolationSegmentOrganizationByNameArgsForCall(0)
-				Expect(actualIsolationSegmentName).To(Equal(isolationSegment))
-				Expect(actualOrgName).To(Equal(org))
-			})
-		})
-
-		Context("generic error while revoking segment isolation", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("ZOMG")
-				fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, expectedErr)
-			})
-
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(testUI.Err).To(Say("warning 1"))
-				Expect(testUI.Err).To(Say("warning 2"))
-			})
+		It("returns an error and the warnings", func() {
+			Expect(testUI.Err).To(Say(deleteIsoSegWarnings[0]))
+			Expect(executeErr).To(MatchError("delete failed boring message"))
 		})
 	})
 })
