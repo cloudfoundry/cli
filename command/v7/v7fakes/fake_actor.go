@@ -502,6 +502,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	DeleteIsolationSegmentByNameStub        func(string) (v7action.Warnings, error)
+	deleteIsolationSegmentByNameMutex       sync.RWMutex
+	deleteIsolationSegmentByNameArgsForCall []struct {
+		arg1 string
+	}
+	deleteIsolationSegmentByNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	deleteIsolationSegmentByNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	DeleteOrgRoleStub        func(constanta.RoleType, string, string, string, bool) (v7action.Warnings, error)
 	deleteOrgRoleMutex       sync.RWMutex
 	deleteOrgRoleArgsForCall []struct {
@@ -4875,6 +4888,69 @@ func (fake *FakeActor) DeleteInstanceByApplicationNameSpaceProcessTypeAndIndexRe
 		})
 	}
 	fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteIsolationSegmentByName(arg1 string) (v7action.Warnings, error) {
+	fake.deleteIsolationSegmentByNameMutex.Lock()
+	ret, specificReturn := fake.deleteIsolationSegmentByNameReturnsOnCall[len(fake.deleteIsolationSegmentByNameArgsForCall)]
+	fake.deleteIsolationSegmentByNameArgsForCall = append(fake.deleteIsolationSegmentByNameArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteIsolationSegmentByName", []interface{}{arg1})
+	fake.deleteIsolationSegmentByNameMutex.Unlock()
+	if fake.DeleteIsolationSegmentByNameStub != nil {
+		return fake.DeleteIsolationSegmentByNameStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteIsolationSegmentByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) DeleteIsolationSegmentByNameCallCount() int {
+	fake.deleteIsolationSegmentByNameMutex.RLock()
+	defer fake.deleteIsolationSegmentByNameMutex.RUnlock()
+	return len(fake.deleteIsolationSegmentByNameArgsForCall)
+}
+
+func (fake *FakeActor) DeleteIsolationSegmentByNameCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.deleteIsolationSegmentByNameMutex.Lock()
+	defer fake.deleteIsolationSegmentByNameMutex.Unlock()
+	fake.DeleteIsolationSegmentByNameStub = stub
+}
+
+func (fake *FakeActor) DeleteIsolationSegmentByNameArgsForCall(i int) string {
+	fake.deleteIsolationSegmentByNameMutex.RLock()
+	defer fake.deleteIsolationSegmentByNameMutex.RUnlock()
+	argsForCall := fake.deleteIsolationSegmentByNameArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) DeleteIsolationSegmentByNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.deleteIsolationSegmentByNameMutex.Lock()
+	defer fake.deleteIsolationSegmentByNameMutex.Unlock()
+	fake.DeleteIsolationSegmentByNameStub = nil
+	fake.deleteIsolationSegmentByNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) DeleteIsolationSegmentByNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.deleteIsolationSegmentByNameMutex.Lock()
+	defer fake.deleteIsolationSegmentByNameMutex.Unlock()
+	fake.DeleteIsolationSegmentByNameStub = nil
+	if fake.deleteIsolationSegmentByNameReturnsOnCall == nil {
+		fake.deleteIsolationSegmentByNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.deleteIsolationSegmentByNameReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -14726,6 +14802,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.deleteDomainMutex.RUnlock()
 	fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
 	defer fake.deleteInstanceByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
+	fake.deleteIsolationSegmentByNameMutex.RLock()
+	defer fake.deleteIsolationSegmentByNameMutex.RUnlock()
 	fake.deleteOrgRoleMutex.RLock()
 	defer fake.deleteOrgRoleMutex.RUnlock()
 	fake.deleteOrganizationMutex.RLock()

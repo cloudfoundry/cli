@@ -61,6 +61,7 @@ type Actor interface {
 	DeleteSpaceQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 	DeleteSpaceRole(roleType constant.RoleType, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
 	DeleteUser(userGuid string) (v7action.Warnings, error)
+	DeleteIsolationSegmentByName(name string) (v7action.Warnings, error)
 	DisableFeatureFlag(flagName string) (v7action.Warnings, error)
 	DisableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 	EnableFeatureFlag(flagName string) (v7action.Warnings, error)
