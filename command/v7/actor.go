@@ -90,6 +90,7 @@ type Actor interface {
 	GetGlobalRunningSecurityGroups() ([]resources.SecurityGroup, v7action.Warnings, error)
 	GetGlobalStagingSecurityGroups() ([]resources.SecurityGroup, v7action.Warnings, error)
 	GetIsolationSegmentsByOrganization(orgName string) ([]v7action.IsolationSegment, v7action.Warnings, error)
+	GetIsolationSegmentSummaries() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)
 	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
 	GetLogCacheEndpoint() (string, v7action.Warnings, error)
 	GetNewestReadyPackageForApplication(appGUID string) (v7action.Package, v7action.Warnings, error)

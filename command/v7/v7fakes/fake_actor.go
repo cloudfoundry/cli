@@ -1090,6 +1090,20 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetIsolationSegmentSummariesStub        func() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)
+	getIsolationSegmentSummariesMutex       sync.RWMutex
+	getIsolationSegmentSummariesArgsForCall []struct {
+	}
+	getIsolationSegmentSummariesReturns struct {
+		result1 []v7action.IsolationSegmentSummary
+		result2 v7action.Warnings
+		result3 error
+	}
+	getIsolationSegmentSummariesReturnsOnCall map[int]struct {
+		result1 []v7action.IsolationSegmentSummary
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetIsolationSegmentsByOrganizationStub        func(string) ([]v7action.IsolationSegment, v7action.Warnings, error)
 	getIsolationSegmentsByOrganizationMutex       sync.RWMutex
 	getIsolationSegmentsByOrganizationArgsForCall []struct {
@@ -7395,6 +7409,64 @@ func (fake *FakeActor) GetGlobalStagingSecurityGroupsReturnsOnCall(i int, result
 	}
 	fake.getGlobalStagingSecurityGroupsReturnsOnCall[i] = struct {
 		result1 []resources.SecurityGroup
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetIsolationSegmentSummaries() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	ret, specificReturn := fake.getIsolationSegmentSummariesReturnsOnCall[len(fake.getIsolationSegmentSummariesArgsForCall)]
+	fake.getIsolationSegmentSummariesArgsForCall = append(fake.getIsolationSegmentSummariesArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetIsolationSegmentSummaries", []interface{}{})
+	fake.getIsolationSegmentSummariesMutex.Unlock()
+	if fake.GetIsolationSegmentSummariesStub != nil {
+		return fake.GetIsolationSegmentSummariesStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getIsolationSegmentSummariesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetIsolationSegmentSummariesCallCount() int {
+	fake.getIsolationSegmentSummariesMutex.RLock()
+	defer fake.getIsolationSegmentSummariesMutex.RUnlock()
+	return len(fake.getIsolationSegmentSummariesArgsForCall)
+}
+
+func (fake *FakeActor) GetIsolationSegmentSummariesCalls(stub func() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	defer fake.getIsolationSegmentSummariesMutex.Unlock()
+	fake.GetIsolationSegmentSummariesStub = stub
+}
+
+func (fake *FakeActor) GetIsolationSegmentSummariesReturns(result1 []v7action.IsolationSegmentSummary, result2 v7action.Warnings, result3 error) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	defer fake.getIsolationSegmentSummariesMutex.Unlock()
+	fake.GetIsolationSegmentSummariesStub = nil
+	fake.getIsolationSegmentSummariesReturns = struct {
+		result1 []v7action.IsolationSegmentSummary
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetIsolationSegmentSummariesReturnsOnCall(i int, result1 []v7action.IsolationSegmentSummary, result2 v7action.Warnings, result3 error) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	defer fake.getIsolationSegmentSummariesMutex.Unlock()
+	fake.GetIsolationSegmentSummariesStub = nil
+	if fake.getIsolationSegmentSummariesReturnsOnCall == nil {
+		fake.getIsolationSegmentSummariesReturnsOnCall = make(map[int]struct {
+			result1 []v7action.IsolationSegmentSummary
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getIsolationSegmentSummariesReturnsOnCall[i] = struct {
+		result1 []v7action.IsolationSegmentSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -14654,6 +14726,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getGlobalRunningSecurityGroupsMutex.RUnlock()
 	fake.getGlobalStagingSecurityGroupsMutex.RLock()
 	defer fake.getGlobalStagingSecurityGroupsMutex.RUnlock()
+	fake.getIsolationSegmentSummariesMutex.RLock()
+	defer fake.getIsolationSegmentSummariesMutex.RUnlock()
 	fake.getIsolationSegmentsByOrganizationMutex.RLock()
 	defer fake.getIsolationSegmentsByOrganizationMutex.RUnlock()
 	fake.getLatestActiveDeploymentForAppMutex.RLock()
