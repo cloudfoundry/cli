@@ -36,11 +36,13 @@ var _ = Describe("network-policies Command", func() {
 		srcApp = ""
 
 		cmd = NetworkPoliciesCommand{
-			UI:          testUI,
-			SourceApp:   srcApp,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				UI:          testUI,
+			},
+			NetworkingActor: fakeActor,
+			SourceApp:       srcApp,
 		}
 
 		binaryName = "faceman"

@@ -43,10 +43,12 @@ var _ = Describe("remove-network-policy Command", func() {
 		protocol = "tcp"
 
 		cmd = RemoveNetworkPolicyCommand{
-			UI:              testUI,
-			Config:          fakeConfig,
-			SharedActor:     fakeSharedActor,
-			Actor:           fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			NetworkingActor: fakeNetworkPolicyActor,
 			RequiredArgs:    flag.RemoveNetworkPolicyArgs{SourceApp: srcApp},
 			DestinationApp:  destApp,
