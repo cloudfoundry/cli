@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
@@ -23,7 +22,6 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeActor
-		fakeActorV2     *v7fakes.FakeResetSpaceIsolationSegmentActorV2
 		binaryName      string
 		executeErr      error
 		space           string
@@ -35,7 +33,6 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeActor)
-		fakeActorV2 = new(v7fakes.FakeResetSpaceIsolationSegmentActorV2)
 
 		cmd = v7.ResetSpaceIsolationSegmentCommand{
 			BaseCommand: v7.BaseCommand{
@@ -44,7 +41,6 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			},
-			ActorV2: fakeActorV2,
 		}
 
 		binaryName = "faceman"
@@ -85,7 +81,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 
 		When("the space lookup is unsuccessful", func() {
 			BeforeEach(func() {
-				fakeActorV2.GetSpaceByOrganizationAndNameReturns(v2action.Space{}, v2action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: space})
+				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, v7action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: space})
 			})
 
 			It("returns the warnings and error", func() {
@@ -97,10 +93,10 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 
 		When("the space lookup is successful", func() {
 			BeforeEach(func() {
-				fakeActorV2.GetSpaceByOrganizationAndNameReturns(v2action.Space{
+				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{
 					Name: space,
 					GUID: "some-space-guid",
-				}, v2action.Warnings{"warning-1", "warning-2"}, nil)
+				}, v7action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
 			When("the reset changes the isolation segment to platform default", func() {
@@ -147,7 +143,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 					Expect(testUI.Err).To(Say("warning-3"))
 					Expect(testUI.Err).To(Say("warning-4"))
 
-					Expect(testUI.Out).To(Say("Applications in this space will be placed in isolation segment some-org-iso-seg-name."))
+					Expect(testUI.Out).To(Say("Applications in this space will be placed in isolation segment 'some-org-iso-seg-name'."))
 					Expect(testUI.Out).To(Say("Running applications need a restart to be moved there."))
 
 					Expect(fakeActor.ResetSpaceIsolationSegmentCallCount()).To(Equal(1))

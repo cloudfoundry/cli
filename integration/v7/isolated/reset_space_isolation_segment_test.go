@@ -137,7 +137,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Say("Resetting isolation segment assignment of space %s in org %s as %s...", spaceName, organizationName, userName))
 
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Applications in this space will be placed in isolation segment %s.", orgIsolationSegmentName))
+					Eventually(session).Should(Say("Applications in this space will be placed in isolation segment '%s'.", orgIsolationSegmentName))
 					Eventually(session).Should(Say("Running applications need a restart to be moved there."))
 					Eventually(session).Should(Exit(0))
 

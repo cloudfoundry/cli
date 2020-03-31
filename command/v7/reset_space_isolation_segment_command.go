@@ -1,17 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
 )
-
-//go:generate counterfeiter . ResetSpaceIsolationSegmentActorV2
-
-type ResetSpaceIsolationSegmentActorV2 interface {
-	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
-}
 
 type ResetSpaceIsolationSegmentCommand struct {
 	BaseCommand
@@ -19,23 +10,6 @@ type ResetSpaceIsolationSegmentCommand struct {
 	RequiredArgs    flag.ResetSpaceIsolationArgs `positional-args:"yes"`
 	usage           interface{}                  `usage:"CF_NAME reset-space-isolation-segment SPACE_NAME"`
 	relatedCommands interface{}                  `related_commands:"org, restart, space"`
-
-	ActorV2 ResetSpaceIsolationSegmentActorV2
-}
-
-func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui command.UI) error {
-	err := cmd.BaseCommand.Setup(config, ui)
-	if err != nil {
-		return err
-	}
-
-	ccClientV2, uaaClientV2, err := sharedV2.GetNewClientsAndConnectToCF(config, ui)
-	if err != nil {
-		return err
-	}
-	cmd.ActorV2 = v2action.NewActor(ccClientV2, uaaClientV2, config)
-
-	return nil
 }
 
 func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
@@ -55,8 +29,8 @@ func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	space, v2Warnings, err := cmd.ActorV2.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.SpaceName)
-	cmd.UI.DisplayWarnings(v2Warnings)
+	space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.RequiredArgs.SpaceName, cmd.Config.TargetedOrganization().GUID)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
@@ -72,7 +46,7 @@ func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	if newIsolationSegmentName == "" {
 		cmd.UI.DisplayText("Applications in this space will be placed in the platform default isolation segment.")
 	} else {
-		cmd.UI.DisplayText("Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.", map[string]interface{}{
+		cmd.UI.DisplayText("Applications in this space will be placed in isolation segment '{{.orgIsolationSegment}}'.", map[string]interface{}{
 			"orgIsolationSegment": newIsolationSegmentName,
 		})
 	}
