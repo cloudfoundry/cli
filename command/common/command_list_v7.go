@@ -157,7 +157,7 @@ type commandList struct {
 	SetOrgRole                         v7.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
 	SetOrgQuota                        v7.SetOrgQuotaCommand                        `command:"set-org-quota" description:"Assign a quota to an organization"`
 	SetRunningEnvironmentVariableGroup v7.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
-	SetSpaceIsolationSegment           v6.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
+	SetSpaceIsolationSegment           v7.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
 	SetSpaceQuota                      v7.SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a quota to a space"`
 	SetSpaceRole                       v7.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
 	SetStagingEnvironmentVariableGroup v7.SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`

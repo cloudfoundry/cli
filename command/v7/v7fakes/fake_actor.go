@@ -47,6 +47,20 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	AssignIsolationSegmentToSpaceByNameAndSpaceStub        func(string, string) (v7action.Warnings, error)
+	assignIsolationSegmentToSpaceByNameAndSpaceMutex       sync.RWMutex
+	assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	assignIsolationSegmentToSpaceByNameAndSpaceReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	AuthenticateStub        func(map[string]string, string, constant.GrantType) error
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
@@ -2952,6 +2966,70 @@ func (fake *FakeActor) ApplySpaceQuotaByNameReturnsOnCall(i int, result1 v7actio
 		})
 	}
 	fake.applySpaceQuotaByNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpace(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall[len(fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall)]
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall = append(fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("AssignIsolationSegmentToSpaceByNameAndSpace", []interface{}{arg1, arg2})
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
+	if fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub != nil {
+		return fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpaceCallCount() int {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RLock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RUnlock()
+	return len(fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpaceCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
+	fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RLock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpaceReturns(result1 v7action.Warnings, result2 error) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
+	fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub = nil
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) AssignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
+	fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub = nil
+	if fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall == nil {
+		fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -14975,6 +15053,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.applyOrganizationQuotaByNameMutex.RUnlock()
 	fake.applySpaceQuotaByNameMutex.RLock()
 	defer fake.applySpaceQuotaByNameMutex.RUnlock()
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RLock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RUnlock()
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
 	fake.bindSecurityGroupToSpaceMutex.RLock()

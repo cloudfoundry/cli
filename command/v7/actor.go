@@ -19,6 +19,7 @@ import (
 type Actor interface {
 	ApplyOrganizationQuotaByName(quotaName string, orgGUID string) (v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
+	AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentName string, spaceGUID string) (v7action.Warnings, error)
 	Authenticate(credentials map[string]string, origin string, grantType uaa.GrantType) error
 	BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v7action.Warnings, error)
 	CancelDeployment(deploymentGUID string) (v7action.Warnings, error)
