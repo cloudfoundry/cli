@@ -153,6 +153,7 @@ type Actor interface {
 	RenameApplicationByNameAndSpaceGUID(oldAppName, newAppName, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	RenameOrganization(oldOrgName, newOrgName string) (v7action.Organization, v7action.Warnings, error)
 	RenameSpaceByNameAndOrganizationGUID(oldSpaceName, newSpaceName, orgGUID string) (v7action.Space, v7action.Warnings, error)
+	ResetOrganizationDefaultIsolationSegment(orgGUID string) (v7action.Warnings, error)
 	ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) (string, v7action.Warnings, error)
 	ResourceMatch(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)

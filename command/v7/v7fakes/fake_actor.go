@@ -2081,6 +2081,19 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	ResetOrganizationDefaultIsolationSegmentStub        func(string) (v7action.Warnings, error)
+	resetOrganizationDefaultIsolationSegmentMutex       sync.RWMutex
+	resetOrganizationDefaultIsolationSegmentArgsForCall []struct {
+		arg1 string
+	}
+	resetOrganizationDefaultIsolationSegmentReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	resetOrganizationDefaultIsolationSegmentReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	ResetSpaceIsolationSegmentStub        func(string, string) (string, v7action.Warnings, error)
 	resetSpaceIsolationSegmentMutex       sync.RWMutex
 	resetSpaceIsolationSegmentArgsForCall []struct {
@@ -11689,6 +11702,69 @@ func (fake *FakeActor) RenameSpaceByNameAndOrganizationGUIDReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) ResetOrganizationDefaultIsolationSegment(arg1 string) (v7action.Warnings, error) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	ret, specificReturn := fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall[len(fake.resetOrganizationDefaultIsolationSegmentArgsForCall)]
+	fake.resetOrganizationDefaultIsolationSegmentArgsForCall = append(fake.resetOrganizationDefaultIsolationSegmentArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ResetOrganizationDefaultIsolationSegment", []interface{}{arg1})
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
+	if fake.ResetOrganizationDefaultIsolationSegmentStub != nil {
+		return fake.ResetOrganizationDefaultIsolationSegmentStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.resetOrganizationDefaultIsolationSegmentReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) ResetOrganizationDefaultIsolationSegmentCallCount() int {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.RLock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.RUnlock()
+	return len(fake.resetOrganizationDefaultIsolationSegmentArgsForCall)
+}
+
+func (fake *FakeActor) ResetOrganizationDefaultIsolationSegmentCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
+	fake.ResetOrganizationDefaultIsolationSegmentStub = stub
+}
+
+func (fake *FakeActor) ResetOrganizationDefaultIsolationSegmentArgsForCall(i int) string {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.RLock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.RUnlock()
+	argsForCall := fake.resetOrganizationDefaultIsolationSegmentArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) ResetOrganizationDefaultIsolationSegmentReturns(result1 v7action.Warnings, result2 error) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
+	fake.ResetOrganizationDefaultIsolationSegmentStub = nil
+	fake.resetOrganizationDefaultIsolationSegmentReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) ResetOrganizationDefaultIsolationSegmentReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
+	fake.ResetOrganizationDefaultIsolationSegmentStub = nil
+	if fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall == nil {
+		fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) ResetSpaceIsolationSegment(arg1 string, arg2 string) (string, v7action.Warnings, error) {
 	fake.resetSpaceIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.resetSpaceIsolationSegmentReturnsOnCall[len(fake.resetSpaceIsolationSegmentArgsForCall)]
@@ -15167,6 +15243,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.renameOrganizationMutex.RUnlock()
 	fake.renameSpaceByNameAndOrganizationGUIDMutex.RLock()
 	defer fake.renameSpaceByNameAndOrganizationGUIDMutex.RUnlock()
+	fake.resetOrganizationDefaultIsolationSegmentMutex.RLock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.RUnlock()
 	fake.resetSpaceIsolationSegmentMutex.RLock()
 	defer fake.resetSpaceIsolationSegmentMutex.RUnlock()
 	fake.resourceMatchMutex.RLock()
