@@ -134,7 +134,8 @@ var _ = Describe("delete-isolation-segment Command", func() {
 		When("the -f flag is not provided", func() {
 			When("the user chooses the default", func() {
 				BeforeEach(func() {
-					input.Write([]byte("\n"))
+					_, err := input.Write([]byte("\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("cancels the deletion", func() {
@@ -146,7 +147,8 @@ var _ = Describe("delete-isolation-segment Command", func() {
 
 			When("the user inputs yes", func() {
 				BeforeEach(func() {
-					input.Write([]byte("yes\n"))
+					_, err := input.Write([]byte("yes\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("deletes the isolation segment", func() {
@@ -158,7 +160,8 @@ var _ = Describe("delete-isolation-segment Command", func() {
 
 			When("the user inputs no", func() {
 				BeforeEach(func() {
-					input.Write([]byte("no\n"))
+					_, err := input.Write([]byte("no\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("cancels the deletion", func() {
