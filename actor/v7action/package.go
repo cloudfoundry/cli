@@ -207,6 +207,11 @@ func (actor Actor) UploadBitsPackage(pkg Package, matchedResources []sharedactio
 	return Package(appPkg), Warnings(warnings), err
 }
 
+func (actor Actor) DownloadBits(pkg Package) (*os.File, Warnings, error) {
+	filePath, warnings, err := actor.CloudControllerClient.DownloadBits(ccv3.Package(pkg))
+	return filePath, Warnings(warnings), err
+}
+
 // PollPackage returns a package of an app.
 func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
 	var allWarnings Warnings

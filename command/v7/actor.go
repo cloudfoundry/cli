@@ -3,6 +3,7 @@ package v7
 import (
 	"context"
 	"io"
+	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -64,6 +65,7 @@ type Actor interface {
 	DeleteIsolationSegmentByName(name string) (v7action.Warnings, error)
 	DisableFeatureFlag(flagName string) (v7action.Warnings, error)
 	DisableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
+	DownloadBits(pkg v7action.Package) (*os.File, v7action.Warnings, error)
 	EnableFeatureFlag(flagName string) (v7action.Warnings, error)
 	EnableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 	EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (v7action.Warnings, error)

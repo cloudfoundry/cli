@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"io"
+	"os"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -55,6 +56,7 @@ type CloudControllerClient interface {
 	DeleteSpaceQuota(spaceQuotaGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteSpace(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteUser(userGUID string) (ccv3.JobURL, ccv3.Warnings, error)
+	DownloadBits(pkg ccv3.Package) (*os.File, ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (ccv3.Application, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)

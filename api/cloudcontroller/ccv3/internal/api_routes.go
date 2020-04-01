@@ -63,6 +63,7 @@ const (
 	GetOrganizationRelationshipDefaultIsolationSegmentRequest   = "GetOrganizationRelationshipDefaultIsolationSegment"
 	GetOrganizationRequest                                      = "GetOrganization"
 	GetOrganizationsRequest                                     = "GetOrganizations"
+	GetPackageBitsRequest                                       = "GetPackageBits"
 	GetPackageRequest                                           = "GetPackage"
 	GetPackagesRequest                                          = "GetPackages"
 	GetPackageDropletsRequest                                   = "GetPackageDroplets"
@@ -232,6 +233,7 @@ var APIRoutes = []Route{
 	{Resource: PackagesResource, Path: "/", Method: http.MethodGet, Name: GetPackagesRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodPost, Name: PostPackageRequest},
 	{Resource: PackagesResource, Path: "/:package_guid", Method: http.MethodGet, Name: GetPackageRequest},
+	{Resource: PackagesResource, Path: "/:package_guid/download", Method: http.MethodGet, Name: GetPackageBitsRequest},
 	{Resource: PackagesResource, Path: "/:package_guid/upload", Method: http.MethodPost, Name: PostPackageBitsRequest},
 	{Resource: PackagesResource, Path: "/:package_guid/droplets", Method: http.MethodGet, Name: GetPackageDropletsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodGet, Name: GetProcessRequest},

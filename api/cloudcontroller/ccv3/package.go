@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -176,6 +177,35 @@ func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource
 	}
 
 	return client.uploadNewAndExistingResources(pkg.GUID, matchedResources, newResources, newResourcesLength)
+}
+
+func (client *Client) DownloadBits(pkg Package) (*os.File, Warnings, error) {
+	packageBits, warnings, err := client.MakeRequestReceiveRaw(
+		internal.GetPackageBitsRequest,
+		internal.Params{"package_guid": pkg.GUID},
+		"application/zip",
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	file, err := ioutil.TempFile("", "packageBits")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	_, err = file.Write(packageBits)
+	if err != nil {
+		os.Remove(file.Name())
+		return nil, nil, err
+	}
+	err = file.Sync()
+	if err != nil {
+		os.Remove(file.Name())
+		return nil, nil, err
+	}
+
+	return file, warnings, err
 }
 
 // UploadPackage uploads a file to a given package's Upload resource. Note:
