@@ -72,7 +72,7 @@ var _ = Describe("logs with log cache", func() {
 	Describe("TailLogsFor", func() {
 		It("writes logs to the log channel", func() {
 			var logMessages chan sharedaction.LogMessage
-			var errors chan error
+			var errorChan chan error
 
 			recentLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error) {
 				return []sharedaction.LogMessage{}, nil
@@ -80,29 +80,34 @@ var _ = Describe("logs with log cache", func() {
 
 			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
 				logMessages = make(chan sharedaction.LogMessage, 2)
-				errors = make(chan error, 2)
-
-				defer close(logMessages)
-				defer close(errors)
-
-				message := *sharedaction.NewLogMessage(
-					"some-message",
-					"OUT",
-					time.Unix(0, 0),
-					"STG",
-					"some-source-instance",
-				)
-				message2 := *sharedaction.NewLogMessage(
-					"some-message2",
-					"OUT",
-					time.Unix(0, 0),
-					"STG",
-					"some-source-instance2",
-				)
-				logMessages <- message
-				logMessages <- message2
+				errorChan = make(chan error, 2)
 				cancelFunc := func() {}
-				return logMessages, errors, cancelFunc
+
+				go func() {
+					defer close(logMessages)
+					defer close(errorChan)
+
+					message := *sharedaction.NewLogMessage(
+						"some-message",
+						"OUT",
+						time.Unix(0, 0),
+						"STG",
+						"some-source-instance",
+					)
+					message2 := *sharedaction.NewLogMessage(
+						"some-message2",
+						"OUT",
+						time.Unix(0, 0),
+						"STG",
+						"some-source-instance2",
+					)
+					logMessages <- message
+					logMessages <- message2
+
+					time.Sleep(1 * time.Second)
+				}()
+
+				return logMessages, errorChan, cancelFunc
 			}
 
 			client := sharedactionfakes.FakeLogCacheClient{}
@@ -123,12 +128,12 @@ var _ = Describe("logs with log cache", func() {
 
 			Eventually(logChan).Should(HaveLen(2))
 
-			Expect(logMessages).To(Receive(&logCacheMessage))
+			Expect(logChan).To(Receive(&logCacheMessage))
 			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message"))
-			Expect(logMessages).To(Receive(&logCacheMessage))
+			Expect(logChan).To(Receive(&logCacheMessage))
 			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message2"))
 
-			Expect(errors).ToNot(Receive())
+			Expect(errorChan).ToNot(Receive())
 
 			// Expect(logMessages).To(Eventually(actual interface{}, intervals ...interface{})
 
@@ -140,5 +145,5 @@ var _ = Describe("logs with log cache", func() {
 	})
 
 	XDescribe("Authentication Token Refresh", func() {
-	})
+	}) // }}
 })

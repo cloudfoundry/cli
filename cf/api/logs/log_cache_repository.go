@@ -2,7 +2,6 @@ package logs
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
@@ -56,10 +55,7 @@ func (r *logCacheRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
 
 func (r *logCacheRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
 	messages, logErrs, stopStreaming := r.getStreamingLogsFunc(appGUID, r.client)
-	// }
 
-	// func (repo *LogCacheRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
-	//  messages, logErrs, stopStreaming := sharedaction.GetStreamingLogs(appGUID, repo.logCacheClient)
 	r.cancelFunc = stopStreaming
 
 	defer close(logChan)
@@ -72,21 +68,15 @@ func (r *logCacheRepository) TailLogsFor(appGUID string, onConnect func(), logCh
 		select {
 		case message, ok := <-messages:
 			if !ok {
-				fmt.Println("closing messages")
 				return
 			}
-			fmt.Printf("debug.1: %+v\n", len(logChan))
-			fmt.Printf("debug.2: %+v\n", logChan)
 			logChan <- NewLogCacheMessage(&terminalColorLogger{}, message)
 		case logErr, ok := <-logErrs:
 			if !ok {
-				fmt.Println("closing logErrs")
 				return
 			}
-			fmt.Printf("debug.3: %+v\n", logErr)
 			errChan <- logErr
 		case <-c:
-			fmt.Println("cancelFunc")
 			r.cancelFunc()
 		}
 	}
