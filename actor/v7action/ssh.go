@@ -13,6 +13,10 @@ type SSHAuthentication struct {
 	Username           string
 }
 
+func (actor Actor) GetSSHPasscode() (string, error) {
+	return actor.UAAClient.GetSSHPasscode(actor.Config.AccessToken(), actor.Config.SSHOAuthClient())
+}
+
 // GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex returns
 // back the SSH authentication information for the SSH session.
 func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(

@@ -31,6 +31,52 @@ var _ = Describe("SSH Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, nil)
 	})
 
+	Describe("GetSSHPasscode", func() {
+		var uaaAccessToken string
+
+		BeforeEach(func() {
+			uaaAccessToken = "4cc3sst0k3n"
+			fakeConfig.AccessTokenReturns(uaaAccessToken)
+			fakeConfig.SSHOAuthClientReturns("some-id")
+		})
+
+		When("no errors are encountered getting the ssh passcode", func() {
+			var expectedCode string
+
+			BeforeEach(func() {
+				expectedCode = "s3curep4ss"
+				fakeUAAClient.GetSSHPasscodeReturns(expectedCode, nil)
+			})
+
+			It("returns the ssh passcode", func() {
+				code, err := actor.GetSSHPasscode()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(code).To(Equal(expectedCode))
+				Expect(fakeUAAClient.GetSSHPasscodeCallCount()).To(Equal(1))
+				accessTokenArg, sshOAuthClientArg := fakeUAAClient.GetSSHPasscodeArgsForCall(0)
+				Expect(accessTokenArg).To(Equal(uaaAccessToken))
+				Expect(sshOAuthClientArg).To(Equal("some-id"))
+			})
+		})
+
+		When("an error is encountered getting the ssh passcode", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("failed fetching code")
+				fakeUAAClient.GetSSHPasscodeReturns("", expectedErr)
+			})
+
+			It("returns the error", func() {
+				_, err := actor.GetSSHPasscode()
+				Expect(err).To(MatchError(expectedErr))
+				Expect(fakeUAAClient.GetSSHPasscodeCallCount()).To(Equal(1))
+				accessTokenArg, sshOAuthClientArg := fakeUAAClient.GetSSHPasscodeArgsForCall(0)
+				Expect(accessTokenArg).To(Equal(uaaAccessToken))
+				Expect(sshOAuthClientArg).To(Equal("some-id"))
+			})
+		})
+	})
 	Describe("GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex", func() {
 		var sshAuth SSHAuthentication
 

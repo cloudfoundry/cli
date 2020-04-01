@@ -120,6 +120,7 @@ type Actor interface {
 	GetRoutesBySpace(spaceGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)
 	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, v7action.Warnings, error)
 	GetSSHEnabledByAppName(appName string, spaceGUID string) (ccv3.SSHEnabled, v7action.Warnings, error)
+	GetSSHPasscode() (string, error)
 	GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint) (v7action.SSHAuthentication, v7action.Warnings, error)
 	GetSecurityGroup(securityGroupName string) (resources.SecurityGroup, v7action.Warnings, error)
 	GetSecurityGroupSummary(securityGroupName string) (v7action.SecurityGroupSummary, v7action.Warnings, error)

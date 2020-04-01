@@ -1563,6 +1563,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetSSHPasscodeStub        func() (string, error)
+	getSSHPasscodeMutex       sync.RWMutex
+	getSSHPasscodeArgsForCall []struct {
+	}
+	getSSHPasscodeReturns struct {
+		result1 string
+		result2 error
+	}
+	getSSHPasscodeReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub        func(string, string, string, uint) (v7action.SSHAuthentication, v7action.Warnings, error)
 	getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex       sync.RWMutex
 	getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall []struct {
@@ -9532,6 +9544,61 @@ func (fake *FakeActor) GetSSHEnabledByAppNameReturnsOnCall(i int, result1 ccv3.S
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetSSHPasscode() (string, error) {
+	fake.getSSHPasscodeMutex.Lock()
+	ret, specificReturn := fake.getSSHPasscodeReturnsOnCall[len(fake.getSSHPasscodeArgsForCall)]
+	fake.getSSHPasscodeArgsForCall = append(fake.getSSHPasscodeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetSSHPasscode", []interface{}{})
+	fake.getSSHPasscodeMutex.Unlock()
+	if fake.GetSSHPasscodeStub != nil {
+		return fake.GetSSHPasscodeStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getSSHPasscodeReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) GetSSHPasscodeCallCount() int {
+	fake.getSSHPasscodeMutex.RLock()
+	defer fake.getSSHPasscodeMutex.RUnlock()
+	return len(fake.getSSHPasscodeArgsForCall)
+}
+
+func (fake *FakeActor) GetSSHPasscodeCalls(stub func() (string, error)) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
+	fake.GetSSHPasscodeStub = stub
+}
+
+func (fake *FakeActor) GetSSHPasscodeReturns(result1 string, result2 error) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
+	fake.GetSSHPasscodeStub = nil
+	fake.getSSHPasscodeReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) GetSSHPasscodeReturnsOnCall(i int, result1 string, result2 error) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
+	fake.GetSSHPasscodeStub = nil
+	if fake.getSSHPasscodeReturnsOnCall == nil {
+		fake.getSSHPasscodeReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.getSSHPasscodeReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(arg1 string, arg2 string, arg3 string, arg4 uint) (v7action.SSHAuthentication, v7action.Warnings, error) {
 	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.Lock()
 	ret, specificReturn := fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall[len(fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall)]
@@ -15255,6 +15322,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getSSHEnabledMutex.RUnlock()
 	fake.getSSHEnabledByAppNameMutex.RLock()
 	defer fake.getSSHEnabledByAppNameMutex.RUnlock()
+	fake.getSSHPasscodeMutex.RLock()
+	defer fake.getSSHPasscodeMutex.RUnlock()
 	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
 	defer fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
 	fake.getSecurityGroupMutex.RLock()
