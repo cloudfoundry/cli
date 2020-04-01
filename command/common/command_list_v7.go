@@ -105,7 +105,7 @@ type commandList struct {
 	MapRoute                           v7.MapRouteCommand                           `command:"map-route" description:"Map a route to an app"`
 	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
 	NetworkPolicies                    v7.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
-	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
+	OauthToken                         v7.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
 	Org                                v7.OrgCommand                                `command:"org" description:"Show org info"`
 	OrgQuotas                          v7.OrgQuotasCommand                          `command:"org-quotas" description:"List available organization quotas"`
 	OrgQuota                           v7.OrgQuotaCommand                           `command:"org-quota" description:"Show organization quota"`

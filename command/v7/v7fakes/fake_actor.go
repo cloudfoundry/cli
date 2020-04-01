@@ -15,6 +15,7 @@ import (
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"github.com/SermoDigital/jose/jwt"
 )
 
 type FakeActor struct {
@@ -1967,6 +1968,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	ParseAccessTokenStub        func(string) (jwt.JWT, error)
+	parseAccessTokenMutex       sync.RWMutex
+	parseAccessTokenArgsForCall []struct {
+		arg1 string
+	}
+	parseAccessTokenReturns struct {
+		result1 jwt.JWT
+		result2 error
+	}
+	parseAccessTokenReturnsOnCall map[int]struct {
+		result1 jwt.JWT
+		result2 error
+	}
 	PollBuildStub        func(string, string) (v7action.Droplet, v7action.Warnings, error)
 	pollBuildMutex       sync.RWMutex
 	pollBuildArgsForCall []struct {
@@ -2054,6 +2068,18 @@ type FakeActor struct {
 		result2 error
 	}
 	prepareBuildpackBitsReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
+	RefreshAccessTokenStub        func() (string, error)
+	refreshAccessTokenMutex       sync.RWMutex
+	refreshAccessTokenArgsForCall []struct {
+	}
+	refreshAccessTokenReturns struct {
+		result1 string
+		result2 error
+	}
+	refreshAccessTokenReturnsOnCall map[int]struct {
 		result1 string
 		result2 error
 	}
@@ -11252,6 +11278,69 @@ func (fake *FakeActor) MapRouteReturnsOnCall(i int, result1 v7action.Warnings, r
 	}{result1, result2}
 }
 
+func (fake *FakeActor) ParseAccessToken(arg1 string) (jwt.JWT, error) {
+	fake.parseAccessTokenMutex.Lock()
+	ret, specificReturn := fake.parseAccessTokenReturnsOnCall[len(fake.parseAccessTokenArgsForCall)]
+	fake.parseAccessTokenArgsForCall = append(fake.parseAccessTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ParseAccessToken", []interface{}{arg1})
+	fake.parseAccessTokenMutex.Unlock()
+	if fake.ParseAccessTokenStub != nil {
+		return fake.ParseAccessTokenStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.parseAccessTokenReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) ParseAccessTokenCallCount() int {
+	fake.parseAccessTokenMutex.RLock()
+	defer fake.parseAccessTokenMutex.RUnlock()
+	return len(fake.parseAccessTokenArgsForCall)
+}
+
+func (fake *FakeActor) ParseAccessTokenCalls(stub func(string) (jwt.JWT, error)) {
+	fake.parseAccessTokenMutex.Lock()
+	defer fake.parseAccessTokenMutex.Unlock()
+	fake.ParseAccessTokenStub = stub
+}
+
+func (fake *FakeActor) ParseAccessTokenArgsForCall(i int) string {
+	fake.parseAccessTokenMutex.RLock()
+	defer fake.parseAccessTokenMutex.RUnlock()
+	argsForCall := fake.parseAccessTokenArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) ParseAccessTokenReturns(result1 jwt.JWT, result2 error) {
+	fake.parseAccessTokenMutex.Lock()
+	defer fake.parseAccessTokenMutex.Unlock()
+	fake.ParseAccessTokenStub = nil
+	fake.parseAccessTokenReturns = struct {
+		result1 jwt.JWT
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) ParseAccessTokenReturnsOnCall(i int, result1 jwt.JWT, result2 error) {
+	fake.parseAccessTokenMutex.Lock()
+	defer fake.parseAccessTokenMutex.Unlock()
+	fake.ParseAccessTokenStub = nil
+	if fake.parseAccessTokenReturnsOnCall == nil {
+		fake.parseAccessTokenReturnsOnCall = make(map[int]struct {
+			result1 jwt.JWT
+			result2 error
+		})
+	}
+	fake.parseAccessTokenReturnsOnCall[i] = struct {
+		result1 jwt.JWT
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) PollBuild(arg1 string, arg2 string) (v7action.Droplet, v7action.Warnings, error) {
 	fake.pollBuildMutex.Lock()
 	ret, specificReturn := fake.pollBuildReturnsOnCall[len(fake.pollBuildArgsForCall)]
@@ -11639,6 +11728,61 @@ func (fake *FakeActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, 
 		})
 	}
 	fake.prepareBuildpackBitsReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) RefreshAccessToken() (string, error) {
+	fake.refreshAccessTokenMutex.Lock()
+	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
+	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
+	}{})
+	fake.recordInvocation("RefreshAccessToken", []interface{}{})
+	fake.refreshAccessTokenMutex.Unlock()
+	if fake.RefreshAccessTokenStub != nil {
+		return fake.RefreshAccessTokenStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.refreshAccessTokenReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) RefreshAccessTokenCallCount() int {
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
+	return len(fake.refreshAccessTokenArgsForCall)
+}
+
+func (fake *FakeActor) RefreshAccessTokenCalls(stub func() (string, error)) {
+	fake.refreshAccessTokenMutex.Lock()
+	defer fake.refreshAccessTokenMutex.Unlock()
+	fake.RefreshAccessTokenStub = stub
+}
+
+func (fake *FakeActor) RefreshAccessTokenReturns(result1 string, result2 error) {
+	fake.refreshAccessTokenMutex.Lock()
+	defer fake.refreshAccessTokenMutex.Unlock()
+	fake.RefreshAccessTokenStub = nil
+	fake.refreshAccessTokenReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) RefreshAccessTokenReturnsOnCall(i int, result1 string, result2 error) {
+	fake.refreshAccessTokenMutex.Lock()
+	defer fake.refreshAccessTokenMutex.Unlock()
+	fake.RefreshAccessTokenStub = nil
+	if fake.refreshAccessTokenReturnsOnCall == nil {
+		fake.refreshAccessTokenReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.refreshAccessTokenReturnsOnCall[i] = struct {
 		result1 string
 		result2 error
 	}{result1, result2}
@@ -15374,6 +15518,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getUserMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
+	fake.parseAccessTokenMutex.RLock()
+	defer fake.parseAccessTokenMutex.RUnlock()
 	fake.pollBuildMutex.RLock()
 	defer fake.pollBuildMutex.RUnlock()
 	fake.pollPackageMutex.RLock()
@@ -15386,6 +15532,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.pollUploadBuildpackJobMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
 	fake.renameApplicationByNameAndSpaceGUIDMutex.RLock()
 	defer fake.renameApplicationByNameAndSpaceGUIDMutex.RUnlock()
 	fake.renameOrganizationMutex.RLock()

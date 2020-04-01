@@ -12,6 +12,7 @@ import (
 	uaa "code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
+	"github.com/SermoDigital/jose/jwt"
 )
 
 //go:generate counterfeiter . Actor
@@ -146,12 +147,14 @@ type Actor interface {
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	GetUser(username, origin string) (v7action.User, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
+	ParseAccessToken(accessToken string) (jwt.JWT, error)
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)
 	PollStart(appGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	PollStartForRolling(appGUID string, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	PollUploadBuildpackJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
+	RefreshAccessToken() (string, error)
 	RenameApplicationByNameAndSpaceGUID(oldAppName, newAppName, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	RenameOrganization(oldOrgName, newOrgName string) (v7action.Organization, v7action.Warnings, error)
 	RenameSpaceByNameAndOrganizationGUID(oldSpaceName, newSpaceName, orgGUID string) (v7action.Space, v7action.Warnings, error)

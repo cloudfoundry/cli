@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/SermoDigital/jose/jws"
+	"github.com/SermoDigital/jose/jwt"
 )
 
 func (actor Actor) RefreshAccessToken() (string, error) {
@@ -34,4 +35,9 @@ func (actor Actor) RefreshAccessToken() (string, error) {
 		return tokens.AuthorizationToken(), nil
 	}
 	return actor.Config.AccessToken(), nil
+}
+
+func (actor Actor) ParseAccessToken(accessToken string) (jwt.JWT, error) {
+	tokenStr := strings.TrimPrefix(accessToken, "bearer ")
+	return jws.ParseJWT([]byte(tokenStr))
 }
