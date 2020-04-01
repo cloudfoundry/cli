@@ -16,27 +16,27 @@ type ColorLogger interface {
 	LogStderrColor(string) string
 }
 
-type logCacheMessage struct {
+type LogCacheMessage struct {
 	colorLogger ColorLogger
 	msg         sharedaction.LogMessage
 }
 
-func NewLogCacheMessage(c ColorLogger, m sharedaction.LogMessage) *logCacheMessage {
-	return &logCacheMessage{
+func NewLogCacheMessage(c ColorLogger, m sharedaction.LogMessage) *LogCacheMessage {
+	return &LogCacheMessage{
 		colorLogger: c,
 		msg:         m,
 	}
 }
 
-func (m *logCacheMessage) ToSimpleLog() string {
+func (m *LogCacheMessage) ToSimpleLog() string {
 	return m.msg.Message()
 }
 
-func (m *logCacheMessage) GetSourceName() string {
+func (m *LogCacheMessage) GetSourceName() string {
 	return m.msg.SourceType()
 }
 
-func (m *logCacheMessage) ToLog(loc *time.Location) string {
+func (m *LogCacheMessage) ToLog(loc *time.Location) string {
 	logMsg := m.msg
 
 	sourceName := logMsg.SourceType()

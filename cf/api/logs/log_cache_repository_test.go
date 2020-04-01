@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/cf/api/logs"
-	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -71,8 +70,11 @@ var _ = Describe("logs with log cache", func() {
 
 	Describe("TailLogsFor", func() {
 		It("writes logs to the log channel", func() {
-			var logMessages chan sharedaction.LogMessage
-			var errorChan chan error
+			var (
+				logMessages chan sharedaction.LogMessage
+				errorChan chan error
+				logCacheMessage *logs.LogCacheMessage
+			)
 
 			recentLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error) {
 				return []sharedaction.LogMessage{}, nil
@@ -116,16 +118,6 @@ var _ = Describe("logs with log cache", func() {
 			errChan := make(chan error, 2)
 			repository.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
-			fakeColorLogger := new(logsfakes.FakeColorLogger)
-			message := *sharedaction.NewLogMessage(
-				"some-message",
-				"OUT",
-				time.Unix(0, 0),
-				"APP/PROC/WEB",
-				"0",
-			)
-			logCacheMessage := logs.NewLogCacheMessage(fakeColorLogger, message)
-
 			Eventually(logChan).Should(HaveLen(2))
 
 			Expect(logChan).To(Receive(&logCacheMessage))
@@ -134,9 +126,6 @@ var _ = Describe("logs with log cache", func() {
 			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message2"))
 
 			Expect(errorChan).ToNot(Receive())
-
-			// Expect(logMessages).To(Eventually(actual interface{}, intervals ...interface{})
-
 		})
 
 		It("writes errors to the error channel", func() {

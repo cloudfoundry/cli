@@ -12,7 +12,10 @@ import (
 
 var _ = Describe("log messages", func() {
 
-	var fakeColorLogger *logsfakes.FakeColorLogger
+	var (
+		fakeColorLogger *logsfakes.FakeColorLogger
+		logCacheMessage *logs.LogCacheMessage
+	)
 
 	// TODO: review if that is the only way to initialize variables of these types
 
@@ -23,8 +26,6 @@ var _ = Describe("log messages", func() {
 		"APP/PROC/WEB",
 		"0",
 	)
-
-	logCacheMessage := logs.NewLogCacheMessage(fakeColorLogger, message)
 
 	BeforeEach(func() {
 		fakeColorLogger = new(logsfakes.FakeColorLogger)
