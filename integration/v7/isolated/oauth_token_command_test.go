@@ -17,7 +17,7 @@ var _ = Describe("oauth-token command", func() {
 			session := helpers.CF("oauth-token", "--help")
 
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("oauth-token - Retrieve and display the OAuth token for the current session"))
+			Eventually(session).Should(Say("oauth-token - Display the OAuth token for the current session and refresh the token if necessary"))
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("cf oauth-token"))
 			Eventually(session).Should(Say("SEE ALSO:"))
