@@ -93,7 +93,7 @@ var _ = Describe("unbind-security-group Command", func() {
 	})
 
 	It("indicates that it will unbind the security group", func() {
-		Expect(testUI.Out).To(Say(`Unbinding security group %s from org %s / space %s as %s\.\.\.`, "some-security-group", "some-org", "some-space", "some-user"))
+		Expect(testUI.Out).To(Say(`Unbinding some-lifecycle security group %s from org %s / space %s as %s\.\.\.`, "some-security-group", "some-org", "some-space", "some-user"))
 	})
 
 	It("displays the warnings from unbinding the security group", func() {

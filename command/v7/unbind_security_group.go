@@ -37,7 +37,8 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	orgName = cmd.RequiredArgs.OrganizationName
 	spaceName = cmd.RequiredArgs.SpaceName
 
-	cmd.UI.DisplayTextWithFlavor("Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Unbinding {{.Lifecycle}} security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"Lifecycle":         string(cmd.Lifecycle),
 		"SecurityGroupName": cmd.RequiredArgs.SecurityGroupName,
 		"OrgName":           orgName,
 		"SpaceName":         spaceName,
