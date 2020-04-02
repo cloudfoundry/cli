@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -50,6 +51,12 @@ var _ = Describe("custom oauth client id", func() {
 			})
 
 			Context("oauth-token", func() {
+				BeforeEach(func() {
+					helpers.SetConfig(func(conf *configv3.Config) {
+						conf.ConfigFile.AccessToken = "invalid-access-token"
+					})
+				})
+
 				It("uses the custom client id and secret", func() {
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(1))
