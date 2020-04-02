@@ -2,6 +2,7 @@ package manifestparser
 
 type Manifest struct {
 	Applications   []Application `yaml:"applications"`
+	Version        int           `yaml:"version,omitempty"`
 	PathToManifest string        `yaml:"-"`
 }
 
