@@ -22,7 +22,7 @@ run:
 
 
     export LC_ALL="en_US.UTF-8"
-    export GOLANGCI_LINT_VERSION="1.21.0"
+    export GOLANGCI_LINT_VERSION="1.24.0"
 
     go version
 
