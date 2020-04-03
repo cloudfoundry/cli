@@ -116,7 +116,7 @@ var _ = Describe("Logs Command", func() {
 					route := fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())
 					// 3 lines of logs for each call to curl + a few lines during the push
 					for i := 0; i < 333; i += 1 {
-						command := exec.Command("curl", route)
+						command := exec.Command("curl", "--fail", route)
 						session, err := Start(command, GinkgoWriter, GinkgoWriter)
 						Expect(err).NotTo(HaveOccurred())
 						Eventually(session).Should(Exit(0))
