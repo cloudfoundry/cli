@@ -44,7 +44,6 @@
       "gocyclo",
       "godox",
       "gofmt",
-      "gomnd",
       "golint",
       "gosec",
       "gosimple",

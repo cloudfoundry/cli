@@ -35,7 +35,8 @@ func (w warningPrinter) print(writer io.Writer) {
 
 		message := fmt.Sprintf(warning.format, coloredVars...)
 
-		fmt.Printf("%s %s %s\n",
+		fmt.Printf(
+			"%s %s %s\n",
 			color.MagentaString(warning.Position.Filename),
 			color.MagentaString(fmt.Sprintf("+%d", warning.Position.Line)),
 			message)
@@ -100,7 +101,7 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
-func (v *visitor) addWarning(pos token.Pos, format string, vars ...interface{}) { //nolint:golint,goprintffuncname
+func (v *visitor) addWarning(pos token.Pos, format string, vars ...interface{}) {
 	v.warnings = append(v.warnings, warning{
 		format:   format,
 		vars:     vars,
