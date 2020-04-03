@@ -2,8 +2,6 @@ package logs
 
 import (
 	"context"
-	"os"
-	"os/signal"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/cf/terminal"
@@ -36,7 +34,7 @@ func NewLogCacheRepository(
 	recentLogsFunc func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error),
 	getStreamingLogsFunc func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc),
 ) *logCacheRepository {
-	return &logCacheRepository{client: client, recentLogsFunc: recentLogsFunc, getStreamingLogsFunc: getStreamingLogsFunc}
+	return &logCacheRepository{client: client, recentLogsFunc: recentLogsFunc, getStreamingLogsFunc: getStreamingLogsFunc, cancelFunc: func() {}}
 }
 
 func (r *logCacheRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
@@ -61,8 +59,11 @@ func (r *logCacheRepository) TailLogsFor(appGUID string, onConnect func(), logCh
 	defer close(logChan)
 	defer close(errChan)
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	// TODO: discuss whether we need to manually handle ctrl+c
+	// ctrl+c will just kill the whole program and all go routines. Not sure why this function in particular needs special ctrl+c behavior.
+	// Update: talked with team, this seems to be just a nice clean up step, maybe not necessary. Will dig more
+	// c := make(chan os.Signal, 1)
+	// signal.Notify(c, os.Interrupt)
 
 	for {
 		select {
@@ -76,8 +77,6 @@ func (r *logCacheRepository) TailLogsFor(appGUID string, onConnect func(), logCh
 				return
 			}
 			errChan <- logErr
-		case <-c:
-			r.cancelFunc()
 		}
 	}
 }

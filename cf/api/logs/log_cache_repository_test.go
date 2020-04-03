@@ -69,24 +69,71 @@ var _ = Describe("logs with log cache", func() {
 	})
 
 	Describe("TailLogsFor", func() {
-		It("writes logs to the log channel", func() {
-			var (
-				inputLogChan chan sharedaction.LogMessage
-				inputErrorChan chan error
-				logCacheMessage *logs.LogCacheMessage
-			)
+		var (
+			inputLogChan    chan sharedaction.LogMessage
+			inputErrorChan  chan error
+			logCacheMessage *logs.LogCacheMessage
+			internalError   error
+		)
 
-			recentLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error) {
-				return []sharedaction.LogMessage{}, nil
-			}
+		cancelFunc := func() {}
 
+		recentLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error) {
+			return []sharedaction.LogMessage{}, nil
+		}
+
+		It("writes to output log channel until input log message channel is closed", func() {
 			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
 				inputLogChan = make(chan sharedaction.LogMessage, 2)
 				inputErrorChan = make(chan error, 2)
-				cancelFunc := func() {}
 
 				go func() {
 					defer close(inputLogChan)
+
+					message := *sharedaction.NewLogMessage(
+						"some-message",
+						"OUT",
+						time.Unix(0, 0),
+						"STG",
+						"some-source-instance",
+					)
+					message2 := *sharedaction.NewLogMessage(
+						"some-message2",
+						"OUT",
+						time.Unix(0, 0),
+						"STG",
+						"some-source-instance2",
+					)
+					inputLogChan <- message
+					inputLogChan <- message2
+
+					time.Sleep(1 * time.Second)
+				}()
+
+				return inputLogChan, inputErrorChan, cancelFunc
+			}
+
+			client := sharedactionfakes.FakeLogCacheClient{}
+			repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
+			outputLogChan := make(chan logs.Loggable, 2)
+			outputErrorChan := make(chan error, 2)
+
+			repository.TailLogsFor("app-guid", func() {}, outputLogChan, outputErrorChan)
+
+			Eventually(outputLogChan).Should(HaveLen(2))
+			Expect(outputLogChan).To(Receive(&logCacheMessage))
+			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message"))
+			Expect(outputLogChan).To(Receive(&logCacheMessage))
+			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message2"))
+			Expect(inputErrorChan).ToNot(Receive())
+		})
+
+		It("writes to output log channel until input error channel is closed", func() {
+			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
+				inputLogChan = make(chan sharedaction.LogMessage, 2)
+				inputErrorChan = make(chan error, 2)
+
+				go func() {
 					defer close(inputErrorChan)
 
 					message := *sharedaction.NewLogMessage(
@@ -116,38 +163,24 @@ var _ = Describe("logs with log cache", func() {
 			repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
 			outputLogChan := make(chan logs.Loggable, 2)
 			outputErrorChan := make(chan error, 2)
+
 			repository.TailLogsFor("app-guid", func() {}, outputLogChan, outputErrorChan)
 
 			Eventually(outputLogChan).Should(HaveLen(2))
-
 			Expect(outputLogChan).To(Receive(&logCacheMessage))
 			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message"))
 			Expect(outputLogChan).To(Receive(&logCacheMessage))
 			Expect(logCacheMessage.ToSimpleLog()).To(Equal("some-message2"))
-
 			Expect(inputErrorChan).ToNot(Receive())
 		})
 
-		It("writes errors to the error channel", func() {
-			var (
-				inputLogChan chan sharedaction.LogMessage
-				inputErrorChan chan error
-				internalError error
-			)
-
-			recentLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, error) {
-				return []sharedaction.LogMessage{}, nil
-			}
-
+		It("writes recoverable errors to output error channel until input error channel is closed", func() {
 			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
 				inputLogChan = make(chan sharedaction.LogMessage)
 				inputErrorChan = make(chan error, 1)
-				cancelFunc := func() {}
 
 				go func() {
-					defer close(inputLogChan)
 					defer close(inputErrorChan)
-
 					inputErrorChan <- errors.New("internal error")
 					time.Sleep(1 * time.Second)
 				}()
@@ -166,11 +199,57 @@ var _ = Describe("logs with log cache", func() {
 			Expect(internalError).To(MatchError("internal error"))
 			Expect(inputLogChan).ToNot(Receive())
 		})
+
+		It("writes recoverable errors to output error channel until input log message channel is closed", func() {
+			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
+				inputLogChan = make(chan sharedaction.LogMessage)
+				inputErrorChan = make(chan error, 1)
+
+				go func() {
+					defer close(inputLogChan)
+					inputErrorChan <- errors.New("internal error")
+					time.Sleep(1 * time.Second)
+				}()
+
+				return inputLogChan, inputErrorChan, cancelFunc
+			}
+
+			client := sharedactionfakes.FakeLogCacheClient{}
+			repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
+			outputLogChan := make(chan logs.Loggable)
+			outputErrorChan := make(chan error, 1)
+			repository.TailLogsFor("app-guid", func() {}, outputLogChan, outputErrorChan)
+
+			Eventually(outputErrorChan).Should(HaveLen(1))
+			Expect(outputErrorChan).To(Receive(&internalError))
+			Expect(internalError).To(MatchError("internal error"))
+			Expect(inputLogChan).ToNot(Receive())
+		})
+
+		It("sets repository.cancelFunc", func() {
+			cancelFunc = func() {
+				panic("asdf")
+			}
+
+			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
+				inputLogChan = make(chan sharedaction.LogMessage)
+				inputErrorChan = make(chan error, 1)
+				close(inputLogChan)
+				close(inputErrorChan)
+				return inputLogChan, inputErrorChan, cancelFunc
+			}
+
+			client := sharedactionfakes.FakeLogCacheClient{}
+			repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
+			outputLogChan := make(chan logs.Loggable)
+			outputErrorChan := make(chan error, 1)
+
+			Expect(repository.Close).ShouldNot(Panic())
+			repository.TailLogsFor("app-guid", func() {}, outputLogChan, outputErrorChan)
+			Expect(repository.Close).Should(Panic())
+		})
 	})
 
-	// - unrecoverable error
-	// - user interrupt
-
 	XDescribe("Authentication Token Refresh", func() {
-	}) // }}
+	})
 })
