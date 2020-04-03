@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -837,6 +838,105 @@ var _ = Describe("Package", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 
+		})
+	})
+
+	Describe("CopyPackage", func() {
+		var (
+			sourcePackageGUID string
+			targetAppGUID     string
+
+			targetPackage Package
+			warnings      Warnings
+			executeErr    error
+			response      string
+		)
+
+		BeforeEach(func() {
+			sourcePackageGUID = "source-package-guid"
+
+			targetAppGUID = "target-app-guid"
+			response = `{
+					"guid": "some-targetPackage-guid"
+				}`
+
+			expectedBody := map[string]interface{}{
+				"relationships": map[string]interface{}{
+					"app": map[string]interface{}{
+						"data": map[string]string{
+							"guid": targetAppGUID,
+						},
+					},
+				},
+			}
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodPost, "/v3/packages", "source_guid="+sourcePackageGUID),
+					VerifyJSONRepresenting(expectedBody),
+					RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+
+		})
+
+		JustBeforeEach(func() {
+			targetPackage, warnings, executeErr = client.CopyPackage(sourcePackageGUID, targetAppGUID)
+		})
+
+		It("returns the created target package and warnings", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(warnings).To(ConsistOf("this is a warning"))
+
+			expectedPackage := Package{
+				GUID: "some-targetPackage-guid",
+			}
+			Expect(targetPackage).To(Equal(expectedPackage))
+		})
+
+		When("cc returns back an error or warnings", func() {
+			BeforeEach(func() {
+				response = ` {
+		 "errors": [
+		   {
+		     "code": 10008,
+		     "detail": "The request is semantically invalid: command presence",
+		     "title": "CF-UnprocessableEntity"
+		   },
+		   {
+		     "code": 10010,
+		     "detail": "Package not found",
+		     "title": "CF-ResourceNotFound"
+		   }
+		 ]
+		}`
+				server.Reset()
+				time.Sleep(10 * time.Millisecond) // guards against <ccerror.RequestError>: {Err: { ... { Err: {s: "EOF"},
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/packages", "source_guid="+sourcePackageGUID),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Package not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
 		})
 	})
 })

@@ -134,6 +134,22 @@ type FakeActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
+	CopyPackageStub        func(string, string) (v7action.Package, v7action.Warnings, error)
+	copyPackageMutex       sync.RWMutex
+	copyPackageArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	copyPackageReturns struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}
+	copyPackageReturnsOnCall map[int]struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}
 	CreateAndUploadBitsPackageByApplicationNameAndSpaceStub        func(string, string, string) (v7action.Package, v7action.Warnings, error)
 	createAndUploadBitsPackageByApplicationNameAndSpaceMutex       sync.RWMutex
 	createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall []struct {
@@ -3404,6 +3420,73 @@ func (fake *FakeActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 str
 	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeActor) CopyPackage(arg1 string, arg2 string) (v7action.Package, v7action.Warnings, error) {
+	fake.copyPackageMutex.Lock()
+	ret, specificReturn := fake.copyPackageReturnsOnCall[len(fake.copyPackageArgsForCall)]
+	fake.copyPackageArgsForCall = append(fake.copyPackageArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CopyPackage", []interface{}{arg1, arg2})
+	fake.copyPackageMutex.Unlock()
+	if fake.CopyPackageStub != nil {
+		return fake.CopyPackageStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.copyPackageReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) CopyPackageCallCount() int {
+	fake.copyPackageMutex.RLock()
+	defer fake.copyPackageMutex.RUnlock()
+	return len(fake.copyPackageArgsForCall)
+}
+
+func (fake *FakeActor) CopyPackageCalls(stub func(string, string) (v7action.Package, v7action.Warnings, error)) {
+	fake.copyPackageMutex.Lock()
+	defer fake.copyPackageMutex.Unlock()
+	fake.CopyPackageStub = stub
+}
+
+func (fake *FakeActor) CopyPackageArgsForCall(i int) (string, string) {
+	fake.copyPackageMutex.RLock()
+	defer fake.copyPackageMutex.RUnlock()
+	argsForCall := fake.copyPackageArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) CopyPackageReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+	fake.copyPackageMutex.Lock()
+	defer fake.copyPackageMutex.Unlock()
+	fake.CopyPackageStub = nil
+	fake.copyPackageReturns = struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) CopyPackageReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+	fake.copyPackageMutex.Lock()
+	defer fake.copyPackageMutex.Unlock()
+	fake.CopyPackageStub = nil
+	if fake.copyPackageReturnsOnCall == nil {
+		fake.copyPackageReturnsOnCall = make(map[int]struct {
+			result1 v7action.Package
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.copyPackageReturnsOnCall[i] = struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeActor) CreateAndUploadBitsPackageByApplicationNameAndSpace(arg1 string, arg2 string, arg3 string) (v7action.Package, v7action.Warnings, error) {
@@ -15278,6 +15361,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.clearTargetMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	fake.copyPackageMutex.RLock()
+	defer fake.copyPackageMutex.RUnlock()
 	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
 	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
 	fake.createApplicationDropletMutex.RLock()

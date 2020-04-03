@@ -19,6 +19,7 @@ type CloudControllerClient interface {
 	CheckRoute(domainGUID string, hostname string, path string) (bool, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CancelDeployment(deploymentGUID string) (ccv3.Warnings, error)
+	CopyPackage(sourcePackageGUID string, targetAppGUID string) (ccv3.Package, ccv3.Warnings, error)
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	CreateApplicationDeployment(appGUID string, dropletGUID string) (string, ccv3.Warnings, error)
 	CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)

@@ -87,6 +87,10 @@ const (
 	// CreatedAtDescendingOrder is a query value for ordering by created_at timestamp,
 	// in descending order.
 	CreatedAtDescendingOrder = "-created_at"
+
+	// SourceGUID is the query parameter for getting an object. Currently it's used as a package GUID
+	// to retrieve a package to later copy it to an app (CopyPackage())
+	SourceGUID = "source_guid"
 )
 
 // Query is additional settings that can be passed to some requests that can

@@ -235,3 +235,26 @@ func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
 
 	return pkg, allWarnings, nil
 }
+
+func (actor Actor) CopyPackage(sourceAppGUID string, targetAppGUID string) (Package, Warnings, error) {
+	var allWarnings Warnings
+
+	sourcePkg, warnings, err := actor.GetNewestReadyPackageForApplication(sourceAppGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+	targetPkg, ccv3Warnings, err := actor.CloudControllerClient.CopyPackage(sourcePkg.GUID, targetAppGUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	readyPackage, warnings, err := actor.PollPackage(Package(targetPkg))
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	return readyPackage, allWarnings, nil
+}
