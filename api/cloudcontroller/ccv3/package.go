@@ -198,6 +198,25 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, warnings, err
 }
 
+// CopyPackage copies a package from a source package to a destination package
+// Note: source app guid is in URL; dest app guid is in body
+func (client *Client) CopyPackage(sourcePkgGUID string, targetAppGUID string) (Package, Warnings, error) {
+	var targetPackage Package
+
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.PostPackageRequest,
+		Query:       []Query{{Key: SourceGUID, Values: []string{sourcePkgGUID}}},
+		RequestBody: map[string]Relationships{
+			"relationships": {
+				constant.RelationshipTypeApplication: Relationship{GUID: targetAppGUID},
+			},
+		},
+		ResponseBody: &targetPackage,
+	})
+
+	return targetPackage, warnings, err
+}
+
 func (client *Client) calculateAppBitsRequestSize(matchedResources []Resource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)

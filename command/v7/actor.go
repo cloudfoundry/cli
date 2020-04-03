@@ -27,6 +27,7 @@ type Actor interface {
 	CheckRoute(domainName string, hostname string, path string) (bool, v7action.Warnings, error)
 	ClearTarget()
 	CloudControllerAPIVersion() string
+	CopyPackage(sourceAppGUID string, targetAppGUID string) (v7action.Package, v7action.Warnings, error)
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v7action.Package, v7action.Warnings, error)
 	CreateApplicationDroplet(appGUID string) (v7action.Droplet, v7action.Warnings, error)
 	CreateApplicationInSpace(app v7action.Application, spaceGUID string) (v7action.Application, v7action.Warnings, error)
