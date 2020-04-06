@@ -1,6 +1,7 @@
 package ccv3
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
 )
@@ -36,4 +37,38 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]ServiceOffering, Wa
 	})
 
 	return resources, warnings, err
+}
+
+func (client *Client) GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName string) (ServiceOffering, Warnings, error) {
+	query := []Query{{Key: NameFilter, Values: []string{serviceOfferingName}}}
+	if serviceBrokerName != "" {
+		query = append(query, Query{Key: ServiceBrokerNamesFilter, Values: []string{serviceBrokerName}})
+	}
+
+	offerings, warnings, err := client.GetServiceOfferings(query...)
+	if err != nil {
+		return ServiceOffering{}, warnings, err
+	}
+
+	switch len(offerings) {
+	case 0:
+		return ServiceOffering{}, warnings, ccerror.ServiceOfferingNotFoundError{
+			ServiceOfferingName: serviceOfferingName,
+			ServiceBrokerName:   serviceBrokerName,
+		}
+	case 1:
+		return offerings[0], warnings, nil
+	default:
+		return ServiceOffering{}, warnings, ccerror.ServiceOfferingNameAmbiguityError{
+			ServiceOfferingName: serviceOfferingName,
+			ServiceBrokerNames:  extractServiceBrokerNames(offerings),
+		}
+	}
+}
+
+func extractServiceBrokerNames(offerings []ServiceOffering) (result []string) {
+	for _, o := range offerings {
+		result = append(result, o.ServiceBrokerName)
+	}
+	return
 }

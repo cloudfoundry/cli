@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
 )
@@ -31,8 +32,8 @@ func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]
 }
 
 func (actor Actor) GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
-	serviceOffering, warnings, err := actor.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
-	return actor.extractLabels(serviceOffering.Metadata, warnings, err)
+	serviceOffering, warnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+	return actor.extractLabels(serviceOffering.Metadata, Warnings(warnings), actionerror.EnrichAPIErrors(err))
 }
 
 func (actor Actor) GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
@@ -132,11 +133,11 @@ func (actor *Actor) UpdateServiceBrokerLabelsByServiceBrokerName(serviceBrokerNa
 }
 
 func (actor *Actor) UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
-	serviceOffering, warnings, err := actor.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+	serviceOffering, warnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
 	if err != nil {
-		return warnings, err
+		return Warnings(warnings), actionerror.EnrichAPIErrors(err)
 	}
-	return actor.updateResourceMetadata("service-offering", serviceOffering.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("service-offering", serviceOffering.GUID, ccv3.Metadata{Labels: labels}, Warnings(warnings))
 }
 
 func (actor *Actor) UpdateServicePlanLabels(servicePlanName string, serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {

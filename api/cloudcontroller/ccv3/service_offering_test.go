@@ -1,6 +1,9 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -10,23 +13,23 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Service Offering", func() {
-	var client *Client
-
-	BeforeEach(func() {
-		client, _ = NewTestClient()
-	})
-
 	Describe("GetServiceOfferings", func() {
 		var (
-			query []Query
+			client *Client
+			query  []Query
 
 			offerings  []ServiceOffering
 			warnings   Warnings
 			executeErr error
 		)
+
+		BeforeEach(func() {
+			client, _ = NewTestClient()
+		})
 
 		JustBeforeEach(func() {
 			offerings, warnings, executeErr = client.GetServiceOfferings(query...)
@@ -179,6 +182,128 @@ var _ = Describe("Service Offering", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetServiceOfferingByNameAndBroker", func() {
+		const (
+			serviceOfferingName = "myServiceOffering"
+		)
+
+		var (
+			client            *Client
+			requester         *ccv3fakes.FakeRequester
+			serviceBrokerName string
+			offering          ServiceOffering
+			warnings          Warnings
+			executeErr        error
+		)
+
+		BeforeEach(func() {
+			requester = new(ccv3fakes.FakeRequester)
+			client, _ = NewFakeRequesterTestClient(requester)
+
+			serviceBrokerName = ""
+		})
+
+		JustBeforeEach(func() {
+			offering, warnings, executeErr = client.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+		})
+
+		When("there is a single match", func() {
+			BeforeEach(func() {
+				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
+					err := requestParams.AppendToList(ServiceOffering{GUID: "service-offering-guid-1"})
+					Expect(err).NotTo(HaveOccurred())
+					return IncludedResources{}, Warnings{"this is a warning"}, nil
+				})
+			})
+
+			It("makes the correct request", func() {
+				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
+				Expect(requester.MakeListRequestArgsForCall(0)).To(MatchFields(IgnoreExtras, Fields{
+					"RequestName":  Equal(internal.GetServiceOfferingsRequest),
+					"Query":        Equal([]Query{{Key: NameFilter, Values: []string{serviceOfferingName}}}),
+					"ResponseBody": Equal(ServiceOffering{}),
+				}))
+			})
+
+			It("returns the service offering and warnings", func() {
+				Expect(offering).To(Equal(ServiceOffering{GUID: "service-offering-guid-1"}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(executeErr).NotTo(HaveOccurred())
+			})
+		})
+
+		When("there are no matches", func() {
+			BeforeEach(func() {
+				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
+					return IncludedResources{}, Warnings{"this is a warning"}, nil
+				})
+
+				serviceBrokerName = "myServiceBroker"
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(executeErr).To(MatchError(ccerror.ServiceOfferingNotFoundError{
+					ServiceOfferingName: serviceOfferingName,
+					ServiceBrokerName:   serviceBrokerName,
+				}))
+			})
+		})
+
+		When("there is more than one match", func() {
+			BeforeEach(func() {
+				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
+					err := requestParams.AppendToList(ServiceOffering{
+						GUID:              "service-offering-guid-1",
+						Name:              serviceOfferingName,
+						ServiceBrokerName: "broker-1",
+					})
+					Expect(err).NotTo(HaveOccurred())
+					err = requestParams.AppendToList(ServiceOffering{
+						GUID:              "service-offering-guid-2",
+						Name:              serviceOfferingName,
+						ServiceBrokerName: "broker-2",
+					})
+					Expect(err).NotTo(HaveOccurred())
+					return IncludedResources{}, Warnings{"this is a warning"}, nil
+				})
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(executeErr).To(MatchError(ccerror.ServiceOfferingNameAmbiguityError{
+					ServiceOfferingName: serviceOfferingName,
+					ServiceBrokerNames:  []string{"broker-1", "broker-2"},
+				}))
+			})
+		})
+
+		When("the broker name is specified", func() {
+			BeforeEach(func() {
+				serviceBrokerName = "myServiceBroker"
+			})
+
+			It("makes the correct request", func() {
+				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
+				Expect(requester.MakeListRequestArgsForCall(0).Query).To(ConsistOf(
+					Query{Key: NameFilter, Values: []string{serviceOfferingName}},
+					Query{Key: ServiceBrokerNamesFilter, Values: []string{"myServiceBroker"}},
+				))
+			})
+		})
+
+		When("the requester returns an error", func() {
+			BeforeEach(func() {
+				requester.MakeListRequestReturns(IncludedResources{}, Warnings{"this is a warning"}, errors.New("bang"))
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(executeErr).To(MatchError("bang"))
 			})
 		})
 	})

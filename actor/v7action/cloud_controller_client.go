@@ -105,6 +105,7 @@ type CloudControllerClient interface {
 	GetServiceBrokers(query ...ccv3.Query) ([]ccv3.ServiceBroker, ccv3.Warnings, error)
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetServiceOfferings(query ...ccv3.Query) ([]ccv3.ServiceOffering, ccv3.Warnings, error)
+	GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName string) (ccv3.ServiceOffering, ccv3.Warnings, error)
 	GetServicePlans(query ...ccv3.Query) ([]ccv3.ServicePlan, ccv3.Warnings, error)
 	GetServicePlansWithSpaceAndOrganization(query ...ccv3.Query) ([]ccv3.ServicePlanWithSpaceAndOrganization, ccv3.Warnings, error)
 	GetSpaceFeature(spaceGUID string, featureName string) (bool, ccv3.Warnings, error)
