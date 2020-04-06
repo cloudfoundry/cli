@@ -99,11 +99,11 @@ var _ = Describe("Build Actions", func() {
 			})
 		})
 
-		When("the package belongs to a different app", func() {
+		When("the package does not belong to the app", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{},
+					[]ccv3.Package{{GUID: "some-other-package-guid"}},
 					ccv3.Warnings{"get-packages-warning"},
 					nil,
 				)

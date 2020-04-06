@@ -45,7 +45,7 @@ func (actor Actor) StagePackage(packageGUID, appName, spaceGUID string) (<-chan 
 			return
 		}
 
-		if len(pkgs) == 0 {
+		if !packageInPackages(packageGUID, pkgs) {
 			err = actionerror.PackageNotFoundInAppError{GUID: packageGUID, AppName: appName}
 			errorStream <- err
 			return
@@ -168,4 +168,13 @@ func (actor Actor) PollBuild(buildGUID string, appName string) (Droplet, Warning
 			return Droplet{}, allWarnings, actionerror.StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 		}
 	}
+}
+
+func packageInPackages(targetPkgGUID string, pkgs []ccv3.Package) bool {
+	for i := range pkgs {
+		if pkgs[i].GUID == targetPkgGUID {
+			return true
+		}
+	}
+	return false
 }
