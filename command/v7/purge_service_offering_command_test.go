@@ -97,7 +97,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 		When("the user chooses the default", func() {
 			BeforeEach(func() {
-				input.Write([]byte("\n"))
+				_, err := input.Write([]byte("\n"))
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("does not purge the service offering", func() {
@@ -109,7 +110,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 		When("the user chooses `no`", func() {
 			BeforeEach(func() {
-				input.Write([]byte("n\n"))
+				_, err := input.Write([]byte("n\n"))
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("does not purge the service offering", func() {
@@ -121,7 +123,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 		When("the user chooses `yes`", func() {
 			BeforeEach(func() {
-				input.Write([]byte("y\n"))
+				_, err := input.Write([]byte("y\n"))
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("purges the service offering", func() {
