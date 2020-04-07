@@ -57,6 +57,18 @@
   revision = "18cdb3586e7fca967680b3330d9c21e3f7d3e767"
 
 [[projects]]
+  branch = "master"
+  digest = "1:6205b1b625268da2b0aedd0acf202e8153301cfaba3856d005de18865b3d3ac1"
+  name = "code.cloudfoundry.org/go-log-cache"
+  packages = [
+    ".",
+    "internal",
+    "rpc/logcache_v1",
+  ]
+  pruneopts = "NUT"
+  revision = "f466e0302c3470445d0111353b0ba5601d2868d8"
+
+[[projects]]
   digest = "1:3d3b0f6dde190db3efcdf2aa6cb3c23be30b5a53c31e91ce9408b62f9e11849c"
   name = "code.cloudfoundry.org/go-loggregator"
   packages = ["rpc/loggregator_v2"]
@@ -728,11 +740,12 @@
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_io",
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_net",
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh",
+    "code.cloudfoundry.org/go-log-cache",
+    "code.cloudfoundry.org/go-log-cache/rpc/logcache_v1",
     "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
     "code.cloudfoundry.org/gofileutils/fileutils",
     "code.cloudfoundry.org/lager/lagertest",
     "code.cloudfoundry.org/log-cache/pkg/client",
-    "code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1",
     "code.cloudfoundry.org/tlsconfig",
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",

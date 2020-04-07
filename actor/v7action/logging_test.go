@@ -10,8 +10,8 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	logcache "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

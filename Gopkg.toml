@@ -49,6 +49,10 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   branch = "master"
+  name = "code.cloudfoundry.org/go-log-cache"
+
+[[constraint]]
+  branch = "master"
   name = "code.cloudfoundry.org/ykk"
 
 [[constraint]]

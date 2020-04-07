@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/util"
-	logcache "code.cloudfoundry.org/log-cache/pkg/client"
+	logcache "code.cloudfoundry.org/go-log-cache"
 )
 
 type RequestLoggerOutput interface {
