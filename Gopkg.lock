@@ -97,18 +97,6 @@
   revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
 
 [[projects]]
-  digest = "1:3b3dceaa9c5b85b42400f717ae0fd38dcefbd9ec78a774e46f8336bf3a30e202"
-  name = "code.cloudfoundry.org/log-cache"
-  packages = [
-    "pkg/client",
-    "pkg/marshaler",
-    "pkg/rpc/logcache_v1",
-  ]
-  pruneopts = "NUT"
-  revision = "73f7c04d741ab02f4471e6d2653c6d71ff6dbd49"
-  version = "v2.3.1"
-
-[[projects]]
   branch = "master"
   digest = "1:d884ec0e4fd80c9fd201d158ac3ff45a38ff0cb13acbf2041da8818915f854de"
   name = "code.cloudfoundry.org/rfc5424"
@@ -745,7 +733,6 @@
     "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
     "code.cloudfoundry.org/gofileutils/fileutils",
     "code.cloudfoundry.org/lager/lagertest",
-    "code.cloudfoundry.org/log-cache/pkg/client",
     "code.cloudfoundry.org/tlsconfig",
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",
