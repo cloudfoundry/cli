@@ -70,7 +70,7 @@ var _ = Describe("Logging Actions", func() {
 		BeforeEach(func() {
 			expectedAppGUID = "some-app-guid"
 			// 2 seconds in the past to get past Walk delay
-			// Walk delay context: https://github.com/cloudfoundry/cli/blob/b8324096a3d5a495bdcae9d1e7f6267ff135fe82/vendor/code.cloudfoundry.org/log-cache/pkg/client/walk.go#L74
+			// Walk delay context: https://github.com/cloudfoundry/cli/blob/283d5fcdefa1806b24f4242adea1fb85871b4c6b/vendor/code.cloudfoundry.org/go-log-cache/walk.go#L74
 			mostRecentTime = time.Now().Add(-2 * time.Second)
 			mostRecentTimestamp := mostRecentTime.UnixNano()
 			slightlyOlderTimestamp := mostRecentTime.Add(-500 * time.Millisecond).UnixNano()
