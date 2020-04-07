@@ -38,13 +38,18 @@ func (cmd StagingEnvironmentVariableGroupCommand) Execute(args []string) error {
 	if len(envVars) == 0 {
 		cmd.UI.DisplayTextWithFlavor("No staging environment variable group has been set.")
 	} else {
-		cmd.displayTable(envVars)
+		table, err := buildEnvVarsTable(envVars)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 	}
 
 	return nil
 }
 
-func (cmd StagingEnvironmentVariableGroupCommand) displayTable(envVars v7action.EnvironmentVariableGroup) {
+func buildEnvVarsTable(envVars v7action.EnvironmentVariableGroup) ([][]string, error) {
 	var keyValueTable = [][]string{
 		{"variable name", "assigned value"},
 	}
@@ -56,5 +61,5 @@ func (cmd StagingEnvironmentVariableGroupCommand) displayTable(envVars v7action.
 		})
 	}
 
-	cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
+	return keyValueTable, nil
 }

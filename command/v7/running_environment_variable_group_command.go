@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -38,23 +37,13 @@ func (cmd RunningEnvironmentVariableGroupCommand) Execute(args []string) error {
 	if len(envVars) == 0 {
 		cmd.UI.DisplayTextWithFlavor("No running environment variable group has been set.")
 	} else {
-		cmd.displayTable(envVars)
+		table, err := buildEnvVarsTable(envVars)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 	}
 
 	return nil
-}
-
-func (cmd RunningEnvironmentVariableGroupCommand) displayTable(envVars v7action.EnvironmentVariableGroup) {
-	var keyValueTable = [][]string{
-		{"variable name", "assigned value"},
-	}
-
-	for envVarName, envVarValue := range envVars {
-		keyValueTable = append(keyValueTable, []string{
-			envVarName,
-			envVarValue.Value,
-		})
-	}
-
-	cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 }
