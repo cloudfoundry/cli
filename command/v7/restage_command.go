@@ -17,7 +17,7 @@ type RestageCommand struct {
 	NoWait              bool                    `long:"no-wait" description:"Do not wait for the long-running operation to complete; restage exits when one instance of the web process is healthy"`
 	usage               interface{}             `usage:"CF_NAME restage APP_NAME\n\nEXAMPLES:\n   CF_NAME restage APP_NAME\n   CF_NAME restage APP_NAME --strategy rolling\n   CF_NAME restage APP_NAME --strategy rolling --no-wait"`
 	relatedCommands     interface{}             `related_commands:"restart"`
-	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	Stager shared.AppStager

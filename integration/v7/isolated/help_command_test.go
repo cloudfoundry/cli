@@ -211,26 +211,13 @@ var _ = Describe("help command", func() {
 				Entry("cf restart", func() (*exec.Cmd, int) {
 					return exec.Command("cf", "h", "restart"), 0
 				}),
-			)
-
-			DescribeTable("NON-V7: shows the CF_STAGING_TIMEOUT and CF_STARTUP_TIMEOUT environment variables",
-				func(setup func() (*exec.Cmd, int)) {
-					cmd, exitCode := setup()
-					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
-					Expect(err).NotTo(HaveOccurred())
-
-					Eventually(session).Should(Say("ENVIRONMENT:"))
-					Eventually(session).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
-					Eventually(session).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
-					Eventually(session).Should(Exit(exitCode))
-				},
-
-				Entry("cf restage", func() (*exec.Cmd, int) {
-					return exec.Command("cf", "h", "restage"), 0
-				}),
 
 				Entry("cf copy-source", func() (*exec.Cmd, int) {
 					return exec.Command("cf", "h", "copy-source"), 0
+				}),
+
+				Entry("cf restage", func() (*exec.Cmd, int) {
+					return exec.Command("cf", "h", "restage"), 0
 				}),
 			)
 		})
