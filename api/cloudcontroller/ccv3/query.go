@@ -91,6 +91,9 @@ const (
 	// SourceGUID is the query parameter for getting an object. Currently it's used as a package GUID
 	// to retrieve a package to later copy it to an app (CopyPackage())
 	SourceGUID = "source_guid"
+
+	// Purge is a query parameter used on a Delete request to indicate that dependent resources should also be deleted
+	Purge = "purge"
 )
 
 // Query is additional settings that can be passed to some requests that can

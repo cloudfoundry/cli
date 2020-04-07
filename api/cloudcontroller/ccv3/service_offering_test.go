@@ -308,4 +308,86 @@ var _ = Describe("Service Offering", func() {
 			})
 		})
 	})
+
+	Describe("PurgeServiceOffering", func() {
+		const serviceOfferingGUID = "fake-service-offering-guid"
+
+		var (
+			client     *Client
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			client, _ = NewTestClient()
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.PurgeServiceOffering(serviceOfferingGUID)
+		})
+
+		When("the Cloud Controller successfully purges the service offering", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/service_offerings/fake-service-offering-guid", "purge=true"),
+						RespondWith(http.StatusNoContent, nil, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+						}),
+					),
+				)
+			})
+
+			It("succeeds and returns warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the Cloud Controller fails to purge the service offering", func() {
+			BeforeEach(func() {
+				response := `{
+                               "errors": [
+                                 {
+                                   "code": 10008,
+								   "detail": "The request is semantically invalid: command presence",
+								   "title": "CF-UnprocessableEntity"
+								 },
+								 {
+								   "code": 10010,
+								   "detail": "Service offering not found",
+								   "title": "CF-ResourceNotFound"
+								 }
+							   ]
+							 }`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/service_offerings/fake-service-offering-guid", "purge=true"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns parsed errors and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Service offering not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 })

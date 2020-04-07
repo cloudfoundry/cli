@@ -53,8 +53,7 @@ var _ = Describe("delete-service-broker command", func() {
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				helpers.SetupCF(orgName, helpers.NewSpaceName())
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				broker.EnableServiceAccess()
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable().EnableServiceAccess()
 			})
 
 			AfterEach(func() {
@@ -85,8 +84,7 @@ var _ = Describe("delete-service-broker command", func() {
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				helpers.SetupCF(orgName, helpers.NewSpaceName())
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				broker.EnableServiceAccess()
+				broker = fakeservicebroker.New().EnsureBrokerIsAvailable().EnableServiceAccess()
 
 				serviceName := helpers.NewServiceInstanceName()
 				session := helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceName)

@@ -2087,6 +2087,20 @@ type FakeActor struct {
 		result1 string
 		result2 error
 	}
+	PurgeServiceOfferingByNameAndBrokerStub        func(string, string) (v7action.Warnings, error)
+	purgeServiceOfferingByNameAndBrokerMutex       sync.RWMutex
+	purgeServiceOfferingByNameAndBrokerArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	purgeServiceOfferingByNameAndBrokerReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	purgeServiceOfferingByNameAndBrokerReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	RefreshAccessTokenStub        func() (string, error)
 	refreshAccessTokenMutex       sync.RWMutex
 	refreshAccessTokenArgsForCall []struct {
@@ -11816,6 +11830,70 @@ func (fake *FakeActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, 
 	}{result1, result2}
 }
 
+func (fake *FakeActor) PurgeServiceOfferingByNameAndBroker(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.purgeServiceOfferingByNameAndBrokerMutex.Lock()
+	ret, specificReturn := fake.purgeServiceOfferingByNameAndBrokerReturnsOnCall[len(fake.purgeServiceOfferingByNameAndBrokerArgsForCall)]
+	fake.purgeServiceOfferingByNameAndBrokerArgsForCall = append(fake.purgeServiceOfferingByNameAndBrokerArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("PurgeServiceOfferingByNameAndBroker", []interface{}{arg1, arg2})
+	fake.purgeServiceOfferingByNameAndBrokerMutex.Unlock()
+	if fake.PurgeServiceOfferingByNameAndBrokerStub != nil {
+		return fake.PurgeServiceOfferingByNameAndBrokerStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.purgeServiceOfferingByNameAndBrokerReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) PurgeServiceOfferingByNameAndBrokerCallCount() int {
+	fake.purgeServiceOfferingByNameAndBrokerMutex.RLock()
+	defer fake.purgeServiceOfferingByNameAndBrokerMutex.RUnlock()
+	return len(fake.purgeServiceOfferingByNameAndBrokerArgsForCall)
+}
+
+func (fake *FakeActor) PurgeServiceOfferingByNameAndBrokerCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.purgeServiceOfferingByNameAndBrokerMutex.Lock()
+	defer fake.purgeServiceOfferingByNameAndBrokerMutex.Unlock()
+	fake.PurgeServiceOfferingByNameAndBrokerStub = stub
+}
+
+func (fake *FakeActor) PurgeServiceOfferingByNameAndBrokerArgsForCall(i int) (string, string) {
+	fake.purgeServiceOfferingByNameAndBrokerMutex.RLock()
+	defer fake.purgeServiceOfferingByNameAndBrokerMutex.RUnlock()
+	argsForCall := fake.purgeServiceOfferingByNameAndBrokerArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) PurgeServiceOfferingByNameAndBrokerReturns(result1 v7action.Warnings, result2 error) {
+	fake.purgeServiceOfferingByNameAndBrokerMutex.Lock()
+	defer fake.purgeServiceOfferingByNameAndBrokerMutex.Unlock()
+	fake.PurgeServiceOfferingByNameAndBrokerStub = nil
+	fake.purgeServiceOfferingByNameAndBrokerReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) PurgeServiceOfferingByNameAndBrokerReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.purgeServiceOfferingByNameAndBrokerMutex.Lock()
+	defer fake.purgeServiceOfferingByNameAndBrokerMutex.Unlock()
+	fake.PurgeServiceOfferingByNameAndBrokerStub = nil
+	if fake.purgeServiceOfferingByNameAndBrokerReturnsOnCall == nil {
+		fake.purgeServiceOfferingByNameAndBrokerReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.purgeServiceOfferingByNameAndBrokerReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) RefreshAccessToken() (string, error) {
 	fake.refreshAccessTokenMutex.Lock()
 	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
@@ -15617,6 +15695,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.pollUploadBuildpackJobMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	fake.purgeServiceOfferingByNameAndBrokerMutex.RLock()
+	defer fake.purgeServiceOfferingByNameAndBrokerMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
 	fake.renameApplicationByNameAndSpaceGUIDMutex.RLock()

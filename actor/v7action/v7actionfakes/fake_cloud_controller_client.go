@@ -1661,6 +1661,19 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	PurgeServiceOfferingStub        func(string) (ccv3.Warnings, error)
+	purgeServiceOfferingMutex       sync.RWMutex
+	purgeServiceOfferingArgsForCall []struct {
+		arg1 string
+	}
+	purgeServiceOfferingReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	purgeServiceOfferingReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	ResourceMatchStub        func([]ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
 	resourceMatchMutex       sync.RWMutex
 	resourceMatchArgsForCall []struct {
@@ -9511,6 +9524,69 @@ func (fake *FakeCloudControllerClient) PollJobReturnsOnCall(i int, result1 ccv3.
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) PurgeServiceOffering(arg1 string) (ccv3.Warnings, error) {
+	fake.purgeServiceOfferingMutex.Lock()
+	ret, specificReturn := fake.purgeServiceOfferingReturnsOnCall[len(fake.purgeServiceOfferingArgsForCall)]
+	fake.purgeServiceOfferingArgsForCall = append(fake.purgeServiceOfferingArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("PurgeServiceOffering", []interface{}{arg1})
+	fake.purgeServiceOfferingMutex.Unlock()
+	if fake.PurgeServiceOfferingStub != nil {
+		return fake.PurgeServiceOfferingStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.purgeServiceOfferingReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) PurgeServiceOfferingCallCount() int {
+	fake.purgeServiceOfferingMutex.RLock()
+	defer fake.purgeServiceOfferingMutex.RUnlock()
+	return len(fake.purgeServiceOfferingArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) PurgeServiceOfferingCalls(stub func(string) (ccv3.Warnings, error)) {
+	fake.purgeServiceOfferingMutex.Lock()
+	defer fake.purgeServiceOfferingMutex.Unlock()
+	fake.PurgeServiceOfferingStub = stub
+}
+
+func (fake *FakeCloudControllerClient) PurgeServiceOfferingArgsForCall(i int) string {
+	fake.purgeServiceOfferingMutex.RLock()
+	defer fake.purgeServiceOfferingMutex.RUnlock()
+	argsForCall := fake.purgeServiceOfferingArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) PurgeServiceOfferingReturns(result1 ccv3.Warnings, result2 error) {
+	fake.purgeServiceOfferingMutex.Lock()
+	defer fake.purgeServiceOfferingMutex.Unlock()
+	fake.PurgeServiceOfferingStub = nil
+	fake.purgeServiceOfferingReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) PurgeServiceOfferingReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.purgeServiceOfferingMutex.Lock()
+	defer fake.purgeServiceOfferingMutex.Unlock()
+	fake.PurgeServiceOfferingStub = nil
+	if fake.purgeServiceOfferingReturnsOnCall == nil {
+		fake.purgeServiceOfferingReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.purgeServiceOfferingReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) ResourceMatch(arg1 []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error) {
 	var arg1Copy []ccv3.Resource
 	if arg1 != nil {
@@ -12461,6 +12537,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.mapRouteMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
+	fake.purgeServiceOfferingMutex.RLock()
+	defer fake.purgeServiceOfferingMutex.RUnlock()
 	fake.resourceMatchMutex.RLock()
 	defer fake.resourceMatchMutex.RUnlock()
 	fake.rootResponseMutex.RLock()

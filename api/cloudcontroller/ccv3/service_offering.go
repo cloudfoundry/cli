@@ -66,6 +66,15 @@ func (client *Client) GetServiceOfferingByNameAndBroker(serviceOfferingName, ser
 	}
 }
 
+func (client *Client) PurgeServiceOffering(serviceOfferingGUID string) (Warnings, error) {
+	_, warnings, err := client.MakeRequest(RequestParams{
+		RequestName: internal.DeleteServiceOfferingRequest,
+		URIParams:   internal.Params{"service_offering_guid": serviceOfferingGUID},
+		Query:       []Query{{Key: Purge, Values: []string{"true"}}},
+	})
+	return warnings, err
+}
+
 func extractServiceBrokerNames(offerings []ServiceOffering) (result []string) {
 	for _, o := range offerings {
 		result = append(result, o.ServiceBrokerName)

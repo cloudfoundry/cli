@@ -121,6 +121,7 @@ type CloudControllerClient interface {
 	GetUsers(query ...ccv3.Query) ([]ccv3.User, ccv3.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
+	PurgeServiceOffering(serviceOfferingGUID string) (ccv3.Warnings, error)
 	ResourceMatch(resources []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	SharePrivateDomainToOrgs(domainGuid string, sharedOrgs ccv3.SharedOrgs) (ccv3.Warnings, error)

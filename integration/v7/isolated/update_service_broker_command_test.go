@@ -49,8 +49,7 @@ var _ = Describe("update-service-broker command", func() {
 
 			BeforeEach(func() {
 				// Note, because we re-configure the broker we should make sure that we don't use the re-usable one
-				broker = fakeservicebroker.New().WithName(helpers.NewServiceBrokerName()).EnsureBrokerIsAvailable()
-				broker.EnableServiceAccess()
+				broker = fakeservicebroker.New().WithName(helpers.NewServiceBrokerName()).EnsureBrokerIsAvailable().EnableServiceAccess()
 
 				serviceInstance = helpers.NewServiceInstanceName()
 				session := helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance, "-b", broker.Name())

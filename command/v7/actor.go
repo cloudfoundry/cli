@@ -155,6 +155,7 @@ type Actor interface {
 	PollStartForRolling(appGUID string, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	PollUploadBuildpackJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
+	PurgeServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName string) (v7action.Warnings, error)
 	RefreshAccessToken() (string, error)
 	RenameApplicationByNameAndSpaceGUID(oldAppName, newAppName, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	RenameOrganization(oldOrgName, newOrgName string) (v7action.Organization, v7action.Warnings, error)

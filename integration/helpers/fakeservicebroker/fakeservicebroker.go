@@ -120,9 +120,10 @@ func (f *FakeServiceBroker) EnsureRegisteredViaV2() *FakeServiceBroker {
 }
 
 // EnableServiceAccess enables access to all service offerings in all orgs for this service broker
-func (f *FakeServiceBroker) EnableServiceAccess() {
+func (f *FakeServiceBroker) EnableServiceAccess() *FakeServiceBroker {
 	session := helpers.CF("enable-service-access", f.ServiceName())
 	Eventually(session).Should(Exit(0))
+	return f
 }
 
 // Configure updates the config of a fake service broker app
