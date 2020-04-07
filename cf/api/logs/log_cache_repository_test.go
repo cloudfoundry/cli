@@ -226,27 +226,32 @@ var _ = Describe("logs with log cache", func() {
 			Expect(inputLogChan).ToNot(Receive())
 		})
 
-		It("sets repository.cancelFunc", func() {
-			cancelFunc = func() {
-				panic("asdf")
-			}
+		When("Close() called", func() {
 
-			getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
-				inputLogChan = make(chan sharedaction.LogMessage)
-				inputErrorChan = make(chan error, 1)
-				close(inputLogChan)
-				close(inputErrorChan)
-				return inputLogChan, inputErrorChan, cancelFunc
-			}
+			It("calls repository.cancelFunc", func() {
+				cancelFuncCallCount := 0
 
-			client := sharedactionfakes.FakeLogCacheClient{}
-			repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
-			outputLogChan := make(chan logs.Loggable)
-			outputErrorChan := make(chan error, 1)
+				cancelFunc = func() {
+					cancelFuncCallCount += 1
+				}
 
-			Expect(repository.Close).ShouldNot(Panic())
-			repository.TailLogsFor("app-guid", func() {}, outputLogChan, outputErrorChan)
-			Expect(repository.Close).Should(Panic())
+				getStreamingLogsFunc := func(appGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc) {
+					inputLogChan = make(chan sharedaction.LogMessage)
+					inputErrorChan = make(chan error, 1)
+					close(inputLogChan)
+					close(inputErrorChan)
+					return inputLogChan, inputErrorChan, cancelFunc
+				}
+
+				client := sharedactionfakes.FakeLogCacheClient{}
+				repository := logs.NewLogCacheRepository(&client, recentLogsFunc, getStreamingLogsFunc)
+				outputLogChan := make(chan logs.Loggable)
+				outputErrorChan := make(chan error, 1)
+
+				repository.TailLogsFor("app-guid", func() {}, outputLogChan, outputErrorChan)
+				repository.Close()
+				Expect(cancelFuncCallCount).To(Equal(1))
+			})
 		})
 	})
 

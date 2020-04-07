@@ -59,12 +59,6 @@ func (r *logCacheRepository) TailLogsFor(appGUID string, onConnect func(), logCh
 	defer close(logChan)
 	defer close(errChan)
 
-	// TODO: discuss whether we need to manually handle ctrl+c
-	// ctrl+c will just kill the whole program and all go routines. Not sure why this function in particular needs special ctrl+c behavior.
-	// Update: talked with team, this seems to be just a nice clean up step, maybe not necessary. Will dig more
-	// c := make(chan os.Signal, 1)
-	// signal.Notify(c, os.Interrupt)
-
 	for {
 		select {
 		case message, ok := <-messages:
