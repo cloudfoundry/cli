@@ -34,7 +34,7 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	logCacheClient := command.NewLogCacheClient(logCacheEndpoint, config, ui)
-	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, logCacheClient)
+	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, logCacheClient)
 
 	return nil
 }
@@ -77,6 +77,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 
 	err = cmd.Stager.StageAndStart(
 		app,
+		cmd.Config.TargetedSpace(),
 		pkg.GUID,
 		cmd.Strategy.Name,
 		cmd.NoWait,

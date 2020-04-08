@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 /*
@@ -20,6 +21,7 @@ import (
 type AppStager interface {
 	StageAndStart(
 		app v7action.Application,
+		space configv3.Space,
 		packageGUID string,
 		strategy constant.DeploymentStrategy,
 		noWait bool,
@@ -29,7 +31,6 @@ type AppStager interface {
 type Stager struct {
 	Actor    stagingAndStartActor
 	UI       command.UI
-	Config   command.Config
 	LogCache sharedaction.LogCacheClient
 }
 
@@ -45,24 +46,24 @@ type stagingAndStartActor interface {
 	StopApplication(appGUID string) (v7action.Warnings, error)
 }
 
-func NewAppStager(actor stagingAndStartActor, ui command.UI, config command.Config, logCache sharedaction.LogCacheClient) AppStager {
+func NewAppStager(actor stagingAndStartActor, ui command.UI, logCache sharedaction.LogCacheClient) AppStager {
 	return &Stager{
 		Actor:    actor,
 		UI:       ui,
-		Config:   config,
 		LogCache: logCache,
 	}
 }
 
 func (stager *Stager) StageAndStart(
 	app v7action.Application,
+	space configv3.Space,
 	packageGUID string,
 	strategy constant.DeploymentStrategy,
 	noWait bool,
 ) error {
 	var warnings v7action.Warnings
 
-	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := stager.Actor.GetStreamingLogsForApplicationByNameAndSpace(app.Name, stager.Config.TargetedSpace().GUID, stager.LogCache)
+	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := stager.Actor.GetStreamingLogsForApplicationByNameAndSpace(app.Name, space.GUID, stager.LogCache)
 	stager.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return logErr
@@ -73,7 +74,7 @@ func (stager *Stager) StageAndStart(
 	dropletStream, warningsStream, errStream := stager.Actor.StagePackage(
 		packageGUID,
 		app.Name,
-		stager.Config.TargetedSpace().GUID,
+		space.GUID,
 	)
 
 	droplet, err := PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, stager.UI)
@@ -144,7 +145,7 @@ func (stager *Stager) StageAndStart(
 
 	summary, warnings, err := stager.Actor.GetDetailedAppSummary(
 		app.Name,
-		stager.Config.TargetedSpace().GUID,
+		space.GUID,
 		false,
 	)
 	stager.UI.DisplayWarnings(warnings)

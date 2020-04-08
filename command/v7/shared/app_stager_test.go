@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -25,11 +24,11 @@ var _ = Describe("app stager", func() {
 		appStager          shared.AppStager
 		executeErr         error
 		testUI             *ui.UI
-		fakeConfig         *commandfakes.FakeConfig
 		fakeActor          *v7fakes.FakeActor
 		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
 		app      v7action.Application
+		space    configv3.Space
 		pkgGUID  string
 		strategy constant.DeploymentStrategy
 		noWait   bool
@@ -41,22 +40,14 @@ var _ = Describe("app stager", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.BinaryNameReturns("some-binary-name")
 		fakeActor = new(v7fakes.FakeActor)
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		allLogsWritten = make(chan bool)
 
 		strategy = constant.DeploymentStrategyDefault
 
-		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-			Name: "some-org",
-		})
-		fakeConfig.TargetedSpaceReturns(configv3.Space{
-			Name: "some-space",
-			GUID: "some-space-guid",
-		})
-		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
+
 		fakeActor.GetApplicationByNameAndSpaceReturns(
 			v7action.Application{GUID: "app-guid"},
 			v7action.Warnings{"get-app-warning"},
@@ -113,9 +104,10 @@ var _ = Describe("app stager", func() {
 	})
 
 	JustBeforeEach(func() {
-		appStager = shared.NewAppStager(fakeActor, testUI, fakeConfig, fakeLogCacheClient)
+		appStager = shared.NewAppStager(fakeActor, testUI, fakeLogCacheClient)
 		executeErr = appStager.StageAndStart(
 			app,
+			space,
 			pkgGUID,
 			strategy,
 			noWait,

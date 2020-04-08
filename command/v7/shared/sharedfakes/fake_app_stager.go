@@ -7,16 +7,18 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeAppStager struct {
-	StageAndStartStub        func(v7action.Application, string, constant.DeploymentStrategy, bool) error
+	StageAndStartStub        func(v7action.Application, configv3.Space, string, constant.DeploymentStrategy, bool) error
 	stageAndStartMutex       sync.RWMutex
 	stageAndStartArgsForCall []struct {
 		arg1 v7action.Application
-		arg2 string
-		arg3 constant.DeploymentStrategy
-		arg4 bool
+		arg2 configv3.Space
+		arg3 string
+		arg4 constant.DeploymentStrategy
+		arg5 bool
 	}
 	stageAndStartReturns struct {
 		result1 error
@@ -28,19 +30,20 @@ type FakeAppStager struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAppStager) StageAndStart(arg1 v7action.Application, arg2 string, arg3 constant.DeploymentStrategy, arg4 bool) error {
+func (fake *FakeAppStager) StageAndStart(arg1 v7action.Application, arg2 configv3.Space, arg3 string, arg4 constant.DeploymentStrategy, arg5 bool) error {
 	fake.stageAndStartMutex.Lock()
 	ret, specificReturn := fake.stageAndStartReturnsOnCall[len(fake.stageAndStartArgsForCall)]
 	fake.stageAndStartArgsForCall = append(fake.stageAndStartArgsForCall, struct {
 		arg1 v7action.Application
-		arg2 string
-		arg3 constant.DeploymentStrategy
-		arg4 bool
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("StageAndStart", []interface{}{arg1, arg2, arg3, arg4})
+		arg2 configv3.Space
+		arg3 string
+		arg4 constant.DeploymentStrategy
+		arg5 bool
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("StageAndStart", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.stageAndStartMutex.Unlock()
 	if fake.StageAndStartStub != nil {
-		return fake.StageAndStartStub(arg1, arg2, arg3, arg4)
+		return fake.StageAndStartStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
@@ -55,17 +58,17 @@ func (fake *FakeAppStager) StageAndStartCallCount() int {
 	return len(fake.stageAndStartArgsForCall)
 }
 
-func (fake *FakeAppStager) StageAndStartCalls(stub func(v7action.Application, string, constant.DeploymentStrategy, bool) error) {
+func (fake *FakeAppStager) StageAndStartCalls(stub func(v7action.Application, configv3.Space, string, constant.DeploymentStrategy, bool) error) {
 	fake.stageAndStartMutex.Lock()
 	defer fake.stageAndStartMutex.Unlock()
 	fake.StageAndStartStub = stub
 }
 
-func (fake *FakeAppStager) StageAndStartArgsForCall(i int) (v7action.Application, string, constant.DeploymentStrategy, bool) {
+func (fake *FakeAppStager) StageAndStartArgsForCall(i int) (v7action.Application, configv3.Space, string, constant.DeploymentStrategy, bool) {
 	fake.stageAndStartMutex.RLock()
 	defer fake.stageAndStartMutex.RUnlock()
 	argsForCall := fake.stageAndStartArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeAppStager) StageAndStartReturns(result1 error) {
