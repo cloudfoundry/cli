@@ -71,8 +71,18 @@ var _ = Describe("create-app Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeSharedActor.CheckTargetReturns(nil)
 		fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
+
+		fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{Name: "destination-space", GUID: "destination-space-guid"},
+			v7action.Warnings{"get-space-by-name-warning"},
+			nil,
+		)
+		fakeActor.GetOrganizationByNameReturns(v7action.Organization{Name: "destination-org", GUID: "destination-org-guid"},
+			v7action.Warnings{"get-org-by-name-warning"},
+			nil,
+		)
 
 		fakeActor.GetApplicationByNameAndSpaceReturnsOnCall(0, sourceApp, v7action.Warnings{"get-source-app-warning"}, nil)
 		fakeActor.GetApplicationByNameAndSpaceReturnsOnCall(1, targetApp, v7action.Warnings{"get-target-app-warning"}, nil)
@@ -110,6 +120,103 @@ var _ = Describe("create-app Command", func() {
 
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError("not-logged-in"))
+		})
+	})
+
+	When("the target organization is specified but the targeted space isn't", func() {
+		BeforeEach(func() {
+			cmd.Organization = "some-other-organization"
+		})
+
+		It("returns an error", func() {
+			Expect(executeErr).To(MatchError("Incorrect Usage: '--organization, -o' requires '--space, -s' to be specified"))
+		})
+	})
+
+	When("a target org and space is provided", func() {
+		BeforeEach(func() {
+			cmd.Organization = "some-other-organization"
+			cmd.Space = "some-other-space"
+		})
+
+		It("retrieves the org by name and the space by name and organization", func() {
+			Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(1))
+			org := fakeActor.GetOrganizationByNameArgsForCall(0)
+			Expect(org).To(Equal(cmd.Organization))
+
+			Expect(fakeActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(1))
+			space, orgGUID := fakeActor.GetSpaceByNameAndOrganizationArgsForCall(0)
+			Expect(space).To(Equal(cmd.Space))
+			Expect(orgGUID).To(Equal("destination-org-guid"))
+		})
+
+		It("displays the warnings", func() {
+			Expect(testUI.Err).To(Say("get-org-by-name-warning"))
+		})
+
+		When("retrieving the organization fails", func() {
+			BeforeEach(func() {
+				fakeActor.GetOrganizationByNameReturns(
+					v7action.Organization{},
+					v7action.Warnings{},
+					errors.New("get-org-by-name-err"),
+				)
+			})
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("get-org-by-name-err"))
+			})
+		})
+
+		When("retrieving the space fails", func() {
+			BeforeEach(func() {
+				fakeActor.GetSpaceByNameAndOrganizationReturns(
+					v7action.Space{},
+					v7action.Warnings{},
+					errors.New("get-space-by-name-err"),
+				)
+			})
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("get-space-by-name-err"))
+			})
+		})
+
+		It("uses the provided org and space", func() {
+			Expect(testUI.Out).To(Say(
+				"Copying source from app %s to target app %s in org %s / space %s as %s...",
+				sourceApp.Name,
+				targetApp.Name,
+				"destination-org",
+				"destination-space",
+				userName,
+			))
+		})
+	})
+
+	When("only a target space is provided", func() {
+		BeforeEach(func() {
+			cmd.Space = "some-other-space"
+		})
+
+		It("retrieves the space by name and organization", func() {
+			Expect(fakeActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(1))
+			space, orgGUID := fakeActor.GetSpaceByNameAndOrganizationArgsForCall(0)
+			Expect(space).To(Equal(cmd.Space))
+			Expect(orgGUID).To(Equal(fakeConfig.TargetedOrganization().GUID))
+		})
+
+		It("displays the warnings", func() {
+			Expect(testUI.Err).To(Say("get-space-by-name-warning"))
+		})
+
+		It("uses the provided org and space", func() {
+			Expect(testUI.Out).To(Say(
+				"Copying source from app %s to target app %s in org %s / space %s as %s...",
+				sourceApp.Name,
+				targetApp.Name,
+				fakeConfig.TargetedOrganization().Name,
+				"destination-space",
+				userName,
+			))
 		})
 	})
 
