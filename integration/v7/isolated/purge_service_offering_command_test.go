@@ -125,11 +125,12 @@ var _ = Describe("purge-service-offering command", func() {
 		})
 
 		When("the service does not exist", func() {
-			It("fails", func() {
+			It("succeeds, printing a message", func() {
 				session := helpers.CF("purge-service-offering", "no-such-service", "-f")
 
-				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say(`Service offering 'no-such-service' not found.`))
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say(`Service offering 'no-such-service' not found.`))
+				Expect(session.Out).To(Say(`OK`))
 			})
 		})
 	})

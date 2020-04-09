@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -135,7 +137,21 @@ var _ = Describe("purge-service-offering command", func() {
 		})
 	})
 
-	When("the actor fails", func() {
+	When("the service offering is not found", func() {
+		BeforeEach(func() {
+			fakeActor.PurgeServiceOfferingByNameAndBrokerReturns(v7action.Warnings{"actor warning"}, ccerror.ServiceOfferingNotFoundError{})
+		})
+
+		It("succeeds with a message", func() {
+			Expect(testUI.Err).To(Say("actor warning"))
+			Expect(testUI.Out).To(Say(`Purging service offering fake-service-offering\.\.\.`))
+			Expect(testUI.Out).To(Say(`Service offering 'fake-service-offering' not found\.`))
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(executeErr).NotTo(HaveOccurred())
+		})
+	})
+
+	When("the actor returns another error", func() {
 		BeforeEach(func() {
 			fakeActor.PurgeServiceOfferingByNameAndBrokerReturns(v7action.Warnings{"actor warning"}, errors.New("fake actor error"))
 		})

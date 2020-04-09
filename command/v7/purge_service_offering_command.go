@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
@@ -44,7 +45,14 @@ func (cmd PurgeServiceOfferingCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.PurgeServiceOfferingByNameAndBroker(cmd.RequiredArgs.ServiceOffering, cmd.ServiceBroker)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		switch err.(type) {
+		case ccerror.ServiceOfferingNotFoundError:
+			cmd.UI.DisplayText("Service offering '{{.ServiceOffering}}' not found.", map[string]interface{}{
+				"ServiceOffering": cmd.RequiredArgs.ServiceOffering,
+			})
+		default:
+			return err
+		}
 	}
 
 	cmd.UI.DisplayOK()
