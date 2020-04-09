@@ -10,37 +10,38 @@ Accepted
 
 _The issue motivating this decision, and any context that influences or constrains the decision._
 
-The cf CLI previously used the traffic controller to retrieve application logs.
-This was implemented as a long-lived websocket connection where logs were
+The CF CLI previously used the Traffic Controller to retrieve application logs.
+This was implemented as a long-lived WebSocket connection where logs were
 streamed to the client.
 
 With the migration to Log Cache we needed to preserve the experience of
-streaming logs, but built [atop an
+streaming logs, but built [on an
 API](https://github.com/cloudfoundry/log-cache-release/blob/f08a3081c029d133300b1d6cb5ea8ebbd2108874/src/README.md)
-where we make numerous HTTP requests to index into a collection of timestamped log envelopes.
+where timestamped log envelopes are retrieved via HTTP requests.
 
-There are two main questions we needed to answer:
+There were two main questions we needed to answer:
 
 1. What is the oldest log that should be shown?
-   An application may have logs from a previous push already present in log cache
+   An application may have logs from a previous push already present in Log Cache
    that do not relate to the current staging operation. We would want to only
    show the logs for the current staging operation.
-2. What is the newest log that can be shown? Log Cache is eventually
-   consistent, so very recent logs may not have 'settled' and if we show them to
-   the user and read forward immediately we will effectively drop logs.
+2. What is the newest log that can be shown?
+   Log Cache is eventually consistent, so very recent logs may be out of order
+   or incomplete. We would only want to show the logs that have "settled" (i.e.
+   logs that have been in Log Cache long enough to converge).
 
 ## Decision
 
 _The change that we're proposing or have agreed to implement._
 
-1. To determine the oldest log that will be shown: we 'peek' at the latest log within
+1. To determine the oldest log that will be shown: we will 'peek' at the latest log within
    Log Cache for the application and read from that point (applying a small offset).
-1. To determine the newest log that will be shown: we do not show envelopes where the
-   timestamp is very new (less than two seconds old).
+2. To determine the newest log that will be shown: we will not show log envelopes where the
+   timestamp is less than two seconds old.
 
-### Peeking at the latest log
+### 1. Peeking at the latest log
 
-The initial cli implementation of Log Cache started reading from Log Cache at an
+The initial CLI implementation of Log Cache started reading from Log Cache at an
 offset based on the current client clock time. This was flawed because an
 incorrectly configured client clock would result in some unexpected behaviour:
 
@@ -51,8 +52,8 @@ incorrectly configured client clock would result in some unexpected behaviour:
   operation might be shown
 
 In an attempt to decouple ourselves from the client clock time we instead 'peek'
-at the timestamp of the latest log envelope for the application and add an
-offset to that timestamp in order to start reading from that point.
+at the timestamp of the latest log envelope for the application and use that
+timestamp (plus a small offset) as our starting point.
 
 XXX: Describe how we arrived at the offset
 
@@ -61,25 +62,22 @@ until envelopes become available.
 
 XXX: Consider if we are retrying on an empty response from Log Cache without a delay.
 
-### Delaying the output of new logs
+### 2. Delaying the output of new logs
 
-The Log Cache client library has a concept of a `WalkDelay` where log envelopes
-with timestamps that are very 'new' are ignored until they are more than a
-certain duration old: \
-https://github.com/cloudfoundry/log-cache-release/blob/f08a3081c029d133300b1d6cb5ea8ebbd2108874/src/pkg/client/walk.go#L174-L183
+By default, the Log Cache client will only return log envelopes that have timestamps
+more than a second old (see the [code](https://github.com/cloudfoundry/log-cache-release/blob/f08a3081c029d133300b1d6cb5ea8ebbd2108874/src/pkg/client/walk.go#L174-L183)).
+This filtering mechanism is known as `WalkDelay` and is configurable.
 
-This defaults to 1 second. In our testing we found that this default was not
-sufficient to avoid effective loss of logs when running against a foundation
-with more than one log cache node.
-
+In our testing we found that the default of one second was not sufficient to allow Log Cache to
+"settle" and resulted in log loss on foundations with multiple Log Cache nodes.
 This is because multiple Log Cache nodes may be ingesting events for the same
 application, but a single Log Cache node hosts the cache for a given
 application. It's possible for us to see a newer log envelope timestamp and move
 our timestamp cursor forwards before we have received an earlier log envelope:
-https://www.pivotaltracker.com/story/show/171759407/comments/212391238
+https://www.pivotaltracker.com/story/show/171759407/comments/212391238.
 
-We experimented with changing this duration and found that a `WalkDelay` of 2 seconds was
-sufficient to ensure that there were no 'missing' log envelopes.
+We decided to increase the `WalkDelay` to 2 seconds to give Log cache more time
+to "settle" in a multiple Log Cache node foundation.
 
 ## Consequences
 
@@ -92,7 +90,7 @@ _What becomes easier or more difficult to do and any risks introduced by the cha
   not closely synchronised to the server
 * As each component that generates logs is responsible for assigning the
   timestamp, there is still potential for clock drift within the foundation to
-  cause strange behaviour
+  cause unexpected behavior.
 * The code is slightly more involved, but it seems like a good trade-off
 
 ### Delaying the output of new logs
@@ -105,4 +103,5 @@ _What becomes easier or more difficult to do and any risks introduced by the cha
   vulnerable to any misconfiguration of the client clock. We've considered
   strategies for removing this dependency on the client clock but have decided
   for now to wait for feedback from our users before attempting to make ourselves
-  reliable in this situation.
+  reliable in this situation. An issue has been filed against the Log Cache
+  client: https://github.com/cloudfoundry/go-log-cache/issues/28
