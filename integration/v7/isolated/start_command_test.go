@@ -1,6 +1,9 @@
 package isolated
 
 import (
+	"fmt"
+	"strings"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -16,7 +19,7 @@ const (
 	PushCommandName = "push"
 )
 
-var _ = Describe("start command", func() {
+var _ = FDescribe("start command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -190,6 +193,37 @@ var _ = Describe("start command", func() {
 					Expect(session.Err).ToNot(Say(`timeout connecting to log server, no log will be shown`))
 
 					Expect(helpers.GetPackageFirstDroplet(packageGUID)).To(Equal(helpers.GetAppDroplet(helpers.AppGUID(appName))))
+				})
+			})
+			When("the package does not exist", func() {
+				var appGUID string
+				var postBody string
+				BeforeEach(func() {
+					session := helpers.CF("app", appName, "--guid")
+					Eventually(session).Should(Exit(0))
+					appGUID = strings.TrimSuffix(string(session.Out.Contents()), "\n")
+
+					postBody = fmt.Sprintf(`{
+						"type": "bits",
+						"relationships": {
+							"app": {
+								"data": {
+									"guid": "%s"
+								}
+							}
+						}
+					}`, appGUID)
+					session = helpers.CF("curl", "-X", "POST", "/v3/packages/", "-d", postBody)
+					Eventually(session).Should(Exit(0))
+
+				})
+
+				It("gives a luxurious error message", func() {
+					session := helpers.CF("start", appName)
+					Eventually(session.Err).Should(Say(`The app package is invalid: Package must be in 'READY' to stage; It currently has 'UPLOADING'.`))
+					Eventually(session).Should(Say("FAILED"))
+
+					Eventually(session).Should(Exit(1))
 				})
 			})
 
