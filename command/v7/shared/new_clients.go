@@ -18,7 +18,7 @@ func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersio
 	if err != nil {
 		return nil, nil, err
 	}
-	uaaClient, err := newWrappedUAAClient(config, ui, ccClient, authWrapper)
+	uaaClient, err := NewWrappedUAAClient(config, ui, ccClient, authWrapper)
 
 	return ccClient, uaaClient, err
 }
@@ -49,7 +49,7 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv
 	return ccClient, authWrapper
 }
 
-func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error) {
+func NewWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Client, authWrapper *ccWrapper.UAAAuthentication) (*uaa.Client, error) {
 	var err error
 	verbose, location := config.Verbose()
 
