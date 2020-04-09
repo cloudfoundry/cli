@@ -41,7 +41,10 @@ type Config interface {
 	RemovePlugin(string)
 	RequestRetryCount() int
 	RoutingEndpoint() string
+	SetAsyncTimeout(timeout int)
 	SetAccessToken(token string)
+	SetColorEnabled(enabled string)
+	SetLocale(locale string)
 	SetMinCLIVersion(version string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
@@ -49,6 +52,7 @@ type Config interface {
 	V7SetSpaceInformation(guid string, name string)
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
+	SetTrace(trace string)
 	SetUAAClientCredentials(client string, clientSecret string)
 	SetUAAEndpoint(uaaEndpoint string)
 	SetUAAGrantType(uaaGrantType string)

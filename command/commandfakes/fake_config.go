@@ -331,6 +331,21 @@ type FakeConfig struct {
 	setAccessTokenArgsForCall []struct {
 		arg1 string
 	}
+	SetAsyncTimeoutStub        func(int)
+	setAsyncTimeoutMutex       sync.RWMutex
+	setAsyncTimeoutArgsForCall []struct {
+		arg1 int
+	}
+	SetColorEnabledStub        func(string)
+	setColorEnabledMutex       sync.RWMutex
+	setColorEnabledArgsForCall []struct {
+		arg1 string
+	}
+	SetLocaleStub        func(string)
+	setLocaleMutex       sync.RWMutex
+	setLocaleArgsForCall []struct {
+		arg1 string
+	}
 	SetMinCLIVersionStub        func(string)
 	setMinCLIVersionMutex       sync.RWMutex
 	setMinCLIVersionArgsForCall []struct {
@@ -371,6 +386,11 @@ type FakeConfig struct {
 		arg1 string
 		arg2 string
 		arg3 string
+	}
+	SetTraceStub        func(string)
+	setTraceMutex       sync.RWMutex
+	setTraceArgsForCall []struct {
+		arg1 string
 	}
 	SetUAAClientCredentialsStub        func(string, string)
 	setUAAClientCredentialsMutex       sync.RWMutex
@@ -2223,6 +2243,99 @@ func (fake *FakeConfig) SetAccessTokenArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
+func (fake *FakeConfig) SetAsyncTimeout(arg1 int) {
+	fake.setAsyncTimeoutMutex.Lock()
+	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
+		arg1 int
+	}{arg1})
+	fake.recordInvocation("SetAsyncTimeout", []interface{}{arg1})
+	fake.setAsyncTimeoutMutex.Unlock()
+	if fake.SetAsyncTimeoutStub != nil {
+		fake.SetAsyncTimeoutStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetAsyncTimeoutCallCount() int {
+	fake.setAsyncTimeoutMutex.RLock()
+	defer fake.setAsyncTimeoutMutex.RUnlock()
+	return len(fake.setAsyncTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) SetAsyncTimeoutCalls(stub func(int)) {
+	fake.setAsyncTimeoutMutex.Lock()
+	defer fake.setAsyncTimeoutMutex.Unlock()
+	fake.SetAsyncTimeoutStub = stub
+}
+
+func (fake *FakeConfig) SetAsyncTimeoutArgsForCall(i int) int {
+	fake.setAsyncTimeoutMutex.RLock()
+	defer fake.setAsyncTimeoutMutex.RUnlock()
+	argsForCall := fake.setAsyncTimeoutArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) SetColorEnabled(arg1 string) {
+	fake.setColorEnabledMutex.Lock()
+	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetColorEnabled", []interface{}{arg1})
+	fake.setColorEnabledMutex.Unlock()
+	if fake.SetColorEnabledStub != nil {
+		fake.SetColorEnabledStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetColorEnabledCallCount() int {
+	fake.setColorEnabledMutex.RLock()
+	defer fake.setColorEnabledMutex.RUnlock()
+	return len(fake.setColorEnabledArgsForCall)
+}
+
+func (fake *FakeConfig) SetColorEnabledCalls(stub func(string)) {
+	fake.setColorEnabledMutex.Lock()
+	defer fake.setColorEnabledMutex.Unlock()
+	fake.SetColorEnabledStub = stub
+}
+
+func (fake *FakeConfig) SetColorEnabledArgsForCall(i int) string {
+	fake.setColorEnabledMutex.RLock()
+	defer fake.setColorEnabledMutex.RUnlock()
+	argsForCall := fake.setColorEnabledArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConfig) SetLocale(arg1 string) {
+	fake.setLocaleMutex.Lock()
+	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetLocale", []interface{}{arg1})
+	fake.setLocaleMutex.Unlock()
+	if fake.SetLocaleStub != nil {
+		fake.SetLocaleStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetLocaleCallCount() int {
+	fake.setLocaleMutex.RLock()
+	defer fake.setLocaleMutex.RUnlock()
+	return len(fake.setLocaleArgsForCall)
+}
+
+func (fake *FakeConfig) SetLocaleCalls(stub func(string)) {
+	fake.setLocaleMutex.Lock()
+	defer fake.setLocaleMutex.Unlock()
+	fake.SetLocaleStub = stub
+}
+
+func (fake *FakeConfig) SetLocaleArgsForCall(i int) string {
+	fake.setLocaleMutex.RLock()
+	defer fake.setLocaleMutex.RUnlock()
+	argsForCall := fake.setLocaleArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConfig) SetMinCLIVersion(arg1 string) {
 	fake.setMinCLIVersionMutex.Lock()
 	fake.setMinCLIVersionArgsForCall = append(fake.setMinCLIVersionArgsForCall, struct {
@@ -2418,6 +2531,37 @@ func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, s
 	defer fake.setTokenInformationMutex.RUnlock()
 	argsForCall := fake.setTokenInformationArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeConfig) SetTrace(arg1 string) {
+	fake.setTraceMutex.Lock()
+	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetTrace", []interface{}{arg1})
+	fake.setTraceMutex.Unlock()
+	if fake.SetTraceStub != nil {
+		fake.SetTraceStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetTraceCallCount() int {
+	fake.setTraceMutex.RLock()
+	defer fake.setTraceMutex.RUnlock()
+	return len(fake.setTraceArgsForCall)
+}
+
+func (fake *FakeConfig) SetTraceCalls(stub func(string)) {
+	fake.setTraceMutex.Lock()
+	defer fake.setTraceMutex.Unlock()
+	fake.SetTraceStub = stub
+}
+
+func (fake *FakeConfig) SetTraceArgsForCall(i int) string {
+	fake.setTraceMutex.RLock()
+	defer fake.setTraceMutex.RUnlock()
+	argsForCall := fake.setTraceArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConfig) SetUAAClientCredentials(arg1 string, arg2 string) {
@@ -3467,6 +3611,12 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setAsyncTimeoutMutex.RLock()
+	defer fake.setAsyncTimeoutMutex.RUnlock()
+	fake.setColorEnabledMutex.RLock()
+	defer fake.setColorEnabledMutex.RUnlock()
+	fake.setLocaleMutex.RLock()
+	defer fake.setLocaleMutex.RUnlock()
 	fake.setMinCLIVersionMutex.RLock()
 	defer fake.setMinCLIVersionMutex.RUnlock()
 	fake.setOrganizationInformationMutex.RLock()
@@ -3479,6 +3629,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
+	fake.setTraceMutex.RLock()
+	defer fake.setTraceMutex.RUnlock()
 	fake.setUAAClientCredentialsMutex.RLock()
 	defer fake.setUAAClientCredentialsMutex.RUnlock()
 	fake.setUAAEndpointMutex.RLock()

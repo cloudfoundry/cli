@@ -216,11 +216,41 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
+	Describe("SetAsyncTimeout", func() {
+		It("sets the async timeout", func() {
+			config = new(Config)
+			config.SetAsyncTimeout(2)
+			Expect(config.ConfigFile.AsyncTimeout).To(Equal(2))
+		})
+	})
+
+	Describe("SetColorEnabled", func() {
+		It("sets the color enabled field", func() {
+			config = new(Config)
+			config.SetColorEnabled("true")
+			Expect(config.ConfigFile.ColorEnabled).To(Equal("true"))
+		})
+	})
+
 	Describe("SetAccessToken", func() {
 		It("sets the authentication token information", func() {
 			config = new(Config)
 			config.SetAccessToken("I am the access token")
 			Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
+		})
+	})
+
+	Describe("SetLocale", func() {
+		It("sets the locale field", func() {
+			config = new(Config)
+			config.SetLocale("en-US")
+			Expect(config.ConfigFile.Locale).To(Equal("en-US"))
+		})
+
+		It("clears the locale field if requested", func() {
+			config = new(Config)
+			config.SetLocale("CLEAR")
+			Expect(config.ConfigFile.Locale).To(Equal(""))
 		})
 	})
 
@@ -302,6 +332,14 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
 			Expect(config.ConfigFile.RefreshToken).To(Equal("I am the refresh token"))
 			Expect(config.ConfigFile.SSHOAuthClient).To(Equal("I am the SSH OAuth client"))
+		})
+	})
+
+	Describe("SetTrace", func() {
+		It("sets the trace field", func() {
+			config = new(Config)
+			config.SetTrace("true")
+			Expect(config.ConfigFile.Trace).To(Equal("true"))
 		})
 	})
 

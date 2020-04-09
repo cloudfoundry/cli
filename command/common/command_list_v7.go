@@ -41,7 +41,7 @@ type commandList struct {
 	Buildpacks                         v7.BuildpacksCommand                         `command:"buildpacks" description:"List all buildpacks"`
 	CancelDeployment                   v7.CancelDeploymentCommand                   `command:"cancel-deployment" description:"Cancel the most recent deployment for an app. Resets the current droplet to the previous deployment's droplet."`
 	CheckRoute                         v7.CheckRouteCommand                         `command:"check-route" description:"Perform a check to determine whether a route currently exists or not"`
-	Config                             v6.ConfigCommand                             `command:"config" description:"Write default values to the config"`
+	Config                             v7.ConfigCommand                             `command:"config" description:"Write default values to the config"`
 	CopySource                         v7.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application and restages that application"`
 	CreateApp                          v7.CreateAppCommand                          `command:"create-app" description:"Create an Application in the target space"`
 	CreateAppManifest                  v7.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`

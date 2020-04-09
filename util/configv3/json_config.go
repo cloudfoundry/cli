@@ -115,9 +115,28 @@ func (config *Config) RoutingEndpoint() string {
 	return config.ConfigFile.RoutingEndpoint
 }
 
+// SetAsyncTimeout sets the async timeout.
+func (config *Config) SetAsyncTimeout(timeout int) {
+	config.ConfigFile.AsyncTimeout = timeout
+}
+
 // SetAccessToken sets the current access token.
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
+}
+
+// SetColorEnabled sets the color enabled feature to true or false
+func (config *Config) SetColorEnabled(enabled string) {
+	config.ConfigFile.ColorEnabled = enabled
+}
+
+// SetLocale sets the locale, or clears the field if requested
+func (config *Config) SetLocale(locale string) {
+	if locale == "CLEAR" {
+		config.ConfigFile.Locale = ""
+	} else {
+		config.ConfigFile.Locale = locale
+	}
 }
 
 // SetMinCLIVersion sets the minimum CLI version required by the CC.
@@ -164,6 +183,11 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 	config.ConfigFile.AccessToken = accessToken
 	config.ConfigFile.RefreshToken = refreshToken
 	config.ConfigFile.SSHOAuthClient = sshOAuthClient
+}
+
+// SetTrace sets the trace field to either true, false, or a path to a file.
+func (config *Config) SetTrace(trace string) {
+	config.ConfigFile.Trace = trace
 }
 
 // SetUAAClientCredentials sets the client credentials.

@@ -41,13 +41,15 @@ var _ = Describe("Color", func() {
 		It("accepts true", func() {
 			err := color.UnmarshalFlag("true")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(color.Color).To(BeTrue())
+			Expect(color.Value).To(Equal("true"))
+			Expect(color.IsSet).To(BeTrue())
 		})
 
 		It("accepts false", func() {
 			err := color.UnmarshalFlag("FalsE")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(color.Color).To(BeFalse())
+			Expect(color.Value).To(Equal("false"))
+			Expect(color.IsSet).To(BeTrue())
 		})
 
 		It("errors on anything else", func() {
