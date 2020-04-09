@@ -48,6 +48,7 @@ func ensureAppIsPushed() {
 			"push", appName(),
 			"-p", pathToApp,
 			"-m", defaultMemoryLimit,
+			"-b ", "https://github.com/cloudfoundry/go-buildpack.git", // Some legacy envs have buildpack that's too old
 		)
 		session.Wait()
 		return session.ExitCode() == 0
