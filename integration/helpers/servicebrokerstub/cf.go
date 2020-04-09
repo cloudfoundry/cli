@@ -2,26 +2,11 @@ package servicebrokerstub
 
 import (
 	"encoding/json"
-	"io"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
-
-func (s *ServiceBrokerStub) registerServiceBroker() {
-	Eventually(helpers.CF("create-service-broker", s.Name, "username", "password", s.URL)).Should(Exit(0))
-
-	Eventually(helpers.CF("service-brokers")).Should(And(Exit(0), Say(s.Name)))
-
-	Eventually(func() io.Reader {
-		session := helpers.CF("service-access", "-b", s.Name)
-		Eventually(session).Should(Exit(0))
-
-		return session.Out
-	}).Should(Say(s.FirstServiceOfferingName()))
-}
 
 func (s *ServiceBrokerStub) register() {
 	Eventually(helpers.CF("create-service-broker", s.Name, s.Username, s.Password, s.URL)).Should(Exit(0))

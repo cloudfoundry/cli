@@ -66,5 +66,6 @@ func (s *ServiceBrokerStub) forget() {
 	req, err := http.NewRequest("DELETE", appURL("/config/", s.GUID), nil)
 	Expect(err).ToNot(HaveOccurred())
 	resp, err := http.DefaultClient.Do(req)
+	Expect(err).ToNot(HaveOccurred())
 	Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 }
