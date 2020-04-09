@@ -77,3 +77,19 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 	w.WriteHeader(http.StatusCreated)
 	return respondWithJSON(w, map[string]interface{}{})
 }
+
+func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	guid, err := readGUID(r)
+	if err != nil {
+		return err
+	}
+
+	_, ok := store.GetBrokerConfiguration(guid)
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return nil
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return respondWithJSON(w, map[string]interface{}{})
+}

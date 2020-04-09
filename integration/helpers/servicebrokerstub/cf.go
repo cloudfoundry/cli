@@ -27,6 +27,11 @@ func (s *ServiceBrokerStub) register() {
 	Eventually(helpers.CF("create-service-broker", s.Name, s.Username, s.Password, s.URL)).Should(Exit(0))
 }
 
+func (s *ServiceBrokerStub) deregister() {
+	s.purgeServiceOfferings(true)
+	Eventually(helpers.CF("delete-service-broker", "-f", s.Name)).Should(Exit(0))
+}
+
 func (s *ServiceBrokerStub) registerViaV2() {
 	broker := map[string]interface{}{
 		"name":          s.Name,
@@ -44,5 +49,16 @@ func (s *ServiceBrokerStub) enableServiceAccess() {
 	for _, offering := range s.Services {
 		session := helpers.CF("enable-service-access", offering.Name)
 		Eventually(session).Should(Exit(0))
+	}
+}
+
+func (s *ServiceBrokerStub) purgeServiceOfferings(ignoreFailures bool) {
+	for _, service := range s.Services {
+		session := helpers.CF("purge-service-offering", service.Name, "-b", s.Name, "-f")
+		session.Wait()
+
+		if !ignoreFailures {
+			Expect(session).To(Exit(0))
+		}
 	}
 }

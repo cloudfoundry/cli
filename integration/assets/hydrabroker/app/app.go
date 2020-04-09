@@ -41,6 +41,7 @@ func App() *mux.Router {
 	b.Use(brokerAuthMiddleware)
 	b.HandleFunc("/v2/catalog", handle("catalog", brokerCatalog)).Methods("GET")
 	b.HandleFunc("/v2/service_instances/{si_guid}", handle("provision", brokerProvision)).Methods("PUT")
+	b.HandleFunc("/v2/service_instances/{si_guid}", handle("deprovision", brokerDeprovision)).Methods("DELETE")
 
 	return r
 }

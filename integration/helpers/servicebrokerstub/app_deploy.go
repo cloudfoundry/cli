@@ -30,11 +30,10 @@ func ensureAppIsDeployed() {
 }
 
 func appResponds() bool {
-	resp, err := http.Get(appURL("/config"))
+	resp, err := http.Head(appURL())
 	Expect(err).ToNot(HaveOccurred())
 	defer resp.Body.Close()
-	b := resp.StatusCode == http.StatusOK
-	return b
+	return resp.StatusCode == http.StatusNoContent
 }
 
 func ensureAppIsPushed() {

@@ -14,7 +14,7 @@ type Service struct {
 	Name        string `json:"name" validate:"printascii,min=5"`
 	GUID        string
 	Description string
-	Plans       []Plan `json:"plans" validate:"len=1,dive"`
+	Plans       []Plan `json:"plans" validate:"min=1,dive"`
 }
 
 type BrokerConfiguration struct {

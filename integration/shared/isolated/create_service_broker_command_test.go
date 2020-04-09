@@ -3,9 +3,10 @@ package isolated
 import (
 	"io"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -67,7 +68,7 @@ var _ = Describe("create-service-broker command", func() {
 					username  string
 					orgName   string
 					spaceName string
-					broker    *fakeservicebroker.FakeServiceBroker
+					broker    *servicebrokerstub.ServiceBrokerStub
 				)
 
 				BeforeEach(func() {
@@ -75,24 +76,25 @@ var _ = Describe("create-service-broker command", func() {
 					orgName = helpers.NewOrgName()
 					spaceName = helpers.NewSpaceName()
 					helpers.SetupCF(orgName, spaceName)
-					broker = fakeservicebroker.New().WithName(brokerName).EnsureAppIsDeployed()
+					broker = servicebrokerstub.Create()
 					helpers.ClearTarget()
 				})
 
 				AfterEach(func() {
 					Eventually(helpers.CF("delete-service-broker", brokerName, "-f")).Should(Exit(0))
 					helpers.QuickDeleteOrg(orgName)
+					broker.Forget()
 				})
 
 				It("registers the broker and service offerings and plans are available", func() {
-					session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL())
+					session := helpers.CF("create-service-broker", brokerName, broker.Username, broker.Password, broker.URL)
 					Eventually(session).Should(Say("Creating service broker %s as %s...", brokerName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("service-access", "-b", brokerName)
-					Eventually(session).Should(Say(broker.ServiceName()))
-					Eventually(session).Should(Say(broker.ServicePlanName()))
+					Eventually(session).Should(Say(broker.FirstServiceOfferingName()))
+					Eventually(session).Should(Say(broker.FirstServicePlanName()))
 
 					session = helpers.CF("service-brokers")
 					Eventually(session).Should(Say(brokerName))
@@ -122,7 +124,7 @@ var _ = Describe("create-service-broker command", func() {
 						username  string
 						orgName   string
 						spaceName string
-						broker    *fakeservicebroker.FakeServiceBroker
+						broker    *servicebrokerstub.ServiceBrokerStub
 					)
 
 					BeforeEach(func() {
@@ -130,17 +132,17 @@ var _ = Describe("create-service-broker command", func() {
 						orgName = helpers.NewOrgName()
 						spaceName = helpers.NewSpaceName()
 						helpers.SetupCF(orgName, spaceName)
-
-						broker = fakeservicebroker.New().WithName(brokerName).EnsureAppIsDeployed()
+						broker = servicebrokerstub.Create()
 					})
 
 					AfterEach(func() {
 						Eventually(helpers.CF("delete-service-broker", brokerName, "-f")).Should(Exit(0))
 						helpers.QuickDeleteOrg(orgName)
+						broker.Forget()
 					})
 
 					It("registers the broker and exposes its services only to the targeted space", func() {
-						session := helpers.CF("create-service-broker", brokerName, "username", "password", broker.URL(), "--space-scoped")
+						session := helpers.CF("create-service-broker", brokerName, broker.Username, broker.Password, broker.URL, "--space-scoped")
 						Eventually(session).Should(Say(
 							"Creating service broker %s in org %s / space %s as %s...", brokerName, orgName, spaceName, username))
 						Eventually(session).Should(Say("OK"))
@@ -154,11 +156,11 @@ var _ = Describe("create-service-broker command", func() {
 							Eventually(session).Should(Exit(0))
 
 							return session.Out
-						}).Should(Say(broker.ServicePlanName()))
+						}).Should(Say(broker.FirstServicePlanName()))
 
 						helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 						session = helpers.CF("marketplace")
-						Eventually(session).ShouldNot(Say(broker.ServicePlanName()))
+						Eventually(session).ShouldNot(Say(broker.FirstServicePlanName()))
 					})
 				})
 			})

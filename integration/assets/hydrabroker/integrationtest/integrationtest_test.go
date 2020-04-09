@@ -105,6 +105,20 @@ var _ = Describe("Integration Test", func() {
 			Expect(r).To(BeEmpty())
 		})
 
+		It("allows a service instance to be deleted", func() {
+			instanceGUID := randomString()
+			request, err := http.NewRequest("DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			Expect(err).NotTo(HaveOccurred())
+			request.SetBasicAuth(cfg.Username, cfg.Password)
+			response, err := client.Do(request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			var r map[string]interface{}
+			fromJSON(response.Body, &r)
+			Expect(r).To(BeEmpty())
+		})
+
 		It("allows the broker to be deleted", func() {
 			By("accepting the delete request", func() {
 				request, err := http.NewRequest("DELETE", server.URL+"/config/"+guid, nil)
