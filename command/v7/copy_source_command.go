@@ -12,14 +12,15 @@ import (
 type CopySourceCommand struct {
 	BaseCommand
 
-	RequiredArgs        flag.CopySourceArgs `positional-args:"yes"`
-	usage               interface{}         `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart]"`
-	NoRestart           bool                `long:"no-restart" description:"Do not restage the destination application"`
-	Organization        string              `short:"o" long:"organization" description:"Org that contains the destination application"`
-	Space               string              `short:"s" long:"space" description:"Space that contains the destination application"`
-	relatedCommands     interface{}         `related_commands:"apps, push, restage, restart, target"`
-	envCFStagingTimeout interface{}         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
-	envCFStartupTimeout interface{}         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	RequiredArgs        flag.CopySourceArgs     `positional-args:"yes"`
+	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY]"`
+	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null"`
+	NoRestart           bool                    `long:"no-restart" description:"Do not restage the destination application"`
+	Organization        string                  `short:"o" long:"organization" description:"Org that contains the destination application"`
+	Space               string                  `short:"s" long:"space" description:"Space that contains the destination application"`
+	relatedCommands     interface{}             `related_commands:"apps, push, restage, restart, target"`
+	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	Stager shared.AppStager
 }
@@ -31,6 +32,13 @@ func (cmd *CopySourceCommand) ValidateFlags() error {
 			Arg2: "--space, -s",
 		}
 	}
+
+	if cmd.NoRestart && cmd.Strategy.Name != constant.DeploymentStrategyDefault {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--no-restart", "--strategy"},
+		}
+	}
+
 	return nil
 }
 
@@ -134,7 +142,7 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 			targetApp,
 			targetSpace,
 			pkg.GUID,
-			constant.DeploymentStrategyDefault,
+			cmd.Strategy.Name,
 			false,
 		)
 		if err != nil {

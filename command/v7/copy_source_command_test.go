@@ -137,6 +137,21 @@ var _ = Describe("copy-source Command", func() {
 		})
 	})
 
+	When("the no restart and strategy flags are both provided", func() {
+		BeforeEach(func() {
+			cmd.NoRestart = true
+			cmd.Strategy = flag.DeploymentStrategy{Name: constant.DeploymentStrategyRolling}
+		})
+
+		It("returns an error", func() {
+			Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+				Args: []string{
+					"--no-restart", "--strategy",
+				},
+			}))
+		})
+	})
+
 	When("a target org and space is provided", func() {
 		BeforeEach(func() {
 			cmd.Organization = "destination-org"
@@ -290,6 +305,25 @@ var _ = Describe("copy-source Command", func() {
 
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(actorError))
+		})
+	})
+
+	When("the strategy flag is set to rolling", func() {
+		BeforeEach(func() {
+			cmd.Strategy = flag.DeploymentStrategy{
+				Name: constant.DeploymentStrategyRolling,
+			}
+		})
+
+		It("stages and starts the app with the appropriate strategy", func() {
+			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
+			returnedApp, spaceForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
+			Expect(returnedApp).To(Equal(targetApp))
+			Expect(spaceForApp).To(Equal(configv3.Space{Name: "some-space", GUID: "some-space-guid"}))
+			Expect(pkgGUID).To(Equal("target-package-guid"))
+			Expect(strategy).To(Equal(constant.DeploymentStrategyRolling))
+			Expect(noWait).To(Equal(false))
+
 		})
 	})
 
