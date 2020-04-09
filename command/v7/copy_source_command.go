@@ -13,8 +13,9 @@ type CopySourceCommand struct {
 	BaseCommand
 
 	RequiredArgs        flag.CopySourceArgs     `positional-args:"yes"`
-	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY]"`
+	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY] [--no-wait]"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null"`
+	NoWait              bool                    `long:"no-wait" description:"Do not wait for the long-running operation to complete; copy-source exits when one instance of the web process is healthy"`
 	NoRestart           bool                    `long:"no-restart" description:"Do not restage the destination application"`
 	Organization        string                  `short:"o" long:"organization" description:"Org that contains the destination application"`
 	Space               string                  `short:"s" long:"space" description:"Space that contains the destination application"`
@@ -36,6 +37,12 @@ func (cmd *CopySourceCommand) ValidateFlags() error {
 	if cmd.NoRestart && cmd.Strategy.Name != constant.DeploymentStrategyDefault {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--no-restart", "--strategy"},
+		}
+	}
+
+	if cmd.NoRestart && cmd.NoWait {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--no-restart", "--no-wait"},
 		}
 	}
 
@@ -143,7 +150,7 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 			targetSpace,
 			pkg.GUID,
 			cmd.Strategy.Name,
-			false,
+			cmd.NoWait,
 		)
 		if err != nil {
 			return mapErr(cmd.Config, targetApp.Name, err)

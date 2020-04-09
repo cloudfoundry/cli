@@ -305,11 +305,50 @@ var _ = Describe("copy-source command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		It("copies the app to the provided space without starting it", func() {
+		It("copies the app to the provided space using a rolling deploy", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("copy-source", sourceAppName, targetAppName, "--strategy", "rolling")
 			Eventually(session).Should(Say("Copying source from app %s to target app %s in org %s / space %s as %s...", sourceAppName, targetAppName, orgName, spaceName, username))
 			Eventually(session).Should(Say("Waiting for app to deploy..."))
+			Eventually(session).Should(Exit(0))
+
+			Eventually(helpers.CF("start", targetAppName)).Should(Exit(0))
+			resp, err := http.Get(fmt.Sprintf("http://%s.%s", targetAppName, helpers.DefaultSharedDomain()))
+			Expect(err).ToNot(HaveOccurred())
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(body)).To(MatchRegexp("hello world"))
+		})
+	})
+
+	Describe("command behavior when the --no-wait flag is passed", func() {
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+
+			sourceAppName = helpers.PrefixedRandomName("hello")
+			targetAppName = helpers.PrefixedRandomName("banana")
+
+			helpers.SetupCF(orgName, spaceName)
+
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", sourceAppName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+			})
+
+			helpers.WithBananaPantsApp(func(appDir string) {
+				Eventually(helpers.CF("push", targetAppName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+			})
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
+		It("copies the app to the provided space", func() {
+			username, _ := helpers.GetCredentials()
+			session := helpers.CF("copy-source", sourceAppName, targetAppName, "--no-wait")
+			Eventually(session).Should(Say("Copying source from app %s to target app %s in org %s / space %s as %s...", sourceAppName, targetAppName, orgName, spaceName, username))
 			Eventually(session).Should(Exit(0))
 
 			Eventually(helpers.CF("start", targetAppName)).Should(Exit(0))
@@ -327,9 +366,10 @@ func helpText(session *Session) {
 	Eventually(session).Should(Say("NAME:"))
 	Eventually(session).Should(Say("copy-source - Copies the source code of an application to another existing application and restages that application"))
 	Eventually(session).Should(Say("USAGE:"))
-	Eventually(session).Should(Say(`cf copy-source SOURCE_APP DESTINATION_APP \[-s TARGET_SPACE \[-o TARGET_ORG\]\] \[--no-restart\] \[--strategy STRATEGY\]`))
+	Eventually(session).Should(Say(`cf copy-source SOURCE_APP DESTINATION_APP \[-s TARGET_SPACE \[-o TARGET_ORG\]\] \[--no-restart\] \[--strategy STRATEGY\] \[--no-wait\]`))
 	Eventually(session).Should(Say("OPTIONS:"))
 	Eventually(session).Should(Say(`--strategy\s+Deployment strategy, either rolling or null`))
+	Eventually(session).Should(Say(`--no-wait\s+Do not wait for the long-running operation to complete; copy-source exits when one instance of the web process is healthy`))
 	Eventually(session).Should(Say(`--no-restart\s+Do not restage the destination application`))
 	Eventually(session).Should(Say(`--organization, -o\s+Org that contains the destination application`))
 	Eventually(session).Should(Say(`--space, -s\s+Space that contains the destination application`))
