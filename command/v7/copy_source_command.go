@@ -13,7 +13,8 @@ type CopySourceCommand struct {
 	BaseCommand
 
 	RequiredArgs        flag.CopySourceArgs `positional-args:"yes"`
-	usage               interface{}         `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP"`
+	usage               interface{}         `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart]"`
+	NoRestart           bool                `long:"no-restart" description:"Do not restage the destination application"`
 	Organization        string              `short:"o" long:"organization" description:"Org that contains the destination application"`
 	Space               string              `short:"s" long:"space" description:"Space that contains the destination application"`
 	relatedCommands     interface{}         `related_commands:"apps, push, restage, restart, target"`
@@ -128,15 +129,20 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.Stager.StageAndStart(
-		targetApp,
-		targetSpace,
-		pkg.GUID,
-		constant.DeploymentStrategyDefault,
-		false,
-	)
-	if err != nil {
-		return mapErr(cmd.Config, targetApp.Name, err)
+	if !cmd.NoRestart {
+		err = cmd.Stager.StageAndStart(
+			targetApp,
+			targetSpace,
+			pkg.GUID,
+			constant.DeploymentStrategyDefault,
+			false,
+		)
+		if err != nil {
+			return mapErr(cmd.Config, targetApp.Name, err)
+		}
+	} else {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayOK()
 	}
 
 	return nil

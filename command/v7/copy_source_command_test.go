@@ -313,6 +313,16 @@ var _ = Describe("copy-source Command", func() {
 		})
 	})
 
+	When("the no-restart flag is set", func() {
+		BeforeEach(func() {
+			cmd.NoRestart = true
+		})
+		It("succeeds but does not restart the app", func() {
+			Expect(executeErr).To(Not(HaveOccurred()))
+			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(0))
+		})
+	})
+
 	It("succeeds", func() {
 		Expect(executeErr).To(Not(HaveOccurred()))
 	})
