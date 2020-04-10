@@ -31,7 +31,7 @@ func (cmd ConfigCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Setting values in config...")
 
 	if cmd.AsyncTimeout.IsSet {
-		cmd.Config.SetAsyncTimeout(int(cmd.AsyncTimeout.Value))
+		cmd.Config.SetAsyncTimeout(cmd.AsyncTimeout.Value)
 	}
 
 	if cmd.Color.IsSet {
