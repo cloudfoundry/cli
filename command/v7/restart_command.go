@@ -58,7 +58,6 @@ func (cmd RestartCommand) Execute(args []string) error {
 		err = cmd.downtimeRestart(app)
 	}
 
-	cmd.UI.DisplayNewline()
 	if err != nil {
 		return err
 	}
@@ -81,6 +80,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 func (cmd RestartCommand) downtimeRestart(app v7action.Application) error {
 	var warnings v7action.Warnings
 	var err error
+
 	if app.Started() {
 		cmd.UI.DisplayText("Stopping app...\n")
 

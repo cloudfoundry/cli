@@ -74,7 +74,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		return err
 	}
 	if packageGuid != "" {
-		cmd.UI.DisplayText("Staging app and tracing logs")
+		cmd.UI.DisplayText("Staging app and tracing logs...")
 
 		logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
 		cmd.UI.DisplayWarnings(logWarnings)
@@ -95,9 +95,11 @@ func (cmd StartCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
+
+		cmd.UI.DisplayNewline()
 	}
 
-	cmd.UI.DisplayText("\nWaiting for app to start...")
+	cmd.UI.DisplayText("Waiting for app to start...")
 
 	warnings, err = cmd.Actor.StartApplication(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)

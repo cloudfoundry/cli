@@ -197,7 +197,7 @@ var _ = Describe("start command", func() {
 				It("gives an error", func() {
 					session := helpers.CF("start", appName)
 
-					Eventually(session.Err).Should(Say(`App can not start with out a package to stage or a droplet to run.`))
+					Eventually(session.Err).Should(Say(`App cannot start without a package to stage or a droplet to run.`))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

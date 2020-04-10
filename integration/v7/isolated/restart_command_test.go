@@ -169,7 +169,7 @@ var _ = Describe("restart command", func() {
 
 						session := helpers.CF("restart", appName)
 						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session.Err).Should(Say(`App can not start with out a package to stage or a droplet to run\.`))
+						Eventually(session.Err).Should(Say(`App cannot start without a package to stage or a droplet to run\.`))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})

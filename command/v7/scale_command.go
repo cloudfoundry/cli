@@ -183,6 +183,8 @@ func (cmd ScaleCommand) showCurrentScale(userName string, runningErr error) erro
 		"Username":  userName,
 	})
 
+	cmd.UI.DisplayNewline()
+
 	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
