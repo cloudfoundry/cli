@@ -71,212 +71,215 @@ var _ = Describe("domains command", func() {
 		})
 	})
 
+	When("no org is targeted", func() {
+		BeforeEach(func() {
+			helpers.LoginCF()
+		})
+
+		It("displays an error message and fails", func() {
+			session := helpers.CF("domains")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.`))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
 	When("logged in", func() {
-		var userName string
+		var (
+			userName      string
+			orgName       string
+			spaceName     string
+			sharedDomain1 helpers.Domain
+			sharedDomain2 helpers.Domain
+		)
 
 		BeforeEach(func() {
 			userName, _ = helpers.GetCredentials()
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.SetupCF(orgName, spaceName)
+
+			sharedDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName("a"))
+			sharedDomain1.CreateShared()
+
+			sharedDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
+			sharedDomain2.CreateShared()
+			Eventually(helpers.CF("set-label", "domain", sharedDomain1.Name, "keyfor1=valuefor1")).Should(Exit(0))
 		})
 
-		When("no org is targeted", func() {
-			BeforeEach(func() {
-				helpers.LoginCF()
-			})
+		AfterEach(func() {
+			if helpers.ClientCredentialsTestMode() {
+				// We have observed pipeline failures at this step, where client credentials get rejected
+				// when trying to delete domains. When logged in as a client, we don't automatically
+				// reautheneticate, so if your access token expires, requests will fail. Here, we try
+				// manually re-authenticating in client-credentials mode.
+				helpers.LoginCFWithClientCredentials()
+			}
 
-			It("displays an error message and fails", func() {
-				session := helpers.CF("domains")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.`))
-				Eventually(session).Should(Exit(1))
-			})
+			Eventually(helpers.CF("delete-shared-domain", sharedDomain1.Name, "-f")).Should(Exit(0))
+			Eventually(helpers.CF("delete-shared-domain", sharedDomain2.Name, "-f")).Should(Exit(0))
+			Eventually(helpers.CF("delete-space", spaceName, "-f")).Should(Exit(0))
+			Eventually(helpers.CF("delete-org", orgName, "-f")).Should(Exit(0))
 		})
 
-		When("an org is targeted", func() {
-			var (
-				orgName       string
-				spaceName     string
-				sharedDomain1 helpers.Domain
-				sharedDomain2 helpers.Domain
-			)
+		It("displays the shared domains and denotes that they are shared", func() {
+			session := helpers.CF("domains")
+			Eventually(session).Should(Exit(0))
+
+			Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
+			Expect(session).Should(Say(`name\s+availability\s+internal`))
+			Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+			Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+		})
+
+		It("displays the shared domains and denotes that they are shared for matching labels only", func() {
+			session := helpers.CF("domains", "--labels", "keyfor1=valuefor1")
+			Eventually(session).Should(Exit(0))
+
+			Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
+			Expect(session).Should(Say(`name\s+availability\s+internal`))
+			Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+			Expect(session).ShouldNot(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+		})
+
+		When("the shared domain is internal", func() {
+			var internalDomainName string
 
 			BeforeEach(func() {
-				orgName = helpers.NewOrgName()
-				spaceName = helpers.NewSpaceName()
-				helpers.SetupCF(orgName, spaceName)
-
-				sharedDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName("a"))
-				sharedDomain1.CreateShared()
-
-				sharedDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
-				sharedDomain2.CreateShared()
-				Eventually(helpers.CF("set-label", "domain", sharedDomain1.Name, "keyfor1=valuefor1")).Should(Exit(0))
+				internalDomainName = helpers.NewDomainName()
+				internalDomain := helpers.NewDomain(orgName, internalDomainName)
+				internalDomain.CreateInternal()
 			})
+
 			AfterEach(func() {
-				Eventually(helpers.CF("delete-shared-domain", sharedDomain1.Name, "-f")).Should(Exit(0))
-				Eventually(helpers.CF("delete-shared-domain", sharedDomain2.Name, "-f")).Should(Exit(0))
-				Eventually(helpers.CF("delete-space", spaceName, "-f")).Should(Exit(0))
-				Eventually(helpers.CF("delete-org", orgName, "-f")).Should(Exit(0))
+				Eventually(helpers.CF("delete-shared-domain", internalDomainName, "-f")).Should(Exit(0))
 			})
 
-			When("the targeted org has shared domains", func() {
+			It("displays the internal flag on the shared domain", func() {
+				session := helpers.CF("domains")
+				Eventually(session).Should(Exit(0))
 
-				It("displays the shared domains and denotes that they are shared", func() {
-					session := helpers.CF("domains")
-					Eventually(session).Should(Exit(0))
-
-					Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
-					Expect(session).Should(Say(`name\s+availability\s+internal`))
-					Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-					Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
-				})
-
-				It("displays the shared domains and denotes that they are shared for matching labels only", func() {
-					session := helpers.CF("domains", "--labels", "keyfor1=valuefor1")
-					Eventually(session).Should(Exit(0))
-
-					Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
-					Expect(session).Should(Say(`name\s+availability\s+internal`))
-					Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-					Expect(session).ShouldNot(Say(`%s\s+shared\s+`, sharedDomain2.Name))
-				})
-
-				When("the shared domain is internal", func() {
-					var internalDomainName string
-
-					BeforeEach(func() {
-						internalDomainName = helpers.NewDomainName()
-						internalDomain := helpers.NewDomain(orgName, internalDomainName)
-						internalDomain.CreateInternal()
-					})
-					AfterEach(func() {
-						Eventually(helpers.CF("delete-shared-domain", internalDomainName, "-f")).Should(Exit(0))
-					})
-
-					It("displays the internal flag on the shared domain", func() {
-						session := helpers.CF("domains")
-						Eventually(session).Should(Exit(0))
-
-						Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-						Expect(session).Should(Say(`name\s+availability\s+internal`))
-						Expect(session).Should(Say(`%s\s+shared\s+true`, internalDomainName))
-					})
-
-					It("displays the shared domains and denotes that they are shared for matching labels only", func() {
-						session := helpers.CF("domains", "--labels", "keyfor1=valuefor1")
-						Eventually(session).Should(Exit(0))
-
-						Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
-						Expect(session).Should(Say(`name\s+availability\s+internal`))
-						Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-						Expect(session).ShouldNot(Say(`%s\s+shared\s+`, sharedDomain2.Name))
-						Expect(session).ShouldNot(Say(internalDomainName))
-
-					})
-				})
+				Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+				Expect(session).Should(Say(`name\s+availability\s+internal`))
+				Expect(session).Should(Say(`%s\s+shared\s+true`, internalDomainName))
 			})
 
-			When("the targeted org has a private domain", func() {
-				var privateDomain1, privateDomain2 helpers.Domain
+			It("displays the shared domains and denotes that they are shared for matching labels only", func() {
+				session := helpers.CF("domains", "--labels", "keyfor1=valuefor1")
+				Eventually(session).Should(Exit(0))
+
+				Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
+				Expect(session).Should(Say(`name\s+availability\s+internal`))
+				Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+				Expect(session).ShouldNot(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+				Expect(session).ShouldNot(Say(internalDomainName))
+			})
+		})
+
+		When("the targeted org has a private domain", func() {
+			var privateDomain1, privateDomain2 helpers.Domain
+
+			BeforeEach(func() {
+				privateDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName("a"))
+				privateDomain1.Create()
+
+				privateDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
+				privateDomain2.Create()
+
+				Eventually(helpers.CF("set-label", "domain", privateDomain2.Name, "keyfor2=valuefor2")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				Eventually(helpers.CF("delete-private-domain", privateDomain1.Name, "-f")).Should(Exit(0))
+				Eventually(helpers.CF("delete-private-domain", privateDomain2.Name, "-f")).Should(Exit(0))
+			})
+
+			It("displays the private domains", func() {
+				session := helpers.CF("domains")
+
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+				Expect(session).Should(Say(`name\s+availability\s+internal`))
+				Expect(session).Should(Say(`%s\s+private\s+`, privateDomain1.Name))
+				Expect(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
+			})
+
+			It("filters private domains by label", func() {
+				session := helpers.CF("domains", "--labels", "keyfor2=valuefor2")
+
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+				Expect(session).Should(Say(`name\s+availability\s+internal`))
+				Expect(session).ShouldNot(Say(`%s\s+private\s+`, privateDomain1.Name))
+				Expect(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
+			})
+
+			When("targeting a different org", func() {
+				var (
+					newOrgName     string
+					newSpaceName   string
+					privateDomain3 helpers.Domain
+				)
 
 				BeforeEach(func() {
-					privateDomain1 = helpers.NewDomain(orgName, helpers.NewDomainName("a"))
-					privateDomain1.Create()
+					newOrgName = helpers.NewOrgName()
+					newSpaceName = helpers.NewSpaceName()
+					helpers.SetupCF(newOrgName, newSpaceName)
 
-					privateDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
-					privateDomain2.Create()
-
-					Eventually(helpers.CF("set-label", "domain", privateDomain2.Name, "keyfor2=valuefor2")).Should(Exit(0))
+					privateDomain3 = helpers.NewDomain(newOrgName, helpers.NewDomainName("c"))
+					privateDomain3.Create()
 				})
+
 				AfterEach(func() {
-					Eventually(helpers.CF("delete-private-domain", privateDomain1.Name, "-f")).Should(Exit(0))
-					Eventually(helpers.CF("delete-private-domain", privateDomain2.Name, "-f")).Should(Exit(0))
+					Eventually(helpers.CF("delete-private-domain", privateDomain3.Name, "-f")).Should(Exit(0))
+					Eventually(helpers.CF("delete-space", newSpaceName, "-f")).Should(Exit(0))
+					Eventually(helpers.CF("delete-org", newOrgName, "-f")).Should(Exit(0))
+					// Outer after-eaches require the initial org/space to be targetted
+					helpers.TargetOrgAndSpace(orgName, spaceName)
 				})
 
-				It("displays the private domains", func() {
+				It("should not display the private domains of other orgs", func() {
 					session := helpers.CF("domains")
 
+					Eventually(session).Should(Say(`Getting domains in org %s as %s`, newOrgName, userName))
+					Eventually(session).Should(Say(`name\s+availability\s+internal`))
+
+					Consistently(session).ShouldNot(Say(`%s`, privateDomain1.Name))
+					Consistently(session).ShouldNot(Say(`%s`, privateDomain2.Name))
+
+					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+					Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain3.Name))
 					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-					Expect(session).Should(Say(`name\s+availability\s+internal`))
-					Expect(session).Should(Say(`%s\s+private\s+`, privateDomain1.Name))
-					Expect(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
+				})
+			})
+
+			When("logged in as a user that cannot see private domains", func() {
+				var userName string
+
+				BeforeEach(func() {
+					userName = helpers.SwitchToOrgRole(orgName, "BillingManager")
+					helpers.TargetOrg(orgName)
 				})
 
-				It("filters private domains by label", func() {
-					session := helpers.CF("domains", "--labels", "keyfor2=valuefor2")
+				JustAfterEach(func() {
+					// waiting AfterEach blocks are designed to run in as admin
+					helpers.LoginCF()
+					helpers.TargetOrg(orgName)
+				})
+
+				It("only prints the shared domains", func() {
+					session := helpers.CF("domains")
+
+					Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
+					Eventually(session).Should(Say(`name\s+availability\s+internal`))
+					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
+					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+
+					Consistently(session).ShouldNot(Say(privateDomain1.Name))
+					Consistently(session).ShouldNot(Say(privateDomain2.Name))
 
 					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-					Expect(session).Should(Say(`name\s+availability\s+internal`))
-					Expect(session).ShouldNot(Say(`%s\s+private\s+`, privateDomain1.Name))
-					Expect(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
-				})
-
-				When("targeting a different org", func() {
-					var (
-						newOrgName     string
-						newSpaceName   string
-						privateDomain3 helpers.Domain
-					)
-
-					BeforeEach(func() {
-						newOrgName = helpers.NewOrgName()
-						newSpaceName = helpers.NewSpaceName()
-						helpers.SetupCF(newOrgName, newSpaceName)
-
-						privateDomain3 = helpers.NewDomain(newOrgName, helpers.NewDomainName("c"))
-						privateDomain3.Create()
-					})
-					AfterEach(func() {
-						Eventually(helpers.CF("delete-private-domain", privateDomain3.Name, "-f")).Should(Exit(0))
-						Eventually(helpers.CF("delete-space", newSpaceName, "-f")).Should(Exit(0))
-						Eventually(helpers.CF("delete-org", newOrgName, "-f")).Should(Exit(0))
-						// Outer after-eaches require the initial org/space to be targetted
-						helpers.TargetOrgAndSpace(orgName, spaceName)
-					})
-
-					It("should not display the private domains of other orgs", func() {
-						session := helpers.CF("domains")
-
-						Eventually(session).Should(Say(`Getting domains in org %s as %s`, newOrgName, userName))
-						Eventually(session).Should(Say(`name\s+availability\s+internal`))
-
-						Consistently(session).ShouldNot(Say(`%s`, privateDomain1.Name))
-						Consistently(session).ShouldNot(Say(`%s`, privateDomain2.Name))
-
-						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
-						Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain3.Name))
-						Eventually(session).Should(Exit(0))
-					})
-				})
-
-				When("logged in as a user that cannot see private domains", func() {
-					var userName string
-
-					BeforeEach(func() {
-						userName = helpers.SwitchToOrgRole(orgName, "BillingManager")
-						helpers.TargetOrg(orgName)
-					})
-					JustAfterEach(func() {
-						// waiting AfterEach blocks are designed to run in as admin
-						helpers.LoginCF()
-						helpers.TargetOrg(orgName)
-					})
-
-					It("only prints the shared domains", func() {
-						session := helpers.CF("domains")
-
-						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-						Eventually(session).Should(Say(`name\s+availability\s+internal`))
-						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
-
-						Consistently(session).ShouldNot(Say(privateDomain1.Name))
-						Consistently(session).ShouldNot(Say(privateDomain2.Name))
-
-						Eventually(session).Should(Exit(0))
-					})
 				})
 			})
 		})
