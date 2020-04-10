@@ -1,4 +1,4 @@
-# 8. Log Cache and Clock Issues
+# 9. Log Cache and Clock Issues
 
 Date: 2020-04-08
 
