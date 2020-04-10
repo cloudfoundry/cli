@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -364,29 +364,29 @@ var _ = Describe("unset-label command", func() {
 		})
 
 		When("unsetting labels from a service-broker", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 
-				session := helpers.CF("set-label", "service-broker", broker.Name(), "pci=true", "public-facing=false")
+				session := helpers.CF("set-label", "service-broker", broker.Name, "pci=true", "public-facing=false")
 				Eventually(session).Should(Exit(0))
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("unsets the specified labels on the service-broker", func() {
-				session := helpers.CF("unset-label", "service-broker", broker.Name(), "public-facing")
+				session := helpers.CF("unset-label", "service-broker", broker.Name, "public-facing")
 				Eventually(session).Should(Exit(0))
-				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-broker %s as %s...`), broker.Name(), username))
+				Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-broker %s as %s...`), broker.Name, username))
 				Expect(session).Should(Say("OK"))
 
-				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name), true, helpers.MetadataLabels{
 					"pci": "true",
 				})
 			})
@@ -394,14 +394,14 @@ var _ = Describe("unset-label command", func() {
 
 		When("unsetting labels from a service-offering", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				serviceOfferingName string
 			)
 
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 				serviceOfferingName = broker.Services[0].Name
 
 				session := helpers.CF("set-label", "service-offering", serviceOfferingName, "pci=true", "public-facing=false")
@@ -409,8 +409,8 @@ var _ = Describe("unset-label command", func() {
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("unsets the specified labels", func() {
@@ -426,9 +426,9 @@ var _ = Describe("unset-label command", func() {
 
 			When("the service broker name is specified", func() {
 				It("unsets the specified labels", func() {
-					session := helpers.CF("unset-label", "-b", broker.Name(), "service-offering", serviceOfferingName, "public-facing")
+					session := helpers.CF("unset-label", "-b", broker.Name, "service-offering", serviceOfferingName, "public-facing")
 					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-offering %s from service broker %s as %s...`), serviceOfferingName, broker.Name(), username))
+					Expect(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-offering %s from service broker %s as %s...`), serviceOfferingName, broker.Name, username))
 					Expect(session).Should(Say("OK"))
 
 					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_offerings?names=%s", serviceOfferingName), true, helpers.MetadataLabels{
@@ -440,7 +440,7 @@ var _ = Describe("unset-label command", func() {
 
 		When("unsetting labels from a service-plan", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				servicePlanName     string
 				serviceOfferingName string
 			)
@@ -448,7 +448,7 @@ var _ = Describe("unset-label command", func() {
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 				servicePlanName = broker.Services[0].Plans[0].Name
 				serviceOfferingName = broker.Services[0].Name
 
@@ -457,13 +457,13 @@ var _ = Describe("unset-label command", func() {
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("unsets the specified labels", func() {
-				session := helpers.CF("unset-label", "service-plan", servicePlanName, "-b", broker.Name(), "-e", serviceOfferingName, "public-facing")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-plan %s from service offering %s / service broker %s as %s...`), servicePlanName, serviceOfferingName, broker.Name(), username))
+				session := helpers.CF("unset-label", "service-plan", servicePlanName, "-b", broker.Name, "-e", serviceOfferingName, "public-facing")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Removing label(s) for service-plan %s from service offering %s / service broker %s as %s...`), servicePlanName, serviceOfferingName, broker.Name, username))
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say("OK"))
 

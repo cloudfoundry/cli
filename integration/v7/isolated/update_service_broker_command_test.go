@@ -3,6 +3,7 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -26,19 +27,20 @@ var _ = Describe("update-service-broker command", func() {
 		})
 
 		It("updates the service broker", func() {
-			broker1 := fakeservicebroker.New().EnsureBrokerIsAvailable()
-			broker2 := fakeservicebroker.New().WithName("single-use").EnsureAppIsDeployed()
-			defer broker2.Destroy()
+			broker1 := servicebrokerstub.Register()
+			broker2 := servicebrokerstub.Create()
+			defer broker1.Forget()
+			defer broker2.Forget()
 
-			session := helpers.CF("update-service-broker", broker1.Name(), broker2.Username(), broker2.Password(), broker2.URL())
+			session := helpers.CF("update-service-broker", broker1.Name, broker2.Username, broker2.Password, broker2.URL)
 
 			Eventually(session.Wait().Out).Should(SatisfyAll(
-				Say("Updating service broker %s as %s...", broker1.Name(), cfUsername),
+				Say("Updating service broker %s as %s...", broker1.Name, cfUsername),
 				Say("OK"),
 			))
 			Eventually(session).Should(Exit(0))
 			session = helpers.CF("service-brokers")
-			Eventually(session.Out).Should(Say("%s[[:space:]]+%s", broker1.Name(), broker2.URL()))
+			Eventually(session.Out).Should(Say("%s[[:space:]]+%s", broker1.Name, broker2.URL))
 		})
 
 		When("the service broker was updated but warnings happened", func() {
@@ -89,12 +91,12 @@ var _ = Describe("update-service-broker command", func() {
 
 		When("the update fails before starting a synchronization job", func() {
 			It("prints an error message", func() {
-				broker := fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker := servicebrokerstub.Register()
 
-				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), "not-a-valid-url")
+				session := helpers.CF("update-service-broker", broker.Name, broker.Username, broker.Password, "not-a-valid-url")
 
 				Eventually(session.Wait().Out).Should(SatisfyAll(
-					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
+					Say("Updating service broker %s as %s...", broker.Name, cfUsername),
 					Say("FAILED"),
 				))
 

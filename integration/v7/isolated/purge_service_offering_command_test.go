@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -83,42 +83,46 @@ var _ = Describe("purge-service-offering command", func() {
 		})
 
 		When("the service exists", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable().EnableServiceAccess()
+				broker = servicebrokerstub.EnableServiceAccess()
+			})
+
+			AfterEach(func() {
+				broker.Forget()
 			})
 
 			It("purges the service offering and plans", func() {
-				session := helpers.CF("purge-service-offering", broker.ServiceName(), "-f")
+				session := helpers.CF("purge-service-offering", broker.FirstServiceOfferingName(), "-f")
 				Eventually(session).Should(Exit(0))
 
-				Expect(session).To(Say(`Purging service offering %s\.\.\.`, broker.ServiceName()))
+				Expect(session).To(Say(`Purging service offering %s\.\.\.`, broker.FirstServiceOfferingName()))
 				Expect(session).To(Say(`OK`))
 
 				session = helpers.CF("marketplace")
 				Eventually(session).Should(Exit(0))
-				Expect(session).NotTo(Say(broker.ServiceName()))
-				Expect(session).NotTo(Say(broker.ServicePlanName()))
+				Expect(session).NotTo(Say(broker.FirstServiceOfferingName()))
+				Expect(session).NotTo(Say(broker.FirstServicePlanName()))
 			})
 
 			When("the service name is ambiguous", func() {
-				var secondBroker *fakeservicebroker.FakeServiceBroker
+				var secondBroker *servicebrokerstub.ServiceBrokerStub
 
 				BeforeEach(func() {
-					secondBroker = fakeservicebroker.NewAlternate()
-					secondBroker.Services[0].Name = broker.ServiceName()
-					secondBroker.EnsureBrokerIsAvailable()
+					secondBroker = servicebrokerstub.New()
+					secondBroker.Services[0].Name = broker.FirstServiceOfferingName()
+					secondBroker.Create().Register().EnableServiceAccess()
 				})
 
 				AfterEach(func() {
-					secondBroker.Destroy()
+					secondBroker.Forget()
 				})
 
 				It("fails, asking the user to disambiguate", func() {
-					session := helpers.CF("purge-service-offering", broker.ServiceName(), "-f")
+					session := helpers.CF("purge-service-offering", broker.FirstServiceOfferingName(), "-f")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say(`Service '%s' is provided by multiple service brokers: %s, %s`, broker.ServiceName(), broker.Name(), secondBroker.Name()))
+					Expect(session.Err).To(Say(`Service '%s' is provided by multiple service brokers: %s, %s`, broker.FirstServiceOfferingName(), broker.Name, secondBroker.Name))
 					Expect(session.Err).To(Say(`Specify a broker by using the '-b' flag.`))
 				})
 			})

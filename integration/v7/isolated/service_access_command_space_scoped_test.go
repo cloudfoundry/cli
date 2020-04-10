@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -18,28 +18,23 @@ var _ = Describe("service-access command for space-scoped service offerings", fu
 
 		service     string
 		servicePlan string
-		broker      *fakeservicebroker.FakeServiceBroker
+		broker      *servicebrokerstub.ServiceBrokerStub
 	)
 
 	BeforeEach(func() {
 		userName, _ = helpers.GetCredentials()
 
-		helpers.LoginCF()
-		helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
-
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		helpers.SetupCF(orgName, spaceName)
 
-		broker = fakeservicebroker.New().WithSpaceScoped()
-		broker.Services[0].Plans[1].Name = helpers.GenerateHigherName(helpers.NewPlanName, broker.Services[0].Plans[0].Name)
-		broker.EnsureBrokerIsAvailable()
-		service = broker.ServiceName()
-		servicePlan = broker.ServicePlanName()
+		broker = servicebrokerstub.Create().RegisterSpaceScoped()
+		service = broker.FirstServiceOfferingName()
+		servicePlan = broker.FirstServicePlanName()
 	})
 
 	AfterEach(func() {
-		broker.Destroy()
+		broker.Forget()
 		helpers.QuickDeleteOrg(orgName)
 	})
 

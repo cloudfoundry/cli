@@ -42,7 +42,13 @@ func (s *ServiceBrokerStub) Forget() {
 }
 
 func (s *ServiceBrokerStub) Register() *ServiceBrokerStub {
-	s.register()
+	s.register(false)
+	s.registered = true
+	return s
+}
+
+func (s *ServiceBrokerStub) RegisterSpaceScoped() *ServiceBrokerStub {
+	s.register(true)
 	s.registered = true
 	return s
 }
@@ -62,6 +68,11 @@ func (s *ServiceBrokerStub) WithPlans(plans int) *ServiceBrokerStub {
 	for len(s.Services[0].Plans) < plans {
 		s.Services[0].Plans = append(s.Services[0].Plans, config.Plan{Name: helpers.PrefixedRandomName("INTEGRATION-PLAN")})
 	}
+	return s
+}
+
+func (s *ServiceBrokerStub) WithName(name string) *ServiceBrokerStub {
+	s.Name = name
 	return s
 }
 

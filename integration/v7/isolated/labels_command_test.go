@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"regexp"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -571,31 +572,31 @@ var _ = Describe("labels command", func() {
 		})
 
 		Describe("service-broker labels", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
 				helpers.LoginCF()
 
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			When("there are labels set on the service broker", func() {
 				BeforeEach(func() {
-					session := helpers.CF("set-label", "service-broker", broker.Name(), "some-other-key=some-other-value")
+					session := helpers.CF("set-label", "service-broker", broker.Name, "some-other-key=some-other-value")
 					Eventually(session).Should(Exit(0))
 
 				})
 
 				It("returns the labels associated with the broker", func() {
-					session := helpers.CF("labels", "service-broker", broker.Name())
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
+					session := helpers.CF("labels", "service-broker", broker.Name)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name, username))
 					Eventually(session).Should(Say(`key\s+value`))
 					Expect(session).To(Say(`some-other-key\s+some-other-value`))
 					Eventually(session).Should(Exit(0))
@@ -604,8 +605,8 @@ var _ = Describe("labels command", func() {
 
 			When("there are no labels set on the service broker", func() {
 				It("indicates that there are no labels", func() {
-					session := helpers.CF("labels", "service-broker", broker.Name())
-					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name(), username))
+					session := helpers.CF("labels", "service-broker", broker.Name)
+					Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-broker %s as %s...\n\n"), broker.Name, username))
 					Expect(session).ToNot(Say(`key\s+value`))
 					Eventually(session).Should(Say("No labels found."))
 					Eventually(session).Should(Exit(0))
@@ -625,7 +626,7 @@ var _ = Describe("labels command", func() {
 
 		Describe("service-offering labels", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				serviceOfferingName string
 			)
 
@@ -634,13 +635,13 @@ var _ = Describe("labels command", func() {
 
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				serviceOfferingName = broker.Services[0].Name
+				broker = servicebrokerstub.Register()
+				serviceOfferingName = broker.FirstServiceOfferingName()
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			When("there are labels set on the service offering", func() {
@@ -660,8 +661,8 @@ var _ = Describe("labels command", func() {
 
 				When("the service broker is specified", func() {
 					It("returns the labels associated with the offering", func() {
-						session := helpers.CF("labels", "-b", broker.Name(), "service-offering", serviceOfferingName)
-						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering %s from service broker %s as %s...\n\n"), serviceOfferingName, broker.Name(), username))
+						session := helpers.CF("labels", "-b", broker.Name, "service-offering", serviceOfferingName)
+						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-offering %s from service broker %s as %s...\n\n"), serviceOfferingName, broker.Name, username))
 						Eventually(session).Should(Say(`key\s+value`))
 						Expect(session).To(Say(`some-other-key\s+some-other-value`))
 						Eventually(session).Should(Exit(0))
@@ -692,7 +693,7 @@ var _ = Describe("labels command", func() {
 
 		Describe("service-plan labels", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				servicePlanName     string
 				serviceOfferingName string
 			)
@@ -702,14 +703,14 @@ var _ = Describe("labels command", func() {
 
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				servicePlanName = broker.Services[0].Plans[0].Name
-				serviceOfferingName = broker.Services[0].Name
+				broker = servicebrokerstub.Register()
+				servicePlanName = broker.FirstServicePlanName()
+				serviceOfferingName = broker.FirstServiceOfferingName()
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			When("there are labels set on the service plan", func() {
@@ -728,8 +729,8 @@ var _ = Describe("labels command", func() {
 
 				When("the service offering and service broker are specified", func() {
 					It("returns the labels associated with the plan", func() {
-						session := helpers.CF("labels", "-e", serviceOfferingName, "-b", broker.Name(), "service-plan", servicePlanName)
-						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan %s from service offering %s / service broker %s as %s..."), servicePlanName, serviceOfferingName, broker.Name(), username))
+						session := helpers.CF("labels", "-e", serviceOfferingName, "-b", broker.Name, "service-plan", servicePlanName)
+						Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for service-plan %s from service offering %s / service broker %s as %s..."), servicePlanName, serviceOfferingName, broker.Name, username))
 						Eventually(session).Should(Say(`key\s+value`))
 						Expect(session).To(Say(`some-other-key\s+some-other-value`))
 						Eventually(session).Should(Exit(0))

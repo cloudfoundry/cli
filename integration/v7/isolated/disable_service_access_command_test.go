@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -101,7 +101,7 @@ var _ = Describe("disable service access command", func() {
 			var (
 				orgName   string
 				spaceName string
-				broker    *fakeservicebroker.FakeServiceBroker
+				broker    *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
@@ -109,63 +109,66 @@ var _ = Describe("disable service access command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.New().WithPlans(2).Create().Register()
 			})
 
 			AfterEach(func() {
-				helpers.TargetOrgAndSpace(orgName, spaceName)
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			When("plans are public", func() {
 				BeforeEach(func() {
-					session := helpers.CF("enable-service-access", broker.ServiceName())
+					session := helpers.CF("enable-service-access", broker.FirstServiceOfferingName())
 					Eventually(session).Should(Exit(0))
 				})
 
 				When("a service name is provided", func() {
 					It("displays an informative message, exits 0, and disables the service for all orgs", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName())
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.ServiceName(), username))
+						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 						Expect(session).To(Say("OK"))
 
-						session = helpers.CF("service-access", "-e", broker.ServiceName())
+						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", broker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+none",
-							broker.ServiceName(),
-							broker.ServicePlanName(),
+							broker.FirstServiceOfferingName(),
+							broker.FirstServicePlanName(),
 						))
 					})
 				})
 
 				When("a service name and plan name are provided", func() {
 					It("displays an informative message, exits 0, and disables the plan for all orgs", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName(), "-p", broker.ServicePlanName())
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-p", broker.FirstServicePlanName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to plan %s of service %s for all orgs as %s...", broker.ServicePlanName(), broker.ServiceName(), username))
+						Expect(session).To(Say("Disabling access to plan %s of service %s for all orgs as %s...", broker.FirstServicePlanName(), broker.FirstServiceOfferingName(), username))
 						Expect(session).To(Say("OK"))
 
-						session = helpers.CF("service-access", "-e", broker.ServiceName())
+						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", broker.Name()))
-						Expect(session).To(Say("%s\\s+%s\\s+none",
-							broker.ServiceName(),
-							broker.ServicePlanName(),
+
+						Expect(string(session.Out.Contents())).To(MatchRegexp(
+							`%s\s+%s\s+none`,
+							broker.FirstServiceOfferingName(),
+							broker.FirstServicePlanName(),
 						))
-						Expect(session).To(Say("%s\\s+.+\\s+all",
-							broker.ServiceName(),
+
+						Expect(string(session.Out.Contents())).To(MatchRegexp(
+							`%s\s+%s\s+all`,
+							broker.FirstServiceOfferingName(),
+							broker.Services[0].Plans[1].Name,
 						))
 					})
 				})
 
 				When("an org name is provided", func() {
 					It("fails", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName(), "-o", orgName)
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-o", orgName)
 						Eventually(session).Should(Exit(1))
-						Expect(session).To(Say("Disabling access to all plans of service %s for org %s as %s...", broker.ServiceName(), orgName, username))
+						Expect(session).To(Say("Disabling access to all plans of service %s for org %s as %s...", broker.FirstServiceOfferingName(), orgName, username))
 						Expect(session).To(Say("FAILED"))
 						Expect(session.Err).To(Say("Cannot remove organization level access for public plans\\."))
 					})
@@ -179,8 +182,8 @@ var _ = Describe("disable service access command", func() {
 					orgName2 = helpers.NewOrgName()
 					spaceName2 := helpers.NewSpaceName()
 					helpers.CreateOrgAndSpace(orgName2, spaceName2)
-					Eventually(helpers.CF("enable-service-access", broker.ServiceName(), "-o", orgName, "-p", broker.ServicePlanName())).Should(Exit(0))
-					Eventually(helpers.CF("enable-service-access", broker.ServiceName(), "-o", orgName2, "-p", broker.ServicePlanName())).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", broker.FirstServiceOfferingName(), "-o", orgName, "-p", broker.FirstServicePlanName())).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", broker.FirstServiceOfferingName(), "-o", orgName2, "-p", broker.FirstServicePlanName())).Should(Exit(0))
 				})
 
 				AfterEach(func() {
@@ -189,18 +192,18 @@ var _ = Describe("disable service access command", func() {
 
 				When("a service name and org is provided", func() {
 					It("displays an informative message, and exits 0, and disables the service for the given org", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName(), "-o", orgName)
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-o", orgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to all plans of service %s for org %s as %s...", broker.ServiceName(), orgName, username))
+						Expect(session).To(Say("Disabling access to all plans of service %s for org %s as %s...", broker.FirstServiceOfferingName(), orgName, username))
 						Expect(session).To(Say("Did not update plan %s as it already has visibility none\\.", broker.Services[0].Plans[1].Name))
 						Expect(session).To(Say("OK"))
 
-						session = helpers.CF("service-access", "-e", broker.ServiceName())
+						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", broker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+limited\\s+%s",
-							broker.ServiceName(),
-							broker.ServicePlanName(),
+							broker.FirstServiceOfferingName(),
+							broker.FirstServicePlanName(),
 							orgName2,
 						))
 					})
@@ -208,17 +211,17 @@ var _ = Describe("disable service access command", func() {
 
 				When("a service name, plan name and org is provided", func() {
 					It("displays an informative message, and exits 0, disables the service for the given org and plan", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName(), "-p", broker.ServicePlanName(), "-o", orgName)
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-p", broker.FirstServicePlanName(), "-o", orgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to plan %s of service %s for org %s as %s...", broker.ServicePlanName(), broker.ServiceName(), orgName, username))
+						Expect(session).To(Say("Disabling access to plan %s of service %s for org %s as %s...", broker.FirstServicePlanName(), broker.FirstServiceOfferingName(), orgName, username))
 						Expect(session).To(Say("OK"))
 
-						session = helpers.CF("service-access", "-e", broker.ServiceName())
+						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", broker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+limited\\s+%s",
-							broker.ServiceName(),
-							broker.ServicePlanName(),
+							broker.FirstServiceOfferingName(),
+							broker.FirstServicePlanName(),
 							orgName2,
 						))
 					})
@@ -227,9 +230,9 @@ var _ = Describe("disable service access command", func() {
 
 			When("the org does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
-					session := helpers.CF("disable-service-access", broker.ServiceName(), "-o", "not-a-real-org")
+					session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-o", "not-a-real-org")
 					Eventually(session).Should(Exit(1))
-					Expect(session).To(Say("Disabling access to all plans of service %s for org not-a-real-org as %s...", broker.ServiceName(), username))
+					Expect(session).To(Say("Disabling access to all plans of service %s for org not-a-real-org as %s...", broker.FirstServiceOfferingName(), username))
 					Expect(session).To(Say("FAILED"))
 					Expect(session.Err).To(Say("Organization 'not-a-real-org' not found"))
 				})
@@ -237,56 +240,56 @@ var _ = Describe("disable service access command", func() {
 
 			When("the plan does not exist", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
-					session := helpers.CF("disable-service-access", broker.ServiceName(), "-p", "plan-does-not-exist")
+					session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-p", "plan-does-not-exist")
 					Eventually(session).Should(Exit(1))
-					Expect(session).To(Say("Disabling access to plan plan-does-not-exist of service %s for all orgs as %s...", broker.ServiceName(), username))
+					Expect(session).To(Say("Disabling access to plan plan-does-not-exist of service %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 					Expect(session).To(Say("FAILED"))
-					Expect(session.Err).To(Say("The plan plan-does-not-exist could not be found for service %s", broker.ServiceName()))
+					Expect(session.Err).To(Say("The plan plan-does-not-exist could not be found for service %s", broker.FirstServiceOfferingName()))
 				})
 			})
 
 			When("two services with the same name are enabled", func() {
-				var secondBroker *fakeservicebroker.FakeServiceBroker
+				var secondBroker *servicebrokerstub.ServiceBrokerStub
 
 				BeforeEach(func() {
-					secondBroker = fakeservicebroker.NewAlternate()
-					secondBroker.Services[0].Name = broker.ServiceName()
-					secondBroker.EnsureBrokerIsAvailable()
-					Eventually(helpers.CF("enable-service-access", broker.ServiceName(), "-b", broker.Name())).Should(Exit(0))
-					Eventually(helpers.CF("enable-service-access", secondBroker.ServiceName(), "-b", secondBroker.Name())).Should(Exit(0))
+					secondBroker = servicebrokerstub.New()
+					secondBroker.Services[0].Name = broker.FirstServiceOfferingName()
+					secondBroker.Create().Register()
+					Eventually(helpers.CF("enable-service-access", broker.FirstServiceOfferingName(), "-b", broker.Name)).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", secondBroker.FirstServiceOfferingName(), "-b", secondBroker.Name)).Should(Exit(0))
 				})
 
 				AfterEach(func() {
-					secondBroker.Destroy()
+					secondBroker.Forget()
 				})
 
 				When("no broker name is provided", func() {
 					It("fails and asks for disambiguation", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName())
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(1))
-						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.ServiceName(), username))
+						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 						Expect(session.Err).To(Say(
 							"Service '%s' is provided by multiple service brokers: %s, %s\nSpecify a broker by using the '-b' flag.",
-							broker.ServiceName(),
-							broker.Name(),
-							secondBroker.Name(),
+							broker.FirstServiceOfferingName(),
+							broker.Name,
+							secondBroker.Name,
 						))
 					})
 				})
 
 				When("a broker name is provided", func() {
 					It("displays an informative message, exits 0, and disables access to the service", func() {
-						session := helpers.CF("disable-service-access", broker.ServiceName(), "-b", secondBroker.Name())
+						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-b", secondBroker.Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to all plans of service %s from broker %s for all orgs as %s...", broker.ServiceName(), secondBroker.Name(), username))
+						Expect(session).To(Say("Disabling access to all plans of service %s from broker %s for all orgs as %s...", broker.FirstServiceOfferingName(), secondBroker.Name, username))
 						Expect(session).To(Say("OK"))
 
-						session = helpers.CF("service-access", "-b", secondBroker.Name())
+						session = helpers.CF("service-access", "-b", secondBroker.Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", secondBroker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", secondBroker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+none",
-							secondBroker.ServiceName(),
-							secondBroker.ServicePlanName(),
+							secondBroker.FirstServiceOfferingName(),
+							secondBroker.FirstServicePlanName(),
 						))
 					})
 				})

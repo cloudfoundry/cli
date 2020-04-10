@@ -3,8 +3,9 @@ package isolated
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -200,20 +201,19 @@ var _ = Describe("space command", func() {
 						service             string
 						servicePlan         string
 						serviceInstanceName string
-						broker              *fakeservicebroker.FakeServiceBroker
+						broker              *servicebrokerstub.ServiceBrokerStub
 					)
 
 					BeforeEach(func() {
-						broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-						service = broker.ServiceName()
-						servicePlan = broker.ServicePlanName()
+						broker = servicebrokerstub.EnableServiceAccess()
+						service = broker.FirstServiceOfferingName()
+						servicePlan = broker.FirstServicePlanName()
 						serviceInstanceName = helpers.NewServiceInstanceName()
-						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						broker.Destroy()
+						broker.Forget()
 					})
 
 					It("shows the service instance", func() {

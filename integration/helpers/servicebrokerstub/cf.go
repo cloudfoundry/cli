@@ -8,8 +8,14 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-func (s *ServiceBrokerStub) register() {
-	Eventually(helpers.CF("create-service-broker", s.Name, s.Username, s.Password, s.URL)).Should(Exit(0))
+func (s *ServiceBrokerStub) register(spaceScoped bool) {
+	params := []string{"create-service-broker", s.Name, s.Username, s.Password, s.URL}
+
+	if spaceScoped {
+		params = append(params, "--space-scoped")
+	}
+
+	Eventually(helpers.CF(params...)).Should(Exit(0))
 }
 
 func (s *ServiceBrokerStub) deregister() {
@@ -32,7 +38,7 @@ func (s *ServiceBrokerStub) registerViaV2() {
 
 func (s *ServiceBrokerStub) enableServiceAccess() {
 	for _, offering := range s.Services {
-		session := helpers.CF("enable-service-access", offering.Name)
+		session := helpers.CF("enable-service-access", offering.Name, "-b", s.Name)
 		Eventually(session).Should(Exit(0))
 	}
 }
