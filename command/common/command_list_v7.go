@@ -100,7 +100,7 @@ type commandList struct {
 	Labels                             v7.LabelsCommand                             `command:"labels" description:"List all labels (key-value pairs) for an API resource"`
 	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v6.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
-	Logout                             v6.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
+	Logout                             v7.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
 	Logs                               v7.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
 	MapRoute                           v7.MapRouteCommand                           `command:"map-route" description:"Map a route to an app"`
 	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
