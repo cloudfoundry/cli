@@ -61,6 +61,68 @@ var _ = Describe("login Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
+	Describe("Validations", func() {
+		When("the --sso and the --origin flag are used together", func() {
+			BeforeEach(func() {
+				cmd.SSO = true
+				cmd.Origin = "some-origin"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--sso", "--origin"},
+				}))
+			})
+		})
+
+		When("the --sso-passcode and the --origin flag are used together", func() {
+			BeforeEach(func() {
+				cmd.SSOPasscode = "some-passcode"
+				cmd.Origin = "some-origin"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--sso-passcode", "--origin"},
+				}))
+			})
+		})
+
+		When("the --sso and the --sso-passcode flag are used together", func() {
+			BeforeEach(func() {
+				cmd.SSO = true
+				cmd.SSOPasscode = "some-passcode"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--sso-passcode", "--sso"},
+				}))
+			})
+		})
+
+		When("the user has manually added their client credentials", func() {
+			BeforeEach(func() {
+				fakeConfig.UAAOAuthClientReturns("some-other-client-id")
+				fakeConfig.UAAOAuthClientSecretReturns("some-secret")
+			})
+
+			It("returns an unsupported error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ManualClientCredentialsError{}))
+			})
+		})
+
+		When("the current grant type is client credentials", func() {
+			BeforeEach(func() {
+				fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypeClientCredentials))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.PasswordGrantTypeLogoutRequiredError{}))
+			})
+		})
+	})
+
 	Describe("API Endpoint", func() {
 		BeforeEach(func() {
 			fakeConfig.APIVersionReturns("3.4.5")
@@ -72,6 +134,18 @@ var _ = Describe("login Command", func() {
 				cmd.APIEndpoint = "api.example.com"
 			})
 
+			It("targets the provided api endpoint and prints all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+
+				actualSettings := fakeActor.SetTargetArgsForCall(0)
+				Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+				Expect(actualSettings.SkipSSLValidation).To(Equal(false))
+
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+			})
+
 			When("the user specifies --skip-ssl-validation", func() {
 				BeforeEach(func() {
 					cmd.SkipSSLValidation = true
@@ -79,28 +153,11 @@ var _ = Describe("login Command", func() {
 
 				It("targets the provided api endpoint", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
-					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
 					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
 					Expect(actualSettings.SkipSSLValidation).To(Equal(true))
 				})
-			})
-
-			When("the user does not specify --skip-ssl-validation", func() {
-				It("targets the provided api endpoint", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("API endpoint: api.example.com\n\n"))
-					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-					actualSettings := fakeActor.SetTargetArgsForCall(0)
-					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
-					Expect(actualSettings.SkipSSLValidation).To(Equal(false))
-				})
-			})
-
-			It("prints all warnings", func() {
-				Expect(testUI.Err).To(Say("some-warning-1"))
-				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
 
 			When("targeting the API fails", func() {
@@ -110,11 +167,8 @@ var _ = Describe("login Command", func() {
 						errors.New("some error"))
 				})
 
-				It("errors", func() {
+				It("errors and prints all warnings", func() {
 					Expect(executeErr).To(MatchError("some error"))
-				})
-
-				It("prints all warnings", func() {
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 				})
@@ -127,10 +181,12 @@ var _ = Describe("login Command", func() {
 					fakeConfig.TargetReturns("api.fake.com")
 				})
 
-				It("does not prompt the user for an API endpoint", func() {
+				It("uses the API endpoint from the config", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say(`API endpoint:\s+api\.fake\.com \(API version: 3\.4\.5\)`))
 					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+
+					actualSettings := fakeActor.SetTargetArgsForCall(0)
+					Expect(actualSettings.URL).To(Equal("https://api.fake.com"))
 				})
 
 				When("the config has SkipSSLValidation false and the --skip-ssl-validation flag is passed", func() {
@@ -140,13 +196,10 @@ var _ = Describe("login Command", func() {
 					})
 
 					It("sets the target with SkipSSLValidation is true", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 						targetSettings := fakeActor.SetTargetArgsForCall(0)
 						Expect(targetSettings.SkipSSLValidation).To(BeTrue())
-					})
-
-					It("does not error", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
 					})
 				})
 			})
@@ -159,6 +212,15 @@ var _ = Describe("login Command", func() {
 					fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
 				})
 
+				It("targets the API that the user inputted", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+					actualSettings := fakeActor.SetTargetArgsForCall(0)
+					Expect(actualSettings.URL).To(Equal("https://api.example.com"))
+					Expect(actualSettings.SkipSSLValidation).To(Equal(false))
+					Expect(fakeConfig.TargetCallCount()).To(Equal(2))
+				})
+
 				When("the user specifies --skip-ssl-validation", func() {
 					BeforeEach(func() {
 						cmd.SkipSSLValidation = true
@@ -167,57 +229,9 @@ var _ = Describe("login Command", func() {
 					It("targets the API that the user inputted", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("API endpoint:"))
-						Expect(testUI.Out).To(Say("api.example.com\n"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
-
-						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 						actualSettings := fakeActor.SetTargetArgsForCall(0)
-						Expect(actualSettings.URL).To(Equal("https://api.example.com"))
 						Expect(actualSettings.SkipSSLValidation).To(Equal(true))
-
-						Expect(fakeConfig.TargetCallCount()).To(Equal(2))
 					})
-				})
-
-				When("the user does not specify --skip-ssl-validation", func() {
-					BeforeEach(func() {
-						cmd.SkipSSLValidation = false
-					})
-
-					It("targets the API that the user inputted", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("API endpoint:"))
-						Expect(testUI.Out).To(Say("api.example.com\n"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
-
-						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-						actualSettings := fakeActor.SetTargetArgsForCall(0)
-						Expect(actualSettings.URL).To(Equal("https://api.example.com"))
-						Expect(actualSettings.SkipSSLValidation).To(Equal(false))
-
-						Expect(fakeConfig.TargetCallCount()).To(Equal(2))
-					})
-				})
-			})
-
-			When("the user inputs an empty API", func() {
-				BeforeEach(func() {
-					cmd.APIEndpoint = ""
-					input.Write([]byte("\n\napi.example.com\n"))
-					fakeConfig.TargetReturnsOnCall(0, "")
-					fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
-				})
-
-				It("reprompts for the API", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("API endpoint:"))
-					Expect(testUI.Out).To(Say("API endpoint:"))
-					Expect(testUI.Out).To(Say("API endpoint:"))
-					Expect(testUI.Out).To(Say("api.example.com\n"))
-					Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
-					Expect(fakeConfig.TargetCallCount()).To(Equal(2))
 				})
 			})
 		})
@@ -233,40 +247,18 @@ var _ = Describe("login Command", func() {
 				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 				actualSettings := fakeActor.SetTargetArgsForCall(0)
 				Expect(actualSettings.URL).To(Equal("https://api.example.com"))
-
-				Expect(testUI.Out).To(Say(`API endpoint:\s+https://api\.example\.com \(API version: 3\.4\.5\)`))
 			})
 		})
 
-		When("the cmd apiEndpoint was not provided and we are already targetted", func() {
-			BeforeEach(func() {
-				cmd.APIEndpoint = ""
-				fakeConfig.TargetReturns("https://omfgdogs.com")
-			})
-
-			It("strips the backslashes before using the endpoint", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-				actualSettings := fakeActor.SetTargetArgsForCall(0)
-				Expect(actualSettings.URL).To(Equal("https://omfgdogs.com"))
-
-				Expect(testUI.Out).To(Say(`API endpoint:\s+https://omfgdogs\.com \(API version: 3\.4\.5\)`))
-			})
-		})
-
-		When("the endpoint is well-formed", func() {
+		When("targeting the API fails due to an invalid certificate", func() {
 			BeforeEach(func() {
 				cmd.APIEndpoint = "api.example.com"
+				fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
 			})
 
-			When("targeting the API fails due to an invalid certificate", func() {
-				BeforeEach(func() {
-					fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: "https://api.example.com"})
-				})
-				It("returns an error mentioning the login command", func() {
-					Expect(executeErr).To(MatchError(
-						translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
-				})
+			It("returns an error mentioning the login command", func() {
+				Expect(executeErr).To(MatchError(
+					translatableerror.InvalidSSLCertError{URL: "https://api.example.com", SuggestedCommand: "login"}))
 			})
 		})
 	})
@@ -274,26 +266,6 @@ var _ = Describe("login Command", func() {
 	Describe("username and password", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("https://some.random.endpoint")
-		})
-
-		When("the current grant type is client credentials", func() {
-			BeforeEach(func() {
-				fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypeClientCredentials))
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
-			})
-
-			It("the returned error is translatable", func() {
-				Expect(executeErr).To(MatchError(translatableerror.PasswordGrantTypeLogoutRequiredError{}))
-			})
-
-			When("client secret in the configuration is present", func() {
-				It("should not display a warning", func() {
-					Expect(testUI.Err).NotTo(Say("Deprecation warning:"))
-				})
-			})
 		})
 
 		When("the current grant type is password", func() {
@@ -306,360 +278,327 @@ var _ = Describe("login Command", func() {
 				Expect(fakeActor.GetLoginPromptsCallCount()).To(Equal(1))
 			})
 
-			When("fetching prompts succeeds", func() {
-				When("one of the prompts has a username key and is text type", func() {
-					BeforeEach(func() {
-						fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
-							"username": {
-								DisplayName: "Username",
-								Type:        coreconfig.AuthPromptTypeText,
-							},
-						})
-					})
-
-					When("the username flag is set", func() {
-						BeforeEach(func() {
-							cmd.Username = "potatoface"
-						})
-
-						It("uses the provided value and does not prompt for the username", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).NotTo(Say("Username:"))
-							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-							credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
-							Expect(credentials["username"]).To(Equal("potatoface"))
-						})
-
-						When("the --origin flag is set", func() {
-							BeforeEach(func() {
-								cmd.Origin = "picklebike"
-							})
-							It("authenticates with it", func() {
-								Expect(executeErr).NotTo(HaveOccurred())
-								Expect(testUI.Out).NotTo(Say("Username:"))
-								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-								credentials, origin, _ := fakeActor.AuthenticateArgsForCall(0)
-								Expect(credentials["username"]).To(Equal("potatoface"))
-								Expect(origin).To(Equal("picklebike"))
-							})
-
-						})
+			When("one of the prompts has a username key and is text type", func() {
+				BeforeEach(func() {
+					fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+						"username": {
+							DisplayName: "Username",
+							Type:        coreconfig.AuthPromptTypeText,
+						},
 					})
 				})
 
-				When("one of the prompts has password key and is password type", func() {
+				When("the username flag is set", func() {
 					BeforeEach(func() {
-						fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
-							"password": {
-								DisplayName: "Your Password",
-								Type:        coreconfig.AuthPromptTypePassword,
-							},
-						})
+						cmd.Username = "potatoface"
 					})
 
-					When("the password flag is set", func() {
-						BeforeEach(func() {
-							cmd.Password = "noprompto"
-						})
-
-						It("uses the provided value and does not prompt for the password", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).NotTo(Say("Your Password:"))
-							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-							credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
-							Expect(credentials["password"]).To(Equal("noprompto"))
-						})
-
-						When("the password is incorrect", func() {
-							BeforeEach(func() {
-								input.Write([]byte("other-password\n"))
-								fakeActor.AuthenticateReturnsOnCall(0, errors.New("bad creds"))
-								fakeActor.AuthenticateReturnsOnCall(1, nil)
-							})
-
-							It("does not reuse the flag value for subsequent attempts", func() {
-								credentials, _, _ := fakeActor.AuthenticateArgsForCall(1)
-								Expect(credentials["password"]).To(Equal("other-password"))
-							})
-						})
-
-						When("there have been too many failed login attempts", func() {
-							BeforeEach(func() {
-								input.Write([]byte("other-password\n"))
-								fakeActor.AuthenticateReturns(
-									uaa.AccountLockedError{
-										Message: "Your account has been locked because of too many failed attempts to login.",
-									},
-								)
-							})
-
-							It("does not reuse the flag value for subsequent attempts", func() {
-								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1), "called Authenticate again after lockout")
-								Expect(testUI.Err).To(Say("Your account has been locked because of too many failed attempts to login."))
-							})
-						})
-					})
-				})
-
-				When("UAA prompts for the SSO passcode during non-SSO flow", func() {
-					BeforeEach(func() {
-						cmd.SSO = false
-						cmd.Password = "some-password"
-						fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
-							"password": {
-								DisplayName: "Your Password",
-								Type:        coreconfig.AuthPromptTypePassword,
-							},
-							"passcode": {
-								DisplayName: "gimme your passcode",
-								Type:        coreconfig.AuthPromptTypePassword,
-							},
-						})
-					})
-
-					It("does not prompt for the passcode", func() {
+					It("uses the provided value for the username", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).NotTo(Say("gimme your passcode"))
-					})
-
-					It("does not send the passcode", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
-						Expect(credentials).To(HaveKeyWithValue("password", "some-password"))
-						Expect(credentials).NotTo(HaveKey("passcode"))
-					})
-				})
-
-				When("multiple prompts of text and password type are returned", func() {
-					BeforeEach(func() {
-						fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
-							"account_number": {
-								DisplayName: "Account Number",
-								Type:        coreconfig.AuthPromptTypeText,
-							},
-							"username": {
-								DisplayName: "Username",
-								Type:        coreconfig.AuthPromptTypeText,
-							},
-							"passcode": {
-								DisplayName: "It's a passcode, what you want it to be???",
-								Type:        coreconfig.AuthPromptTypePassword,
-							},
-							"password": {
-								DisplayName: "Your Password",
-								Type:        coreconfig.AuthPromptTypePassword,
-							},
-							"supersecret": {
-								DisplayName: "MFA Code",
-								Type:        coreconfig.AuthPromptTypePassword,
-							},
-						})
-					})
-
-					When("no authentication flags are set", func() {
-						BeforeEach(func() {
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
-						})
-
-						It("displays text prompts, starting with username, then password prompts, starting with password", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-
-							Expect(testUI.Out).To(Say("\n\n"))
-							Expect(testUI.Out).To(Say("Username:"))
-							Expect(testUI.Out).To(Say("faker"))
-
-							Expect(testUI.Out).To(Say("\n\n"))
-							Expect(testUI.Out).To(Say("Account Number:"))
-							Expect(testUI.Out).To(Say("someaccount"))
-
-							Expect(testUI.Out).To(Say("\n\n"))
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).NotTo(Say("somepassword"))
-
-							Expect(testUI.Out).To(Say("\n\n"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Out).NotTo(Say("garbage"))
-						})
-
-						It("authenticates with the responses", func() {
-							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-							credentials, _, grantType := fakeActor.AuthenticateArgsForCall(0)
-							Expect(credentials["username"]).To(Equal("faker"))
-							Expect(credentials["password"]).To(Equal("somepassword"))
-							Expect(credentials["supersecret"]).To(Equal("garbage"))
-							Expect(grantType).To(Equal(constant.GrantTypePassword))
-						})
-					})
-
-					When("an error occurs prompting for the username", func() {
-						var fakeUI *commandfakes.FakeUI
-
-						BeforeEach(func() {
-							fakeUI = new(commandfakes.FakeUI)
-							fakeUI.DisplayTextPromptReturns("", errors.New("some-error"))
-							cmd = LoginCommand{
-								UI:            fakeUI,
-								Actor:         fakeActor,
-								Config:        fakeConfig,
-								ActorReloader: fakeActorReloader,
-							}
-						})
-
-						It("stops prompting after the first prompt", func() {
-							Expect(fakeUI.DisplayTextPromptCallCount()).To(Equal(1))
-						})
-
-						It("errors", func() {
-							Expect(executeErr).To(MatchError("Unable to authenticate."))
-						})
-					})
-
-					When("an error occurs in an additional text prompt after username", func() {
-						var fakeUI *commandfakes.FakeUI
-
-						BeforeEach(func() {
-							fakeUI = new(commandfakes.FakeUI)
-							fakeUI.DisplayTextPromptReturnsOnCall(0, "some-name", nil)
-							fakeUI.DisplayTextPromptReturnsOnCall(1, "", errors.New("some-error"))
-							cmd = LoginCommand{
-								UI:            fakeUI,
-								Actor:         fakeActor,
-								Config:        fakeConfig,
-								ActorReloader: fakeActorReloader,
-							}
-						})
-
-						It("returns the error", func() {
-							Expect(executeErr).To(MatchError("Unable to authenticate."))
-						})
-					})
-
-					When("an error occurs prompting for the password", func() {
-						var fakeUI *commandfakes.FakeUI
-
-						BeforeEach(func() {
-							fakeUI = new(commandfakes.FakeUI)
-							fakeUI.DisplayPasswordPromptReturns("", errors.New("some-error"))
-							cmd = LoginCommand{
-								UI:            fakeUI,
-								Actor:         fakeActor,
-								Config:        fakeConfig,
-								ActorReloader: fakeActorReloader,
-							}
-						})
-
-						It("stops prompting after the first prompt", func() {
-							Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(1))
-						})
-
-						It("errors", func() {
-							Expect(executeErr).To(MatchError("Unable to authenticate."))
-						})
-					})
-
-					When("an error occurs prompting for prompts of type password that are not the 'password'", func() {
-						var fakeUI *commandfakes.FakeUI
-
-						BeforeEach(func() {
-							fakeUI = new(commandfakes.FakeUI)
-							fakeUI.DisplayPasswordPromptReturnsOnCall(0, "some-password", nil)
-							fakeUI.DisplayPasswordPromptReturnsOnCall(1, "", errors.New("some-error"))
-
-							cmd = LoginCommand{
-								UI:            fakeUI,
-								Actor:         fakeActor,
-								Config:        fakeConfig,
-								ActorReloader: fakeActorReloader,
-							}
-						})
-
-						It("stops prompting after the second prompt", func() {
-							Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(2))
-						})
-
-						It("errors", func() {
-							Expect(executeErr).To(MatchError("Unable to authenticate."))
-						})
-					})
-
-					When("authenticating succeeds", func() {
-						BeforeEach(func() {
-							fakeConfig.CurrentUserNameReturns("potatoface", nil)
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
-						})
-
-						It("displays OK and a status summary", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("OK"))
-							Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-							Expect(testUI.Out).To(Say(`User:\s+potatoface`))
-
-							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-						})
-					})
-
-					When("authenticating fails", func() {
-						BeforeEach(func() {
-							fakeActor.AuthenticateReturns(errors.New("something died"))
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
-						})
-
-						It("prints the error message three times", func() {
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Err).To(Say("something died"))
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Err).To(Say("something died"))
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Err).To(Say("something died"))
-						})
-
-						It("returns an error indicating that it could not authenticate", func() {
-							Expect(executeErr).To(MatchError("Unable to authenticate."))
-						})
-
-						It("displays a status summary", func() {
-							Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-							Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, cmd.Config.BinaryName(), cmd.Config.BinaryName()))
-						})
-
-					})
-
-					When("authenticating fails with a bad credentials error", func() {
-						BeforeEach(func() {
-							fakeActor.AuthenticateReturns(uaa.UnauthorizedError{Message: "Bad credentials"})
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
-						})
-
-						It("converts the error before printing it", func() {
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
-							Expect(testUI.Out).To(Say("Your Password:"))
-							Expect(testUI.Out).To(Say("MFA Code:"))
-							Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
-						})
-					})
-				})
-
-				When("custom client ID and client secret are set in the config file", func() {
-					BeforeEach(func() {
-						fakeConfig.UAAOAuthClientReturns("some-other-client-id")
-						fakeConfig.UAAOAuthClientSecretReturns("some-secret")
-					})
-
-					It("prints a deprecation warning", func() {
-						deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
-						Expect(testUI.Err).To(Say(deprecationMessage))
-					})
-
-					It("still attempts to log in", func() {
 						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+						Expect(credentials["username"]).To(Equal("potatoface"))
+					})
+
+					When("the --origin flag is set", func() {
+						BeforeEach(func() {
+							cmd.Origin = "picklebike"
+						})
+
+						It("authenticates with the specified origin", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+							credentials, origin, _ := fakeActor.AuthenticateArgsForCall(0)
+							Expect(credentials["username"]).To(Equal("potatoface"))
+							Expect(origin).To(Equal("picklebike"))
+						})
+					})
+				})
+			})
+
+			When("one of the prompts has password key and is password type", func() {
+				BeforeEach(func() {
+					fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+						"password": {
+							DisplayName: "Your Password",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+					})
+				})
+
+				When("the password flag is set", func() {
+					BeforeEach(func() {
+						cmd.Password = "noprompto"
+					})
+
+					It("uses the provided value", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+						Expect(credentials["password"]).To(Equal("noprompto"))
+					})
+
+					When("the password is incorrect", func() {
+						BeforeEach(func() {
+							input.Write([]byte("other-password\n"))
+							fakeActor.AuthenticateReturnsOnCall(0, errors.New("bad creds"))
+							fakeActor.AuthenticateReturnsOnCall(1, nil)
+						})
+
+						It("does not reuse the flag value for subsequent attempts", func() {
+							credentials, _, _ := fakeActor.AuthenticateArgsForCall(1)
+							Expect(credentials["password"]).To(Equal("other-password"))
+						})
+					})
+
+					When("there have been too many failed login attempts", func() {
+						BeforeEach(func() {
+							input.Write([]byte("other-password\n"))
+							fakeActor.AuthenticateReturns(
+								uaa.AccountLockedError{
+									Message: "Your account has been locked because of too many failed attempts to login.",
+								},
+							)
+						})
+
+						It("does not reuse the flag value for subsequent attempts", func() {
+							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1), "called Authenticate again after lockout")
+							Expect(testUI.Err).To(Say("Your account has been locked because of too many failed attempts to login."))
+						})
+					})
+				})
+			})
+
+			When("UAA prompts for the SSO passcode during non-SSO flow", func() {
+				BeforeEach(func() {
+					cmd.SSO = false
+					cmd.Password = "some-password"
+					fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+						"password": {
+							DisplayName: "Your Password",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+						"passcode": {
+							DisplayName: "gimme your passcode",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+					})
+				})
+
+				It("does not prompt for the passcode", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).NotTo(Say("gimme your passcode"))
+				})
+
+				It("does not send the passcode", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
+					Expect(credentials).To(HaveKeyWithValue("password", "some-password"))
+					Expect(credentials).NotTo(HaveKey("passcode"))
+				})
+			})
+
+			When("multiple prompts of text and password type are returned", func() {
+				BeforeEach(func() {
+					fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+						"account_number": {
+							DisplayName: "Account Number",
+							Type:        coreconfig.AuthPromptTypeText,
+						},
+						"username": {
+							DisplayName: "Username",
+							Type:        coreconfig.AuthPromptTypeText,
+						},
+						"passcode": {
+							DisplayName: "It's a passcode, what you want it to be???",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+						"password": {
+							DisplayName: "Your Password",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+						"supersecret": {
+							DisplayName: "MFA Code",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+					})
+				})
+
+				When("all authentication information is coming from prompts, not flags", func() {
+					BeforeEach(func() {
+						input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
+					})
+
+					It("displays text prompts, starting with username, then password prompts, starting with password", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("Username:"))
+						Expect(testUI.Out).To(Say("faker"))
+
+						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("Account Number:"))
+						Expect(testUI.Out).To(Say("someaccount"))
+
+						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).NotTo(Say("somepassword"))
+
+						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Out).NotTo(Say("garbage"))
+					})
+
+					It("authenticates with the responses", func() {
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						credentials, _, grantType := fakeActor.AuthenticateArgsForCall(0)
+						Expect(credentials["username"]).To(Equal("faker"))
+						Expect(credentials["password"]).To(Equal("somepassword"))
+						Expect(credentials["supersecret"]).To(Equal("garbage"))
+						Expect(grantType).To(Equal(constant.GrantTypePassword))
+					})
+				})
+
+				When("an error occurs prompting for the username", func() {
+					var fakeUI *commandfakes.FakeUI
+
+					BeforeEach(func() {
+						fakeUI = new(commandfakes.FakeUI)
+						fakeUI.DisplayTextPromptReturns("", errors.New("some-error"))
+						cmd = LoginCommand{
+							UI:            fakeUI,
+							Actor:         fakeActor,
+							Config:        fakeConfig,
+							ActorReloader: fakeActorReloader,
+						}
+					})
+
+					It("stops prompting after the first prompt and errors", func() {
+						Expect(fakeUI.DisplayTextPromptCallCount()).To(Equal(1))
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+					})
+				})
+
+				When("an error occurs in an additional text prompt after username", func() {
+					var fakeUI *commandfakes.FakeUI
+
+					BeforeEach(func() {
+						fakeUI = new(commandfakes.FakeUI)
+						fakeUI.DisplayTextPromptReturnsOnCall(0, "some-name", nil)
+						fakeUI.DisplayTextPromptReturnsOnCall(1, "", errors.New("some-error"))
+						cmd = LoginCommand{
+							UI:            fakeUI,
+							Actor:         fakeActor,
+							Config:        fakeConfig,
+							ActorReloader: fakeActorReloader,
+						}
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+					})
+				})
+
+				When("an error occurs prompting for the password", func() {
+					var fakeUI *commandfakes.FakeUI
+
+					BeforeEach(func() {
+						fakeUI = new(commandfakes.FakeUI)
+						fakeUI.DisplayPasswordPromptReturns("", errors.New("some-error"))
+						cmd = LoginCommand{
+							UI:            fakeUI,
+							Actor:         fakeActor,
+							Config:        fakeConfig,
+							ActorReloader: fakeActorReloader,
+						}
+					})
+
+					It("stops prompting after the first prompt and errors", func() {
+						Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(1))
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+					})
+				})
+
+				When("an error occurs prompting for prompts of type password that are not the 'password'", func() {
+					var fakeUI *commandfakes.FakeUI
+
+					BeforeEach(func() {
+						fakeUI = new(commandfakes.FakeUI)
+						fakeUI.DisplayPasswordPromptReturnsOnCall(0, "some-password", nil)
+						fakeUI.DisplayPasswordPromptReturnsOnCall(1, "", errors.New("some-error"))
+
+						cmd = LoginCommand{
+							UI:            fakeUI,
+							Actor:         fakeActor,
+							Config:        fakeConfig,
+							ActorReloader: fakeActorReloader,
+						}
+					})
+
+					It("stops prompting after the second prompt and errors", func() {
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+					})
+				})
+
+				When("authenticating succeeds", func() {
+					BeforeEach(func() {
+						fakeConfig.CurrentUserNameReturns("potatoface", nil)
+						input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
+					})
+
+					It("displays OK and a status summary", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("OK"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+						Expect(testUI.Out).To(Say(`User:\s+potatoface`))
+
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					})
+				})
+
+				When("authenticating fails", func() {
+					BeforeEach(func() {
+						fakeActor.AuthenticateReturns(errors.New("something died"))
+						input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
+					})
+
+					It("prints the error message three times", func() {
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Err).To(Say("something died"))
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Err).To(Say("something died"))
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Err).To(Say("something died"))
+
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(3))
+					})
+
+					It("displays a status summary", func() {
+						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' or '%s login --sso' to log in.`, cmd.Config.BinaryName(), cmd.Config.BinaryName()))
+					})
+				})
+
+				When("authenticating fails with a bad credentials error", func() {
+					BeforeEach(func() {
+						fakeActor.AuthenticateReturns(uaa.UnauthorizedError{Message: "Bad credentials"})
+						input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
+					})
+
+					It("converts the error before printing it", func() {
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+						Expect(testUI.Out).To(Say("Your Password:"))
+						Expect(testUI.Out).To(Say("MFA Code:"))
+						Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
 					})
 				})
 			})
@@ -1586,40 +1525,6 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
 				})
-			})
-		})
-	})
-
-	Describe("Targeting Org and Space", func() {
-		When("the user selects an org and space by list positions", func() {
-			BeforeEach(func() {
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-					GUID: "targeted-org-guid1"})
-				fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
-
-				spaces := []v7action.Space{
-					{
-						GUID: "some-space-guid",
-						Name: "some-space-name",
-					},
-					{
-						GUID: "some-space-guid1",
-						Name: "some-space-name1",
-					},
-				}
-
-				fakeActor.GetOrganizationSpacesReturns(
-					spaces,
-					v7action.Warnings{},
-					nil,
-				)
-
-				input.Write([]byte("2\n"))
-			})
-
-			It("outputs targeted org", func() {
-				Expect(testUI.Out).To(Say("Targeted org targeted-org-name\n\nSelect a space"),
-					"Expect an empty line between 'Targeted org' and 'Select a space' messages")
 			})
 		})
 	})

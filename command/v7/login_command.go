@@ -36,19 +36,6 @@ func (a ActualActorReloader) Reload(config command.Config, ui command.UI) (Actor
 	return v7action.NewActor(ccClient, config, nil, uaaClient, clock.NewClock()), nil
 }
 
-// func (reloadFunc ReloadFunc) Reload(config command.Config, ui command.UI) (Actor, error) {
-// 	return reloadFunc(config, ui)
-// }
-
-// var reloadFunc ReloadFunc = func(config command.Config, ui command.UI) (Actor, error) {
-// 	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return v7action.NewActor(ccClient, config, nil, uaaClient, clock.NewClock()), nil
-// }
-
 const maxLoginTries = 3
 
 type LoginCommand struct {
@@ -85,9 +72,8 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return translatableerror.PasswordGrantTypeLogoutRequiredError{}
 	}
 
-	//TODO: change this to return an error
 	if cmd.Config.UAAOAuthClient() != "cf" || cmd.Config.UAAOAuthClientSecret() != "" {
-		cmd.UI.DisplayWarning("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead.")
+		return translatableerror.ManualClientCredentialsError{}
 	}
 
 	err := cmd.validateFlags()
@@ -219,10 +205,10 @@ func (cmd *LoginCommand) determineAPIEndpoint() (v7action.TargetSettings, error)
 	endpoint := cmd.APIEndpoint
 	skipSSLValidation := cmd.SkipSSLValidation
 
-	var target = cmd.Config.Target()
+	var configTarget = cmd.Config.Target()
 
-	if target != "" && endpoint == "" {
-		endpoint = target
+	if endpoint == "" && configTarget != "" {
+		endpoint = configTarget
 		skipSSLValidation = cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation
 	}
 
@@ -297,15 +283,12 @@ func (cmd *LoginCommand) authenticate() error {
 	}
 
 	for i := 0; i < maxLoginTries; i++ {
-		fmt.Println("login Tries", i)
 		if passPrompt, ok := prompts["password"]; ok {
 			if cmd.Password != "" {
 				credentials["password"] = cmd.Password
-				fmt.Println("happens once with flag", cmd.Password, credentials["password"])
 				cmd.Password = ""
 			} else {
 				credentials["password"], err = cmd.UI.DisplayPasswordPrompt(passPrompt.DisplayName)
-				fmt.Println("happens againwith flag", cmd.Password, credentials["password"])
 				if err != nil {
 					return err
 				}
