@@ -15,15 +15,15 @@ import (
 func newDefaultConfig() *ServiceBrokerStub {
 	return &ServiceBrokerStub{
 		URL:      "broker-route-not-created-yet",
-		Name:     helpers.PrefixedRandomName("SERVICE-BROKER"),
-		Username: helpers.PrefixedRandomName("user"),
-		Password: helpers.RandomName(),
+		Name:     helpers.NewServiceBrokerName(),
+		Username: helpers.NewUsername(),
+		Password: helpers.NewPassword(),
 		Services: []config.Service{
 			{
-				Name: helpers.PrefixedRandomName("INTEGRATION-SERVICE"),
+				Name: helpers.NewServiceOfferingName(),
 				Plans: []config.Plan{
 					{
-						Name: helpers.PrefixedRandomName("INTEGRATION-PLAN"),
+						Name: helpers.NewPlanName(),
 					},
 				},
 			},

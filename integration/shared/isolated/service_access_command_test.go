@@ -146,6 +146,7 @@ var _ = Describe("service-access command", func() {
 					helpers.SetupCF(orgName, spaceName)
 
 					otherBroker = servicebrokerstub.New().WithPlans(2)
+					otherBroker.Name = helpers.GenerateHigherName(helpers.NewServiceBrokerName, broker.Name)
 					otherBroker.Services[0].Plans[1].Name = helpers.GenerateLowerName(helpers.NewPlanName, otherBroker.Services[0].Plans[0].Name)
 					otherBroker.Create().Register()
 
