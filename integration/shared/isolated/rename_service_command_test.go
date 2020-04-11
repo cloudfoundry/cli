@@ -3,7 +3,7 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -17,7 +17,7 @@ var _ = Describe("rename-service command", func() {
 			serviceName  string
 			orgName      string
 			spaceName    string
-			broker       *fakeservicebroker.FakeServiceBroker
+			broker       *servicebrokerstub.ServiceBrokerStub
 		)
 
 		BeforeEach(func() {
@@ -26,16 +26,15 @@ var _ = Describe("rename-service command", func() {
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
 
-			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-			serviceName = broker.ServiceName()
+			broker = servicebrokerstub.EnableServiceAccess()
+			serviceName = broker.FirstServiceOfferingName()
 
-			Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
-			Eventually(helpers.CF("create-service", serviceName, broker.ServicePlanName(), instanceName)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", serviceName, broker.FirstServicePlanName(), instanceName)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
 			Eventually(helpers.CF("delete-service", "my-new-instance-name", "-f")).Should(Exit(0))
-			broker.Destroy()
+			broker.Forget()
 			helpers.QuickDeleteOrg(orgName)
 		})
 

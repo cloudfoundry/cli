@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -83,7 +83,7 @@ var _ = Describe("service-access command", func() {
 
 				service     string
 				servicePlan string
-				broker      *fakeservicebroker.FakeServiceBroker
+				broker      *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
@@ -91,15 +91,15 @@ var _ = Describe("service-access command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 
-				broker = fakeservicebroker.New()
+				broker = servicebrokerstub.New().WithPlans(2)
 				broker.Services[0].Plans[1].Name = helpers.GenerateHigherName(helpers.NewPlanName, broker.Services[0].Plans[0].Name)
-				broker.EnsureBrokerIsAvailable()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker.Create().Register()
+				service = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
+				broker.Forget()
 				helpers.QuickDeleteOrg(orgName)
 			})
 
@@ -137,7 +137,7 @@ var _ = Describe("service-access command", func() {
 
 			When("multiple brokers are registered and with varying service accessibility", func() {
 				var (
-					otherBroker *fakeservicebroker.FakeServiceBroker
+					otherBroker *servicebrokerstub.ServiceBrokerStub
 
 					otherOrgName string
 				)
@@ -145,9 +145,9 @@ var _ = Describe("service-access command", func() {
 				BeforeEach(func() {
 					helpers.SetupCF(orgName, spaceName)
 
-					otherBroker = fakeservicebroker.NewAlternate()
+					otherBroker = servicebrokerstub.New().WithPlans(2)
 					otherBroker.Services[0].Plans[1].Name = helpers.GenerateLowerName(helpers.NewPlanName, otherBroker.Services[0].Plans[0].Name)
-					otherBroker.EnsureBrokerIsAvailable()
+					otherBroker.Create().Register()
 
 					otherOrgName = helpers.GenerateLowerName(helpers.NewOrgName, orgName)
 					helpers.CreateOrg(otherOrgName)
@@ -162,15 +162,15 @@ var _ = Describe("service-access command", func() {
 
 				AfterEach(func() {
 					helpers.QuickDeleteOrg(otherOrgName)
-					otherBroker.Destroy()
+					otherBroker.Forget()
 				})
 
 				When("the -b flag is passed", func() {
 					It("shows only services from the specified broker", func() {
-						session := helpers.CF("service-access", "-b", otherBroker.Name())
+						session := helpers.CF("service-access", "-b", otherBroker.Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Getting service access for broker %s as %s...", otherBroker.Name(), userName))
-						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name()))
+						Expect(session).To(Say("Getting service access for broker %s as %s...", otherBroker.Name, userName))
+						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name))
 						Expect(session).To(Say(`service\s+plan\s+access\s+org`))
 						Expect(session).To(Say(`%s\s+%s\s+%s`, otherBroker.Services[0].Name, otherBroker.Services[0].Plans[0].Name, "all"))
 						Expect(string(session.Out.Contents())).NotTo(ContainSubstring(service))
@@ -182,7 +182,7 @@ var _ = Describe("service-access command", func() {
 						session := helpers.CF("service-access", "-e", otherBroker.Services[0].Name)
 						Eventually(session).Should(Exit(0))
 						Expect(session).To(Say("Getting service access for service %s as %s...", otherBroker.Services[0].Name, userName))
-						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name()))
+						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name))
 						Expect(session).To(Say(`service\s+plan\s+access\s+org`))
 						Expect(session).To(Say(`%s\s+%s\s+%s`, otherBroker.Services[0].Name, otherBroker.Services[0].Plans[0].Name, "all"))
 						Expect(string(session.Out.Contents())).NotTo(ContainSubstring(service))
@@ -194,7 +194,7 @@ var _ = Describe("service-access command", func() {
 						By("not displaying brokers that were only enabled in a different org than the provided one")
 						session := helpers.CF("service-access", "-o", orgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name()))
+						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name))
 						Expect(session).To(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
 							otherBroker.Services[0].Plans[1].Name,
@@ -203,18 +203,18 @@ var _ = Describe("service-access command", func() {
 							otherBroker.Services[0].Name,
 							otherBroker.Services[0].Plans[0].Name,
 						))
-						Expect(string(session.Out.Contents())).NotTo(ContainSubstring(`broker:\s+%s`, broker.Name()))
+						Expect(string(session.Out.Contents())).NotTo(ContainSubstring(`broker:\s+%s`, broker.Name))
 
 						By("displaying brokers that were enabled in the provided org")
 						session = helpers.CF("service-access", "-o", otherOrgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say(`broker:\s+%s`, broker.Name()))
+						Expect(session).To(Say(`broker:\s+%s`, broker.Name))
 						Expect(session).To(Say(`%s\s+%s\s+limited\s+%s`,
 							broker.Services[0].Name,
 							broker.Services[0].Plans[0].Name,
 							otherOrgName,
 						))
-						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name()))
+						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name))
 						Expect(session).To(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
 							otherBroker.Services[0].Plans[1].Name,

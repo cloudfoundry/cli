@@ -3,9 +3,8 @@ package push
 import (
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,19 +46,19 @@ var _ = Describe("bind app to provided services from manifest", func() {
 	})
 
 	When("the services do exist", func() {
-		var broker *servicebrokerstub.ServiceBrokerStub
+		var broker *fakeservicebroker.FakeServiceBroker
 
 		BeforeEach(func() {
-			broker = servicebrokerstub.Register()
-			Eventually(helpers.CF("enable-service-access", broker.FirstServiceOfferingName())).Should(Exit(0))
+			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
 
-			Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), managedServiceInstanceName)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), managedServiceInstanceName)).Should(Exit(0))
 
 			Eventually(helpers.CF("create-user-provided-service", userProvidedServiceInstanceName)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
-			broker.Forget()
+			broker.Destroy()
 		})
 
 		When("the app is new", func() {
@@ -88,7 +87,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 
 				session := helpers.CF("services")
 				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s`, managedServiceInstanceName, broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), appName))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s`, managedServiceInstanceName, broker.ServiceName(), broker.ServicePlanName(), appName))
 				Eventually(session).Should(Say(`%s\s+user-provided\s+%s`, userProvidedServiceInstanceName, appName))
 
 			})
