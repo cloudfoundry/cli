@@ -22,6 +22,7 @@ type AppStager interface {
 	StageAndStart(
 		app v7action.Application,
 		space configv3.Space,
+		organization configv3.Organization,
 		packageGUID string,
 		strategy constant.DeploymentStrategy,
 		noWait bool,
@@ -31,6 +32,7 @@ type AppStager interface {
 type Stager struct {
 	Actor    stagingAndStartActor
 	UI       command.UI
+	Config   command.Config
 	LogCache sharedaction.LogCacheClient
 }
 
@@ -46,10 +48,11 @@ type stagingAndStartActor interface {
 	StopApplication(appGUID string) (v7action.Warnings, error)
 }
 
-func NewAppStager(actor stagingAndStartActor, ui command.UI, logCache sharedaction.LogCacheClient) AppStager {
+func NewAppStager(actor stagingAndStartActor, ui command.UI, config command.Config, logCache sharedaction.LogCacheClient) AppStager {
 	return &Stager{
 		Actor:    actor,
 		UI:       ui,
+		Config:   config,
 		LogCache: logCache,
 	}
 }
@@ -57,6 +60,7 @@ func NewAppStager(actor stagingAndStartActor, ui command.UI, logCache sharedacti
 func (stager *Stager) StageAndStart(
 	app v7action.Application,
 	space configv3.Space,
+	organization configv3.Organization,
 	packageGUID string,
 	strategy constant.DeploymentStrategy,
 	noWait bool,
@@ -107,6 +111,20 @@ func (stager *Stager) StageAndStart(
 			return err
 		}
 	} else {
+		user, err := stager.Config.CurrentUser()
+		if err != nil {
+			return err
+		}
+
+		stager.UI.DisplayTextWithFlavor("Restarting app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...",
+			map[string]interface{}{
+				"App":      app.Name,
+				"Org":      organization.Name,
+				"Space":    space.Name,
+				"UserName": user.Name,
+			},
+		)
+
 		warnings, err = stager.Actor.StopApplication(app.GUID)
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {

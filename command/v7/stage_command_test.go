@@ -37,7 +37,7 @@ var _ = Describe("stage Command", func() {
 		appName     string
 		packageGUID string
 		spaceGUID   string
-		appGUID     string
+		app         v7action.Application
 
 		allLogsWritten   chan bool
 		closedTheStreams bool
@@ -159,13 +159,11 @@ var _ = Describe("stage Command", func() {
 
 		BeforeEach(func() {
 			cmd.PackageGUID = ""
-			appGUID = "some-app-guid"
+			app = v7action.Application{GUID: "some-app-guid", Name: "some-name"}
 			newestPackageGUID = "newest-package-guid"
 
 			fakeActor.GetApplicationByNameAndSpaceReturns(
-				v7action.Application{
-					GUID: appGUID,
-				},
+				app,
 				v7action.Warnings{"app-by-name-warning"},
 				nil)
 
@@ -183,8 +181,8 @@ var _ = Describe("stage Command", func() {
 			Expect(testUI.Err).To(Say("app-by-name-warning"))
 
 			Expect(fakeActor.GetNewestReadyPackageForApplicationCallCount()).To(Equal(1))
-			appGUIDArg := fakeActor.GetNewestReadyPackageForApplicationArgsForCall(0)
-			Expect(appGUIDArg).To(Equal(appGUID))
+			appArg := fakeActor.GetNewestReadyPackageForApplicationArgsForCall(0)
+			Expect(appArg).To(Equal(app))
 			Expect(testUI.Err).To(Say("newest-pkg-warning"))
 
 			Expect(fakeActor.StagePackageCallCount()).To(Equal(1))

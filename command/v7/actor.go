@@ -27,7 +27,7 @@ type Actor interface {
 	CheckRoute(domainName string, hostname string, path string) (bool, v7action.Warnings, error)
 	ClearTarget()
 	CloudControllerAPIVersion() string
-	CopyPackage(sourceAppGUID string, targetAppGUID string) (v7action.Package, v7action.Warnings, error)
+	CopyPackage(sourceApp v7action.Application, targetApp v7action.Application) (v7action.Package, v7action.Warnings, error)
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v7action.Package, v7action.Warnings, error)
 	CreateApplicationDroplet(appGUID string) (v7action.Droplet, v7action.Warnings, error)
 	CreateApplicationInSpace(app v7action.Application, spaceGUID string) (v7action.Application, v7action.Warnings, error)
@@ -99,7 +99,7 @@ type Actor interface {
 	GetIsolationSegmentSummaries() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)
 	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
 	GetLogCacheEndpoint() (string, v7action.Warnings, error)
-	GetNewestReadyPackageForApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
+	GetNewestReadyPackageForApplication(app v7action.Application) (v7action.Package, v7action.Warnings, error)
 	GetOrgUsersByRoleType(orgGUID string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
 	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
 	GetOrganizationDomains(string, string) ([]v7action.Domain, v7action.Warnings, error)

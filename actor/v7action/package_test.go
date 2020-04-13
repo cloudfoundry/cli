@@ -148,14 +148,17 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("GetNewestReadyPackageForApplication", func() {
 		var (
-			appGUID    string
+			app        Application
 			executeErr error
 
 			warnings Warnings
 		)
 
 		BeforeEach(func() {
-			appGUID = "some-app-guid"
+			app = Application{
+				GUID: "some-app-guid",
+				Name: "some-app",
+			}
 		})
 
 		When("the GetNewestReadyPackageForApplication call succeeds", func() {
@@ -179,11 +182,11 @@ var _ = Describe("Package Actions", func() {
 					)
 				})
 				It("gets the most recent package for the given app guid that has a ready state", func() {
-					expectedPackage, warnings, err := actor.GetNewestReadyPackageForApplication("my-app-guid")
+					expectedPackage, warnings, err := actor.GetNewestReadyPackageForApplication(app)
 
 					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
-						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"my-app-guid"}},
+						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
 						ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"READY"}},
 						ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 					))
@@ -209,11 +212,11 @@ var _ = Describe("Package Actions", func() {
 				})
 
 				JustBeforeEach(func() {
-					_, warnings, executeErr = actor.GetNewestReadyPackageForApplication(appGUID)
+					_, warnings, executeErr = actor.GetNewestReadyPackageForApplication(app)
 				})
 
 				It("returns an error and warnings", func() {
-					Expect(executeErr).To(MatchError(actionerror.PackageNotFoundInAppError{}))
+					Expect(executeErr).To(MatchError(actionerror.NoEligiblePackagesError{AppName: "some-app"}))
 					Expect(warnings).To(ConsistOf("get-application-packages-warning"))
 				})
 			})
@@ -233,7 +236,7 @@ var _ = Describe("Package Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.GetNewestReadyPackageForApplication("my-app-guid")
+				_, warnings, err := actor.GetNewestReadyPackageForApplication(app)
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-packages-warning"))
@@ -1029,15 +1032,18 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("CopyPackage", func() {
 		var (
-			sourceAppGUID string
-			targetAppGUID string
-			pkg           Package
-			warnings      Warnings
-			executeErr    error
+			sourceApp  Application
+			targetApp  Application
+			pkg        Package
+			warnings   Warnings
+			executeErr error
 		)
 
 		BeforeEach(func() {
-			targetAppGUID = "target-app-guid"
+			targetApp = Application{
+				GUID: "target-app-guid",
+				Name: "target-app",
+			}
 
 			fakeCloudControllerClient.GetPackagesReturns(
 				[]ccv3.Package{{GUID: "source-package-guid"}},
@@ -1064,7 +1070,7 @@ var _ = Describe("Package Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			pkg, warnings, executeErr = actor.CopyPackage(sourceAppGUID, targetAppGUID)
+			pkg, warnings, executeErr = actor.CopyPackage(sourceApp, targetApp)
 		})
 
 		When("getting the source package fails", func() {
@@ -1087,7 +1093,7 @@ var _ = Describe("Package Actions", func() {
 				Expect(queries).To(Equal([]ccv3.Query{
 					ccv3.Query{
 						Key:    ccv3.AppGUIDFilter,
-						Values: []string{sourceAppGUID},
+						Values: []string{sourceApp.GUID},
 					},
 					ccv3.Query{
 						Key:    ccv3.StatesFilter,
@@ -1119,7 +1125,7 @@ var _ = Describe("Package Actions", func() {
 
 				sourcePkgGUID, appGUID := fakeCloudControllerClient.CopyPackageArgsForCall(0)
 				Expect(sourcePkgGUID).To(Equal("source-package-guid"))
-				Expect(appGUID).To(Equal(targetAppGUID))
+				Expect(appGUID).To(Equal(targetApp.GUID))
 			})
 		})
 

@@ -93,7 +93,7 @@ var _ = Describe("restage command", func() {
 					session := helpers.CF("restage", appName)
 					Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-					Eventually(session.Err).Should(Say(`Package not found in app '%s'\.`, appName))
+					Eventually(session.Err).Should(Say(`App '%s' has no eligible packages\.`, appName))
 					Eventually(session.Err).Should(Say(`TIP: Use 'cf packages %s' to list packages in your app. Use 'cf create-package' to create one\.`, appName))
 					Eventually(session).Should(Exit(1))
 				})

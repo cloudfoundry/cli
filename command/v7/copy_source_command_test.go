@@ -305,9 +305,9 @@ var _ = Describe("copy-source Command", func() {
 
 	It("copies the package", func() {
 		Expect(fakeActor.CopyPackageCallCount()).To(Equal(1))
-		srcAppGUID, tgtAppGUID := fakeActor.CopyPackageArgsForCall(0)
-		Expect(srcAppGUID).To(Equal(sourceApp.GUID))
-		Expect(tgtAppGUID).To(Equal(targetApp.GUID))
+		srcApp, tgtApp := fakeActor.CopyPackageArgsForCall(0)
+		Expect(srcApp).To(Equal(sourceApp))
+		Expect(tgtApp).To(Equal(targetApp))
 
 		Expect(testUI.Err).To(Say("copy-package-warning"))
 	})
@@ -332,9 +332,10 @@ var _ = Describe("copy-source Command", func() {
 
 		It("stages and starts the app with the appropriate strategy", func() {
 			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
-			returnedApp, spaceForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
+			returnedApp, spaceForApp, orgForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
 			Expect(returnedApp).To(Equal(targetApp))
 			Expect(spaceForApp).To(Equal(configv3.Space{Name: "some-space", GUID: "some-space-guid"}))
+			Expect(orgForApp).To(Equal(configv3.Organization{Name: "some-org"}))
 			Expect(pkgGUID).To(Equal("target-package-guid"))
 			Expect(strategy).To(Equal(constant.DeploymentStrategyRolling))
 			Expect(noWait).To(Equal(false))
@@ -349,9 +350,10 @@ var _ = Describe("copy-source Command", func() {
 
 		It("stages and starts the app with the appropriate strategy", func() {
 			Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
-			returnedApp, spaceForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
+			returnedApp, spaceForApp, orgForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
 			Expect(returnedApp).To(Equal(targetApp))
 			Expect(spaceForApp).To(Equal(configv3.Space{Name: "some-space", GUID: "some-space-guid"}))
+			Expect(orgForApp).To(Equal(configv3.Organization{Name: "some-org"}))
 			Expect(pkgGUID).To(Equal("target-package-guid"))
 			Expect(strategy).To(Equal(constant.DeploymentStrategyDefault))
 			Expect(noWait).To(Equal(true))
@@ -360,9 +362,10 @@ var _ = Describe("copy-source Command", func() {
 
 	It("stages and starts the target app", func() {
 		Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
-		returnedApp, spaceForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
+		returnedApp, spaceForApp, orgForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
 		Expect(returnedApp).To(Equal(targetApp))
 		Expect(spaceForApp).To(Equal(configv3.Space{Name: "some-space", GUID: "some-space-guid"}))
+		Expect(orgForApp).To(Equal(configv3.Organization{Name: "some-org"}))
 		Expect(pkgGUID).To(Equal("target-package-guid"))
 		Expect(strategy).To(Equal(constant.DeploymentStrategyDefault))
 		Expect(noWait).To(Equal(false))

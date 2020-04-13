@@ -134,11 +134,11 @@ type FakeActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	CopyPackageStub        func(string, string) (v7action.Package, v7action.Warnings, error)
+	CopyPackageStub        func(v7action.Application, v7action.Application) (v7action.Package, v7action.Warnings, error)
 	copyPackageMutex       sync.RWMutex
 	copyPackageArgsForCall []struct {
-		arg1 string
-		arg2 string
+		arg1 v7action.Application
+		arg2 v7action.Application
 	}
 	copyPackageReturns struct {
 		result1 v7action.Package
@@ -1221,10 +1221,10 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetNewestReadyPackageForApplicationStub        func(string) (v7action.Package, v7action.Warnings, error)
+	GetNewestReadyPackageForApplicationStub        func(v7action.Application) (v7action.Package, v7action.Warnings, error)
 	getNewestReadyPackageForApplicationMutex       sync.RWMutex
 	getNewestReadyPackageForApplicationArgsForCall []struct {
-		arg1 string
+		arg1 v7action.Application
 	}
 	getNewestReadyPackageForApplicationReturns struct {
 		result1 v7action.Package
@@ -3436,12 +3436,12 @@ func (fake *FakeActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 str
 	}{result1}
 }
 
-func (fake *FakeActor) CopyPackage(arg1 string, arg2 string) (v7action.Package, v7action.Warnings, error) {
+func (fake *FakeActor) CopyPackage(arg1 v7action.Application, arg2 v7action.Application) (v7action.Package, v7action.Warnings, error) {
 	fake.copyPackageMutex.Lock()
 	ret, specificReturn := fake.copyPackageReturnsOnCall[len(fake.copyPackageArgsForCall)]
 	fake.copyPackageArgsForCall = append(fake.copyPackageArgsForCall, struct {
-		arg1 string
-		arg2 string
+		arg1 v7action.Application
+		arg2 v7action.Application
 	}{arg1, arg2})
 	fake.recordInvocation("CopyPackage", []interface{}{arg1, arg2})
 	fake.copyPackageMutex.Unlock()
@@ -3461,13 +3461,13 @@ func (fake *FakeActor) CopyPackageCallCount() int {
 	return len(fake.copyPackageArgsForCall)
 }
 
-func (fake *FakeActor) CopyPackageCalls(stub func(string, string) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeActor) CopyPackageCalls(stub func(v7action.Application, v7action.Application) (v7action.Package, v7action.Warnings, error)) {
 	fake.copyPackageMutex.Lock()
 	defer fake.copyPackageMutex.Unlock()
 	fake.CopyPackageStub = stub
 }
 
-func (fake *FakeActor) CopyPackageArgsForCall(i int) (string, string) {
+func (fake *FakeActor) CopyPackageArgsForCall(i int) (v7action.Application, v7action.Application) {
 	fake.copyPackageMutex.RLock()
 	defer fake.copyPackageMutex.RUnlock()
 	argsForCall := fake.copyPackageArgsForCall[i]
@@ -8137,11 +8137,11 @@ func (fake *FakeActor) GetLogCacheEndpointReturnsOnCall(i int, result1 string, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetNewestReadyPackageForApplication(arg1 string) (v7action.Package, v7action.Warnings, error) {
+func (fake *FakeActor) GetNewestReadyPackageForApplication(arg1 v7action.Application) (v7action.Package, v7action.Warnings, error) {
 	fake.getNewestReadyPackageForApplicationMutex.Lock()
 	ret, specificReturn := fake.getNewestReadyPackageForApplicationReturnsOnCall[len(fake.getNewestReadyPackageForApplicationArgsForCall)]
 	fake.getNewestReadyPackageForApplicationArgsForCall = append(fake.getNewestReadyPackageForApplicationArgsForCall, struct {
-		arg1 string
+		arg1 v7action.Application
 	}{arg1})
 	fake.recordInvocation("GetNewestReadyPackageForApplication", []interface{}{arg1})
 	fake.getNewestReadyPackageForApplicationMutex.Unlock()
@@ -8161,13 +8161,13 @@ func (fake *FakeActor) GetNewestReadyPackageForApplicationCallCount() int {
 	return len(fake.getNewestReadyPackageForApplicationArgsForCall)
 }
 
-func (fake *FakeActor) GetNewestReadyPackageForApplicationCalls(stub func(string) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeActor) GetNewestReadyPackageForApplicationCalls(stub func(v7action.Application) (v7action.Package, v7action.Warnings, error)) {
 	fake.getNewestReadyPackageForApplicationMutex.Lock()
 	defer fake.getNewestReadyPackageForApplicationMutex.Unlock()
 	fake.GetNewestReadyPackageForApplicationStub = stub
 }
 
-func (fake *FakeActor) GetNewestReadyPackageForApplicationArgsForCall(i int) string {
+func (fake *FakeActor) GetNewestReadyPackageForApplicationArgsForCall(i int) v7action.Application {
 	fake.getNewestReadyPackageForApplicationMutex.RLock()
 	defer fake.getNewestReadyPackageForApplicationMutex.RUnlock()
 	argsForCall := fake.getNewestReadyPackageForApplicationArgsForCall[i]

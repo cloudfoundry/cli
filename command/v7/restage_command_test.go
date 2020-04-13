@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -143,8 +142,8 @@ var _ = Describe("restage Command", func() {
 
 	It("gets the newest package and displays all warnings", func() {
 		Expect(fakeActor.GetNewestReadyPackageForApplicationCallCount()).To(Equal(1))
-		appGUID := fakeActor.GetNewestReadyPackageForApplicationArgsForCall(0)
-		Expect(appGUID).To(Equal("app-guid"))
+		app := fakeActor.GetNewestReadyPackageForApplicationArgsForCall(0)
+		Expect(app).To(Equal(app))
 
 		Expect(testUI.Err).To(Say("get-package-warning"))
 	})
@@ -161,29 +160,14 @@ var _ = Describe("restage Command", func() {
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError("get-package-error"))
 		})
-
-		When("there are no packages available to stage", func() {
-			BeforeEach(func() {
-				fakeActor.GetNewestReadyPackageForApplicationReturns(
-					v7action.Package{},
-					v7action.Warnings{"get-package-warning"},
-					actionerror.PackageNotFoundInAppError{},
-				)
-			})
-
-			It("displays all warnings and returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.PackageNotFoundInAppError{
-					AppName: app.Name, BinaryName: "some-binary-name"}))
-				Expect(testUI.Err).To(Say("get-package-warning"))
-			})
-		})
 	})
 
 	It("stages and starts the app", func() {
 		Expect(fakeAppStager.StageAndStartCallCount()).To(Equal(1))
-		returnedApp, spaceForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
+		returnedApp, spaceForApp, orgForApp, pkgGUID, strategy, noWait := fakeAppStager.StageAndStartArgsForCall(0)
 		Expect(returnedApp).To(Equal(app))
 		Expect(spaceForApp).To(Equal(fakeConfig.TargetedSpace()))
+		Expect(orgForApp).To(Equal(fakeConfig.TargetedOrganization()))
 		Expect(pkgGUID).To(Equal("earliest-package-guid"))
 		Expect(strategy).To(Equal(constant.DeploymentStrategyDefault))
 		Expect(noWait).To(Equal(false))

@@ -66,7 +66,7 @@ func (cmd StageCommand) Execute(args []string) error {
 			return err
 		}
 
-		pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app.GUID)
+		pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err

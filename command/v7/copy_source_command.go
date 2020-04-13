@@ -60,7 +60,7 @@ func (cmd *CopySourceCommand) Setup(config command.Config, ui command.UI) error 
 		return err
 	}
 	logCacheClient := command.NewLogCacheClient(logCacheEndpoint, config, ui)
-	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, logCacheClient)
+	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, logCacheClient)
 
 	return nil
 }
@@ -100,6 +100,7 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 			"UserName":  user.Name,
 		},
 	)
+	cmd.UI.DisplayNewline()
 
 	targetOrg := cmd.Config.TargetedOrganization()
 	targetSpace := cmd.Config.TargetedSpace()
@@ -138,16 +139,28 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 		return err
 	}
 
-	pkg, warnings, err := cmd.Actor.CopyPackage(sourceApp.GUID, targetApp.GUID)
+	pkg, warnings, err := cmd.Actor.CopyPackage(sourceApp, targetApp)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
 	if !cmd.NoRestart {
+		cmd.UI.DisplayTextWithFlavor(
+			"Staging app {{.TargetApp}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.UserName}}...",
+			map[string]interface{}{
+				"TargetApp":   cmd.RequiredArgs.TargetAppName,
+				"TargetOrg":   targetOrgName,
+				"TargetSpace": targetSpaceName,
+				"UserName":    user.Name,
+			},
+		)
+		cmd.UI.DisplayNewline()
+
 		err = cmd.Stager.StageAndStart(
 			targetApp,
 			targetSpace,
+			targetOrg,
 			pkg.GUID,
 			cmd.Strategy.Name,
 			cmd.NoWait,
@@ -156,7 +169,6 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 			return mapErr(cmd.Config, targetApp.Name, err)
 		}
 	} else {
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayOK()
 	}
 

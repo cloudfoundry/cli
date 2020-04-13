@@ -34,7 +34,7 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	logCacheClient := command.NewLogCacheClient(logCacheEndpoint, config, ui)
-	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, logCacheClient)
+	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, logCacheClient)
 
 	return nil
 }
@@ -69,7 +69,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
-	pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app.GUID)
+	pkg, warnings, err := cmd.Actor.GetNewestReadyPackageForApplication(app)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return mapErr(cmd.Config, cmd.RequiredArgs.AppName, err)
@@ -78,6 +78,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 	err = cmd.Stager.StageAndStart(
 		app,
 		cmd.Config.TargetedSpace(),
+		cmd.Config.TargetedOrganization(),
 		pkg.GUID,
 		cmd.Strategy.Name,
 		cmd.NoWait,
@@ -106,8 +107,8 @@ func mapErr(config command.Config, appName string, err error) error {
 			Message:    err.Error(),
 			BinaryName: config.BinaryName(),
 		}
-	case actionerror.PackageNotFoundInAppError:
-		return translatableerror.PackageNotFoundInAppError{
+	case actionerror.NoEligiblePackagesError:
+		return translatableerror.NoEligiblePackagesError{
 			AppName:    appName,
 			BinaryName: config.BinaryName(),
 		}

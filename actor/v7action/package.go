@@ -130,11 +130,11 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	return updatedPackage, append(allWarnings, updatedWarnings...), err
 }
 
-func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package, Warnings, error) {
+func (actor Actor) GetNewestReadyPackageForApplication(app Application) (Package, Warnings, error) {
 	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
 		ccv3.Query{
 			Key:    ccv3.AppGUIDFilter,
-			Values: []string{appGUID},
+			Values: []string{app.GUID},
 		},
 		ccv3.Query{
 			Key:    ccv3.StatesFilter,
@@ -151,7 +151,7 @@ func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package,
 	}
 
 	if len(ccv3Packages) == 0 {
-		return Package{}, Warnings(warnings), actionerror.PackageNotFoundInAppError{}
+		return Package{}, Warnings(warnings), actionerror.NoEligiblePackagesError{AppName: app.Name}
 	}
 
 	return Package(ccv3Packages[0]), Warnings(warnings), nil
@@ -236,15 +236,14 @@ func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
 	return pkg, allWarnings, nil
 }
 
-func (actor Actor) CopyPackage(sourceAppGUID string, targetAppGUID string) (Package, Warnings, error) {
+func (actor Actor) CopyPackage(sourceApp Application, targetApp Application) (Package, Warnings, error) {
 	var allWarnings Warnings
-
-	sourcePkg, warnings, err := actor.GetNewestReadyPackageForApplication(sourceAppGUID)
+	sourcePkg, warnings, err := actor.GetNewestReadyPackageForApplication(sourceApp)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return Package{}, allWarnings, err
 	}
-	targetPkg, ccv3Warnings, err := actor.CloudControllerClient.CopyPackage(sourcePkg.GUID, targetAppGUID)
+	targetPkg, ccv3Warnings, err := actor.CloudControllerClient.CopyPackage(sourcePkg.GUID, targetApp.GUID)
 	allWarnings = append(allWarnings, ccv3Warnings...)
 	if err != nil {
 		return Package{}, allWarnings, err
