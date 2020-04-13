@@ -68,7 +68,7 @@ var _ = Describe("password command", func() {
 			))
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
-				[]string{"Changing password..."},
+				[]string{"Changing password for user " + deps.Config.Username() + "..."},
 				[]string{"OK"},
 				[]string{"Please log in again"},
 			))
@@ -109,7 +109,7 @@ var _ = Describe("password command", func() {
 			))
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
-				[]string{"Changing password..."},
+				[]string{"Changing password for user " + deps.Config.Username() + "..."},
 				[]string{"FAILED"},
 				[]string{"Current password did not match"},
 			))
