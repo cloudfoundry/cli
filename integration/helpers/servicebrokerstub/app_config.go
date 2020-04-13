@@ -66,8 +66,8 @@ func (s *ServiceBrokerStub) configure() {
 
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
-	defer resp.Body.Close()
 	Expect(err).ToNot(HaveOccurred())
+	defer resp.Body.Close()
 	Expect(resp.StatusCode).To(Equal(http.StatusNoContent))
 }
 
