@@ -193,14 +193,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd *LoginCommand) targetSpace(space v7action.Space) {
-	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
-
-	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}", map[string]interface{}{
-		"Space": space.Name,
-	})
-}
-
 func (cmd *LoginCommand) determineAPIEndpoint() (v7action.TargetSettings, error) {
 	endpoint := cmd.APIEndpoint
 	skipSSLValidation := cmd.SkipSSLValidation
@@ -248,33 +240,21 @@ func (cmd *LoginCommand) targetAPI(settings v7action.TargetSettings) error {
 }
 
 func (cmd *LoginCommand) authenticate() error {
-	prompts := cmd.Actor.GetLoginPrompts()
-	credentials := make(map[string]string)
 	var err error
+	var credentials = make(map[string]string)
+
+	prompts := cmd.Actor.GetLoginPrompts()
+	nonPasswordPrompts, passwordPrompts := cmd.groupPrompts(prompts)
 
 	if value, ok := prompts["username"]; ok {
-		if prompts["username"].Type == coreconfig.AuthPromptTypeText && cmd.Username != "" {
-			credentials["username"] = cmd.Username
-		} else {
-			credentials["username"], err = cmd.UI.DisplayTextPrompt(value.DisplayName)
-			if err != nil {
-				return err
-			}
-			cmd.UI.DisplayNewline()
+		credentials["username"], err = cmd.getFlagValOrPrompt(&cmd.Username, value, true)
+		if err != nil {
+			return err
 		}
-
-		delete(prompts, "username")
+		cmd.UI.DisplayNewline()
 	}
 
-	passwordKeys := []string{}
-	for key, prompt := range prompts {
-		if prompt.Type == coreconfig.AuthPromptTypePassword {
-			if key != "passcode" && key != "password" {
-				passwordKeys = append(passwordKeys, key)
-			}
-			continue
-		}
-
+	for key, prompt := range nonPasswordPrompts {
 		credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
 		if err != nil {
 			return err
@@ -283,24 +263,21 @@ func (cmd *LoginCommand) authenticate() error {
 	}
 
 	for i := 0; i < maxLoginTries; i++ {
-		if passPrompt, ok := prompts["password"]; ok {
-			if cmd.Password != "" {
-				credentials["password"] = cmd.Password
-				cmd.Password = ""
-			} else {
-				credentials["password"], err = cmd.UI.DisplayPasswordPrompt(passPrompt.DisplayName)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		for _, key := range passwordKeys {
-			cmd.UI.DisplayNewline()
-			credentials[key], err = cmd.UI.DisplayPasswordPrompt(prompts[key].DisplayName)
+		// ensure that password gets prompted before other codes (eg. mfa code)
+		if prompt, ok := prompts["password"]; ok {
+			credentials["password"], err = cmd.getFlagValOrPrompt(&cmd.Password, prompt, false)
 			if err != nil {
 				return err
 			}
+			cmd.UI.DisplayNewline()
+		}
+
+		for key, prompt := range passwordPrompts {
+			credentials[key], err = cmd.UI.DisplayPasswordPrompt(prompt.DisplayName)
+			if err != nil {
+				return err
+			}
+			cmd.UI.DisplayNewline()
 		}
 
 		cmd.UI.DisplayText("Authenticating...")
@@ -330,14 +307,10 @@ func (cmd *LoginCommand) authenticateSSO() error {
 	var err error
 	for i := 0; i < maxLoginTries; i++ {
 		var passcode string
-		if len(cmd.SSOPasscode) > 0 {
-			passcode = cmd.SSOPasscode
-			cmd.SSOPasscode = ""
-		} else {
-			passcode, err = cmd.UI.DisplayPasswordPrompt(prompts["passcode"].DisplayName)
-			if err != nil {
-				return err
-			}
+
+		passcode, err = cmd.getFlagValOrPrompt(&cmd.SSOPasscode, prompts["passcode"], false)
+		if err != nil {
+			return err
 		}
 
 		credentials := map[string]string{"passcode": passcode}
@@ -355,6 +328,44 @@ func (cmd *LoginCommand) authenticateSSO() error {
 		}
 	}
 	return err
+}
+
+func (cmd *LoginCommand) groupPrompts(prompts map[string]coreconfig.AuthPrompt) (map[string]coreconfig.AuthPrompt, map[string]coreconfig.AuthPrompt) {
+	var (
+		nonPasswordPrompts = make(map[string]coreconfig.AuthPrompt)
+		passwordPrompts    = make(map[string]coreconfig.AuthPrompt)
+	)
+
+	for key, prompt := range prompts {
+		if prompt.Type == coreconfig.AuthPromptTypePassword {
+			if key == "passcode" || key == "password" {
+				continue
+			}
+
+			passwordPrompts[key] = prompt
+		} else {
+			if key == "username" {
+				continue
+			}
+
+			nonPasswordPrompts[key] = prompt
+		}
+	}
+
+	return nonPasswordPrompts, passwordPrompts
+}
+
+func (cmd *LoginCommand) getFlagValOrPrompt(field *string, prompt coreconfig.AuthPrompt, isText bool) (string, error) {
+	if *field != "" {
+		value := *field
+		*field = ""
+		return value, nil
+	} else {
+		if isText {
+			return cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+		}
+		return cmd.UI.DisplayPasswordPrompt(prompt.DisplayName)
+	}
 }
 
 func (cmd *LoginCommand) showStatus() {
@@ -487,6 +498,14 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 	}
 
 	return choice, err
+}
+
+func (cmd *LoginCommand) targetSpace(space v7action.Space) {
+	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
+
+	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}", map[string]interface{}{
+		"Space": space.Name,
+	})
 }
 
 func (cmd *LoginCommand) validateFlags() error {

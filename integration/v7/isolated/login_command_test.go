@@ -15,7 +15,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("login command", func() {
+var _ = Describe("login command", func() {
 	BeforeEach(func() {
 		helpers.SkipIfClientCredentialsTestMode()
 	})
@@ -485,8 +485,8 @@ var _ = FDescribe("login command", func() {
 
 		When("MFA is enabled", func() {
 			var (
-				mfaCode  string
-				server   *ghttp.Server
+				mfaCode string
+				server  *ghttp.Server
 			)
 
 			BeforeEach(func() {
@@ -552,14 +552,14 @@ var _ = FDescribe("login command", func() {
 
 	Describe("Client Credentials", func() {
 		var (
-			username              string
-			password              string
-			clientID        string
-			clientSecret    string
+			username     string
+			password     string
+			clientID     string
+			clientSecret string
 		)
 
 		When("the user has manually added client credentials to the config file", func() {
-			BeforeEach( func() {
+			BeforeEach(func() {
 				clientID, clientSecret = helpers.SkipIfCustomClientCredentialsNotSet()
 				username, password = helpers.GetCredentials()
 				helpers.SetConfig(func(config *configv3.Config) {

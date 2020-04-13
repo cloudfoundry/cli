@@ -385,13 +385,9 @@ var _ = Describe("login Command", func() {
 					})
 				})
 
-				It("does not prompt for the passcode", func() {
+				It("does not prompt for the passcode, only the password", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).NotTo(Say("gimme your passcode"))
-				})
-
-				It("does not send the passcode", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
 					credentials, _, _ := fakeActor.AuthenticateArgsForCall(0)
 					Expect(credentials).To(HaveKeyWithValue("password", "some-password"))
 					Expect(credentials).NotTo(HaveKey("passcode"))
@@ -820,7 +816,7 @@ var _ = Describe("login Command", func() {
 				})
 			})
 
-			When("fetching  the organization fails", func() {
+			When("fetching the organization fails", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
 						v7action.Organization{},
