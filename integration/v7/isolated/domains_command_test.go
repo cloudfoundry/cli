@@ -108,14 +108,6 @@ var _ = Describe("domains command", func() {
 		})
 
 		AfterEach(func() {
-			if helpers.ClientCredentialsTestMode() {
-				// We have observed pipeline failures at this step, where client credentials get rejected
-				// when trying to delete domains. When logged in as a client, we don't automatically
-				// reautheneticate, so if your access token expires, requests will fail. Here, we try
-				// manually re-authenticating in client-credentials mode.
-				helpers.LoginCFWithClientCredentials()
-			}
-
 			Eventually(helpers.CF("delete-shared-domain", sharedDomain1.Name, "-f")).Should(Exit(0))
 			Eventually(helpers.CF("delete-shared-domain", sharedDomain2.Name, "-f")).Should(Exit(0))
 			Eventually(helpers.CF("delete-space", spaceName, "-f")).Should(Exit(0))
