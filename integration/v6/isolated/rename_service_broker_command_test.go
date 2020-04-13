@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,8 +30,8 @@ var _ = Describe("rename-service-broker command", func() {
 			originalName := helpers.NewServiceBrokerName()
 			updatedName := helpers.NewServiceBrokerName()
 
-			broker := fakeservicebroker.New().WithName(originalName).EnsureBrokerIsAvailable()
-			defer broker.Destroy()
+			broker := servicebrokerstub.New().WithName(originalName).Create().Register()
+			defer broker.Forget()
 
 			session := helpers.CF("rename-service-broker", originalName, updatedName)
 
@@ -43,7 +43,7 @@ var _ = Describe("rename-service-broker command", func() {
 			session = helpers.CF("service-brokers")
 			Eventually(session.Out).Should(Say(updatedName))
 
-			broker.WithName(updatedName) // Destroy() needs to know the new name
+			broker.WithName(updatedName) // Forget() needs to know the new name
 		})
 
 		When("the service broker doesn't exist", func() {
@@ -60,16 +60,15 @@ var _ = Describe("rename-service-broker command", func() {
 
 		When("the rename fails", func() {
 			It("prints an error message", func() {
-				originalName := helpers.NewServiceBrokerName()
+				broker1 := servicebrokerstub.Register()
+				broker2 := servicebrokerstub.Register()
+				defer broker1.Forget()
+				defer broker2.Forget()
 
-				broker1 := fakeservicebroker.New().EnsureBrokerIsAvailable()
-				broker2 := fakeservicebroker.New().WithName(originalName).EnsureBrokerIsAvailable()
-				defer broker2.Destroy()
-
-				session := helpers.CF("rename-service-broker", broker2.Name(), broker1.Name())
+				session := helpers.CF("rename-service-broker", broker2.Name, broker1.Name)
 
 				Eventually(session.Wait().Out).Should(SatisfyAll(
-					Say("Renaming service broker %s to %s as %s", broker2.Name(), broker1.Name(), cfUsername),
+					Say("Renaming service broker %s to %s as %s", broker2.Name, broker1.Name, cfUsername),
 					Say("FAILED"),
 					Say("Server error, status code: 400, error code: 270002, message: The service broker name is taken"),
 				))
