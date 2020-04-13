@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -114,6 +115,7 @@ var _ = Describe("Logs Command", func() {
 
 				It("it can get at least 1000 recent log messages", func() {
 					route := fmt.Sprintf("%s.%s", appName, helpers.DefaultSharedDomain())
+
 					// 3 lines of logs for each call to curl + a few lines during the push
 					for i := 0; i < 333; i += 1 {
 						command := exec.Command("curl", "--fail", route)
@@ -121,6 +123,10 @@ var _ = Describe("Logs Command", func() {
 						Expect(err).NotTo(HaveOccurred())
 						Eventually(session).Should(Exit(0))
 					}
+
+					// allow multiple log cache nodes time to sychronize
+					// otherwise the most recent logs may be missing or out of order
+					time.Sleep(2 * time.Second)
 
 					session := helpers.CF("logs", appName, "--recent")
 					Eventually(session).Should(Exit(0))
