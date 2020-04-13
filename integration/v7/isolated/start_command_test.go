@@ -19,7 +19,7 @@ const (
 	PushCommandName = "push"
 )
 
-var _ = FDescribe("start command", func() {
+var _ = Describe("start command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -220,7 +220,7 @@ var _ = FDescribe("start command", func() {
 
 				It("gives a luxurious error message", func() {
 					session := helpers.CF("start", appName)
-					Eventually(session.Err).Should(Say(`The app package is invalid: Package must be in 'READY' to stage; It currently has 'UPLOADING'.`))
+					Eventually(session.Err).Should(Say(`Cannot stage package unless its state is 'READY'.`))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

@@ -105,8 +105,13 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 }
 
 func handleBadRequest(errorResponse ccerror.V3Error, _ *cloudcontroller.Request) error {
-	// Currently the CF-BadQueryParameter is the only 400 BadRequest error returned from v3
-	return ccerror.BadRequestError{Message: errorResponse.Detail}
+	switch errorResponse.Detail {
+	case "Bad request: Cannot stage package whose state is not ready.":
+		return ccerror.InvalidStateError{}
+	default:
+		return ccerror.BadRequestError{Message: errorResponse.Detail}
+
+	}
 }
 
 func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Request) error {
