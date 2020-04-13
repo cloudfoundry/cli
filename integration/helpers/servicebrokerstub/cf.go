@@ -9,7 +9,16 @@ import (
 )
 
 func (s *ServiceBrokerStub) register(spaceScoped bool) {
-	params := []string{"create-service-broker", s.Name, s.Username, s.Password, s.URL}
+	var params []string
+
+	switch s.registered {
+	case true:
+		params = []string{"update-service-broker"}
+	case false:
+		params = []string{"create-service-broker"}
+	}
+
+	params = append(params, s.Name, s.Username, s.Password, s.URL)
 
 	if spaceScoped {
 		params = append(params, "--space-scoped")

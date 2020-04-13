@@ -19,10 +19,10 @@ func New() *BrokerConfigurationStore {
 	}
 }
 
-func (c *BrokerConfigurationStore) CreateBroker(cfg config.BrokerConfiguration) (string, error) {
+func (c *BrokerConfigurationStore) CreateBroker(cfg config.BrokerConfiguration) string {
 	rawGUID, err := uuid.NewV4()
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 	guid := rawGUID.String()
 
@@ -30,7 +30,13 @@ func (c *BrokerConfigurationStore) CreateBroker(cfg config.BrokerConfiguration) 
 	c.data[guid] = cfg
 	c.mutex.Unlock()
 
-	return guid, nil
+	return guid
+}
+
+func (c *BrokerConfigurationStore) UpdateBroker(guid string, cfg config.BrokerConfiguration) {
+	c.mutex.Lock()
+	c.data[guid] = cfg
+	c.mutex.Unlock()
 }
 
 func (c *BrokerConfigurationStore) DeleteBroker(guid string) {

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"errors"
+	"crypto/subtle"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
@@ -17,16 +17,21 @@ func checkAuth(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *
 
 	config, ok := store.GetBrokerConfiguration(guid)
 	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return nil
+		return notFoundError{}
 	}
 
 	givenUsername, givenPassword, ok := r.BasicAuth()
-	if !ok || config.Username != givenUsername || config.Password != givenPassword {
-		return errors.New("not authorized")
+	if !ok {
+		return unauthorizedError{}
 	}
 
-	return nil
+	// Compare everything every time to protect against timing attacks
+	if 2 == subtle.ConstantTimeCompare([]byte(config.Username), []byte(givenUsername))+
+		subtle.ConstantTimeCompare([]byte(config.Password), []byte(givenPassword)) {
+		return nil
+	}
+
+	return unauthorizedError{}
 }
 
 func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
@@ -41,19 +46,24 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 		return nil
 	}
 
+	if config.CatalogResponse != 0 {
+		w.WriteHeader(config.CatalogResponse)
+		return nil
+	}
+
 	var services []domain.Service
 	for _, s := range config.Services {
 		var plans []domain.ServicePlan
 		for _, p := range s.Plans {
 			plans = append(plans, domain.ServicePlan{
 				Name:        p.Name,
-				ID:          p.GUID,
+				ID:          p.ID,
 				Description: p.Description,
 			})
 		}
 		services = append(services, domain.Service{
 			Name:        s.Name,
-			ID:          s.GUID,
+			ID:          s.ID,
 			Description: s.Description,
 			Plans:       plans,
 		})
@@ -68,9 +78,14 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 		return err
 	}
 
-	_, ok := store.GetBrokerConfiguration(guid)
+	config, ok := store.GetBrokerConfiguration(guid)
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
+		return nil
+	}
+
+	if config.ProvisionResponse != 0 {
+		w.WriteHeader(config.ProvisionResponse)
 		return nil
 	}
 
@@ -84,9 +99,14 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 		return err
 	}
 
-	_, ok := store.GetBrokerConfiguration(guid)
+	config, ok := store.GetBrokerConfiguration(guid)
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
+		return nil
+	}
+
+	if config.DeprovisionResponse != 0 {
+		w.WriteHeader(config.DeprovisionResponse)
 		return nil
 	}
 

@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -46,15 +45,14 @@ var _ = Describe("update-service-broker command", func() {
 		When("the service broker was updated but warnings happened", func() {
 			var (
 				serviceInstance string
-				broker          *fakeservicebroker.FakeServiceBroker
+				broker          *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
-				// Note, because we re-configure the broker we should make sure that we don't use the re-usable one
-				broker = fakeservicebroker.New().WithName(helpers.NewServiceBrokerName()).EnsureBrokerIsAvailable().EnableServiceAccess()
+				broker = servicebrokerstub.EnableServiceAccess()
 
 				serviceInstance = helpers.NewServiceInstanceName()
-				session := helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance, "-b", broker.Name())
+				session := helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance, "-b", broker.Name)
 				Eventually(session).Should(Exit(0))
 
 				broker.Services[0].Plans[0].Name = "different-plan-name"
@@ -63,14 +61,15 @@ var _ = Describe("update-service-broker command", func() {
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
+				helpers.CF("delete-service", "-f", serviceInstance)
+				broker.Forget()
 			})
 
 			It("should yield a warning", func() {
-				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL())
+				session := helpers.CF("update-service-broker", broker.Name, broker.Username, broker.Password, broker.URL)
 
 				Eventually(session.Wait().Out).Should(SatisfyAll(
-					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
+					Say("Updating service broker %s as %s...", broker.Name, cfUsername),
 					Say("OK"),
 				))
 				Eventually(session.Err).Should(Say("Warning: Service plans are missing from the broker's catalog"))
@@ -109,23 +108,22 @@ var _ = Describe("update-service-broker command", func() {
 		})
 
 		When("the update fails after starting a synchronization job", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				broker.WithCatalogStatus(500).Configure()
+				broker = servicebrokerstub.Register()
+				broker.WithCatalogResponse(500).Configure()
 			})
 
 			AfterEach(func() {
-				broker.WithCatalogStatus(200).Configure()
-				broker.Destroy()
+				broker.Forget()
 			})
 
 			It("prints an error message and the job guid", func() {
-				session := helpers.CF("update-service-broker", broker.Name(), broker.Username(), broker.Password(), broker.URL())
+				session := helpers.CF("update-service-broker", broker.Name, broker.Username, broker.Password, broker.URL)
 
 				Eventually(session.Wait().Out).Should(SatisfyAll(
-					Say("Updating service broker %s as %s...", broker.Name(), cfUsername),
+					Say("Updating service broker %s as %s...", broker.Name, cfUsername),
 					Say("FAILED"),
 				))
 

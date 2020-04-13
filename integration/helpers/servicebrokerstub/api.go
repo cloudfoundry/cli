@@ -6,10 +6,13 @@ import (
 )
 
 type ServiceBrokerStub struct {
-	Name, URL, GUID    string
-	Username, Password string
-	Services           []config.Service
-	registered         bool
+	Name, URL, GUID     string
+	Username, Password  string
+	Services            []config.Service
+	registered          bool
+	CatalogResponse     int
+	ProvisionResponse   int
+	DeprovisionResponse int
 }
 
 func New() *ServiceBrokerStub {
@@ -39,6 +42,11 @@ func (s *ServiceBrokerStub) Forget() {
 		s.deregister()
 	}
 	s.forget()
+}
+
+func (s *ServiceBrokerStub) Configure() *ServiceBrokerStub {
+	s.configure()
+	return s
 }
 
 func (s *ServiceBrokerStub) Register() *ServiceBrokerStub {
@@ -73,6 +81,21 @@ func (s *ServiceBrokerStub) WithPlans(plans int) *ServiceBrokerStub {
 
 func (s *ServiceBrokerStub) WithName(name string) *ServiceBrokerStub {
 	s.Name = name
+	return s
+}
+
+func (s *ServiceBrokerStub) WithCatalogResponse(statusCode int) *ServiceBrokerStub {
+	s.CatalogResponse = statusCode
+	return s
+}
+
+func (s *ServiceBrokerStub) WithProvisionResponse(statusCode int) *ServiceBrokerStub {
+	s.ProvisionResponse = statusCode
+	return s
+}
+
+func (s *ServiceBrokerStub) WithDeprovisionResponse(statusCode int) *ServiceBrokerStub {
+	s.DeprovisionResponse = statusCode
 	return s
 }
 
