@@ -119,6 +119,7 @@ type Actor interface {
 	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
 	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
+	GetRouterGroups() ([]v7action.RouterGroup, v7action.Warnings, error)
 	GetRouteSummaries([]v7action.Route) ([]v7action.RouteSummary, v7action.Warnings, error)
 	GetRoutesByOrg(orgGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)
 	GetRoutesBySpace(spaceGUID string, labels string) ([]v7action.Route, v7action.Warnings, error)

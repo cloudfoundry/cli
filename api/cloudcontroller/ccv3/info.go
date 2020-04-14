@@ -75,6 +75,7 @@ func (info Info) OAuthClient() string {
 	return info.Links.AppSSH.Meta.OAuthClient
 }
 
+// Routing returns the HREF of the routing API.
 func (info Info) Routing() string {
 	return info.Links.Routing.HREF
 }

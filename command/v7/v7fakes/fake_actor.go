@@ -1528,6 +1528,20 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetRouterGroupsStub        func() ([]v7action.RouterGroup, v7action.Warnings, error)
+	getRouterGroupsMutex       sync.RWMutex
+	getRouterGroupsArgsForCall []struct {
+	}
+	getRouterGroupsReturns struct {
+		result1 []v7action.RouterGroup
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRouterGroupsReturnsOnCall map[int]struct {
+		result1 []v7action.RouterGroup
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetRoutesByOrgStub        func(string, string) ([]v7action.Route, v7action.Warnings, error)
 	getRoutesByOrgMutex       sync.RWMutex
 	getRoutesByOrgArgsForCall []struct {
@@ -9463,6 +9477,64 @@ func (fake *FakeActor) GetRouteSummariesReturnsOnCall(i int, result1 []v7action.
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetRouterGroups() ([]v7action.RouterGroup, v7action.Warnings, error) {
+	fake.getRouterGroupsMutex.Lock()
+	ret, specificReturn := fake.getRouterGroupsReturnsOnCall[len(fake.getRouterGroupsArgsForCall)]
+	fake.getRouterGroupsArgsForCall = append(fake.getRouterGroupsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetRouterGroups", []interface{}{})
+	fake.getRouterGroupsMutex.Unlock()
+	if fake.GetRouterGroupsStub != nil {
+		return fake.GetRouterGroupsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRouterGroupsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRouterGroupsCallCount() int {
+	fake.getRouterGroupsMutex.RLock()
+	defer fake.getRouterGroupsMutex.RUnlock()
+	return len(fake.getRouterGroupsArgsForCall)
+}
+
+func (fake *FakeActor) GetRouterGroupsCalls(stub func() ([]v7action.RouterGroup, v7action.Warnings, error)) {
+	fake.getRouterGroupsMutex.Lock()
+	defer fake.getRouterGroupsMutex.Unlock()
+	fake.GetRouterGroupsStub = stub
+}
+
+func (fake *FakeActor) GetRouterGroupsReturns(result1 []v7action.RouterGroup, result2 v7action.Warnings, result3 error) {
+	fake.getRouterGroupsMutex.Lock()
+	defer fake.getRouterGroupsMutex.Unlock()
+	fake.GetRouterGroupsStub = nil
+	fake.getRouterGroupsReturns = struct {
+		result1 []v7action.RouterGroup
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRouterGroupsReturnsOnCall(i int, result1 []v7action.RouterGroup, result2 v7action.Warnings, result3 error) {
+	fake.getRouterGroupsMutex.Lock()
+	defer fake.getRouterGroupsMutex.Unlock()
+	fake.GetRouterGroupsStub = nil
+	if fake.getRouterGroupsReturnsOnCall == nil {
+		fake.getRouterGroupsReturnsOnCall = make(map[int]struct {
+			result1 []v7action.RouterGroup
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRouterGroupsReturnsOnCall[i] = struct {
+		result1 []v7action.RouterGroup
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetRoutesByOrg(arg1 string, arg2 string) ([]v7action.Route, v7action.Warnings, error) {
 	fake.getRoutesByOrgMutex.Lock()
 	ret, specificReturn := fake.getRoutesByOrgReturnsOnCall[len(fake.getRoutesByOrgArgsForCall)]
@@ -15686,6 +15758,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getRouteLabelsMutex.RUnlock()
 	fake.getRouteSummariesMutex.RLock()
 	defer fake.getRouteSummariesMutex.RUnlock()
+	fake.getRouterGroupsMutex.RLock()
+	defer fake.getRouterGroupsMutex.RUnlock()
 	fake.getRoutesByOrgMutex.RLock()
 	defer fake.getRoutesByOrgMutex.RUnlock()
 	fake.getRoutesBySpaceMutex.RLock()

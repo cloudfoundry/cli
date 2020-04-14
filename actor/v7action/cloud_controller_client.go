@@ -99,6 +99,7 @@ type CloudControllerClient interface {
 	GetRoles(query ...ccv3.Query) ([]ccv3.Role, ccv3.IncludedResources, ccv3.Warnings, error)
 	RootResponse() (ccv3.Info, ccv3.Warnings, error)
 	GetRouteDestinations(routeGUID string) ([]ccv3.RouteDestination, ccv3.Warnings, error)
+	GetRouterGroups() ([]ccv3.RouterGroup, ccv3.Warnings, error)
 	GetRoutes(query ...ccv3.Query) ([]ccv3.Route, ccv3.Warnings, error)
 	GetRunningSecurityGroups(spaceGUID string, queries ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
 	GetSecurityGroups(query ...ccv3.Query) ([]resources.SecurityGroup, ccv3.Warnings, error)
