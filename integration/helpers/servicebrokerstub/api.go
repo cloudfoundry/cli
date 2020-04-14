@@ -111,6 +111,10 @@ func (s *ServiceBrokerStub) FirstServiceOfferingName() string {
 	return s.Services[0].Name
 }
 
+func (s *ServiceBrokerStub) FirstServiceOfferingDescription() string {
+	return s.Services[0].Description
+}
+
 func (s *ServiceBrokerStub) FirstServicePlanName() string {
 	return s.Services[0].Plans[0].Name
 }

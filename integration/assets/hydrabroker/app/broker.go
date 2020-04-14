@@ -66,13 +66,19 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 				ID:              p.ID,
 				Description:     p.Description,
 				MaintenanceInfo: mi,
+				Bindable:        &s.Bindable,
 			})
 		}
 		services = append(services, domain.Service{
-			Name:        s.Name,
-			ID:          s.ID,
-			Description: s.Description,
-			Plans:       plans,
+			Name:                s.Name,
+			ID:                  s.ID,
+			Description:         s.Description,
+			Plans:               plans,
+			BindingsRetrievable: s.Bindable,
+			Metadata: &domain.ServiceMetadata{
+				Shareable:        &s.Shareable,
+				DocumentationUrl: `http://documentation.url`,
+			},
 		})
 	}
 
@@ -90,12 +96,16 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 		return nil
 	}
 
+	response := map[string]interface{}{
+		"dashboard_url": `http://example.com`,
+	}
+
 	switch config.AsyncResponseDelay {
 	case 0:
 		w.WriteHeader(http.StatusCreated)
-		return respondWithJSON(w, map[string]interface{}{})
+		return respondWithJSON(w, response)
 	default:
-		return brokerAsyncResponse(w, config.AsyncResponseDelay)
+		return brokerAsyncResponse(w, config.AsyncResponseDelay, response)
 	}
 }
 
@@ -115,15 +125,73 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 		w.WriteHeader(http.StatusOK)
 		return respondWithJSON(w, map[string]interface{}{})
 	default:
-		return brokerAsyncResponse(w, config.AsyncResponseDelay)
+		return brokerAsyncResponse(w, config.AsyncResponseDelay, nil)
 	}
 }
 
-func brokerAsyncResponse(w http.ResponseWriter, duration time.Duration) error {
+func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	config, err := brokerCheckRequest(store, r)
+	if err != nil {
+		return err
+	}
+
+	if config.BindResponse != 0 {
+		w.WriteHeader(config.BindResponse)
+		return nil
+	}
+
+	switch config.AsyncResponseDelay {
+	case 0:
+		w.WriteHeader(http.StatusCreated)
+		return respondWithJSON(w, map[string]interface{}{})
+	default:
+		return brokerAsyncResponse(w, config.AsyncResponseDelay, nil)
+	}
+}
+
+func brokerGetBinding(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	config, err := brokerCheckRequest(store, r)
+	if err != nil {
+		return err
+	}
+
+	if config.GetBindingResponse != 0 {
+		w.WriteHeader(config.GetBindingResponse)
+		return nil
+	}
+
+	return respondWithJSON(w, map[string]interface{}{})
+}
+
+func brokerUnbind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	config, err := brokerCheckRequest(store, r)
+	if err != nil {
+		return err
+	}
+
+	if config.UnbindResponse != 0 {
+		w.WriteHeader(config.UnbindResponse)
+		return nil
+	}
+
+	switch config.AsyncResponseDelay {
+	case 0:
+		w.WriteHeader(http.StatusOK)
+		return respondWithJSON(w, map[string]interface{}{})
+	default:
+		return brokerAsyncResponse(w, config.AsyncResponseDelay, nil)
+	}
+}
+
+func brokerAsyncResponse(w http.ResponseWriter, duration time.Duration, params map[string]interface{}) error {
+	if params == nil {
+		params = make(map[string]interface{})
+	}
+
+	params["operation"] = time.Now().Add(duration)
+
 	w.WriteHeader(http.StatusAccepted)
-	return respondWithJSON(w, map[string]interface{}{
-		"operation": time.Now().Add(duration),
-	})
+	return respondWithJSON(w, params)
 }
 
 func brokerLastOperation(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {

@@ -2,8 +2,9 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -218,21 +219,20 @@ var _ = Describe("service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      *servicebrokerstub.ServiceBrokerStub
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
+					broker = servicebrokerstub.EnableServiceAccess()
+					service = broker.FirstServiceOfferingName()
+					servicePlan = broker.FirstServicePlanName()
 
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName, "-t", "database, email")).Should(Exit(0))
 				})
 
 				AfterEach(func() {
 					Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				When("the --guid flag is provided", func() {
@@ -285,10 +285,10 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say(`service:\s+%s`, service))
 							Eventually(session).Should(Say(`tags:\s+database, email`))
 							Eventually(session).Should(Say(`plan:\s+%s`, servicePlan))
-							Eventually(session).Should(Say(`description:\s+fake service`))
+							Eventually(session).Should(Say(`description:\s+%s`, broker.FirstServiceOfferingDescription()))
 							Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
 							Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
-							Eventually(session).Should(Say(`service broker:\s+%s`, broker.Name()))
+							Eventually(session).Should(Say(`service broker:\s+%s`, broker.Name))
 							Eventually(session).Should(Say("\n\n"))
 							Consistently(session).ShouldNot(Say("shared with spaces:"))
 							Eventually(session).Should(Say(`Showing status of last operation from service %s\.\.\.`, serviceInstanceName))
@@ -333,7 +333,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say(`service:\s+%s`, service))
 							Eventually(session).Should(Say(`tags:\s+database, email`))
 							Eventually(session).Should(Say(`plan:\s+%s`, servicePlan))
-							Eventually(session).Should(Say(`description:\s+fake service`))
+							Eventually(session).Should(Say(`description:\s+%s`, broker.FirstServiceOfferingDescription()))
 							Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
 							Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
 							Eventually(session).Should(Say("\n\n"))
@@ -389,21 +389,42 @@ var _ = Describe("service command", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionMaintenanceInfoInSummaryV2)
 					})
-					It("displays description of upgrade when available", func() {
-						By("Having a service instance with no maintenance_info in the plan")
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-						Eventually(session).Should(Say("There is no upgrade available for this service."))
 
-						By("Adding maintenance_info to the service plan")
-						broker.Services[0].Plans[0].SetMaintenanceInfo("3.0.0", "Stemcell update.\nExpect downtime.")
-						broker.Update()
+					When("maintenance_info is not configured", func() {
+						It("says that the broker does not support upgrades", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
+							Eventually(session).Should(Say("Upgrades are not supported by this broker."))
+						})
+					})
 
-						session = helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
-						Eventually(session).Should(Say("Showing available upgrade details for this service..."))
-						Eventually(session).Should(Say("upgrade description: Stemcell update.\nExpect downtime."))
-						Eventually(session).Should(Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'`, serviceInstanceName))
+					When("maintenance_info is configured", func() {
+						BeforeEach(func() {
+							broker.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{
+								Version:     "3.0.0",
+								Description: "Stemcell update.\nExpect downtime.",
+							}
+							broker.Configure().Register()
+						})
+
+						It("says that an upgrade is available", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say(`name:\s+%s`, serviceInstanceName))
+							Eventually(session).Should(Say("Showing available upgrade details for this service..."))
+							Eventually(session).Should(Say("upgrade description: Stemcell update.\nExpect downtime."))
+							Eventually(session).Should(Say(`TIP: You can upgrade using 'cf update-service %s --upgrade'`, serviceInstanceName))
+						})
+
+						It("says that a new service instance is already up to date", func() {
+							newServiceInstanceName := helpers.PrefixedRandomName("SI")
+							session := helpers.CF("create-service", service, servicePlan, newServiceInstanceName)
+							Eventually(session).Should(Exit(0))
+							defer helpers.CF("delete-service", "-f", newServiceInstanceName).Wait()
+
+							session = helpers.CF("service", newServiceInstanceName)
+							Eventually(session).Should(Say(`name:\s+%s`, newServiceInstanceName))
+							Eventually(session).Should(Say("There is no upgrade available for this service."))
+						})
 					})
 				})
 			})
@@ -417,7 +438,7 @@ var _ = Describe("service command", func() {
 
 			service     string
 			servicePlan string
-			broker      *fakeservicebroker.FakeServiceBroker
+			broker      *servicebrokerstub.ServiceBrokerStub
 		)
 
 		BeforeEach(func() {
@@ -425,19 +446,15 @@ var _ = Describe("service command", func() {
 			sourceSpaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, sourceSpaceName)
 
-			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-			service = broker.ServiceName()
-			servicePlan = broker.ServicePlanName()
+			broker = servicebrokerstub.EnableServiceAccess()
+			service = broker.FirstServiceOfferingName()
+			servicePlan = broker.FirstServicePlanName()
 
-			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
-			// need to login as admin
-			helpers.LoginCF()
-			helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
-			broker.Destroy()
+			broker.Forget()
 			helpers.QuickDeleteOrg(orgName)
 		})
 
@@ -500,8 +517,8 @@ var _ = Describe("service command", func() {
 				When("the service is no longer shareable", func() {
 					Context("due to service broker settings", func() {
 						BeforeEach(func() {
-							broker.Services[0].Metadata.Shareable = false
-							broker.Update()
+							broker.Services[0].Shareable = false
+							broker.Configure().Register()
 						})
 
 						It("should display that service instance sharing is disabled for this service", func() {

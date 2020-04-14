@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -297,18 +298,17 @@ var _ = Describe("bind-service command", func() {
 			})
 
 			When("the service is provided by a broker", func() {
-				var broker *fakeservicebroker.FakeServiceBroker
+				var broker *servicebrokerstub.ServiceBrokerStub
 
 				AfterEach(func() {
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				When("the service binding is blocking", func() {
 					BeforeEach(func() {
-						broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+						broker = servicebrokerstub.EnableServiceAccess()
 
-						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
-						Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance)).Should(Exit(0))
+						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
 					})
 
 					It("binds the service to the app, displays OK and TIP", func() {
@@ -327,10 +327,9 @@ var _ = Describe("bind-service command", func() {
 
 				When("the service binding is asynchronous", func() {
 					BeforeEach(func() {
-						broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
+						broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).Create().Register().EnableServiceAccess()
 
-						Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
-						Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance)).Should(Exit(0))
+						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
 
 						Eventually(func() *Session {
 							session := helpers.CF("service", serviceInstance)

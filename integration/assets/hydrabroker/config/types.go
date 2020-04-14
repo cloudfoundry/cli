@@ -18,6 +18,8 @@ type Service struct {
 	ID          string `json:"id,omitempty"`
 	Description string `json:"description,omitempty"`
 	Plans       []Plan `json:"plans" validate:"min=1,dive"`
+	Shareable   bool   `json:"shareable"`
+	Bindable    bool   `json:"bindable"`
 }
 
 type BrokerConfiguration struct {
@@ -27,6 +29,9 @@ type BrokerConfiguration struct {
 	CatalogResponse     int           `json:"catalog_response,omitempty" validate:"min=0,max=600"`
 	ProvisionResponse   int           `json:"provision_response,omitempty" validate:"min=0,max=600"`
 	DeprovisionResponse int           `json:"deprovision_response,omitempty" validate:"min=0,max=600"`
+	BindResponse        int           `json:"bind_response,omitempty" validate:"min=0,max=600"`
+	UnbindResponse      int           `json:"unbind_response,omitempty" validate:"min=0,max=600"`
+	GetBindingResponse  int           `json:"get_binding_response,omitempty" validate:"min=0,max=600"`
 	AsyncResponseDelay  time.Duration `json:"async_response_delay"`
 }
 

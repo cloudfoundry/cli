@@ -30,6 +30,10 @@ func App() *mux.Router {
 	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}", handle(brokerProvision)).Methods("PUT")
 	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}", handle(brokerDeprovision)).Methods("DELETE")
 	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}/last_operation", handle(brokerLastOperation)).Methods("GET")
+	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}/service_bindings/{b_guid}", handle(brokerBind)).Methods("PUT")
+	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}/service_bindings/{b_guid}", handle(brokerGetBinding)).Methods("GET")
+	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}/service_bindings/{b_guid}", handle(brokerUnbind)).Methods("DELETE")
+	r.HandleFunc("/broker/{guid}/v2/service_instances/{si_guid}/service_bindings/{b_guid}/last_operation", handle(brokerLastOperation)).Methods("GET")
 
 	return r
 }
