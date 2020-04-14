@@ -95,7 +95,7 @@ var _ = Describe("custom oauth client id", func() {
 					configPath, `"UAAOAuthClient": ".*",`, `"UAAOAuthClient": "",`)
 			})
 
-			Context("v6 command", func() {
+			Context("oauth-token command", func() {
 				It("replaces the empty client id with the default values for client id and secret", func() {
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(0))
@@ -106,7 +106,7 @@ var _ = Describe("custom oauth client id", func() {
 				})
 			})
 
-			Context("v7 command", func() {
+			Context("tasks command", func() {
 				It("writes default values for client id and secret", func() {
 					session := helpers.CF("tasks", "some-app")
 					Eventually(session).Should(Exit(1))
@@ -126,7 +126,7 @@ var _ = Describe("custom oauth client id", func() {
 					configPath, `"UAAOAuthClientSecret": ".*",`, "")
 			})
 
-			Context("v6 command", func() {
+			Context("oauth-token command", func() {
 				It("writes default values for client id and secret", func() {
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(0))
@@ -137,7 +137,7 @@ var _ = Describe("custom oauth client id", func() {
 				})
 			})
 
-			Context("v7 command", func() {
+			Context("tasks command", func() {
 				It("writes default values for client id and secret", func() {
 					session := helpers.CF("tasks")
 					Eventually(session).Should(Exit(1))
@@ -156,7 +156,7 @@ var _ = Describe("custom oauth client id", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		Context("v6 command", func() {
+		Context("help command", func() {
 			It("writes default values for client id and secret to the config", func() {
 				Expect(configPath).ToNot(BeAnExistingFile())
 
@@ -169,7 +169,7 @@ var _ = Describe("custom oauth client id", func() {
 			})
 		})
 
-		Context("v7 command", func() {
+		Context("tasks command", func() {
 			It("writes default values for client id and secret to the config", func() {
 				Expect(configPath).ToNot(BeAnExistingFile())
 
