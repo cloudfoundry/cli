@@ -40,9 +40,31 @@ var _ = Describe("logs command", func() {
 				 ]}`),
 		)
 
+		// The v6 version of this command makes the below request when logging in.
+		// See below for comparison with v7 version.
 		helpers.AddHandler(server,
 			http.MethodGet,
 			"/v3/spaces?organization_guids=f3ea75ba-ea6b-439f-8889-b07abf718e6a",
+			http.StatusOK,
+			[]byte(
+				`{
+					 "total_results": 1,
+					 "total_pages": 1,
+					 "resources": [
+						 {
+							 "guid": "1704b4e7-14bb-4b7b-bc23-0b8d23a60238",
+							 "name": "some-fake-space"
+						 }
+					 ]}`),
+		)
+
+		// The v7 version of this command makes the below request when logging in,
+		// which is similar to the v6 version above except for the additional 'order_by'
+		// query parameter. Rather than split these tests across two files, we just add
+		// a handler for both routes (with and without 'order_by').
+		helpers.AddHandler(server,
+			http.MethodGet,
+			"/v3/spaces?order_by=name&organization_guids=f3ea75ba-ea6b-439f-8889-b07abf718e6a",
 			http.StatusOK,
 			[]byte(
 				`{
