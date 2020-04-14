@@ -65,7 +65,7 @@ var _ = Describe("custom oauth client id", func() {
 			})
 
 			Context("auth", func() {
-				It("uses the custom client id and secret", func() {
+				It("returns an error indicating that client credentials in the config file is no longer supported", func() {
 					username, password := helpers.GetCredentials()
 					env := map[string]string{
 						"CF_USERNAME": username,
@@ -74,7 +74,7 @@ var _ = Describe("custom oauth client id", func() {
 					session := helpers.CFWithEnv(env, "auth")
 					Eventually(session).Should(Exit(1))
 					Expect(session.Err).To(Say(
-						"Credentials were rejected, please try again."))
+						"Error: Support for manually writing your client credentials to config.json has been removed. For similar functionality please use `cf auth --client-credentials`."))
 				})
 			})
 
