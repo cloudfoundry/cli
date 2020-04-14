@@ -20,7 +20,6 @@ const (
 
 	retryCount    = 5
 	retryInterval = time.Millisecond * 250
-	walkDelay     = time.Second * 2
 )
 
 type LogMessage struct {
@@ -139,6 +138,9 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 			return
 		}
 
+		const offset = 1 * time.Second
+		walkStartTime := ts.Add(-offset)
+
 		logcache.Walk(
 			ctx,
 			appGUID,
@@ -155,7 +157,7 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 				return true
 			}),
 			client.Read,
-			logcache.WithWalkDelay(walkDelay),
+			logcache.WithWalkDelay(2*time.Second),
 			logcache.WithWalkStartTime(walkStartTime),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
 			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
@@ -196,7 +198,6 @@ func latestEnvelopeTimestamp(client LogCacheClient, errs chan error, ctx context
 			return false
 		}),
 		r,
-		logcache.WithWalkDelay(walkDelay),
 		logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 		logcache.WithWalkLogger(log.New(channelWriter{
 			errChannel: errs,
