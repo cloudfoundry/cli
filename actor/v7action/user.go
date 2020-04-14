@@ -78,6 +78,10 @@ func (actor Actor) DeleteUser(userGuid string) (Warnings, error) {
 	return allWarnings, err
 }
 
+func (actor Actor) UpdateUserPassword(userGUID string, oldPassword string, newPassword string) error {
+	return actor.UAAClient.UpdatePassword(userGUID, oldPassword, newPassword)
+}
+
 func SortUsers(users []User) {
 	sort.Slice(users, func(i, j int) bool {
 		if users[i].PresentationName == users[j].PresentationName {

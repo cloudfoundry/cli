@@ -16,5 +16,6 @@ type UAAClient interface {
 	ListUsers(userName, origin string) ([]uaa.User, error)
 	LoginPrompts() map[string][]string
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
+	UpdatePassword(userGUID string, oldPassword string, newPassword string) error
 	ValidateClientUser(clientID string) error
 }

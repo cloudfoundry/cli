@@ -2880,6 +2880,19 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateUserPasswordStub        func(string, string, string) error
+	updateUserPasswordMutex       sync.RWMutex
+	updateUserPasswordArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	updateUserPasswordReturns struct {
+		result1 error
+	}
+	updateUserPasswordReturnsOnCall map[int]struct {
+		result1 error
+	}
 	UploadBitsPackageStub        func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
@@ -15345,6 +15358,68 @@ func (fake *FakeActor) UpdateStackLabelsByStackNameReturnsOnCall(i int, result1 
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpdateUserPassword(arg1 string, arg2 string, arg3 string) error {
+	fake.updateUserPasswordMutex.Lock()
+	ret, specificReturn := fake.updateUserPasswordReturnsOnCall[len(fake.updateUserPasswordArgsForCall)]
+	fake.updateUserPasswordArgsForCall = append(fake.updateUserPasswordArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdateUserPassword", []interface{}{arg1, arg2, arg3})
+	fake.updateUserPasswordMutex.Unlock()
+	if fake.UpdateUserPasswordStub != nil {
+		return fake.UpdateUserPasswordStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.updateUserPasswordReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeActor) UpdateUserPasswordCallCount() int {
+	fake.updateUserPasswordMutex.RLock()
+	defer fake.updateUserPasswordMutex.RUnlock()
+	return len(fake.updateUserPasswordArgsForCall)
+}
+
+func (fake *FakeActor) UpdateUserPasswordCalls(stub func(string, string, string) error) {
+	fake.updateUserPasswordMutex.Lock()
+	defer fake.updateUserPasswordMutex.Unlock()
+	fake.UpdateUserPasswordStub = stub
+}
+
+func (fake *FakeActor) UpdateUserPasswordArgsForCall(i int) (string, string, string) {
+	fake.updateUserPasswordMutex.RLock()
+	defer fake.updateUserPasswordMutex.RUnlock()
+	argsForCall := fake.updateUserPasswordArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeActor) UpdateUserPasswordReturns(result1 error) {
+	fake.updateUserPasswordMutex.Lock()
+	defer fake.updateUserPasswordMutex.Unlock()
+	fake.UpdateUserPasswordStub = nil
+	fake.updateUserPasswordReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeActor) UpdateUserPasswordReturnsOnCall(i int, result1 error) {
+	fake.updateUserPasswordMutex.Lock()
+	defer fake.updateUserPasswordMutex.Unlock()
+	fake.UpdateUserPasswordStub = nil
+	if fake.updateUserPasswordReturnsOnCall == nil {
+		fake.updateUserPasswordReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.updateUserPasswordReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeActor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
 	var arg2Copy []sharedaction.V3Resource
 	if arg2 != nil {
@@ -15938,6 +16013,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateSpaceQuotaMutex.RUnlock()
 	fake.updateStackLabelsByStackNameMutex.RLock()
 	defer fake.updateStackLabelsByStackNameMutex.RUnlock()
+	fake.updateUserPasswordMutex.RLock()
+	defer fake.updateUserPasswordMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()

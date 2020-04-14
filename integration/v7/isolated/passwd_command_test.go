@@ -1,5 +1,3 @@
-// +build !windows
-
 package isolated
 
 import (
@@ -16,7 +14,6 @@ import (
 )
 
 var _ = Describe("passwd command", func() {
-
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("appears in cf help -a", func() {
@@ -25,7 +22,7 @@ var _ = Describe("passwd command", func() {
 				Expect(session).To(HaveCommandInCategoryWithDescription("passwd", "GETTING STARTED", "Change user password"))
 			})
 
-			It("Displays command usage to output", func() {
+			It("displays command usage to output", func() {
 				session := helpers.CF("passwd", "--help")
 
 				Eventually(session).Should(Say(`NAME:`))
@@ -83,9 +80,9 @@ var _ = Describe("passwd command", func() {
 
 		When("the password is successfully changed", func() {
 			It("succeeds", func() {
-				Eventually(session.Out).Should(Say("Current Password>"))
-				Eventually(session.Out).Should(Say("New Password>"))
-				Eventually(session.Out).Should(Say("Verify Password>"))
+				Eventually(session.Out).Should(Say("Current password:"))
+				Eventually(session.Out).Should(Say("New password:"))
+				Eventually(session.Out).Should(Say("Verify password:"))
 				Eventually(session.Out).Should(Say("Changing password for user " + username + "..."))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say("Please log in again"))
@@ -101,12 +98,12 @@ var _ = Describe("passwd command", func() {
 			})
 
 			It("fails with an error message", func() {
-				Eventually(session.Out).Should(Say("Current Password>"))
-				Eventually(session.Out).Should(Say("New Password>"))
-				Eventually(session.Out).Should(Say("Verify Password>"))
+				Eventually(session.Out).Should(Say("Current password:"))
+				Eventually(session.Out).Should(Say("New password:"))
+				Eventually(session.Out).Should(Say("Verify password:"))
 				Eventually(session.Out).Should(Say("Changing password for user " + username + "..."))
+				Eventually(session.Err).Should(Say("Password verification does not match."))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Password verification does not match"))
 				Eventually(session).Should(Exit(1))
 
 				helpers.LoginAs(username, currentPassword)
@@ -119,12 +116,12 @@ var _ = Describe("passwd command", func() {
 			})
 
 			It("fails with an error message", func() {
-				Eventually(session.Out).Should(Say("Current Password>"))
-				Eventually(session.Out).Should(Say("New Password>"))
-				Eventually(session.Out).Should(Say("Verify Password>"))
+				Eventually(session.Out).Should(Say("Current password:"))
+				Eventually(session.Out).Should(Say("New password:"))
+				Eventually(session.Out).Should(Say("Verify password:"))
 				Eventually(session.Out).Should(Say("Changing password for user " + username + "..."))
+				Eventually(session.Err).Should(Say("Old password is incorrect"))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Current password did not match"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -136,31 +133,12 @@ var _ = Describe("passwd command", func() {
 			})
 
 			It("fails with an error message", func() {
-				Eventually(session.Out).Should(Say("Current Password>"))
-				Eventually(session.Out).Should(Say("New Password>"))
-				Eventually(session.Out).Should(Say("Verify Password>"))
+				Eventually(session.Out).Should(Say("Current password:"))
+				Eventually(session.Out).Should(Say("New password:"))
+				Eventually(session.Out).Should(Say("Verify password:"))
 				Eventually(session.Out).Should(Say("Changing password for user " + username + "..."))
+				Eventually(session.Err).Should(Say("Your new password cannot be the same as the old password."))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Server error"))
-				Eventually(session).Should(Exit(1))
-
-				helpers.LoginAs(username, currentPassword)
-			})
-		})
-
-		When("the user enters a zero-length new password", func() {
-			BeforeEach(func() {
-				newPassword = ""
-				verifyPassword = ""
-			})
-
-			It("fails with an error message", func() {
-				Eventually(session.Out).Should(Say("Current Password>"))
-				Eventually(session.Out).Should(Say("New Password>"))
-				Eventually(session.Out).Should(Say("Verify Password>"))
-				Eventually(session.Out).Should(Say("Changing password for user " + username + "..."))
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Server error"))
 				Eventually(session).Should(Exit(1))
 
 				helpers.LoginAs(username, currentPassword)
@@ -173,8 +151,8 @@ var _ = Describe("passwd command", func() {
 			})
 
 			It("fails with an error message", func() {
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

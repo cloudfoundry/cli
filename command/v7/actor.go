@@ -210,6 +210,7 @@ type Actor interface {
 	UpdateSpaceLabelsBySpaceName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	UpdateSpaceQuota(quotaName, orgGUID, newName string, limits v7action.QuotaLimits) (v7action.Warnings, error)
 	UpdateStackLabelsByStackName(string, map[string]types.NullString) (v7action.Warnings, error)
+	UpdateUserPassword(userGUID string, oldPassword string, newPassword string) error
 	UploadBitsPackage(pkg v7action.Package, matchedResources []sharedaction.V3Resource, newResources io.Reader, newResourcesLength int64) (v7action.Package, v7action.Warnings, error)
 	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (ccv3.JobURL, v7action.Warnings, error)
 	UploadDroplet(dropletGUID string, dropletPath string, progressReader io.Reader, fileSize int64) (v7action.Warnings, error)

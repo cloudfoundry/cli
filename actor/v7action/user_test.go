@@ -328,6 +328,54 @@ var _ = Describe("User Actions", func() {
 
 	})
 
+	Describe("UpdateUserPassword", func() {
+		var (
+			userGUID    = "some-user"
+			oldPassword = "old1"
+			newPassword = "new1"
+			actualErr   error
+		)
+
+		JustBeforeEach(func() {
+			actualErr = actor.UpdateUserPassword(userGUID, oldPassword, newPassword)
+		})
+
+		When("no API errors occur", func() {
+			BeforeEach(func() {
+				fakeUAAClient.UpdatePasswordReturns(nil)
+			})
+
+			It("does not return an error", func() {
+				Expect(actualErr).NotTo(HaveOccurred())
+
+				Expect(fakeUAAClient.UpdatePasswordCallCount()).To(Equal(1))
+				givenUserGUID, givenOldPassword, givenNewPassword := fakeUAAClient.UpdatePasswordArgsForCall(0)
+				Expect(givenUserGUID).To(Equal(userGUID))
+				Expect(givenOldPassword).To(Equal(oldPassword))
+				Expect(givenNewPassword).To(Equal(newPassword))
+			})
+		})
+
+		When("the UAA API returns an error", func() {
+			var returnedErr error
+
+			BeforeEach(func() {
+				returnedErr = errors.New("some UAA error")
+				fakeUAAClient.UpdatePasswordReturns(returnedErr)
+			})
+
+			It("returns the same error", func() {
+				Expect(actualErr).To(MatchError(returnedErr))
+
+				Expect(fakeUAAClient.UpdatePasswordCallCount()).To(Equal(1))
+				givenUserGUID, givenOldPassword, givenNewPassword := fakeUAAClient.UpdatePasswordArgsForCall(0)
+				Expect(givenUserGUID).To(Equal(userGUID))
+				Expect(givenOldPassword).To(Equal(oldPassword))
+				Expect(givenNewPassword).To(Equal(newPassword))
+			})
+		})
+	})
+
 	Describe("SortUsers", func() {
 		var (
 			users []User

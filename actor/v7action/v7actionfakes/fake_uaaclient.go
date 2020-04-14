@@ -116,6 +116,19 @@ type FakeUAAClient struct {
 		result1 uaa.RefreshedTokens
 		result2 error
 	}
+	UpdatePasswordStub        func(string, string, string) error
+	updatePasswordMutex       sync.RWMutex
+	updatePasswordArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	updatePasswordReturns struct {
+		result1 error
+	}
+	updatePasswordReturnsOnCall map[int]struct {
+		result1 error
+	}
 	ValidateClientUserStub        func(string) error
 	validateClientUserMutex       sync.RWMutex
 	validateClientUserArgsForCall []struct {
@@ -622,6 +635,68 @@ func (fake *FakeUAAClient) RefreshAccessTokenReturnsOnCall(i int, result1 uaa.Re
 	}{result1, result2}
 }
 
+func (fake *FakeUAAClient) UpdatePassword(arg1 string, arg2 string, arg3 string) error {
+	fake.updatePasswordMutex.Lock()
+	ret, specificReturn := fake.updatePasswordReturnsOnCall[len(fake.updatePasswordArgsForCall)]
+	fake.updatePasswordArgsForCall = append(fake.updatePasswordArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UpdatePassword", []interface{}{arg1, arg2, arg3})
+	fake.updatePasswordMutex.Unlock()
+	if fake.UpdatePasswordStub != nil {
+		return fake.UpdatePasswordStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.updatePasswordReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeUAAClient) UpdatePasswordCallCount() int {
+	fake.updatePasswordMutex.RLock()
+	defer fake.updatePasswordMutex.RUnlock()
+	return len(fake.updatePasswordArgsForCall)
+}
+
+func (fake *FakeUAAClient) UpdatePasswordCalls(stub func(string, string, string) error) {
+	fake.updatePasswordMutex.Lock()
+	defer fake.updatePasswordMutex.Unlock()
+	fake.UpdatePasswordStub = stub
+}
+
+func (fake *FakeUAAClient) UpdatePasswordArgsForCall(i int) (string, string, string) {
+	fake.updatePasswordMutex.RLock()
+	defer fake.updatePasswordMutex.RUnlock()
+	argsForCall := fake.updatePasswordArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeUAAClient) UpdatePasswordReturns(result1 error) {
+	fake.updatePasswordMutex.Lock()
+	defer fake.updatePasswordMutex.Unlock()
+	fake.UpdatePasswordStub = nil
+	fake.updatePasswordReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUAAClient) UpdatePasswordReturnsOnCall(i int, result1 error) {
+	fake.updatePasswordMutex.Lock()
+	defer fake.updatePasswordMutex.Unlock()
+	fake.UpdatePasswordStub = nil
+	if fake.updatePasswordReturnsOnCall == nil {
+		fake.updatePasswordReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.updatePasswordReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeUAAClient) ValidateClientUser(arg1 string) error {
 	fake.validateClientUserMutex.Lock()
 	ret, specificReturn := fake.validateClientUserReturnsOnCall[len(fake.validateClientUserArgsForCall)]
@@ -701,6 +776,8 @@ func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	defer fake.loginPromptsMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
+	fake.updatePasswordMutex.RLock()
+	defer fake.updatePasswordMutex.RUnlock()
 	fake.validateClientUserMutex.RLock()
 	defer fake.validateClientUserMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

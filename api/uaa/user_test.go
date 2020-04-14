@@ -267,6 +267,56 @@ var _ = Describe("User", func() {
 		})
 	})
 
+	Describe("UpdatePassword", func() {
+		When("no errors occur", func() {
+			BeforeEach(func() {
+				response := `{
+					"status": "ok"
+				}`
+
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodPut, "/Users/some-user/password"),
+						VerifyHeaderKV("Content-Type", "application/json"),
+						VerifyBody([]byte(`{"oldPassword":"old1","password":"new1"}`)),
+						RespondWith(http.StatusOK, response),
+					))
+			})
+
+			It("updates password", func() {
+				err := client.UpdatePassword("some-user", "old1", "new1")
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		When("an error occurs", func() {
+			var response string
+
+			BeforeEach(func() {
+				response = `{
+					"error": "some-error",
+					"error_description": "some-description"
+				}`
+
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
+						VerifyRequest(http.MethodPut, "/Users/some-user/password"),
+						RespondWith(http.StatusTeapot, response),
+					))
+			})
+
+			It("returns the error", func() {
+				err := client.UpdatePassword("some-user", "old1", "new1")
+				Expect(err).To(MatchError(RawHTTPStatusError{
+					StatusCode:  http.StatusTeapot,
+					RawResponse: []byte(response),
+				}))
+			})
+		})
+	})
+
 	Describe("ValidateClientUser", func() {
 		var (
 			clientID string
