@@ -419,11 +419,14 @@ var _ = Describe("service command", func() {
 							newServiceInstanceName := helpers.PrefixedRandomName("SI")
 							session := helpers.CF("create-service", service, servicePlan, newServiceInstanceName)
 							Eventually(session).Should(Exit(0))
-							defer helpers.CF("delete-service", "-f", newServiceInstanceName).Wait()
 
 							session = helpers.CF("service", newServiceInstanceName)
 							Eventually(session).Should(Say(`name:\s+%s`, newServiceInstanceName))
 							Eventually(session).Should(Say("There is no upgrade available for this service."))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("delete-service", "-f", newServiceInstanceName)
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
