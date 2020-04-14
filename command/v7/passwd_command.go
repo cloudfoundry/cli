@@ -42,8 +42,6 @@ func (cmd PasswdCommand) Execute(args []string) error {
 		"Username": currentUser.Name,
 	})
 
-	cmd.UI.DisplayNewline()
-
 	if newPassword != verifyPassword {
 		return translatableerror.PasswordVerificationFailedError{}
 	}
