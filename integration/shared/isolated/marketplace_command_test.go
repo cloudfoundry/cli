@@ -3,8 +3,9 @@ package isolated
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -50,8 +51,8 @@ var _ = Describe("marketplace command", func() {
 			When("not logged in", func() {
 				When("there are accessible services", func() {
 					var (
-						broker1 *fakeservicebroker.FakeServiceBroker
-						broker2 *fakeservicebroker.FakeServiceBroker
+						broker1 *servicebrokerstub.ServiceBrokerStub
+						broker2 *servicebrokerstub.ServiceBrokerStub
 						org     string
 						space   string
 					)
@@ -62,18 +63,16 @@ var _ = Describe("marketplace command", func() {
 						helpers.SetupCF(org, space)
 						helpers.TargetOrgAndSpace(org, space)
 
-						broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
-						enableServiceAccess(broker1)
-						broker2 = fakeservicebroker.NewAlternate().EnsureBrokerIsAvailable()
-						enableServiceAccess(broker2)
+						broker1 = servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
+						broker2 = servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 
 						helpers.LogoutCF()
 					})
 
 					AfterEach(func() {
 						helpers.SetupCF(org, space)
-						broker1.Destroy()
-						broker2.Destroy()
+						broker1.Forget()
+						broker2.Forget()
 						helpers.QuickDeleteOrg(org)
 					})
 
@@ -83,8 +82,8 @@ var _ = Describe("marketplace command", func() {
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say("\n\n"))
 						Eventually(session).Should(Say("service\\s+plans\\s+description"))
-						Eventually(session).Should(Say("%s\\s+%s\\s+fake service", broker1.ServiceName(), planNamesOf(broker1)))
-						Eventually(session).Should(Say("%s\\s+%s\\s+fake service", broker2.ServiceName(), planNamesOf(broker2)))
+						Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker1.FirstServiceOfferingName(), planNamesOf(broker1), broker1.FirstServiceOfferingDescription()))
+						Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker2.FirstServiceOfferingName(), planNamesOf(broker2), broker2.FirstServiceOfferingDescription()))
 						Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 						Eventually(session).Should(Exit(0))
 					})
@@ -114,10 +113,10 @@ var _ = Describe("marketplace command", func() {
 
 				When("a service is accessible but not in the currently targeted org", func() {
 					var (
-						broker1      *fakeservicebroker.FakeServiceBroker
+						broker1      *servicebrokerstub.ServiceBrokerStub
 						org1, space1 string
 
-						broker2      *fakeservicebroker.FakeServiceBroker
+						broker2      *servicebrokerstub.ServiceBrokerStub
 						org2, space2 string
 					)
 
@@ -127,7 +126,7 @@ var _ = Describe("marketplace command", func() {
 						helpers.SetupCF(org1, space1)
 						helpers.TargetOrgAndSpace(org1, space1)
 
-						broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
+						broker1 = servicebrokerstub.New().WithPlans(2).Register()
 						enableServiceAccessForOrg(broker1, org1)
 
 						org2 = helpers.NewOrgName()
@@ -135,17 +134,14 @@ var _ = Describe("marketplace command", func() {
 						helpers.CreateOrgAndSpace(org2, space2)
 						helpers.TargetOrgAndSpace(org2, space2)
 
-						broker2 = fakeservicebroker.NewAlternate().EnsureBrokerIsAvailable()
-						enableServiceAccess(broker2)
+						broker2 = servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 					})
 
 					AfterEach(func() {
-						helpers.TargetOrgAndSpace(org2, space2)
-						broker2.Destroy()
+						broker2.Forget()
 						helpers.QuickDeleteOrg(org2)
 
-						helpers.TargetOrgAndSpace(org1, space1)
-						broker1.Destroy()
+						broker1.Forget()
 						helpers.QuickDeleteOrg(org1)
 					})
 
@@ -156,9 +152,9 @@ var _ = Describe("marketplace command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("\n\n"))
 							Eventually(session).Should(Say("service\\s+plans\\s+description\\s+broker"))
-							Consistently(session).ShouldNot(Say(broker1.ServiceName()))
+							Consistently(session).ShouldNot(Say(broker1.FirstServiceOfferingName()))
 							Consistently(session).ShouldNot(Say(planNamesOf(broker1)))
-							Eventually(session).Should(Say("%s\\s+%s\\s+fake service\\s*", broker2.ServiceName(), planNamesOf(broker2)))
+							Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s*", broker2.FirstServiceOfferingName(), planNamesOf(broker2), broker2.FirstServiceOfferingDescription()))
 							Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 							Eventually(session).Should(Exit(0))
 						})
@@ -171,10 +167,10 @@ var _ = Describe("marketplace command", func() {
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("\n\n"))
 							Eventually(session).Should(Say("service\\s+plans\\s+description\\s+broker"))
-							Consistently(session).ShouldNot(Say(broker1.ServiceName()))
+							Consistently(session).ShouldNot(Say(broker1.FirstServiceOfferingName()))
 							Consistently(session).ShouldNot(Say(planNamesOf(broker1)))
-							Consistently(session).ShouldNot(Say(broker1.Name()))
-							Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+%s", broker2.ServiceName(), planNamesOf(broker2), broker2.ServiceDescription(), broker2.Name()))
+							Consistently(session).ShouldNot(Say(broker1.Name))
+							Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+%s", broker2.FirstServiceOfferingName(), planNamesOf(broker2), broker2.FirstServiceOfferingDescription(), broker2.Name))
 							Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 							Eventually(session).Should(Exit(0))
 						})
@@ -186,7 +182,7 @@ var _ = Describe("marketplace command", func() {
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Say("\n\n"))
 								Eventually(session).Should(Say("service\\s+description\\s+broker"))
-								Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker2.ServiceName(), broker2.ServiceDescription(), broker2.Name()))
+								Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker2.FirstServiceOfferingName(), broker2.FirstServiceOfferingDescription(), broker2.Name))
 								Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 								Eventually(session).Should(Exit(0))
 							})
@@ -228,7 +224,7 @@ var _ = Describe("marketplace command", func() {
 
 					When("the specified service exists", func() {
 						var (
-							broker *fakeservicebroker.FakeServiceBroker
+							broker *servicebrokerstub.ServiceBrokerStub
 							org    string
 							space  string
 						)
@@ -238,8 +234,7 @@ var _ = Describe("marketplace command", func() {
 							space = helpers.NewSpaceName()
 							helpers.SetupCF(org, space)
 
-							broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-							enableServiceAccess(broker)
+							broker = servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 
 							helpers.LogoutCF()
 						})
@@ -247,17 +242,17 @@ var _ = Describe("marketplace command", func() {
 						AfterEach(func() {
 							helpers.LoginCF()
 							helpers.TargetOrgAndSpace(org, space)
-							broker.Destroy()
+							broker.Forget()
 							helpers.QuickDeleteOrg(org)
 						})
 
 						It("displays extended information about the service", func() {
-							session := helpers.CF("marketplace", "-s", broker.ServiceName())
-							Eventually(session).Should(Say("Getting service plan information for service %s\\.\\.\\.", broker.ServiceName()))
+							session := helpers.CF("marketplace", "-s", broker.FirstServiceOfferingName())
+							Eventually(session).Should(Say("Getting service plan information for service %s\\.\\.\\.", broker.FirstServiceOfferingName()))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("\n\n"))
 							Eventually(session).Should(Say("service plan\\s+description\\s+free or paid"))
-							Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker.ServicePlanName(), broker.ServicePlanDescription(), "free"))
+							Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker.FirstServicePlanName(), broker.FirstServicePlanDescription(), "free"))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -301,7 +296,7 @@ var _ = Describe("marketplace command", func() {
 
 						When("the specified service exists", func() {
 							var (
-								broker *fakeservicebroker.FakeServiceBroker
+								broker *servicebrokerstub.ServiceBrokerStub
 								org    string
 								space  string
 							)
@@ -311,29 +306,28 @@ var _ = Describe("marketplace command", func() {
 								space = helpers.NewSpaceName()
 								helpers.SetupCF(org, space)
 
-								broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-								enableServiceAccess(broker)
+								broker = servicebrokerstub.New().WithPlans(2).EnableServiceAccess()
 							})
 
 							AfterEach(func() {
-								broker.Destroy()
+								broker.Forget()
 								helpers.QuickDeleteOrg(org)
 							})
 
 							It("displays extended information about the service", func() {
-								session := helpers.CF("marketplace", "-s", broker.ServiceName())
-								Eventually(session).Should(Say("Getting service plan information for service %s as %s\\.\\.\\.", broker.ServiceName(), user))
+								session := helpers.CF("marketplace", "-s", broker.FirstServiceOfferingName())
+								Eventually(session).Should(Say("Getting service plan information for service %s as %s\\.\\.\\.", broker.FirstServiceOfferingName(), user))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Say("\n\n"))
 								Eventually(session).Should(Say("service plan\\s+description\\s+free or paid"))
-								Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker.ServicePlanName(), broker.ServicePlanDescription(), "free"))
+								Eventually(session).Should(Say("%s\\s+%s\\s+%s", broker.FirstServicePlanName(), broker.FirstServicePlanDescription(), "free"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
 
 						When("the specified service is accessible but not in the targeted space", func() {
 							var (
-								broker *fakeservicebroker.FakeServiceBroker
+								broker *servicebrokerstub.ServiceBrokerStub
 								org    string
 								space  string
 							)
@@ -343,23 +337,22 @@ var _ = Describe("marketplace command", func() {
 								space = helpers.NewSpaceName()
 								helpers.SetupCF(org, space)
 
-								broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+								broker = servicebrokerstub.New().WithPlans(2).Register()
 								enableServiceAccessForOrg(broker, org)
 
 								helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 							})
 
 							AfterEach(func() {
-								helpers.TargetOrgAndSpace(org, space)
-								broker.Destroy()
+								broker.Forget()
 								helpers.QuickDeleteOrg(org)
 							})
 
 							It("displays an error that the service doesn't exist", func() {
-								session := helpers.CF("marketplace", "-s", broker.ServiceName())
-								Eventually(session).Should(Say("Getting service plan information for service %s as %s\\.\\.\\.", broker.ServiceName(), user))
+								session := helpers.CF("marketplace", "-s", broker.FirstServiceOfferingName())
+								Eventually(session).Should(Say("Getting service plan information for service %s as %s\\.\\.\\.", broker.FirstServiceOfferingName(), user))
 								Eventually(session).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Service offering '%s' not found", broker.ServiceName()))
+								Eventually(session.Err).Should(Say("Service offering '%s' not found", broker.FirstServiceOfferingName()))
 								Eventually(session).Should(Exit(1))
 							})
 						})
@@ -370,14 +363,14 @@ var _ = Describe("marketplace command", func() {
 	})
 })
 
-func enableServiceAccess(broker *fakeservicebroker.FakeServiceBroker) {
-	Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+func enableServiceAccessForOrg(broker *servicebrokerstub.ServiceBrokerStub, orgName string) {
+	Eventually(helpers.CF("enable-service-access", broker.FirstServiceOfferingName(), "-o", orgName)).Should(Exit(0))
 }
 
-func enableServiceAccessForOrg(broker *fakeservicebroker.FakeServiceBroker, orgName string) {
-	Eventually(helpers.CF("enable-service-access", broker.ServiceName(), "-o", orgName)).Should(Exit(0))
-}
-
-func planNamesOf(broker *fakeservicebroker.FakeServiceBroker) string {
-	return strings.Join(broker.Services[0].PlanNames(), ", ")
+func planNamesOf(broker *servicebrokerstub.ServiceBrokerStub) string {
+	var planNames []string
+	for _, p := range broker.Services[0].Plans {
+		planNames = append(planNames, p.Name)
+	}
+	return strings.Join(planNames, ", ")
 }

@@ -93,7 +93,7 @@ var _ = Describe("service-access command", func() {
 
 				broker = servicebrokerstub.New().WithPlans(2)
 				broker.Services[0].Plans[1].Name = helpers.GenerateHigherName(helpers.NewPlanName, broker.Services[0].Plans[0].Name)
-				broker.Create().Register()
+				broker.Register()
 				service = broker.FirstServiceOfferingName()
 				servicePlan = broker.FirstServicePlanName()
 			})
@@ -148,7 +148,7 @@ var _ = Describe("service-access command", func() {
 					otherBroker = servicebrokerstub.New().WithPlans(2)
 					otherBroker.Name = helpers.GenerateHigherName(helpers.NewServiceBrokerName, broker.Name)
 					otherBroker.Services[0].Plans[1].Name = helpers.GenerateLowerName(helpers.NewPlanName, otherBroker.Services[0].Plans[0].Name)
-					otherBroker.Create().Register()
+					otherBroker.Register()
 
 					otherOrgName = helpers.GenerateLowerName(helpers.NewOrgName, orgName)
 					helpers.CreateOrg(otherOrgName)

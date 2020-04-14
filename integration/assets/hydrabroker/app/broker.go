@@ -2,6 +2,7 @@ package app
 
 import (
 	"crypto/subtle"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -75,6 +76,7 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 			Description:         s.Description,
 			Plans:               plans,
 			BindingsRetrievable: s.Bindable,
+			Requires:            brokerCastRequires(s.Requires),
 			Metadata: &domain.ServiceMetadata{
 				Shareable:        &s.Shareable,
 				DocumentationUrl: `http://documentation.url`,
@@ -105,7 +107,27 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 		w.WriteHeader(http.StatusCreated)
 		return respondWithJSON(w, response)
 	default:
-		return brokerAsyncResponse(w, config.AsyncResponseDelay, response)
+		return brokerAsyncResponse(w, r, config.AsyncResponseDelay, response)
+	}
+}
+
+func brokerUpdate(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	config, err := brokerCheckRequest(store, r)
+	if err != nil {
+		return err
+	}
+
+	if config.UpdateResponse != 0 {
+		w.WriteHeader(config.UpdateResponse)
+		return nil
+	}
+
+	switch config.AsyncResponseDelay {
+	case 0:
+		w.WriteHeader(http.StatusOK)
+		return respondWithJSON(w, map[string]interface{}{})
+	default:
+		return brokerAsyncResponse(w, r, config.AsyncResponseDelay, nil)
 	}
 }
 
@@ -125,7 +147,7 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 		w.WriteHeader(http.StatusOK)
 		return respondWithJSON(w, map[string]interface{}{})
 	default:
-		return brokerAsyncResponse(w, config.AsyncResponseDelay, nil)
+		return brokerAsyncResponse(w, r, config.AsyncResponseDelay, nil)
 	}
 }
 
@@ -145,7 +167,7 @@ func brokerBind(store *store.BrokerConfigurationStore, w http.ResponseWriter, r 
 		w.WriteHeader(http.StatusCreated)
 		return respondWithJSON(w, map[string]interface{}{})
 	default:
-		return brokerAsyncResponse(w, config.AsyncResponseDelay, nil)
+		return brokerAsyncResponse(w, r, config.AsyncResponseDelay, nil)
 	}
 }
 
@@ -179,11 +201,15 @@ func brokerUnbind(store *store.BrokerConfigurationStore, w http.ResponseWriter, 
 		w.WriteHeader(http.StatusOK)
 		return respondWithJSON(w, map[string]interface{}{})
 	default:
-		return brokerAsyncResponse(w, config.AsyncResponseDelay, nil)
+		return brokerAsyncResponse(w, r, config.AsyncResponseDelay, nil)
 	}
 }
 
-func brokerAsyncResponse(w http.ResponseWriter, duration time.Duration, params map[string]interface{}) error {
+func brokerAsyncResponse(w http.ResponseWriter, r *http.Request, duration time.Duration, params map[string]interface{}) error {
+	if r.FormValue("accepts_incomplete") != "true" {
+		return fmt.Errorf("want to respond async, but got `accepts_incomplete` = `%v`", r.FormValue("accepts_incomplete"))
+	}
+
 	if params == nil {
 		params = make(map[string]interface{})
 	}
@@ -214,4 +240,12 @@ func brokerLastOperation(store *store.BrokerConfigurationStore, w http.ResponseW
 	}
 
 	return respondWithJSON(w, result)
+}
+
+func brokerCastRequires(input []string) (result []domain.RequiredPermission) {
+	for _, v := range input {
+		result = append(result, domain.RequiredPermission(v))
+	}
+
+	return
 }

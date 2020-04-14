@@ -127,6 +127,14 @@ var _ = Describe("Integration Test", func() {
 			Expect(r).To(BeEmpty())
 		})
 
+		It("allows a service instance to be updated", func() {
+			instanceGUID := randomString()
+
+			cfg.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "1.2.3"}
+			response := httpRequest(cfg, "PATCH", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, toJSON(cfg))
+			expectStatusCode(response, http.StatusOK)
+		})
+
 		It("allows a binding to be created", func() {
 			instanceGUID := randomString()
 			bindingGUID := randomString()
@@ -307,7 +315,7 @@ var _ = Describe("Integration Test", func() {
 			instanceGUID := randomString()
 
 			By("accepting the request", func() {
-				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", nil)
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse
@@ -333,7 +341,7 @@ var _ = Describe("Integration Test", func() {
 			instanceGUID := randomString()
 
 			By("accepting the request", func() {
-				response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"?accepts_incomplete=true", nil)
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse
@@ -358,7 +366,7 @@ var _ = Describe("Integration Test", func() {
 			bindingGUID := randomString()
 
 			By("accepting the request", func() {
-				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse
@@ -383,7 +391,7 @@ var _ = Describe("Integration Test", func() {
 			bindingGUID := randomString()
 
 			By("accepting the request", func() {
-				response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID, nil)
+				response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/service_bindings/"+bindingGUID+"?accepts_incomplete=true", nil)
 				expectStatusCode(response, http.StatusAccepted)
 
 				var provisionResponse apiresponses.ProvisioningResponse

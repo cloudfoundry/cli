@@ -26,15 +26,17 @@ func newDefaultConfig() *ServiceBrokerStub {
 				Description: helpers.PrefixedRandomName("SERVICE-OFFERING-DESCRIPTION"),
 				Shareable:   true,
 				Bindable:    true,
-				Plans: []config.Plan{
-					{
-						Name:        helpers.NewPlanName(),
-						ID:          helpers.RandomName(),
-						Description: helpers.PrefixedRandomName("PLAN-DESCRIPTION"),
-					},
-				},
+				Plans:       []config.Plan{newDefaultPlan()},
 			},
 		},
+	}
+}
+
+func newDefaultPlan() config.Plan {
+	return config.Plan{
+		Name:        helpers.NewPlanName(),
+		ID:          helpers.RandomName(),
+		Description: helpers.PrefixedRandomName("PLAN-DESCRIPTION"),
 	}
 }
 

@@ -4,13 +4,13 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
-	"code.cloudfoundry.org/cli/integration/helpers"
 )
 
 type ServiceBrokerStub struct {
 	Name, URL, GUID     string
 	Username, Password  string
 	Services            []config.Service
+	created             bool
 	registered          bool
 	CatalogResponse     int
 	ProvisionResponse   int
@@ -53,31 +53,43 @@ func (s *ServiceBrokerStub) Configure() *ServiceBrokerStub {
 }
 
 func (s *ServiceBrokerStub) Register() *ServiceBrokerStub {
+	if !s.created {
+		s.Create()
+	}
 	s.register(false)
 	s.registered = true
 	return s
 }
 
 func (s *ServiceBrokerStub) RegisterSpaceScoped() *ServiceBrokerStub {
+	if !s.created {
+		s.Create()
+	}
 	s.register(true)
 	s.registered = true
 	return s
 }
 
 func (s *ServiceBrokerStub) RegisterViaV2() *ServiceBrokerStub {
+	if !s.created {
+		s.Create()
+	}
 	s.registerViaV2()
 	s.registered = true
 	return s
 }
 
 func (s *ServiceBrokerStub) EnableServiceAccess() *ServiceBrokerStub {
+	if !s.registered {
+		s.Register()
+	}
 	s.enableServiceAccess()
 	return s
 }
 
 func (s *ServiceBrokerStub) WithPlans(plans int) *ServiceBrokerStub {
 	for len(s.Services[0].Plans) < plans {
-		s.Services[0].Plans = append(s.Services[0].Plans, config.Plan{Name: helpers.PrefixedRandomName("INTEGRATION-PLAN")})
+		s.Services[0].Plans = append(s.Services[0].Plans, newDefaultPlan())
 	}
 	return s
 }
@@ -117,4 +129,8 @@ func (s *ServiceBrokerStub) FirstServiceOfferingDescription() string {
 
 func (s *ServiceBrokerStub) FirstServicePlanName() string {
 	return s.Services[0].Plans[0].Name
+}
+
+func (s *ServiceBrokerStub) FirstServicePlanDescription() string {
+	return s.Services[0].Plans[0].Description
 }

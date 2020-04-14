@@ -86,7 +86,7 @@ func ensureAppIsPushed() {
 				ok = pushApp()
 			}
 			if !ok {
-				time.Sleep(5 * time.Second)
+				time.Sleep(time.Second)
 			}
 		}
 

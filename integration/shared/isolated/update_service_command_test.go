@@ -2,8 +2,9 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -104,37 +105,36 @@ var _ = Describe("update-service command", func() {
 
 		When("there is a service instance", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				serviceInstanceName string
 				username            string
 			)
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+				broker = servicebrokerstub.EnableServiceAccess()
 
 				serviceInstanceName = helpers.PrefixedRandomName("SI")
-				Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstanceName)).Should(Exit(0))
+				Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)).Should(Exit(0))
 
 				username, _ = helpers.GetCredentials()
 			})
 
 			AfterEach(func() {
 				Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-				broker.Destroy()
+				broker.Forget()
 			})
 
 			When("updating to a service plan that does not exist", func() {
 				It("displays an informative error message, exits 1", func() {
 					session := helpers.CF("update-service", serviceInstanceName, "-p", "non-existing-service-plan")
-					Eventually(session).Should(Say("Plan does not exist for the %s service", broker.ServiceName()))
+					Eventually(session).Should(Say("Plan does not exist for the %s service", broker.FirstServiceOfferingName()))
 					Eventually(session).Should(Exit(1))
 				})
 			})
 
 			When("updating to the same service plan (no-op)", func() {
 				It("displays an informative success message, exits 0", func() {
-					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.ServicePlanName())
+					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.FirstServicePlanName())
 					Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("No changes were made"))
@@ -190,8 +190,8 @@ var _ = Describe("update-service command", func() {
 
 						When("upgrade is available", func() {
 							BeforeEach(func() {
-								broker.Services[0].Plans[0].MaintenanceInfo.Version = "9.1.2"
-								broker.Update()
+								broker.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "9.1.2"}
+								broker.Configure().Register()
 							})
 
 							It("updates the service", func() {
@@ -227,8 +227,8 @@ var _ = Describe("update-service command", func() {
 
 					When("providing --force argument and upgrade is available", func() {
 						BeforeEach(func() {
-							broker.Services[0].Plans[0].MaintenanceInfo.Version = "9.1.2"
-							broker.Update()
+							broker.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "9.1.2"}
+							broker.Configure().Register()
 						})
 
 						It("updates the service without prompting", func() {

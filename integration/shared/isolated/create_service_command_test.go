@@ -295,7 +295,7 @@ var _ = Describe("create-service command", func() {
 				)
 
 				BeforeEach(func() {
-					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).Create().Register().EnableServiceAccess()
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
 					service = broker.FirstServiceOfferingName()
 					servicePlan = broker.FirstServicePlanName()
 				})
@@ -329,7 +329,7 @@ var _ = Describe("create-service command", func() {
 					broker2 = servicebrokerstub.New()
 					broker2.Services[0].Name = service
 					broker2.Services[0].Plans[0].Name = servicePlan
-					broker2.Create().Register().EnableServiceAccess()
+					broker2.EnableServiceAccess()
 				})
 
 				AfterEach(func() {

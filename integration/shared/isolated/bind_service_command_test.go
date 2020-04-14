@@ -327,7 +327,7 @@ var _ = Describe("bind-service command", func() {
 
 				When("the service binding is asynchronous", func() {
 					BeforeEach(func() {
-						broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).Create().Register().EnableServiceAccess()
+						broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
 
 						Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance)).Should(Exit(0))
 

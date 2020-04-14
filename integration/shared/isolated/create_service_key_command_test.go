@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -116,20 +116,19 @@ var _ = Describe("create-service-key command", func() {
 		})
 
 		When("provided with a brokered service instance", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker = servicebrokerstub.EnableServiceAccess()
+				service = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 
-				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 			})
 
 			AfterEach(func() {
 				Eventually(helpers.CF("delete-service-key", serviceInstance, serviceKeyName)).Should(Exit(0))
-				broker.Destroy()
+				broker.Forget()
 			})
 
 			It("creates the service key and displays OK", func() {
@@ -209,7 +208,7 @@ var _ = Describe("create-service-key command", func() {
 			When("the service is not bindable", func() {
 				BeforeEach(func() {
 					broker.Services[0].Bindable = false
-					broker.Update()
+					broker.Configure().Register()
 				})
 
 				It("displays FAILED and an informative error, and exits 1", func() {

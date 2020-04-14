@@ -2,7 +2,7 @@ package global
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -110,19 +110,18 @@ var _ = Describe("unshare-service command", func() {
 		})
 
 		When("there is a managed service instance in my current targeted space", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker = servicebrokerstub.EnableServiceAccess()
+				service = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 
-				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
+				broker.Forget()
 			})
 
 			When("the service instance has not been shared to this space", func() {
@@ -322,15 +321,15 @@ var _ = Describe("unshare-service command", func() {
 
 		When("there is a shared service instance in my currently targeted space", func() {
 			var (
-				broker   *fakeservicebroker.FakeServiceBroker
+				broker   *servicebrokerstub.ServiceBrokerStub
 				user     string
 				password string
 			)
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				service = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker = servicebrokerstub.EnableServiceAccess()
+				service = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 
 				user = helpers.NewUsername()
 				password = helpers.NewPassword()
@@ -347,7 +346,7 @@ var _ = Describe("unshare-service command", func() {
 			AfterEach(func() {
 				helpers.SetupCF(sourceOrgName, sourceSpaceName)
 				Eventually(helpers.CF("delete-user", user)).Should(Exit(0))
-				broker.Destroy()
+				broker.Forget()
 			})
 
 			Context("and I have no access to the source space", func() {
