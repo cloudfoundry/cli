@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
@@ -62,7 +63,7 @@ func readPassword(pid int, rd *bufio.Scanner) string {
 	_, _ = syscall.Wait4(pid, &ws, 0, nil)
 
 	if rd.Scan() {
-		return rd.Text()
+		return strings.TrimSpace(rd.Text())
 	}
 	return ""
 }
