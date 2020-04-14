@@ -5,9 +5,10 @@ type NewBrokerResponse struct {
 }
 
 type Plan struct {
-	Name        string `json:"name" validate:"printascii,min=5"`
-	ID          string `json:"id,omitempty"`
-	Description string `json:"description,omitempty"`
+	Name            string           `json:"name" validate:"printascii,min=5"`
+	ID              string           `json:"id,omitempty"`
+	Description     string           `json:"description,omitempty"`
+	MaintenanceInfo *MaintenanceInfo `json:"maintenance_info,omitempty"`
 }
 
 type Service struct {
@@ -24,4 +25,9 @@ type BrokerConfiguration struct {
 	CatalogResponse     int       `json:"catalog_response,omitempty" validate:"min=0,max=600"`
 	ProvisionResponse   int       `json:"provision_response,omitempty" validate:"min=0,max=600"`
 	DeprovisionResponse int       `json:"deprovision_response,omitempty" validate:"min=0,max=600"`
+}
+
+type MaintenanceInfo struct {
+	Version     string `json:"version,omitempty"`
+	Description string `json:"description,omitempty"`
 }

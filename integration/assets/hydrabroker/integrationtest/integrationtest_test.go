@@ -246,6 +246,43 @@ var _ = Describe("Integration Test", func() {
 			Expect(response.StatusCode).To(Equal(http.StatusTeapot))
 		})
 	})
+
+	Describe("configuring the catalog", func() {
+		It("can be configured with maintenance info", func() {
+			var guid string
+			cfg := randomConfiguration()
+
+			By("accepting the configuration", func() {
+				cfg.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{
+					Version:     "1.2.3",
+					Description: "a description",
+				}
+
+				response, err := client.Post(server.URL+"/config", "application/json", toJSON(cfg))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.StatusCode).To(Equal(http.StatusCreated))
+
+				var r config.NewBrokerResponse
+				fromJSON(response.Body, &r)
+				guid = r.GUID
+			})
+
+			By("showing it in the catalog", func() {
+				request, err := http.NewRequest("GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+				Expect(err).NotTo(HaveOccurred())
+				request.SetBasicAuth(cfg.Username, cfg.Password)
+				response, err := client.Do(request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+				var catalog apiresponses.CatalogResponse
+				fromJSON(response.Body, &catalog)
+				Expect(catalog.Services[0].Name).To(Equal(cfg.Services[0].Name))
+				Expect(catalog.Services[0].Plans[0].MaintenanceInfo.Version).To(Equal("1.2.3"))
+				Expect(catalog.Services[0].Plans[0].MaintenanceInfo.Description).To(Equal("a description"))
+			})
+		})
+	})
 })
 
 func randomConfiguration() config.BrokerConfiguration {

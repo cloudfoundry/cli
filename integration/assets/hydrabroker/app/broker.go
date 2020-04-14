@@ -55,10 +55,20 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 	for _, s := range config.Services {
 		var plans []domain.ServicePlan
 		for _, p := range s.Plans {
+			var mi *domain.MaintenanceInfo
+
+			if p.MaintenanceInfo != nil {
+				mi = &domain.MaintenanceInfo{
+					Version:     p.MaintenanceInfo.Version,
+					Description: p.MaintenanceInfo.Description,
+				}
+			}
+
 			plans = append(plans, domain.ServicePlan{
-				Name:        p.Name,
-				ID:          p.ID,
-				Description: p.Description,
+				Name:            p.Name,
+				ID:              p.ID,
+				Description:     p.Description,
+				MaintenanceInfo: mi,
 			})
 		}
 		services = append(services, domain.Service{
