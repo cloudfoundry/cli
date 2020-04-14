@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	constanta "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
@@ -1220,6 +1221,16 @@ type FakeActor struct {
 		result1 string
 		result2 v7action.Warnings
 		result3 error
+	}
+	GetLoginPromptsStub        func() map[string]coreconfig.AuthPrompt
+	getLoginPromptsMutex       sync.RWMutex
+	getLoginPromptsArgsForCall []struct {
+	}
+	getLoginPromptsReturns struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}
+	getLoginPromptsReturnsOnCall map[int]struct {
+		result1 map[string]coreconfig.AuthPrompt
 	}
 	GetNewestReadyPackageForApplicationStub        func(v7action.Application) (v7action.Package, v7action.Warnings, error)
 	getNewestReadyPackageForApplicationMutex       sync.RWMutex
@@ -8135,6 +8146,58 @@ func (fake *FakeActor) GetLogCacheEndpointReturnsOnCall(i int, result1 string, r
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
+	fake.getLoginPromptsMutex.Lock()
+	ret, specificReturn := fake.getLoginPromptsReturnsOnCall[len(fake.getLoginPromptsArgsForCall)]
+	fake.getLoginPromptsArgsForCall = append(fake.getLoginPromptsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetLoginPrompts", []interface{}{})
+	fake.getLoginPromptsMutex.Unlock()
+	if fake.GetLoginPromptsStub != nil {
+		return fake.GetLoginPromptsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getLoginPromptsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeActor) GetLoginPromptsCallCount() int {
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
+	return len(fake.getLoginPromptsArgsForCall)
+}
+
+func (fake *FakeActor) GetLoginPromptsCalls(stub func() map[string]coreconfig.AuthPrompt) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = stub
+}
+
+func (fake *FakeActor) GetLoginPromptsReturns(result1 map[string]coreconfig.AuthPrompt) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	fake.getLoginPromptsReturns = struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}{result1}
+}
+
+func (fake *FakeActor) GetLoginPromptsReturnsOnCall(i int, result1 map[string]coreconfig.AuthPrompt) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	if fake.getLoginPromptsReturnsOnCall == nil {
+		fake.getLoginPromptsReturnsOnCall = make(map[int]struct {
+			result1 map[string]coreconfig.AuthPrompt
+		})
+	}
+	fake.getLoginPromptsReturnsOnCall[i] = struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}{result1}
 }
 
 func (fake *FakeActor) GetNewestReadyPackageForApplication(arg1 v7action.Application) (v7action.Package, v7action.Warnings, error) {
@@ -15583,6 +15646,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getLatestActiveDeploymentForAppMutex.RUnlock()
 	fake.getLogCacheEndpointMutex.RLock()
 	defer fake.getLogCacheEndpointMutex.RUnlock()
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
 	fake.getNewestReadyPackageForApplicationMutex.RLock()
 	defer fake.getNewestReadyPackageForApplicationMutex.RUnlock()
 	fake.getOrgUsersByRoleTypeMutex.RLock()

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	uaa "code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"github.com/SermoDigital/jose/jwt"
@@ -99,6 +100,7 @@ type Actor interface {
 	GetIsolationSegmentSummaries() ([]v7action.IsolationSegmentSummary, v7action.Warnings, error)
 	GetLatestActiveDeploymentForApp(appGUID string) (v7action.Deployment, v7action.Warnings, error)
 	GetLogCacheEndpoint() (string, v7action.Warnings, error)
+	GetLoginPrompts() map[string]coreconfig.AuthPrompt
 	GetNewestReadyPackageForApplication(app v7action.Application) (v7action.Package, v7action.Warnings, error)
 	GetOrgUsersByRoleType(orgGUID string) (map[constant.RoleType][]v7action.User, v7action.Warnings, error)
 	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)

@@ -99,7 +99,7 @@ type commandList struct {
 	IsolationSegments                  v7.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
 	Labels                             v7.LabelsCommand                             `command:"labels" description:"List all labels (key-value pairs) for an API resource"`
 	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
-	Login                              v6.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
+	Login                              v7.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v7.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
 	Logs                               v7.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
 	MapRoute                           v7.MapRouteCommand                           `command:"map-route" description:"Map a route to an app"`
