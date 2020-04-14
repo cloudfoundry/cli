@@ -253,7 +253,8 @@ var _ = Describe("app stager", func() {
 			})
 
 			It("displays that it's restarting the app", func() {
-				user, _ := fakeConfig.CurrentUser()
+				user, err := fakeConfig.CurrentUser()
+				Expect(err).NotTo(HaveOccurred())
 				Expect(testUI.Out).To(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, app.Name, organization.Name, space.Name, user.Name))
 			})
 
