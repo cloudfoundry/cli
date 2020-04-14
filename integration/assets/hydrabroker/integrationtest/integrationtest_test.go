@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"strings"
+	"time"
 
 	uuid2 "github.com/nu7hatch/gouuid"
 
@@ -22,13 +24,17 @@ import (
 
 var _ = Describe("Integration Test", func() {
 	var (
-		server *httptest.Server
-		client *http.Client
+		server      *httptest.Server
+		client      *http.Client
+		create      func(io.Reader) string
+		httpRequest func(cfg config.BrokerConfiguration, method, url string, body io.Reader) *http.Response
 	)
 
 	BeforeEach(func() {
 		server = httptest.NewServer(app.App())
 		client = server.Client()
+		create = creator(server, client)
+		httpRequest = requestor(client)
 	})
 
 	AfterEach(func() {
@@ -38,24 +44,18 @@ var _ = Describe("Integration Test", func() {
 	It("responds to an aliveness test", func() {
 		response, err := client.Head(server.URL)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(response.StatusCode).To(Equal(http.StatusNoContent))
+		expectStatusCode(response, http.StatusNoContent)
 	})
 
 	It("allows a broker to be created", func() {
-		response, err := client.Post(server.URL+"/config", "application/json", toJSON(randomConfiguration()))
-		Expect(err).NotTo(HaveOccurred())
-		Expect(response.StatusCode).To(Equal(http.StatusCreated))
-
-		var r config.NewBrokerResponse
-		fromJSON(response.Body, &r)
-		Expect(r.GUID).NotTo(BeEmpty())
+		create(toJSON(randomConfiguration()))
 	})
 
 	When("the create request is missing parameters", func() {
 		It("fails", func() {
 			response, err := client.Post(server.URL+"/config", "application/json", strings.NewReader("{}"))
 			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusBadRequest))
+			expectStatusCode(response, http.StatusBadRequest)
 
 			b, err := ioutil.ReadAll(response.Body)
 			Expect(err).NotTo(HaveOccurred())
@@ -71,19 +71,13 @@ var _ = Describe("Integration Test", func() {
 
 		BeforeEach(func() {
 			cfg = randomConfiguration()
-			response, err := client.Post(server.URL+"/config", "application/json", toJSON(cfg))
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusCreated))
-
-			var r config.NewBrokerResponse
-			fromJSON(response.Body, &r)
-			guid = r.GUID
+			guid = create(toJSON(cfg))
 		})
 
 		It("lists the broker", func() {
 			response, err := client.Get(server.URL + "/config")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusOK))
+			expectStatusCode(response, http.StatusOK)
 
 			var r []string
 			fromJSON(response.Body, &r)
@@ -94,16 +88,12 @@ var _ = Describe("Integration Test", func() {
 		It("rejects requests without a password", func() {
 			response, err := client.Get(server.URL + "/broker/" + guid + "/v2/catalog")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusUnauthorized))
+			expectStatusCode(response, http.StatusUnauthorized)
 		})
 
 		It("responds to the catalog endpoint", func() {
-			request, err := http.NewRequest("GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
-			Expect(err).NotTo(HaveOccurred())
-			request.SetBasicAuth(cfg.Username, cfg.Password)
-			response, err := client.Do(request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusOK))
+			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+			expectStatusCode(response, http.StatusOK)
 
 			var catalog apiresponses.CatalogResponse
 			fromJSON(response.Body, &catalog)
@@ -117,12 +107,8 @@ var _ = Describe("Integration Test", func() {
 
 		It("allows a service instance to be created", func() {
 			instanceGUID := randomString()
-			request, err := http.NewRequest("PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
-			Expect(err).NotTo(HaveOccurred())
-			request.SetBasicAuth(cfg.Username, cfg.Password)
-			response, err := client.Do(request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusCreated))
+			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			expectStatusCode(response, http.StatusCreated)
 
 			var r map[string]interface{}
 			fromJSON(response.Body, &r)
@@ -131,12 +117,8 @@ var _ = Describe("Integration Test", func() {
 
 		It("allows a service instance to be deleted", func() {
 			instanceGUID := randomString()
-			request, err := http.NewRequest("DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
-			Expect(err).NotTo(HaveOccurred())
-			request.SetBasicAuth(cfg.Username, cfg.Password)
-			response, err := client.Do(request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusOK))
+			response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			expectStatusCode(response, http.StatusOK)
 
 			var r map[string]interface{}
 			fromJSON(response.Body, &r)
@@ -149,19 +131,19 @@ var _ = Describe("Integration Test", func() {
 				Expect(err).NotTo(HaveOccurred())
 				response, err := client.Do(request)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusNoContent))
+				expectStatusCode(response, http.StatusNoContent)
 			})
 
 			By("no longer responding to the catalog endpoint", func() {
 				response, err := client.Get(server.URL + "/broker/" + guid + "/v2/catalog")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusNotFound))
+				expectStatusCode(response, http.StatusNotFound)
 			})
 
 			By("no longer listing the broker", func() {
 				response, err := client.Get(server.URL + "/config")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusOK))
+				expectStatusCode(response, http.StatusOK)
 
 				var r []string
 				fromJSON(response.Body, &r)
@@ -177,16 +159,12 @@ var _ = Describe("Integration Test", func() {
 				Expect(err).NotTo(HaveOccurred())
 				response, err := client.Do(request)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusNoContent))
+				expectStatusCode(response, http.StatusNoContent)
 			})
 
 			By("updating the catalog", func() {
-				request, err := http.NewRequest("GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
-				Expect(err).NotTo(HaveOccurred())
-				request.SetBasicAuth(newCfg.Username, newCfg.Password)
-				response, err := client.Do(request)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusOK))
+				response := httpRequest(newCfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+				expectStatusCode(response, http.StatusOK)
 
 				var catalog apiresponses.CatalogResponse
 				fromJSON(response.Body, &catalog)
@@ -195,7 +173,7 @@ var _ = Describe("Integration Test", func() {
 		})
 	})
 
-	Describe("custom responses", func() {
+	Describe("configuring response codes", func() {
 		var (
 			guid string
 			cfg  config.BrokerConfiguration
@@ -208,42 +186,101 @@ var _ = Describe("Integration Test", func() {
 			cfg.ProvisionResponse = http.StatusBadGateway
 			cfg.DeprovisionResponse = http.StatusTeapot
 
-			response, err := client.Post(server.URL+"/config", "application/json", toJSON(cfg))
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusCreated))
-
-			var r config.NewBrokerResponse
-			fromJSON(response.Body, &r)
-			guid = r.GUID
+			guid = create(toJSON(cfg))
 		})
 
-		It("allows custom catalog responses", func() {
-			request, err := http.NewRequest("GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
-			Expect(err).NotTo(HaveOccurred())
-			request.SetBasicAuth(cfg.Username, cfg.Password)
-			response, err := client.Do(request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
+		It("allows configuration of the catalog response code", func() {
+			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+			expectStatusCode(response, http.StatusInternalServerError)
 		})
 
-		It("allows custom provision responses", func() {
+		It("allows configuration of the provision response code", func() {
 			instanceGUID := randomString()
-			request, err := http.NewRequest("PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
-			Expect(err).NotTo(HaveOccurred())
-			request.SetBasicAuth(cfg.Username, cfg.Password)
-			response, err := client.Do(request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+			response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			expectStatusCode(response, http.StatusBadGateway)
 		})
 
-		It("allows custom deprovision response", func() {
+		It("allows configuration of the deprovision response code", func() {
 			instanceGUID := randomString()
-			request, err := http.NewRequest("DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
-			Expect(err).NotTo(HaveOccurred())
-			request.SetBasicAuth(cfg.Username, cfg.Password)
-			response, err := client.Do(request)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(response.StatusCode).To(Equal(http.StatusTeapot))
+			response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+			expectStatusCode(response, http.StatusTeapot)
+		})
+	})
+
+	Describe("configuring async responses", func() {
+		const delay = 100 * time.Millisecond
+
+		var (
+			guid string
+			cfg  config.BrokerConfiguration
+		)
+		BeforeEach(func() {
+			cfg = randomConfiguration()
+			cfg.AsyncResponseDelay = delay
+			guid = create(toJSON(cfg))
+		})
+
+		getLastOperation := func(cfg config.BrokerConfiguration, guid, instanceGUID, op string) string {
+			response := httpRequest(
+				cfg,
+				"GET",
+				server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID+"/last_operation?operation="+url.QueryEscape(op),
+				nil,
+			)
+			expectStatusCode(response, http.StatusOK)
+
+			var lastOperationResponse apiresponses.LastOperationResponse
+			fromJSON(response.Body, &lastOperationResponse)
+
+			return string(lastOperationResponse.State)
+		}
+
+		It("does async provision", func() {
+			var operation string
+			instanceGUID := randomString()
+
+			By("accepting the provision request", func() {
+				response := httpRequest(cfg, "PUT", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusAccepted)
+
+				var provisionResponse apiresponses.ProvisioningResponse
+				fromJSON(response.Body, &provisionResponse)
+				operation = provisionResponse.OperationData
+			})
+
+			By("responding that the operation is still in progress", func() {
+				Expect(getLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("in progress"))
+			})
+
+			time.Sleep(delay)
+
+			By("responding that the operation is complete", func() {
+				Expect(getLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("succeeded"))
+			})
+		})
+
+		It("does async deprovision", func() {
+			var operation string
+			instanceGUID := randomString()
+
+			By("accepting the deprovision request", func() {
+				response := httpRequest(cfg, "DELETE", server.URL+"/broker/"+guid+"/v2/service_instances/"+instanceGUID, nil)
+				expectStatusCode(response, http.StatusAccepted)
+
+				var provisionResponse apiresponses.ProvisioningResponse
+				fromJSON(response.Body, &provisionResponse)
+				operation = provisionResponse.OperationData
+			})
+
+			By("responding that the operation is still in progress", func() {
+				Expect(getLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("in progress"))
+			})
+
+			time.Sleep(delay)
+
+			By("responding that the operation is complete", func() {
+				Expect(getLastOperation(cfg, guid, instanceGUID, operation)).To(Equal("succeeded"))
+			})
 		})
 	})
 
@@ -258,22 +295,12 @@ var _ = Describe("Integration Test", func() {
 					Description: "a description",
 				}
 
-				response, err := client.Post(server.URL+"/config", "application/json", toJSON(cfg))
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusCreated))
-
-				var r config.NewBrokerResponse
-				fromJSON(response.Body, &r)
-				guid = r.GUID
+				guid = create(toJSON(cfg))
 			})
 
 			By("showing it in the catalog", func() {
-				request, err := http.NewRequest("GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
-				Expect(err).NotTo(HaveOccurred())
-				request.SetBasicAuth(cfg.Username, cfg.Password)
-				response, err := client.Do(request)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.StatusCode).To(Equal(http.StatusOK))
+				response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+				expectStatusCode(response, http.StatusOK)
 
 				var catalog apiresponses.CatalogResponse
 				fromJSON(response.Body, &catalog)
@@ -284,6 +311,17 @@ var _ = Describe("Integration Test", func() {
 		})
 	})
 })
+
+func expectStatusCode(response *http.Response, statusCode int) {
+	Expect(response.StatusCode).To(Equal(statusCode), func() string {
+		b, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			response.Body.Close()
+			return "Body: " + string(b)
+		}
+		return "could not read body"
+	})
+}
 
 func randomConfiguration() config.BrokerConfiguration {
 	return config.BrokerConfiguration{
@@ -322,6 +360,33 @@ func fromJSON(input io.ReadCloser, output interface{}) {
 	b, err := ioutil.ReadAll(input)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = json.Unmarshal(b, output)
+	err = input.Close()
 	Expect(err).NotTo(HaveOccurred())
+
+	err = json.Unmarshal(b, output)
+	Expect(err).NotTo(HaveOccurred(), string(b))
+}
+
+func requestor(client *http.Client) func(config.BrokerConfiguration, string, string, io.Reader) *http.Response {
+	return func(cfg config.BrokerConfiguration, method, url string, body io.Reader) *http.Response {
+		request, err := http.NewRequest(method, url, body)
+		Expect(err).NotTo(HaveOccurred())
+		request.SetBasicAuth(cfg.Username, cfg.Password)
+		response, err := client.Do(request)
+		Expect(err).NotTo(HaveOccurred())
+		return response
+	}
+}
+
+func creator(server *httptest.Server, client *http.Client) func(io.Reader) string {
+	return func(body io.Reader) string {
+		response, err := client.Post(server.URL+"/config", "application/json", body)
+		Expect(err).NotTo(HaveOccurred())
+		expectStatusCode(response, http.StatusCreated)
+
+		var r config.NewBrokerResponse
+		fromJSON(response.Body, &r)
+		Expect(r.GUID).NotTo(BeEmpty())
+		return r.GUID
+	}
 }

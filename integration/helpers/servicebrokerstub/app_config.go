@@ -88,6 +88,7 @@ func (s *ServiceBrokerStub) marshal() io.Reader {
 		CatalogResponse:     s.CatalogResponse,
 		ProvisionResponse:   s.ProvisionResponse,
 		DeprovisionResponse: s.DeprovisionResponse,
+		AsyncResponseDelay:  s.AsyncResponseDelay,
 	})
 	Expect(err).ToNot(HaveOccurred())
 	return bytes.NewReader(body)

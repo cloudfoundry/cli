@@ -1,6 +1,8 @@
 package servicebrokerstub
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/helpers"
 )
@@ -13,6 +15,7 @@ type ServiceBrokerStub struct {
 	CatalogResponse     int
 	ProvisionResponse   int
 	DeprovisionResponse int
+	AsyncResponseDelay  time.Duration
 }
 
 func New() *ServiceBrokerStub {
@@ -96,6 +99,11 @@ func (s *ServiceBrokerStub) WithProvisionResponse(statusCode int) *ServiceBroker
 
 func (s *ServiceBrokerStub) WithDeprovisionResponse(statusCode int) *ServiceBrokerStub {
 	s.DeprovisionResponse = statusCode
+	return s
+}
+
+func (s *ServiceBrokerStub) WithAsyncDelay(delay time.Duration) *ServiceBrokerStub {
+	s.AsyncResponseDelay = delay
 	return s
 }
 

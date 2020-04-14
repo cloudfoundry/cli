@@ -3,47 +3,44 @@ package app
 import (
 	"crypto/subtle"
 	"net/http"
+	"time"
+
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/store"
 	"github.com/pivotal-cf/brokerapi/v7/domain"
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 
-func checkAuth(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+func brokerCheckRequest(store *store.BrokerConfigurationStore, r *http.Request) (config.BrokerConfiguration, error) {
 	guid, err := readGUID(r)
 	if err != nil {
-		return err
+		return config.BrokerConfiguration{}, err
 	}
 
-	config, ok := store.GetBrokerConfiguration(guid)
+	cfg, ok := store.GetBrokerConfiguration(guid)
 	if !ok {
-		return notFoundError{}
+		return config.BrokerConfiguration{}, notFoundError{}
 	}
 
 	givenUsername, givenPassword, ok := r.BasicAuth()
 	if !ok {
-		return unauthorizedError{}
+		return config.BrokerConfiguration{}, unauthorizedError{}
 	}
 
 	// Compare everything every time to protect against timing attacks
-	if 2 == subtle.ConstantTimeCompare([]byte(config.Username), []byte(givenUsername))+
-		subtle.ConstantTimeCompare([]byte(config.Password), []byte(givenPassword)) {
-		return nil
+	if 2 != subtle.ConstantTimeCompare([]byte(cfg.Username), []byte(givenUsername))+
+		subtle.ConstantTimeCompare([]byte(cfg.Password), []byte(givenPassword)) {
+		return config.BrokerConfiguration{}, nil
 	}
 
-	return unauthorizedError{}
+	return cfg, nil
 }
 
 func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	guid, err := readGUID(r)
+	config, err := brokerCheckRequest(store, r)
 	if err != nil {
 		return err
-	}
-
-	config, ok := store.GetBrokerConfiguration(guid)
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return nil
 	}
 
 	if config.CatalogResponse != 0 {
@@ -83,15 +80,9 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 }
 
 func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	guid, err := readGUID(r)
+	config, err := brokerCheckRequest(store, r)
 	if err != nil {
 		return err
-	}
-
-	config, ok := store.GetBrokerConfiguration(guid)
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return nil
 	}
 
 	if config.ProvisionResponse != 0 {
@@ -99,20 +90,19 @@ func brokerProvision(store *store.BrokerConfigurationStore, w http.ResponseWrite
 		return nil
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	return respondWithJSON(w, map[string]interface{}{})
+	switch config.AsyncResponseDelay {
+	case 0:
+		w.WriteHeader(http.StatusCreated)
+		return respondWithJSON(w, map[string]interface{}{})
+	default:
+		return brokerAsyncResponse(w, config.AsyncResponseDelay)
+	}
 }
 
 func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
-	guid, err := readGUID(r)
+	config, err := brokerCheckRequest(store, r)
 	if err != nil {
 		return err
-	}
-
-	config, ok := store.GetBrokerConfiguration(guid)
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return nil
 	}
 
 	if config.DeprovisionResponse != 0 {
@@ -120,6 +110,40 @@ func brokerDeprovision(store *store.BrokerConfigurationStore, w http.ResponseWri
 		return nil
 	}
 
-	w.WriteHeader(http.StatusOK)
-	return respondWithJSON(w, map[string]interface{}{})
+	switch config.AsyncResponseDelay {
+	case 0:
+		w.WriteHeader(http.StatusOK)
+		return respondWithJSON(w, map[string]interface{}{})
+	default:
+		return brokerAsyncResponse(w, config.AsyncResponseDelay)
+	}
+}
+
+func brokerAsyncResponse(w http.ResponseWriter, duration time.Duration) error {
+	w.WriteHeader(http.StatusAccepted)
+	return respondWithJSON(w, map[string]interface{}{
+		"operation": time.Now().Add(duration),
+	})
+}
+
+func brokerLastOperation(store *store.BrokerConfigurationStore, w http.ResponseWriter, r *http.Request) error {
+	_, err := brokerCheckRequest(store, r)
+	if err != nil {
+		return err
+	}
+
+	var when time.Time
+	if err := when.UnmarshalJSON([]byte(`"` + r.FormValue("operation") + `"`)); err != nil {
+		return err
+	}
+
+	var result apiresponses.LastOperationResponse
+	switch time.Now().After(when) {
+	case true:
+		result.State = domain.Succeeded
+	case false:
+		result.State = domain.InProgress
+	}
+
+	return respondWithJSON(w, result)
 }

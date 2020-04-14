@@ -4,9 +4,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
+
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -177,19 +179,17 @@ var _ = Describe("create-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      *servicebrokerstub.ServiceBrokerStub
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
-
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+					broker = servicebrokerstub.EnableServiceAccess()
+					service = broker.FirstServiceOfferingName()
+					servicePlan = broker.FirstServicePlanName()
 				})
 
 				AfterEach(func() {
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				It("displays an informative success message, exits 0", func() {
@@ -291,18 +291,17 @@ var _ = Describe("create-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      *servicebrokerstub.ServiceBrokerStub
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).Create().Register().EnableServiceAccess()
+					service = broker.FirstServiceOfferingName()
+					servicePlan = broker.FirstServicePlanName()
 				})
 
 				AfterEach(func() {
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				It("creates the service and displays a message that creation is in progress", func() {
@@ -319,26 +318,23 @@ var _ = Describe("create-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker1     *fakeservicebroker.FakeServiceBroker
-					broker2     *fakeservicebroker.FakeServiceBroker
+					broker1     *servicebrokerstub.ServiceBrokerStub
+					broker2     *servicebrokerstub.ServiceBrokerStub
 				)
 
 				BeforeEach(func() {
-					broker1 = fakeservicebroker.New().EnsureBrokerIsAvailable()
-					service = broker1.ServiceName()
-					servicePlan = broker1.ServicePlanName()
-					broker2 = fakeservicebroker.NewAlternate()
+					broker1 = servicebrokerstub.EnableServiceAccess()
+					service = broker1.FirstServiceOfferingName()
+					servicePlan = broker1.FirstServicePlanName()
+					broker2 = servicebrokerstub.New()
 					broker2.Services[0].Name = service
 					broker2.Services[0].Plans[0].Name = servicePlan
-					broker2.EnsureBrokerIsAvailable()
-
-					Eventually(helpers.CF("enable-service-access", service, "-b", broker1.Name())).Should(Exit(0))
-					Eventually(helpers.CF("enable-service-access", service, "-b", broker2.Name())).Should(Exit(0))
+					broker2.Create().Register().EnableServiceAccess()
 				})
 
 				AfterEach(func() {
-					broker1.Destroy()
-					broker2.Destroy()
+					broker1.Forget()
+					broker2.Forget()
 				})
 
 				When("the user does not specify which broker to use", func() {
@@ -365,7 +361,7 @@ var _ = Describe("create-service command", func() {
 
 						It("displays an informative success message, exits 0", func() {
 							By("creating the service with -b flag")
-							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name())
+							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name)
 							Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
 								"my-service", org, space, username))
 							Eventually(session).Should(Say("OK"))
