@@ -110,8 +110,7 @@ var _ = Describe("domains command", func() {
 		AfterEach(func() {
 			Eventually(helpers.CF("delete-shared-domain", sharedDomain1.Name, "-f")).Should(Exit(0))
 			Eventually(helpers.CF("delete-shared-domain", sharedDomain2.Name, "-f")).Should(Exit(0))
-			Eventually(helpers.CF("delete-space", spaceName, "-f")).Should(Exit(0))
-			Eventually(helpers.CF("delete-org", orgName, "-f")).Should(Exit(0))
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		It("displays the shared domains and denotes that they are shared", func() {
@@ -223,9 +222,7 @@ var _ = Describe("domains command", func() {
 				})
 
 				AfterEach(func() {
-					Eventually(helpers.CF("delete-private-domain", privateDomain3.Name, "-f")).Should(Exit(0))
-					Eventually(helpers.CF("delete-space", newSpaceName, "-f")).Should(Exit(0))
-					Eventually(helpers.CF("delete-org", newOrgName, "-f")).Should(Exit(0))
+					helpers.QuickDeleteOrg(newOrgName)
 					// Outer after-eaches require the initial org/space to be targetted
 					helpers.TargetOrgAndSpace(orgName, spaceName)
 				})
