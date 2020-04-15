@@ -4,12 +4,12 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	. "code.cloudfoundry.org/cli/command/v6"
-	"code.cloudfoundry.org/cli/command/v6/v6fakes"
+	. "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -23,7 +23,7 @@ var _ = Describe("terminate-task Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v6fakes.FakeTerminateTaskActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -32,13 +32,15 @@ var _ = Describe("terminate-task Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v6fakes.FakeTerminateTaskActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = TerminateTaskCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.RequiredArgs.AppName = "some-app-name"
@@ -119,16 +121,16 @@ var _ = Describe("terminate-task Command", func() {
 			When("provided a valid application name and task sequence ID", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v3action.Application{GUID: "some-app-guid"},
-						v3action.Warnings{"get-application-warning"},
+						v7action.Application{GUID: "some-app-guid"},
+						v7action.Warnings{"get-application-warning"},
 						nil)
 					fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-						v3action.Task{GUID: "some-task-guid"},
-						v3action.Warnings{"get-task-warning"},
+						v7action.Task{GUID: "some-task-guid"},
+						v7action.Warnings{"get-task-warning"},
 						nil)
 					fakeActor.TerminateTaskReturns(
-						v3action.Task{},
-						v3action.Warnings{"terminate-task-warning"},
+						v7action.Task{},
+						v7action.Warnings{"terminate-task-warning"},
 						nil)
 				})
 
@@ -172,7 +174,7 @@ var _ = Describe("terminate-task Command", func() {
 					When("getting the app returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3action.Application{GUID: "some-app-guid"},
+								v7action.Application{GUID: "some-app-guid"},
 								nil,
 								returnedErr)
 						})
@@ -185,11 +187,11 @@ var _ = Describe("terminate-task Command", func() {
 					When("getting the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3action.Application{GUID: "some-app-guid"},
+								v7action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v3action.Task{},
+								v7action.Task{},
 								nil,
 								returnedErr)
 						})
@@ -202,15 +204,15 @@ var _ = Describe("terminate-task Command", func() {
 					When("terminating the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3action.Application{GUID: "some-app-guid"},
+								v7action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v3action.Task{GUID: "some-task-guid"},
+								v7action.Task{GUID: "some-task-guid"},
 								nil,
 								nil)
 							fakeActor.TerminateTaskReturns(
-								v3action.Task{GUID: "some-task-guid"},
+								v7action.Task{GUID: "some-task-guid"},
 								nil,
 								returnedErr)
 						})
@@ -231,8 +233,8 @@ var _ = Describe("terminate-task Command", func() {
 					When("getting the app returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3action.Application{GUID: "some-app-guid"},
-								v3action.Warnings{"get-application-warning-1", "get-application-warning-2"},
+								v7action.Application{GUID: "some-app-guid"},
+								v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 								expectedErr)
 						})
 
@@ -247,12 +249,12 @@ var _ = Describe("terminate-task Command", func() {
 					When("getting the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3action.Application{GUID: "some-app-guid"},
+								v7action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v3action.Task{},
-								v3action.Warnings{"get-task-warning-1", "get-task-warning-2"},
+								v7action.Task{},
+								v7action.Warnings{"get-task-warning-1", "get-task-warning-2"},
 								expectedErr)
 						})
 
@@ -267,16 +269,16 @@ var _ = Describe("terminate-task Command", func() {
 					When("terminating the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3action.Application{GUID: "some-app-guid"},
+								v7action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v3action.Task{GUID: "some-task-guid"},
+								v7action.Task{GUID: "some-task-guid"},
 								nil,
 								nil)
 							fakeActor.TerminateTaskReturns(
-								v3action.Task{},
-								v3action.Warnings{"terminate-task-warning-1", "terminate-task-warning-2"},
+								v7action.Task{},
+								v7action.Warnings{"terminate-task-warning-1", "terminate-task-warning-2"},
 								expectedErr)
 						})
 
