@@ -20,6 +20,7 @@ const (
 
 	retryCount    = 5
 	retryInterval = time.Millisecond * 250
+	walkDelay     = time.Second * 2
 )
 
 type LogMessage struct {
@@ -120,6 +121,13 @@ func (b *cliRetryBackoff) Reset() {
 	b.count = 0
 }
 
+// (4/16/2020)
+// We have decided not to fully unit test this functionality and wanted to document why
+// This logic is very highly coupled to the go-log-cache dependancy we consume.  We struggled with mocks to try and unit test this
+// We also thought of other ways to refactor this that might have allowed us to better unit test this, we believe while this would add some value
+// It would not be valuable enough to justify the effort.  We are confident that the Log Egress team has adequate testing in the go-log-cache client
+// And are confident in our integration tests to ensure we are able to stream logs.
+
 func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage, <-chan error, context.CancelFunc) {
 
 	logrus.Info("Start Tailing Logs")
@@ -138,9 +146,6 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 			return
 		}
 
-		const offset = 1 * time.Second
-		walkStartTime := ts.Add(-offset)
-
 		logcache.Walk(
 			ctx,
 			appGUID,
@@ -157,8 +162,8 @@ func GetStreamingLogs(appGUID string, client LogCacheClient) (<-chan LogMessage,
 				return true
 			}),
 			client.Read,
-			logcache.WithWalkDelay(2*time.Second),
-			logcache.WithWalkStartTime(walkStartTime),
+			logcache.WithWalkDelay(walkDelay),
+			logcache.WithWalkStartTime(ts),
 			logcache.WithWalkEnvelopeTypes(logcache_v1.EnvelopeType_LOG),
 			logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 			logcache.WithWalkLogger(log.New(channelWriter{
@@ -198,6 +203,7 @@ func latestEnvelopeTimestamp(client LogCacheClient, errs chan error, ctx context
 			return false
 		}),
 		r,
+		logcache.WithWalkDelay(walkDelay),
 		logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 		logcache.WithWalkLogger(log.New(channelWriter{
 			errChannel: errs,
