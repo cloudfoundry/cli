@@ -5,11 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
-//type PurgeServiceOfferingActor interface {
-//	PurgeServiceOffering(service v2action.Service) (v2action.Warnings, error)
-//	GetServiceByNameAndBrokerName(serviceName, brokerName string) (v2action.Service, v2action.Warnings, error)
-//}
-
 type PurgeServiceOfferingCommand struct {
 	BaseCommand
 
