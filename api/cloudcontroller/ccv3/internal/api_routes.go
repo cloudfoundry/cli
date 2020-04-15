@@ -7,7 +7,7 @@ import "net/http"
 // HTTP method + non-parameter parts of the path + "Request"
 //
 // If the request returns a single entity by GUID, use the singular (for example
-// /v2/organizations/:organization_guid is GetOrganization).
+// /v3/organizations/:organization_guid is GetOrganization).
 const (
 	DeleteApplicationProcessInstanceRequest                     = "DeleteApplicationProcessInstance"
 	DeleteApplicationRequest                                    = "DeleteApplication"
