@@ -54,12 +54,7 @@ func NewCommandParser() (CommandParser, error) {
 
 func (p *CommandParser) ParseCommandFromArgs(ui *ui.UI, args []string) (int, error) {
 	p.UI = ui
-	exitStatus, err := p.parse(args, &common.Commands)
-	// TODO Remove the fallback command and return an UnknownCommandError
-	if _, ok := err.(translatableerror.V3V2SwitchError); ok {
-		return p.parse(args, &common.FallbackCommands)
-	}
-	return exitStatus, err
+	return p.parse(args, &common.Commands)
 }
 
 func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string) error {

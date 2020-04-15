@@ -10,10 +10,7 @@ import (
 )
 
 var Commands commandList
-var FallbackCommands V2CommandList
-
-type V2CommandList struct {
-}
+var ShouldFallbackToLegacy = true
 
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`

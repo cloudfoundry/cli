@@ -11,11 +11,7 @@ import (
 )
 
 var Commands commandList
-var FallbackCommands V2CommandList
-
-type V2CommandList struct {
-	V2App v6.V3AppCommand `command:"app" description:"Display health and status for an app"`
-}
+var ShouldFallbackToLegacy = false
 
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
@@ -49,8 +45,8 @@ type commandList struct {
 	CreatePackage                      v7.CreatePackageCommand                      `command:"create-package" description:"Uploads a Package"`
 	CreateIsolationSegment             v7.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
 	CreateOrg                          v7.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
-	CreateOrgQuota                     v7.CreateOrgQuotaCommand                     `command:"create-org-quota" description:"Define a new quota for an organization"`
-	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" description:"Create a private domain for a specific org"`
+	CreateOrgQuota                     v7.CreateOrgQuotaCommand                     `command:"create-org-quota" alias:"create-quota" description:"Define a new quota for an organization"`
+	CreatePrivateDomain                v7.CreatePrivateDomainCommand                `command:"create-private-domain" alias:"create-domain" description:"Create a private domain for a specific org"`
 	CreateRoute                        v7.CreateRouteCommand                        `command:"create-route" description:"Create a route for later use"`
 	CreateSecurityGroup                v7.CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
 	CreateService                      v6.CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
@@ -66,9 +62,9 @@ type commandList struct {
 	DeleteBuildpack                    v7.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
 	DeleteIsolationSegment             v7.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
 	DeleteOrg                          v7.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
-	DeleteOrgQuota                     v7.DeleteOrgQuotaCommand                     `command:"delete-org-quota" description:"Delete an organization quota"`
+	DeleteOrgQuota                     v7.DeleteOrgQuotaCommand                     `command:"delete-org-quota" alias:"delete-quota" description:"Delete an organization quota"`
 	DeleteOrphanedRoutes               v7.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app or service instance)"`
-	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" description:"Delete a private domain"`
+	DeletePrivateDomain                v7.DeletePrivateDomainCommand                `command:"delete-private-domain" alias:"delete-domain" description:"Delete a private domain"`
 	DeleteRoute                        v7.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
 	DeleteSecurityGroup                v7.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
 	DeleteService                      v6.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
@@ -107,8 +103,8 @@ type commandList struct {
 	NetworkPolicies                    v7.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	OauthToken                         v7.OauthTokenCommand                         `command:"oauth-token" description:"Display the OAuth token for the current session and refresh the token if necessary"`
 	Org                                v7.OrgCommand                                `command:"org" description:"Show org info"`
-	OrgQuotas                          v7.OrgQuotasCommand                          `command:"org-quotas" description:"List available organization quotas"`
-	OrgQuota                           v7.OrgQuotaCommand                           `command:"org-quota" description:"Show organization quota"`
+	OrgQuotas                          v7.OrgQuotasCommand                          `command:"org-quotas" alias:"quotas" description:"List available organization quotas"`
+	OrgQuota                           v7.OrgQuotaCommand                           `command:"org-quota" alias:"quota" description:"Show organization quota"`
 	OrgUsers                           v7.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Orgs                               v7.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
 	Packages                           v7.PackagesCommand                           `command:"packages" description:"List packages of an app"`
@@ -155,7 +151,7 @@ type commandList struct {
 	SetLabel                           v7.SetLabelCommand                           `command:"set-label" description:"Set a label (key-value pairs) for an API resource"`
 	SetOrgDefaultIsolationSegment      v7.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set the default isolation segment used for apps in spaces in an org"`
 	SetOrgRole                         v7.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
-	SetOrgQuota                        v7.SetOrgQuotaCommand                        `command:"set-org-quota" description:"Assign a quota to an organization"`
+	SetOrgQuota                        v7.SetOrgQuotaCommand                        `command:"set-org-quota" alias:"set-quota" description:"Assign a quota to an organization"`
 	SetRunningEnvironmentVariableGroup v7.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
 	SetSpaceIsolationSegment           v7.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
 	SetSpaceQuota                      v7.SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a quota to a space"`
@@ -193,7 +189,7 @@ type commandList struct {
 	UnsharePrivateDomain               v7.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with a specific org"`
 	UnshareService                     v6.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
 	UpdateBuildpack                    v7.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
-	UpdateOrgQuota                     v7.UpdateOrgQuotaCommand                     `command:"update-org-quota" description:"Update an existing organization quota"`
+	UpdateOrgQuota                     v7.UpdateOrgQuotaCommand                     `command:"update-org-quota" alias:"update-quota" description:"Update an existing organization quota"`
 	UpdateSecurityGroup                v7.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
 	UpdateService                      v6.UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
 	UpdateServiceBroker                v7.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`

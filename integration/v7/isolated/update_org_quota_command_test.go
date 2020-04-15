@@ -17,6 +17,8 @@ var _ = Describe("update-org-quota command", func() {
 				Eventually(session).Should(Say("update-org-quota - Update an existing organization quota"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`cf update-org-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] \[-n NEW_NAME\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans | --disallow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
+				Eventually(session).Should(Say("ALIAS:"))
+				Eventually(session).Should(Say("update-quota"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`-a\s+Total number of application instances. -1 represents an unlimited amount.`))
 				Eventually(session).Should(Say(`--allow-paid-service-plans\s+Allow provisioning instances of paid service plans.`))

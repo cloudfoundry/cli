@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/util/command_parser"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
@@ -23,20 +25,24 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)
 	}
+
 	commandUI, err := ui.NewUI(config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)
 	}
+
 	p, err := command_parser.NewCommandParser()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)
 	}
+
 	exitCode, err = p.ParseCommandFromArgs(commandUI, os.Args[1:])
 	if err == nil {
 		os.Exit(exitCode)
 	}
+
 	if _, ok := err.(command_parser.UnknownCommandError); ok {
 		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
 		if commandIsPlugin {
@@ -44,9 +50,13 @@ func main() {
 			if err != nil {
 				exitCode = 1
 			}
-		} else {
+		} else if common.ShouldFallbackToLegacy {
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 			//NOT REACHED, legacy main will exit the process
+		} else {
+			err = actionerror.InvalidCommandError{CommandName: os.Args[1]}
+			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			os.Exit(1)
 		}
 	}
 

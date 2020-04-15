@@ -26,6 +26,8 @@ var _ = Describe("delete-private-domain command", func() {
 			Eventually(session).Should(Say(`\s+delete-private-domain - Delete a private domain`))
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(`\s+cf delete-private-domain DOMAIN \[-f\]`))
+			Eventually(session).Should(Say("ALIAS:"))
+			Eventually(session).Should(Say(`\s+delete-domain`))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Say("SEE ALSO:"))
