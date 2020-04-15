@@ -43,7 +43,7 @@ func (c UpdateServiceInstanceCompositeActor) UpgradeServiceInstance(serviceInsta
 		return warnings, err
 	}
 
-	if upgradeIsAvailable(serviceInstance, servicePlan) {
+	if !upgradeIsAvailable(serviceInstance, servicePlan) {
 		return warnings, actionerror.ServiceUpgradeNotAvailableError{}
 	}
 
@@ -66,5 +66,5 @@ func (c UpdateServiceInstanceCompositeActor) CloudControllerAPIVersion() string 
 }
 
 func upgradeIsAvailable(serviceInstance v2action.ServiceInstance, servicePlan v2action.ServicePlan) bool {
-	return serviceInstance.MaintenanceInfo.Version == servicePlan.MaintenanceInfo.Version
+	return serviceInstance.MaintenanceInfo.Version != servicePlan.MaintenanceInfo.Version
 }
