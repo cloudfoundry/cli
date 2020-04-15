@@ -45,15 +45,19 @@ func main() {
 
 	if _, ok := err.(command_parser.UnknownCommandError); ok {
 		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
-		if commandIsPlugin {
+
+		switch {
+		case commandIsPlugin:
 			err = plugin_util.RunPlugin(plugin)
 			if err != nil {
 				exitCode = 1
 			}
-		} else if common.ShouldFallbackToLegacy {
+
+		case common.ShouldFallbackToLegacy:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 			//NOT REACHED, legacy main will exit the process
-		} else {
+
+		default:
 			err = actionerror.InvalidCommandError{CommandName: os.Args[1]}
 			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			os.Exit(1)
