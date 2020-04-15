@@ -79,7 +79,7 @@ type commandList struct {
 	DeleteSpaceQuota                   v7.DeleteSpaceQuotaCommand                   `command:"delete-space-quota" description:"Delete a space quota"`
 	DeleteUser                         v7.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
 	DisableFeatureFlag                 v7.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
-	DisableOrgIsolation                v6.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
+	DisableOrgIsolation                v7.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
 	DisableSSH                         v7.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
 	DisableServiceAccess               v7.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
 	DisallowSpaceSSH                   v7.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
