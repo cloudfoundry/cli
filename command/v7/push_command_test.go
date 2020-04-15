@@ -14,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/types"
@@ -85,7 +84,7 @@ var _ = Describe("push Command", func() {
 		fakeSharedActor     *commandfakes.FakeSharedActor
 		fakeActor           *v7fakes.FakePushActor
 		fakeVersionActor    *v7fakes.FakeV7ActorForPush
-		fakeProgressBar     *v6fakes.FakeProgressBar
+		fakeProgressBar     *v7fakes.FakeProgressBar
 		fakeLogCacheClient  *sharedactionfakes.FakeLogCacheClient
 		fakeManifestLocator *v7fakes.FakeManifestLocator
 		fakeManifestParser  *v7fakes.FakeManifestParser
@@ -107,7 +106,7 @@ var _ = Describe("push Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakePushActor)
 		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
-		fakeProgressBar = new(v6fakes.FakeProgressBar)
+		fakeProgressBar = new(v7fakes.FakeProgressBar)
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		appName1 = "first-app"
