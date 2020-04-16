@@ -145,11 +145,11 @@ var _ = Describe("update-service command", func() {
 				It("displays an informative success message, exits 0", func() {
 					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.FirstServicePlanName())
 
-					Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 
 					Expect(session).Should(Say("OK"))
 					Expect(session).Should(Say("No changes were made"))
-					Expect(session).Should(Exit(0))
 				})
 			})
 
