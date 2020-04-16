@@ -193,22 +193,25 @@ func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flag
 		fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
 		_, err := p.parse([]string{"help", originalArgs[0]}, commandList)
 		return 1, err
+
 	case flags.ErrUnknownCommand:
 		if containsHelpFlag(originalArgs) {
 			return p.parse([]string{"help", originalArgs[0]}, commandList)
 		} else {
-			// TODO Extract handling of unknown commands/suggested commands out of legacy
-			return 0, UnknownCommandError{}
+			return 0, UnknownCommandError{CommandName: originalArgs[0]}
 		}
+
 	case flags.ErrCommandRequired:
 		if common.Commands.VerboseOrVersion {
 			return p.parse([]string{"version"}, commandList)
 		} else {
 			return p.parse([]string{"help"}, commandList)
 		}
+
 	default:
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 	}
+
 	return 0, nil
 }
 

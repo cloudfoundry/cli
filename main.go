@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/util/command_parser"
@@ -43,7 +42,7 @@ func main() {
 		os.Exit(exitCode)
 	}
 
-	if _, ok := err.(command_parser.UnknownCommandError); ok {
+	if unknownCommandError, ok := err.(command_parser.UnknownCommandError); ok {
 		plugin, commandIsPlugin := plugin_util.IsPluginCommand(os.Args[1:])
 
 		switch {
@@ -58,8 +57,8 @@ func main() {
 			//NOT REACHED, legacy main will exit the process
 
 		default:
-			err = actionerror.InvalidCommandError{CommandName: os.Args[1]}
-			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			unknownCommandError.Suggest(plugin_util.PluginCommandNames())
+			fmt.Fprintf(os.Stderr, "%s\n", unknownCommandError.Error())
 			os.Exit(1)
 		}
 	}
