@@ -376,7 +376,7 @@ var _ = Describe("Services Repo", func() {
 			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "tags": null}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
 				Response: testnet.TestResponse{Status: http.StatusOK},
 			}))
 
@@ -390,11 +390,12 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "tags": null}`),
+					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusNotFound},
 				}))
 
 				err := repo.UpdateServiceInstance("instance-guid", "plan-guid", nil, nil)
+
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
 			})
@@ -405,7 +406,7 @@ var _ = Describe("Services Repo", func() {
 				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
-					Matcher:  testnet.RequestBodyMatcher(`{"parameters": {"foo": "bar"}, "tags": null}`),
+					Matcher:  testnet.RequestBodyMatcher(`{"parameters": {"foo": "bar"}}`),
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
@@ -436,7 +437,7 @@ var _ = Describe("Services Repo", func() {
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
-				tags := []string{"foo", "bar"}
+				tags := &[]string{"foo", "bar"}
 
 				err := repo.UpdateServiceInstance("instance-guid", "", nil, tags)
 				Expect(testHandler).To(HaveAllRequestsCalled())
@@ -451,7 +452,7 @@ var _ = Describe("Services Repo", func() {
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
-				tags := []string{}
+				tags := &[]string{}
 
 				err := repo.UpdateServiceInstance("instance-guid", "", nil, tags)
 				Expect(testHandler).To(HaveAllRequestsCalled())
