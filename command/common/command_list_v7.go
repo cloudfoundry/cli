@@ -116,7 +116,6 @@ type commandList struct {
 	RemoveNetworkPolicy                v7.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	Rename                             v7.RenameCommand                             `command:"rename" description:"Rename an app"`
-	RenameBuildpack                    v6.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
 	RenameOrg                          v7.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
 	RenameService                      v6.RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`
 	RenameServiceBroker                v7.RenameServiceBrokerCommand                `command:"rename-service-broker" description:"Rename a service broker"`
