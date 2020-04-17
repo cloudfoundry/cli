@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-# Skips dupl and lll
-GOBIN=~/go/bin gometalinter --disable-all --enable=deadcode --enable=errcheck --enable=gocyclo --enable=goimports --enable=staticcheck --enable=vet --enable=gotype --enable=interfacer --enable=misspell --enable=test --enable=unused --enable=gofmt --enable=ineffassign --enable=structcheck --enable=testify --enable=vetshadow --enable=aligncheck --enable=gas --enable=goconst --enable=golint --enable=gosimple --enable=unconvert --enable=varcheck --deadline=30s ./actor/... ./api/... ./util/{ui,panichandler,configv3,sorting} | grep -v fake
-
-# Also Skips unused and structcheck
-GOBIN=~/go/bin gometalinter --disable-all --enable=deadcode --enable=errcheck --enable=gocyclo --enable=goimports --enable=staticcheck --enable=vet --enable=gotype --enable=interfacer --enable=misspell --enable=test --enable=gofmt --enable=ineffassign --enable=testify --enable=vetshadow --enable=aligncheck --enable=gas --enable=goconst --enable=golint --enable=gosimple --enable=unconvert --enable=varcheck --deadline=30s ./command/... | grep -v fake

@@ -26,10 +26,12 @@ ifndef TARGET_V7
 TARGET = v6
 export GOFLAGS =
 SLOW_SPEC_THRESHOLD=60
+LINT_FLAGS = --build-tags=V7
 else
 TARGET = v7
 export GOFLAGS = -tags=V7
 SLOW_SPEC_THRESHOLD=120
+LINT_FLAGS =
 endif
 
 GINKGO_FLAGS=-r -randomizeAllSpecs -requireSuite
@@ -38,7 +40,6 @@ ginkgo_int = ginkgo $(GINKGO_INT_FLAGS)
 
 GINKGO_UNITS_FLAGS=$(GINKGO_FLAGS) -randomizeSuites -p
 ginkgo_units = ginkgo $(GINKGO_UNITS_FLAGS)
-
 
 all: lint test build
 
@@ -83,12 +84,6 @@ fly-windows-units:
 
 format: ## Run go fmt
 	go fmt ./...
-
-golangci-lint: ## Run golangci-lint to validate code quality
-	golangci-lint run
-
-golangci-lint-fix: ## Run golangci-lint --fix to try to autofix issues
-	golangci-lint run --fix
 
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
@@ -152,7 +147,9 @@ i: integration-tests-full
 integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
 
-lint: format custom-lint golangci-lint ## Runs all linters and formatters
+lint: custom-lint ## Runs all linters and formatters
+	golangci-lint run $(LINT_FLAGS)
+	@echo "No custom lint errors!"
 
 ifeq ($(TARGET),v6)
 out/cf: out/cf6
@@ -254,7 +251,7 @@ units-full: build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-.PHONY: all build clean format version lint custom-lint golangci-lint golangci-lint-fix
+.PHONY: all build clean format version lint custom-lint
 .PHONY: test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY: check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
 .PHONY: help

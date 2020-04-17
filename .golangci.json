@@ -2,9 +2,6 @@
   "run": {
     "concurrency": 4,
     "timeout": "20m",
-    "build-tags": [
-      "V7"
-    ],
     "skip-dirs": [
       "^cf",
       "^ci",
@@ -30,46 +27,26 @@
       ".*fake.*"
     ],
     "skip-files": [
-      "command/v7/shared/noaa_debug_printer.go",
       "integration/helpers/fake_server.go"
     ]
   },
   "linters": {
-    "enable-all": true,
-    "disable": [
-      "dupl",
-      "funlen",
-      "gochecknoglobals",
-      "gocognit",
-      "gocyclo",
-      "godox",
-      "gofmt",
-      "golint",
-      "gosec",
-      "gosimple",
-      "lll",
-      "maligned",
-      "misspell",
-      "nakedret",
-      "prealloc",
-      "scopelint",
+    "disable-all": true,
+    "enable": [
+      "govet",
+      "goimports",
+      "errcheck",
       "staticcheck",
-      "stylecheck",
-      "unparam",
-      "whitespace",
-      "wsl"
+      "unused",
+      "structcheck",
+      "varcheck",
+      "ineffassign",
+      "deadcode"
     ]
   },
   "linters-settings": {
     "errcheck": {
       "check-blank": true
-    },
-    "goconst": {
-      "min-len": "2",
-      "min-occurrences": 3
-    },
-    "misspell": {
-      "locale": "US"
     }
   },
   "issues": {
@@ -86,20 +63,13 @@
       "U1000: field `envCFStartupTimeout` is unused",
       "U1000: field `relatedCommands` is unused",
       "U1000: field `usage` is unused",
+      "SA5008: duplicate struct tag \"choice\"",
       "`allproxy` is unused",
       "`dockerPassword` is unused",
       "`envCFStagingTimeout` is unused",
       "`envCFStartupTimeout` is unused",
       "`relatedCommands` is unused",
       "`usage` is unused"
-    ],
-    "exclude-rules": [
-      {
-        "path": "_test.go",
-        "linters": [
-          "goconst"
-        ]
-      }
     ]
   }
 }
