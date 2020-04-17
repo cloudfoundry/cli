@@ -3,6 +3,8 @@ package v7
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/util/ui"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 )
@@ -59,7 +61,7 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 			cmd.UI.DisplayText("broker: {{.BrokerName}}", map[string]interface{}{
 				"BrokerName": plan.BrokerName,
 			})
-			cmd.UI.DisplayTableWithHeader("   ", data, 3)
+			cmd.UI.DisplayTableWithHeader("   ", data, ui.DefaultTableSpacePadding)
 			cmd.UI.DisplayNewline()
 
 			data = nil

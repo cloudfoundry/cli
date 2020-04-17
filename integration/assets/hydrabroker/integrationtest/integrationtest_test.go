@@ -5,20 +5,18 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"time"
 
-	uuid2 "github.com/nu7hatch/gouuid"
-
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/app"
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
+	uuid2 "github.com/nu7hatch/gouuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"net/http"
-	"net/http/httptest"
-
+	. "github.com/onsi/gomega/gstruct"
 	"github.com/pivotal-cf/brokerapi/v7/domain/apiresponses"
 )
 
@@ -91,18 +89,39 @@ var _ = Describe("Integration Test", func() {
 			expectStatusCode(response, http.StatusUnauthorized)
 		})
 
-		It("responds to the catalog endpoint", func() {
+		It("rejects requests with the wrong username", func() {
+			cfg.Username = "wrong"
+			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+			expectStatusCode(response, http.StatusUnauthorized)
+		})
+
+		It("rejects requests with the wrong password", func() {
+			cfg.Password = "wrong"
+			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
+			expectStatusCode(response, http.StatusUnauthorized)
+		})
+
+		FIt("responds to the catalog endpoint", func() {
 			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
 			expectStatusCode(response, http.StatusOK)
 
 			var catalog apiresponses.CatalogResponse
 			fromJSON(response.Body, &catalog)
+			Expect(catalog.Services).To(HaveLen(1))
 			Expect(catalog.Services[0].ID).To(Equal(cfg.Services[0].ID))
 			Expect(catalog.Services[0].Name).To(Equal(cfg.Services[0].Name))
 			Expect(catalog.Services[0].Description).To(Equal(cfg.Services[0].Description))
+			Expect(catalog.Services[0].Plans).To(HaveLen(2))
 			Expect(catalog.Services[0].Plans[0].ID).To(Equal(cfg.Services[0].Plans[0].ID))
 			Expect(catalog.Services[0].Plans[0].Name).To(Equal(cfg.Services[0].Plans[0].Name))
 			Expect(catalog.Services[0].Plans[0].Description).To(Equal(cfg.Services[0].Plans[0].Description))
+			Expect(catalog.Services[0].Plans[0].Free).To(PointTo(Equal(cfg.Services[0].Plans[0].Free)))
+			Expect(catalog.Services[0].Plans[0].Bindable).To(PointTo(Equal(cfg.Services[0].Bindable)))
+			Expect(catalog.Services[0].Plans[1].ID).To(Equal(cfg.Services[0].Plans[1].ID))
+			Expect(catalog.Services[0].Plans[1].Name).To(Equal(cfg.Services[0].Plans[1].Name))
+			Expect(catalog.Services[0].Plans[1].Description).To(Equal(cfg.Services[0].Plans[1].Description))
+			Expect(catalog.Services[0].Plans[1].Free).To(PointTo(Equal(cfg.Services[0].Plans[1].Free)))
+			Expect(catalog.Services[0].Plans[1].Bindable).To(PointTo(Equal(cfg.Services[0].Bindable)))
 		})
 
 		It("allows a service instance to be created", func() {
@@ -462,6 +481,13 @@ func randomConfiguration() config.BrokerConfiguration {
 						Name:        randomString(),
 						ID:          randomString(),
 						Description: randomString(),
+						Free:        true,
+					},
+					{
+						Name:        randomString(),
+						ID:          randomString(),
+						Description: randomString(),
+						Free:        false,
 					},
 				},
 			},

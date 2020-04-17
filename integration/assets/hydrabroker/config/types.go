@@ -1,6 +1,8 @@
 package config
 
-import "time"
+import (
+	"time"
+)
 
 type NewBrokerResponse struct {
 	GUID string `json:"guid"`
@@ -11,6 +13,7 @@ type Plan struct {
 	ID              string           `json:"id,omitempty"`
 	Description     string           `json:"description,omitempty"`
 	MaintenanceInfo *MaintenanceInfo `json:"maintenance_info,omitempty"`
+	Free            bool             `json:"free"`
 }
 
 type Service struct {

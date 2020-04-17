@@ -152,6 +152,7 @@ type Actor interface {
 	GetUnstagedNewestPackageGUID(appGuid string) (string, v7action.Warnings, error)
 	GetUser(username, origin string) (v7action.User, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
+	Marketplace(filter v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)
 	ParseAccessToken(accessToken string) (jwt.JWT, error)
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)

@@ -12,8 +12,13 @@ type ServicePlan struct {
 	GUID string
 	// Name is the name of the service plan.
 	Name string
+	// Description of the Service Plan.
+	Description string
 	// VisibilityType can be "public", "admin", "organization" or "space"
 	VisibilityType VisibilityType `json:"visibility_type"`
+	// Free shows whether or not the Service Plan is free of charge.
+	Free bool
+
 	// ServicePlanGUID is the GUID of the service offering
 	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid"`
 	// SpaceGUID is the space that a plan from a space-scoped broker relates to
@@ -93,6 +98,61 @@ func (client *Client) GetServicePlansWithSpaceAndOrganization(query ...Query) ([
 	}
 
 	return enrichedPlans, warnings, err
+}
+
+type ServiceOfferingWithPlans struct {
+	// GUID is a unique service offering identifier.
+	GUID string
+	// Name is the name of the service offering.
+	Name string
+	// Description of the service offering
+	Description string
+	// ServiceBrokerName is the name of the service broker
+	ServiceBrokerName string
+
+	// List of service plans that this service offering provides
+	Plans []ServicePlan
+}
+
+func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOfferingWithPlans, Warnings, error) {
+	query = append(query, Query{
+		Key:    Include,
+		Values: []string{"service_offering"},
+	})
+
+	plans, included, warnings, err := client.getServicePlans(query...)
+	if err != nil {
+		return nil, warnings, err
+	}
+
+	var offeringsWithPlans []ServiceOfferingWithPlans
+	offeringGUIDLookup := make(map[string]int)
+
+	indexOfOffering := func(serviceOfferingGUID string) int {
+		if i, ok := offeringGUIDLookup[serviceOfferingGUID]; ok {
+			return i
+		}
+
+		i := len(offeringsWithPlans)
+		offeringGUIDLookup[serviceOfferingGUID] = i
+		offeringsWithPlans = append(offeringsWithPlans, ServiceOfferingWithPlans{GUID: serviceOfferingGUID})
+
+		return i
+	}
+
+	for _, p := range plans {
+		i := indexOfOffering(p.ServiceOfferingGUID)
+		offeringsWithPlans[i].Plans = append(offeringsWithPlans[i].Plans, p)
+	}
+
+	for _, o := range included.ServiceOfferings {
+		i := indexOfOffering(o.GUID)
+		offeringsWithPlans[i].Name = o.Name
+		offeringsWithPlans[i].Description = o.Description
+		offeringsWithPlans[i].ServiceBrokerName = o.ServiceBrokerName
+	}
+
+	return offeringsWithPlans, warnings, nil
 }
 
 func computeSpaceDetailsTable(included IncludedResources) map[string]planSpaceDetails {

@@ -99,7 +99,7 @@ type commandList struct {
 	Logout                             v7.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
 	Logs                               v7.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
 	MapRoute                           v7.MapRouteCommand                           `command:"map-route" description:"Map a route to an app"`
-	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
+	Marketplace                        v7.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
 	NetworkPolicies                    v7.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	OauthToken                         v7.OauthTokenCommand                         `command:"oauth-token" description:"Display the OAuth token for the current session and refresh the token if necessary"`
 	Org                                v7.OrgCommand                                `command:"org" description:"Show org info"`

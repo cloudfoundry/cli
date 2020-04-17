@@ -17,18 +17,20 @@ func newDefaultConfig() *ServiceBrokerStub {
 	return &ServiceBrokerStub{
 		URL:      "broker-route-not-created-yet",
 		Name:     helpers.NewServiceBrokerName(),
-		Username: helpers.NewUsername(),
-		Password: helpers.NewPassword(),
-		Services: []config.Service{
-			{
-				Name:        helpers.NewServiceOfferingName(),
-				ID:          helpers.RandomName(),
-				Description: helpers.PrefixedRandomName("SERVICE-OFFERING-DESCRIPTION"),
-				Shareable:   true,
-				Bindable:    true,
-				Plans:       []config.Plan{newDefaultPlan()},
-			},
-		},
+		Username: "username",
+		Password: "password",
+		Services: []config.Service{newDefaultServiceOffering()},
+	}
+}
+
+func newDefaultServiceOffering() config.Service {
+	return config.Service{
+		Name:        helpers.NewServiceOfferingName(),
+		ID:          helpers.RandomName(),
+		Description: helpers.PrefixedRandomName("SERVICE-OFFERING-DESCRIPTION"),
+		Shareable:   true,
+		Bindable:    true,
+		Plans:       []config.Plan{newDefaultPlan()},
 	}
 }
 
@@ -37,6 +39,7 @@ func newDefaultPlan() config.Plan {
 		Name:        helpers.NewPlanName(),
 		ID:          helpers.RandomName(),
 		Description: helpers.PrefixedRandomName("PLAN-DESCRIPTION"),
+		Free:        true,
 	}
 }
 
@@ -89,10 +92,10 @@ func (s *ServiceBrokerStub) marshal() io.Reader {
 		Services:            s.Services,
 		Username:            s.Username,
 		Password:            s.Password,
-		CatalogResponse:     s.CatalogResponse,
-		ProvisionResponse:   s.ProvisionResponse,
-		DeprovisionResponse: s.DeprovisionResponse,
-		AsyncResponseDelay:  s.AsyncResponseDelay,
+		CatalogResponse:     s.catalogResponse,
+		ProvisionResponse:   s.provisionResponse,
+		DeprovisionResponse: s.deprovisionResponse,
+		AsyncResponseDelay:  s.asyncResponseDelay,
 	})
 	Expect(err).ToNot(HaveOccurred())
 	return bytes.NewReader(body)

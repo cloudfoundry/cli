@@ -91,9 +91,7 @@ var _ = Describe("service-access command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 
-				broker = servicebrokerstub.New().WithPlans(2)
-				broker.Services[0].Plans[1].Name = helpers.GenerateHigherName(helpers.NewPlanName, broker.Services[0].Plans[0].Name)
-				broker.Register()
+				broker = servicebrokerstub.New().WithPlans(2).Register()
 				service = broker.FirstServiceOfferingName()
 				servicePlan = broker.FirstServicePlanName()
 			})
@@ -145,10 +143,7 @@ var _ = Describe("service-access command", func() {
 				BeforeEach(func() {
 					helpers.SetupCF(orgName, spaceName)
 
-					otherBroker = servicebrokerstub.New().WithPlans(2)
-					otherBroker.Name = helpers.GenerateHigherName(helpers.NewServiceBrokerName, broker.Name)
-					otherBroker.Services[0].Plans[1].Name = helpers.GenerateLowerName(helpers.NewPlanName, otherBroker.Services[0].Plans[0].Name)
-					otherBroker.Register()
+					otherBroker = servicebrokerstub.New().WithHigherNameThan(broker).WithPlans(2).Register()
 
 					otherOrgName = helpers.GenerateLowerName(helpers.NewOrgName, orgName)
 					helpers.CreateOrg(otherOrgName)

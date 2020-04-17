@@ -3,6 +3,8 @@ package servicebrokerstub
 import (
 	"time"
 
+	"code.cloudfoundry.org/cli/integration/helpers"
+
 	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 )
 
@@ -12,10 +14,10 @@ type ServiceBrokerStub struct {
 	Services            []config.Service
 	created             bool
 	registered          bool
-	CatalogResponse     int
-	ProvisionResponse   int
-	DeprovisionResponse int
-	AsyncResponseDelay  time.Duration
+	catalogResponse     int
+	provisionResponse   int
+	deprovisionResponse int
+	asyncResponseDelay  time.Duration
 }
 
 func New() *ServiceBrokerStub {
@@ -27,16 +29,17 @@ func Create() *ServiceBrokerStub {
 }
 
 func Register() *ServiceBrokerStub {
-	return New().Create().Register()
+	return New().Register()
 }
 
 func EnableServiceAccess() *ServiceBrokerStub {
-	return New().Create().Register().EnableServiceAccess()
+	return New().EnableServiceAccess()
 }
 
 func (s *ServiceBrokerStub) Create() *ServiceBrokerStub {
 	ensureAppIsDeployed()
 	s.requestNewBrokerRoute()
+	s.created = true
 	return s
 }
 
@@ -87,35 +90,55 @@ func (s *ServiceBrokerStub) EnableServiceAccess() *ServiceBrokerStub {
 	return s
 }
 
-func (s *ServiceBrokerStub) WithPlans(plans int) *ServiceBrokerStub {
-	for len(s.Services[0].Plans) < plans {
-		s.Services[0].Plans = append(s.Services[0].Plans, newDefaultPlan())
-	}
-	return s
-}
-
 func (s *ServiceBrokerStub) WithName(name string) *ServiceBrokerStub {
 	s.Name = name
 	return s
 }
 
+func (s *ServiceBrokerStub) WithServiceOfferings(services int) *ServiceBrokerStub {
+	previousName := s.Services[0].Name
+	for len(s.Services) < services {
+		ser := newDefaultServiceOffering()
+		ser.Name = helpers.GenerateHigherName(helpers.NewServiceOfferingName, previousName)
+		previousName = ser.Name
+		s.Services = append(s.Services, ser)
+	}
+	return s
+}
+
+func (s *ServiceBrokerStub) WithPlans(plans int) *ServiceBrokerStub {
+	previousName := s.Services[0].Plans[0].Name
+	for len(s.Services[0].Plans) < plans {
+		p := newDefaultPlan()
+		p.Name = helpers.GenerateHigherName(helpers.NewPlanName, previousName)
+		previousName = p.Name
+		s.Services[0].Plans = append(s.Services[0].Plans, p)
+	}
+	return s
+}
+
+func (s *ServiceBrokerStub) WithHigherNameThan(o *ServiceBrokerStub) *ServiceBrokerStub {
+	higherName := helpers.GenerateHigherName(helpers.NewServiceBrokerName, o.Name)
+	return s.WithName(higherName)
+}
+
 func (s *ServiceBrokerStub) WithCatalogResponse(statusCode int) *ServiceBrokerStub {
-	s.CatalogResponse = statusCode
+	s.catalogResponse = statusCode
 	return s
 }
 
 func (s *ServiceBrokerStub) WithProvisionResponse(statusCode int) *ServiceBrokerStub {
-	s.ProvisionResponse = statusCode
+	s.provisionResponse = statusCode
 	return s
 }
 
 func (s *ServiceBrokerStub) WithDeprovisionResponse(statusCode int) *ServiceBrokerStub {
-	s.DeprovisionResponse = statusCode
+	s.deprovisionResponse = statusCode
 	return s
 }
 
 func (s *ServiceBrokerStub) WithAsyncDelay(delay time.Duration) *ServiceBrokerStub {
-	s.AsyncResponseDelay = delay
+	s.asyncResponseDelay = delay
 	return s
 }
 

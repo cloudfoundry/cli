@@ -32,7 +32,7 @@ func brokerCheckRequest(store *store.BrokerConfigurationStore, r *http.Request) 
 	// Compare everything every time to protect against timing attacks
 	if 2 != subtle.ConstantTimeCompare([]byte(cfg.Username), []byte(givenUsername))+
 		subtle.ConstantTimeCompare([]byte(cfg.Password), []byte(givenPassword)) {
-		return config.BrokerConfiguration{}, nil
+		return config.BrokerConfiguration{}, unauthorizedError{}
 	}
 
 	return cfg, nil
@@ -50,10 +50,13 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 	}
 
 	var services []domain.Service
-	for _, s := range config.Services {
+	for _, ser := range config.Services {
 		var plans []domain.ServicePlan
-		for _, p := range s.Plans {
+		s := ser // Copy to protect from memory reuse
+
+		for _, pla := range s.Plans {
 			var mi *domain.MaintenanceInfo
+			p := pla // Copy to protect from memory reuse
 
 			if p.MaintenanceInfo != nil {
 				mi = &domain.MaintenanceInfo{
@@ -68,6 +71,7 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 				Description:     p.Description,
 				MaintenanceInfo: mi,
 				Bindable:        &s.Bindable,
+				Free:            &p.Free,
 			})
 		}
 		services = append(services, domain.Service{

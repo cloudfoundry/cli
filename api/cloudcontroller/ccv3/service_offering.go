@@ -14,6 +14,8 @@ type ServiceOffering struct {
 	Name string
 	// ServiceBrokerName is the name of the service broker
 	ServiceBrokerName string `jsonry:"relationships.service_broker.data.name"`
+	// Description of the service offering
+	Description string
 
 	Metadata *Metadata
 }

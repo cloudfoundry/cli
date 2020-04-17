@@ -2023,6 +2023,21 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	MarketplaceStub        func(v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)
+	marketplaceMutex       sync.RWMutex
+	marketplaceArgsForCall []struct {
+		arg1 v7action.MarketplaceFilter
+	}
+	marketplaceReturns struct {
+		result1 []v7action.ServiceOfferingWithPlans
+		result2 v7action.Warnings
+		result3 error
+	}
+	marketplaceReturnsOnCall map[int]struct {
+		result1 []v7action.ServiceOfferingWithPlans
+		result2 v7action.Warnings
+		result3 error
+	}
 	ParseAccessTokenStub        func(string) (jwt.JWT, error)
 	parseAccessTokenMutex       sync.RWMutex
 	parseAccessTokenArgsForCall []struct {
@@ -11601,6 +11616,72 @@ func (fake *FakeActor) MapRouteReturnsOnCall(i int, result1 v7action.Warnings, r
 	}{result1, result2}
 }
 
+func (fake *FakeActor) Marketplace(arg1 v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error) {
+	fake.marketplaceMutex.Lock()
+	ret, specificReturn := fake.marketplaceReturnsOnCall[len(fake.marketplaceArgsForCall)]
+	fake.marketplaceArgsForCall = append(fake.marketplaceArgsForCall, struct {
+		arg1 v7action.MarketplaceFilter
+	}{arg1})
+	fake.recordInvocation("Marketplace", []interface{}{arg1})
+	fake.marketplaceMutex.Unlock()
+	if fake.MarketplaceStub != nil {
+		return fake.MarketplaceStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.marketplaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) MarketplaceCallCount() int {
+	fake.marketplaceMutex.RLock()
+	defer fake.marketplaceMutex.RUnlock()
+	return len(fake.marketplaceArgsForCall)
+}
+
+func (fake *FakeActor) MarketplaceCalls(stub func(v7action.MarketplaceFilter) ([]v7action.ServiceOfferingWithPlans, v7action.Warnings, error)) {
+	fake.marketplaceMutex.Lock()
+	defer fake.marketplaceMutex.Unlock()
+	fake.MarketplaceStub = stub
+}
+
+func (fake *FakeActor) MarketplaceArgsForCall(i int) v7action.MarketplaceFilter {
+	fake.marketplaceMutex.RLock()
+	defer fake.marketplaceMutex.RUnlock()
+	argsForCall := fake.marketplaceArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeActor) MarketplaceReturns(result1 []v7action.ServiceOfferingWithPlans, result2 v7action.Warnings, result3 error) {
+	fake.marketplaceMutex.Lock()
+	defer fake.marketplaceMutex.Unlock()
+	fake.MarketplaceStub = nil
+	fake.marketplaceReturns = struct {
+		result1 []v7action.ServiceOfferingWithPlans
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) MarketplaceReturnsOnCall(i int, result1 []v7action.ServiceOfferingWithPlans, result2 v7action.Warnings, result3 error) {
+	fake.marketplaceMutex.Lock()
+	defer fake.marketplaceMutex.Unlock()
+	fake.MarketplaceStub = nil
+	if fake.marketplaceReturnsOnCall == nil {
+		fake.marketplaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.ServiceOfferingWithPlans
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.marketplaceReturnsOnCall[i] = struct {
+		result1 []v7action.ServiceOfferingWithPlans
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) ParseAccessToken(arg1 string) (jwt.JWT, error) {
 	fake.parseAccessTokenMutex.Lock()
 	ret, specificReturn := fake.parseAccessTokenReturnsOnCall[len(fake.parseAccessTokenArgsForCall)]
@@ -15975,6 +16056,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getUserMutex.RUnlock()
 	fake.mapRouteMutex.RLock()
 	defer fake.mapRouteMutex.RUnlock()
+	fake.marketplaceMutex.RLock()
+	defer fake.marketplaceMutex.RUnlock()
 	fake.parseAccessTokenMutex.RLock()
 	defer fake.parseAccessTokenMutex.RUnlock()
 	fake.pollBuildMutex.RLock()
