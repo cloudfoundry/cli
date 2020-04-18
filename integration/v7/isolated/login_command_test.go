@@ -107,7 +107,7 @@ var _ = Describe("login command", func() {
 
 					session = helpers.CF("api")
 					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say("api endpoint:   %s", apiURL))
+					Expect(session).Should(Say("API endpoint:   %s", apiURL))
 				})
 
 				When("the provided API endpoint is unreachable", func() {
@@ -141,7 +141,7 @@ var _ = Describe("login command", func() {
 
 					apiSession := helpers.CF("api")
 					Eventually(apiSession).Should(Exit(0))
-					Eventually(apiSession).Should(Say("api endpoint:   %s", apiURL))
+					Eventually(apiSession).Should(Say("API endpoint:   %s", apiURL))
 				})
 			})
 		})
@@ -168,7 +168,7 @@ var _ = Describe("login command", func() {
 
 			It("displays the API endpoint as https once targeted", func() {
 				Eventually(session).Should(Say("API endpoint: %s", hostname))
-				Eventually(session).Should(Say(`API endpoint:\s+https://%s\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`, hostname))
+				Eventually(session).Should(Say(`API version:\s+\d\.\d{1,3}\.\d{1,3}`))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -213,7 +213,7 @@ var _ = Describe("login command", func() {
 
 					session = helpers.CF("api")
 					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say("api endpoint:   %s", apiURL))
+					Expect(session).Should(Say("API endpoint:   %s", apiURL))
 				})
 			})
 
@@ -301,7 +301,8 @@ var _ = Describe("login command", func() {
 					Eventually(session.Err).Should(Say(`Invalid passcode`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session.Err).Should(Say(`Invalid passcode`))
-					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API version:\s+\d\.\d{1,3}\.\d{1,3}`))
 					Eventually(session).Should(Say(`Not logged in. Use 'cf login' or 'cf login --sso' to log in.`))
 					Eventually(session.Err).Should(Say(`Unable to authenticate`))
 					Eventually(session).Should(Say(`FAILED`))
@@ -328,8 +329,9 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 				Eventually(session).Should(Say(`Authenticating\.\.\.`))
 				Eventually(session).Should(Say(`OK`))
-				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
-				Eventually(session).Should(Say("User:\\s+" + username))
+				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI()))
+				Eventually(session).Should(Say(`API version:\s+\d\.\d{1,3}\.\d{1,3}`))
+				Eventually(session).Should(Say("user:\\s+" + username))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -351,7 +353,7 @@ var _ = Describe("login command", func() {
 			Expect(err).ToNot(HaveOccurred())
 			session := helpers.CFWithStdin(buffer, "login")
 			Eventually(session).Should(Say("Email:"))
-			Eventually(session).Should(Say("\n\n"))
+			Eventually(session).Should(Say("\n"))
 			Eventually(session).Should(Say("Password:"))
 			Eventually(session).Should(Say("\n\n"))
 			Eventually(session).Should(Exit(0))
@@ -436,8 +438,9 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`OK`))
-					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
-					Eventually(session).Should(Say("User:\\s+" + username))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API version:\s+\d\.\d{1,3}\.\d{1,3}`))
+					Eventually(session).Should(Say("user:\\s+" + username))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -457,7 +460,8 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say(`Password:`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API version:\s+\d\.\d{1,3}\.\d{1,3}`))
 					Eventually(session).Should(Say(`Not logged in. Use 'cf login' or 'cf login --sso' to log in.`))
 					Eventually(session.Err).Should(Say(`Unable to authenticate.`))
 					Eventually(session).Should(Say(`FAILED`))
@@ -521,9 +525,9 @@ var _ = Describe("login command", func() {
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CFWithStdin(input, "login")
 					Eventually(session).Should(Say("Email: "))
-					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("\n"))
 					Eventually(session).Should(Say("Password:"))
-					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("\n"))
 					Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
 					Eventually(session).Should(Exit(0))
 				})
@@ -662,7 +666,7 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
 						Eventually(session).Should(Say("\n\n"))
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
-						Eventually(session).Should(Say("Targeted org org20"))
+						Eventually(session).Should(Say(`Targeted org org20\.`))
 
 						Eventually(session).Should(Exit(0))
 					})
@@ -770,7 +774,7 @@ var _ = Describe("login command", func() {
 					session := helpers.CF("login", "-u", username, "-p", password, "-o", orgName)
 
 					Eventually(session).Should(Exit(0))
-					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`org:\s+%s`, orgName))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
@@ -869,15 +873,15 @@ var _ = Describe("login command", func() {
 					Expect(writeErr).ToNot(HaveOccurred())
 					session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
 
-					Eventually(session).Should(Say(`Targeted org\s+%s`, orgName))
-					Eventually(session).Should(Say(`\n\nTargeted space\s+%s`, spaceName))
+					Eventually(session).Should(Say(`Targeted org\s+%s\.`, orgName))
+					Eventually(session).Should(Say(`\nTargeted space\s+%s\.`, spaceName))
 
-					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
-					Eventually(session).Should(Say(`Space:\s+%s`, spaceName))
+					Eventually(session).Should(Say(`org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`space:\s+%s`, spaceName))
 					Eventually(session).Should(Exit(0))
 
 					sessionOutput := string(session.Out.Contents())
-					Expect(sessionOutput).To(MatchRegexp(`\S\n\n\n\nAPI`))
+					Expect(sessionOutput).To(MatchRegexp(`\S\nAPI`))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
@@ -1009,7 +1013,7 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
 						Eventually(session).Should(Say("\n\n"))
 						Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
-						Eventually(session).Should(Say("Targeted space test-space-1"))
+						Eventually(session).Should(Say(`Targeted space test-space-1\.`))
 
 						Eventually(session).Should(Exit(0))
 					})
@@ -1059,7 +1063,7 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Say("API endpoint:"))
 				Eventually(session).Should(Say("\n\n"))
 				Eventually(session).Should(Say("Email:"))
-				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("\n"))
 				Eventually(session).Should(Say("Password:"))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("\n\n"))
@@ -1071,10 +1075,10 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Say("Select a space:"))
 				Eventually(session).Should(Say("\n\n"))
 				Eventually(session).Should(Say(regexp.QuoteMeta(`Space (enter to skip):`)))
-				Eventually(session).Should(Say(fmt.Sprintf("Targeted space %s", spaceName2)))
+				Eventually(session).Should(Say(fmt.Sprintf(`Targeted space %s\.`, spaceName2)))
 				Eventually(session).Should(Say("\n\n"))
-				Eventually(session).Should(Say(`Org:\s+%s`, orgName1))
-				Eventually(session).Should(Say(`Space:\s+%s`, spaceName2))
+				Eventually(session).Should(Say(`org:\s+%s`, orgName1))
+				Eventually(session).Should(Say(`space:\s+%s`, spaceName2))
 				Eventually(session).Should(Exit(0))
 
 				targetSession := helpers.CF("target")

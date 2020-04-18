@@ -436,15 +436,15 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Out).To(Say("Username:"))
 						Expect(testUI.Out).To(Say("faker"))
 
-						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("\n"))
 						Expect(testUI.Out).To(Say("Account Number:"))
 						Expect(testUI.Out).To(Say("someaccount"))
 
-						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("\n"))
 						Expect(testUI.Out).To(Say("Your Password:"))
 						Expect(testUI.Out).NotTo(Say("somepassword"))
 
-						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("\n"))
 						Expect(testUI.Out).To(Say("MFA Code:"))
 						Expect(testUI.Out).NotTo(Say("garbage"))
 					})
@@ -551,7 +551,7 @@ var _ = Describe("login Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-						Expect(testUI.Out).To(Say(`User:\s+potatoface`))
+						Expect(testUI.Out).To(Say(`user:\s+potatoface`))
 
 						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
 					})
@@ -639,7 +639,7 @@ var _ = Describe("login Command", func() {
 			It("authenticates with the inputted code", func() {
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
-				Expect(testUI.Out).To(Say(`User:\s+potatoface`))
+				Expect(testUI.Out).To(Say(`user:\s+potatoface`))
 
 				Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
 				credentials, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
@@ -693,7 +693,7 @@ var _ = Describe("login Command", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, fakeAPI))
-				Expect(testUI.Out).To(Say(`User:\s+potatoface`))
+				Expect(testUI.Out).To(Say(`user:\s+potatoface`))
 			})
 
 			When("an incorrect passcode is inputted", func() {
@@ -819,9 +819,10 @@ var _ = Describe("login Command", func() {
 				})
 
 				It("reports to the user that the org is targeted", func() {
-					Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
-					Expect(testUI.Out).To(Say("User:           some-user"))
-					Expect(testUI.Out).To(Say("Org:            some-org"))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com`))
+					Expect(testUI.Out).To(Say(`API version:\s+3.4.5`))
+					Expect(testUI.Out).To(Say("user:           some-user"))
+					Expect(testUI.Out).To(Say("org:            some-org"))
 				})
 			})
 
@@ -883,8 +884,9 @@ var _ = Describe("login Command", func() {
 					It("displays how to target an org and space", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
-						Expect(testUI.Out).To(Say(`User:\s+some-user`))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com`))
+						Expect(testUI.Out).To(Say(`API version:\s+3.4.5`))
+						Expect(testUI.Out).To(Say(`user:\s+some-user`))
 						Expect(testUI.Out).To(Say("No org or space targeted, use '%s target -o ORG -s SPACE'", binaryName))
 					})
 				})
@@ -1177,7 +1179,7 @@ var _ = Describe("login Command", func() {
 						})
 
 						It("displays that the spacce has been targeted", func() {
-							Expect(testUI.Out).To(Say(`Space:\s+some-space`))
+							Expect(testUI.Out).To(Say(`space:\s+some-space`))
 						})
 					})
 				})
@@ -1201,7 +1203,7 @@ var _ = Describe("login Command", func() {
 					})
 
 					It("reports that no space is targeted", func() {
-						Expect(testUI.Out).To(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE'`))
+						Expect(testUI.Out).To(Say(`space:\s+No space targeted, use 'some-executable target -s SPACE'`))
 					})
 				})
 			})
@@ -1225,8 +1227,9 @@ var _ = Describe("login Command", func() {
 
 						It("displays how to target a space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com \(API version: 3.4.5\)`))
-							Expect(testUI.Out).To(Say(`User:\s+some-user`))
+							Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com`))
+							Expect(testUI.Out).To(Say(`API version:\s+3.4.5`))
+							Expect(testUI.Out).To(Say(`user:\s+some-user`))
 							Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
 						})
 					})
@@ -1264,9 +1267,9 @@ var _ = Describe("login Command", func() {
 							Expect(firstArg).To(Equal("some-space-guid"))
 							Expect(secondArg).To(Equal("some-space-name"))
 
-							Expect(testUI.Out).To(Say(`Targeted space some-space-name`))
-							Expect(testUI.Out).To(Say(`Space:\s+some-space-name`))
-							Expect(testUI.Out).NotTo(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE`))
+							Expect(testUI.Out).To(Say(`Targeted space some-space-name\.`))
+							Expect(testUI.Out).To(Say(`space:\s+some-space-name`))
+							Expect(testUI.Out).NotTo(Say(`space:\s+No space targeted, use 'some-executable target -s SPACE`))
 						})
 					})
 

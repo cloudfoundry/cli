@@ -153,7 +153,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	targetedOrg := cmd.Config.TargetedOrganization()
 
 	if targetedOrg.GUID != "" {
-		cmd.UI.DisplayTextWithFlavor("Targeted org {{.Organization}}", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Targeted org {{.Organization}}.", map[string]interface{}{
 			"Organization": cmd.Config.TargetedOrganizationName(),
 		})
 		cmd.UI.DisplayNewline()
@@ -185,10 +185,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			}
 		}
 	}
-
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayNewline()
 
 	return nil
 }
@@ -254,7 +250,6 @@ func (cmd *LoginCommand) authenticate() error {
 		if err != nil {
 			return err
 		}
-		cmd.UI.DisplayNewline()
 	}
 
 	for key, prompt := range nonPasswordPrompts {
@@ -262,7 +257,6 @@ func (cmd *LoginCommand) authenticate() error {
 		if err != nil {
 			return err
 		}
-		cmd.UI.DisplayNewline()
 	}
 
 	for i := 0; i < maxLoginTries; i++ {
@@ -272,7 +266,6 @@ func (cmd *LoginCommand) authenticate() error {
 			if err != nil {
 				return err
 			}
-			cmd.UI.DisplayNewline()
 		}
 
 		for key, prompt := range passwordPrompts {
@@ -280,9 +273,9 @@ func (cmd *LoginCommand) authenticate() error {
 			if err != nil {
 				return err
 			}
-			cmd.UI.DisplayNewline()
 		}
 
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Authenticating...")
 
 		err = cmd.Actor.Authenticate(credentials, cmd.Origin, constant.GrantTypePassword)
@@ -301,6 +294,7 @@ func (cmd *LoginCommand) authenticate() error {
 			break
 		}
 	}
+
 	return err
 }
 
@@ -375,12 +369,11 @@ func (cmd *LoginCommand) showStatus() {
 	tableContent := [][]string{
 		{
 			cmd.UI.TranslateText("API endpoint:"),
-			cmd.UI.TranslateText("{{.APIEndpoint}} (API version: {{.APIVersion}})",
-				map[string]interface{}{
-					"APIEndpoint": strings.TrimRight(cmd.Config.Target(), "/"),
-					"APIVersion":  cmd.Config.APIVersion(),
-				},
-			),
+			strings.TrimRight(cmd.Config.Target(), "/"),
+		},
+		{
+			cmd.UI.TranslateText("API version:"),
+			cmd.Config.APIVersion(),
 		},
 	}
 
@@ -390,7 +383,7 @@ func (cmd *LoginCommand) showStatus() {
 		command.DisplayNotLoggedInText(cmd.Config.BinaryName(), cmd.UI)
 		return
 	}
-	tableContent = append(tableContent, []string{cmd.UI.TranslateText("User:"), user})
+	tableContent = append(tableContent, []string{cmd.UI.TranslateText("user:"), user})
 
 	orgName := cmd.Config.TargetedOrganizationName()
 	if orgName == "" {
@@ -402,7 +395,7 @@ func (cmd *LoginCommand) showStatus() {
 		)
 		return
 	}
-	tableContent = append(tableContent, []string{cmd.UI.TranslateText("Org:"), orgName})
+	tableContent = append(tableContent, []string{cmd.UI.TranslateText("org:"), orgName})
 
 	spaceContent := cmd.Config.TargetedSpace().Name
 	if spaceContent == "" {
@@ -412,7 +405,7 @@ func (cmd *LoginCommand) showStatus() {
 			},
 		)
 	}
-	tableContent = append(tableContent, []string{cmd.UI.TranslateText("Space:"), spaceContent})
+	tableContent = append(tableContent, []string{cmd.UI.TranslateText("space:"), spaceContent})
 
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
 }
@@ -506,9 +499,10 @@ func (cmd *LoginCommand) promptMenu(choices []string, text string, prompt string
 func (cmd *LoginCommand) targetSpace(space v7action.Space) {
 	cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
 
-	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Targeted space {{.Space}}.", map[string]interface{}{
 		"Space": space.Name,
 	})
+	cmd.UI.DisplayNewline()
 }
 
 func (cmd *LoginCommand) validateFlags() error {
