@@ -51,7 +51,7 @@ var _ = Describe("api Command", func() {
 
 		It("clears the target", func() {
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say("Unsetting api endpoint..."))
+			Expect(testUI.Out).To(Say("Unsetting API endpoint..."))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(fakeActor.ClearTargetCallCount()).To(Equal(1))
 		})
@@ -68,7 +68,7 @@ var _ = Describe("api Command", func() {
 		})
 
 		It("signals that it's setting the API endpoint", func() {
-			Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+			Expect(testUI.Out).To(Say("Setting API endpoint to %s...", CCAPI))
 		})
 
 		When("the API endpoint does not specify a protocol/schema (does not begin with 'http')", func() {
@@ -84,11 +84,11 @@ var _ = Describe("api Command", func() {
 				settings := fakeActor.SetTargetArgsForCall(0)
 				Expect(settings.URL).To(Equal("https://" + CCAPI))
 				Expect(settings.SkipSSLValidation).To(BeFalse())
-				Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+				Expect(testUI.Out).To(Say("Setting API endpoint to %s...", CCAPI))
 				Expect(testUI.Out).To(Say(`OK
 
-api endpoint:   some-api-target
-api version:    100.200.300`,
+API endpoint:   some-api-target
+API version:    100.200.300`,
 				))
 			})
 		})
@@ -106,8 +106,8 @@ api version:    100.200.300`,
 
 				Expect(testUI.Out).To(Say(`OK
 
-api endpoint:   some-api-target
-api version:    100.200.300`,
+API endpoint:   some-api-target
+API version:    100.200.300`,
 				))
 			})
 		})
@@ -119,7 +119,7 @@ api version:    100.200.300`,
 
 			It("returns an error with a --skip-ssl-validation tip", func() {
 				Expect(err).To(MatchError(ccerror.UnverifiedServerError{URL: CCAPI}))
-				Expect(testUI.Out).ToNot(Say(`api endpoint:\s+some-api-target`))
+				Expect(testUI.Out).ToNot(Say(`API endpoint:\s+some-api-target`))
 			})
 		})
 
@@ -137,7 +137,7 @@ api version:    100.200.300`,
 				Expect(settings.URL).To(Equal(CCAPI))
 				Expect(settings.SkipSSLValidation).To(BeFalse())
 
-				Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+				Expect(testUI.Out).To(Say("Setting API endpoint to %s...", CCAPI))
 				Expect(testUI.Out).To(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -179,7 +179,7 @@ api version:    100.200.300`,
 			It("informs the user that the API endpoint is not set through a tip", func() {
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
+				Expect(testUI.Out).To(Say("No API endpoint set. Use 'cf api' to set an endpoint"))
 			})
 		})
 
@@ -193,8 +193,8 @@ api version:    100.200.300`,
 
 			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say(`api endpoint:\s+some-api-target`))
-				Expect(testUI.Out).To(Say(`api version:\s+100.200.300`))
+				Expect(testUI.Out).To(Say(`API endpoint:\s+some-api-target`))
+				Expect(testUI.Out).To(Say(`API version:\s+100.200.300`))
 			})
 		})
 

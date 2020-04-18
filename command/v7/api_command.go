@@ -44,14 +44,14 @@ func (cmd *APICommand) Execute(args []string) error {
 }
 
 func (cmd *APICommand) clearTarget() error {
-	cmd.UI.DisplayTextWithFlavor("Unsetting api endpoint...")
+	cmd.UI.DisplayTextWithFlavor("Unsetting API endpoint...")
 	cmd.Actor.ClearTarget()
 	cmd.UI.DisplayOK()
 	return nil
 }
 
 func (cmd *APICommand) setAPI() error {
-	cmd.UI.DisplayTextWithFlavor("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Setting API endpoint to {{.Endpoint}}...", map[string]interface{}{
 		"Endpoint": cmd.OptionalArgs.URL,
 	})
 
@@ -83,7 +83,7 @@ func (cmd *APICommand) processURL(apiURL string) string {
 
 func (cmd *APICommand) viewTarget() error {
 	if cmd.Config.Target() == "" {
-		cmd.UI.DisplayText("No api endpoint set. Use '{{.Name}}' to set an endpoint", map[string]interface{}{
+		cmd.UI.DisplayText("No API endpoint set. Use '{{.Name}}' to set an endpoint", map[string]interface{}{
 			"Name": "cf api",
 		})
 		return nil
@@ -94,12 +94,13 @@ func (cmd *APICommand) viewTarget() error {
 
 func (cmd *APICommand) displayTarget() error {
 	cmd.UI.DisplayKeyValueTable("", [][]string{
-		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("api version:"), cmd.Config.APIVersion()},
+		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
+		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
 	}, 3)
 
 	user, err := cmd.Config.CurrentUser()
 	if user.Name == "" {
+		cmd.UI.DisplayNewline()
 		command.DisplayNotLoggedInText(cmd.Config.BinaryName(), cmd.UI)
 	}
 	return err
