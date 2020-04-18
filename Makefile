@@ -59,9 +59,9 @@ clean: ## Just remove all cf* files from the `out` directory
 clear: clean  ## Make everyone happy
 
 custom-lint: ## Run our custom linters
-	@echo "style linting files:" # this list will grow as we cleanup all the code
-	@bash -c "go run bin/style/main.go api util"
-	@echo "No lint errors!"
+	@echo "Running custom linters..." # this list will grow as we cleanup all the code:
+	bash -c "go run bin/style/main.go api util"
+	@echo "No custom lint errors!"
 	@echo
 
 fly-windows-experimental: check-target-env
@@ -148,8 +148,9 @@ integration-full-tests: integration-tests-full
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
 
 lint: custom-lint ## Runs all linters and formatters
+	@echo "Running linters..."
 	golangci-lint run $(LINT_FLAGS)
-	@echo "No custom lint errors!"
+	@echo "No lint errors!"
 
 ifeq ($(TARGET),v6)
 out/cf: out/cf6
