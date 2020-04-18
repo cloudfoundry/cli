@@ -148,8 +148,8 @@ func (cmd *TargetCommand) setSpace() error {
 // displayTargetTable neatly displays target information.
 func (cmd *TargetCommand) displayTargetTable(user configv3.User) {
 	table := [][]string{
-		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("api version:"), cmd.Actor.CloudControllerAPIVersion()},
+		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
+		{cmd.UI.TranslateText("API version:"), cmd.Actor.CloudControllerAPIVersion()},
 		{cmd.UI.TranslateText("user:"), user.Name},
 	}
 
