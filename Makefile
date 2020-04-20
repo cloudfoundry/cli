@@ -26,12 +26,12 @@ ifndef TARGET_V7
 TARGET = v6
 export GOFLAGS =
 SLOW_SPEC_THRESHOLD=60
-LINT_FLAGS = --build-tags=V7
+LINT_FLAGS =
 else
 TARGET = v7
 export GOFLAGS = -tags=V7
 SLOW_SPEC_THRESHOLD=120
-LINT_FLAGS =
+LINT_FLAGS = --build-tags=V7
 endif
 
 GINKGO_FLAGS=-r -randomizeAllSpecs -requireSuite

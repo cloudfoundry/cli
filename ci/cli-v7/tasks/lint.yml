@@ -10,6 +10,9 @@ inputs:
 - name: cli
   path: gopath/src/code.cloudfoundry.org/cli
 
+params:
+  TARGET_V7:
+
 run:
   path: bash
   args:

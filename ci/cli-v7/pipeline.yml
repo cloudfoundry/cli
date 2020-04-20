@@ -254,6 +254,8 @@ jobs:
   - in_parallel:
     - task: lint
       file: cli/ci/cli-v7/tasks/lint.yml
+      params:
+        TARGET_V7: true
       on_failure:
         put: slack-alert
         params:
