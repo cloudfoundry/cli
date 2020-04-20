@@ -56,6 +56,7 @@ var _ = Describe("Process", func() {
 			err       error
 		)
 		JustBeforeEach(func() {
+			process = Process{}
 			err = yaml.Unmarshal(yamlBytes, &process)
 		})
 		When("'disk_quota' (underscore, backwards-compatible) is specified", func() {
