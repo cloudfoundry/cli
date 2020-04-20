@@ -135,7 +135,6 @@ var _ = Describe("logs command", func() {
 
 		BeforeEach(func() {
 			latestEnvelopeTimestamp := "1581447006352020890"
-			latestEnvelopeTimestampMinusOneSecond := "1581447005352020890"
 			nextEnvelopeTimestamp := "1581447009352020890"
 			nextEnvelopeTimestampPlusOneNanosecond := "1581447009352020891"
 
@@ -164,7 +163,7 @@ var _ = Describe("logs command", func() {
 						}`, latestEnvelopeTimestamp)))
 							Expect(err).ToNot(HaveOccurred())
 						}
-					case fmt.Sprintf("envelope_types=LOG&start_time=%s", latestEnvelopeTimestampMinusOneSecond):
+					case fmt.Sprintf("envelope_types=LOG&start_time=%s", latestEnvelopeTimestamp):
 						_, err := w.Write([]byte(fmt.Sprintf(`{
 							"envelopes": {
 								"batch": [
