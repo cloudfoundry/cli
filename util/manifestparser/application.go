@@ -1,6 +1,7 @@
 package manifestparser
 
 import (
+	"errors"
 	"reflect"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -16,7 +17,7 @@ type Docker struct {
 // struct.
 type Application struct {
 	Name                    string                   `yaml:"name"`
-	DiskQuota               string                   `yaml:"disk_quota,omitempty"`
+	DiskQuota               string                   `yaml:"disk-quota,omitempty"`
 	Docker                  *Docker                  `yaml:"docker,omitempty"`
 	HealthCheckType         constant.HealthCheckType `yaml:"health-check-type,omitempty"`
 	HealthCheckEndpoint     string                   `yaml:"health-check-http-endpoint,omitempty"`
@@ -76,6 +77,19 @@ func (application *Application) UnmarshalYAML(unmarshal func(v interface{}) erro
 
 	value := reflect.ValueOf(*application)
 	removeDuplicateMapKeys(value, application.RemainingManifestFields)
+	// old style was `disk_quota` (underscore not hyphen)
+	// we maintain backwards-compatibility by supporting both flavors
+	if application.RemainingManifestFields["disk_quota"] != nil {
+		if application.DiskQuota != "" {
+			return errors.New("cannot define both `disk_quota` and `disk-quota`")
+		}
+		diskQuota, ok := application.RemainingManifestFields["disk_quota"].(string)
+		if !ok {
+			return errors.New("`disk_quota` must be a string")
+		}
+		application.DiskQuota = diskQuota
+		delete(application.RemainingManifestFields, "disk_quota")
+	}
 
 	return nil
 }

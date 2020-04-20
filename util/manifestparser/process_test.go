@@ -2,9 +2,9 @@ package manifestparser_test
 
 import (
 	. "code.cloudfoundry.org/cli/util/manifestparser"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 )
 
 var _ = Describe("Process", func() {
@@ -48,5 +48,34 @@ var _ = Describe("Process", func() {
 				Expect(process.RemainingManifestFields["command"]).To(Equal("./start.sh"))
 			})
 		})
+	})
+	Describe("UnmarshalYAML", func() {
+		var (
+			yamlBytes []byte
+			process   Process
+			err       error
+		)
+		JustBeforeEach(func() {
+			err = yaml.Unmarshal(yamlBytes, &process)
+		})
+		When("'disk_quota' (underscore, backwards-compatible) is specified", func() {
+			BeforeEach(func() {
+				yamlBytes = []byte("disk_quota: 5G")
+			})
+			It("unmarshals it properly", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(process).To(Equal(Process{DiskQuota: "5G", RemainingManifestFields: map[string]interface{}{}}))
+			})
+		})
+		When("'disk-quota' (hyphen, new convention) is specified", func() {
+			BeforeEach(func() {
+				yamlBytes = []byte("disk-quota: 5G")
+			})
+			It("unmarshals it properly", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(process).To(Equal(Process{DiskQuota: "5G", RemainingManifestFields: map[string]interface{}{}}))
+			})
+		})
+
 	})
 })

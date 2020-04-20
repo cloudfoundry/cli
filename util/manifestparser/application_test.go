@@ -39,6 +39,59 @@ name: spark
 			})
 		})
 
+		When("a disk quota is provided", func() {
+			When("it has a hyphen (`disk-quota`)", func() {
+				BeforeEach(func() {
+					rawYAML = []byte(`---
+disk-quota: 5G
+`)
+				})
+
+				It("unmarshals the disk quota", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(application.DiskQuota).To(Equal("5G"))
+				})
+			})
+			When("it has an underscore (`disk_quota`)", func() {
+				BeforeEach(func() {
+					rawYAML = []byte(`---
+disk_quota: 5G
+`)
+				})
+
+				It("unmarshals the disk quota because we maintain backwards-compatibility with the old style", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(application.DiskQuota).To(Equal("5G"))
+				})
+				It("doesn't leave a second version of `disk_quota` in the remaining manifest fields", func() {
+					Expect(application.RemainingManifestFields["disk_quota"]).To(BeNil())
+				})
+			})
+			When("it has an underscore but it isn't a string", func() {
+				BeforeEach(func() {
+					rawYAML = []byte(`---
+disk_quota: [1]
+`)
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("`disk_quota` must be a string"))
+				})
+			})
+			When("both underscore and hyphen versions are present", func() {
+				BeforeEach(func() {
+					rawYAML = []byte(`---
+disk_quota: 5G
+disk-quota: 6G
+`)
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("cannot define both `disk_quota` and `disk-quota`"))
+				})
+			})
+		})
+
 		Context("when default-route is provided", func() {
 			BeforeEach(func() {
 				rawYAML = []byte(`---
