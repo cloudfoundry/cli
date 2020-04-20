@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("curl command", func() {
+var _ = FDescribe("curl command", func() {
 	var ExpectHelpText = func(session *Session) {
 		Eventually(session).Should(Say(`NAME:\n`))
 		Eventually(session).Should(Say(`curl - Executes a request to the targeted API endpoint\n`))

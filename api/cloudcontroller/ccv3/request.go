@@ -21,6 +21,7 @@ type requestOptions struct {
 	// RequestName is the name of the request (see routes)
 	RequestName string
 
+	Header http.Header
 	// Method is the HTTP method.
 	Method string
 	// URL is the request path.
@@ -34,6 +35,8 @@ type requestOptions struct {
 func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*cloudcontroller.Request, error) {
 	var request *http.Request
 	var err error
+	//fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	//fmt.Println(passedRequest)
 	if passedRequest.URL != "" {
 		request, err = http.NewRequest(
 			passedRequest.Method,
@@ -54,7 +57,11 @@ func (requester *RealRequester) newHTTPRequest(passedRequest requestOptions) (*c
 		request.URL.RawQuery = FormatQueryParameters(passedRequest.Query).Encode()
 	}
 
-	request.Header = http.Header{}
+	if passedRequest.Header != nil {
+		request.Header = passedRequest.Header
+	} else {
+		request.Header = http.Header{}
+	}
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("User-Agent", requester.userAgent)
 

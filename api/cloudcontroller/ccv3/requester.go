@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"runtime"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -18,7 +19,6 @@ type RequestParams struct {
 	URIParams      internal.Params
 	Query          []Query
 	RequestBody    interface{}
-	RequestHeaders [][]string
 	ResponseBody   interface{}
 	URL            string
 	AppendToList   func(item interface{}) error
@@ -46,6 +46,13 @@ type Requester interface {
 		requestBodyMimeType string,
 		responseBody interface{},
 	) (string, Warnings, error)
+
+	MakeRequestSendReceiveRaw(
+		Method string,
+		URL string,
+		headers http.Header,
+		requestBody []byte,
+	) ([]byte, Warnings, error)
 
 	MakeRequestUploadAsync(
 		requestName string,
@@ -126,6 +133,29 @@ func (requester *RealRequester) MakeRequestReceiveRaw(
 
 	err = requester.connection.Make(request, &response)
 
+	return response.RawResponse, response.Warnings, err
+}
+
+func (requester *RealRequester) MakeRequestSendReceiveRaw(
+	Method string,
+	URL string,
+	headers http.Header,
+	requestBody []byte,
+) ([]byte, Warnings, error) {
+	request, err := requester.newHTTPRequest(requestOptions{
+		URL:    URL,
+		Method: Method,
+		Body:   bytes.NewReader(requestBody),
+		Header: headers,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = requester.connection.Make(request, &response)
+	// for some flag cases (-i) we will need to get more data off the response (headers etc) consider returning full response
 	return response.RawResponse, response.Warnings, err
 }
 

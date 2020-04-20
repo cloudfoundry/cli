@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -18,7 +19,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("shared request helpers", func() {
+var _ = FDescribe("shared request helpers", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -439,6 +440,100 @@ var _ = Describe("shared request helpers", func() {
 					}))
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
+			})
+		})
+	})
+
+	Describe("MakeRequestSendReceiveRaw", func() {
+		var (
+			method        string
+			url           string
+			headers       http.Header
+			requestBody   []byte
+			responseBytes []byte
+			warnings      Warnings
+			executeErr    error
+		)
+		JustBeforeEach(func() {
+			responseBytes, warnings, executeErr = client.MakeRequestSendReceiveRaw(method, url, headers, requestBody)
+		})
+
+		Context("PATCH request with body", func() {
+			BeforeEach(func() {
+				method = "PATCH"
+				url = fmt.Sprintf("%s/v3/apps/%s", server.URL(), "some-app-guid")
+				headers = http.Header{}
+				headers.Set("Banana", "Plantain")
+
+				var err error
+				requestBody, err = json.Marshal(Application{
+					GUID:                "some-app-guid",
+					Name:                "some-app-name",
+					StackName:           "some-stack-name",
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					LifecycleBuildpacks: []string{"some-buildpack"},
+					Relationships: Relationships{
+						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
+					},
+				})
+
+				Expect(err).NotTo(HaveOccurred())
+
+				response := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
+						}
+					}
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-app-name",
+					"lifecycle": map[string]interface{}{
+						"type": "buildpack",
+						"data": map[string]interface{}{
+							"buildpacks": []string{"some-buildpack"},
+							"stack":      "some-stack-name",
+						},
+					},
+					"relationships": map[string]interface{}{
+						"space": map[string]interface{}{
+							"data": map[string]string{
+								"guid": "some-space-guid",
+							},
+						},
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid"),
+						VerifyHeader(http.Header{"Banana": {"Plantain"}}),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("successfully makes the request", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				actualResponse := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
+						}
+					}
+				}`
+				Expect(string(responseBytes)).To(Equal(actualResponse))
 			})
 		})
 	})
