@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
 type LogsCommand struct {
@@ -31,12 +30,7 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
+	cmd.LogCacheClient = command.NewLogCacheClient(cmd.cloudControllerClient.Info.LogCache(), config, ui)
 	return nil
 }
 
