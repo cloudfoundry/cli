@@ -33,7 +33,8 @@ var _ = Describe("table alignment", func() {
 		})
 	})
 
-	When("output is in language with multibyte characters", func() {
+	// TODO: un-pend when we have a translation for "API version:"
+	PWhen("output is in language with multibyte characters", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
@@ -44,10 +45,8 @@ var _ = Describe("table alignment", func() {
 		It("aligns the table correctly", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CFWithEnv(map[string]string{"LANG": "ja-JP.utf8"}, "target")
-			Eventually(session).Should(Say("API エンドポイント:   %s", apiURL))
-			// TODO: "version" here should be translated for all languages. We have translation resources for "api version"
-			// (lowercase), which is what this said in V6, but we don't yet have them for "API version" (uppercase).
-			Eventually(session).Should(Say(`API version:          [\d.]+`))
+			Eventually(session).Should(Say("API エンドポイント   %s", apiURL))
+			Eventually(session).Should(Say(`API バージョン:      [\d.]+`))
 			Eventually(session).Should(Say("ユーザー:            %s", username))
 			Eventually(session).Should(Say("組織:                %s", ReadOnlyOrg))
 			Eventually(session).Should(Say("スペース:            %s", ReadOnlySpace))
