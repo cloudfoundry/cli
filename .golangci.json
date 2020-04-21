@@ -2,26 +2,6 @@
   "run": {
     "concurrency": 4,
     "timeout": "20m",
-    "skip-dirs": [
-      "^cf",
-      "^ci",
-      "^doc",
-      "^fixtures",
-      "^i18n",
-      "^plugin",
-      "^vendor",
-      "^actor/cfnetworkingaction",
-      "^actor/pluginaction",
-      "^actor/pushaction",
-      "^actor/v2.*",
-      "^actor/v3.*",
-      "^api/cloudcontroller/ccv2",
-      "^api/plugin",
-      "^api/router",
-      "^integration/assets",
-      "^integration/v6",
-      ".*fake.*"
-    ],
     "skip-files": [
       "integration/helpers/fake_server.go"
     ]

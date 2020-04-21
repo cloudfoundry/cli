@@ -149,7 +149,9 @@ integration-tests-full: build integration-cleanup integration-isolated integrati
 
 lint: custom-lint ## Runs all linters and formatters
 	@echo "Running linters..."
-	golangci-lint run $(LINT_FLAGS)
+	go list -f "{{.Dir}}" ./... \
+		| grep -v -e "/cf/" -e "/fixtures/" -e "/assets/" -e "/plugin/" -e "fakes" \
+		| xargs golangci-lint run $(LINT_FLAGS)
 	@echo "No lint errors!"
 
 ifeq ($(TARGET),v6)
