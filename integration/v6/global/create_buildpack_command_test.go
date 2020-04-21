@@ -91,7 +91,7 @@ var _ = Describe("create buildpack command", func() {
 					buildpackDir, err = ioutil.TempDir("", "buildpackdir-")
 					Expect(err).ToNot(HaveOccurred())
 					file, err := ioutil.TempFile(buildpackDir, "myfile-")
-					defer file.Close()
+					defer file.Close() // nolint
 					Expect(err).ToNot(HaveOccurred())
 				})
 

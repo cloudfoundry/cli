@@ -31,7 +31,7 @@ var _ = Describe("Plugin Client", func() {
 			client.WrapConnection(fakeConnectionWrapper)
 			Expect(fakeConnectionWrapper.WrapCallCount()).To(Equal(1))
 
-			client.GetPluginRepository("does-not-matter")
+			_, _ = client.GetPluginRepository("does-not-matter")
 			Expect(fakeConnectionWrapper.MakeCallCount()).To(Equal(1))
 		})
 	})
@@ -48,7 +48,7 @@ var _ = Describe("Plugin Client", func() {
 		})
 
 		It("adds a user agent header", func() {
-			client.GetPluginRepository(server.URL())
+			_, _ = client.GetPluginRepository(server.URL())
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 		})
 	})

@@ -207,7 +207,10 @@ var _ = Describe("v3-scale command", func() {
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 					By("scaling memory to 64M")
 					buffer := NewBuffer()
-					buffer.Write([]byte("y\n"))
+
+					_, err := buffer.Write([]byte("y\n"))
+					Expect(err).NotTo(HaveOccurred())
+
 					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-m", "64M")
 					Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
@@ -227,7 +230,10 @@ var _ = Describe("v3-scale command", func() {
 
 					By("scaling disk to 92M")
 					buffer = NewBuffer()
-					buffer.Write([]byte("y\n"))
+
+					_, err = buffer.Write([]byte("y\n"))
+					Expect(err).NotTo(HaveOccurred())
+
 					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-k", "92M")
 					Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
@@ -260,7 +266,10 @@ var _ = Describe("v3-scale command", func() {
 				When("the user chooses not to restart the app", func() {
 					It("cancels the scale", func() {
 						buffer := NewBuffer()
-						buffer.Write([]byte("n\n"))
+
+						_, err := buffer.Write([]byte("n\n"))
+						Expect(err).NotTo(HaveOccurred())
+
 						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "90M")
 						Eventually(session).Should(Say("This will cause the app to restart"))
 						Consistently(session).ShouldNot(Say("Stopping"))
@@ -279,7 +288,10 @@ var _ = Describe("v3-scale command", func() {
 				When("the app starts successfully", func() {
 					It("scales the app accordingly", func() {
 						buffer := NewBuffer()
-						buffer.Write([]byte("y\n"))
+
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).NotTo(HaveOccurred())
+
 						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "120M", "-m", "60M")
 						Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
@@ -303,7 +315,10 @@ var _ = Describe("v3-scale command", func() {
 				When("the app does not start successfully", func() {
 					It("scales the app and displays the app summary", func() {
 						buffer := NewBuffer()
-						buffer.Write([]byte("y\n"))
+
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).NotTo(HaveOccurred())
+
 						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "10M", "-m", "6M")
 						Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))

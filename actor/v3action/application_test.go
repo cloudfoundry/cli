@@ -552,7 +552,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("gets polling and timeout values from the config", func() {
-						actor.PollStart("some-guid", warningsChannel)
+						err := actor.PollStart("some-guid", warningsChannel)
+						Expect(err).To(MatchError(actionerror.StartupTimeoutError{}))
 						funcDone <- nil
 
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))

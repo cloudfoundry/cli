@@ -110,7 +110,8 @@ applications:
 			When("it is a valid index", func() {
 				It("does not throw any error", func() {
 					buffer := NewBuffer()
-					buffer.Write([]byte("exit\n"))
+					_, err := buffer.Write([]byte("exit\n"))
+					Expect(err).NotTo(HaveOccurred())
 
 					By("waiting for all instances to be running")
 					Eventually(func() bool {

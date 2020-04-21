@@ -13,8 +13,6 @@ import (
 // Client is a client that can be used to talk to a Cloud Controller's V2
 // Endpoints.
 type Client struct {
-	routerGroupEndpoint string
-
 	connection Connection
 	router     *rata.RequestGenerator
 	userAgent  string

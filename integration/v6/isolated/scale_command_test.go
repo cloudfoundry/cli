@@ -136,7 +136,9 @@ var _ = XDescribe("scale command", func() {
 
 						When("user enters y", func() {
 							It("scales application to specified memory with restart", func() {
-								buffer.Write([]byte("y\n"))
+								_, err := buffer.Write([]byte("y\n"))
+								Expect(err).NotTo(HaveOccurred())
+
 								session := helpers.CFWithStdin(buffer, "scale", appName, "-m", "256M")
 								Eventually(session).Should(Say("This will cause the app to restart. Are you sure you want to scale %s\\? \\[yN]]", appName))
 								Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
@@ -162,7 +164,9 @@ var _ = XDescribe("scale command", func() {
 
 						When("user enters n", func() {
 							It("does not scale the app", func() {
-								buffer.Write([]byte("n\n"))
+								_, err := buffer.Write([]byte("n\n"))
+								Expect(err).NotTo(HaveOccurred())
+
 								session := helpers.CFWithStdin(buffer, "scale", appName, "-m", "256M")
 								Eventually(session).Should(Say("This will cause the app to restart. Are you sure you want to scale %s\\? \\[yN]]", appName))
 								Eventually(session).Should(Say("Scale cancelled"))

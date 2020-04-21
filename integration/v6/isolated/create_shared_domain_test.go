@@ -105,8 +105,6 @@ var _ = Describe("create-shared-domain command", func() {
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
-						session = helpers.CF("domains")
-
 						var sharedDomainResponse struct {
 							Resources []struct {
 								Entity struct {

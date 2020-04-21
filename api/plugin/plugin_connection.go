@@ -18,7 +18,7 @@ import (
 // PluginConnection represents a connection to a plugin repo.
 type PluginConnection struct {
 	HTTPClient  *http.Client
-	proxyReader ProxyReader
+	proxyReader ProxyReader // nolint
 }
 
 // NewConnection returns a new PluginConnection

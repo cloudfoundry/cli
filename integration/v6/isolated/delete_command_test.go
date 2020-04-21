@@ -96,7 +96,8 @@ var _ = Describe("delete command", func() {
 
 				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("\n"))
+						_, err := buffer.Write([]byte("\n"))
+						Expect(err).NotTo(HaveOccurred())
 					})
 
 					It("does not delete the app", func() {

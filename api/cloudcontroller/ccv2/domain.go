@@ -70,12 +70,16 @@ func (client *Client) CreateSharedDomain(domainName string, routerGroupdGUID str
 		RouterGroupGUID: routerGroupdGUID,
 		Internal:        isInternal,
 	}
+
 	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostSharedDomainRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
-
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 	logcache "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -189,27 +188,6 @@ var _ = Describe("Logging Actions", func() {
 
 			When("LogCache returns logs", func() {
 				BeforeEach(func() {
-					outMessage := events.LogMessage_OUT
-					ts1 := int64(10)
-					ts2 := int64(20)
-					sourceType := "some-source-type"
-					sourceInstance := "some-source-instance"
-
-					var messages []*events.LogMessage
-					messages = append(messages, &events.LogMessage{
-						Message:        []byte("message-2"),
-						MessageType:    &outMessage,
-						Timestamp:      &ts2,
-						SourceType:     &sourceType,
-						SourceInstance: &sourceInstance,
-					})
-					messages = append(messages, &events.LogMessage{
-						Message:        []byte("message-1"),
-						MessageType:    &outMessage,
-						Timestamp:      &ts1,
-						SourceType:     &sourceType,
-						SourceInstance: &sourceInstance,
-					})
 					fakeConfig.DialTimeoutReturns(60 * time.Minute)
 
 					fakeLogCacheClient.ReadReturns([]*loggregator_v2.Envelope{{

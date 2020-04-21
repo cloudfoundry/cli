@@ -580,7 +580,8 @@ var _ = Describe("Package Actions", func() {
 					Expect(bitsPathFile.Close()).To(Succeed())
 					bitsPath = bitsPathFile.Name()
 
-					zipit(tempFilePath, bitsPath, "")
+					err = zipit(tempFilePath, bitsPath, "")
+					Expect(err).ToNot(HaveOccurred())
 					Expect(os.Remove(tempFilePath)).To(Succeed())
 				})
 
@@ -682,7 +683,8 @@ var _ = Describe("Package Actions", func() {
 					Expect(archivePathFile.Close()).To(Succeed())
 					archivePath = archivePathFile.Name()
 
-					zipit(tempArchiveFilePath, archivePath, "")
+					err = zipit(tempArchiveFilePath, archivePath, "")
+					Expect(err).ToNot(HaveOccurred())
 					Expect(os.Remove(tempArchiveFilePath)).To(Succeed())
 
 					tempFile, err := ioutil.TempFile("", "example-file-")

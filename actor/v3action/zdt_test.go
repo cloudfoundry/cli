@@ -305,11 +305,12 @@ var _ = Describe("v3-zdt-push", func() {
 				})
 
 				It("gets polling and timeout values from the config", func() {
-					actor.ZeroDowntimePollStart("some-guid", warningsChannel)
+					err := actor.ZeroDowntimePollStart("some-guid", warningsChannel)
 					funcDone <- nil
 
 					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					Expect(err).To(MatchError(actionerror.StartupTimeoutError{}))
 				})
 			})
 
