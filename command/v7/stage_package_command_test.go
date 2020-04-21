@@ -21,11 +21,11 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("stage Command", func() {
+var _ = Describe("stage-package Command", func() {
 	const dropletCreateTime = "2017-08-14T21:16:42Z"
 
 	var (
-		cmd                v7.StageCommand
+		cmd                v7.StagePackageCommand
 		testUI             *ui.UI
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
@@ -58,7 +58,7 @@ var _ = Describe("stage Command", func() {
 		packageGUID = "some-package-guid"
 		spaceGUID = "some-space-guid"
 
-		cmd = v7.StageCommand{
+		cmd = v7.StagePackageCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
 			PackageGUID:  packageGUID,
 			BaseCommand: v7.BaseCommand{

@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("stage command", func() {
+var _ = Describe("stage-package command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -30,18 +30,20 @@ var _ = Describe("stage command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("stage", "APPS", "Create a new droplet for an app, defaults to the newest package"))
+				Expect(session).To(HaveCommandInCategoryWithDescription("stage-package", "APPS", "Stage a package into a droplet"))
 			})
 
 			It("Displays command usage to output", func() {
-				session := helpers.CF("stage", "--help")
+				session := helpers.CF("stage-package", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("stage - Create a new droplet for an app, defaults to the newest package"))
+				Eventually(session).Should(Say("stage-package - Stage a package into a droplet"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf stage APP_NAME \[--package-guid PACKAGE_GUID\]`))
+				Eventually(session).Should(Say(`cf stage-package APP_NAME \[--package-guid PACKAGE_GUID\]`))
+				Eventually(session).Should(Say("ALIAS:"))
+				Eventually(session).Should(Say("stage"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say(`--package-guid\s+The guid of the package to stage \(default: latest package\)`))
+				Eventually(session).Should(Say(`--package-guid\s+The guid of the package to stage \(default: latest ready package\)`))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 				Eventually(session).Should(Say("SEE ALSO:"))
@@ -54,7 +56,7 @@ var _ = Describe("stage command", func() {
 
 	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("stage", "--package-guid", "some-package-guid")
+			session := helpers.CF("stage-package", "--package-guid", "some-package-guid")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session).Should(Say("NAME:"))
@@ -64,7 +66,7 @@ var _ = Describe("stage command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "stage", appName, "--package-guid", "some-package-guid")
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "stage-package", appName, "--package-guid", "some-package-guid")
 		})
 	})
 
@@ -96,7 +98,7 @@ var _ = Describe("stage command", func() {
 				})
 
 				It("stages the package", func() {
-					session := helpers.CF("stage", appName, "--package-guid", packageGUID)
+					session := helpers.CF("stage-package", appName, "--package-guid", packageGUID)
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -119,7 +121,7 @@ var _ = Describe("stage command", func() {
 					})
 
 					It("errors saying the package does *not* exist", func() {
-						session := helpers.CF("stage", otherAppName, "--package-guid", packageGUID)
+						session := helpers.CF("stage-package", otherAppName, "--package-guid", packageGUID)
 						userName, _ := helpers.GetCredentials()
 
 						Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, otherAppName, orgName, spaceName, userName))
@@ -133,7 +135,7 @@ var _ = Describe("stage command", func() {
 			// TODO: remove flag from this sad path?
 			When("the app does not exist", func() {
 				It("displays app not found and exits 1", func() {
-					session := helpers.CF("stage", appName, "--package-guid", "some-package-guid")
+					session := helpers.CF("stage-package", appName, "--package-guid", "some-package-guid")
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -151,7 +153,7 @@ var _ = Describe("stage command", func() {
 				})
 
 				It("displays package not found and exits 1", func() {
-					session := helpers.CF("stage", appName, "--package-guid", "some-package-guid")
+					session := helpers.CF("stage-package", appName, "--package-guid", "some-package-guid")
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -173,7 +175,7 @@ var _ = Describe("stage command", func() {
 			})
 
 			It("stages the most recent package for the app", func() {
-				session := helpers.CF("stage", appName)
+				session := helpers.CF("stage-package", appName)
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))

@@ -11,12 +11,12 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-type StageCommand struct {
+type StagePackageCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
-	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage (default: latest package)"`
-	usage           interface{}  `usage:"CF_NAME stage APP_NAME [--package-guid PACKAGE_GUID]"`
+	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage (default: latest ready package)"`
+	usage           interface{}  `usage:"CF_NAME stage-package APP_NAME [--package-guid PACKAGE_GUID]"`
 	relatedCommands interface{}  `related_commands:"app, create-package, droplets, packages, push, set-droplet"`
 
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
@@ -24,7 +24,7 @@ type StageCommand struct {
 	LogCacheClient sharedaction.LogCacheClient
 }
 
-func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *StagePackageCommand) Setup(config command.Config, ui command.UI) error {
 	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func (cmd *StageCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd StageCommand) Execute(args []string) error {
+func (cmd StagePackageCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
