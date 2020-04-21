@@ -114,10 +114,6 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd V3SSHCommand) parseForwardSpecs() ([]sharedaction.LocalPortForward, error) {
-	return nil, nil
-}
-
 // EvaluateTTYOption determines which TTY options are mutually exclusive and
 // returns an error accordingly.
 func (cmd V3SSHCommand) EvaluateTTYOption() (sharedaction.TTYOption, error) {

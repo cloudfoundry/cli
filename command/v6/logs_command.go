@@ -1,11 +1,12 @@
 package v6
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"context"
 	"os"
 	"os/signal"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/actionerror"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"

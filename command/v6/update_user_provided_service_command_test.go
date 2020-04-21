@@ -194,7 +194,8 @@ var _ = Describe("update-user-provided-service Command", func() {
 					cmd.Credentials.IsSet = true
 					cmd.Credentials.UserPromptCredentials = []string{"pass phrase", "cred"}
 
-					input.Write([]byte("very secret passphrase\nsecret cred\n"))
+					_, err := input.Write([]byte("very secret passphrase\nsecret cred\n"))
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("prompts the user for credentials", func() {

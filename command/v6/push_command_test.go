@@ -1102,7 +1102,8 @@ var _ = Describe("push Command", func() {
 
 						Context("the docker password environment variable is *not* set", func() {
 							BeforeEach(func() {
-								input.Write([]byte("some-docker-password\n"))
+								_, err := input.Write([]byte("some-docker-password\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("prompts the user for a password", func() {

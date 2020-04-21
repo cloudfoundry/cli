@@ -14,10 +14,10 @@ import (
 
 //These constants are only for filling in translations.
 const (
-	runningState   = "RUNNING"
-	cancelingState = "CANCELING"
-	pendingState   = "PENDING"
-	succeededState = "SUCCEEDED"
+	runningState   = "RUNNING"   // nolint
+	cancelingState = "CANCELING" // nolint
+	pendingState   = "PENDING"   // nolint
+	succeededState = "SUCCEEDED" // nolint
 )
 
 //go:generate counterfeiter . TasksActor

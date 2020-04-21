@@ -91,7 +91,8 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("outputs a warning", func() {
-				GetNewClientsAndConnectToCF(fakeConfig, testUI)
+				_, _, err := GetNewClientsAndConnectToCF(fakeConfig, testUI)
+				Expect(err).To(HaveOccurred())
 				Expect(testUI.Err).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 			})
 		})

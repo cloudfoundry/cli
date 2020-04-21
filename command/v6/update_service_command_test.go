@@ -180,7 +180,8 @@ var _ = Describe("update-service Command", func() {
 
 					When("user refuses to proceed with the upgrade", func() {
 						BeforeEach(func() {
-							input.Write([]byte("n\n"))
+							_, err := input.Write([]byte("n\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("does not send an upgrade request", func() {
@@ -199,7 +200,8 @@ var _ = Describe("update-service Command", func() {
 
 					When("user goes ahead with the upgrade", func() {
 						BeforeEach(func() {
-							input.Write([]byte("y\n"))
+							_, err := input.Write([]byte("y\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("mentions which service instance was updated by which user", func() {
@@ -274,7 +276,8 @@ var _ = Describe("update-service Command", func() {
 
 					When("user presses return", func() {
 						BeforeEach(func() {
-							input.Write([]byte("\n"))
+							_, err := input.Write([]byte("\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("cancels the update", func() {

@@ -29,10 +29,10 @@ func (p *DebugPrinter) addOutput(output RequestLoggerOutput) {
 func (p DebugPrinter) Print(title string, dump string) {
 	for _, output := range p.outputs {
 		_ = output.Start()
-		defer output.Stop()
+		defer output.Stop() // nolint:errcheck
 
-		output.DisplayType(title, time.Now())
-		output.DisplayDump(dump)
+		_ = output.DisplayType(title, time.Now())
+		_ = output.DisplayDump(dump)
 	}
 
 }

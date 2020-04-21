@@ -18,12 +18,8 @@
       "^api/cloudcontroller/ccv2",
       "^api/plugin",
       "^api/router",
-      "^command/plugin",
-      "^command/v6",
       "^integration/assets",
       "^integration/v6",
-      "^util/generic",
-      "^util/manifest",
       ".*fake.*"
     ],
     "skip-files": [
@@ -44,11 +40,7 @@
       "deadcode"
     ]
   },
-  "linters-settings": {
-    "errcheck": {
-      "check-blank": true
-    }
-  },
+  "linters-settings": {},
   "issues": {
     "max-same-issue": 0,
     "exclude": [
