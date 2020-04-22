@@ -60,7 +60,7 @@ var _ = Describe("marketplace", func() {
 		})
 
 		It("calls the client", func() {
-			actor.Marketplace(MarketplaceFilter{})
+			_, _, _ = actor.Marketplace(MarketplaceFilter{})
 
 			Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 			queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
@@ -105,7 +105,7 @@ var _ = Describe("marketplace", func() {
 
 		When("a space GUID is specified", func() {
 			It("adds the GUID to the query", func() {
-				actor.Marketplace(MarketplaceFilter{SpaceGUID: "space-guid"})
+				_, _, _ = actor.Marketplace(MarketplaceFilter{SpaceGUID: "space-guid"})
 
 				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
@@ -115,7 +115,7 @@ var _ = Describe("marketplace", func() {
 
 		When("a service offering name is specified", func() {
 			It("adds the service offering name to the query", func() {
-				actor.Marketplace(MarketplaceFilter{ServiceOfferingName: "my-service-offering"})
+				_, _, _ = actor.Marketplace(MarketplaceFilter{ServiceOfferingName: "my-service-offering"})
 
 				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
@@ -125,7 +125,7 @@ var _ = Describe("marketplace", func() {
 
 		When("a service broker name is specified", func() {
 			It("adds the service broker name to the query", func() {
-				actor.Marketplace(MarketplaceFilter{ServiceBrokerName: "my-service-broker"})
+				_, _, _ = actor.Marketplace(MarketplaceFilter{ServiceBrokerName: "my-service-broker"})
 
 				Expect(fakeCloudControllerClient.GetServicePlansWithOfferingsCallCount()).To(Equal(1))
 				queries := fakeCloudControllerClient.GetServicePlansWithOfferingsArgsForCall(0)
@@ -135,7 +135,7 @@ var _ = Describe("marketplace", func() {
 
 		When("all filters are specified", func() {
 			It("adds all the filters to the query", func() {
-				actor.Marketplace(MarketplaceFilter{
+				_, _, _ = actor.Marketplace(MarketplaceFilter{
 					SpaceGUID:           "space-guid",
 					ServiceBrokerName:   "my-service-broker",
 					ServiceOfferingName: "my-service-offering",

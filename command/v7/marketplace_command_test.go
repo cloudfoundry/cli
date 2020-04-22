@@ -135,7 +135,8 @@ var _ = Describe("marketplace command", func() {
 				setFlag(&cmd, k, v)
 			}
 
-			cmd.Execute(nil)
+			err := cmd.Execute(nil)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(message))
 		},
@@ -212,7 +213,8 @@ var _ = Describe("marketplace command", func() {
 				setFlag(&cmd, k, v)
 			}
 
-			cmd.Execute(nil)
+			err := cmd.Execute(nil)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(fakeActor.MarketplaceCallCount()).To(Equal(1))
 			Expect(fakeActor.MarketplaceArgsForCall(0)).To(Equal(expectedFilter))
