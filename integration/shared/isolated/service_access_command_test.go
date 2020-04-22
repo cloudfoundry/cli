@@ -135,8 +135,7 @@ var _ = Describe("service-access command", func() {
 
 			When("multiple brokers are registered and with varying service accessibility", func() {
 				var (
-					otherBroker *servicebrokerstub.ServiceBrokerStub
-
+					otherBroker  *servicebrokerstub.ServiceBrokerStub
 					otherOrgName string
 				)
 
@@ -193,11 +192,11 @@ var _ = Describe("service-access command", func() {
 						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name))
 						Expect(session).To(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
-							otherBroker.Services[0].Plans[1].Name,
+							otherBroker.Services[0].Plans[0].Name,
 						))
 						Expect(session).To(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
-							otherBroker.Services[0].Plans[0].Name,
+							otherBroker.Services[0].Plans[1].Name,
 						))
 						Expect(string(session.Out.Contents())).NotTo(ContainSubstring(`broker:\s+%s`, broker.Name))
 
@@ -213,11 +212,11 @@ var _ = Describe("service-access command", func() {
 						Expect(session).To(Say(`broker:\s+%s`, otherBroker.Name))
 						Expect(session).To(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
-							otherBroker.Services[0].Plans[1].Name,
+							otherBroker.Services[0].Plans[0].Name,
 						))
 						Expect(session).To(Say(`%s\s+%s\s+all`,
 							otherBroker.Services[0].Name,
-							otherBroker.Services[0].Plans[0].Name,
+							otherBroker.Services[0].Plans[1].Name,
 						))
 					})
 				})
