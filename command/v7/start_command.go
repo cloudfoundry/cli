@@ -2,6 +2,8 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -17,6 +19,7 @@ type StartCommand struct {
 	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	LogCacheClient sharedaction.LogCacheClient
+	Stager         shared.AppStager
 }
 
 func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
@@ -30,6 +33,7 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, cmd.LogCacheClient)
 
 	return nil
 }
@@ -51,86 +55,32 @@ func (cmd StartCommand) Execute(args []string) error {
 		return err
 	}
 
-	if app.Started() {
-		cmd.UI.DisplayText("App '{{.AppName}}' is already started.",
-			map[string]interface{}{
-				"AppName": cmd.RequiredArgs.AppName,
-			})
-		cmd.UI.DisplayOK()
-		return nil
-	}
-
-	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.RequiredArgs.AppName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-	})
-	cmd.UI.DisplayNewline()
-
-	packageGuid, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
+	packageGUID, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	if packageGuid != "" {
-		cmd.UI.DisplayText("Staging app and tracing logs...")
 
-		logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.LogCacheClient)
-		cmd.UI.DisplayWarnings(logWarnings)
-		if logErr != nil {
-			return logErr
-		}
-		defer stopLogStreamFunc()
-
-		dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(packageGuid, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-
-		droplet, err := shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
-		if err != nil {
-			return err
-		}
-
-		warnings, err = cmd.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
-
+	if packageGUID != "" && app.Stopped() {
+		cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   cmd.RequiredArgs.AppName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		})
 		cmd.UI.DisplayNewline()
+
+		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, constant.DeploymentStrategyDefault, false, constant.ApplicationStarting)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = cmd.Stager.StartApp(app, v7action.Droplet{}, constant.DeploymentStrategyDefault, false, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationStarting)
+		if err != nil {
+			return err
+		}
 	}
 
-	cmd.UI.DisplayText("Waiting for app to start...")
-
-	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayNewline()
-
-	handleInstanceDetails := func(instanceDetails string) {
-		cmd.UI.DisplayText(instanceDetails)
-	}
-
-	warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-
-	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(
-		cmd.RequiredArgs.AppName,
-		cmd.Config.TargetedSpace().GUID,
-		false,
-	)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-
-	appSummaryDisplayer.AppDisplay(summary, false)
 	return nil
+
 }

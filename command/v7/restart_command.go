@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
@@ -27,6 +28,24 @@ type RestartCommand struct {
 	relatedCommands     interface{}             `related_commands:"restage, restart-app-instance"`
 	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+
+	Stager shared.AppStager
+}
+
+func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
+	err := cmd.BaseCommand.Setup(config, ui)
+	if err != nil {
+		return err
+	}
+	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
+	if err != nil {
+		ui.DisplayText("here3")
+		return err
+	}
+	logCacheClient := command.NewLogCacheClient(logCacheEndpoint, config, ui)
+	cmd.Stager = shared.NewAppStager(cmd.Actor, cmd.UI, cmd.Config, logCacheClient)
+
+	return nil
 }
 
 func (cmd RestartCommand) Execute(args []string) error {
@@ -45,90 +64,34 @@ func (cmd RestartCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayTextWithFlavor("Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n", map[string]interface{}{
-		"AppName":   cmd.RequiredArgs.AppName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-	})
-	switch cmd.Strategy.Name {
-	case constant.DeploymentStrategyRolling:
-		err = cmd.zeroDowntimeRestart(app)
-	default:
-		err = cmd.downtimeRestart(app)
-	}
 
-	if err != nil {
-		return err
-	}
-
-	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(
-		cmd.RequiredArgs.AppName,
-		cmd.Config.TargetedSpace().GUID,
-		false,
-	)
+	packageGUID, warnings, err := cmd.Actor.GetUnstagedNewestPackageGUID(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	appSummaryDisplayer.AppDisplay(summary, false)
 
-	return nil
-}
+	if packageGUID != "" || cmd.Strategy.Name == constant.DeploymentStrategyRolling {
+		cmd.UI.DisplayTextWithFlavor("Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   cmd.RequiredArgs.AppName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		})
+		cmd.UI.DisplayNewline()
+	}
 
-func (cmd RestartCommand) downtimeRestart(app v7action.Application) error {
-	var warnings v7action.Warnings
-	var err error
-
-	if app.Started() {
-		cmd.UI.DisplayText("Stopping app...\n")
-
-		warnings, err = cmd.Actor.StopApplication(app.GUID)
-		cmd.UI.DisplayWarnings(warnings)
+	if packageGUID != "" {
+		err = cmd.Stager.StageAndStart(app, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), packageGUID, cmd.Strategy.Name, cmd.NoWait, constant.ApplicationRestarting)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = cmd.Stager.StartApp(app, v7action.Droplet{}, cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
 		if err != nil {
 			return err
 		}
 	}
 
-	warnings, err = cmd.Actor.StartApplication(app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayText("Waiting for app to start...\n")
-
-	handleInstanceDetails := func(instanceDetails string) {
-		cmd.UI.DisplayText(instanceDetails)
-	}
-
-	warnings, err = cmd.Actor.PollStart(app.GUID, cmd.NoWait, handleInstanceDetails)
-	cmd.UI.DisplayWarnings(warnings)
-	return err
-}
-
-func (cmd RestartCommand) zeroDowntimeRestart(app v7action.Application) error {
-	cmd.UI.DisplayText("Creating deployment for app {{.AppName}}...\n",
-		map[string]interface{}{
-			"AppName": cmd.RequiredArgs.AppName,
-		},
-	)
-
-	deploymentGUID, warnings, err := cmd.Actor.CreateDeployment(app.GUID, "")
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayText("Waiting for app to deploy...\n")
-
-	handleInstanceDetails := func(instanceDetails string) {
-		cmd.UI.DisplayText(instanceDetails)
-	}
-
-	warnings, err = cmd.Actor.PollStartForRolling(app.GUID, deploymentGUID, cmd.NoWait, handleInstanceDetails)
-	cmd.UI.DisplayWarnings(warnings)
-
-	return err
+	return nil
 }

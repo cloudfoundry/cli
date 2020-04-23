@@ -164,6 +164,7 @@ func (cmd CopySourceCommand) Execute(args []string) error {
 			pkg.GUID,
 			cmd.Strategy.Name,
 			cmd.NoWait,
+			constant.ApplicationRestarting,
 		)
 		if err != nil {
 			return mapErr(cmd.Config, targetApp.Name, err)

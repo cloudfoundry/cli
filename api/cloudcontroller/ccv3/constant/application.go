@@ -11,6 +11,16 @@ const (
 	AppLifecycleTypeDocker AppLifecycleType = "docker"
 )
 
+// ApplicationAction represents the action being taken on an application
+type ApplicationAction string
+
+const (
+	// ApplicationStarting indicates that the app is being started
+	ApplicationStarting ApplicationAction = "Starting"
+	// ApplicationRestarting indicates that the app is being restarted
+	ApplicationRestarting ApplicationAction = "Restarting"
+)
+
 // ApplicationState represents the current desired state of the app.
 type ApplicationState string
 

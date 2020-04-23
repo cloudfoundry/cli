@@ -26,6 +26,23 @@ type AppStager interface {
 		packageGUID string,
 		strategy constant.DeploymentStrategy,
 		noWait bool,
+		appAction constant.ApplicationAction,
+	) error
+
+	StageApp(
+		app v7action.Application,
+		packageGUID string,
+		space configv3.Space,
+	) (v7action.Droplet, error)
+
+	StartApp(
+		app v7action.Application,
+		droplet v7action.Droplet,
+		strategy constant.DeploymentStrategy,
+		noWait bool,
+		space configv3.Space,
+		organization configv3.Organization,
+		appAction constant.ApplicationAction,
 	) error
 }
 
@@ -64,13 +81,29 @@ func (stager *Stager) StageAndStart(
 	packageGUID string,
 	strategy constant.DeploymentStrategy,
 	noWait bool,
+	appAction constant.ApplicationAction,
 ) error {
-	var warnings v7action.Warnings
 
+	droplet, err := stager.StageApp(app, packageGUID, space)
+	if err != nil {
+		return err
+	}
+
+	stager.UI.DisplayNewline()
+
+	err = stager.StartApp(app, droplet, strategy, noWait, space, organization, appAction)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (stager *Stager) StageApp(app v7action.Application, packageGUID string, space configv3.Space) (v7action.Droplet, error) {
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := stager.Actor.GetStreamingLogsForApplicationByNameAndSpace(app.Name, space.GUID, stager.LogCache)
 	stager.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
-		return logErr
+		return v7action.Droplet{}, logErr
 	}
 	defer stopLogStreamFunc()
 
@@ -83,9 +116,21 @@ func (stager *Stager) StageAndStart(
 
 	droplet, err := PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, stager.UI)
 	if err != nil {
-		return err
+		return v7action.Droplet{}, err
 	}
 
+	return droplet, nil
+}
+
+func (stager *Stager) StartApp(
+	app v7action.Application,
+	droplet v7action.Droplet,
+	strategy constant.DeploymentStrategy,
+	noWait bool,
+	space configv3.Space,
+	organization configv3.Organization,
+	appAction constant.ApplicationAction,
+) error {
 	if strategy == constant.DeploymentStrategyRolling {
 		stager.UI.DisplayText("Creating deployment for app {{.AppName}}...\n",
 			map[string]interface{}{
@@ -116,34 +161,52 @@ func (stager *Stager) StageAndStart(
 			return err
 		}
 
-		stager.UI.DisplayTextWithFlavor("Restarting app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...",
+		stager.UI.DisplayTextWithFlavor("{{.Action}} app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...",
 			map[string]interface{}{
+				"Action":   appAction,
 				"App":      app.Name,
 				"Org":      organization.Name,
 				"Space":    space.Name,
 				"UserName": user.Name,
 			},
 		)
-
-		warnings, err = stager.Actor.StopApplication(app.GUID)
-		stager.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
-
-		// attach droplet to app
-		warnings, err = stager.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
-		stager.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
-
 		stager.UI.DisplayNewline()
+
+		if app.Started() {
+			if appAction == constant.ApplicationStarting {
+				stager.UI.DisplayText("App '{{.AppName}}' is already started.",
+					map[string]interface{}{
+						"AppName": app.Name,
+					})
+				stager.UI.DisplayOK()
+				return nil
+
+			} else {
+				stager.UI.DisplayText("Stopping app...")
+				stager.UI.DisplayNewline()
+
+				warnings, err := stager.Actor.StopApplication(app.GUID)
+				stager.UI.DisplayWarnings(warnings)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		if droplet.GUID != "" {
+			// attach droplet to app
+			warnings, err := stager.Actor.SetApplicationDroplet(app.GUID, droplet.GUID)
+			stager.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return err
+			}
+		}
+
 		stager.UI.DisplayText("Waiting for app to start...")
 		stager.UI.DisplayNewline()
 
 		// start the application
-		warnings, err = stager.Actor.StartApplication(app.GUID)
+		warnings, err := stager.Actor.StartApplication(app.GUID)
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
