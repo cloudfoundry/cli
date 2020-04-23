@@ -50,9 +50,10 @@ var _ = Describe("service-access Command", func() {
 
 		DescribeTable("message text",
 			func(broker, serviceOffering, organization, expectedOutput string) {
-				cmd.Broker = broker
-				cmd.ServiceOffering = serviceOffering
-				cmd.Organization = organization
+
+				setFlag(&cmd, "-o", organization)
+				setFlag(&cmd, "-e", serviceOffering)
+				setFlag(&cmd, "-b", broker)
 
 				executeErr := cmd.Execute(nil)
 
@@ -127,9 +128,9 @@ var _ = Describe("service-access Command", func() {
 
 		When("resource flags are passed", func() {
 			BeforeEach(func() {
-				cmd.Broker = "test-broker"
-				cmd.ServiceOffering = "test-service"
-				cmd.Organization = "test-organization"
+				setFlag(&cmd, "-o", "test-organization")
+				setFlag(&cmd, "-e", "test-service")
+				setFlag(&cmd, "-b", "test-broker")
 			})
 
 			It("passes the right flags to the actor", func() {

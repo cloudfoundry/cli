@@ -7,7 +7,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -36,9 +35,6 @@ var _ = Describe("purge-service-offering command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = PurgeServiceOfferingCommand{
-			RequiredArgs:  flag.Service{ServiceOffering: "fake-service-offering"},
-			ServiceBroker: "fake-service-broker",
-			Force:         true,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -46,6 +42,10 @@ var _ = Describe("purge-service-offering command", func() {
 				SharedActor: fakeSharedActor,
 			},
 		}
+
+		setPositionalFlags(&cmd, "fake-service-offering")
+		setFlag(&cmd, "-b", "fake-service-broker")
+		setFlag(&cmd, "-f")
 
 		fakeActor.PurgeServiceOfferingByNameAndBrokerReturns(v7action.Warnings{"a warning"}, nil)
 	})
@@ -79,7 +79,7 @@ var _ = Describe("purge-service-offering command", func() {
 
 	When("the -f (force) flag is not specified", func() {
 		BeforeEach(func() {
-			cmd.Force = false
+			setFlag(&cmd, "-f", false)
 		})
 
 		It("prints a warning", func() {
@@ -89,7 +89,7 @@ var _ = Describe("purge-service-offering command", func() {
 
 		When("the service broker name is not specified", func() {
 			BeforeEach(func() {
-				cmd.ServiceBroker = ""
+				setFlag(&cmd, "-b", "")
 			})
 
 			It("prints a message that does not include the service broker name", func() {

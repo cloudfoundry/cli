@@ -89,3 +89,46 @@ func setFlag(cmd interface{}, flag string, values ...interface{}) {
 
 	Fail(fmt.Sprintf("could not find flag '%s' in command struct", flag))
 }
+
+func setPositionalFlags(cmd interface{}, values ...interface{}) {
+	ptr := reflect.ValueOf(cmd)
+	if ptr.Kind() != reflect.Ptr {
+		Fail("need to pass a pointer to the command struct")
+	}
+
+	val := ptr.Elem()
+	if val.Kind() != reflect.Struct {
+		Fail("need to pass a command struct")
+	}
+
+	typ := val.Type()
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+
+		if tagValue, ok := field.Tag.Lookup("positional-args"); ok && tagValue == "yes" && field.Type.Kind() == reflect.Struct {
+			if len(values) != field.Type.NumField() {
+				Fail(fmt.Sprintf("%d values provided but positional args struct %s has %d fields", len(values), field.Name, field.Type.NumField()))
+			}
+
+			for j := 0; j < field.Type.NumField(); j++ {
+				posField := field.Type.Field(j)
+				value := reflect.ValueOf(values[j])
+				if value.Type().ConvertibleTo(posField.Type) {
+					val.Field(i).Field(j).Set(value.Convert(posField.Type))
+				} else {
+					Fail(fmt.Sprintf(
+						"Could not set field '%s' type '%s' to '%v' type '%s'",
+						posField.Name,
+						posField.Type,
+						value.Interface(),
+						value.Type(),
+					))
+				}
+			}
+
+			return
+		}
+	}
+
+	Fail(`Did not find a field with 'positional-args:"yes"' in the struct`)
+}

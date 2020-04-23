@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -38,10 +37,9 @@ var _ = Describe("disable-service-access Command", func() {
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,
 			},
-			RequiredArgs: flag.Service{
-				ServiceOffering: "some-service",
-			},
 		}
+
+		setPositionalFlags(&cmd, "some-service")
 
 		fakeActor.DisableServiceAccessReturns(nil, v7action.Warnings{"a warning"}, nil)
 	})
@@ -59,12 +57,12 @@ var _ = Describe("disable-service-access Command", func() {
 	DescribeTable(
 		"message text",
 		func(plan, org, broker, expected string) {
-			cmd.RequiredArgs = flag.Service{ServiceOffering: "fake-service"}
+			setPositionalFlags(&cmd, "fake-service")
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
-			cmd.ServicePlan = plan
-			cmd.Organization = org
-			cmd.ServiceBroker = broker
+			setFlag(&cmd, "-o", org)
+			setFlag(&cmd, "-p", plan)
+			setFlag(&cmd, "-b", broker)
 
 			err := cmd.Execute(nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -97,10 +95,10 @@ var _ = Describe("disable-service-access Command", func() {
 			org      = "myorg"
 		)
 
-		cmd.RequiredArgs.ServiceOffering = offering
-		cmd.ServiceBroker = broker
-		cmd.ServicePlan = plan
-		cmd.Organization = org
+		setFlag(&cmd, "-b", broker)
+		setFlag(&cmd, "-o", org)
+		setFlag(&cmd, "-p", plan)
+		setPositionalFlags(&cmd, offering)
 
 		err := cmd.Execute(nil)
 		Expect(err).NotTo(HaveOccurred())

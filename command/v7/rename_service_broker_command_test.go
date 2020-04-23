@@ -1,16 +1,14 @@
 package v7_test
 
 import (
-	"errors"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -38,10 +36,6 @@ var _ = Describe("rename-service-broker command", func() {
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
 		cmd = &v7.RenameServiceBrokerCommand{
-			RequiredArgs: flag.RenameServiceBrokerArgs{
-				OldServiceBrokerName: oldBrokerName,
-				NewServiceBrokerName: newBrokerName,
-			},
 			BaseCommand: v7.BaseCommand{
 				Actor:       fakeUpdateServiceBrokerActor,
 				SharedActor: fakeSharedActor,
@@ -49,6 +43,8 @@ var _ = Describe("rename-service-broker command", func() {
 				Config:      fakeConfig,
 			},
 		}
+
+		setPositionalFlags(cmd, oldBrokerName, newBrokerName)
 	})
 
 	When("logged in", func() {
