@@ -203,7 +203,6 @@ func latestEnvelopeTimestamp(client LogCacheClient, errs chan error, ctx context
 			return false
 		}),
 		r,
-		logcache.WithWalkDelay(walkDelay),
 		logcache.WithWalkBackoff(newCliRetryBackoff(retryInterval, retryCount)),
 		logcache.WithWalkLogger(log.New(channelWriter{
 			errChannel: errs,
