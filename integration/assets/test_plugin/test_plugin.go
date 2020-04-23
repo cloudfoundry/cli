@@ -17,7 +17,16 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 		result, _ := cliConnection.CliCommandWithoutTerminalOutput("target")
 		fmt.Println("Done CliCommandWithoutTerminalOutput:", result)
 	case "CliCommand":
-		result, _ := cliConnection.CliCommand("target")
+		var result []string
+		var err error
+		if len(args) > 1 {
+			result, err = cliConnection.CliCommand(args[1:]...)
+			if err != nil {
+				fmt.Println("Error in CliCommand()", err)
+			}
+		} else {
+			result, _ = cliConnection.CliCommand("target")
+		}
 		fmt.Println("Done CliCommand:", result)
 	case "GetCurrentOrg":
 		result, err := cliConnection.GetCurrentOrg()
