@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("logs", func() {
+var _ = Describe("logs", func() {
 	BeforeEach(func() {
 		installTestPlugin()
 	})
@@ -39,7 +39,8 @@ var _ = FDescribe("logs", func() {
 				session := helpers.CF("CliCommand", "push",
 					appName, "-p", appDir, "-b", "staticfile_buildpack")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say("Staticfile Buildpack version"))
+				Expect(session).To(Say("buildpack: staticfile_buildpack"))
+				Expect(session).To(Say("Creating app"))
 			})
 		})
 	})
@@ -77,8 +78,8 @@ var _ = FDescribe("logs", func() {
 
 		It("outputs the recent application logs", func() {
 			session := helpers.CF("CliCommand", "logs", appName, "--recent")
-			Eventually(session).Should(Say("Staticfile Buildpack version"))
-			Eventually(session).Should(Exit())
+			Eventually(session).Should(Exit(0))
+			Expect(session).To(Say("Staticfile Buildpack version"))
 		})
 
 	})
