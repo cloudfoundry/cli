@@ -52,7 +52,9 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return cmd.showCurrentScale(user.Name, err)
 	}
 
-	scaled, err := cmd.scaleProcess(app.GUID, user.Name)
+	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
+
+	scaled, err := cmd.scaleProcess(shouldRestart, app.GUID, user.Name)
 	if err != nil {
 		return err
 	}
@@ -60,13 +62,15 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return nil
 	}
 
-	handleInstanceDetails := func(instanceDetails string) {
-		cmd.UI.DisplayText(instanceDetails)
-	}
+	if shouldRestart {
+		handleInstanceDetails := func(instanceDetails string) {
+			cmd.UI.DisplayText(instanceDetails)
+		}
 
-	warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayWarnings(warnings)
+		warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayWarnings(warnings)
+	}
 
 	showErr := cmd.showCurrentScale(user.Name, err)
 	if showErr != nil {
@@ -92,7 +96,7 @@ func (cmd ScaleCommand) translateErrors(err error) error {
 	return err
 }
 
-func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, error) {
+func (cmd ScaleCommand) scaleProcess(shouldRestart bool, appGUID string, username string) (bool, error) {
 	cmd.UI.DisplayTextWithFlavor("Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -101,7 +105,6 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 	})
 	cmd.UI.DisplayNewline()
 
-	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
 	if shouldRestart && !cmd.Force {
 		shouldScale, err := cmd.UI.DisplayBoolPrompt(
 			false,
@@ -136,7 +139,7 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 		}
 	}
 
-	return true, nil
+	return true, err
 }
 
 func (cmd ScaleCommand) restartApplication(appGUID string, username string) error {
