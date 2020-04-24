@@ -45,7 +45,7 @@ var _ = Describe("logs", func() {
 		})
 	})
 
-	XWhen("tailing logs for an app from a plugin", func() {
+	When("tailing logs for an app from a plugin", func() {
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				session := helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")
@@ -67,7 +67,7 @@ var _ = Describe("logs", func() {
 
 	})
 
-	XWhen("viewing recent logs for an app from a plugin", func() {
+	When("viewing recent logs for an app from a plugin", func() {
 
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
