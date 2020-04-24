@@ -109,8 +109,8 @@ func (fake *FakeLogCacheClient) Invocations() map[string][][]interface{} {
 	}
 	return copiedInvocations
 }
-func (fake *FakeLogCacheClient) recordInvocation(key string, args []interface{}) {
 
+func (fake *FakeLogCacheClient) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {

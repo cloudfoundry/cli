@@ -139,9 +139,9 @@ var _ = Describe("Logging Actions", func() {
 				}
 			})
 
-			It("starts walking at the mostRecentEnvelope's time", func() {
+			It("it starts walking at 1 second previous to the mostRecentEnvelope's time", func() {
 				Eventually(messages).Should(BeClosed())
-				Expect(walkStartTime).To(BeTemporally("~", mostRecentTime, time.Millisecond))
+				Expect(walkStartTime).To(BeTemporally("~", mostRecentTime.Add(-1*time.Second), time.Millisecond))
 			})
 
 			It("converts them to log messages and passes them through the messages channel", func() {
