@@ -240,6 +240,7 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, do
 	e := make(chan error)
 	defer doneWait.Done()
 
+	go cmd.logRepo.TailLogsFor(app.GUID, func() {}, c, e)
 	for {
 		select {
 		case msg, ok := <-c:
@@ -289,7 +290,6 @@ func (cmd *Start) waitForInstancesToStage(app models.Application) (bool, error) 
 		cmd.ui.Say("")
 		if app.StagingFailedReason == "NoAppDetectedError" {
 			return false, errors.New(T(`{{.Err}}
-			
 TIP: Buildpacks are detected when the "{{.PushCommand}}" is executed from within the directory that contains the app source code.
 
 Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.
