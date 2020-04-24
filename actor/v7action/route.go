@@ -391,6 +391,8 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]Route, Warnings, erro
 }
 
 func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings) ([]Route, Warnings, error) {
+	actorRoutes := convertToActorRoutes(routes)
+
 	spaceGUIDsSet := map[string]struct{}{}
 	spacesQuery := ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{}}
 
@@ -412,7 +414,16 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 		spacesByGUID[space.GUID] = space
 	}
 
+	for _, route := range actorRoutes {
+		route.SpaceName = spacesByGUID[route.SpaceGUID].Name
+	}
+
+	return actorRoutes, allWarnings, nil
+}
+
+func convertToActorRoutes(routes []ccv3.Route) []Route {
 	actorRoutes := []Route{}
+
 	for _, route := range routes {
 		destinations := make([]RouteDestination, len(route.Destinations))
 		for i, destination := range route.Destinations {
@@ -429,7 +440,6 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 			SpaceGUID:    route.SpaceGUID,
 			DomainGUID:   route.DomainGUID,
 			URL:          route.URL,
-			SpaceName:    spacesByGUID[route.SpaceGUID].Name,
 			DomainName:   getDomainName(route.URL, route.Host, route.Path),
 			Destinations: destinations,
 		}
@@ -442,7 +452,7 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 		actorRoutes = append(actorRoutes, actorRoute)
 	}
 
-	return actorRoutes, allWarnings, nil
+	return actorRoutes
 }
 
 func getDomainName(fullURL, host, path string) string {

@@ -94,6 +94,7 @@ type CloudControllerClient interface {
 	GetPackages(query ...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error)
 	GetPackageDroplets(packageGUID string, query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
 	GetProcess(processGUID string) (ccv3.Process, ccv3.Warnings, error)
+	GetProcesses(query ...ccv3.Query) ([]ccv3.Process, ccv3.Warnings, error)
 	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
 	GetProcessSidecars(processGUID string) ([]ccv3.Sidecar, ccv3.Warnings, error)
 	GetRoles(query ...ccv3.Query) ([]ccv3.Role, ccv3.IncludedResources, ccv3.Warnings, error)

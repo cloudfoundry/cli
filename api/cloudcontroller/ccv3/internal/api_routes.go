@@ -68,6 +68,7 @@ const (
 	GetPackagesRequest                                          = "GetPackages"
 	GetPackageDropletsRequest                                   = "GetPackageDroplets"
 	GetProcessRequest                                           = "GetProcess"
+	GetProcessesRequest                                         = "GetProcesses"
 	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetProcessSidecarsRequest                                   = "GetProcessSidecars"
 	GetRolesRequest                                             = "GetRoles"
@@ -236,6 +237,7 @@ var APIRoutes = []Route{
 	{Resource: PackagesResource, Path: "/:package_guid/upload", Method: http.MethodPost, Name: PostPackageBitsRequest},
 	{Resource: PackagesResource, Path: "/:package_guid/droplets", Method: http.MethodGet, Name: GetPackageDropletsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodGet, Name: GetProcessRequest},
+	{Resource: ProcessesResource, Path: "/", Method: http.MethodGet, Name: GetProcessesRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodPatch, Name: PatchProcessRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/sidecars", Method: http.MethodGet, Name: GetProcessSidecarsRequest},

@@ -23,6 +23,7 @@ type Process struct {
 	Instances                    types.NullInt
 	MemoryInMB                   types.NullUint64
 	DiskInMB                     types.NullUint64
+	AppGUID                      string
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
@@ -39,12 +40,13 @@ func (p Process) MarshalJSON() ([]byte, error) {
 
 func (p *Process) UnmarshalJSON(data []byte) error {
 	var ccProcess struct {
-		Command    types.FilteredString `json:"command"`
-		DiskInMB   types.NullUint64     `json:"disk_in_mb"`
-		GUID       string               `json:"guid"`
-		Instances  types.NullInt        `json:"instances"`
-		MemoryInMB types.NullUint64     `json:"memory_in_mb"`
-		Type       string               `json:"type"`
+		Command       types.FilteredString `json:"command"`
+		DiskInMB      types.NullUint64     `json:"disk_in_mb"`
+		GUID          string               `json:"guid"`
+		Instances     types.NullInt        `json:"instances"`
+		MemoryInMB    types.NullUint64     `json:"memory_in_mb"`
+		Type          string               `json:"type"`
+		Relationships `json:"relationships"`
 
 		HealthCheck struct {
 			Type constant.HealthCheckType `json:"type"`
@@ -71,6 +73,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 	p.Instances = ccProcess.Instances
 	p.MemoryInMB = ccProcess.MemoryInMB
 	p.Type = ccProcess.Type
+	p.AppGUID = ccProcess.Relationships[constant.RelationshipTypeApplication].GUID
 
 	return nil
 }
@@ -170,6 +173,22 @@ func (client *Client) GetProcess(processGUID string) (Process, Warnings, error) 
 	})
 
 	return responseBody, warnings, err
+}
+
+func (client Client) GetProcesses(query ...Query) ([]Process, Warnings, error) {
+	var resources []Process
+
+	_, warnings, err := client.MakeListRequest(RequestParams{
+		RequestName:  internal.GetProcessesRequest,
+		Query:        query,
+		ResponseBody: Process{},
+		AppendToList: func(item interface{}) error {
+			resources = append(resources, item.(Process))
+			return nil
+		},
+	})
+
+	return resources, warnings, err
 }
 
 // UpdateProcess updates the process's command or health check settings. GUID
