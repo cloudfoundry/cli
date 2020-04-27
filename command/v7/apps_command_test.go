@@ -186,14 +186,12 @@ var _ = Describe("apps Command", func() {
 						},
 						Routes: []v7action.Route{
 							{
-								Host:       "some-app-1",
-								DomainName: "some-other-domain",
-								URL:        "some-app-1.some-other-domain",
+								Host: "some-app-1",
+								URL:  "some-app-1.some-other-domain",
 							},
 							{
-								Host:       "some-app-1",
-								DomainName: "some-domain",
-								URL:        "some-app-1.some-domain",
+								Host: "some-app-1",
+								URL:  "some-app-1.some-domain",
 							},
 						},
 					},
@@ -222,9 +220,8 @@ var _ = Describe("apps Command", func() {
 						},
 						Routes: []v7action.Route{
 							{
-								Host:       "some-app-2",
-								DomainName: "some-domain",
-								URL:        "some-app-2.some-domain",
+								Host: "some-app-2",
+								URL:  "some-app-2.some-domain",
 							},
 						},
 					},

@@ -106,9 +106,9 @@ var _ = Describe("routes Command", func() {
 
 			BeforeEach(func() {
 				routes = []v7action.Route{
-					{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"},
-					{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
-					{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"},
+					{GUID: "route-guid-3", Host: "host-1"},
+					{GUID: "route-guid-1"},
+					{GUID: "route-guid-2", Host: "host-3", Path: "/path/2"},
 				}
 
 				fakeActor.GetRoutesBySpaceReturns(
@@ -131,9 +131,22 @@ var _ = Describe("routes Command", func() {
 
 				BeforeEach(func() {
 					routeSummaries = []v7action.RouteSummary{
-						{Route: v7action.Route{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"}},
-						{Route: v7action.Route{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"}},
-						{Route: v7action.Route{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"}, AppNames: []string{"app1", "app2"}},
+						{
+							DomainName: "domain1",
+							SpaceName:  "space-1",
+							Route:      v7action.Route{GUID: "route-guid-1"},
+						},
+						{
+							DomainName: "domain2",
+							SpaceName:  "space-2",
+							Route:      v7action.Route{GUID: "route-guid-2", Host: "host-3", Path: "/path/2"},
+						},
+						{
+							DomainName: "domain3",
+							SpaceName:  "space-3",
+							Route:      v7action.Route{GUID: "route-guid-3", Host: "host-1"},
+							AppNames:   []string{"app1", "app2"},
+						},
 					}
 
 					fakeActor.GetRouteSummariesReturns(

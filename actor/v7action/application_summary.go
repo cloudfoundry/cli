@@ -83,6 +83,8 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 			return nil, allWarnings, err
 		}
 
+		processSummariesByAppGUID[app.GUID].Sort()
+
 		summary := ApplicationSummary{
 			Application:      actor.convertCCToActorApplication(app),
 			ProcessSummaries: processSummariesByAppGUID[app.GUID],

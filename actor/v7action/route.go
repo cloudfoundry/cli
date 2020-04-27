@@ -24,8 +24,6 @@ type Route struct {
 	DomainGUID   string
 	Host         string
 	Path         string
-	DomainName   string
-	SpaceName    string
 	URL          string
 	Destinations []RouteDestination
 	Metadata     *Metadata
@@ -33,7 +31,9 @@ type Route struct {
 
 type RouteSummary struct {
 	Route
-	AppNames []string
+	AppNames   []string
+	DomainName string
+	SpaceName  string
 }
 
 func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (Route, Warnings, error) {
@@ -65,8 +65,6 @@ func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (Ro
 		Path:       route.Path,
 		SpaceGUID:  route.SpaceGUID,
 		DomainGUID: route.DomainGUID,
-		SpaceName:  spaceGUID,
-		DomainName: domainName,
 	}, allWarnings, err
 }
 
@@ -118,9 +116,7 @@ func (actor Actor) GetRoutesBySpace(spaceGUID string, labelSelector string) ([]R
 		return nil, allWarnings, err
 	}
 
-	ret, actor_warnings, err := actor.createActionRoutes(routes, allWarnings)
-
-	return ret, actor_warnings, err
+	return convertToActorRoutes(routes), allWarnings, nil
 }
 
 func (actor Actor) parseRoutePath(routePath string) (string, string, string, string, Warnings, error) {
@@ -191,10 +187,8 @@ func (actor Actor) GetRoute(routePath string, spaceGUID string) (Route, Warnings
 		}
 	}
 
-	actionRoutes, allWarnings, err := actor.createActionRoutes(routes, allWarnings)
-	if err != nil {
-		return Route{}, allWarnings, err
-	}
+	actionRoutes := convertToActorRoutes(routes)
+
 	return actionRoutes[0], allWarnings, nil
 }
 
@@ -213,7 +207,7 @@ func (actor Actor) GetRoutesByOrg(orgGUID string, labelSelector string) ([]Route
 		return nil, allWarnings, err
 	}
 
-	return actor.createActionRoutes(routes, allWarnings)
+	return convertToActorRoutes(routes), allWarnings, nil
 }
 
 func (actor Actor) GetRouteSummaries(routes []Route) ([]RouteSummary, Warnings, error) {
@@ -387,10 +381,10 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]Route, Warnings, erro
 		return nil, allWarnings, err
 	}
 
-	return actor.createActionRoutes(routes, allWarnings)
+	return convertToActorRoutes(routes), allWarnings, nil
 }
 
-func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings) ([]Route, Warnings, error) {
+func (actor Actor) createRouteSummaries(routes []ccv3.Route, allWarnings Warnings) ([]RouteSummary, Warnings, error) {
 	actorRoutes := convertToActorRoutes(routes)
 
 	spaceGUIDsSet := map[string]struct{}{}
@@ -414,11 +408,16 @@ func (actor Actor) createActionRoutes(routes []ccv3.Route, allWarnings Warnings)
 		spacesByGUID[space.GUID] = space
 	}
 
+	var routeSummaries []RouteSummary
+
 	for _, route := range actorRoutes {
-		route.SpaceName = spacesByGUID[route.SpaceGUID].Name
+		routeSummaries = append(routeSummaries, RouteSummary{Route: route,
+			SpaceName:  spacesByGUID[route.SpaceGUID].Name,
+			DomainName: getDomainName(route.URL, route.Host, route.Path),
+		})
 	}
 
-	return actorRoutes, allWarnings, nil
+	return routeSummaries, allWarnings, nil
 }
 
 func convertToActorRoutes(routes []ccv3.Route) []Route {
@@ -440,7 +439,6 @@ func convertToActorRoutes(routes []ccv3.Route) []Route {
 			SpaceGUID:    route.SpaceGUID,
 			DomainGUID:   route.DomainGUID,
 			URL:          route.URL,
-			DomainName:   getDomainName(route.URL, route.Host, route.Path),
 			Destinations: destinations,
 		}
 

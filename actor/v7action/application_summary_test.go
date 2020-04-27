@@ -105,15 +105,18 @@ var _ = Describe("Application Summary Actions", func() {
 						Type:       "some-type",
 						Command:    *types.NewFilteredString("[Redacted Value]"),
 						MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+						AppGUID:    "some-app-guid",
 					},
 					{
 						GUID:       "some-process-web-guid",
 						Type:       "web",
 						Command:    *types.NewFilteredString("[Redacted Value]"),
 						MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+						AppGUID:    "some-app-guid",
 					},
 				}
-				fakeCloudControllerClient.GetApplicationProcessesReturns(
+
+				fakeCloudControllerClient.GetProcessesReturns(
 					listedProcesses,
 					ccv3.Warnings{"get-app-processes-warning"},
 					nil,
@@ -163,6 +166,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			It("returns the summary and warnings with droplet information", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+
 				Expect(summaries).To(Equal([]ApplicationSummary{
 					{
 						Application: Application{
@@ -177,6 +181,7 @@ var _ = Describe("Application Summary Actions", func() {
 									Type:       "web",
 									Command:    *types.NewFilteredString("[Redacted Value]"),
 									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+									AppGUID:    "some-app-guid",
 								},
 								InstanceDetails: []ProcessInstance{
 									{
@@ -196,6 +201,7 @@ var _ = Describe("Application Summary Actions", func() {
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									Type:       "some-type",
 									Command:    *types.NewFilteredString("[Redacted Value]"),
+									AppGUID:    "some-app-guid",
 								},
 								InstanceDetails: []ProcessInstance{
 									{
@@ -232,8 +238,10 @@ var _ = Describe("Application Summary Actions", func() {
 					ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{"some-key=some-value"}},
 				))
 
-				Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
+				Expect(fakeCloudControllerClient.GetProcessesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetProcessesArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+				))
 
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(2))
 				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
