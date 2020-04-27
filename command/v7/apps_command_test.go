@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -125,7 +127,7 @@ var _ = Describe("apps Command", func() {
 						State: constant.ApplicationStarted,
 					},
 					ProcessSummaries: []v7action.ProcessSummary{{Process: v7action.Process{Type: "process-type"}}},
-					Routes:           []v7action.Route{},
+					Routes:           []resources.Route{},
 				},
 			}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -184,16 +186,14 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 						},
-						Routes: []v7action.Route{
+						Routes: []resources.Route{
 							{
-								Host:       "some-app-1",
-								DomainName: "some-other-domain",
-								URL:        "some-app-1.some-other-domain",
+								Host: "some-app-1",
+								URL:  "some-app-1.some-other-domain",
 							},
 							{
-								Host:       "some-app-1",
-								DomainName: "some-domain",
-								URL:        "some-app-1.some-domain",
+								Host: "some-app-1",
+								URL:  "some-app-1.some-domain",
 							},
 						},
 					},
@@ -220,11 +220,10 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 						},
-						Routes: []v7action.Route{
+						Routes: []resources.Route{
 							{
-								Host:       "some-app-2",
-								DomainName: "some-domain",
-								URL:        "some-app-2.some-domain",
+								Host: "some-app-2",
+								URL:  "some-app-2.some-domain",
 							},
 						},
 					},

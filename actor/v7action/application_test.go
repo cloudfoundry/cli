@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -121,7 +123,7 @@ var _ = Describe("Application Actions", func() {
 			When("getting the routes succeeds", func() {
 				When("there are no routes", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv3.Route{}, nil, nil)
+						fakeCloudControllerClient.GetApplicationRoutesReturns([]resources.Route{}, nil, nil)
 					})
 
 					It("does not delete any routes", func() {
@@ -131,7 +133,7 @@ var _ = Describe("Application Actions", func() {
 
 				When("there are routes", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv3.Route{{GUID: "route-1-guid"}, {GUID: "route-2-guid", URL: "route-2.example.com"}}, nil, nil)
+						fakeCloudControllerClient.GetApplicationRoutesReturns([]resources.Route{{GUID: "route-1-guid"}, {GUID: "route-2-guid", URL: "route-2.example.com"}}, nil, nil)
 					})
 
 					It("deletes the routes", func() {
@@ -169,13 +171,13 @@ var _ = Describe("Application Actions", func() {
 					When("app to delete has a route bound to another app", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.GetApplicationRoutesReturns(
-								[]ccv3.Route{
+								[]resources.Route{
 									{GUID: "route-1-guid"},
 									{GUID: "route-2-guid",
 										URL: "route-2.example.com",
-										Destinations: []ccv3.RouteDestination{
-											{App: ccv3.RouteDestinationApp{GUID: "abc123"}},
-											{App: ccv3.RouteDestinationApp{GUID: "different-app-guid"}},
+										Destinations: []resources.RouteDestination{
+											{App: resources.RouteDestinationApp{GUID: "abc123"}},
+											{App: resources.RouteDestinationApp{GUID: "different-app-guid"}},
 										},
 									},
 								},

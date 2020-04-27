@@ -3,7 +3,8 @@ package v7
 import (
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -68,7 +69,7 @@ func (cmd AppsCommand) Execute(args []string) error {
 	return nil
 }
 
-func getURLs(routes []v7action.Route) string {
+func getURLs(routes []resources.Route) string {
 	var routeURLs []string
 	for _, route := range routes {
 		routeURLs = append(routeURLs, route.URL)

@@ -3,6 +3,8 @@ package shared_test
 import (
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "code.cloudfoundry.org/cli/command/v7/shared"
@@ -492,7 +494,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the application has routes", func() {
 			BeforeEach(func() {
-				summary.Routes = []v7action.Route{
+				summary.Routes = []resources.Route{
 					{Host: "route1", URL: "route1.example.com"},
 					{Host: "route2", URL: "route2.example.com"},
 				}

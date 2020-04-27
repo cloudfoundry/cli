@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -292,7 +294,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.GetRoutesReturns(
-					[]ccv3.Route{
+					[]resources.Route{
 						{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname", URL: "hostname.domain-name", Path: "/the-path"},
 					},
 					ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
@@ -365,7 +367,7 @@ var _ = Describe("labels", func() {
 					)
 
 					fakeCloudControllerClient.GetRoutesReturns(
-						[]ccv3.Route{
+						[]resources.Route{
 							{GUID: "route-guid", SpaceGUID: "space-guid", DomainGUID: "domain-guid", Host: "hostname", URL: "hostname.domain-name", Path: "/the-path"},
 						},
 						ccv3.Warnings{"get-route-warning-1", "get-route-warning-2"},
@@ -915,7 +917,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.GetRoutesReturns(
-					[]ccv3.Route{
+					[]resources.Route{
 						{GUID: "route-guid", SpaceGUID: "some-space-guid", DomainGUID: "domain-guid", Host: "hostname", URL: "hostname.domain-name", Path: "/the-path"},
 					},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
@@ -947,11 +949,14 @@ var _ = Describe("labels", func() {
 				BeforeEach(func() {
 					expectedLabels = map[string]types.NullString{"key1": types.NewNullString("value1"), "key2": types.NewNullString("value2")}
 					fakeCloudControllerClient.GetRoutesReturns(
-						[]ccv3.Route{ccv3.Route{
-							GUID: "some-guid",
-							Metadata: &ccv3.Metadata{
-								Labels: expectedLabels,
-							}}},
+						[]resources.Route{
+							{
+								GUID: "some-guid",
+								Metadata: &resources.Metadata{
+									Labels: expectedLabels,
+								},
+							},
+						},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)
@@ -975,7 +980,7 @@ var _ = Describe("labels", func() {
 				)
 
 				fakeCloudControllerClient.GetRoutesReturns(
-					[]ccv3.Route{ccv3.Route{GUID: "some-guid"}},
+					[]resources.Route{resources.Route{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					errors.New("get-routes-error"),
 				)

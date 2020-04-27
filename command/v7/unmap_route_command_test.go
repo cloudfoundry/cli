@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -182,7 +184,7 @@ var _ = Describe("unmap-route Command", func() {
 				When("getting the route errors", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{},
+							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							errors.New("get-route-error"),
 						)
@@ -216,7 +218,7 @@ var _ = Describe("unmap-route Command", func() {
 				When("getting the route succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{GUID: "route-guid"},
+							resources.Route{GUID: "route-guid"},
 							v7action.Warnings{"get-route-warnings"},
 							nil,
 						)
@@ -236,7 +238,7 @@ var _ = Describe("unmap-route Command", func() {
 					When("getting the route destination fails because the app is not mapped", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{},
+								resources.RouteDestination{},
 								v7action.Warnings{"get-destination-warning"},
 								actionerror.RouteDestinationNotFoundError{},
 							)
@@ -258,7 +260,7 @@ var _ = Describe("unmap-route Command", func() {
 					When("getting the route destination fails for another reason", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{},
+								resources.RouteDestination{},
 								v7action.Warnings{"get-destination-warning"},
 								errors.New("failed to get destination"),
 							)
@@ -280,7 +282,7 @@ var _ = Describe("unmap-route Command", func() {
 					When("getting the route destination succeeds", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{GUID: "destination-guid"},
+								resources.RouteDestination{GUID: "destination-guid"},
 								v7action.Warnings{"get-destination-warning"},
 								nil,
 							)

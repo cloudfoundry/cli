@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -39,7 +41,7 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 		return allWarnings, err
 	}
 
-	var routes []Route
+	var routes []resources.Route
 	if deleteRoutes {
 		var getRoutesWarnings Warnings
 		routes, getRoutesWarnings, err = actor.GetApplicationRoutes(app.GUID)

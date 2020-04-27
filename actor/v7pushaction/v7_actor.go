@@ -3,6 +3,8 @@ package v7pushaction
 import (
 	"io"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 )
@@ -15,15 +17,15 @@ type V7Actor interface {
 	CreateBitsPackageByApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
 	CreateDeployment(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
 	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
-	CreateRoute(spaceGUID, domainName, hostname, path string) (v7action.Route, v7action.Warnings, error)
+	CreateRoute(spaceGUID, domainName, hostname, path string) (resources.Route, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetApplicationDroplets(appName string, spaceGUID string) ([]v7action.Droplet, v7action.Warnings, error)
-	GetApplicationRoutes(appGUID string) ([]v7action.Route, v7action.Warnings, error)
+	GetApplicationRoutes(appGUID string) ([]resources.Route, v7action.Warnings, error)
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
 	GetDefaultDomain(orgGUID string) (v7action.Domain, v7action.Warnings, error)
 	GetDomain(domainGUID string) (v7action.Domain, v7action.Warnings, error)
-	GetRouteByAttributes(domainName, domainGUID, hostname, path string) (v7action.Route, v7action.Warnings, error)
-	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
+	GetRouteByAttributes(domainName, domainGUID, hostname, path string) (resources.Route, v7action.Warnings, error)
+	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (resources.RouteDestination, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)

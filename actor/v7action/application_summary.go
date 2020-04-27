@@ -3,12 +3,13 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type ApplicationSummary struct {
 	Application
 	ProcessSummaries ProcessSummaries
-	Routes           []Route
+	Routes           []resources.Route
 }
 
 // v7action.DetailedApplicationSummary represents an application with its processes and droplet.
@@ -35,8 +36,8 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 	var allSummaries []ApplicationSummary
 
 	keys := []ccv3.Query{
-		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
-		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+		{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+		{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
 	}
 	if len(labelSelector) > 0 {
 		keys = append(keys, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
@@ -47,14 +48,51 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 		return nil, allWarnings, err
 	}
 
-	for _, app := range apps {
-		summary, summaryWarnings, err := actor.createSummary(actor.convertCCToActorApplication(app), false)
-		allWarnings = append(allWarnings, summaryWarnings...)
+	processes, warnings, err := actor.CloudControllerClient.GetProcesses(ccv3.Query{
+		Key: ccv3.AppGUIDFilter, Values: toAppGUIDs(apps),
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	processSummariesByAppGUID := make(map[string]ProcessSummaries, len(apps))
+	for _, process := range processes {
+		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+		allWarnings = append(allWarnings, Warnings(warnings)...)
 		if err != nil {
 			return nil, allWarnings, err
 		}
-		allSummaries = append(allSummaries, summary)
 
+		var instanceDetails []ProcessInstance
+		for _, instance := range instances {
+			instanceDetails = append(instanceDetails, ProcessInstance(instance))
+		}
+
+		processSummary := ProcessSummary{
+			Process:         Process(process),
+			InstanceDetails: instanceDetails,
+		}
+
+		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
+	}
+
+	for _, app := range apps {
+		routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(app.GUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
+
+		processSummariesByAppGUID[app.GUID].Sort()
+
+		summary := ApplicationSummary{
+			Application:      actor.convertCCToActorApplication(app),
+			ProcessSummaries: processSummariesByAppGUID[app.GUID],
+			Routes:           routes,
+		}
+
+		allSummaries = append(allSummaries, summary)
 	}
 
 	return allSummaries, allWarnings, nil
@@ -93,13 +131,11 @@ func (actor Actor) createSummary(app Application, withObfuscatedValues bool) (Ap
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	var appRoutes []Route
 	routes, warnings, err := actor.GetApplicationRoutes(app.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
 	}
-	appRoutes = routes
 
 	return ApplicationSummary{
 		Application: Application{
@@ -110,9 +146,8 @@ func (actor Actor) createSummary(app Application, withObfuscatedValues bool) (Ap
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
 		},
 		ProcessSummaries: processSummaries,
-		Routes:           appRoutes,
+		Routes:           routes,
 	}, allWarnings, nil
-
 }
 
 func (actor Actor) addDroplet(summary ApplicationSummary) (DetailedApplicationSummary, Warnings, error) {
@@ -129,4 +164,14 @@ func (actor Actor) addDroplet(summary ApplicationSummary) (DetailedApplicationSu
 		ApplicationSummary: summary,
 		CurrentDroplet:     droplet,
 	}, allWarnings, nil
+}
+
+func toAppGUIDs(apps []ccv3.Application) []string {
+	guids := make([]string, len(apps))
+
+	for i, app := range apps {
+		guids[i] = app.GUID
+	}
+
+	return guids
 }

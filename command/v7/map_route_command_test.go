@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -182,7 +184,7 @@ var _ = Describe("map-route Command", func() {
 				When("getting the route errors", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{},
+							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							errors.New("get-route-error"),
 						)
@@ -218,7 +220,7 @@ var _ = Describe("map-route Command", func() {
 				When("the route does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{},
+							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							actionerror.RouteNotFoundError{},
 						)
@@ -257,7 +259,7 @@ var _ = Describe("map-route Command", func() {
 				When("getting the route succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{GUID: "route-guid"},
+							resources.Route{GUID: "route-guid"},
 							v7action.Warnings{"get-route-warnings"},
 							nil,
 						)
@@ -266,7 +268,7 @@ var _ = Describe("map-route Command", func() {
 					When("getting the destination errors", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{},
+								resources.RouteDestination{},
 								v7action.Warnings{"get-destination-warning"},
 								errors.New("get-destination-error"),
 							)
@@ -302,9 +304,9 @@ var _ = Describe("map-route Command", func() {
 					When("the destination already exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{
+								resources.RouteDestination{
 									GUID: "route-dst-guid",
-									App: v7action.RouteDestinationApp{
+									App: resources.RouteDestinationApp{
 										GUID: "existing-app-guid",
 									},
 								},
