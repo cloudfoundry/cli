@@ -77,19 +77,35 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 		processSummariesByAppGUID[process.AppGUID] = append(processSummariesByAppGUID[process.AppGUID], processSummary)
 	}
 
-	for _, app := range apps {
-		routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(app.GUID)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return nil, allWarnings, err
+	spaceRoutes, warnings, err := actor.CloudControllerClient.GetRoutes(ccv3.Query{
+		Key:    ccv3.SpaceGUIDFilter,
+		Values: []string{spaceGUID},
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	routesByAppGUID := make(map[string][]resources.Route)
+	for _, route := range spaceRoutes {
+		for _, dest := range route.Destinations {
+			routesByAppGUID[dest.App.GUID] = append(routesByAppGUID[dest.App.GUID], route)
 		}
+	}
+
+	for _, app := range apps {
+		//routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(app.GUID)
+		//allWarnings = append(allWarnings, warnings...)
+		//if err != nil {
+		//	return nil, allWarnings, err
+		//}
 
 		processSummariesByAppGUID[app.GUID].Sort()
 
 		summary := ApplicationSummary{
 			Application:      actor.convertCCToActorApplication(app),
 			ProcessSummaries: processSummariesByAppGUID[app.GUID],
-			Routes:           routes,
+			Routes:           routesByAppGUID[app.GUID],
 		}
 
 		allSummaries = append(allSummaries, summary)
