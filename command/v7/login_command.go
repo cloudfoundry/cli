@@ -86,6 +86,14 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return err
 	}
 
+	versionWarning, err := shared.CheckCCAPIVersion(cmd.Config.APIVersion())
+	if err != nil {
+		return err
+	}
+	if versionWarning != "" {
+		cmd.UI.DisplayWarning(versionWarning)
+	}
+
 	cmd.UI.DisplayNewline()
 
 	err = cmd.targetAPI(endpoint)
@@ -535,3 +543,4 @@ func contains(s []string, v string) bool {
 	}
 	return false
 }
+
