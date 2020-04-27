@@ -9,10 +9,6 @@ type TargetSettings ccv3.TargetSettings
 // SetTarget targets the Cloud Controller using the client and sets target
 // information in the actor based on the response.
 func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
-	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
-		return nil, nil
-	}
-
 	rootInfo, warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
 	if err != nil {
 		return Warnings(warnings), err

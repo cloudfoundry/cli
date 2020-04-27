@@ -82,20 +82,6 @@ var _ = Describe("Targeting", func() {
 			warnings, err = actor.SetTarget(settings)
 		})
 
-		When("the requested API and SSL configuration match the existing state", func() {
-			BeforeEach(func() {
-				fakeConfig.TargetReturns(targetedURL)
-				fakeConfig.SkipSSLValidationReturns(skipSSLValidation)
-			})
-
-			It("does not make any API calls", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(BeNil())
-
-				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(BeZero())
-			})
-		})
-
 		It("targets CF with the expected arguments", func() {
 			Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
 			connectionSettings := fakeCloudControllerClient.TargetCFArgsForCall(0)
