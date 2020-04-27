@@ -98,6 +98,14 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return err
 	}
 
+	versionWarning, err := shared.CheckCCAPIVersion(cmd.Config.APIVersion())
+	if err != nil {
+		return err
+	}
+	if versionWarning != "" {
+		cmd.UI.DisplayWarning(versionWarning)
+	}
+
 	cmd.Actor, err = cmd.ActorReloader.Reload(cmd.Config, cmd.UI)
 	if err != nil {
 		return err

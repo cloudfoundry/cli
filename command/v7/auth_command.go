@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
 type AuthCommand struct {
@@ -37,6 +38,14 @@ func (cmd AuthCommand) Execute(args []string) error {
 	username, password, err := cmd.getUsernamePassword()
 	if err != nil {
 		return err
+	}
+
+	versionWarning, err := shared.CheckCCAPIVersion(cmd.Config.APIVersion())
+	if err != nil {
+		return err
+	}
+	if versionWarning != "" {
+		cmd.UI.DisplayWarning(versionWarning)
 	}
 
 	if !cmd.ClientCredentials {

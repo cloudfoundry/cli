@@ -55,6 +55,7 @@ var _ = Describe("login Command", func() {
 		cmd.APIEndpoint = ""
 
 		fakeActorReloader.ReloadReturns(fakeActor, nil)
+		fakeConfig.APIVersionReturns("3.84.0")
 	})
 
 	JustBeforeEach(func() {
@@ -124,10 +125,6 @@ var _ = Describe("login Command", func() {
 	})
 
 	Describe("API Endpoint", func() {
-		BeforeEach(func() {
-			fakeConfig.APIVersionReturns("3.4.5")
-		})
-
 		When("user provides the api endpoint using the -a flag", func() {
 			BeforeEach(func() {
 				fakeActor.SetTargetReturns(v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
@@ -187,6 +184,28 @@ var _ = Describe("login Command", func() {
 
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
 					Expect(actualSettings.URL).To(Equal("https://api.fake.com"))
+				})
+
+				When("the API version is older than the minimum supported API version for the v7 CLI", func() {
+					BeforeEach(func() {
+						fakeConfig.APIVersionReturns("3.83.0")
+					})
+					It("warns that the user is targeting an unsupported API version and that things may not work correctly", func() {
+						Expect(testUI.Err).To(Say("Warning: Your targeted API's version \\(3.83.0\\) is less than the minimum supported API version \\(3.84.0\\). Some commands may not function correctly."))
+					})
+				})
+
+				When("the API version is empty", func() {
+					BeforeEach(func() {
+						fakeConfig.APIVersionReturns("")
+					})
+					It("returns an error", func() {
+						Expect(executeErr).To(HaveOccurred())
+					})
+				})
+
+				It("should NOT warn that the user is targeting an unsupported API version", func() {
+					Expect(testUI.Err).ToNot(Say("is less than the minimum supported API version"))
 				})
 
 				When("the config has SkipSSLValidation false and the --skip-ssl-validation flag is passed", func() {

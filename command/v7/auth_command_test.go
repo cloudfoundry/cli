@@ -42,6 +42,7 @@ var _ = Describe("auth Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.UAAOAuthClientReturns("cf")
+		fakeConfig.APIVersionReturns("3.84.0")
 	})
 
 	JustBeforeEach(func() {
@@ -205,6 +206,29 @@ var _ = Describe("auth Command", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.Username = testID
 					cmd.RequiredArgs.Password = testSecret
+				})
+
+				When("the API version is older than the minimum supported API version for the v7 CLI", func() {
+					BeforeEach(func() {
+						fakeConfig.APIVersionReturns("3.83.0")
+					})
+					It("warns that the user is targeting an unsupported API version and that things may not work correctly", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("Warning: Your targeted API's version \\(3.83.0\\) is less than the minimum supported API version \\(3.84.0\\). Some commands may not function correctly."))
+					})
+				})
+
+				When("the API version is empty", func() {
+					BeforeEach(func() {
+						fakeConfig.APIVersionReturns("")
+					})
+					It("returns an error", func() {
+						Expect(err).To(HaveOccurred())
+					})
+				})
+
+				It("should NOT warn that the user is targeting an unsupported API version", func() {
+					Expect(testUI.Err).ToNot(Say("is less than the minimum supported API version"))
 				})
 
 				It("outputs API target information and clears the targeted org and space", func() {
