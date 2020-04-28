@@ -108,7 +108,7 @@ func NewLogCacheClient(logCacheEndpoint string, config Config, ui UI) *logcache.
 	client = &http.Client{Transport: tr}
 
 	verbose, location := config.Verbose()
-	if verbose {
+	if verbose && ui != nil {
 		printer := DebugPrinter{}
 		printer.addOutput(ui.RequestLoggerTerminalDisplay())
 		if location != nil {
