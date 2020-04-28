@@ -42,7 +42,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 
 	versionWarning, err := shared.CheckCCAPIVersion(cmd.Config.APIVersion())
 	if err != nil {
-		return err
+		cmd.UI.DisplayWarning("Warning: unable to determine whether targeted API's version meets minimum supported.")
 	}
 	if versionWarning != "" {
 		cmd.UI.DisplayWarning(versionWarning)

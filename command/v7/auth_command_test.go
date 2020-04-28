@@ -222,8 +222,9 @@ var _ = Describe("auth Command", func() {
 					BeforeEach(func() {
 						fakeConfig.APIVersionReturns("")
 					})
-					It("returns an error", func() {
-						Expect(err).To(HaveOccurred())
+					It("prints a warning message", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("Warning: unable to determine whether targeted API's version meets minimum supported."))
 					})
 				})
 

@@ -199,8 +199,9 @@ var _ = Describe("login Command", func() {
 					BeforeEach(func() {
 						fakeConfig.APIVersionReturns("")
 					})
-					It("returns an error", func() {
-						Expect(executeErr).To(HaveOccurred())
+					It("prints a warning message", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("Warning: unable to determine whether targeted API's version meets minimum supported."))
 					})
 				})
 
