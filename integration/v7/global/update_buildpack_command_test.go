@@ -487,7 +487,7 @@ var _ = Describe("update-buildpack command", func() {
 
 							It("displays an error that the buildpack already has a stack association", func() {
 								session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[1])
-								Eventually(session.Err).Should(Say("Buildpack stack can not be changed"))
+								Eventually(session.Err).Should(Say("Buildpack stack cannot be changed"))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							})
