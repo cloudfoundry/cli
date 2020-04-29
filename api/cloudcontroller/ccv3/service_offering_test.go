@@ -42,7 +42,7 @@ var _ = Describe("Service Offering", func() {
 					{
 						"pagination": {
 							"next": {
-								"href": "%s/v3/service_offerings?names=myServiceOffering&service_broker_names=myServiceBroker&page=2"
+								"href": "%s/v3/service_offerings?names=myServiceOffering&service_broker_names=myServiceBroker&fields[service_broker]=name,guid&page=2"
 							}
 						},
 						"resources": [
@@ -52,7 +52,7 @@ var _ = Describe("Service Offering", func() {
 								"relationships": {
 									"service_broker": {
 										"data": {
-											"name": "overview-broker"
+											"guid": "overview-broker-guid"
 										}
 									}
 								}
@@ -63,12 +63,20 @@ var _ = Describe("Service Offering", func() {
 								"relationships": {
 									"service_broker": {
 										"data": {
-											"name": "overview-broker"
+											"guid": "overview-broker-guid"
 										}
 									}
 								}
 							}
-						]
+						],
+						"included": {
+							"service_brokers": [
+								{
+									"guid": "overview-broker-guid",
+									"name": "overview-broker"
+								}
+							]	
+						}
 					}`,
 					server.URL())
 
@@ -86,21 +94,29 @@ var _ = Describe("Service Offering", func() {
 								"relationships": {
 									"service_broker": {
 										"data": {
-											"name": "other-broker"
+											"guid": "other-broker-guid"
 										}
 									}
 								}
 							}
-						]
+						],
+						"included": {
+							"service_brokers": [
+								{
+									"guid": "other-broker-guid",
+									"name": "other-broker"
+								}
+							]	
+						}
 					}`
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_offerings", "names=myServiceOffering&service_broker_names=myServiceBroker"),
+						VerifyRequest(http.MethodGet, "/v3/service_offerings", "names=myServiceOffering&service_broker_names=myServiceBroker&fields[service_broker]=name,guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_offerings", "names=myServiceOffering&service_broker_names=myServiceBroker&page=2"),
+						VerifyRequest(http.MethodGet, "/v3/service_offerings", "names=myServiceOffering&service_broker_names=myServiceBroker&fields[service_broker]=name,guid&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 					),
 				)
@@ -125,16 +141,19 @@ var _ = Describe("Service Offering", func() {
 						GUID:              "service-offering-1-guid",
 						Name:              "service-offering-1-name",
 						ServiceBrokerName: "overview-broker",
+						ServiceBrokerGUID: "overview-broker-guid",
 					},
 					ServiceOffering{
 						GUID:              "service-offering-2-guid",
 						Name:              "service-offering-2-name",
 						ServiceBrokerName: "overview-broker",
+						ServiceBrokerGUID: "overview-broker-guid",
 					},
 					ServiceOffering{
 						GUID:              "service-offering-3-guid",
 						Name:              "service-offering-3-name",
 						ServiceBrokerName: "other-broker",
+						ServiceBrokerGUID: "other-broker-guid",
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -224,8 +243,11 @@ var _ = Describe("Service Offering", func() {
 			It("makes the correct request", func() {
 				Expect(requester.MakeListRequestCallCount()).To(Equal(1))
 				Expect(requester.MakeListRequestArgsForCall(0)).To(MatchFields(IgnoreExtras, Fields{
-					"RequestName":  Equal(internal.GetServiceOfferingsRequest),
-					"Query":        Equal([]Query{{Key: NameFilter, Values: []string{serviceOfferingName}}}),
+					"RequestName": Equal(internal.GetServiceOfferingsRequest),
+					"Query": Equal([]Query{
+						{Key: NameFilter, Values: []string{serviceOfferingName}},
+						{Key: FieldsServiceBroker, Values: []string{"name", "guid"}},
+					}),
 					"ResponseBody": Equal(ServiceOffering{}),
 				}))
 			})
@@ -261,16 +283,22 @@ var _ = Describe("Service Offering", func() {
 					err := requestParams.AppendToList(ServiceOffering{
 						GUID:              "service-offering-guid-1",
 						Name:              serviceOfferingName,
-						ServiceBrokerName: "broker-1",
+						ServiceBrokerGUID: "broker-1-guid",
 					})
 					Expect(err).NotTo(HaveOccurred())
 					err = requestParams.AppendToList(ServiceOffering{
 						GUID:              "service-offering-guid-2",
 						Name:              serviceOfferingName,
-						ServiceBrokerName: "broker-2",
+						ServiceBrokerGUID: "broker-2-guid",
 					})
 					Expect(err).NotTo(HaveOccurred())
-					return IncludedResources{}, Warnings{"this is a warning"}, nil
+					return IncludedResources{
+							ServiceBrokers: []ServiceBroker{
+								{GUID: "broker-1-guid", Name: "broker-1"},
+								{GUID: "broker-2-guid", Name: "broker-2"},
+							}},
+						Warnings{"this is a warning"},
+						nil
 				})
 			})
 
@@ -293,6 +321,7 @@ var _ = Describe("Service Offering", func() {
 				Expect(requester.MakeListRequestArgsForCall(0).Query).To(ConsistOf(
 					Query{Key: NameFilter, Values: []string{serviceOfferingName}},
 					Query{Key: ServiceBrokerNamesFilter, Values: []string{"myServiceBroker"}},
+					Query{Key: FieldsServiceBroker, Values: []string{"name", "guid"}},
 				))
 			})
 		})

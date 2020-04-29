@@ -424,11 +424,12 @@ var _ = Describe("Service Plan", func() {
 
 		When("when the query succeeds", func() {
 			BeforeEach(func() {
-				response1 := fmt.Sprintf(`
+
+				response1Template := `
 					{
 						"pagination": {
 							"next": {
-								"href": "%s/v3/service_plans?include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&page=2"
+								"href": "%s/v3/service_plans?include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&fields[service_offering.service_broker]=name,guid&page=2"
 							}
 						},
 						"resources": [
@@ -468,7 +469,7 @@ var _ = Describe("Service Plan", func() {
 									"relationships": {
 										"service_broker": {
 											"data": {
-												"name": "service-broker-1"
+												"guid": "service-broker-1-guid"
 											}
 										}
 									}
@@ -480,16 +481,26 @@ var _ = Describe("Service Plan", func() {
 									"relationships": {
 										"service_broker": {
 											"data": {
-												"name": "service-broker-2"
+												"guid": "service-broker-2-guid"
 											}
 										}
 									}
 								}
+							],
+							"service_brokers": [
+								{
+									"name": "service-broker-1",
+									"guid": "service-broker-1-guid"
+								},
+								{
+									"name": "service-broker-2",
+									"guid": "service-broker-2-guid"
+								}
 							]
 						}
-					}`,
-					server.URL())
+					}`
 
+				response1 := fmt.Sprintf(response1Template, server.URL())
 				response2 := `
 					{
 						"pagination": {
@@ -521,10 +532,16 @@ var _ = Describe("Service Plan", func() {
 									"relationships": {
 										"service_broker": {
 											"data": {
-												"name": "service-broker-1"
+												"guid": "service-broker-1-guid"
 											}
 										}
 									}
+								}
+							],
+							"service_brokers": [
+								{
+									"name": "service-broker-1",
+									"guid": "service-broker-1-guid"
 								}
 							]
 						}
@@ -532,11 +549,11 @@ var _ = Describe("Service Plan", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&fields[service_offering.service_broker]=name,guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&page=2"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&space_guids=some-space-guid&organization_guids=some-org-guid&fields[service_offering.service_broker]=name,guid&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 					),
 				)
@@ -616,7 +633,7 @@ var _ = Describe("Service Plan", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering"),
+						VerifyRequest(http.MethodGet, "/v3/service_plans", "include=service_offering&fields[service_offering.service_broker]=name,guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

@@ -119,6 +119,10 @@ func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOff
 		Key:    Include,
 		Values: []string{"service_offering"},
 	})
+	query = append(query, Query{
+		Key:    FieldsServiceOfferingServiceBroker,
+		Values: []string{"name,guid"},
+	})
 
 	plans, included, warnings, err := client.getServicePlans(query...)
 	if err != nil {
@@ -140,6 +144,11 @@ func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOff
 		return i
 	}
 
+	brokerNameLookup := make(map[string]string)
+	for _, b := range included.ServiceBrokers {
+		brokerNameLookup[b.GUID] = b.Name
+	}
+
 	for _, p := range plans {
 		i := indexOfOffering(p.ServiceOfferingGUID)
 		offeringsWithPlans[i].Plans = append(offeringsWithPlans[i].Plans, p)
@@ -149,7 +158,7 @@ func (client *Client) GetServicePlansWithOfferings(query ...Query) ([]ServiceOff
 		i := indexOfOffering(o.GUID)
 		offeringsWithPlans[i].Name = o.Name
 		offeringsWithPlans[i].Description = o.Description
-		offeringsWithPlans[i].ServiceBrokerName = o.ServiceBrokerName
+		offeringsWithPlans[i].ServiceBrokerName = brokerNameLookup[o.ServiceBrokerGUID]
 	}
 
 	return offeringsWithPlans, warnings, nil

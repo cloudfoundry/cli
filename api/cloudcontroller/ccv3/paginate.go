@@ -21,6 +21,7 @@ func (requester RealRequester) paginate(request *cloudcontroller.Request, obj in
 		includes.Organizations = append(includes.Organizations, wrapper.IncludedResources.Organizations...)
 		includes.Spaces = append(includes.Spaces, wrapper.IncludedResources.Spaces...)
 		includes.ServiceOfferings = append(includes.ServiceOfferings, wrapper.IncludedResources.ServiceOfferings...)
+		includes.ServiceBrokers = append(includes.ServiceBrokers, wrapper.IncludedResources.ServiceBrokers...)
 
 		if wrapper.NextPage() == "" {
 			break
