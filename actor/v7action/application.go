@@ -34,6 +34,7 @@ func (app Application) Stopped() bool {
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
 	var allWarnings Warnings
+	var jobQueue []ccv3.JobURL
 
 	app, getAppWarnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
 	allWarnings = append(allWarnings, getAppWarnings...)
@@ -68,11 +69,7 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 		return allWarnings, err
 	}
 
-	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-	allWarnings = append(allWarnings, pollWarnings...)
-	if err != nil {
-		return allWarnings, err
-	}
+	jobQueue = append(jobQueue, jobURL)
 
 	if deleteRoutes {
 		for _, route := range routes {
@@ -85,11 +82,15 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 				return allWarnings, err
 			}
 
-			pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-			allWarnings = append(allWarnings, pollWarnings...)
-			if err != nil {
-				return allWarnings, err
-			}
+			jobQueue = append(jobQueue, jobURL)
+		}
+	}
+
+	for _, job := range jobQueue {
+		pollWarnings, err := actor.CloudControllerClient.PollJob(job)
+		allWarnings = append(allWarnings, pollWarnings...)
+		if err != nil {
+			return allWarnings, err
 		}
 	}
 

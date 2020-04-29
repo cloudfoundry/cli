@@ -206,12 +206,11 @@ var _ = Describe("Application Actions", func() {
 								ccv3.Warnings{"delete-route-2-warning"},
 								errors.New("delete-route-2-error"),
 							)
-							fakeCloudControllerClient.PollJobReturnsOnCall(1, ccv3.Warnings{"poll-job-warning"}, nil)
 						})
 
 						It("returns the error", func() {
 							Expect(executeErr).To(MatchError("delete-route-2-error"))
-							Expect(warnings).To(ConsistOf("delete-route-1-warning", "delete-route-2-warning", "poll-job-warning"))
+							Expect(warnings).To(ConsistOf("delete-route-1-warning", "delete-route-2-warning"))
 						})
 					})
 
