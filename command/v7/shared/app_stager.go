@@ -2,6 +2,7 @@ package shared
 
 import (
 	"context"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -161,9 +162,9 @@ func (stager *Stager) StartApp(
 			return err
 		}
 
-		stager.UI.DisplayTextWithFlavor("{{.Action}} app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...",
+		flavorText := fmt.Sprintf("%s app {{.App}} in org {{.Org}} / space {{.Space}} as {{.UserName}}...", appAction)
+		stager.UI.DisplayTextWithFlavor(flavorText,
 			map[string]interface{}{
-				"Action":   appAction,
 				"App":      app.Name,
 				"Org":      organization.Name,
 				"Space":    space.Name,
