@@ -1,0 +1,12 @@
+---
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=route_registrar/properties?/route_registrar/routes/name=uaa/registration_interval
+  value: 30s
+- type: replace
+  path: /instance_groups/name=api/jobs/name=route_registrar/properties?/route_registrar/routes/name=api/registration_interval
+  value: 30s
+- type: replace
+  path: /instance_groups/name=api/jobs/name=route_registrar/properties?/route_registrar/routes/name=policy-server/registration_interval
+  value: 30s
+- type: remove
+  path: /instance_groups/name=api/jobs/name=route_registrar/properties?/route_registrar/routes/name=api/health_check/timeout
