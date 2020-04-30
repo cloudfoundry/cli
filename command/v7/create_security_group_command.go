@@ -35,7 +35,10 @@ func (cmd CreateSecurityGroupCommand) Execute(args []string) error {
 
 	warnings, err := cmd.Actor.CreateSecurityGroup(cmd.RequiredArgs.SecurityGroup, string(cmd.RequiredArgs.PathToJSONRules))
 	cmd.UI.DisplayWarnings(warnings)
-	if _, ok := err.(*json.SyntaxError); ok {
+
+	_, isSyntaxErr := err.(*json.SyntaxError)
+	_, isUnmarshalErr := err.(*json.UnmarshalTypeError)
+	if isSyntaxErr || isUnmarshalErr {
 		return actionerror.SecurityGroupJsonSyntaxError{Path: string(cmd.RequiredArgs.PathToJSONRules)}
 	}
 

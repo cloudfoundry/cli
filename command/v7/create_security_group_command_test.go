@@ -91,6 +91,20 @@ var _ = Describe("create-security-group Command", func() {
 		})
 	})
 
+	When("the provided JSON does not contain the required fields", func() {
+		BeforeEach(func() {
+			fakeActor.CreateSecurityGroupReturns(
+				v7action.Warnings{"create-security-group-warning"},
+				&json.UnmarshalTypeError{})
+		})
+
+		It("returns a custom error and provides an example", func() {
+			Expect(executeErr).To(HaveOccurred())
+			Expect(executeErr).To(Equal(actionerror.SecurityGroupJsonSyntaxError{Path: "some-path"}))
+			Expect(testUI.Err).To(Say("create-security-group-warning"))
+		})
+	})
+
 	When("the security group already exists", func() {
 		BeforeEach(func() {
 			fakeActor.CreateSecurityGroupReturns(

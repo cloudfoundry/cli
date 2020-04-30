@@ -220,7 +220,18 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		When("Unmarshaling fails", func() {
+		When("the json does not contain the required fields", func() {
+			BeforeEach(func() {
+				fileContents = []byte(`{"blah": "blah"}`)
+			})
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				_, ok := executeErr.(*json.UnmarshalTypeError)
+				Expect(ok).To(BeTrue())
+				Expect(warnings).To(Equal(Warnings{}))
+			})
+		})
+		When("the json is invalid", func() {
 			BeforeEach(func() {
 				fileContents = []byte("not-valid-json")
 			})
