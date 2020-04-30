@@ -28,7 +28,6 @@ func (so *ServiceOffering) UnmarshalJSON(data []byte) error {
 
 // GetServiceOffering lists service offering with optional filters.
 func (client *Client) GetServiceOfferings(query ...Query) ([]ServiceOffering, Warnings, error) {
-	var tempResources []*ServiceOffering
 	var resources []ServiceOffering
 
 	query = append(query, Query{Key: FieldsServiceBroker, Values: []string{"name", "guid"}})
@@ -38,8 +37,7 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]ServiceOffering, Wa
 		Query:        query,
 		ResponseBody: ServiceOffering{},
 		AppendToList: func(item interface{}) error {
-			myItem := item.(ServiceOffering)
-			tempResources = append(tempResources, &myItem)
+			resources = append(resources, item.(ServiceOffering))
 			return nil
 		},
 	})
@@ -49,9 +47,8 @@ func (client *Client) GetServiceOfferings(query ...Query) ([]ServiceOffering, Wa
 		brokerNameLookup[b.GUID] = b.Name
 	}
 
-	for _, offering := range tempResources {
-		offering.ServiceBrokerName = brokerNameLookup[offering.ServiceBrokerGUID]
-		resources = append(resources, *offering)
+	for i, _ := range resources {
+		resources[i].ServiceBrokerName = brokerNameLookup[resources[i].ServiceBrokerGUID]
 	}
 
 	return resources, warnings, err
