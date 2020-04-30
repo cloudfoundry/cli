@@ -243,7 +243,7 @@ applications:
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("parses the manifest properly", func() {
+			It("returns an error", func() {
 				Expect(executeErr).To(HaveOccurred())
 			})
 		})

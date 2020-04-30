@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"encoding/json"
 	"errors"
 	"regexp"
 
@@ -180,15 +181,14 @@ var _ = Describe("apply-manifest Command", func() {
 				})
 
 				When("the manifest is unparseable", func() {
-					var expectedErr error
-
 					BeforeEach(func() {
-						expectedErr = errors.New("oooooh nooooos")
-						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, expectedErr)
+						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, &json.UnmarshalTypeError{
+							Value: "oooooh nooooos",
+						})
 					})
 
 					It("returns back the parse error", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(executeErr).To(MatchError(errors.New("Unable to apply manifest because its format is invalid.")))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
 					})

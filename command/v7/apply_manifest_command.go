@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/cf/errors"
+	"encoding/json"
 	"os"
 
 	"code.cloudfoundry.org/cli/command"
@@ -76,6 +78,9 @@ func (cmd ApplyManifestCommand) Execute(args []string) error {
 
 	manifest, err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
 	if err != nil {
+		if _, ok := err.(*json.UnmarshalTypeError); ok {
+			return errors.New("Unable to apply manifest because its format is invalid.")
+		}
 		return err
 	}
 
