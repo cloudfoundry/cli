@@ -33,7 +33,7 @@ var _ = Describe("routes command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`check-route, domains, map-route, unmap-route`))
+			Eventually(session).Should(Say(`check-route, create-route, domains, map-route, unmap-route`))
 
 			Eventually(session).Should(Exit(0))
 		})
