@@ -61,7 +61,7 @@ func (m ManifestParser) InterpolateAndParse(pathToManifest string, pathsToVarsFi
 	}
 
 	if len(parsedManifest.Applications) == 0 {
-		return Manifest{}, errors.New("must have at least one application")
+		return Manifest{}, errors.New("Manifest must have at least one application.")
 	}
 
 	parsedManifest.PathToManifest = pathToManifest

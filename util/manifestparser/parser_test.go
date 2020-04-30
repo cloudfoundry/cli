@@ -73,6 +73,22 @@ applications:
 			})
 		})
 
+		When("the manifest does not contain applications", func() {
+			BeforeEach(func() {
+				rawManifest = []byte(`---
+applications:
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(errors.New("Manifest must have at least one application.")))
+			})
+
+		})
+
 		When("the manifest contains variables that need interpolation", func() {
 			BeforeEach(func() {
 				rawManifest = []byte(`---
