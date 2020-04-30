@@ -35,7 +35,6 @@ func (cmd EnvCommand) Execute(_ []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
-	cmd.UI.DisplayOK()
 
 	envGroups, warnings, err := cmd.Actor.GetEnvironmentVariablesByApplicationNameAndSpace(
 		appName,
