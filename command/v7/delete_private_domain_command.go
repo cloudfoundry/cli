@@ -28,20 +28,16 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 		return err
 	}
 
-	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
-	cmd.UI.DisplayWarnings(warnings)
-
 	cmd.UI.DisplayTextWithFlavor("Deleting private domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
 		"DomainName": domainName,
 		"Username":   currentUser.Name,
 	})
 
+	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
+	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
 		if _, ok := err.(actionerror.DomainNotFoundError); ok {
-			cmd.UI.DisplayTextWithFlavor("Deleting private domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
-				"DomainName": domainName,
-				"Username":   currentUser.Name,
-			})
 			cmd.UI.DisplayWarning("Domain '{{.DomainName}}' does not exist.", map[string]interface{}{
 				"DomainName": cmd.RequiredArgs.Domain,
 			})
