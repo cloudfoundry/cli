@@ -1,9 +1,10 @@
 package v7_test
 
 import (
-	"encoding/json"
 	"errors"
 	"regexp"
+
+	"gopkg.in/yaml.v2"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -182,8 +183,8 @@ var _ = Describe("apply-manifest Command", func() {
 
 				When("the manifest is unparseable", func() {
 					BeforeEach(func() {
-						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, &json.UnmarshalTypeError{
-							Value: "oooooh nooooos",
+						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, &yaml.TypeError{
+							Errors: []string{"oooooh nooooos"},
 						})
 					})
 

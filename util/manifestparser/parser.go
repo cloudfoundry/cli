@@ -57,7 +57,7 @@ func (m ManifestParser) InterpolateAndParse(pathToManifest string, pathsToVarsFi
 	var parsedManifest Manifest
 	err = yaml.Unmarshal(rawManifest, &parsedManifest)
 	if err != nil {
-		return Manifest{}, err
+		return Manifest{}, &yaml.TypeError{}
 	}
 
 	if len(parsedManifest.Applications) == 0 {

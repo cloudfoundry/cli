@@ -2,6 +2,7 @@ package manifestparser_test
 
 import (
 	"errors"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -245,6 +246,21 @@ applications:
 
 			It("returns an error", func() {
 				Expect(executeErr).To(HaveOccurred())
+			})
+		})
+
+		When("unmarshalling returns an error", func() {
+			BeforeEach(func() {
+				rawManifest = []byte(`---
+blah blah
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(&yaml.TypeError{}))
 			})
 		})
 	})
