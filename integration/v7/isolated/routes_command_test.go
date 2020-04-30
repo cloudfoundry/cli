@@ -25,11 +25,11 @@ var _ = Describe("routes command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`cf routes \[--orglevel\]\n`))
+			Eventually(session).Should(Say(`cf routes \[--org-level\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
-			Eventually(session).Should(Say(`--orglevel\s+List all the routes for all spaces of current organization`))
+			Eventually(session).Should(Say(`--org-level\s+List all the routes for all spaces of current organization`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -126,7 +126,7 @@ var _ = Describe("routes command", func() {
 
 			When("fetching routes by org", func() {
 				It("lists all the routes in the org", func() {
-					session := helpers.CF("routes", "--orglevel")
+					session := helpers.CF("routes", "--org-level")
 					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
 					Eventually(session).Should(Say(`space\s+host\s+domain\s+path\s+apps`))
 

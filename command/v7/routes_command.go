@@ -12,9 +12,9 @@ import (
 type RoutesCommand struct {
 	BaseCommand
 
-	usage           interface{} `usage:"CF_NAME routes [--orglevel]"`
+	usage           interface{} `usage:"CF_NAME routes [--org-level]"`
 	relatedCommands interface{} `related_commands:"check-route, domains, map-route, unmap-route"`
-	Orglevel        bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
+	Orglevel        bool        `long:"org-level" description:"List all the routes for all spaces of current organization"`
 	Labels          string      `long:"labels" description:"Selector to filter routes by labels"`
 }
 
