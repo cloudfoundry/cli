@@ -3,6 +3,8 @@ package types
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/jessevdk/go-flags"
 )
 
 const JsonNull = "null"
@@ -26,7 +28,10 @@ func (n *NullInt) ParseStringValue(val string) error {
 	if err != nil {
 		n.IsSet = false
 		n.Value = 0
-		return err
+		return &flags.Error{
+			Type:    flags.ErrMarshal,
+			Message: "invalid integer value",
+		}
 	}
 
 	n.Value = intVal
