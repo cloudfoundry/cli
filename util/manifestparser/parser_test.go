@@ -2,10 +2,11 @@ package manifestparser_test
 
 import (
 	"errors"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/yaml.v2"
 
 	. "code.cloudfoundry.org/cli/util/manifestparser"
 
