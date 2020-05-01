@@ -331,9 +331,7 @@ var _ = Describe("shared request helpers", func() {
 					StackName:           "some-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"some-buildpack"},
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					SpaceGUID:           "some-space-guid",
 				}
 				requestParams = RequestParams{
 					RequestName:  internal.PatchApplicationRequest,

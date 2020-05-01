@@ -158,9 +158,7 @@ func (actor Actor) CreateApplicationInSpace(app resources.Application, spaceGUID
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
 			StackName:           app.StackName,
 			Name:                app.Name,
-			Relationships: resources.Relationships{
-				constant.RelationshipTypeSpace: resources.Relationship{GUID: spaceGUID},
-			},
+			SpaceGUID:           spaceGUID,
 		})
 
 	if err != nil {

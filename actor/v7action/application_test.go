@@ -608,10 +608,8 @@ var _ = Describe("Application Actions", func() {
 
 				Expect(fakeCloudControllerClient.CreateApplicationCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(resources.Application{
-					Name: "some-app-name",
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					Name:                "some-app-name",
+					SpaceGUID:           "some-space-guid",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
 				}))

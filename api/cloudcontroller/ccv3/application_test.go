@@ -261,10 +261,8 @@ var _ = Describe("Application", func() {
 					return "", Warnings{"this is a warning"}, nil
 				})
 				appToCreate = resources.Application{
-					Name: "some-app-name",
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
 				}
 			})
 
@@ -535,7 +533,7 @@ var _ = Describe("Application", func() {
 					requestParams.ResponseBody.(*resources.Application).StackName = requestParams.RequestBody.(resources.Application).StackName
 					requestParams.ResponseBody.(*resources.Application).LifecycleType = requestParams.RequestBody.(resources.Application).LifecycleType
 					requestParams.ResponseBody.(*resources.Application).LifecycleBuildpacks = requestParams.RequestBody.(resources.Application).LifecycleBuildpacks
-					requestParams.ResponseBody.(*resources.Application).Relationships = requestParams.RequestBody.(resources.Application).Relationships
+					requestParams.ResponseBody.(*resources.Application).SpaceGUID = requestParams.RequestBody.(resources.Application).SpaceGUID
 					return "", Warnings{"this is a warning"}, nil
 				})
 
@@ -545,9 +543,7 @@ var _ = Describe("Application", func() {
 					StackName:           "some-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"some-buildpack"},
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					SpaceGUID:           "some-space-guid",
 				}
 			})
 
@@ -571,9 +567,7 @@ var _ = Describe("Application", func() {
 					LifecycleBuildpacks: []string{"some-buildpack"},
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					Name:                "some-app-name",
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					SpaceGUID:           "some-space-guid",
 				}))
 			})
 		})

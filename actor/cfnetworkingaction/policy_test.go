@@ -154,27 +154,21 @@ var _ = Describe("Policy", func() {
 			}}, nil)
 
 			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{
-				Name: "appA",
-				GUID: "appAGUID",
-				Relationships: map[constant.RelationshipType]resources.Relationship{
-					constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
-				},
+				Name:      "appA",
+				GUID:      "appAGUID",
+				SpaceGUID: "spaceAGUID",
 			}, []string{"GetApplicationByNameAndSpaceWarning"}, nil)
 
 			fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{
 				{
-					Name: "appB",
-					GUID: "appBGUID",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
-					},
+					Name:      "appB",
+					GUID:      "appBGUID",
+					SpaceGUID: "spaceAGUID",
 				},
 				{
-					Name: "appC",
-					GUID: "appCGUID",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceCGUID"},
-					},
+					Name:      "appC",
+					GUID:      "appCGUID",
+					SpaceGUID: "spaceCGUID",
 				},
 			}, []string{"GetApplicationsWarning"}, nil)
 
@@ -362,42 +356,32 @@ var _ = Describe("Policy", func() {
 
 			fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{
 				{
-					Name: "appA",
-					GUID: "appAGUID",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
-					},
+					Name:      "appA",
+					GUID:      "appAGUID",
+					SpaceGUID: "spaceAGUID",
 				},
 				{
-					Name: "appB",
-					GUID: "appBGUID",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
-					},
+					Name:      "appB",
+					GUID:      "appBGUID",
+					SpaceGUID: "spaceAGUID",
 				},
 				{
-					Name: "appC",
-					GUID: "appCGUID",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceCGUID"},
-					},
+					Name:      "appC",
+					GUID:      "appCGUID",
+					SpaceGUID: "spaceCGUID",
 				},
 			}, []string{"filter-apps-by-space-warning"}, nil)
 
 			fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{
 				{
-					GUID: "appBGUID",
-					Name: "appB",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
-					},
+					GUID:      "appBGUID",
+					Name:      "appB",
+					SpaceGUID: "spaceAGUID",
 				},
 				{
-					GUID: "appCGUID",
-					Name: "appC",
-					Relationships: map[constant.RelationshipType]resources.Relationship{
-						constant.RelationshipTypeSpace: {GUID: "spaceCGUID"},
-					},
+					GUID:      "appCGUID",
+					Name:      "appC",
+					SpaceGUID: "spaceCGUID",
 				},
 			}, []string{"filter-apps-by-guid-warning"}, nil)
 

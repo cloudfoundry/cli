@@ -21,8 +21,8 @@ type Application struct {
 	Metadata *Metadata
 	// Name is the name given to the application.
 	Name string
-	// Relationships list the relationships to the application.
-	Relationships Relationships
+	// SpaceGUID is the unique identifier of the parent space.
+	SpaceGUID string
 	// State is the desired state of the application.
 	State constant.ApplicationState
 }
@@ -30,9 +30,14 @@ type Application struct {
 // MarshalJSON converts an Application into a Cloud Controller Application.
 func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp := ccApplication{
-		Name:          a.Name,
-		Relationships: a.Relationships,
-		Metadata:      a.Metadata,
+		Name:     a.Name,
+		Metadata: a.Metadata,
+	}
+
+	if a.SpaceGUID != "" {
+		ccApp.Relationships = Relationships{
+			constant.RelationshipTypeSpace: Relationship{GUID: a.SpaceGUID},
+		}
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
@@ -67,7 +72,7 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 	a.LifecycleBuildpacks = lifecycle.Data.Buildpacks
 	a.LifecycleType = lifecycle.Type
 	a.Name = ccApp.Name
-	a.Relationships = ccApp.Relationships
+	a.SpaceGUID = ccApp.Relationships[constant.RelationshipTypeSpace].GUID
 	a.State = ccApp.State
 	a.Metadata = ccApp.Metadata
 

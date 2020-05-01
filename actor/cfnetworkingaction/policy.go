@@ -153,11 +153,9 @@ func uniqueSpaceGUIDs(applications []resources.Application) []string {
 	var spaceGUIDs []string
 	occurrences := map[string]struct{}{}
 	for _, app := range applications {
-		spaceGUID := app.Relationships[constant.RelationshipTypeSpace].GUID
-
-		if _, ok := occurrences[spaceGUID]; !ok {
-			spaceGUIDs = append(spaceGUIDs, spaceGUID)
-			occurrences[spaceGUID] = struct{}{}
+		if _, ok := occurrences[app.SpaceGUID]; !ok {
+			spaceGUIDs = append(spaceGUIDs, app.SpaceGUID)
+			occurrences[app.SpaceGUID] = struct{}{}
 		}
 	}
 	return spaceGUIDs
@@ -270,7 +268,6 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 	var policies []Policy
 	for _, v1Policy := range v1Policies {
 		destination := appByGUID[v1Policy.Destination.ID]
-		spaceGUID := destination.Relationships[constant.RelationshipTypeSpace].GUID
 
 		policies = append(policies, Policy{
 			SourceName:           appByGUID[v1Policy.Source.ID].Name,
@@ -278,8 +275,8 @@ func (actor Actor) getPoliciesForApplications(applications []resources.Applicati
 			Protocol:             string(v1Policy.Destination.Protocol),
 			StartPort:            v1Policy.Destination.Ports.Start,
 			EndPort:              v1Policy.Destination.Ports.End,
-			DestinationSpaceName: spaceNamesByGUID[spaceGUID],
-			DestinationOrgName:   orgNamesBySpaceGUID[spaceGUID],
+			DestinationSpaceName: spaceNamesByGUID[destination.SpaceGUID],
+			DestinationOrgName:   orgNamesBySpaceGUID[destination.SpaceGUID],
 		})
 	}
 

@@ -111,11 +111,9 @@ var _ = Describe("Application Actions", func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]resources.Application{
 						{
-							Name: "some-app-name",
-							GUID: "some-app-guid",
-							Relationships: resources.Relationships{
-								constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-							},
+							Name:      "some-app-name",
+							GUID:      "some-app-guid",
+							SpaceGUID: "some-space-guid",
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -185,18 +183,14 @@ var _ = Describe("Application Actions", func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]resources.Application{
 						{
-							GUID: "some-app-guid-1",
-							Name: "some-app-1",
-							Relationships: resources.Relationships{
-								constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid-1"},
-							},
+							GUID:      "some-app-guid-1",
+							Name:      "some-app-1",
+							SpaceGUID: "some-space-guid-1",
 						},
 						{
-							GUID: "some-app-guid-2",
-							Name: "some-app-2",
-							Relationships: resources.Relationships{
-								constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid-2"},
-							},
+							GUID:      "some-app-guid-2",
+							Name:      "some-app-2",
+							SpaceGUID: "some-space-guid-2",
 						},
 					},
 					ccv3.Warnings{"warning-1", "warning-2"},
@@ -253,18 +247,14 @@ var _ = Describe("Application Actions", func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]resources.Application{
 						{
-							GUID: "some-app-guid-1",
-							Name: "some-app-1",
-							Relationships: resources.Relationships{
-								constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid-1"},
-							},
+							GUID:      "some-app-guid-1",
+							Name:      "some-app-1",
+							SpaceGUID: "some-space-guid-1",
 						},
 						{
-							GUID: "some-app-guid-2",
-							Name: "some-app-2",
-							Relationships: resources.Relationships{
-								constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid-2"},
-							},
+							GUID:      "some-app-guid-2",
+							Name:      "some-app-2",
+							SpaceGUID: "some-space-guid-2",
 						},
 					},
 					ccv3.Warnings{"warning-1", "warning-2"},
@@ -338,9 +328,7 @@ var _ = Describe("Application Actions", func() {
 						GUID:                "some-app-guid",
 						LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
-						Relationships: resources.Relationships{
-							constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-						},
+						SpaceGUID:           "some-space-guid",
 					},
 					ccv3.Warnings{"some-warning"},
 					nil,
@@ -360,10 +348,8 @@ var _ = Describe("Application Actions", func() {
 
 				Expect(fakeCloudControllerClient.CreateApplicationCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(resources.Application{
-					Name: "some-app-name",
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					Name:                "some-app-name",
+					SpaceGUID:           "some-space-guid",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
 				}))
@@ -430,9 +416,7 @@ var _ = Describe("Application Actions", func() {
 					StackName:           "response-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"response-buildpack-1", "response-buildpack-2"},
-					Relationships: resources.Relationships{
-						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
-					},
+					SpaceGUID:           "some-space-guid",
 				}
 				fakeCloudControllerClient.UpdateApplicationReturns(
 					apiResponseApp,

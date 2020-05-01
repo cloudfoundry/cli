@@ -110,9 +110,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
 			StackName:           app.StackName,
 			Name:                app.Name,
-			Relationships: resources.Relationships{
-				constant.RelationshipTypeSpace: resources.Relationship{GUID: spaceGUID},
-			},
+			SpaceGUID:           spaceGUID,
 		})
 
 	if err != nil {
@@ -201,7 +199,7 @@ func (Actor) convertCCToActorApplication(app resources.Application) Application 
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,
 		State:               app.State,
-		SpaceGUID:           app.Relationships[constant.RelationshipTypeSpace].GUID,
+		SpaceGUID:           app.SpaceGUID,
 	}
 }
 
