@@ -3,6 +3,8 @@ package ccv3
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -79,7 +81,7 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 	var ccRole struct {
 		GUID          string `json:"guid"`
 		Type          string `json:"type"`
-		Relationships Relationships
+		Relationships resources.Relationships
 		IncludedUsers IncludedUsers
 	}
 

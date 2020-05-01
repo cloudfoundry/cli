@@ -1,51 +1,9 @@
 package ccv3
 
 import (
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-// Relationship represents a one to one relationship.
-// An empty GUID will be marshaled as `null`.
-type Relationship struct {
-	GUID string
-}
-
-func (r Relationship) MarshalJSON() ([]byte, error) {
-	if r.GUID == "" {
-		var emptyCCRelationship struct {
-			Data interface{} `json:"data"`
-		}
-		return json.Marshal(emptyCCRelationship)
-	}
-
-	var ccRelationship struct {
-		Data struct {
-			GUID string `json:"guid"`
-		} `json:"data"`
-	}
-
-	ccRelationship.Data.GUID = r.GUID
-	return json.Marshal(ccRelationship)
-}
-
-func (r *Relationship) UnmarshalJSON(data []byte) error {
-	var ccRelationship struct {
-		Data struct {
-			GUID string `json:"guid"`
-		} `json:"data"`
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &ccRelationship)
-	if err != nil {
-		return err
-	}
-
-	r.GUID = ccRelationship.Data.GUID
-	return nil
-}
 
 // DeleteIsolationSegmentOrganization will delete the relationship between
 // the isolation segment and the organization provided.
@@ -71,8 +29,8 @@ func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInsta
 
 // GetOrganizationDefaultIsolationSegment returns the relationship between an
 // organization and it's default isolation segment.
-func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
-	var responseBody Relationship
+func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (resources.Relationship, Warnings, error) {
+	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetOrganizationRelationshipDefaultIsolationSegmentRequest,
@@ -85,8 +43,8 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 
 // GetSpaceIsolationSegment returns the relationship between a space and it's
 // isolation segment.
-func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, Warnings, error) {
-	var responseBody Relationship
+func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (resources.Relationship, Warnings, error) {
+	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetSpaceRelationshipIsolationSegmentRequest,
@@ -98,13 +56,13 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 }
 
 // SetApplicationDroplet sets the specified droplet on the given application.
-func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (Relationship, Warnings, error) {
-	var responseBody Relationship
+func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (resources.Relationship, Warnings, error) {
+	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchApplicationCurrentDropletRequest,
 		URIParams:    internal.Params{"app_guid": appGUID},
-		RequestBody:  Relationship{GUID: dropletGUID},
+		RequestBody:  resources.Relationship{GUID: dropletGUID},
 		ResponseBody: &responseBody,
 	})
 
@@ -114,13 +72,13 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 // UpdateOrganizationDefaultIsolationSegmentRelationship sets the default isolation segment
 // for an organization on the controller.
 // If isoSegGuid is empty it will reset the default isolation segment.
-func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isoSegGUID string) (Relationship, Warnings, error) {
-	var responseBody Relationship
+func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isoSegGUID string) (resources.Relationship, Warnings, error) {
+	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:    internal.Params{"organization_guid": orgGUID},
-		RequestBody:  Relationship{GUID: isoSegGUID},
+		RequestBody:  resources.Relationship{GUID: isoSegGUID},
 		ResponseBody: &responseBody,
 	})
 
@@ -129,13 +87,13 @@ func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgG
 
 // UpdateSpaceIsolationSegmentRelationship assigns an isolation segment to a space and
 // returns the relationship.
-func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (Relationship, Warnings, error) {
-	var responseBody Relationship
+func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (resources.Relationship, Warnings, error) {
+	var responseBody resources.Relationship
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchSpaceRelationshipIsolationSegmentRequest,
 		URIParams:    internal.Params{"space_guid": spaceGUID},
-		RequestBody:  Relationship{GUID: isolationSegmentGUID},
+		RequestBody:  resources.Relationship{GUID: isolationSegmentGUID},
 		ResponseBody: &responseBody,
 	})
 

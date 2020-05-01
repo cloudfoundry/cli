@@ -30,8 +30,8 @@ func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, erro
 
 	space, apiWarnings, err := actor.CloudControllerClient.CreateSpace(ccv3.Space{
 		Name: spaceName,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: orgGUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeOrganization: resources.Relationship{GUID: orgGUID},
 		},
 	})
 

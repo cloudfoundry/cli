@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -34,7 +36,7 @@ var _ = Describe("Logging Actions", func() {
 		When("the application can be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app",
 							GUID: "some-app-guid",
@@ -155,7 +157,7 @@ var _ = Describe("Logging Actions", func() {
 				expectedAppGUID = "some-app-guid"
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app",
 							GUID: expectedAppGUID,

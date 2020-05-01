@@ -8,22 +8,23 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeV7ActorForPush struct {
-	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(string, string) (resources.Application, v7action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getApplicationByNameAndSpaceReturns struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -97,7 +98,7 @@ type FakeV7ActorForPush struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
+func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpace(arg1 string, arg2 string) (resources.Application, v7action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
@@ -122,7 +123,7 @@ func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceCallCount() int {
 	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v7action.Application, v7action.Warnings, error)) {
+func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceCalls(stub func(string, string) (resources.Application, v7action.Warnings, error)) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = stub
@@ -135,30 +136,30 @@ func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceArgsForCall(i int) (
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceReturns(result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7ActorForPush) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Application
+			result1 resources.Application
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

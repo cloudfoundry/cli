@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -104,7 +106,7 @@ var _ = Describe("set-health-check Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(v7action.Application{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(resources.Application{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -120,7 +122,7 @@ var _ = Describe("set-health-check Command", func() {
 	When("application is started", func() {
 		BeforeEach(func() {
 			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(
-				v7action.Application{
+				resources.Application{
 					State: constant.ApplicationStarted,
 				},
 				v7action.Warnings{"warning-1", "warning-2"},
@@ -150,7 +152,7 @@ var _ = Describe("set-health-check Command", func() {
 	When("app is not started", func() {
 		BeforeEach(func() {
 			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(
-				v7action.Application{
+				resources.Application{
 					State: constant.ApplicationStopped,
 				},
 				v7action.Warnings{"warning-1", "warning-2"},

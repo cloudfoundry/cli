@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -31,8 +33,8 @@ var _ = Describe("copy-source Command", func() {
 		binaryName    string
 		userName      string
 		executeErr    error
-		sourceApp     v7action.Application
-		targetApp     v7action.Application
+		sourceApp     resources.Application
+		targetApp     resources.Application
 		actorError    error
 		targetPackage v7action.Package
 	)
@@ -46,11 +48,11 @@ var _ = Describe("copy-source Command", func() {
 
 		binaryName = "faceman"
 		userName = "banana"
-		sourceApp = v7action.Application{
+		sourceApp = resources.Application{
 			Name: "source-app-name",
 			GUID: "source-app-guid",
 		}
-		targetApp = v7action.Application{
+		targetApp = resources.Application{
 			Name: "target-app-name",
 			GUID: "target-app-guid",
 		}
@@ -276,7 +278,7 @@ var _ = Describe("copy-source Command", func() {
 
 	When("retrieving the source app fails", func() {
 		BeforeEach(func() {
-			fakeActor.GetApplicationByNameAndSpaceReturnsOnCall(0, v7action.Application{}, v7action.Warnings{"get-source-app-warning"}, errors.New("get-source-app-error"))
+			fakeActor.GetApplicationByNameAndSpaceReturnsOnCall(0, resources.Application{}, v7action.Warnings{"get-source-app-warning"}, errors.New("get-source-app-error"))
 		})
 
 		It("returns an error", func() {
@@ -295,7 +297,7 @@ var _ = Describe("copy-source Command", func() {
 
 	When("retrieving the target app fails", func() {
 		BeforeEach(func() {
-			fakeActor.GetApplicationByNameAndSpaceReturnsOnCall(1, v7action.Application{}, v7action.Warnings{"get-target-app-warning"}, errors.New("get-target-app-error"))
+			fakeActor.GetApplicationByNameAndSpaceReturnsOnCall(1, resources.Application{}, v7action.Warnings{"get-target-app-warning"}, errors.New("get-target-app-error"))
 		})
 
 		It("returns an error", func() {

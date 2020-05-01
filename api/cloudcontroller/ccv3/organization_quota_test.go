@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
@@ -854,7 +856,7 @@ var _ = Describe("Organization Quotas", func() {
 		var (
 			warnings             Warnings
 			executeErr           error
-			AppliedOrgQuotaGUIDS RelationshipList
+			AppliedOrgQuotaGUIDS resources.RelationshipList
 			quotaGuid            = "quotaGuid"
 			orgGuid              = "orgGuid"
 		)
@@ -890,7 +892,7 @@ var _ = Describe("Organization Quotas", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(AppliedOrgQuotaGUIDS).To(Equal(RelationshipList{GUIDs: []string{orgGuid}}))
+				Expect(AppliedOrgQuotaGUIDS).To(Equal(resources.RelationshipList{GUIDs: []string{orgGuid}}))
 			})
 		})
 

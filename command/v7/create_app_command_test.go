@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -85,7 +87,7 @@ var _ = Describe("create-app Command", func() {
 
 		When("the create is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateApplicationInSpaceReturns(v7action.Application{}, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				fakeActor.CreateApplicationInSpaceReturns(resources.Application{}, v7action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("displays the header and ok", func() {
@@ -100,7 +102,7 @@ var _ = Describe("create-app Command", func() {
 				Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1))
 
 				createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
-				Expect(createApp).To(Equal(v7action.Application{
+				Expect(createApp).To(Equal(resources.Application{
 					Name: app,
 				}))
 				Expect(createSpaceGUID).To(Equal("some-space-guid"))
@@ -117,7 +119,7 @@ var _ = Describe("create-app Command", func() {
 					Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1))
 
 					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
-					Expect(createApp).To(Equal(v7action.Application{
+					Expect(createApp).To(Equal(resources.Application{
 						Name:          app,
 						LifecycleType: constant.AppLifecycleTypeDocker,
 					}))
@@ -132,7 +134,7 @@ var _ = Describe("create-app Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am an error")
-					fakeActor.CreateApplicationInSpaceReturns(v7action.Application{}, v7action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+					fakeActor.CreateApplicationInSpaceReturns(resources.Application{}, v7action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
 				})
 
 				It("displays the header and error", func() {
@@ -148,7 +150,7 @@ var _ = Describe("create-app Command", func() {
 			Context("due to NameNotUniqueInSpaceError{}", func() {
 				BeforeEach(func() {
 					fakeActor.CreateApplicationInSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"I am a warning", "I am also a warning"},
 						ccerror.NameNotUniqueInSpaceError{
 							UnprocessableEntityError: ccerror.UnprocessableEntityError{

@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -49,8 +51,8 @@ var _ = Describe("Package", func() {
 				BeforeEach(func() {
 					inputPackage = Package{
 						Type: constant.PackageTypeDocker,
-						Relationships: Relationships{
-							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 						},
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
@@ -121,8 +123,8 @@ var _ = Describe("Package", func() {
 				BeforeEach(func() {
 					inputPackage = Package{
 						Type: constant.PackageTypeBits,
-						Relationships: Relationships{
-							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 						},
 					}
 					response := `{

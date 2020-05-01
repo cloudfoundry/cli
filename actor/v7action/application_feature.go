@@ -1,6 +1,9 @@
 package v7action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
+)
 
 type ApplicationFeature ccv3.Buildpack
 
@@ -33,7 +36,7 @@ func (actor Actor) GetSSHEnabledByAppName(appName string, spaceGUID string) (ccv
 	return sshEnabled, allWarnings, nil
 }
 
-func (actor Actor) UpdateAppFeature(app Application, enabled bool, featureName string) (Warnings, error) {
+func (actor Actor) UpdateAppFeature(app resources.Application, enabled bool, featureName string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.UpdateAppFeature(app.GUID, enabled, featureName)
 	return Warnings(warnings), err
 }

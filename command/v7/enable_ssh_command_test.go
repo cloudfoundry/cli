@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -74,7 +76,7 @@ var _ = Describe("enable-ssh Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeEnableSSHActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{Name: "some-app", GUID: "some-app-guid"},
+					resources.Application{Name: "some-app", GUID: "some-app-guid"},
 					v7action.Warnings{"some-get-app-warnings"},
 					nil,
 				)
@@ -169,7 +171,7 @@ var _ = Describe("enable-ssh Command", func() {
 					BeforeEach(func() {
 						returnedErr = actionerror.ApplicationNotFoundError{Name: "some-app"}
 						fakeEnableSSHActor.GetApplicationByNameAndSpaceReturns(
-							v7action.Application{},
+							resources.Application{},
 							nil,
 							returnedErr)
 					})
@@ -204,7 +206,7 @@ var _ = Describe("enable-ssh Command", func() {
 				BeforeEach(func() {
 					returnedErr = errors.New("some-error")
 					fakeEnableSSHActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{Name: "some-app"},
+						resources.Application{Name: "some-app"},
 						v7action.Warnings{"some-warning"},
 						nil,
 					)

@@ -3,6 +3,8 @@ package v3action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
@@ -58,7 +60,7 @@ var _ = Describe("Application Manifest Actions", func() {
 				When("the app exists", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
-							[]ccv3.Application{{GUID: "app-1-guid"}},
+							[]resources.Application{{GUID: "app-1-guid"}},
 							ccv3.Warnings{"app-1-warning"},
 							nil,
 						)

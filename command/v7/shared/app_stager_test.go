@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
@@ -29,7 +31,7 @@ var _ = Describe("app stager", func() {
 		fakeActor          *v7fakes.FakeActor
 		fakeLogCacheClient *sharedactionfakes.FakeLogCacheClient
 
-		app          v7action.Application
+		app          resources.Application
 		space        configv3.Space
 		organization configv3.Organization
 		pkgGUID      string
@@ -53,7 +55,7 @@ var _ = Describe("app stager", func() {
 			allLogsWritten = make(chan bool)
 
 			pkgGUID = "package-guid"
-			app = v7action.Application{GUID: "app-guid", Name: "app-name"}
+			app = resources.Application{GUID: "app-guid", Name: "app-name"}
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
 			organization = configv3.Organization{Name: "some-org"}
 			strategy = constant.DeploymentStrategyDefault
@@ -185,7 +187,7 @@ var _ = Describe("app stager", func() {
 			allLogsWritten = make(chan bool)
 
 			pkgGUID = "package-guid"
-			app = v7action.Application{GUID: "app-guid", Name: "app-name"}
+			app = resources.Application{GUID: "app-guid", Name: "app-name"}
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
 			organization = configv3.Organization{Name: "some-org"}
 			strategy = constant.DeploymentStrategyDefault
@@ -324,7 +326,7 @@ var _ = Describe("app stager", func() {
 			noWait = true
 			appAction = constant.ApplicationRestarting
 
-			app = v7action.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
+			app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
 			droplet = v7action.Droplet{GUID: "droplet-guid"}
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
 			organization = configv3.Organization{Name: "some-org"}
@@ -422,7 +424,7 @@ var _ = Describe("app stager", func() {
 			When("the app action is starting", func() {
 				BeforeEach(func() {
 					appAction = constant.ApplicationStarting
-					app = v7action.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStopped}
+					app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStopped}
 				})
 
 				It("displays output for each step of starting", func() {
@@ -448,7 +450,7 @@ var _ = Describe("app stager", func() {
 
 				When("the app is already started", func() {
 					BeforeEach(func() {
-						app = v7action.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
+						app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
 					})
 					It("does not attempt to start the application", func() {
 						Expect(executeErr).To(BeNil())
@@ -483,7 +485,7 @@ var _ = Describe("app stager", func() {
 
 				When("the app is already stopped", func() {
 					BeforeEach(func() {
-						app = v7action.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStopped}
+						app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStopped}
 					})
 
 					It("does not stop the application", func() {

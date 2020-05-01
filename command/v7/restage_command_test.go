@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -29,11 +31,11 @@ var _ = Describe("restage Command", func() {
 
 		executeErr  error
 		expectedErr error
-		app         v7action.Application
+		app         resources.Application
 	)
 
 	BeforeEach(func() {
-		app = v7action.Application{Name: "some-app", GUID: "app-guid"}
+		app = resources.Application{Name: "some-app", GUID: "app-guid"}
 
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
@@ -129,7 +131,7 @@ var _ = Describe("restage Command", func() {
 	When("getting the application fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationByNameAndSpaceReturns(
-				v7action.Application{},
+				resources.Application{},
 				v7action.Warnings{"get-app-warning"},
 				errors.New("get-app-error"),
 			)

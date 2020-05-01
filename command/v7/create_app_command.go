@@ -1,10 +1,10 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type CreateAppCommand struct {
@@ -35,7 +35,7 @@ func (cmd CreateAppCommand) Execute(args []string) error {
 	})
 
 	_, warnings, err := cmd.Actor.CreateApplicationInSpace(
-		v7action.Application{
+		resources.Application{
 			Name:          cmd.RequiredArgs.AppName,
 			LifecycleType: constant.AppLifecycleType(cmd.AppType),
 		},

@@ -13,25 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
-// Application represents a V3 actor application.
-type Application struct {
-	Name                string
-	GUID                string
-	StackName           string
-	State               constant.ApplicationState
-	LifecycleType       constant.AppLifecycleType
-	LifecycleBuildpacks []string
-	Metadata            *Metadata
-}
-
-func (app Application) Started() bool {
-	return app.State == constant.ApplicationStarted
-}
-
-func (app Application) Stopped() bool {
-	return app.State == constant.ApplicationStopped
-}
-
 func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {
 	var allWarnings Warnings
 	var jobQueue []ccv3.JobURL
@@ -97,7 +78,7 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 	return allWarnings, err
 }
 
-func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]Application, Warnings, error) {
+func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]resources.Application, Warnings, error) {
 	uniqueAppGUIDs := map[string]bool{}
 	for _, appGUID := range appGUIDs {
 		uniqueAppGUIDs[appGUID] = true
@@ -115,15 +96,10 @@ func (actor Actor) GetApplicationsByGUIDs(appGUIDs []string) ([]Application, War
 		return nil, Warnings(warnings), actionerror.ApplicationsNotFoundError{}
 	}
 
-	actorApps := []Application{}
-	for _, a := range apps {
-		actorApps = append(actorApps, actor.convertCCToActorApplication(a))
-	}
-
-	return actorApps, Warnings(warnings), nil
+	return apps, Warnings(warnings), nil
 }
 
-func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]Application, Warnings, error) {
+func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]resources.Application, Warnings, error) {
 	uniqueAppNames := map[string]bool{}
 	for _, appName := range appNames {
 		uniqueAppNames[appName] = true
@@ -142,64 +118,56 @@ func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID s
 		return nil, Warnings(warnings), actionerror.ApplicationsNotFoundError{}
 	}
 
-	actorApps := []Application{}
-	for _, a := range apps {
-		actorApps = append(actorApps, actor.convertCCToActorApplication(a))
-	}
-	return actorApps, Warnings(warnings), nil
+	return apps, Warnings(warnings), nil
 }
 
 // GetApplicationByNameAndSpace returns the application with the given
 // name in the given space.
-func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
+func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, Warnings, error) {
 	apps, warnings, err := actor.GetApplicationsByNamesAndSpace([]string{appName}, spaceGUID)
 
 	if err != nil {
 		if _, ok := err.(actionerror.ApplicationsNotFoundError); ok {
-			return Application{}, warnings, actionerror.ApplicationNotFoundError{Name: appName}
+			return resources.Application{}, warnings, actionerror.ApplicationNotFoundError{Name: appName}
 		}
-		return Application{}, warnings, err
+		return resources.Application{}, warnings, err
 	}
 
 	return apps[0], warnings, nil
 }
 
 // GetApplicationsBySpace returns all applications in a space.
-func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
-	ccApps, warnings, err := actor.CloudControllerClient.GetApplications(
+func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]resources.Application, Warnings, error) {
+	apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 	)
 
 	if err != nil {
-		return []Application{}, Warnings(warnings), err
+		return []resources.Application{}, Warnings(warnings), err
 	}
 
-	var apps []Application
-	for _, ccApp := range ccApps {
-		apps = append(apps, actor.convertCCToActorApplication(ccApp))
-	}
 	return apps, Warnings(warnings), nil
 }
 
 // CreateApplicationInSpace creates and returns the application with the given
 // name in the given space.
-func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (Application, Warnings, error) {
+func (actor Actor) CreateApplicationInSpace(app resources.Application, spaceGUID string) (resources.Application, Warnings, error) {
 	createdApp, warnings, err := actor.CloudControllerClient.CreateApplication(
-		ccv3.Application{
+		resources.Application{
 			LifecycleType:       app.LifecycleType,
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
 			StackName:           app.StackName,
 			Name:                app.Name,
-			Relationships: ccv3.Relationships{
-				constant.RelationshipTypeSpace: ccv3.Relationship{GUID: spaceGUID},
+			Relationships: resources.Relationships{
+				constant.RelationshipTypeSpace: resources.Relationship{GUID: spaceGUID},
 			},
 		})
 
 	if err != nil {
-		return Application{}, Warnings(warnings), err
+		return resources.Application{}, Warnings(warnings), err
 	}
 
-	return actor.convertCCToActorApplication(createdApp), Warnings(warnings), nil
+	return createdApp, Warnings(warnings), nil
 }
 
 // SetApplicationProcessHealthCheckTypeByNameAndSpace sets the health check
@@ -212,11 +180,11 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	httpEndpoint string,
 	processType string,
 	invocationTimeout int64,
-) (Application, Warnings, error) {
+) (resources.Application, Warnings, error) {
 
 	app, getWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
-		return Application{}, getWarnings, err
+		return resources.Application{}, getWarnings, err
 	}
 
 	setWarnings, err := actor.UpdateProcessByTypeAndApplication(
@@ -407,34 +375,22 @@ func (actor Actor) PollProcesses(processes []ccv3.Process, handleInstanceDetails
 }
 
 // UpdateApplication updates the buildpacks on an application
-func (actor Actor) UpdateApplication(app Application) (Application, Warnings, error) {
-	ccApp := ccv3.Application{
+func (actor Actor) UpdateApplication(app resources.Application) (resources.Application, Warnings, error) {
+	ccApp := resources.Application{
 		GUID:                app.GUID,
 		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
-		Metadata:            (*ccv3.Metadata)(app.Metadata),
+		Metadata:            app.Metadata,
 		Name:                app.Name,
 	}
 
 	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccApp)
 	if err != nil {
-		return Application{}, Warnings(warnings), err
+		return resources.Application{}, Warnings(warnings), err
 	}
 
-	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
-}
-
-func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
-	return Application{
-		GUID:                app.GUID,
-		StackName:           app.StackName,
-		LifecycleType:       app.LifecycleType,
-		LifecycleBuildpacks: app.LifecycleBuildpacks,
-		Name:                app.Name,
-		State:               app.State,
-		Metadata:            (*Metadata)(app.Metadata),
-	}
+	return updatedApp, Warnings(warnings), nil
 }
 
 func (actor Actor) getDeployment(deploymentGUID string) (ccv3.Deployment, Warnings, error) {
@@ -474,18 +430,18 @@ func (actor Actor) getProcesses(deployment ccv3.Deployment, appGUID string, noWa
 	return nil, nil, nil
 }
 
-func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spaceGUID string) (Application, Warnings, error) {
+func (actor Actor) RenameApplicationByNameAndSpaceGUID(appName, newAppName, spaceGUID string) (resources.Application, Warnings, error) {
 	allWarnings := Warnings{}
 	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return Application{}, allWarnings, err
+		return resources.Application{}, allWarnings, err
 	}
 	application.Name = newAppName
 	application, warnings, err = actor.UpdateApplication(application)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return Application{}, allWarnings, err
+		return resources.Application{}, allWarnings, err
 	}
 
 	return application, allWarnings, nil

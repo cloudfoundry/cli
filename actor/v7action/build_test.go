@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -74,7 +76,7 @@ var _ = Describe("Build Actions", func() {
 
 		When("app is not found", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{}, ccv3.Warnings{"get-apps-warning"}, nil)
 			})
 
 			It("returns the error and warnings", func() {
@@ -88,7 +90,7 @@ var _ = Describe("Build Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("I am a passion fruit")
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns([]ccv3.Package{}, ccv3.Warnings{"get-packages-warning"}, expectedErr)
 			})
 
@@ -101,7 +103,7 @@ var _ = Describe("Build Actions", func() {
 
 		When("the package does not belong to the app", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
 					[]ccv3.Package{{GUID: "some-other-package-guid"}},
 					ccv3.Warnings{"get-packages-warning"},
@@ -118,7 +120,7 @@ var _ = Describe("Build Actions", func() {
 
 		When("the creation is successful", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
 					[]ccv3.Package{{GUID: packageGUID}},
 					ccv3.Warnings{"get-packages-warning"},
@@ -264,7 +266,7 @@ var _ = Describe("Build Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
 					[]ccv3.Package{{GUID: packageGUID}},
 					ccv3.Warnings{"get-packages-warning"},

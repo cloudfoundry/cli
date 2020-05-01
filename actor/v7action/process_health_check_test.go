@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -68,7 +70,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					nil,
 				)
@@ -86,7 +88,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					expectedErr,
 				)
@@ -101,7 +103,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							GUID: "some-app-guid",
 						},

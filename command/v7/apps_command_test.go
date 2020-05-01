@@ -121,7 +121,7 @@ var _ = Describe("apps Command", func() {
 			expectedErr = ccerror.RequestError{}
 			fakeActor.GetAppSummariesForSpaceReturns([]v7action.ApplicationSummary{
 				{
-					Application: v7action.Application{
+					Application: resources.Application{
 						GUID:  "app-guid",
 						Name:  "some-app",
 						State: constant.ApplicationStarted,
@@ -147,7 +147,7 @@ var _ = Describe("apps Command", func() {
 			BeforeEach(func() {
 				appSummaries := []v7action.ApplicationSummary{
 					{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "app-guid-1",
 							Name:  "some-app-1",
 							State: constant.ApplicationStarted,
@@ -198,7 +198,7 @@ var _ = Describe("apps Command", func() {
 						},
 					},
 					{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "app-guid-2",
 							Name:  "some-app-2",
 							State: constant.ApplicationStopped,
@@ -254,7 +254,7 @@ var _ = Describe("apps Command", func() {
 			BeforeEach(func() {
 				appSummaries := []v7action.ApplicationSummary{
 					{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "app-guid",
 							Name:  "some-app",
 							State: constant.ApplicationStarted,

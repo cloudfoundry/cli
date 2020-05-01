@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
@@ -40,13 +42,13 @@ func (p Process) MarshalJSON() ([]byte, error) {
 
 func (p *Process) UnmarshalJSON(data []byte) error {
 	var ccProcess struct {
-		Command       types.FilteredString `json:"command"`
-		DiskInMB      types.NullUint64     `json:"disk_in_mb"`
-		GUID          string               `json:"guid"`
-		Instances     types.NullInt        `json:"instances"`
-		MemoryInMB    types.NullUint64     `json:"memory_in_mb"`
-		Type          string               `json:"type"`
-		Relationships `json:"relationships"`
+		Command       types.FilteredString    `json:"command"`
+		DiskInMB      types.NullUint64        `json:"disk_in_mb"`
+		GUID          string                  `json:"guid"`
+		Instances     types.NullInt           `json:"instances"`
+		MemoryInMB    types.NullUint64        `json:"memory_in_mb"`
+		Type          string                  `json:"type"`
+		Relationships resources.Relationships `json:"relationships"`
 
 		HealthCheck struct {
 			Type constant.HealthCheckType `json:"type"`

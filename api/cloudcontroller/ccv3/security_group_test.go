@@ -276,7 +276,7 @@ var _ = Describe("SecurityGroup", func() {
 
 			Expect(params.RequestName).To(Equal(internal.PostSecurityGroupRunningSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
-			Expect(params.RequestBody).To(Equal(RelationshipList{
+			Expect(params.RequestBody).To(Equal(resources.RelationshipList{
 				GUIDs: []string{spaceGUID},
 			}))
 		})
@@ -309,7 +309,7 @@ var _ = Describe("SecurityGroup", func() {
 
 			Expect(params.RequestName).To(Equal(internal.PostSecurityGroupStagingSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
-			Expect(params.RequestBody).To(Equal(RelationshipList{
+			Expect(params.RequestBody).To(Equal(resources.RelationshipList{
 				GUIDs: []string{spaceGUID},
 			}))
 		})

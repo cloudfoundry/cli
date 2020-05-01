@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -107,7 +109,7 @@ var _ = Describe("tasks Command", func() {
 			When("provided a valid application name", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{GUID: "some-app-guid"},
+						resources.Application{GUID: "some-app-guid"},
 						v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 						nil)
 					fakeActor.GetApplicationTasksReturns(
@@ -224,7 +226,7 @@ var _ = Describe("tasks Command", func() {
 							expectedErr = errors.New("request-error")
 							returnedErr = ccerror.RequestError{Err: expectedErr}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								nil,
 								returnedErr)
 						})
@@ -240,7 +242,7 @@ var _ = Describe("tasks Command", func() {
 						BeforeEach(func() {
 							returnedErr = ccerror.UnverifiedServerError{URL: "some-url"}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetApplicationTasksReturns(
@@ -262,7 +264,7 @@ var _ = Describe("tasks Command", func() {
 						BeforeEach(func() {
 							expectedErr = errors.New("bananapants")
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 								expectedErr)
 						})
@@ -281,7 +283,7 @@ var _ = Describe("tasks Command", func() {
 						BeforeEach(func() {
 							expectedErr = errors.New("bananapants??")
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 								nil)
 							fakeActor.GetApplicationTasksReturns(

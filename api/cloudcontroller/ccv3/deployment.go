@@ -3,6 +3,8 @@ package ccv3
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -16,7 +18,7 @@ type Deployment struct {
 	DropletGUID   string
 	CreatedAt     string
 	UpdatedAt     string
-	Relationships Relationships
+	Relationships resources.Relationships
 	NewProcesses  []Process
 }
 
@@ -27,8 +29,8 @@ func (d Deployment) MarshalJSON() ([]byte, error) {
 	}
 
 	var ccDeployment struct {
-		Droplet       *Droplet      `json:"droplet,omitempty"`
-		Relationships Relationships `json:"relationships,omitempty"`
+		Droplet       *Droplet                `json:"droplet,omitempty"`
+		Relationships resources.Relationships `json:"relationships,omitempty"`
 	}
 
 	if d.DropletGUID != "" {
@@ -45,7 +47,7 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 	var ccDeployment struct {
 		GUID          string                   `json:"guid,omitempty"`
 		CreatedAt     string                   `json:"created_at,omitempty"`
-		Relationships Relationships            `json:"relationships,omitempty"`
+		Relationships resources.Relationships  `json:"relationships,omitempty"`
 		State         constant.DeploymentState `json:"state,omitempty"`
 		Status        struct {
 			Value  constant.DeploymentStatusValue  `json:"value"`
@@ -83,7 +85,7 @@ func (client *Client) CancelDeployment(deploymentGUID string) (Warnings, error) 
 func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID string) (string, Warnings, error) {
 	dep := Deployment{
 		DropletGUID:   dropletGUID,
-		Relationships: Relationships{constant.RelationshipTypeApplication: Relationship{GUID: appGUID}},
+		Relationships: resources.Relationships{constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID}},
 	}
 
 	var responseBody Deployment

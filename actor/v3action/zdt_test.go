@@ -3,6 +3,7 @@ package v3action_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	"errors"
 	"fmt"
@@ -31,12 +32,12 @@ var _ = Describe("v3-zdt-push", func() {
 
 	Describe("CancelDeploymentByAppNameAndSpace", func() {
 		var (
-			app ccv3.Application
+			app resources.Application
 		)
 
 		BeforeEach(func() {
-			app = ccv3.Application{GUID: "app-guid"}
-			fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{app}, ccv3.Warnings{"getapp-warning"}, nil)
+			app = resources.Application{GUID: "app-guid"}
+			fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{app}, ccv3.Warnings{"getapp-warning"}, nil)
 			fakeCloudControllerClient.GetDeploymentsReturns([]ccv3.Deployment{{GUID: "deployment-guid"}}, ccv3.Warnings{"getdep-warning"}, nil)
 			fakeCloudControllerClient.CancelDeploymentReturns(ccv3.Warnings{"cancel-warning"}, nil)
 		})

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -109,7 +111,7 @@ var _ = Describe("scale Command", func() {
 		When("the application does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"get-app-warning"},
 					actionerror.ApplicationNotFoundError{Name: appName})
 			})
@@ -133,7 +135,7 @@ var _ = Describe("scale Command", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get app error")
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"get-app-warning"},
 					expectedErr)
 			})
@@ -210,7 +212,7 @@ var _ = Describe("scale Command", func() {
 				}
 
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{GUID: "some-app-guid"},
+					resources.Application{GUID: "some-app-guid"},
 					v7action.Warnings{"get-app-warning"},
 					nil)
 			})

@@ -148,7 +148,7 @@ var _ = Describe("unmap-route Command", func() {
 			When("getting the app errors", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"get-app-warnings"},
 						errors.New("get-app-error"),
 					)
@@ -175,7 +175,7 @@ var _ = Describe("unmap-route Command", func() {
 			When("getting the app succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{Name: "app", GUID: "app-guid"},
+						resources.Application{Name: "app", GUID: "app-guid"},
 						v7action.Warnings{"get-app-warnings"},
 						nil,
 					)

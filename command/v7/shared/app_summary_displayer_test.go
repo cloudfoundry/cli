@@ -48,7 +48,7 @@ var _ = Describe("app summary displayer", func() {
 					uptime = time.Since(time.Unix(267321600, 0))
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStarted,
 							},
@@ -158,7 +158,7 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStarted,
 							},
@@ -236,7 +236,7 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStarted,
 							},
@@ -302,7 +302,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStarted,
 						},
@@ -351,7 +351,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStarted,
 						},
@@ -389,7 +389,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStopped,
 						},
@@ -449,7 +449,7 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStopped,
 							},
@@ -519,7 +519,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:          "some-guid",
 							Name:          "some-app",
 							State:         constant.ApplicationStarted,

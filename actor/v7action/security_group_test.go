@@ -352,14 +352,14 @@ var _ = Describe("Security Group Actions", func() {
 						[]ccv3.Space{{
 							Name: "my-space",
 							GUID: "space-guid-1",
-							Relationships: ccv3.Relationships{
-								constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
+							Relationships: resources.Relationships{
+								constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-1"},
 							},
 						}, {
 							Name: "your-space",
 							GUID: "space-guid-2",
-							Relationships: ccv3.Relationships{
-								constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
+							Relationships: resources.Relationships{
+								constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-2"},
 							},
 						}},
 						ccv3.IncludedResources{Organizations: []ccv3.Organization{{
@@ -512,14 +512,14 @@ var _ = Describe("Security Group Actions", func() {
 					[]ccv3.Space{{
 						Name: "my-space",
 						GUID: "space-guid-1",
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-1"},
 						},
 					}, {
 						Name: "your-space",
 						GUID: "space-guid-2",
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-2"},
 						},
 					}},
 					ccv3.IncludedResources{Organizations: []ccv3.Organization{{

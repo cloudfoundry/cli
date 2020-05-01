@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -26,7 +28,7 @@ var _ = Describe("Relationship List Actions", func() {
 			serviceInstanceGUID string
 			shareToSpaceGUID    string
 
-			relationshipList RelationshipList
+			relationshipList resources.RelationshipList
 			warnings         Warnings
 			shareErr         error
 		)
@@ -43,10 +45,10 @@ var _ = Describe("Relationship List Actions", func() {
 		})
 
 		When("no errors occur sharing the service instance", func() {
-			var returnedRelationshipList ccv3.RelationshipList
+			var returnedRelationshipList resources.RelationshipList
 
 			BeforeEach(func() {
-				returnedRelationshipList = ccv3.RelationshipList{
+				returnedRelationshipList = resources.RelationshipList{
 					GUIDs: []string{"some-space-guid"},
 				}
 				fakeCloudControllerClient.ShareServiceInstanceToSpacesReturns(
@@ -57,7 +59,7 @@ var _ = Describe("Relationship List Actions", func() {
 
 			It("does not return an error and returns warnings", func() {
 				Expect(shareErr).ToNot(HaveOccurred())
-				Expect(relationshipList).To(Equal(RelationshipList(returnedRelationshipList)))
+				Expect(relationshipList).To(Equal(returnedRelationshipList))
 				Expect(warnings).To(ConsistOf("share-service-instance-warning"))
 
 				Expect(fakeCloudControllerClient.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
@@ -73,7 +75,7 @@ var _ = Describe("Relationship List Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("share service instance error")
 				fakeCloudControllerClient.ShareServiceInstanceToSpacesReturns(
-					ccv3.RelationshipList{},
+					resources.RelationshipList{},
 					ccv3.Warnings{"share-service-instance-warning"},
 					expectedErr)
 			})

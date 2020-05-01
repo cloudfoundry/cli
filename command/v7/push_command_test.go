@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
@@ -375,8 +377,8 @@ var _ = Describe("push Command", func() {
 									BeforeEach(func() {
 										fakeActor.CreatePushPlansReturns(
 											[]v7pushaction.PushPlan{
-												v7pushaction.PushPlan{Application: v7action.Application{Name: "first-app", GUID: "potato"}},
-												v7pushaction.PushPlan{Application: v7action.Application{Name: "second-app", GUID: "potato"}},
+												v7pushaction.PushPlan{Application: resources.Application{Name: "first-app", GUID: "potato"}},
+												v7pushaction.PushPlan{Application: resources.Application{Name: "second-app", GUID: "potato"}},
 											},
 											v7action.Warnings{"create-push-plans-warnings"},
 											nil,
@@ -392,7 +394,7 @@ var _ = Describe("push Command", func() {
 											BeforeEach(func() {
 												fakeActor.ActualizeStub = func(v7pushaction.PushPlan, v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
 													return FillInEvents([]Step{
-														{Plan: v7pushaction.PushPlan{Application: v7action.Application{GUID: "potato"}}},
+														{Plan: v7pushaction.PushPlan{Application: resources.Application{GUID: "potato"}}},
 													})
 												}
 											})
@@ -402,33 +404,33 @@ var _ = Describe("push Command", func() {
 													fakeActor.ActualizeStub = func(pushPlan v7pushaction.PushPlan, _ v7pushaction.ProgressBar) <-chan *v7pushaction.PushEvent {
 														return FillInEvents([]Step{
 															{
-																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:  v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event: v7pushaction.CreatingArchive,
 															},
 															{
-																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:     v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event:    v7pushaction.UploadingApplicationWithArchive,
 																Warnings: v7pushaction.Warnings{"upload app archive warning"},
 															},
 															{
-																Plan:     v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:     v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event:    v7pushaction.RetryUpload,
 																Warnings: v7pushaction.Warnings{"retry upload warning"},
 															},
 															{
-																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:  v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event: v7pushaction.UploadWithArchiveComplete,
 															},
 															{
-																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:  v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event: v7pushaction.RestartingApplication,
 															},
 															{
-																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:  v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event: v7pushaction.StartingDeployment,
 															},
 															{
-																Plan:  v7pushaction.PushPlan{Application: v7action.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
+																Plan:  v7pushaction.PushPlan{Application: resources.Application{GUID: pushPlan.Application.GUID, Name: pushPlan.Application.Name}},
 																Event: v7pushaction.WaitingForDeployment,
 															},
 														})
@@ -544,7 +546,7 @@ var _ = Describe("push Command", func() {
 												BeforeEach(func() {
 													summary := v7action.DetailedApplicationSummary{
 														ApplicationSummary: v7action.ApplicationSummary{
-															Application:      v7action.Application{},
+															Application:      resources.Application{},
 															ProcessSummaries: v7action.ProcessSummaries{},
 														},
 														CurrentDroplet: v7action.Droplet{},

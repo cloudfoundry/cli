@@ -3,6 +3,8 @@ package v3action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
@@ -69,7 +71,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					nil,
 				)
@@ -87,7 +89,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					expectedErr,
 				)
@@ -102,7 +104,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							GUID: "some-app-guid",
 						},
@@ -215,7 +217,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					nil,
 				)
@@ -236,7 +238,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					expectedErr,
 				)
@@ -249,15 +251,15 @@ var _ = Describe("Process Health Check Actions", func() {
 		})
 
 		When("application exists", func() {
-			var ccv3App ccv3.Application
+			var ccv3App resources.Application
 
 			BeforeEach(func() {
-				ccv3App = ccv3.Application{
+				ccv3App = resources.Application{
 					GUID: "some-app-guid",
 				}
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{ccv3App},
+					[]resources.Application{ccv3App},
 					ccv3.Warnings{"some-warning"},
 					nil,
 				)

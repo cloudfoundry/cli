@@ -3,6 +3,8 @@ package ccv3
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -119,13 +121,13 @@ func (sq *SpaceQuota) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (RelationshipList, Warnings, error) {
-	var responseBody RelationshipList
+func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (resources.RelationshipList, Warnings, error) {
+	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostSpaceQuotaRelationshipsRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGUID},
-		RequestBody:  RelationshipList{GUIDs: []string{spaceGUID}},
+		RequestBody:  resources.RelationshipList{GUIDs: []string{spaceGUID}},
 		ResponseBody: &responseBody,
 	})
 

@@ -3,6 +3,8 @@ package cfnetworkingaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
@@ -28,13 +30,13 @@ var _ = Describe("Policy", func() {
 		fakeCloudControllerClient = new(cfnetworkingactionfakes.FakeCloudControllerClient)
 		fakeNetworkingClient = new(cfnetworkingactionfakes.FakeNetworkingClient)
 
-		fakeCloudControllerClient.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (ccv3.Application, ccv3.Warnings, error) {
+		fakeCloudControllerClient.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (resources.Application, ccv3.Warnings, error) {
 			if appName == "appA" {
-				return ccv3.Application{GUID: "appAGUID"}, []string{"v3ActorWarningA"}, nil
+				return resources.Application{GUID: "appAGUID"}, []string{"v3ActorWarningA"}, nil
 			} else if appName == "appB" {
-				return ccv3.Application{GUID: "appBGUID"}, []string{"v3ActorWarningB"}, nil
+				return resources.Application{GUID: "appBGUID"}, []string{"v3ActorWarningB"}, nil
 			}
-			return ccv3.Application{}, nil, nil
+			return resources.Application{}, nil, nil
 		}
 
 		actor = NewActor(fakeNetworkingClient, fakeCloudControllerClient)
@@ -85,7 +87,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the source app fails ", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(ccv3.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
 			It("returns a sensible error", func() {
 				Expect(warnings).To(ConsistOf("v3ActorWarningA"))
@@ -95,11 +97,11 @@ var _ = Describe("Policy", func() {
 
 		When("getting the destination app fails ", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (ccv3.Application, ccv3.Warnings, error) {
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (resources.Application, ccv3.Warnings, error) {
 					if appName == "appB" {
-						return ccv3.Application{}, []string{"v3ActorWarningB"}, errors.New("banana")
+						return resources.Application{}, []string{"v3ActorWarningB"}, errors.New("banana")
 					}
-					return ccv3.Application{}, []string{"v3ActorWarningA"}, nil
+					return resources.Application{}, []string{"v3ActorWarningA"}, nil
 				}
 			})
 			It("returns a sensible error", func() {
@@ -151,26 +153,26 @@ var _ = Describe("Policy", func() {
 				},
 			}}, nil)
 
-			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(ccv3.Application{
+			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{
 				Name: "appA",
 				GUID: "appAGUID",
-				Relationships: map[constant.RelationshipType]ccv3.Relationship{
+				Relationships: map[constant.RelationshipType]resources.Relationship{
 					constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
 				},
 			}, []string{"GetApplicationByNameAndSpaceWarning"}, nil)
 
-			fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{
+			fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{
 				{
 					Name: "appB",
 					GUID: "appBGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
 					},
 				},
 				{
 					Name: "appC",
 					GUID: "appCGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceCGUID"},
 					},
 				},
@@ -180,14 +182,14 @@ var _ = Describe("Policy", func() {
 				{
 					Name: "spaceA",
 					GUID: "spaceAGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeOrganization: {GUID: "orgAGUID"},
 					},
 				},
 				{
 					Name: "spaceC",
 					GUID: "spaceCGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeOrganization: {GUID: "orgCGUID"},
 					},
 				},
@@ -270,7 +272,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the applications by name and space fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(ccv3.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
@@ -291,7 +293,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the applications by guids fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, []string{"GetApplicationsWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{}, []string{"GetApplicationsWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
@@ -358,42 +360,42 @@ var _ = Describe("Policy", func() {
 				},
 			}}, nil)
 
-			fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []ccv3.Application{
+			fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{
 				{
 					Name: "appA",
 					GUID: "appAGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
 					},
 				},
 				{
 					Name: "appB",
 					GUID: "appBGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
 					},
 				},
 				{
 					Name: "appC",
 					GUID: "appCGUID",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceCGUID"},
 					},
 				},
 			}, []string{"filter-apps-by-space-warning"}, nil)
 
-			fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []ccv3.Application{
+			fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{
 				{
 					GUID: "appBGUID",
 					Name: "appB",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceAGUID"},
 					},
 				},
 				{
 					GUID: "appCGUID",
 					Name: "appC",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeSpace: {GUID: "spaceCGUID"},
 					},
 				},
@@ -403,14 +405,14 @@ var _ = Describe("Policy", func() {
 				{
 					GUID: "spaceAGUID",
 					Name: "spaceA",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeOrganization: {GUID: "orgAGUID"},
 					},
 				},
 				{
 					GUID: "spaceCGUID",
 					Name: "spaceC",
-					Relationships: map[constant.RelationshipType]ccv3.Relationship{
+					Relationships: map[constant.RelationshipType]resources.Relationship{
 						constant.RelationshipTypeOrganization: {GUID: "orgCGUID"},
 					},
 				},
@@ -517,7 +519,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the applications with a space guids filter fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []ccv3.Application{}, []string{"filter-apps-by-space-warning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{}, []string{"filter-apps-by-space-warning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
@@ -538,7 +540,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the applications by guids fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []ccv3.Application{}, []string{"filter-apps-by-guid-warning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{}, []string{"filter-apps-by-guid-warning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
@@ -636,7 +638,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the source app fails ", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(ccv3.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
 			It("returns a sensible error", func() {
 				Expect(warnings).To(ConsistOf("v3ActorWarningA"))
@@ -646,8 +648,8 @@ var _ = Describe("Policy", func() {
 
 		When("getting the destination app fails ", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturnsOnCall(0, ccv3.Application{}, []string{"v3ActorWarningA"}, nil)
-				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturnsOnCall(1, ccv3.Application{}, []string{"v3ActorWarningB"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturnsOnCall(0, resources.Application{}, []string{"v3ActorWarningA"}, nil)
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturnsOnCall(1, resources.Application{}, []string{"v3ActorWarningB"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {

@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -97,7 +99,7 @@ var _ = Describe("stop Command", func() {
 				GUID: "some-space-guid",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, nil)
 		})
 
@@ -130,7 +132,7 @@ var _ = Describe("stop Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
 
 		It("says that the app failed to stop", func() {
@@ -153,7 +155,7 @@ var _ = Describe("stop Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
 		})
@@ -178,7 +180,7 @@ var _ = Describe("stop Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStopped}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 		})
 
 		It("says that the app failed to stop", func() {
@@ -206,7 +208,7 @@ var _ = Describe("stop Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = errors.New("some-error")
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
 
 		It("says that the app failed to stop", func() {
@@ -231,7 +233,7 @@ var _ = Describe("stop Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v7action.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(resources.Application{State: constant.ApplicationStarted}, v7action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = errors.New("some-error")
 			fakeActor.StopApplicationReturns(v7action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
 		})

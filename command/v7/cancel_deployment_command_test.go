@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -108,7 +110,7 @@ var _ = Describe("Cancel deployment command", func() {
 		When("getting the app fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"get-app-warning"},
 					errors.New("get-app-error"),
 				)
@@ -128,7 +130,7 @@ var _ = Describe("Cancel deployment command", func() {
 			BeforeEach(func() {
 				appGUID = "some-app-guid"
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{Name: appName, GUID: appGUID},
+					resources.Application{Name: appName, GUID: appGUID},
 					v7action.Warnings{"get-app-warning"},
 					nil,
 				)

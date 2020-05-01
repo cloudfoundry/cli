@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -21,7 +23,7 @@ import (
 
 type AppStager interface {
 	StageAndStart(
-		app v7action.Application,
+		app resources.Application,
 		space configv3.Space,
 		organization configv3.Organization,
 		packageGUID string,
@@ -31,13 +33,13 @@ type AppStager interface {
 	) error
 
 	StageApp(
-		app v7action.Application,
+		app resources.Application,
 		packageGUID string,
 		space configv3.Space,
 	) (v7action.Droplet, error)
 
 	StartApp(
-		app v7action.Application,
+		app resources.Application,
 		droplet v7action.Droplet,
 		strategy constant.DeploymentStrategy,
 		noWait bool,
@@ -76,7 +78,7 @@ func NewAppStager(actor stagingAndStartActor, ui command.UI, config command.Conf
 }
 
 func (stager *Stager) StageAndStart(
-	app v7action.Application,
+	app resources.Application,
 	space configv3.Space,
 	organization configv3.Organization,
 	packageGUID string,
@@ -100,7 +102,7 @@ func (stager *Stager) StageAndStart(
 	return nil
 }
 
-func (stager *Stager) StageApp(app v7action.Application, packageGUID string, space configv3.Space) (v7action.Droplet, error) {
+func (stager *Stager) StageApp(app resources.Application, packageGUID string, space configv3.Space) (v7action.Droplet, error) {
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := stager.Actor.GetStreamingLogsForApplicationByNameAndSpace(app.Name, space.GUID, stager.LogCache)
 	stager.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
@@ -124,7 +126,7 @@ func (stager *Stager) StageApp(app v7action.Application, packageGUID string, spa
 }
 
 func (stager *Stager) StartApp(
-	app v7action.Application,
+	app resources.Application,
 	droplet v7action.Droplet,
 	strategy constant.DeploymentStrategy,
 	noWait bool,

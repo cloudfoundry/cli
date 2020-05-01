@@ -7,7 +7,7 @@ import (
 )
 
 type ApplicationSummary struct {
-	Application
+	resources.Application
 	ProcessSummaries ProcessSummaries
 	Routes           []resources.Route
 }
@@ -87,7 +87,7 @@ func (actor Actor) GetAppSummariesForSpace(spaceGUID string, labelSelector strin
 		processSummariesByAppGUID[app.GUID].Sort()
 
 		summary := ApplicationSummary{
-			Application:      actor.convertCCToActorApplication(app),
+			Application:      app,
 			ProcessSummaries: processSummariesByAppGUID[app.GUID],
 			Routes:           routes,
 		}
@@ -122,7 +122,7 @@ func (actor Actor) GetDetailedAppSummary(appName, spaceGUID string, withObfuscat
 	return detailedSummary, allWarnings, err
 }
 
-func (actor Actor) createSummary(app Application, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
+func (actor Actor) createSummary(app resources.Application, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID, withObfuscatedValues)
@@ -138,13 +138,7 @@ func (actor Actor) createSummary(app Application, withObfuscatedValues bool) (Ap
 	}
 
 	return ApplicationSummary{
-		Application: Application{
-			Name:                app.Name,
-			GUID:                app.GUID,
-			State:               app.State,
-			LifecycleType:       app.LifecycleType,
-			LifecycleBuildpacks: app.LifecycleBuildpacks,
-		},
+		Application:      app,
 		ProcessSummaries: processSummaries,
 		Routes:           routes,
 	}, allWarnings, nil
@@ -166,7 +160,7 @@ func (actor Actor) addDroplet(summary ApplicationSummary) (DetailedApplicationSu
 	}, allWarnings, nil
 }
 
-func toAppGUIDs(apps []ccv3.Application) []string {
+func toAppGUIDs(apps []resources.Application) []string {
 	guids := make([]string, len(apps))
 
 	for i, app := range apps {

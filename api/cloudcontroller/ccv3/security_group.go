@@ -95,7 +95,7 @@ func (client *Client) UpdateSecurityGroupRunningSpace(securityGroupGUID string, 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostSecurityGroupRunningSpaceRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
-		RequestBody: RelationshipList{
+		RequestBody: resources.RelationshipList{
 			GUIDs: []string{spaceGUID},
 		},
 	})
@@ -107,7 +107,7 @@ func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostSecurityGroupStagingSpaceRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
-		RequestBody: RelationshipList{
+		RequestBody: resources.RelationshipList{
 			GUIDs: []string{spaceGUID},
 		},
 	})

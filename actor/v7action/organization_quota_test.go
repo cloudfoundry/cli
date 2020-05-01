@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -63,7 +65,7 @@ var _ = Describe("Organization Quota Actions", func() {
 					nil,
 				)
 				fakeCloudControllerClient.ApplyOrganizationQuotaReturns(
-					ccv3.RelationshipList{},
+					resources.RelationshipList{},
 					ccv3.Warnings{"apply-quota-warning"},
 					errors.New("apply-quota-error"),
 				)
@@ -89,7 +91,7 @@ var _ = Describe("Organization Quota Actions", func() {
 					nil,
 				)
 				fakeCloudControllerClient.ApplyOrganizationQuotaReturns(
-					ccv3.RelationshipList{
+					resources.RelationshipList{
 						GUIDs: []string{orgGUID},
 					},
 					ccv3.Warnings{"apply-quota-warning"},

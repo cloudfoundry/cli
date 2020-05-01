@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
@@ -34,7 +36,7 @@ var _ = Describe("Space Quotas", func() {
 			executeErr       error
 			quotaGUID        string
 			spaceGUID        string
-			relationshipList RelationshipList
+			relationshipList resources.RelationshipList
 		)
 
 		BeforeEach(func() {
@@ -69,7 +71,7 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(relationshipList).To(Equal(RelationshipList{
+				Expect(relationshipList).To(Equal(resources.RelationshipList{
 					GUIDs: []string{"space-guid-1"},
 				}))
 			})

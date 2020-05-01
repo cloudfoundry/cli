@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
@@ -28,13 +30,13 @@ var _ = Describe("Application", func() {
 	Describe("Application", func() {
 		Describe("MarshalJSON", func() {
 			var (
-				app      Application
+				app      resources.Application
 				appBytes []byte
 				err      error
 			)
 
 			BeforeEach(func() {
-				app = Application{}
+				app = resources.Application{}
 			})
 
 			JustBeforeEach(func() {
@@ -44,7 +46,7 @@ var _ = Describe("Application", func() {
 
 			When("no lifecycle is provided", func() {
 				BeforeEach(func() {
-					app = Application{}
+					app = resources.Application{}
 				})
 
 				It("omits the lifecycle from the JSON", func() {
@@ -54,7 +56,7 @@ var _ = Describe("Application", func() {
 
 			When("lifecycle type docker is provided", func() {
 				BeforeEach(func() {
-					app = Application{
+					app = resources.Application{
 						LifecycleType: constant.AppLifecycleTypeDocker,
 					}
 				})
@@ -118,8 +120,8 @@ var _ = Describe("Application", func() {
 
 			When("metadata is provided", func() {
 				BeforeEach(func() {
-					app = Application{
-						Metadata: &Metadata{
+					app = resources.Application{
+						Metadata: &resources.Metadata{
 							Labels: map[string]types.NullString{
 								"some-key":  types.NewNullString("some-value"),
 								"other-key": types.NewNullString("other-value\nwith a newline & a \" quote")},
@@ -140,8 +142,8 @@ var _ = Describe("Application", func() {
 
 				When("labels need to be removed", func() {
 					BeforeEach(func() {
-						app = Application{
-							Metadata: &Metadata{
+						app = resources.Application{
+							Metadata: &resources.Metadata{
 								Labels: map[string]types.NullString{
 									"some-key":      types.NewNullString("some-value"),
 									"other-key":     types.NewNullString("other-value\nwith a newline & a \" quote"),
@@ -168,14 +170,14 @@ var _ = Describe("Application", func() {
 
 		Describe("UnmarshalJSON", func() {
 			var (
-				app      Application
+				app      resources.Application
 				appBytes []byte
 				err      error
 			)
 
 			BeforeEach(func() {
 				appBytes = []byte("{}")
-				app = Application{}
+				app = resources.Application{}
 			})
 
 			JustBeforeEach(func() {
@@ -189,7 +191,7 @@ var _ = Describe("Application", func() {
 				})
 
 				It("omits the lifecycle from the JSON", func() {
-					Expect(app).To(Equal(Application{}))
+					Expect(app).To(Equal(resources.Application{}))
 				})
 			})
 
@@ -198,7 +200,7 @@ var _ = Describe("Application", func() {
 					appBytes = []byte(`{"lifecycle":{"type":"docker","data":{}}}`)
 				})
 				It("sets the lifecycle type to docker with empty data", func() {
-					Expect(app).To(Equal(Application{
+					Expect(app).To(Equal(resources.Application{
 						LifecycleType: constant.AppLifecycleTypeDocker,
 					}))
 				})
@@ -212,7 +214,7 @@ var _ = Describe("Application", func() {
 					})
 
 					It("sets them in the JSON", func() {
-						Expect(app).To(Equal(Application{
+						Expect(app).To(Equal(resources.Application{
 							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 							LifecycleBuildpacks: []string{"some-buildpack"},
 						}))
@@ -226,8 +228,8 @@ var _ = Describe("Application", func() {
 				})
 
 				It("sets the labels", func() {
-					Expect(app).To(Equal(Application{
-						Metadata: &Metadata{
+					Expect(app).To(Equal(resources.Application{
+						Metadata: &resources.Metadata{
 							Labels: map[string]types.NullString{
 								"some-key": types.NewNullString("some-value"),
 							},
@@ -240,9 +242,9 @@ var _ = Describe("Application", func() {
 
 	Describe("CreateApplication", func() {
 		var (
-			appToCreate Application
+			appToCreate resources.Application
 
-			createdApp Application
+			createdApp resources.Application
 			warnings   Warnings
 			executeErr error
 		)
@@ -254,14 +256,14 @@ var _ = Describe("Application", func() {
 		When("the application successfully is created", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					requestParams.ResponseBody.(*Application).GUID = "some-app-guid"
-					requestParams.ResponseBody.(*Application).Name = requestParams.RequestBody.(Application).Name
+					requestParams.ResponseBody.(*resources.Application).GUID = "some-app-guid"
+					requestParams.ResponseBody.(*resources.Application).Name = requestParams.RequestBody.(resources.Application).Name
 					return "", Warnings{"this is a warning"}, nil
 				})
-				appToCreate = Application{
+				appToCreate = resources.Application{
 					Name: "some-app-name",
-					Relationships: Relationships{
-						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
 					},
 				}
 			})
@@ -271,7 +273,7 @@ var _ = Describe("Application", func() {
 				actualParams := requester.MakeRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationRequest))
 				Expect(actualParams.RequestBody).To(Equal(appToCreate))
-				_, ok := actualParams.ResponseBody.(*Application)
+				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
@@ -279,7 +281,7 @@ var _ = Describe("Application", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(createdApp).To(Equal(Application{
+				Expect(createdApp).To(Equal(resources.Application{
 					Name: "some-app-name",
 					GUID: "some-app-guid",
 				}))
@@ -334,7 +336,7 @@ var _ = Describe("Application", func() {
 			appName   = "some-app-name"
 			spaceGUID = "some-space-guid"
 
-			app        Application
+			app        resources.Application
 			warnings   Warnings
 			executeErr error
 		)
@@ -346,7 +348,7 @@ var _ = Describe("Application", func() {
 		When("the application exists", func() {
 			BeforeEach(func() {
 				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-					err := requestParams.AppendToList(Application{GUID: "app-guid-2"})
+					err := requestParams.AppendToList(resources.Application{GUID: "app-guid-2"})
 					Expect(err).NotTo(HaveOccurred())
 					return IncludedResources{}, Warnings{"this is a warning"}, nil
 				})
@@ -360,14 +362,14 @@ var _ = Describe("Application", func() {
 					{Key: NameFilter, Values: []string{"some-app-name"}},
 					{Key: SpaceGUIDFilter, Values: []string{"some-space-guid"}},
 				}))
-				_, ok := actualParams.ResponseBody.(Application)
+				_, ok := actualParams.ResponseBody.(resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
 			It("returns the queried application and all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(app).To(Equal(Application{GUID: "app-guid-2"}))
+				Expect(app).To(Equal(resources.Application{GUID: "app-guid-2"}))
 			})
 		})
 
@@ -429,7 +431,7 @@ var _ = Describe("Application", func() {
 		var (
 			filters []Query
 
-			apps       []Application
+			apps       []resources.Application
 			warnings   Warnings
 			executeErr error
 		)
@@ -441,7 +443,7 @@ var _ = Describe("Application", func() {
 		When("applications exist", func() {
 			BeforeEach(func() {
 				requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-					err := requestParams.AppendToList(Application{GUID: "app-guid-1"})
+					err := requestParams.AppendToList(resources.Application{GUID: "app-guid-1"})
 					Expect(err).NotTo(HaveOccurred())
 					return IncludedResources{}, Warnings{"this is a warning", "this is another warning"}, nil
 				})
@@ -457,7 +459,7 @@ var _ = Describe("Application", func() {
 				actualParams := requester.MakeListRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.GetApplicationsRequest))
 				Expect(actualParams.Query).To(Equal(filters))
-				_, ok := actualParams.ResponseBody.(Application)
+				_, ok := actualParams.ResponseBody.(resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
@@ -465,7 +467,7 @@ var _ = Describe("Application", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 
-				Expect(apps).To(ConsistOf(Application{GUID: "app-guid-1"}))
+				Expect(apps).To(ConsistOf(resources.Application{GUID: "app-guid-1"}))
 			})
 		})
 
@@ -514,9 +516,9 @@ var _ = Describe("Application", func() {
 
 	Describe("UpdateApplication", func() {
 		var (
-			appToUpdate Application
+			appToUpdate resources.Application
 
-			updatedApp Application
+			updatedApp resources.Application
 			warnings   Warnings
 			executeErr error
 		)
@@ -528,23 +530,23 @@ var _ = Describe("Application", func() {
 		When("the application successfully is updated", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					requestParams.ResponseBody.(*Application).GUID = "some-app-guid"
-					requestParams.ResponseBody.(*Application).Name = requestParams.RequestBody.(Application).Name
-					requestParams.ResponseBody.(*Application).StackName = requestParams.RequestBody.(Application).StackName
-					requestParams.ResponseBody.(*Application).LifecycleType = requestParams.RequestBody.(Application).LifecycleType
-					requestParams.ResponseBody.(*Application).LifecycleBuildpacks = requestParams.RequestBody.(Application).LifecycleBuildpacks
-					requestParams.ResponseBody.(*Application).Relationships = requestParams.RequestBody.(Application).Relationships
+					requestParams.ResponseBody.(*resources.Application).GUID = "some-app-guid"
+					requestParams.ResponseBody.(*resources.Application).Name = requestParams.RequestBody.(resources.Application).Name
+					requestParams.ResponseBody.(*resources.Application).StackName = requestParams.RequestBody.(resources.Application).StackName
+					requestParams.ResponseBody.(*resources.Application).LifecycleType = requestParams.RequestBody.(resources.Application).LifecycleType
+					requestParams.ResponseBody.(*resources.Application).LifecycleBuildpacks = requestParams.RequestBody.(resources.Application).LifecycleBuildpacks
+					requestParams.ResponseBody.(*resources.Application).Relationships = requestParams.RequestBody.(resources.Application).Relationships
 					return "", Warnings{"this is a warning"}, nil
 				})
 
-				appToUpdate = Application{
+				appToUpdate = resources.Application{
 					GUID:                "some-app-guid",
 					Name:                "some-app-name",
 					StackName:           "some-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"some-buildpack"},
-					Relationships: Relationships{
-						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
 					},
 				}
 			})
@@ -555,7 +557,7 @@ var _ = Describe("Application", func() {
 				Expect(actualParams.RequestName).To(Equal(internal.PatchApplicationRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
 				Expect(actualParams.RequestBody).To(Equal(appToUpdate))
-				_, ok := actualParams.ResponseBody.(*Application)
+				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
@@ -563,14 +565,14 @@ var _ = Describe("Application", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(updatedApp).To(Equal(Application{
+				Expect(updatedApp).To(Equal(resources.Application{
 					GUID:                "some-app-guid",
 					StackName:           "some-stack-name",
 					LifecycleBuildpacks: []string{"some-buildpack"},
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					Name:                "some-app-name",
-					Relationships: Relationships{
-						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
 					},
 				}))
 			})
@@ -621,7 +623,7 @@ var _ = Describe("Application", func() {
 
 	Describe("UpdateApplicationStop", func() {
 		var (
-			responseApp Application
+			responseApp resources.Application
 			warnings    Warnings
 			executeErr  error
 		)
@@ -633,9 +635,9 @@ var _ = Describe("Application", func() {
 		When("the response succeeds", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					requestParams.ResponseBody.(*Application).GUID = "some-app-guid"
-					requestParams.ResponseBody.(*Application).Name = "some-app"
-					requestParams.ResponseBody.(*Application).State = constant.ApplicationStopped
+					requestParams.ResponseBody.(*resources.Application).GUID = "some-app-guid"
+					requestParams.ResponseBody.(*resources.Application).Name = "some-app"
+					requestParams.ResponseBody.(*resources.Application).State = constant.ApplicationStopped
 					return "", Warnings{"this is a warning"}, nil
 				})
 			})
@@ -645,12 +647,12 @@ var _ = Describe("Application", func() {
 				actualParams := requester.MakeRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationActionStopRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
-				_, ok := actualParams.ResponseBody.(*Application)
+				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
 			It("returns the application, warnings, and no error", func() {
-				Expect(responseApp).To(Equal(Application{
+				Expect(responseApp).To(Equal(resources.Application{
 					GUID:  "some-app-guid",
 					Name:  "some-app",
 					State: constant.ApplicationStopped,
@@ -705,7 +707,7 @@ var _ = Describe("Application", func() {
 
 	Describe("UpdateApplicationStart", func() {
 		var (
-			responseApp Application
+			responseApp resources.Application
 			warnings    Warnings
 			executeErr  error
 		)
@@ -717,8 +719,8 @@ var _ = Describe("Application", func() {
 		When("the response succeeds", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					requestParams.ResponseBody.(*Application).GUID = "some-app-guid"
-					requestParams.ResponseBody.(*Application).Name = "some-app"
+					requestParams.ResponseBody.(*resources.Application).GUID = "some-app-guid"
+					requestParams.ResponseBody.(*resources.Application).Name = "some-app"
 					return "", Warnings{"this is a warning"}, nil
 				})
 			})
@@ -728,14 +730,14 @@ var _ = Describe("Application", func() {
 				actualParams := requester.MakeRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationActionStartRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
-				_, ok := actualParams.ResponseBody.(*Application)
+				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
 			It("returns warnings and no error", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(responseApp).To(Equal(Application{
+				Expect(responseApp).To(Equal(resources.Application{
 					GUID: "some-app-guid",
 					Name: "some-app",
 				}))
@@ -787,7 +789,7 @@ var _ = Describe("Application", func() {
 
 	Describe("UpdateApplicationRestart", func() {
 		var (
-			responseApp Application
+			responseApp resources.Application
 			warnings    Warnings
 			executeErr  error
 		)
@@ -799,9 +801,9 @@ var _ = Describe("Application", func() {
 		When("the response succeeds", func() {
 			BeforeEach(func() {
 				requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-					requestParams.ResponseBody.(*Application).GUID = "some-app-guid"
-					requestParams.ResponseBody.(*Application).Name = "some-app"
-					requestParams.ResponseBody.(*Application).State = constant.ApplicationStarted
+					requestParams.ResponseBody.(*resources.Application).GUID = "some-app-guid"
+					requestParams.ResponseBody.(*resources.Application).Name = "some-app"
+					requestParams.ResponseBody.(*resources.Application).State = constant.ApplicationStarted
 					return "", Warnings{"this is a warning"}, nil
 				})
 			})
@@ -811,12 +813,12 @@ var _ = Describe("Application", func() {
 				actualParams := requester.MakeRequestArgsForCall(0)
 				Expect(actualParams.RequestName).To(Equal(internal.PostApplicationActionRestartRequest))
 				Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
-				_, ok := actualParams.ResponseBody.(*Application)
+				_, ok := actualParams.ResponseBody.(*resources.Application)
 				Expect(ok).To(BeTrue())
 			})
 
 			It("returns the application, warnings, and no error", func() {
-				Expect(responseApp).To(Equal(Application{
+				Expect(responseApp).To(Equal(resources.Application{
 					GUID:  "some-app-guid",
 					Name:  "some-app",
 					State: constant.ApplicationStarted,

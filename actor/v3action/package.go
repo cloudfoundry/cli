@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -32,8 +34,8 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 	}
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeDocker,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: app.GUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID},
 		},
 		DockerImage:    dockerImageCredentials.Path,
 		DockerUsername: dockerImageCredentials.Username,
@@ -65,11 +67,11 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 		return Package{}, allWarnings, err
 	}
 
-	var resources []sharedaction.Resource
+	var fileResources []sharedaction.Resource
 	if info.IsDir() {
-		resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
+		fileResources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
 	} else {
-		resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
+		fileResources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
 	}
 	if err != nil {
 		return Package{}, allWarnings, err
@@ -79,9 +81,9 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 
 	var archivePath string
 	if info.IsDir() {
-		archivePath, err = actor.SharedActor.ZipDirectoryResources(bitsPath, resources)
+		archivePath, err = actor.SharedActor.ZipDirectoryResources(bitsPath, fileResources)
 	} else {
-		archivePath, err = actor.SharedActor.ZipArchiveResources(bitsPath, resources)
+		archivePath, err = actor.SharedActor.ZipArchiveResources(bitsPath, fileResources)
 	}
 	if err != nil {
 		os.RemoveAll(archivePath)
@@ -91,8 +93,8 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeBits,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: app.GUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID},
 		},
 	}
 
@@ -155,8 +157,8 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 func (actor Actor) CreateBitsPackageByApplication(appGUID string) (Package, Warnings, error) {
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeBits,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 		},
 	}
 

@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -40,7 +42,7 @@ var _ = Describe("Event Actions", func() {
 
 		When("getting the app succeeds", func() {
 			BeforeEach(func() {
-				apps := []ccv3.Application{
+				apps := []resources.Application{
 					{GUID: "some-app-guid"},
 				}
 

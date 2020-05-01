@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -47,7 +49,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 		fakeSharedActor.ReadArchiveReturns(new(v7pushactionfakes.FakeReadCloser), 0, nil)
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 		}
@@ -93,7 +95,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					}
 
 					paramPlan = PushPlan{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name: "some-app",
 							GUID: "some-app-guid",
 						},
@@ -118,7 +120,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					}
 
 					paramPlan = PushPlan{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name: "some-app",
 							GUID: "some-app-guid",
 						},
@@ -164,7 +166,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					BeforeEach(func() {
 						fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
 						fakeV7Actor.UpdateApplicationReturns(
-							v7action.Application{
+							resources.Application{
 								Name: "some-app",
 								GUID: paramPlan.Application.GUID,
 							},
@@ -297,7 +299,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					}
 
 					paramPlan = PushPlan{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name: "some-app",
 							GUID: "some-app-guid",
 						},
@@ -378,7 +380,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 			}
 
 			paramPlan = PushPlan{
-				Application: v7action.Application{
+				Application: resources.Application{
 					Name: "some-app",
 					GUID: "some-app-guid",
 				},

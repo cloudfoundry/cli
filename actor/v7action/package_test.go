@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -39,7 +41,7 @@ var _ = Describe("Package Actions", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -102,7 +104,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"get-applications-warning"},
 					expectedErr,
 				)
@@ -123,7 +125,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -148,14 +150,14 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("GetNewestReadyPackageForApplication", func() {
 		var (
-			app        Application
+			app        resources.Application
 			executeErr error
 
 			warnings Warnings
 		)
 
 		BeforeEach(func() {
-			app = Application{
+			app = resources.Application{
 				GUID: "some-app-guid",
 				Name: "some-app",
 			}
@@ -258,7 +260,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can't be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-app-warning"},
 					errors.New("some-app-error"),
 				)
@@ -273,7 +275,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
@@ -306,8 +308,8 @@ var _ = Describe("Package Actions", func() {
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -330,8 +332,8 @@ var _ = Describe("Package Actions", func() {
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -350,8 +352,8 @@ var _ = Describe("Package Actions", func() {
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{GUID: "some-app-guid"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 						},
 					}))
 				})
@@ -388,7 +390,7 @@ var _ = Describe("Package Actions", func() {
 		When("retrieving the application errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-app-warning"},
 					errors.New("some-get-error"),
 				)
@@ -403,7 +405,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
@@ -487,8 +489,8 @@ var _ = Describe("Package Actions", func() {
 								createdPackage = ccv3.Package{
 									GUID:  "some-pkg-guid",
 									State: constant.PackageAwaitingUpload,
-									Relationships: ccv3.Relationships{
-										constant.RelationshipTypeApplication: ccv3.Relationship{
+									Relationships: resources.Relationships{
+										constant.RelationshipTypeApplication: resources.Relationship{
 											GUID: "some-app-guid",
 										},
 									},
@@ -572,8 +574,8 @@ var _ = Describe("Package Actions", func() {
 										inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
 										Expect(inputPackage).To(Equal(ccv3.Package{
 											Type: constant.PackageTypeBits,
-											Relationships: ccv3.Relationships{
-												constant.RelationshipTypeApplication: ccv3.Relationship{GUID: "some-app-guid"},
+											Relationships: resources.Relationships{
+												constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 											},
 										}))
 									})
@@ -854,8 +856,8 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
 					Type: constant.PackageTypeBits,
-					Relationships: ccv3.Relationships{
-						constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 					},
 				}))
 
@@ -1032,15 +1034,15 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("CopyPackage", func() {
 		var (
-			sourceApp  Application
-			targetApp  Application
+			sourceApp  resources.Application
+			targetApp  resources.Application
 			pkg        Package
 			warnings   Warnings
 			executeErr error
 		)
 
 		BeforeEach(func() {
-			targetApp = Application{
+			targetApp = resources.Application{
 				GUID: "target-app-guid",
 				Name: "target-app",
 			}

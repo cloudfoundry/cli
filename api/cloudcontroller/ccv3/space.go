@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // Space represents a Cloud Controller V3 Space.
@@ -11,7 +12,7 @@ type Space struct {
 	// Name is the name of the space.
 	Name string `json:"name"`
 	// Relationships list the relationships to the space.
-	Relationships Relationships `json:"relationships,omitempty"`
+	Relationships resources.Relationships `json:"relationships,omitempty"`
 	// Metadata is used for custom tagging of API resources
 	Metadata *Metadata `json:"metadata,omitempty"`
 }

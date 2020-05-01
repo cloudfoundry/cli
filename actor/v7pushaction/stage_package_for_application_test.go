@@ -3,6 +3,8 @@ package v7pushaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
@@ -28,7 +30,7 @@ var _ = Describe("StagePackageForApplication", func() {
 		actor, fakeV7Actor, _ = getTestPushActor()
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 			PackageGUID: "some-pkg-guid",

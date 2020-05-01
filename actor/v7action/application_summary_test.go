@@ -90,7 +90,7 @@ var _ = Describe("Application Summary Actions", func() {
 		When("getting the application is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
@@ -171,7 +171,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				Expect(summaries).To(Equal([]ApplicationSummary{
 					{
-						Application: Application{
+						Application: resources.Application{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStarted,
@@ -266,7 +266,7 @@ var _ = Describe("Application Summary Actions", func() {
 		When("getting the application fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
@@ -309,7 +309,7 @@ var _ = Describe("Application Summary Actions", func() {
 		When("getting the application is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
@@ -421,7 +421,7 @@ var _ = Describe("Application Summary Actions", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(summary).To(Equal(DetailedApplicationSummary{
 								ApplicationSummary: v7action.ApplicationSummary{
-									Application: Application{
+									Application: resources.Application{
 										Name:  "some-app-name",
 										GUID:  "some-app-guid",
 										State: constant.ApplicationStarted,
@@ -565,7 +565,7 @@ var _ = Describe("Application Summary Actions", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(summary).To(Equal(DetailedApplicationSummary{
 							ApplicationSummary: v7action.ApplicationSummary{
-								Application: Application{
+								Application: resources.Application{
 									Name:  "some-app-name",
 									GUID:  "some-app-guid",
 									State: constant.ApplicationStarted,
@@ -709,7 +709,7 @@ var _ = Describe("Application Summary Actions", func() {
 		When("no applications are returned", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"get-apps-warning"},
 					nil,
 				)
@@ -724,7 +724,7 @@ var _ = Describe("Application Summary Actions", func() {
 		When("getting the application fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",

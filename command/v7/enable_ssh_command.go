@@ -1,17 +1,8 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/flag"
 )
-
-type EnableSSHActor interface {
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetAppFeature(appGUID string, featureName string) (ccv3.ApplicationFeature, v7action.Warnings, error)
-	GetSSHEnabled(appGUID string) (ccv3.SSHEnabled, v7action.Warnings, error)
-	UpdateAppFeature(app v7action.Application, enabled bool, featureName string) (v7action.Warnings, error)
-}
 
 type EnableSSHCommand struct {
 	BaseCommand

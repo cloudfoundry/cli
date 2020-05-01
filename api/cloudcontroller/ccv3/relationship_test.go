@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -24,7 +26,7 @@ var _ = Describe("Relationship", func() {
 		Describe("MarshalJSON", func() {
 			When("the isolation segment is specified by name", func() {
 				It("contains the name in the marshaled JSON", func() {
-					body, err := json.Marshal(Relationship{GUID: "some-iso-guid"})
+					body, err := json.Marshal(resources.Relationship{GUID: "some-iso-guid"})
 					expectedJSON := `{
 					"data": {
 						"guid": "some-iso-guid"
@@ -38,7 +40,7 @@ var _ = Describe("Relationship", func() {
 
 			When("the isolation segment is the empty string", func() {
 				It("contains null in the marshaled JSON", func() {
-					body, err := json.Marshal(Relationship{GUID: ""})
+					body, err := json.Marshal(resources.Relationship{GUID: ""})
 					expectedJSON := `{
 					"data": null
 				}`
@@ -75,7 +77,7 @@ var _ = Describe("Relationship", func() {
 				relationship, warnings, err := client.UpdateSpaceIsolationSegmentRelationship("some-space-guid", "some-iso-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(relationship).To(Equal(Relationship{
+				Expect(relationship).To(Equal(resources.Relationship{
 					GUID: "some-isolation-segment-guid",
 				}))
 			})
@@ -182,7 +184,7 @@ var _ = Describe("Relationship", func() {
 				relationship, warnings, err := client.GetOrganizationDefaultIsolationSegment("some-org-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(relationship).To(Equal(Relationship{
+				Expect(relationship).To(Equal(resources.Relationship{
 					GUID: "some-isolation-segment-guid",
 				}))
 			})
@@ -238,7 +240,7 @@ var _ = Describe("Relationship", func() {
 				relationship, warnings, err := client.GetSpaceIsolationSegment("some-space-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(relationship).To(Equal(Relationship{
+				Expect(relationship).To(Equal(resources.Relationship{
 					GUID: "some-isolation-segment-guid",
 				}))
 			})
@@ -270,7 +272,7 @@ var _ = Describe("Relationship", func() {
 
 			It("patches the organization's default isolation segment", func() {
 				relationship, warnings, err := client.UpdateOrganizationDefaultIsolationSegmentRelationship("some-org-guid", "some-isolation-segment-guid")
-				Expect(relationship).To(Equal(Relationship{GUID: "some-isolation-segment-guid"}))
+				Expect(relationship).To(Equal(resources.Relationship{GUID: "some-isolation-segment-guid"}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})

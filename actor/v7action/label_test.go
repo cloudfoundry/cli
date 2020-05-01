@@ -47,7 +47,7 @@ var _ = Describe("labels", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{ccv3.Application{GUID: "some-guid"}},
+					[]resources.Application{{GUID: "some-guid"}},
 					ccv3.Warnings([]string{"warning-1", "warning-2"}),
 					nil,
 				)
@@ -84,7 +84,7 @@ var _ = Describe("labels", func() {
 			When("GetApplications fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv3.Application{ccv3.Application{GUID: "some-guid"}},
+						[]resources.Application{{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-failure-1", "warning-failure-2"}),
 						errors.New("get-apps-error"),
 					)
@@ -100,7 +100,7 @@ var _ = Describe("labels", func() {
 			When("UpdateApplication fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv3.Application{ccv3.Application{GUID: "some-guid"}},
+						[]resources.Application{{GUID: "some-guid"}},
 						ccv3.Warnings([]string{"warning-1", "warning-2"}),
 						nil,
 					)

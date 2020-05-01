@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Policy struct {
@@ -80,7 +81,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 		return []Policy{}, allWarnings, err
 	}
 
-	policies, warnings, err := actor.getPoliciesForApplications([]ccv3.Application{srcApp})
+	policies, warnings, err := actor.getPoliciesForApplications([]resources.Application{srcApp})
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
@@ -148,7 +149,7 @@ func filterPoliciesWithoutMatchingSourceGUIDs(v1Policies []cfnetv1.Policy, srcAp
 	return toReturn
 }
 
-func uniqueSpaceGUIDs(applications []ccv3.Application) []string {
+func uniqueSpaceGUIDs(applications []resources.Application) []string {
 	var spaceGUIDs []string
 	occurrences := map[string]struct{}{}
 	for _, app := range applications {
@@ -211,7 +212,7 @@ func (actor Actor) orgNamesBySpaceGUID(spaces []ccv3.Space) (map[string]string, 
 	return orgNamesBySpaceGUID, warnings, nil
 }
 
-func (actor Actor) getPoliciesForApplications(applications []ccv3.Application) ([]Policy, ccv3.Warnings, error) {
+func (actor Actor) getPoliciesForApplications(applications []resources.Application) ([]Policy, ccv3.Warnings, error) {
 	var allWarnings ccv3.Warnings
 
 	var srcAppGUIDs []string
@@ -261,7 +262,7 @@ func (actor Actor) getPoliciesForApplications(applications []ccv3.Application) (
 		return []Policy{}, allWarnings, err
 	}
 
-	appByGUID := map[string]ccv3.Application{}
+	appByGUID := map[string]resources.Application{}
 	for _, app := range applications {
 		appByGUID[app.GUID] = app
 	}

@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -31,7 +33,7 @@ var _ = Describe("start Command", func() {
 
 		binaryName string
 		executeErr error
-		app        v7action.Application
+		app        resources.Application
 	)
 
 	BeforeEach(func() {
@@ -44,7 +46,7 @@ var _ = Describe("start Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		app = v7action.Application{Name: "app-name", GUID: "app-guid"}
+		app = resources.Application{Name: "app-name", GUID: "app-guid"}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 			Name: "some-org",
@@ -115,7 +117,7 @@ var _ = Describe("start Command", func() {
 	When("Getting the application fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationByNameAndSpaceReturns(
-				v7action.Application{},
+				resources.Application{},
 				v7action.Warnings{"get-app-warning"},
 				errors.New("get-app-error"),
 			)
@@ -135,7 +137,7 @@ var _ = Describe("start Command", func() {
 
 		When("the app is stopped", func() {
 			BeforeEach(func() {
-				app = v7action.Application{Name: "app-name", GUID: "app-guid", State: constant.ApplicationStopped}
+				app = resources.Application{Name: "app-name", GUID: "app-guid", State: constant.ApplicationStopped}
 				fakeActor.GetApplicationByNameAndSpaceReturns(app, v7action.Warnings{"get-app-warning"}, nil)
 			})
 
@@ -166,7 +168,7 @@ var _ = Describe("start Command", func() {
 
 		When("the app is started", func() {
 			BeforeEach(func() {
-				app = v7action.Application{Name: "app-name", GUID: "app-guid", State: constant.ApplicationStarted}
+				app = resources.Application{Name: "app-name", GUID: "app-guid", State: constant.ApplicationStarted}
 				fakeActor.GetApplicationByNameAndSpaceReturns(app, v7action.Warnings{"get-app-warning"}, nil)
 			})
 

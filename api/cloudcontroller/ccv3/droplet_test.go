@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -54,8 +56,8 @@ var _ = Describe("Droplet", func() {
 			actualParams := requester.MakeRequestArgsForCall(0)
 			Expect(actualParams.RequestName).To(Equal(internal.PostDropletRequest))
 			Expect(actualParams.RequestBody).To(Equal(DropletCreateRequest{
-				Relationships: Relationships{
-					constant.RelationshipTypeApplication: Relationship{GUID: "app-guid"},
+				Relationships: resources.Relationships{
+					constant.RelationshipTypeApplication: resources.Relationship{GUID: "app-guid"},
 				},
 			}))
 			_, ok := actualParams.ResponseBody.(*Droplet)

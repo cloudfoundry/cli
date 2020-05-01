@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -319,18 +321,18 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("PATCH resource", func() {
 			var (
-				responseBody Application
+				responseBody resources.Application
 			)
 
 			BeforeEach(func() {
-				requestBody := Application{
+				requestBody := resources.Application{
 					GUID:                "some-app-guid",
 					Name:                "some-app-name",
 					StackName:           "some-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"some-buildpack"},
-					Relationships: Relationships{
-						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeSpace: resources.Relationship{GUID: "some-space-guid"},
 					},
 				}
 				requestParams = RequestParams{
@@ -387,7 +389,7 @@ var _ = Describe("shared request helpers", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 
-					Expect(responseBody).To(Equal(Application{
+					Expect(responseBody).To(Equal(resources.Application{
 						GUID:                "some-app-guid",
 						StackName:           "some-stack-name",
 						LifecycleBuildpacks: []string{"some-buildpack"},

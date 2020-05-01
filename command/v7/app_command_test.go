@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/types"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -103,7 +105,7 @@ var _ = Describe("app Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{GUID: "some-guid"},
+					resources.Application{GUID: "some-guid"},
 					v7action.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
@@ -126,7 +128,7 @@ var _ = Describe("app Command", func() {
 			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						actionerror.ApplicationNotFoundError{Name: "some-app"})
 				})
@@ -145,7 +147,7 @@ var _ = Describe("app Command", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("get app summary error")
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						expectedErr)
 				})
@@ -183,7 +185,7 @@ var _ = Describe("app Command", func() {
 			BeforeEach(func() {
 				summary := v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name:  "some-app",
 							State: constant.ApplicationStarted,
 						},

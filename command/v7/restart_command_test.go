@@ -3,6 +3,8 @@ package v7_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -29,7 +31,7 @@ var _ = Describe("restart Command", func() {
 
 		binaryName string
 		executeErr error
-		app        v7action.Application
+		app        resources.Application
 		strategy   constant.DeploymentStrategy
 		noWait     bool
 	)
@@ -43,7 +45,7 @@ var _ = Describe("restart Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		app = v7action.Application{Name: "app-name", GUID: "app-guid"}
+		app = resources.Application{Name: "app-name", GUID: "app-guid"}
 		strategy = constant.DeploymentStrategyDefault
 		noWait = false
 
@@ -114,7 +116,7 @@ var _ = Describe("restart Command", func() {
 	When("Getting the application fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationByNameAndSpaceReturns(
-				v7action.Application{},
+				resources.Application{},
 				v7action.Warnings{"get-app-warning"},
 				errors.New("get-app-error"),
 			)

@@ -3,6 +3,8 @@ package v7action
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 )
 
@@ -63,7 +65,7 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 	}, allWarnings, err
 }
 
-func (actor Actor) getUsername(application Application, processType string, processIndex uint) (string, Warnings, error) {
+func (actor Actor) getUsername(application resources.Application, processType string, processIndex uint) (string, Warnings, error) {
 	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(application.GUID, false)
 	if err != nil {
 		return "", processWarnings, err

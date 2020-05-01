@@ -3,6 +3,8 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -79,7 +81,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
-					ccv3.Relationship{
+					resources.Relationship{
 						GUID: "default-iso-seg-guid",
 					},
 					ccv3.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"},

@@ -7,14 +7,15 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeAppStager struct {
-	StageAndStartStub        func(v7action.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) error
+	StageAndStartStub        func(resources.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) error
 	stageAndStartMutex       sync.RWMutex
 	stageAndStartArgsForCall []struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 configv3.Space
 		arg3 configv3.Organization
 		arg4 string
@@ -28,10 +29,10 @@ type FakeAppStager struct {
 	stageAndStartReturnsOnCall map[int]struct {
 		result1 error
 	}
-	StageAppStub        func(v7action.Application, string, configv3.Space) (v7action.Droplet, error)
+	StageAppStub        func(resources.Application, string, configv3.Space) (v7action.Droplet, error)
 	stageAppMutex       sync.RWMutex
 	stageAppArgsForCall []struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 string
 		arg3 configv3.Space
 	}
@@ -43,10 +44,10 @@ type FakeAppStager struct {
 		result1 v7action.Droplet
 		result2 error
 	}
-	StartAppStub        func(v7action.Application, v7action.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error
+	StartAppStub        func(resources.Application, v7action.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error
 	startAppMutex       sync.RWMutex
 	startAppArgsForCall []struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 v7action.Droplet
 		arg3 constant.DeploymentStrategy
 		arg4 bool
@@ -64,11 +65,11 @@ type FakeAppStager struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAppStager) StageAndStart(arg1 v7action.Application, arg2 configv3.Space, arg3 configv3.Organization, arg4 string, arg5 constant.DeploymentStrategy, arg6 bool, arg7 constant.ApplicationAction) error {
+func (fake *FakeAppStager) StageAndStart(arg1 resources.Application, arg2 configv3.Space, arg3 configv3.Organization, arg4 string, arg5 constant.DeploymentStrategy, arg6 bool, arg7 constant.ApplicationAction) error {
 	fake.stageAndStartMutex.Lock()
 	ret, specificReturn := fake.stageAndStartReturnsOnCall[len(fake.stageAndStartArgsForCall)]
 	fake.stageAndStartArgsForCall = append(fake.stageAndStartArgsForCall, struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 configv3.Space
 		arg3 configv3.Organization
 		arg4 string
@@ -94,13 +95,13 @@ func (fake *FakeAppStager) StageAndStartCallCount() int {
 	return len(fake.stageAndStartArgsForCall)
 }
 
-func (fake *FakeAppStager) StageAndStartCalls(stub func(v7action.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) error) {
+func (fake *FakeAppStager) StageAndStartCalls(stub func(resources.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) error) {
 	fake.stageAndStartMutex.Lock()
 	defer fake.stageAndStartMutex.Unlock()
 	fake.StageAndStartStub = stub
 }
 
-func (fake *FakeAppStager) StageAndStartArgsForCall(i int) (v7action.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) {
+func (fake *FakeAppStager) StageAndStartArgsForCall(i int) (resources.Application, configv3.Space, configv3.Organization, string, constant.DeploymentStrategy, bool, constant.ApplicationAction) {
 	fake.stageAndStartMutex.RLock()
 	defer fake.stageAndStartMutex.RUnlock()
 	argsForCall := fake.stageAndStartArgsForCall[i]
@@ -130,11 +131,11 @@ func (fake *FakeAppStager) StageAndStartReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeAppStager) StageApp(arg1 v7action.Application, arg2 string, arg3 configv3.Space) (v7action.Droplet, error) {
+func (fake *FakeAppStager) StageApp(arg1 resources.Application, arg2 string, arg3 configv3.Space) (v7action.Droplet, error) {
 	fake.stageAppMutex.Lock()
 	ret, specificReturn := fake.stageAppReturnsOnCall[len(fake.stageAppArgsForCall)]
 	fake.stageAppArgsForCall = append(fake.stageAppArgsForCall, struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 string
 		arg3 configv3.Space
 	}{arg1, arg2, arg3})
@@ -156,13 +157,13 @@ func (fake *FakeAppStager) StageAppCallCount() int {
 	return len(fake.stageAppArgsForCall)
 }
 
-func (fake *FakeAppStager) StageAppCalls(stub func(v7action.Application, string, configv3.Space) (v7action.Droplet, error)) {
+func (fake *FakeAppStager) StageAppCalls(stub func(resources.Application, string, configv3.Space) (v7action.Droplet, error)) {
 	fake.stageAppMutex.Lock()
 	defer fake.stageAppMutex.Unlock()
 	fake.StageAppStub = stub
 }
 
-func (fake *FakeAppStager) StageAppArgsForCall(i int) (v7action.Application, string, configv3.Space) {
+func (fake *FakeAppStager) StageAppArgsForCall(i int) (resources.Application, string, configv3.Space) {
 	fake.stageAppMutex.RLock()
 	defer fake.stageAppMutex.RUnlock()
 	argsForCall := fake.stageAppArgsForCall[i]
@@ -195,11 +196,11 @@ func (fake *FakeAppStager) StageAppReturnsOnCall(i int, result1 v7action.Droplet
 	}{result1, result2}
 }
 
-func (fake *FakeAppStager) StartApp(arg1 v7action.Application, arg2 v7action.Droplet, arg3 constant.DeploymentStrategy, arg4 bool, arg5 configv3.Space, arg6 configv3.Organization, arg7 constant.ApplicationAction) error {
+func (fake *FakeAppStager) StartApp(arg1 resources.Application, arg2 v7action.Droplet, arg3 constant.DeploymentStrategy, arg4 bool, arg5 configv3.Space, arg6 configv3.Organization, arg7 constant.ApplicationAction) error {
 	fake.startAppMutex.Lock()
 	ret, specificReturn := fake.startAppReturnsOnCall[len(fake.startAppArgsForCall)]
 	fake.startAppArgsForCall = append(fake.startAppArgsForCall, struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 v7action.Droplet
 		arg3 constant.DeploymentStrategy
 		arg4 bool
@@ -225,13 +226,13 @@ func (fake *FakeAppStager) StartAppCallCount() int {
 	return len(fake.startAppArgsForCall)
 }
 
-func (fake *FakeAppStager) StartAppCalls(stub func(v7action.Application, v7action.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error) {
+func (fake *FakeAppStager) StartAppCalls(stub func(resources.Application, v7action.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) error) {
 	fake.startAppMutex.Lock()
 	defer fake.startAppMutex.Unlock()
 	fake.StartAppStub = stub
 }
 
-func (fake *FakeAppStager) StartAppArgsForCall(i int) (v7action.Application, v7action.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) {
+func (fake *FakeAppStager) StartAppArgsForCall(i int) (resources.Application, v7action.Droplet, constant.DeploymentStrategy, bool, configv3.Space, configv3.Organization, constant.ApplicationAction) {
 	fake.startAppMutex.RLock()
 	defer fake.startAppMutex.RUnlock()
 	argsForCall := fake.startAppArgsForCall[i]

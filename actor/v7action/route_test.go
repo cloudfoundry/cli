@@ -544,7 +544,7 @@ var _ = Describe("Route Actions", func() {
 			}
 
 			fakeCloudControllerClient.GetApplicationsReturns(
-				[]ccv3.Application{
+				[]resources.Application{
 					{
 						GUID: "app-guid-1",
 						Name: "app-name-1",

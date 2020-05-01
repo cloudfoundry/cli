@@ -3,6 +3,8 @@ package ccv3
 import (
 	"io"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/uploads"
@@ -35,15 +37,15 @@ type DropletBuildpack struct {
 }
 
 type DropletCreateRequest struct {
-	Relationships Relationships `json:"relationships"`
+	Relationships resources.Relationships `json:"relationships"`
 }
 
 // CreateDroplet creates a new droplet without a package for the app with
 // the given guid.
 func (client *Client) CreateDroplet(appGUID string) (Droplet, Warnings, error) {
 	requestBody := DropletCreateRequest{
-		Relationships: Relationships{
-			constant.RelationshipTypeApplication: Relationship{GUID: appGUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 		},
 	}
 

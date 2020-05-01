@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
@@ -37,7 +39,7 @@ var _ = Describe("stage-package Command", func() {
 		appName     string
 		packageGUID string
 		spaceGUID   string
-		app         v7action.Application
+		app         resources.Application
 
 		allLogsWritten   chan bool
 		closedTheStreams bool
@@ -159,7 +161,7 @@ var _ = Describe("stage-package Command", func() {
 
 		BeforeEach(func() {
 			cmd.PackageGUID = ""
-			app = v7action.Application{GUID: "some-app-guid", Name: "some-name"}
+			app = resources.Application{GUID: "some-app-guid", Name: "some-name"}
 			newestPackageGUID = "newest-package-guid"
 
 			fakeActor.GetApplicationByNameAndSpaceReturns(
@@ -194,7 +196,7 @@ var _ = Describe("stage-package Command", func() {
 		When("It can't get the application's information", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"app-warning"},
 					errors.New("cant-get-app-error"))
 			})

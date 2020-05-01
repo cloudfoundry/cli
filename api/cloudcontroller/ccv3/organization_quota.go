@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // OrganizationQuota represents a Cloud Controller organization quota.
@@ -9,13 +10,13 @@ type OrganizationQuota struct {
 	Quota
 }
 
-func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (RelationshipList, Warnings, error) {
-	var responseBody RelationshipList
+func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (resources.RelationshipList, Warnings, error) {
+	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationQuotaApplyRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGuid},
-		RequestBody:  RelationshipList{GUIDs: []string{orgGuid}},
+		RequestBody:  resources.RelationshipList{GUIDs: []string{orgGuid}},
 		ResponseBody: &responseBody,
 	})
 

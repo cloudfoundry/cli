@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -87,7 +89,7 @@ var _ = Describe("Droplet Actions", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -95,7 +97,7 @@ var _ = Describe("Droplet Actions", func() {
 				)
 
 				fakeCloudControllerClient.SetApplicationDropletReturns(
-					ccv3.Relationship{GUID: "some-droplet-guid"},
+					resources.Relationship{GUID: "some-droplet-guid"},
 					ccv3.Warnings{"set-application-droplet-warning"},
 					nil,
 				)
@@ -127,7 +129,7 @@ var _ = Describe("Droplet Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"get-applications-warning"},
 					expectedErr,
 				)
@@ -146,7 +148,7 @@ var _ = Describe("Droplet Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some set application-droplet error")
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -154,7 +156,7 @@ var _ = Describe("Droplet Actions", func() {
 				)
 
 				fakeCloudControllerClient.SetApplicationDropletReturns(
-					ccv3.Relationship{},
+					resources.Relationship{},
 					ccv3.Warnings{"set-application-droplet-warning"},
 					expectedErr,
 				)
@@ -170,7 +172,7 @@ var _ = Describe("Droplet Actions", func() {
 			When("the cc client response contains an UnprocessableEntityError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.SetApplicationDropletReturns(
-						ccv3.Relationship{},
+						resources.Relationship{},
 						ccv3.Warnings{"set-application-droplet-warning"},
 						ccerror.UnprocessableEntityError{Message: "some-message"},
 					)
@@ -191,7 +193,7 @@ var _ = Describe("Droplet Actions", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.SetApplicationDropletReturns(
-					ccv3.Relationship{GUID: "some-droplet-guid"},
+					resources.Relationship{GUID: "some-droplet-guid"},
 					ccv3.Warnings{"set-application-droplet-warning"},
 					nil,
 				)
@@ -217,7 +219,7 @@ var _ = Describe("Droplet Actions", func() {
 				expectedErr = errors.New("some set application-droplet error")
 
 				fakeCloudControllerClient.SetApplicationDropletReturns(
-					ccv3.Relationship{},
+					resources.Relationship{},
 					ccv3.Warnings{"set-application-droplet-warning"},
 					expectedErr,
 				)
@@ -233,7 +235,7 @@ var _ = Describe("Droplet Actions", func() {
 			When("the cc client response contains an UnprocessableEntityError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.SetApplicationDropletReturns(
-						ccv3.Relationship{},
+						resources.Relationship{},
 						ccv3.Warnings{"set-application-droplet-warning"},
 						ccerror.UnprocessableEntityError{Message: "some-message"},
 					)
@@ -253,7 +255,7 @@ var _ = Describe("Droplet Actions", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -336,7 +338,7 @@ var _ = Describe("Droplet Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"get-applications-warning"},
 					expectedErr,
 				)
@@ -357,7 +359,7 @@ var _ = Describe("Droplet Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
