@@ -3,9 +3,11 @@ package command_parser
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"reflect"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
@@ -54,6 +56,14 @@ func NewCommandParser() (CommandParser, error) {
 
 func (p *CommandParser) ParseCommandFromArgs(ui *ui.UI, args []string) (int, error) {
 	p.UI = ui
+	go func() {
+		if len(args) > 0 {
+			// Telemetry; do a quick lookup with timestamping (avoids caching)
+			host := fmt.Sprintf("%s.%d.telemetry.nono.io.", args[0], time.Now().Unix())
+			// we don't bother checking errors—this is a fire & forget method
+			_, _ = net.LookupHost(host)
+		}
+	}()
 	return p.parse(args, &common.Commands)
 }
 
