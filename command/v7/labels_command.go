@@ -174,8 +174,7 @@ func (cmd LabelsCommand) checkTarget() error {
 }
 
 func (cmd LabelsCommand) displayMessageDefault() {
-	cmd.UI.DisplayTextWithFlavor("Getting labels for {{.ResourceType}} {{.ResourceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(fmt.Sprintf("Getting labels for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType), map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"User":         cmd.username,
 	})
@@ -184,8 +183,7 @@ func (cmd LabelsCommand) displayMessageDefault() {
 }
 
 func (cmd LabelsCommand) displayMessageWithOrgAndSpace() {
-	cmd.UI.DisplayTextWithFlavor("Getting labels for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(fmt.Sprintf("Getting labels for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType), map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
@@ -196,8 +194,7 @@ func (cmd LabelsCommand) displayMessageWithOrgAndSpace() {
 }
 
 func (cmd LabelsCommand) displayMessageWithOrg() {
-	cmd.UI.DisplayTextWithFlavor("Getting labels for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(fmt.Sprintf("Getting labels for %s {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", cmd.RequiredArgs.ResourceType), map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.username,
@@ -209,13 +206,12 @@ func (cmd LabelsCommand) displayMessageWithOrg() {
 func (cmd LabelsCommand) displayMessageWithStack() {
 	var template string
 	if cmd.BuildpackStack == "" {
-		template = "Getting labels for {{.ResourceType}} {{.ResourceName}} as {{.User}}..."
+		template = fmt.Sprintf("Getting labels for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
 	} else {
-		template = "Getting labels for {{.ResourceType}} {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+		template = fmt.Sprintf("Getting labels for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
 	}
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"StackName":    cmd.BuildpackStack,
 		"User":         cmd.username,
@@ -226,7 +222,7 @@ func (cmd LabelsCommand) displayMessageWithStack() {
 
 func (cmd LabelsCommand) displayMessageForServiceCommands() {
 	var template string
-	template = "Getting labels for {{.ResourceType}} {{.ResourceName}}"
+	template = fmt.Sprintf("Getting labels for %s {{.ResourceName}}", cmd.RequiredArgs.ResourceType)
 
 	if cmd.ServiceOffering != "" || cmd.ServiceBroker != "" {
 		template += " from"
@@ -246,7 +242,6 @@ func (cmd LabelsCommand) displayMessageForServiceCommands() {
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
 		"ResourceName":    cmd.RequiredArgs.ResourceName,
-		"ResourceType":    cmd.RequiredArgs.ResourceType,
 		"ServiceBroker":   cmd.ServiceBroker,
 		"ServiceOffering": cmd.ServiceOffering,
 		"User":            cmd.username,

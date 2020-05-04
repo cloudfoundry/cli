@@ -2,6 +2,7 @@ package v7
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -161,19 +162,19 @@ func (cmd *LabelUpdater) validateFlags() error {
 	return nil
 }
 
+func actionForResourceString(action string, resourceType string) string {
+	return fmt.Sprintf("%s label(s) for %s", action, resourceType)
+}
+
 func (cmd *LabelUpdater) displayMessageDefault() {
-	cmd.UI.DisplayTextWithFlavor("{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}...", map[string]interface{}{
-		"Action":       cmd.Action,
-		"ResourceType": cmd.targetResource.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"User":         cmd.Username,
 	})
 }
 
 func (cmd *LabelUpdater) displayMessageWithOrgAndSpace() {
-	cmd.UI.DisplayTextWithFlavor("{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"Action":       cmd.Action,
-		"ResourceType": cmd.targetResource.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
@@ -184,14 +185,12 @@ func (cmd *LabelUpdater) displayMessageWithOrgAndSpace() {
 func (cmd *LabelUpdater) displayMessageWithStack() {
 	var template string
 	if cmd.targetResource.BuildpackStack == "" {
-		template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} as {{.User}}..."
+		template = actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} as {{.User}}..."
 	} else {
-		template = "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+		template = actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
 	}
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"Action":       cmd.Action,
-		"ResourceType": cmd.targetResource.ResourceType,
 		"ResourceName": cmd.targetResource.ResourceName,
 		"StackName":    cmd.targetResource.BuildpackStack,
 		"User":         cmd.Username,
@@ -199,7 +198,7 @@ func (cmd *LabelUpdater) displayMessageWithStack() {
 }
 
 func (cmd *LabelUpdater) displayMessageForServiceCommands() {
-	template := "{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}}"
+	template := actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}}"
 
 	if cmd.targetResource.ServiceOffering != "" || cmd.targetResource.ServiceBroker != "" {
 		template += " from"
@@ -218,9 +217,7 @@ func (cmd *LabelUpdater) displayMessageForServiceCommands() {
 
 	template += " as {{.User}}..."
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"Action":          cmd.Action,
 		"ResourceName":    cmd.targetResource.ResourceName,
-		"ResourceType":    cmd.targetResource.ResourceType,
 		"ServiceBroker":   cmd.targetResource.ServiceBroker,
 		"ServiceOffering": cmd.targetResource.ServiceOffering,
 		"User":            cmd.Username,
@@ -228,9 +225,7 @@ func (cmd *LabelUpdater) displayMessageForServiceCommands() {
 }
 
 func (cmd *LabelUpdater) displayMessageWithOrg() {
-	cmd.UI.DisplayTextWithFlavor("{{.Action}} label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
-		"Action":       cmd.Action,
-		"ResourceType": cmd.targetResource.ResourceType,
+	cmd.UI.DisplayTextWithFlavor( actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.Username,
