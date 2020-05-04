@@ -62,9 +62,12 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 				"BrokerName": plan.BrokerName,
 			})
 			cmd.UI.DisplayTableWithHeader("   ", data, ui.DefaultTableSpacePadding)
-			cmd.UI.DisplayNewline()
 
 			data = nil
+		}
+
+		if endOfGrouping && !endOfList {
+			cmd.UI.DisplayNewline()
 		}
 	}
 
