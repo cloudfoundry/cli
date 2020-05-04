@@ -47,6 +47,8 @@ var _ = Describe("start command", func() {
 				Eventually(session).Should(Say("start - Start an app"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf start APP_NAME"))
+				Eventually(session).Should(Say("If the app's most recent package is unstaged, starting the app will stage and run that package."))
+				Eventually(session).Should(Say("Otherwise, the app's current droplet will be run."))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("st"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
