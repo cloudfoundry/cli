@@ -76,4 +76,5 @@ type Config interface {
 	Verbose() (bool, []string)
 	WritePluginConfig() error
 	WriteConfig() error
+	BackoffFactor() time.Duration
 }

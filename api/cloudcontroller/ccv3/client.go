@@ -89,8 +89,9 @@ type Client struct {
 
 	Requester
 
-	jobPollingInterval time.Duration
-	jobPollingTimeout  time.Duration
+	jobPollingBackoffFactor time.Duration
+	jobPollingInterval      time.Duration
+	jobPollingTimeout       time.Duration
 
 	clock Clock
 }
@@ -102,6 +103,8 @@ type Config struct {
 
 	// AppVersion is the version of the application/process using the client.
 	AppVersion string
+
+	JobPollingBackoffFactor time.Duration
 
 	// JobPollingTimeout is the maximum amount of time a job polls for.
 	JobPollingTimeout time.Duration
@@ -116,10 +119,11 @@ type Config struct {
 // NewClient returns a new Client.
 func NewClient(config Config) *Client {
 	return &Client{
-		clock:              new(internal.RealTime),
-		jobPollingInterval: config.JobPollingInterval,
-		jobPollingTimeout:  config.JobPollingTimeout,
-		Requester:          NewRequester(config),
+		clock:                   new(internal.RealTime),
+		jobPollingBackoffFactor: config.JobPollingBackoffFactor,
+		jobPollingInterval:      config.JobPollingInterval,
+		jobPollingTimeout:       config.JobPollingTimeout,
+		Requester:               NewRequester(config),
 	}
 }
 

@@ -20,7 +20,7 @@ const (
 	// was chosen as a replacement.
 
 	// DefaultPollingInterval is the time between consecutive polls of a status.
-	DefaultPollingInterval = 3 * time.Second
+	DefaultPollingInterval = 1 * time.Second
 
 	// DefaultStagingTimeout is the default timeout for application staging.
 	DefaultStagingTimeout = 15 * time.Minute
@@ -58,9 +58,9 @@ func (*Config) NOAARequestRetryCount() int {
 }
 
 // PollingInterval returns the time between polls.
-func (config *Config) PollingInterval() time.Duration {
-	return DefaultPollingInterval
-}
+//func (config *Config) PollingInterval() time.Duration {
+//	return DefaultPollingInterval
+//}
 
 // RequestRetryCount returns the number of request retries.
 func (*Config) RequestRetryCount() int {

@@ -31,6 +31,8 @@ type JSONConfig struct {
 	UAAGrantType             string             `json:"UAAGrantType"`
 	UAAOAuthClient           string             `json:"UAAOAuthClient"`
 	UAAOAuthClientSecret     string             `json:"UAAOAuthClientSecret"`
+	JobPollingBackoffFactor  time.Duration      `json:"JobPollingBackoffFactor"`
+	JobPollingInterval       time.Duration      `json:"JobPollingInterval"`
 }
 
 // Organization contains basic information about the targeted organization.
@@ -52,6 +54,14 @@ type User struct {
 	GUID     string
 	Origin   string
 	IsClient bool
+}
+
+func (config *Config) PollingInterval() time.Duration {
+	return config.ConfigFile.JobPollingInterval
+}
+
+func (config *Config) BackoffFactor() time.Duration {
+	return config.ConfigFile.JobPollingBackoffFactor
 }
 
 // AccessToken returns the access token for making authenticated API calls.

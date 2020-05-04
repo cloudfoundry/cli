@@ -40,11 +40,12 @@ func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv
 	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	ccClient := ccv3.NewClient(ccv3.Config{
-		AppName:            config.BinaryName(),
-		AppVersion:         config.BinaryVersion(),
-		JobPollingTimeout:  config.OverallPollingTimeout(),
-		JobPollingInterval: config.PollingInterval(),
-		Wrappers:           ccWrappers,
+		AppName:                 config.BinaryName(),
+		AppVersion:              config.BinaryVersion(),
+		JobPollingTimeout:       config.OverallPollingTimeout(),
+		JobPollingInterval:      config.PollingInterval(),
+		JobPollingBackoffFactor: config.BackoffFactor(),
+		Wrappers:                ccWrappers,
 	})
 	return ccClient, authWrapper
 }

@@ -97,6 +97,9 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		job         Job
 	)
 
+	factor := client.jobPollingBackoffFactor
+	backoff :=  client.jobPollingInterval
+
 	startTime := client.clock.Now()
 	for client.clock.Now().Sub(startTime) < client.jobPollingTimeout {
 		job, warnings, err = client.GetJob(jobURL)
@@ -114,7 +117,8 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 			return allWarnings, nil
 		}
 
-		time.Sleep(client.jobPollingInterval)
+		backoff = time.Duration(backoff * factor) / time.Second
+		time.Sleep(backoff)
 	}
 
 	return allWarnings, ccerror.JobTimeoutError{
