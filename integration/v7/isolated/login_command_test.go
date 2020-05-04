@@ -1061,7 +1061,7 @@ var _ = Describe("login command", func() {
 
 				session := helpers.CFWithStdin(buffer, "login", "--skip-ssl-validation")
 				Eventually(session).Should(Say("API endpoint:"))
-				Eventually(session).Should(Say("\n\n"))
+				Eventually(session).Should(Say("\n"))
 				Eventually(session).Should(Say("Email:"))
 				Eventually(session).Should(Say("\n"))
 				Eventually(session).Should(Say("Password:"))

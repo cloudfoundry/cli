@@ -214,6 +214,7 @@ var _ = Describe("auth Command", func() {
 					})
 					It("warns that the user is targeting an unsupported API version and that things may not work correctly", func() {
 						Expect(err).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
 						Expect(testUI.Err).To(Say("Warning: Your targeted API's version \\(3.83.0\\) is less than the minimum supported API version \\(3.84.0\\). Some commands may not function correctly."))
 					})
 				})

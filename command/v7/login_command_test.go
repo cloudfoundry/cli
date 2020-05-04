@@ -452,7 +452,7 @@ var _ = Describe("login Command", func() {
 					It("displays text prompts, starting with username, then password prompts, starting with password", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("\n\n"))
+						Expect(testUI.Out).To(Say("\n"))
 						Expect(testUI.Out).To(Say("Username:"))
 						Expect(testUI.Out).To(Say("faker"))
 

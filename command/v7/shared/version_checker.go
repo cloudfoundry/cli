@@ -20,7 +20,7 @@ func CheckCCAPIVersion(currentAPIVersion string) (string, error) {
 	}
 
 	if currentSemver.LT(minimumSemver) {
-		return fmt.Sprintf("Warning: Your targeted API's version (%s) is less than the minimum supported API version (%s). Some commands may not function correctly.", currentAPIVersion, minimumCCAPIVersionForV7), nil
+		return fmt.Sprintf("\nWarning: Your targeted API's version (%s) is less than the minimum supported API version (%s). Some commands may not function correctly.", currentAPIVersion, minimumCCAPIVersionForV7), nil
 	}
 
 	return "", nil

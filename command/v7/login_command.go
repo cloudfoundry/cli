@@ -86,8 +86,6 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayNewline()
-
 	err = cmd.targetAPI(endpoint)
 	if err != nil {
 		translatedErr := translatableerror.ConvertToTranslatableError(err)

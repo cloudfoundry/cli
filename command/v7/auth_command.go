@@ -40,6 +40,12 @@ func (cmd AuthCommand) Execute(args []string) error {
 		return err
 	}
 
+	cmd.UI.DisplayTextWithFlavor(
+		"API endpoint: {{.Endpoint}}",
+		map[string]interface{}{
+			"Endpoint": cmd.Config.Target(),
+		})
+
 	versionWarning, err := shared.CheckCCAPIVersion(cmd.Config.APIVersion())
 	if err != nil {
 		cmd.UI.DisplayWarning("Warning: unable to determine whether targeted API's version meets minimum supported.")
@@ -56,11 +62,8 @@ func (cmd AuthCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor(
-		"API endpoint: {{.Endpoint}}",
-		map[string]interface{}{
-			"Endpoint": cmd.Config.Target(),
-		})
+	cmd.UI.DisplayNewline()
+
 	cmd.UI.DisplayText("Authenticating...")
 
 	credentials := make(map[string]string)
