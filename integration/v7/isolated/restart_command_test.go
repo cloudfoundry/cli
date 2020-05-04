@@ -29,16 +29,19 @@ var _ = Describe("restart command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("restart", "APPS", "Stop all instances of the app, then start them again. This causes downtime."))
+				Expect(session).To(HaveCommandInCategoryWithDescription("restart", "APPS", "Stop all instances of the app, then start them again."))
 			})
 
 			It("displays command usage to output", func() {
 				session := helpers.CF("restart", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`restart - Stop all instances of the app, then start them again\. This causes downtime\.`))
+				Eventually(session).Should(Say(`restart - Stop all instances of the app, then start them again\.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restart APP_NAME"))
+				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy rolling'."))
+				Eventually(session).Should(Say("If the app's most recent package is unstaged, restarting the app will stage and run that package."))
+				Eventually(session).Should(Say("Otherwise, the app's current droplet will be run."))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rs"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))

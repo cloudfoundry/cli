@@ -125,7 +125,7 @@ type commandList struct {
 	ResetSpaceIsolationSegment         v7.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v7.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)."`
 	StagePackage                       v7.StagePackageCommand                       `command:"stage-package" alias:"stage" description:"Stage a package into a droplet"`
-	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
+	Restart                            v7.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again."`
 	RestartAppInstance                 v7.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	RouterGroups                       v7.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
 	Routes                             v7.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
