@@ -167,14 +167,14 @@ func actionForResourceString(action string, resourceType string) string {
 }
 
 func (cmd *LabelUpdater) displayMessageDefault() {
-	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType)+" {{.ResourceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"User":         cmd.Username,
 	})
 }
 
 func (cmd *LabelUpdater) displayMessageWithOrgAndSpace() {
-	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType)+" {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
@@ -225,7 +225,7 @@ func (cmd *LabelUpdater) displayMessageForServiceCommands() {
 }
 
 func (cmd *LabelUpdater) displayMessageWithOrg() {
-	cmd.UI.DisplayTextWithFlavor( actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType) + " {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor(actionForResourceString(string(cmd.Action), cmd.targetResource.ResourceType)+" {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
 		"ResourceName": cmd.targetResource.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.Username,
