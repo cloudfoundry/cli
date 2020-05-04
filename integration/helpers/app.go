@@ -142,21 +142,29 @@ console: bundle exec irb`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), nil, 0666)
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), []byte(`source 'http://rubygems.org'
+gem 'irb'`,
+	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
-GEM
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`GEM
+  remote: http://rubygems.org/
   specs:
+    io-console (0.5.6)
+    irb (1.2.4)
+      reline (>= 0.0.1)
+    reline (0.1.4)
+      io-console (~> 0.5)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  irb
 
 BUNDLED WITH
-   1.15.0
-	`), 0666)
+   2.1.4`,
+	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
