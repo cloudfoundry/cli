@@ -46,7 +46,7 @@ func (cmd SetEnvCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayText("TIP: Use 'cf stage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
+	cmd.UI.DisplayText("TIP: Use 'cf restage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
 		"AppName": appName,
 	})
 

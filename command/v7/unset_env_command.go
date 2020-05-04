@@ -51,7 +51,7 @@ func (cmd UnsetEnvCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	if err == nil {
-		cmd.UI.DisplayText("TIP: Use 'cf stage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
+		cmd.UI.DisplayText("TIP: Use 'cf restage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
 			"AppName": appName,
 		})
 	}

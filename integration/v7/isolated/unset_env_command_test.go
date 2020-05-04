@@ -125,7 +125,7 @@ var _ = Describe("unset-env command", func() {
 
 					Eventually(session).Should(Say(`Removing env variable %s from app %s in org %s / space %s as %s\.\.\.`, envVarName, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say(`TIP: Use 'cf stage %s' to ensure your env variable changes take effect\.`, appName))
+					Eventually(session).Should(Say(`TIP: Use 'cf restage %s' to ensure your env variable changes take effect\.`, appName))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
 					Eventually(session).ShouldNot(Say(`"%s"`, envVarName))

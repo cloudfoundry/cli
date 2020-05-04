@@ -126,7 +126,7 @@ var _ = Describe("set-env command", func() {
 
 					Eventually(session).Should(Say(`Setting env variable %s for app %s in org %s / space %s as %s\.\.\.`, envVarName, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say(`TIP: Use 'cf stage %s' to ensure your env variable changes take effect\.`, appName))
+					Eventually(session).Should(Say(`TIP: Use 'cf restage %s' to ensure your env variable changes take effect\.`, appName))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
@@ -145,7 +145,7 @@ var _ = Describe("set-env command", func() {
 
 						Eventually(session).Should(Say(`Setting env variable %s for app %s in org %s / space %s as %s\.\.\.`, envVarName, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say(`TIP: Use 'cf stage %s' to ensure your env variable changes take effect\.`, appName))
+						Eventually(session).Should(Say(`TIP: Use 'cf restage %s' to ensure your env variable changes take effect\.`, appName))
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
@@ -166,7 +166,7 @@ var _ = Describe("set-env command", func() {
 
 					Eventually(session).Should(Say(`Setting env variable %s for app %s in org %s / space %s as %s\.\.\.`, envVarName, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say(`TIP: Use 'cf stage %s' to ensure your env variable changes take effect\.`, appName))
+					Eventually(session).Should(Say(`TIP: Use 'cf restage %s' to ensure your env variable changes take effect\.`, appName))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
