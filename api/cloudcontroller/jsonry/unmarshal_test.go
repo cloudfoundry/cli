@@ -56,6 +56,29 @@ var _ = Describe("Unmarshal", func() {
 		Expect(s.C).To(Equal([]int{1, 2, 3}))
 	})
 
+	It("unmarshals lists of struct", func() {
+		type T struct {
+			D string `json:"d"`
+			E int    `json:"e"`
+		}
+
+		var s struct {
+			P string
+			A []T
+		}
+
+		data := `{"p":"baz", "a": [ {"d": "foo", "e": 123}, {"d": "bar", "e": 1} ]}`
+
+		err := jsonry.Unmarshal([]byte(data), &s)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(s.P).To(Equal("baz"))
+		Expect(s.A[0].D).To(Equal("foo"))
+		Expect(s.A[0].E).To(Equal(123))
+		Expect(s.A[1].D).To(Equal("bar"))
+		Expect(s.A[1].E).To(Equal(1))
+	})
+
 	It("unmarshals reference to nested JSON", func() {
 		var s struct {
 			A string `jsonry:"aa.bb.cccc.d.e7.foo"`
@@ -191,6 +214,25 @@ var _ = Describe("Unmarshal", func() {
 			err := jsonry.Unmarshal([]byte(`{"s": [4, "hello"]}`), &s)
 			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to 'int' for field 'S' index 1`))
 		})
+
+		When("in a list of structs", func() {
+			It("fails when its not a struct", func() {
+				var s struct{ S []struct{ A string } }
+				err := jsonry.Unmarshal([]byte(`{"s": ["123"]}`), &s)
+				Expect(err).To(MatchError(`could not convert value '123' type 'string' to 'struct { A string }' for field 'S' index 0`))
+			})
+
+			It("succeeds when the struct doesn't match", func() {
+				var s struct {
+					S []struct {
+						A bool
+					}
+				}
+				err := jsonry.Unmarshal([]byte(`{"s": [{"b": "123"}]}`), &s)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s.S[0].A).To(BeFalse())
+			})
+		})
 	})
 
 	Context("numbers", func() {
@@ -199,6 +241,15 @@ var _ = Describe("Unmarshal", func() {
 			err := jsonry.Unmarshal([]byte(`{"i": 42}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.I).To(Equal(42))
+		})
+
+		It("can unmarshal a float", func() {
+			var s struct{ F float64 }
+
+			err := jsonry.Unmarshal([]byte(`{"f": 42.02}`), &s)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(s.F).To(Equal(42.02))
 		})
 
 		It("fails when the JSON value is not an int", func() {

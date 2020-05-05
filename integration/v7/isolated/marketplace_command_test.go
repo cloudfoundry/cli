@@ -3,6 +3,8 @@ package isolated
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
+
 	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -94,6 +96,17 @@ var _ = Describe("marketplace command", func() {
 			broker3 = servicebrokerstub.New().WithHigherNameThan(broker2).WithPlans(2)
 			broker3.Services[0].Name = broker2.Services[0].Name
 			broker3.Services[0].Plans[0].Free = false
+			broker3.Services[0].Plans[0].Costs = []config.Cost{
+				{
+					Amount: map[string]float64{"gbp": 600.00, "usd": 649.00},
+					Unit:   "MONTHLY",
+				},
+				{
+					Amount: map[string]float64{"usd": 0.999},
+					Unit:   "1GB of messages over 20GB",
+				},
+			}
+			broker3.Services[0].Plans[1].Free = false
 			broker3.EnableServiceAccess()
 		})
 
@@ -212,16 +225,7 @@ var _ = Describe("marketplace command", func() {
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(Say(`Getting service plan information for service offering %s\.\.\.`, broker2.Services[0].Name))
-					Expect(session).To(Say(`\n\n`))
-					Expect(session).To(Say(`broker: %s`, broker2.Name))
-					Expect(session).To(Say(`plan\s+description\s+free or paid`))
-					Expect(session).To(Say(`%s\s+%s\s+%s`, broker2.Services[0].Plans[2].Name, broker2.Services[0].Plans[2].Description, "free"))
-
-					Expect(session).To(Say(`\n\n`))
-					Expect(session).To(Say(`broker: %s`, broker3.Name))
-					Expect(session).To(Say(`plan\s+description\s+free or paid`))
-					Expect(session).To(Say(`%s\s+%s\s+%s`, broker3.Services[0].Plans[0].Name, broker3.Services[0].Plans[0].Description, "paid"))
-					Expect(session).To(Say(`%s\s+%s\s+%s`, broker3.Services[0].Plans[1].Name, broker3.Services[0].Plans[1].Description, "free"))
+					expectMarketplaceServiceOfferingOutput(session, broker2, broker3)
 
 					Expect(string(session.Out.Contents())).NotTo(SatisfyAny(
 						ContainSubstring(broker1.Name),
@@ -236,7 +240,7 @@ var _ = Describe("marketplace command", func() {
 					Expect(session).To(Say(`Getting service plan information for service offering %s from service broker %s\.\.\.`, broker2.Services[0].Name, broker2.Name))
 					Expect(session).To(Say(`\n\n`))
 					Expect(session).To(Say(`broker: %s`, broker2.Name))
-					Expect(session).To(Say(`plan\s+description\s+free or paid`))
+					Expect(session).To(Say(`plan\s+description\s+free or paid\s+cost`))
 					Expect(session).To(Say(`%s\s+%s\s+%s`, broker2.Services[0].Plans[2].Name, broker2.Services[0].Plans[2].Description, "free"))
 
 					Expect(string(session.Out.Contents())).NotTo(SatisfyAny(
@@ -260,16 +264,7 @@ var _ = Describe("marketplace command", func() {
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(Say(`Getting service plan information for service offering %s in org %s / space %s as %s\.\.\.`, broker2.Services[0].Name, org1, space1, username))
-					Expect(session).To(Say(`\n\n`))
-					Expect(session).To(Say(`broker: %s`, broker2.Name))
-					Expect(session).To(Say(`plan\s+description\s+free or paid`))
-					Expect(session).To(Say(`%s\s+%s\s+%s`, broker2.Services[0].Plans[2].Name, broker2.Services[0].Plans[2].Description, "free"))
-
-					Expect(session).To(Say(`\n\n`))
-					Expect(session).To(Say(`broker: %s`, broker3.Name))
-					Expect(session).To(Say(`plan\s+description\s+free or paid`))
-					Expect(session).To(Say(`%s\s+%s\s+%s`, broker3.Services[0].Plans[0].Name, broker3.Services[0].Plans[0].Description, "paid"))
-					Expect(session).To(Say(`%s\s+%s\s+%s`, broker3.Services[0].Plans[1].Name, broker3.Services[0].Plans[1].Description, "free"))
+					expectMarketplaceServiceOfferingOutput(session, broker2, broker3)
 				})
 
 				It("can also filter by service broker name", func() {
@@ -279,7 +274,7 @@ var _ = Describe("marketplace command", func() {
 					Expect(session).To(Say(`Getting service plan information for service offering %s from service broker %s in org %s / space %s as %s\.\.\.`, broker2.Services[0].Name, broker2.Name, org1, space1, username))
 					Expect(session).To(Say(`\n\n`))
 					Expect(session).To(Say(`broker: %s`, broker2.Name))
-					Expect(session).To(Say(`plan\s+description\s+free or paid`))
+					Expect(session).To(Say(`plan\s+description\s+free or paid\s+cost`))
 					Expect(session).To(Say(`%s\s+%s\s+%s`, broker2.Services[0].Plans[2].Name, broker2.Services[0].Plans[2].Description, "free"))
 
 					Expect(string(session.Out.Contents())).NotTo(SatisfyAny(
@@ -291,6 +286,19 @@ var _ = Describe("marketplace command", func() {
 		})
 	})
 })
+
+func expectMarketplaceServiceOfferingOutput(session *Session, broker2, broker3 *servicebrokerstub.ServiceBrokerStub) {
+	Expect(session).To(Say(`\n\n`))
+	Expect(session).To(Say(`broker: %s`, broker2.Name))
+	Expect(session).To(Say(`plan\s+description\s+free or paid\s+cost`))
+	Expect(session).To(Say(`%s\s+%s\s+%s`, broker2.Services[0].Plans[2].Name, broker2.Services[0].Plans[2].Description, "free"))
+
+	Expect(session).To(Say(`\n\n`))
+	Expect(session).To(Say(`broker: %s`, broker3.Name))
+	Expect(session).To(Say(`plan\s+description\s+free or paid\s+cost`))
+	Expect(session).To(Say(`%s\s+%s\s+%s\s+%s`, broker3.Services[0].Plans[0].Name, broker3.Services[0].Plans[0].Description, "paid", "GBP 600.00/MONTHLY, USD 649.00/MONTHLY, USD 1.00/1GB of messages over 20GB"))
+	Expect(session).To(Say(`%s\s+%s\s+%s`, broker3.Services[0].Plans[1].Name, broker3.Services[0].Plans[1].Description, "paid"))
+}
 
 func planNamesOf(broker *servicebrokerstub.ServiceBrokerStub) string {
 	var planNames []string

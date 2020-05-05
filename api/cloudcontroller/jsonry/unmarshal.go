@@ -16,7 +16,7 @@ var (
 )
 
 func Unmarshal(data []byte, store interface{}) error {
-	storeValue, err := relectOnAndCheckStructPointer(store)
+	storeValue, err := reflectOnAndCheckStructPointer(store)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func Unmarshal(data []byte, store interface{}) error {
 	return unmarshal(storeValue, tree)
 }
 
-func relectOnAndCheckStructPointer(store interface{}) (reflect.Value, error) {
+func reflectOnAndCheckStructPointer(store interface{}) (reflect.Value, error) {
 	p := reflect.ValueOf(store)
 	if kind := p.Kind(); kind != reflect.Ptr {
 		return reflect.Value{}, errors.New("the storage object must be a pointer")
@@ -182,6 +182,15 @@ func setSlice(fieldName string, store reflect.Value, value interface{}) error {
 			continue
 		}
 
+		if actualKind(elemType) == reflect.Struct && actualKind(vv.Type()) == reflect.Map {
+			var structElement = reflect.New(elemType).Elem()
+			err := unmarshal(structElement, v)
+			if err == nil {
+				arr.Index(i).Set(structElement)
+				continue
+			}
+		}
+
 		return fmt.Errorf(
 			"could not convert value '%v' type '%s' to '%s' for field '%s' index %d",
 			v,
@@ -222,6 +231,9 @@ func valueOfWithDenumberification(v interface{}) reflect.Value {
 		// Extend to support other number types as needed
 		if i64, err := num.Int64(); err == nil {
 			return reflect.ValueOf(int(i64))
+		}
+		if f64, err := num.Float64(); err == nil {
+			return reflect.ValueOf(float64(f64))
 		}
 	}
 

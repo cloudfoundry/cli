@@ -14,6 +14,7 @@ type Plan struct {
 	Description     string           `json:"description,omitempty"`
 	MaintenanceInfo *MaintenanceInfo `json:"maintenance_info,omitempty"`
 	Free            bool             `json:"free"`
+	Costs           []Cost           `json:"costs"`
 }
 
 type Service struct {
@@ -43,4 +44,9 @@ type BrokerConfiguration struct {
 type MaintenanceInfo struct {
 	Version     string `json:"version,omitempty"`
 	Description string `json:"description,omitempty"`
+}
+
+type Cost struct {
+	Amount map[string]float64 `json:"amount"`
+	Unit   string             `json:"unit"`
 }

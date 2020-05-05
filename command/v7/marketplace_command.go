@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -118,9 +119,9 @@ func (cmd MarketplaceCommand) displayMessage(username string) {
 
 func (cmd MarketplaceCommand) displayPlansTable(offerings []v7action.ServiceOfferingWithPlans) error {
 	for _, o := range offerings {
-		data := [][]string{{"plan", "description", "free or paid"}}
+		data := [][]string{{"plan", "description", "free or paid", "costs"}}
 		for _, p := range o.Plans {
-			data = append(data, []string{p.Name, p.Description, freeOrPaid(p.Free)})
+			data = append(data, []string{p.Name, p.Description, freeOrPaid(p.Free), costsList(p.Costs)})
 		}
 
 		cmd.UI.DisplayNewline()
@@ -178,4 +179,12 @@ func freeOrPaid(free bool) string {
 		return "free"
 	}
 	return "paid"
+}
+
+func costsList(costs []ccv3.Cost) string {
+	var costsOutput []string
+	for _, cost := range costs {
+		costsOutput = append(costsOutput, fmt.Sprintf("%s %.2f/%s", cost.Currency, cost.Amount, cost.Unit))
+	}
+	return strings.Join(costsOutput, ", ")
 }

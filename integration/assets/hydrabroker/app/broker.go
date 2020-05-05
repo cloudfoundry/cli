@@ -65,6 +65,16 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 				}
 			}
 
+			var costs []domain.ServicePlanCost
+			if p.Costs != nil {
+				for _, c := range p.Costs {
+					costs = append(costs, domain.ServicePlanCost{
+						Amount: c.Amount,
+						Unit:   c.Unit,
+					})
+				}
+			}
+
 			plans = append(plans, domain.ServicePlan{
 				Name:            p.Name,
 				ID:              p.ID,
@@ -72,6 +82,9 @@ func brokerCatalog(store *store.BrokerConfigurationStore, w http.ResponseWriter,
 				MaintenanceInfo: mi,
 				Bindable:        &s.Bindable,
 				Free:            &p.Free,
+				Metadata: &domain.ServicePlanMetadata{
+					Costs: costs,
+				},
 			})
 		}
 		services = append(services, domain.Service{

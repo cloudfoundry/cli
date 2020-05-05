@@ -451,6 +451,31 @@ var _ = Describe("Service Plan", func() {
 								"name": "service-plan-2-name",
 								"description": "service-plan-2-description",
 								"free": false,
+								"costs": [
+									{
+										"amount": 649.00,
+										"currency": "USD",
+										"unit": "MONTHLY"
+									},
+									{
+										"amount": 649.123,
+										"currency": "GBP",
+										"unit": "MONTHLY"
+									}
+								],
+								"broker_catalog": {
+									"metadata": {
+										"costs":[
+											{
+												"amount": {
+													"usd": 649.0,
+													"gpb": 649.0
+												},
+												"unit": "MONTHLY"
+											}
+										]
+									}
+								},
 								"relationships": {
 									"service_offering": {
 									   "data": {
@@ -603,10 +628,22 @@ var _ = Describe("Service Plan", func() {
 						ServiceBrokerName: "service-broker-2",
 						Plans: []ServicePlan{
 							{
-								GUID:                "service-plan-2-guid",
-								Name:                "service-plan-2-name",
-								Description:         "service-plan-2-description",
-								Free:                false,
+								GUID:        "service-plan-2-guid",
+								Name:        "service-plan-2-name",
+								Description: "service-plan-2-description",
+								Free:        false,
+								Costs: []Cost{
+									{
+										Amount:   649.00,
+										Currency: "USD",
+										Unit:     "MONTHLY",
+									},
+									{
+										Amount:   649.123,
+										Currency: "GBP",
+										Unit:     "MONTHLY",
+									},
+								},
 								ServiceOfferingGUID: "69d428b9-75b4-44db-addf-19c85c7f0f1e",
 							},
 						},

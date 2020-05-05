@@ -464,11 +464,28 @@ var _ = Describe("marketplace command", func() {
 									Name:        "plan-2",
 									Description: "just another plan",
 									Free:        false,
+									Costs: []ccv3.Cost{
+										{
+											Currency: "USD",
+											Amount:   100,
+											Unit:     "Monthly",
+										},
+										{
+											Currency: "USD",
+											Amount:   0.999,
+											Unit:     "1GB of messages over 20GB",
+										},
+									},
 								},
 								{
 									GUID: "plan-guid-3",
 									Name: "plan-3",
 									Free: true,
+								},
+								{
+									GUID: "plan-guid-4",
+									Name: "plan-4",
+									Free: false,
 								},
 							},
 						},
@@ -483,13 +500,14 @@ var _ = Describe("marketplace command", func() {
 
 				Expect(testUI.Out).To(Say(`\n\n`))
 				Expect(testUI.Out).To(Say(`broker: service-broker-1`))
-				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid`))
+				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+cost`))
 				Expect(testUI.Out).To(Say(`plan-1\s+best available plan\s+free`))
 				Expect(testUI.Out).To(Say(`\n\n`))
 				Expect(testUI.Out).To(Say(`broker: service-broker-2`))
-				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid`))
-				Expect(testUI.Out).To(Say(`plan-2\s+just another plan\s+paid`))
+				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+cost`))
+				Expect(testUI.Out).To(Say(`plan-2\s+just another plan\s+paid\s+USD 100.00/Monthly, USD 1.00/1GB of messages over 20GB`))
 				Expect(testUI.Out).To(Say(`plan-3\s+free`))
+				Expect(testUI.Out).To(Say(`plan-4\s+paid`))
 
 				Expect(testUI.Err).To(Say("warning 1"))
 				Expect(testUI.Err).To(Say("warning 2"))

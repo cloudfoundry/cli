@@ -1,9 +1,10 @@
 package ccv3
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
 )
 
 // ServicePlan represents a Cloud Controller V3 Service Plan.
@@ -18,13 +19,20 @@ type ServicePlan struct {
 	VisibilityType VisibilityType `json:"visibility_type"`
 	// Free shows whether or not the Service Plan is free of charge.
 	Free bool
-
+	// Cost shows the cost of a paid service plan
+	Costs []Cost `json:"costs"`
 	// ServicePlanGUID is the GUID of the service offering
 	ServiceOfferingGUID string `jsonry:"relationships.service_offering.data.guid"`
 	// SpaceGUID is the space that a plan from a space-scoped broker relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid"`
 
 	Metadata *Metadata
+}
+
+type Cost struct {
+	Amount   float64 `json:"amount"`
+	Currency string  `json:"currency"`
+	Unit     string  `json:"unit"`
 }
 
 func (sp *ServicePlan) UnmarshalJSON(data []byte) error {
