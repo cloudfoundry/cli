@@ -15,7 +15,7 @@ type SetRunningEnvironmentVariableGroupCommand struct {
 
 	RequiredArgs    flag.SetEnvVarGroup `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
-	relatedCommands interface{}         `related_commands:"set-env, staging-environment-variable-group"`
+	relatedCommands interface{}         `related_commands:"set-env, running-environment-variable-group"`
 }
 
 func (cmd SetRunningEnvironmentVariableGroupCommand) Execute(args []string) error {
