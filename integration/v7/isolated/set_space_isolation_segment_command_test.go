@@ -93,7 +93,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 						session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
 						Eventually(session).Should(Say(`Updating isolation segment of space %s in org %s as %s\.\.\.`, spaceName, organizationName, userName))
 						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say("In order to move running applications to this isolation segment, they must be restarted."))
+						Eventually(session).Should(Say("TIP: Restart applications in this space to relocate them to this isolation segment."))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -106,7 +106,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 							session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
 							Eventually(session).Should(Say(`Updating isolation segment of space %s in org %s as %s\.\.\.`, spaceName, organizationName, userName))
 							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say("In order to move running applications to this isolation segment, they must be restarted."))
+							Eventually(session).Should(Say("TIP: Restart applications in this space to relocate them to this isolation segment."))
 							Eventually(session).Should(Exit(0))
 						})
 					})
