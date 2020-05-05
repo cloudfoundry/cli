@@ -27,6 +27,8 @@ func (cmd IsolationSegmentsCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
+	cmd.UI.DisplayNewline()
+
 	summaries, warnings, err := cmd.Actor.GetIsolationSegmentSummaries()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
