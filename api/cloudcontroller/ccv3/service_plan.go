@@ -29,14 +29,14 @@ type ServicePlan struct {
 	Metadata *Metadata
 }
 
+func (sp *ServicePlan) UnmarshalJSON(data []byte) error {
+	return jsonry.Unmarshal(data, sp)
+}
+
 type Cost struct {
 	Amount   float64 `json:"amount"`
 	Currency string  `json:"currency"`
 	Unit     string  `json:"unit"`
-}
-
-func (sp *ServicePlan) UnmarshalJSON(data []byte) error {
-	return jsonry.Unmarshal(data, sp)
 }
 
 // GetServicePlans lists service plan with optional filters.
