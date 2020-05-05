@@ -91,7 +91,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 						session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)
 						Eventually(session).Should(Say(`Setting isolation segment %s to default on org %s as %s\.\.\.`, isolationSegmentName, orgName, userName))
 						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say(`In order to move running applications to this isolation segment, they must be restarted\.`))
+						Eventually(session).Should(Say("TIP: Restart applications in this organization to relocate them to this isolation segment."))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -104,7 +104,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 							session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)
 							Eventually(session).Should(Say(`Setting isolation segment %s to default on org %s as %s\.\.\.`, isolationSegmentName, orgName, userName))
 							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say(`In order to move running applications to this isolation segment, they must be restarted\.`))
+							Eventually(session).Should(Say("TIP: Restart applications in this organization to relocate them to this isolation segment."))
 							Eventually(session).Should(Exit(0))
 						})
 					})
