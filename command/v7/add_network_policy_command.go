@@ -18,15 +18,14 @@ type NetworkingActor interface {
 type AddNetworkPolicyCommand struct {
 	BaseCommand
 
-	RequiredArgs   flag.AddNetworkPolicyArgs `positional-args:"yes"`
-	DestinationApp string                    `long:"destination-app" required:"true" description:"Name of app to connect to"`
-	Port           flag.NetworkPort          `long:"port" description:"Port or range of ports for connection to destination app (Default: 8080)"`
-	Protocol       flag.NetworkProtocol      `long:"protocol" description:"Protocol to connect apps with (Default: tcp)"`
+	RequiredArgs flag.AddNetworkPolicyArgsV7 `positional-args:"yes"`
+	Port         flag.NetworkPort            `long:"port" description:"Port or range of ports for connection to destination app (Default: 8080)"`
+	Protocol     flag.NetworkProtocol        `long:"protocol" description:"Protocol to connect apps with (Default: tcp)"`
 
 	DestinationOrg   string `short:"o" description:"The org of the destination app (Default: targeted org)"`
 	DestinationSpace string `short:"s" description:"The space of the destination app (Default: targeted space)"`
 
-	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
+	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, remove-network-policy"`
 
 	NetworkingActor NetworkingActor
@@ -108,7 +107,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 			"SrcAppName": cmd.RequiredArgs.SourceApp,
 			"Org":        cmd.Config.TargetedOrganization().Name,
 			"Space":      cmd.Config.TargetedSpace().Name,
-			"DstAppName": cmd.DestinationApp,
+			"DstAppName": cmd.RequiredArgs.DestApp,
 			"DstOrg":     displayDestinationOrg,
 			"DstSpace":   cmd.DestinationSpace,
 			"User":       user.Name,
@@ -118,12 +117,12 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 			"SrcAppName": cmd.RequiredArgs.SourceApp,
 			"Org":        cmd.Config.TargetedOrganization().Name,
 			"Space":      cmd.Config.TargetedSpace().Name,
-			"DstAppName": cmd.DestinationApp,
+			"DstAppName": cmd.RequiredArgs.DestApp,
 			"User":       user.Name,
 		})
 	}
 
-	warnings, err := cmd.NetworkingActor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	warnings, err := cmd.NetworkingActor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.RequiredArgs.DestApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

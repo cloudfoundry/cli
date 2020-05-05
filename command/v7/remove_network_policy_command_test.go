@@ -50,10 +50,12 @@ var _ = Describe("remove-network-policy Command", func() {
 				Actor:       fakeActor,
 			},
 			NetworkingActor: fakeNetworkPolicyActor,
-			RequiredArgs:    flag.RemoveNetworkPolicyArgs{SourceApp: srcApp},
-			DestinationApp:  destApp,
-			Protocol:        flag.NetworkProtocol{Protocol: protocol},
-			Port:            flag.NetworkPort{StartPort: 8080, EndPort: 8081},
+			RequiredArgs: flag.RemoveNetworkPolicyArgsV7{
+				SourceApp: srcApp,
+				DestApp:   destApp,
+			},
+			Protocol: flag.NetworkProtocol{Protocol: protocol},
+			Port:     flag.NetworkPort{StartPort: 8080, EndPort: 8081},
 		}
 
 		binaryName = "faceman"

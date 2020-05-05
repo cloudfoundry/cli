@@ -391,6 +391,16 @@ type AddNetworkPolicyArgs struct {
 	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
 }
 
+type AddNetworkPolicyArgsV7 struct {
+	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
+	DestApp   string `positional-arg-name:"DESTINATION_APP" required:"true" description:"The destination app"`
+}
+
 type RemoveNetworkPolicyArgs struct {
 	SourceApp string
+}
+
+type RemoveNetworkPolicyArgsV7 struct {
+	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
+	DestApp   string `positional-arg-name:"DESTINATION_APP" required:"true" description:"The destination app"`
 }

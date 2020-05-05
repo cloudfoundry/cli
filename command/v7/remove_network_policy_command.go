@@ -18,14 +18,13 @@ type RemoveNetworkPolicyActor interface {
 type RemoveNetworkPolicyCommand struct {
 	BaseCommand
 
-	RequiredArgs     flag.RemoveNetworkPolicyArgs `positional-args:"yes"`
-	DestinationApp   string                       `long:"destination-app" required:"true" description:"Name of app to connect to"`
-	Port             flag.NetworkPort             `long:"port" required:"true" description:"Port or range of ports that destination app is connected with"`
-	Protocol         flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol that apps are connected with"`
-	DestinationOrg   string                       `short:"o" description:"The org of the destination app (Default: targeted org)"`
-	DestinationSpace string                       `short:"s" description:"The space of the destination app (Default: targeted space)"`
+	RequiredArgs     flag.RemoveNetworkPolicyArgsV7 `positional-args:"yes"`
+	Port             flag.NetworkPort               `long:"port" required:"true" description:"Port or range of ports that destination app is connected with"`
+	Protocol         flag.NetworkProtocol           `long:"protocol" required:"true" description:"Protocol that apps are connected with"`
+	DestinationOrg   string                         `short:"o" description:"The org of the destination app (Default: targeted org)"`
+	DestinationSpace string                         `short:"s" description:"The space of the destination app (Default: targeted space)"`
 
-	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend --destination-app backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
+	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, add-network-policy"`
 
 	NetworkingActor RemoveNetworkPolicyActor
@@ -92,7 +91,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 			"SrcAppName": cmd.RequiredArgs.SourceApp,
 			"Org":        cmd.Config.TargetedOrganization().Name,
 			"Space":      cmd.Config.TargetedSpace().Name,
-			"DstAppName": cmd.DestinationApp,
+			"DstAppName": cmd.RequiredArgs.DestApp,
 			"DstOrg":     displayDestinationOrg,
 			"DstSpace":   cmd.DestinationSpace,
 			"User":       user.Name,
@@ -102,12 +101,12 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 			"SrcAppName": cmd.RequiredArgs.SourceApp,
 			"Org":        cmd.Config.TargetedOrganization().Name,
 			"Space":      cmd.Config.TargetedSpace().Name,
-			"DstAppName": cmd.DestinationApp,
+			"DstAppName": cmd.RequiredArgs.DestApp,
 			"User":       user.Name,
 		})
 	}
 
-	removeWarnings, err := cmd.NetworkingActor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	removeWarnings, err := cmd.NetworkingActor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.RequiredArgs.DestApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(removeWarnings)
 	if err != nil {
 		switch err.(type) {

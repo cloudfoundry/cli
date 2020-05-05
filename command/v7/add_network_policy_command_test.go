@@ -53,9 +53,11 @@ var _ = Describe("add-network-policy Command", func() {
 				Actor:       fakeActor,
 				SharedActor: fakeSharedActor,
 			},
-			NetworkingActor:  fakeNetworkingActor,
-			RequiredArgs:     flag.AddNetworkPolicyArgs{SourceApp: srcApp},
-			DestinationApp:   destApp,
+			NetworkingActor: fakeNetworkingActor,
+			RequiredArgs: flag.AddNetworkPolicyArgsV7{
+				SourceApp: srcApp,
+				DestApp:   destApp,
+			},
 			DestinationSpace: space,
 			DestinationOrg:   org,
 		}
