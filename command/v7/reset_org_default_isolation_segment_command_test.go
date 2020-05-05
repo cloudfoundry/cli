@@ -134,7 +134,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 						Expect(testUI.Err).To(Say("warning-4"))
 
 						Expect(testUI.Out).To(Say("Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment."))
-						Expect(testUI.Out).To(Say("Running applications need a restart to be moved there."))
+						Expect(testUI.Out).To(Say("TIP: Restart applications in this organization to relocate them to this isolation segment."))
 
 						Expect(fakeActor.ResetOrganizationDefaultIsolationSegmentCallCount()).To(Equal(1))
 						orgGUID := fakeActor.ResetOrganizationDefaultIsolationSegmentArgsForCall(0)
