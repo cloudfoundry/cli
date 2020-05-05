@@ -15,7 +15,7 @@ type RestageCommand struct {
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null."`
 	NoWait              bool                    `long:"no-wait" description:"Do not wait for the long-running operation to complete; restage exits when one instance of the web process is healthy"`
-	usage               interface{}             `usage:"CF_NAME restage APP_NAME\n\nEXAMPLES:\n   CF_NAME restage APP_NAME\n   CF_NAME restage APP_NAME --strategy rolling\n   CF_NAME restage APP_NAME --strategy rolling --no-wait"`
+	usage               interface{}             `usage:"CF_NAME restage APP_NAME\n\n   This command will cause downtime unless you use '--strategy rolling'.\n\nEXAMPLES:\n   CF_NAME restage APP_NAME\n   CF_NAME restage APP_NAME --strategy rolling\n   CF_NAME restage APP_NAME --strategy rolling --no-wait"`
 	relatedCommands     interface{}             `related_commands:"restart"`
 	envCFStagingTimeout interface{}             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`

@@ -20,10 +20,11 @@ var _ = Describe("restage command", func() {
 				session := helpers.CF("restage", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`restage - Recreate the app's executable artifact using the latest pushed app files and the latest environment \(variables, service bindings, buildpack, stack, etc\.\).`))
+				Eventually(session).Should(Say(`restage - Stage the app's latest package into a droplet and restart the app with this new droplet and updated configuration \(environment variables, service bindings, buildpack, stack, etc.\).`))
 				Eventually(session).ShouldNot(Say(`This action will cause app downtime.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restage APP_NAME"))
+				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy rolling'."))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("cf restage APP_NAME"))
 				Eventually(session).Should(Say("cf restage APP_NAME --strategy rolling"))
