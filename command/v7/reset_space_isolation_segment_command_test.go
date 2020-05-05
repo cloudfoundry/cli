@@ -116,8 +116,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 					Expect(testUI.Err).To(Say("warning-3"))
 					Expect(testUI.Err).To(Say("warning-4"))
 
-					Expect(testUI.Out).To(Say("Applications in this space will be placed in the platform default isolation segment."))
-					Expect(testUI.Out).To(Say("Running applications need a restart to be moved there."))
+					Expect(testUI.Out).To(Say("TIP: Restart applications in this space to relocate them to the platform default."))
 
 					Expect(fakeActor.ResetSpaceIsolationSegmentCallCount()).To(Equal(1))
 					orgGUID, spaceGUID := fakeActor.ResetSpaceIsolationSegmentArgsForCall(0)
@@ -143,8 +142,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 					Expect(testUI.Err).To(Say("warning-3"))
 					Expect(testUI.Err).To(Say("warning-4"))
 
-					Expect(testUI.Out).To(Say("Applications in this space will be placed in isolation segment 'some-org-iso-seg-name'."))
-					Expect(testUI.Out).To(Say("Running applications need a restart to be moved there."))
+					Expect(testUI.Out).To(Say("TIP: Restart applications in this space to relocate them to this organization's default isolation segment."))
 
 					Expect(fakeActor.ResetSpaceIsolationSegmentCallCount()).To(Equal(1))
 					orgGUID, spaceGUID := fakeActor.ResetSpaceIsolationSegmentArgsForCall(0)

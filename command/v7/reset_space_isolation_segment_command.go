@@ -44,13 +44,10 @@ func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	if newIsolationSegmentName == "" {
-		cmd.UI.DisplayText("Applications in this space will be placed in the platform default isolation segment.")
+		cmd.UI.DisplayText("TIP: Restart applications in this space to relocate them to the platform default.")
 	} else {
-		cmd.UI.DisplayText("Applications in this space will be placed in isolation segment '{{.orgIsolationSegment}}'.", map[string]interface{}{
-			"orgIsolationSegment": newIsolationSegmentName,
-		})
+		cmd.UI.DisplayText("TIP: Restart applications in this space to relocate them to this organization's default isolation segment.")
 	}
-	cmd.UI.DisplayText("Running applications need a restart to be moved there.")
 
 	return nil
 }

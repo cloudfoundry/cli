@@ -112,8 +112,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Say("Resetting isolation segment assignment of space %s in org %s as %s...", spaceName, organizationName, userName))
 
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Applications in this space will be placed in the platform default isolation segment."))
-					Eventually(session).Should(Say("Running applications need a restart to be moved there."))
+					Eventually(session).Should(Say("TIP: Restart applications in this space to relocate them to the platform default."))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("space", spaceName)
@@ -137,8 +136,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Say("Resetting isolation segment assignment of space %s in org %s as %s...", spaceName, organizationName, userName))
 
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Applications in this space will be placed in isolation segment '%s'.", orgIsolationSegmentName))
-					Eventually(session).Should(Say("Running applications need a restart to be moved there."))
+					Eventually(session).Should(Say("TIP: Restart applications in this space to relocate them to this organization's default isolation segment."))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("space", spaceName)
