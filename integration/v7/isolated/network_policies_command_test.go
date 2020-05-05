@@ -52,7 +52,7 @@ var _ = Describe("network-policies command", func() {
 				Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 			})
 
-			session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
+			session := helpers.CF("add-network-policy", appName, appName)
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -93,7 +93,7 @@ var _ = Describe("network-policies command", func() {
 
 				helpers.SetupCF(orgName, spaceName)
 
-				session := helpers.CF("add-network-policy", appName, "--destination-app", destApp, "-o", destOrg, "-s", destSpace)
+				session := helpers.CF("add-network-policy", appName, destApp, "-o", destOrg, "-s", destSpace)
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Adding network policy from app %s in org %s / space %s to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, destApp, destOrg, destSpace, username))
 				Eventually(session).Should(Say("OK"))
@@ -119,7 +119,7 @@ var _ = Describe("network-policies command", func() {
 					Eventually(helpers.CF("push", srcAppName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 				})
 
-				session := helpers.CF("add-network-policy", srcAppName, "--destination-app", appName)
+				session := helpers.CF("add-network-policy", srcAppName, appName)
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -154,7 +154,7 @@ var _ = Describe("network-policies command", func() {
 
 					helpers.SetupCF(orgName, spaceName)
 
-					session := helpers.CF("add-network-policy", appName, "--destination-app", destApp, "-o", destOrg, "-s", destSpace)
+					session := helpers.CF("add-network-policy", appName, destApp, "-o", destOrg, "-s", destSpace)
 					username, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say(`Adding network policy from app %s in org %s / space %s to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, destApp, destOrg, destSpace, username))
 					Eventually(session).Should(Say("OK"))
