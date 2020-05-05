@@ -327,6 +327,7 @@ var _ = Describe("Droplet Actions", func() {
 				Expect(fakeCloudControllerClient.GetDropletsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetDropletsArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+					ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 				))
 			})
 		})

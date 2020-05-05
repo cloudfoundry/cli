@@ -69,6 +69,7 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]D
 
 	ccv3Droplets, apiWarnings, err := actor.CloudControllerClient.GetDroplets(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{application.GUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 	)
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)

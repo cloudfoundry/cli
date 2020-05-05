@@ -143,8 +143,9 @@ var _ = Describe("packages Command", func() {
 			Expect(err).ToNot(HaveOccurred())
 			package2UTCTime, err := time.Parse(time.RFC3339, package2UTC)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say(`some-package-guid-2\s+failed\s+%s`, testUI.UserFriendlyDate(package2UTCTime)))
+
 			Expect(testUI.Out).To(Say(`some-package-guid-1\s+ready\s+%s`, testUI.UserFriendlyDate(package1UTCTime)))
+			Expect(testUI.Out).To(Say(`some-package-guid-2\s+failed\s+%s`, testUI.UserFriendlyDate(package2UTCTime)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))

@@ -93,6 +93,7 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+					ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 				))
 			})
 		})

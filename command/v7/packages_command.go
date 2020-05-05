@@ -69,8 +69,8 @@ func (cmd PackagesCommand) Execute(args []string) error {
 		},
 	}
 
-	for i := len(contents) - 1; i >= 0; i-- {
-		table = append(table, contents[i])
+	for _, p := range contents {
+		table = append(table, p)
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)

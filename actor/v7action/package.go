@@ -168,6 +168,7 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 
 	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
