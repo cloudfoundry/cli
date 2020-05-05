@@ -41,8 +41,7 @@ func (cmd ResetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayText("Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment.")
-	cmd.UI.DisplayText("TIP: Restart applications in this organization to relocate them to this isolation segment.")
+	cmd.UI.DisplayText("TIP: Restart applications in spaces without assigned isolation segments to move them to the platform default.")
 
 	return nil
 }
