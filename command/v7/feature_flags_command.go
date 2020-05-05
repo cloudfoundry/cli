@@ -10,7 +10,7 @@ type FeatureFlagsCommand struct {
 	BaseCommand
 
 	usage           interface{} `usage:"CF_NAME feature-flags"`
-	relatedCommands interface{} `related_commands:"disable-feature-flag, enable-feature-flag"`
+	relatedCommands interface{} `related_commands:"disable-feature-flag, enable-feature-flag, feature-flag"`
 }
 
 func (cmd FeatureFlagsCommand) Execute(args []string) error {

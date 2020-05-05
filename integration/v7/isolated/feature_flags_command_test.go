@@ -25,7 +25,7 @@ var _ = Describe("feature-flags command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(`cf feature-flags`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say(`disable-feature-flag, enable-feature-flag`))
+			Eventually(session).Should(Say(`disable-feature-flag, enable-feature-flag, feature-flag`))
 
 			Eventually(session).Should(Exit(0))
 		})
