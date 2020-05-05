@@ -81,7 +81,7 @@ type PushCommand struct {
 	NoManifest              bool                                `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
-	NoWait                  bool                                `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
+	NoWait                  bool                                `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	AppPath                 flag.PathWithExistenceCheck         `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	RandomRoute             bool                                `long:"random-route" description:"Create a random route for this app (except when no-route is specified in the manifest)"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`

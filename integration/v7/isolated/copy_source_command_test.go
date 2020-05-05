@@ -408,7 +408,7 @@ func helpText(session *Session) {
 	Eventually(session).Should(Say(`cf copy-source SOURCE_APP DESTINATION_APP \[-s TARGET_SPACE \[-o TARGET_ORG\]\] \[--no-restart\] \[--strategy STRATEGY\] \[--no-wait\]`))
 	Eventually(session).Should(Say("OPTIONS:"))
 	Eventually(session).Should(Say(`--strategy\s+Deployment strategy, either rolling or null`))
-	Eventually(session).Should(Say(`--no-wait\s+Do not wait for the long-running operation to complete; copy-source exits when one instance of the web process is healthy`))
+	Eventually(session).Should(Say(`--no-wait\s+ Exit when the first instance of the web process is healthy`))
 	Eventually(session).Should(Say(`--no-restart\s+Do not restage the destination application`))
 	Eventually(session).Should(Say(`--organization, -o\s+Org that contains the destination application`))
 	Eventually(session).Should(Say(`--space, -s\s+Space that contains the destination application`))
