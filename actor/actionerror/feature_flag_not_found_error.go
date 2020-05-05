@@ -8,5 +8,5 @@ type FeatureFlagNotFoundError struct {
 }
 
 func (e FeatureFlagNotFoundError) Error() string {
-	return fmt.Sprintf("Feature flag not found - Name: '%s'", e.FeatureFlagName)
+	return fmt.Sprintf("Feature flag '%s' not found.", e.FeatureFlagName)
 }
