@@ -30,7 +30,7 @@ func (n *NullInt) ParseStringValue(val string) error {
 		n.Value = 0
 		return &flags.Error{
 			Type:    flags.ErrMarshal,
-			Message: "invalid integer value",
+			Message: fmt.Sprintf("invalid integer value `%s`", val),
 		}
 	}
 
@@ -42,8 +42,7 @@ func (n *NullInt) ParseStringValue(val string) error {
 
 // IsValidValue returns an error if the input value is not an integer.
 func (n *NullInt) IsValidValue(val string) error {
-	_, err := strconv.Atoi(val)
-	return err
+	return n.ParseStringValue(val)
 }
 
 // ParseIntValue is used to parse a user provided *int argument.

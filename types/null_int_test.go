@@ -54,7 +54,7 @@ var _ = Describe("NullInt", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError("invalid integer value `not-a-integer`"))
 			})
 		})
 	})
@@ -90,7 +90,7 @@ var _ = Describe("NullInt", func() {
 				err := nullInt.ParseStringValue("abcdef")
 				Expect(err).To(MatchError(&flags.Error{
 					Type:    flags.ErrMarshal,
-					Message: "invalid integer value",
+					Message: "invalid integer value `abcdef`",
 				}))
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
 			})
