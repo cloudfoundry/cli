@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -61,8 +62,13 @@ func (cmd DropletsCommand) Execute(args []string) error {
 			return err
 		}
 
+		dropletGUID := droplet.GUID
+		if droplet.IsCurrent {
+			dropletGUID = fmt.Sprintf(`%s (current)`, dropletGUID)
+		}
+
 		table = append(table, []string{
-			droplet.GUID,
+			dropletGUID,
 			cmd.UI.TranslateText(strings.ToLower(string(droplet.State))),
 			cmd.UI.UserFriendlyDate(t),
 		})

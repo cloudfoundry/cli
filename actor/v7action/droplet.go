@@ -17,6 +17,7 @@ type Droplet struct {
 	Stack      string
 	Image      string
 	Buildpacks []DropletBuildpack
+	IsCurrent  bool
 }
 
 type DropletBuildpack ccv3.DropletBuildpack
@@ -77,9 +78,25 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]D
 		return nil, allWarnings, err
 	}
 
+	if len(ccv3Droplets) == 0 {
+		return []Droplet{}, allWarnings, nil
+	}
+
+	currentDroplet, apiWarnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(application.GUID)
+	allWarnings = append(allWarnings, apiWarnings...)
+	if err != nil {
+		return []Droplet{}, allWarnings, err
+	}
+
 	var droplets []Droplet
 	for _, ccv3Droplet := range ccv3Droplets {
-		droplets = append(droplets, actor.convertCCToActorDroplet(ccv3Droplet))
+		droplet := actor.convertCCToActorDroplet(ccv3Droplet)
+
+		if ccv3Droplet.GUID == currentDroplet.GUID {
+			droplet.IsCurrent = true
+		}
+
+		droplets = append(droplets, droplet)
 	}
 
 	return droplets, allWarnings, err

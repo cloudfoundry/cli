@@ -288,13 +288,27 @@ var _ = Describe("Droplet Actions", func() {
 					ccv3.Warnings{"get-application-droplets-warning"},
 					nil,
 				)
+
+				fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+					ccv3.Droplet{
+						GUID:      "some-droplet-guid-2",
+						State:     constant.DropletFailed,
+						CreatedAt: "2017-08-16T00:18:24Z",
+						Buildpacks: []ccv3.DropletBuildpack{
+							{Name: "java"},
+						},
+						Stack: "windows",
+					},
+					ccv3.Warnings{"get-current-droplet-warning"},
+					nil,
+				)
 			})
 
 			It("gets the app's droplets", func() {
 				droplets, warnings, err := actor.GetApplicationDroplets("some-app-name", "some-space-guid")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-droplets-warning"))
+				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-droplets-warning", "get-current-droplet-warning"))
 				Expect(droplets).To(Equal([]Droplet{
 					{
 						GUID:      "some-droplet-guid-1",
@@ -304,8 +318,9 @@ var _ = Describe("Droplet Actions", func() {
 							{Name: "ruby"},
 							{Name: "nodejs"},
 						},
-						Image: "docker/some-image",
-						Stack: "penguin",
+						Image:     "docker/some-image",
+						Stack:     "penguin",
+						IsCurrent: false,
 					},
 					{
 						GUID:      "some-droplet-guid-2",
@@ -314,7 +329,8 @@ var _ = Describe("Droplet Actions", func() {
 						Buildpacks: []DropletBuildpack{
 							{Name: "java"},
 						},
-						Stack: "windows",
+						Stack:     "windows",
+						IsCurrent: true,
 					},
 				}))
 
@@ -329,6 +345,36 @@ var _ = Describe("Droplet Actions", func() {
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
 					ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 				))
+
+				Expect(fakeCloudControllerClient.GetApplicationDropletCurrentCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationDropletCurrentArgsForCall(0)).To(Equal("some-app-guid"))
+			})
+		})
+
+		When("the application does not have associated droplets", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetDropletsReturns(
+					[]ccv3.Droplet{},
+					ccv3.Warnings{"get-application-droplets-warning"},
+					nil,
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.GetApplicationDroplets("some-app-name", "some-space-guid")
+
+				Expect(err).To(BeNil())
+				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-droplets-warning"))
+
+				Expect(fakeCloudControllerClient.GetApplicationDropletCurrentCallCount()).To(Equal(0))
 			})
 		})
 

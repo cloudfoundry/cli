@@ -110,7 +110,7 @@ var _ = Describe("droplets command", func() {
 					session := helpers.CF("droplets", appName)
 					Eventually(session).Should(Say(`Getting droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`guid\s+state\s+created`))
-					Eventually(session).Should(Say(`\s+.*\s+staged\s+%s`, helpers.UserFriendlyDateRegex))
+					Eventually(session).Should(Say(`\s+.* \(current\)\s+staged\s+%s`, helpers.UserFriendlyDateRegex))
 
 					Eventually(session).Should(Exit(0))
 				})

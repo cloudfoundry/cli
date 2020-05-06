@@ -123,11 +123,13 @@ var _ = Describe("droplets Command", func() {
 					GUID:      "some-droplet-guid-1",
 					State:     constant.DropletStaged,
 					CreatedAt: createdAtOne,
+					IsCurrent: true,
 				},
 				{
 					GUID:      "some-droplet-guid-2",
 					State:     constant.DropletFailed,
 					CreatedAt: createdAtTwo,
+					IsCurrent: false,
 				},
 			}
 			fakeActor.GetApplicationDropletsReturns(droplets, v7action.Warnings{"warning-1", "warning-2"}, nil)
@@ -145,7 +147,7 @@ var _ = Describe("droplets Command", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`guid\s+state\s+created\n`))
-			Expect(testUI.Out).To(Say(`some-droplet-guid-1\s+staged\s+%s\n`, testUI.UserFriendlyDate(createdAtOneParsed)))
+			Expect(testUI.Out).To(Say(`some-droplet-guid-1 \(current\)\s+staged\s+%s\n`, testUI.UserFriendlyDate(createdAtOneParsed)))
 			Expect(testUI.Out).To(Say(`some-droplet-guid-2\s+failed\s+%s\n`, testUI.UserFriendlyDate(createdAtTwoParsed)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
