@@ -49,12 +49,11 @@ func (cmd *ServiceBrokersCommand) displayServiceBrokersTable(serviceBrokers []v7
 		{
 			cmd.UI.TranslateText("name"),
 			cmd.UI.TranslateText("url"),
-			cmd.UI.TranslateText("status"),
 		},
 	}
 
 	for _, serviceBroker := range serviceBrokers {
-		table = append(table, []string{serviceBroker.Name, serviceBroker.URL, serviceBroker.Status})
+		table = append(table, []string{serviceBroker.Name, serviceBroker.URL})
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)

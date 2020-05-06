@@ -67,8 +67,7 @@ var _ = Describe("ServiceBroker", func() {
 							{
 								"name": "service-broker-name-1",
 								"guid": "service-broker-guid-1",
-								"url": "service-broker-url-1",
-							    "status": "synchronization in progress"
+								"url": "service-broker-url-1"
 							}
 						]
 					}`
@@ -87,7 +86,6 @@ var _ = Describe("ServiceBroker", func() {
 					Name:     "service-broker-name-1",
 					GUID:     "service-broker-guid-1",
 					URL:      "service-broker-url-1",
-					Status:   "synchronization in progress",
 					Metadata: nil,
 				}))
 				Expect(warnings).To(ConsistOf("this is another warning"))
@@ -106,7 +104,6 @@ var _ = Describe("ServiceBroker", func() {
 								"name": "service-broker-name-1",
 								"guid": "service-broker-guid-1",
 								"url": "service-broker-url-1",
-							    "status": "synchronization in progress",
 								"metadata": {
 									"labels": {
 										"some-key":"some-value",
@@ -128,10 +125,9 @@ var _ = Describe("ServiceBroker", func() {
 			It("returns the service broker with the labels in Metadata", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(serviceBrokers).To(ConsistOf(ServiceBroker{
-					Name:   "service-broker-name-1",
-					GUID:   "service-broker-guid-1",
-					URL:    "service-broker-url-1",
-					Status: "synchronization in progress",
+					Name: "service-broker-name-1",
+					GUID: "service-broker-guid-1",
+					URL:  "service-broker-url-1",
 					Metadata: &Metadata{
 						Labels: map[string]types.NullString{
 							"some-key":  types.NewNullString("some-value"),
@@ -156,14 +152,12 @@ var _ = Describe("ServiceBroker", func() {
 								"name": "service-broker-name-1",
 								"guid": "service-broker-guid-1",
 								"url": "service-broker-url-1",
-							    "status": "synchronization in progress",
 								"relationships": {}
 							},
 							{
 								"name": "service-broker-name-2",
 								"guid": "service-broker-guid-2",
 								"url": "service-broker-url-2",
-								"status": "synchronization failed",
 								"relationships": {}
 							}
 						]
@@ -179,7 +173,6 @@ var _ = Describe("ServiceBroker", func() {
 								"name": "service-broker-name-3",
 								"guid": "service-broker-guid-3",
 								"url": "service-broker-url-3",
-								"status": "available",
 								"relationships": {}
 							}
 						]
@@ -203,9 +196,9 @@ var _ = Describe("ServiceBroker", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(serviceBrokers).To(ConsistOf(
-					ServiceBroker{Name: "service-broker-name-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1", Status: "synchronization in progress"},
-					ServiceBroker{Name: "service-broker-name-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2", Status: "synchronization failed"},
-					ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3", Status: "available"},
+					ServiceBroker{Name: "service-broker-name-1", GUID: "service-broker-guid-1", URL: "service-broker-url-1"},
+					ServiceBroker{Name: "service-broker-name-2", GUID: "service-broker-guid-2", URL: "service-broker-url-2"},
+					ServiceBroker{Name: "service-broker-name-3", GUID: "service-broker-guid-3", URL: "service-broker-url-3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
@@ -229,8 +222,7 @@ var _ = Describe("ServiceBroker", func() {
 							{
 								"name": "special-unicorn-broker",
 								"guid": "service-broker-guid-1",
-								"url": "service-broker-url-1",
-							    "status": "synchronization in progress"
+								"url": "service-broker-url-1"
 							}
 						]
 					}`

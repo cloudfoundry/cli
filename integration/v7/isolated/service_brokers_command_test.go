@@ -68,9 +68,9 @@ var _ = Describe("service-brokers command", func() {
 
 			It("prints a table of service brokers", func() {
 				Eventually(session).Should(Say("Getting service brokers as %s...", username))
-				Eventually(session).Should(Say(`name\s+url\s+status`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker1.Name, broker1.URL, "available"))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker2.Name, broker2.URL, "available"))
+				Eventually(session).Should(Say(`name\s+url`))
+				Eventually(session).Should(Say(`%s\s+%s`, broker1.Name, broker1.URL))
+				Eventually(session).Should(Say(`%s\s+%s`, broker2.Name, broker2.URL))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -95,33 +95,6 @@ var _ = Describe("service-brokers command", func() {
 					Eventually(session).Should(Say("No service brokers found"))
 					Eventually(session).Should(Exit(0))
 				})
-			})
-		})
-
-		When("the broker was created via the V2 API", func() {
-			var (
-				orgName   string
-				spaceName string
-				broker    *servicebrokerstub.ServiceBrokerStub
-			)
-
-			BeforeEach(func() {
-				orgName = helpers.NewOrgName()
-				spaceName = helpers.NewSpaceName()
-				helpers.SetupCF(orgName, spaceName)
-				broker = servicebrokerstub.Create().RegisterViaV2()
-			})
-
-			AfterEach(func() {
-				broker.Forget()
-				helpers.QuickDeleteOrg(orgName)
-			})
-
-			It("shows as 'available'", func() {
-				Eventually(session).Should(Say("Getting service brokers as %s...", username))
-				Eventually(session).Should(Say(`name\s+url\s+status`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker.Name, broker.URL, "available"))
-				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

@@ -17,8 +17,6 @@ type ServiceBroker struct {
 	Name string
 	// URL is the url of the service broker.
 	URL string
-	// Status is the state of the service broker.
-	Status string
 
 	Metadata *Metadata
 }
