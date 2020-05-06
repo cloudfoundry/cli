@@ -104,6 +104,8 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		cmd.UI.DisplayWarning(versionWarning)
 	}
 
+	cmd.UI.DisplayNewline()
+
 	cmd.Actor, err = cmd.ActorReloader.Reload(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
