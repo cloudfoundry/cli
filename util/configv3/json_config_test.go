@@ -298,15 +298,15 @@ var _ = Describe("JSONConfig", func() {
 					},
 				},
 			}
-			config.SetTargetInformation(
-				"https://api.foo.com",
-				"2.59.31",
-				"https://login.foo.com",
-				"2.0.0",
-				"wws://doppler.foo.com:443",
-				"https://api.foo.com/routing",
-				true,
-			)
+			config.SetTargetInformation(TargetInformationArgs{
+				Api:               "https://api.foo.com",
+				ApiVersion:        "2.59.31",
+				Auth:              "https://login.foo.com",
+				MinCLIVersion:     "2.0.0",
+				Doppler:           "wws://doppler.foo.com:443",
+				Routing:           "https://api.foo.com/routing",
+				SkipSSLValidation: true,
+			})
 
 			Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
 			Expect(config.ConfigFile.APIVersion).To(Equal("2.59.31"))

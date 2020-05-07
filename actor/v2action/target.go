@@ -1,12 +1,16 @@
 package v2action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+
+	"code.cloudfoundry.org/cli/util/configv3"
+)
 
 type TargetSettings ccv2.TargetSettings
 
 // ClearTarget clears target information from the actor.
 func (actor Actor) ClearTarget() {
-	actor.Config.SetTargetInformation("", "", "", "", "", "", false)
+	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{})
 	actor.Config.SetTokenInformation("", "", "")
 }
 
@@ -28,15 +32,15 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		return Warnings(warnings), err
 	}
 
-	actor.Config.SetTargetInformation(
-		actor.CloudControllerClient.API(),
-		actor.CloudControllerClient.APIVersion(),
-		actor.CloudControllerClient.AuthorizationEndpoint(),
-		actor.CloudControllerClient.MinCLIVersion(),
-		actor.CloudControllerClient.DopplerEndpoint(),
-		actor.CloudControllerClient.RoutingEndpoint(),
-		settings.SkipSSLValidation,
-	)
+	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{
+		Api:               actor.CloudControllerClient.API(),
+		ApiVersion:        actor.CloudControllerClient.APIVersion(),
+		Auth:              actor.CloudControllerClient.AuthorizationEndpoint(),
+		MinCLIVersion:     actor.CloudControllerClient.MinCLIVersion(),
+		Doppler:           actor.CloudControllerClient.DopplerEndpoint(),
+		Routing:           actor.CloudControllerClient.RoutingEndpoint(),
+		SkipSSLValidation: settings.SkipSSLValidation,
+	})
 	actor.Config.SetTokenInformation("", "", "")
 
 	return Warnings(warnings), nil

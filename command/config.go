@@ -50,7 +50,7 @@ type Config interface {
 	SetRefreshToken(token string)
 	SetSpaceInformation(guid string, name string, allowSSH bool)
 	V7SetSpaceInformation(guid string, name string)
-	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
+	SetTargetInformation(args configv3.TargetInformationArgs)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	SetTrace(trace string)
 	SetUAAClientCredentials(client string, clientSecret string)

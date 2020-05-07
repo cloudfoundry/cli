@@ -164,16 +164,26 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH
 }
 
+type TargetInformationArgs struct {
+	Api               string
+	ApiVersion        string
+	Auth              string
+	Doppler           string
+	MinCLIVersion     string
+	Routing           string
+	SkipSSLValidation bool
+}
+
 // SetTargetInformation sets the currently targeted CC API and related other
 // related API URLs.
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool) {
-	config.ConfigFile.Target = api
-	config.ConfigFile.APIVersion = apiVersion
-	config.ConfigFile.AuthorizationEndpoint = auth
-	config.SetMinCLIVersion(minCLIVersion)
-	config.ConfigFile.DopplerEndpoint = doppler
-	config.ConfigFile.RoutingEndpoint = routing
-	config.ConfigFile.SkipSSLValidation = skipSSLValidation
+func (config *Config) SetTargetInformation(args TargetInformationArgs) {
+	config.ConfigFile.Target = args.Api
+	config.ConfigFile.APIVersion = args.ApiVersion
+	config.ConfigFile.AuthorizationEndpoint = args.Auth
+	config.SetMinCLIVersion(args.MinCLIVersion)
+	config.ConfigFile.DopplerEndpoint = args.Doppler
+	config.ConfigFile.RoutingEndpoint = args.Routing
+	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
 
 	config.UnsetOrganizationAndSpaceInformation()
 }

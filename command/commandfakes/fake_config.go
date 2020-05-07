@@ -369,16 +369,10 @@ type FakeConfig struct {
 		arg2 string
 		arg3 bool
 	}
-	SetTargetInformationStub        func(string, string, string, string, string, string, bool)
+	SetTargetInformationStub        func(configv3.TargetInformationArgs)
 	setTargetInformationMutex       sync.RWMutex
 	setTargetInformationArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
-		arg6 string
-		arg7 bool
+		arg1 configv3.TargetInformationArgs
 	}
 	SetTokenInformationStub        func(string, string, string)
 	setTokenInformationMutex       sync.RWMutex
@@ -2463,21 +2457,15 @@ func (fake *FakeConfig) SetSpaceInformationArgsForCall(i int) (string, string, b
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeConfig) SetTargetInformation(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 string, arg7 bool) {
+func (fake *FakeConfig) SetTargetInformation(arg1 configv3.TargetInformationArgs) {
 	fake.setTargetInformationMutex.Lock()
 	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 string
-		arg6 string
-		arg7 bool
-	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
-	fake.recordInvocation("SetTargetInformation", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7})
+		arg1 configv3.TargetInformationArgs
+	}{arg1})
+	fake.recordInvocation("SetTargetInformation", []interface{}{arg1})
 	fake.setTargetInformationMutex.Unlock()
 	if fake.SetTargetInformationStub != nil {
-		fake.SetTargetInformationStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+		fake.SetTargetInformationStub(arg1)
 	}
 }
 
@@ -2487,17 +2475,17 @@ func (fake *FakeConfig) SetTargetInformationCallCount() int {
 	return len(fake.setTargetInformationArgsForCall)
 }
 
-func (fake *FakeConfig) SetTargetInformationCalls(stub func(string, string, string, string, string, string, bool)) {
+func (fake *FakeConfig) SetTargetInformationCalls(stub func(configv3.TargetInformationArgs)) {
 	fake.setTargetInformationMutex.Lock()
 	defer fake.setTargetInformationMutex.Unlock()
 	fake.SetTargetInformationStub = stub
 }
 
-func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string, bool) {
+func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) configv3.TargetInformationArgs {
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	argsForCall := fake.setTargetInformationArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
+	return argsForCall.arg1
 }
 
 func (fake *FakeConfig) SetTokenInformation(arg1 string, arg2 string, arg3 string) {

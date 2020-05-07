@@ -1,6 +1,10 @@
 package v7action
 
-import "time"
+import (
+	"time"
+
+	"code.cloudfoundry.org/cli/util/configv3"
+)
 
 //go:generate counterfeiter . Config
 
@@ -12,7 +16,7 @@ type Config interface {
 	SSHOAuthClient() string
 	SetAccessToken(token string)
 	SetRefreshToken(token string)
-	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
+	SetTargetInformation(args configv3.TargetInformationArgs)
 	SetTokenInformation(accessToken string, refreshToken string, token string)
 	SetUAAClientCredentials(client string, clientSecret string)
 	SetUAAGrantType(grantType string)

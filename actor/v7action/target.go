@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type TargetSettings ccv3.TargetSettings
@@ -14,20 +15,21 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		return Warnings(warnings), err
 	}
 
-	actor.Config.SetTargetInformation(settings.URL,
-		rootInfo.CloudControllerAPIVersion(),
-		rootInfo.UAA(),
-		"", // Oldest supported V3 version should be OK
-		rootInfo.Logging(),
-		rootInfo.Routing(),
-		settings.SkipSSLValidation,
-	)
+	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{
+		Api:               settings.URL,
+		ApiVersion:        rootInfo.CloudControllerAPIVersion(),
+		Auth:              rootInfo.UAA(),
+		MinCLIVersion:     "", // Oldest supported V3 version should be OK
+		Doppler:           rootInfo.Logging(),
+		Routing:           rootInfo.Routing(),
+		SkipSSLValidation: settings.SkipSSLValidation,
+	})
 	actor.Config.SetTokenInformation("", "", "")
 	return Warnings(warnings), nil
 }
 
 // ClearTarget clears target information from the actor.
 func (actor Actor) ClearTarget() {
-	actor.Config.SetTargetInformation("", "", "", "", "", "", false)
+	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{})
 	actor.Config.SetTokenInformation("", "", "")
 }

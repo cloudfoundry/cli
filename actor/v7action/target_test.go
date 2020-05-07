@@ -105,14 +105,14 @@ var _ = Describe("Targeting", func() {
 
 		It("sets all the target information", func() {
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, _, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
 
-			Expect(api).To(Equal(expectedAPI))
-			Expect(apiVersion).To(Equal(expectedAPIVersion))
-			Expect(auth).To(Equal(expectedAuth))
-			Expect(doppler).To(Equal(expectedDoppler))
-			Expect(routing).To(Equal(expectedRouting))
-			Expect(sslDisabled).To(Equal(skipSSLValidation))
+			Expect(targetInfoArgs.Api).To(Equal(expectedAPI))
+			Expect(targetInfoArgs.ApiVersion).To(Equal(expectedAPIVersion))
+			Expect(targetInfoArgs.Auth).To(Equal(expectedAuth))
+			Expect(targetInfoArgs.Doppler).To(Equal(expectedDoppler))
+			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
+			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
 		})
 
 		It("clears all the token information", func() {
@@ -135,15 +135,15 @@ var _ = Describe("Targeting", func() {
 			actor.ClearTarget()
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
 
-			Expect(api).To(BeEmpty())
-			Expect(apiVersion).To(BeEmpty())
-			Expect(auth).To(BeEmpty())
-			Expect(minCLIVersion).To(BeEmpty())
-			Expect(doppler).To(BeEmpty())
-			Expect(routing).To(BeEmpty())
-			Expect(sslDisabled).To(BeFalse())
+			Expect(targetInfoArgs.Api).To(BeEmpty())
+			Expect(targetInfoArgs.ApiVersion).To(BeEmpty())
+			Expect(targetInfoArgs.Auth).To(BeEmpty())
+			Expect(targetInfoArgs.MinCLIVersion).To(BeEmpty())
+			Expect(targetInfoArgs.Doppler).To(BeEmpty())
+			Expect(targetInfoArgs.Routing).To(BeEmpty())
+			Expect(targetInfoArgs.SkipSSLValidation).To(BeFalse())
 		})
 
 		It("clears all the token information", func() {
