@@ -1,4 +1,4 @@
-// +build !V7
+// +build V6
 
 /**
 * This is an example plugin where we use both arguments and flags. The plugin

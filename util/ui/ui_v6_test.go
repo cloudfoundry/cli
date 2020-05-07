@@ -1,4 +1,4 @@
-// +build !V7
+// +build V6
 
 package ui_test
 

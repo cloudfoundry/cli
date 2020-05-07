@@ -1,4 +1,4 @@
-// +build !V7
+// +build V6
 
 /**
 	* 1. Setup the server so cf can call it under main.

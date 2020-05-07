@@ -1,4 +1,4 @@
-// +build V7
+// +build V7 V8
 
 package internal_test
 

@@ -1,4 +1,4 @@
-// +build !V7
+// +build V6
 
 /**
 * This is an example of an interactive plugin. The plugin is invoked with
