@@ -179,7 +179,7 @@ else
 out/cf7: $(GOSRC)
 	CGO_ENABLED=0 go build \
 		$(REQUIRED_FOR_STATIC_BINARY_V7) \
-		-ldflags "$(LD_FLAGS_LINUX_V7)" -v -o out/cf7 .
+		-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7 .
 endif
 
 # Build dynamic binary for Darwin (we need Darwin's networking stack, which we find at runtime)

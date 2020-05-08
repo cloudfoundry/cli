@@ -1,4 +1,6 @@
-package v7
+// +build v7 v8
+
+package command
 
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
