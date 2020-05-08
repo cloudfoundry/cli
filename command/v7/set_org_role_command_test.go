@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -64,7 +65,7 @@ var _ = Describe("set-org-role Command", func() {
 		)
 
 		fakeActor.GetUserReturns(
-			v7action.User{GUID: "target-user-guid", Username: "target-user"},
+			resources.User{GUID: "target-user-guid", Username: "target-user"},
 			nil,
 		)
 	})

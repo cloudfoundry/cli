@@ -459,7 +459,7 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateUserStub        func(string, string, string) (v7action.User, v7action.Warnings, error)
+	CreateUserStub        func(string, string, string) (resources.User, v7action.Warnings, error)
 	createUserMutex       sync.RWMutex
 	createUserArgsForCall []struct {
 		arg1 string
@@ -467,12 +467,12 @@ type FakeActor struct {
 		arg3 string
 	}
 	createUserReturns struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 v7action.Warnings
 		result3 error
 	}
 	createUserReturnsOnCall map[int]struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1261,18 +1261,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetOrgUsersByRoleTypeStub        func(string) (map[constanta.RoleType][]v7action.User, v7action.Warnings, error)
+	GetOrgUsersByRoleTypeStub        func(string) (map[constanta.RoleType][]resources.User, v7action.Warnings, error)
 	getOrgUsersByRoleTypeMutex       sync.RWMutex
 	getOrgUsersByRoleTypeArgsForCall []struct {
 		arg1 string
 	}
 	getOrgUsersByRoleTypeReturns struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrgUsersByRoleTypeReturnsOnCall map[int]struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1883,18 +1883,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetSpaceUsersByRoleTypeStub        func(string) (map[constanta.RoleType][]v7action.User, v7action.Warnings, error)
+	GetSpaceUsersByRoleTypeStub        func(string) (map[constanta.RoleType][]resources.User, v7action.Warnings, error)
 	getSpaceUsersByRoleTypeMutex       sync.RWMutex
 	getSpaceUsersByRoleTypeArgsForCall []struct {
 		arg1 string
 	}
 	getSpaceUsersByRoleTypeReturns struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceUsersByRoleTypeReturnsOnCall map[int]struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1995,18 +1995,18 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetUserStub        func(string, string) (v7action.User, error)
+	GetUserStub        func(string, string) (resources.User, error)
 	getUserMutex       sync.RWMutex
 	getUserArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getUserReturns struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 error
 	}
 	getUserReturnsOnCall map[int]struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 error
 	}
 	MapRouteStub        func(string, string) (v7action.Warnings, error)
@@ -4889,7 +4889,7 @@ func (fake *FakeActor) CreateSpaceRoleReturnsOnCall(i int, result1 v7action.Warn
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateUser(arg1 string, arg2 string, arg3 string) (v7action.User, v7action.Warnings, error) {
+func (fake *FakeActor) CreateUser(arg1 string, arg2 string, arg3 string) (resources.User, v7action.Warnings, error) {
 	fake.createUserMutex.Lock()
 	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
 	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
@@ -4915,7 +4915,7 @@ func (fake *FakeActor) CreateUserCallCount() int {
 	return len(fake.createUserArgsForCall)
 }
 
-func (fake *FakeActor) CreateUserCalls(stub func(string, string, string) (v7action.User, v7action.Warnings, error)) {
+func (fake *FakeActor) CreateUserCalls(stub func(string, string, string) (resources.User, v7action.Warnings, error)) {
 	fake.createUserMutex.Lock()
 	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = stub
@@ -4928,30 +4928,30 @@ func (fake *FakeActor) CreateUserArgsForCall(i int) (string, string, string) {
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeActor) CreateUserReturns(result1 v7action.User, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) CreateUserReturns(result1 resources.User, result2 v7action.Warnings, result3 error) {
 	fake.createUserMutex.Lock()
 	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = nil
 	fake.createUserReturns = struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) CreateUserReturnsOnCall(i int, result1 v7action.User, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) CreateUserReturnsOnCall(i int, result1 resources.User, result2 v7action.Warnings, result3 error) {
 	fake.createUserMutex.Lock()
 	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = nil
 	if fake.createUserReturnsOnCall == nil {
 		fake.createUserReturnsOnCall = make(map[int]struct {
-			result1 v7action.User
+			result1 resources.User
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createUserReturnsOnCall[i] = struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -8386,7 +8386,7 @@ func (fake *FakeActor) GetNewestReadyPackageForApplicationReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrgUsersByRoleType(arg1 string) (map[constanta.RoleType][]v7action.User, v7action.Warnings, error) {
+func (fake *FakeActor) GetOrgUsersByRoleType(arg1 string) (map[constanta.RoleType][]resources.User, v7action.Warnings, error) {
 	fake.getOrgUsersByRoleTypeMutex.Lock()
 	ret, specificReturn := fake.getOrgUsersByRoleTypeReturnsOnCall[len(fake.getOrgUsersByRoleTypeArgsForCall)]
 	fake.getOrgUsersByRoleTypeArgsForCall = append(fake.getOrgUsersByRoleTypeArgsForCall, struct {
@@ -8410,7 +8410,7 @@ func (fake *FakeActor) GetOrgUsersByRoleTypeCallCount() int {
 	return len(fake.getOrgUsersByRoleTypeArgsForCall)
 }
 
-func (fake *FakeActor) GetOrgUsersByRoleTypeCalls(stub func(string) (map[constanta.RoleType][]v7action.User, v7action.Warnings, error)) {
+func (fake *FakeActor) GetOrgUsersByRoleTypeCalls(stub func(string) (map[constanta.RoleType][]resources.User, v7action.Warnings, error)) {
 	fake.getOrgUsersByRoleTypeMutex.Lock()
 	defer fake.getOrgUsersByRoleTypeMutex.Unlock()
 	fake.GetOrgUsersByRoleTypeStub = stub
@@ -8423,30 +8423,30 @@ func (fake *FakeActor) GetOrgUsersByRoleTypeArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetOrgUsersByRoleTypeReturns(result1 map[constanta.RoleType][]v7action.User, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrgUsersByRoleTypeReturns(result1 map[constanta.RoleType][]resources.User, result2 v7action.Warnings, result3 error) {
 	fake.getOrgUsersByRoleTypeMutex.Lock()
 	defer fake.getOrgUsersByRoleTypeMutex.Unlock()
 	fake.GetOrgUsersByRoleTypeStub = nil
 	fake.getOrgUsersByRoleTypeReturns = struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrgUsersByRoleTypeReturnsOnCall(i int, result1 map[constanta.RoleType][]v7action.User, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrgUsersByRoleTypeReturnsOnCall(i int, result1 map[constanta.RoleType][]resources.User, result2 v7action.Warnings, result3 error) {
 	fake.getOrgUsersByRoleTypeMutex.Lock()
 	defer fake.getOrgUsersByRoleTypeMutex.Unlock()
 	fake.GetOrgUsersByRoleTypeStub = nil
 	if fake.getOrgUsersByRoleTypeReturnsOnCall == nil {
 		fake.getOrgUsersByRoleTypeReturnsOnCall = make(map[int]struct {
-			result1 map[constanta.RoleType][]v7action.User
+			result1 map[constanta.RoleType][]resources.User
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrgUsersByRoleTypeReturnsOnCall[i] = struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11017,7 +11017,7 @@ func (fake *FakeActor) GetSpaceSummaryByNameAndOrganizationReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceUsersByRoleType(arg1 string) (map[constanta.RoleType][]v7action.User, v7action.Warnings, error) {
+func (fake *FakeActor) GetSpaceUsersByRoleType(arg1 string) (map[constanta.RoleType][]resources.User, v7action.Warnings, error) {
 	fake.getSpaceUsersByRoleTypeMutex.Lock()
 	ret, specificReturn := fake.getSpaceUsersByRoleTypeReturnsOnCall[len(fake.getSpaceUsersByRoleTypeArgsForCall)]
 	fake.getSpaceUsersByRoleTypeArgsForCall = append(fake.getSpaceUsersByRoleTypeArgsForCall, struct {
@@ -11041,7 +11041,7 @@ func (fake *FakeActor) GetSpaceUsersByRoleTypeCallCount() int {
 	return len(fake.getSpaceUsersByRoleTypeArgsForCall)
 }
 
-func (fake *FakeActor) GetSpaceUsersByRoleTypeCalls(stub func(string) (map[constanta.RoleType][]v7action.User, v7action.Warnings, error)) {
+func (fake *FakeActor) GetSpaceUsersByRoleTypeCalls(stub func(string) (map[constanta.RoleType][]resources.User, v7action.Warnings, error)) {
 	fake.getSpaceUsersByRoleTypeMutex.Lock()
 	defer fake.getSpaceUsersByRoleTypeMutex.Unlock()
 	fake.GetSpaceUsersByRoleTypeStub = stub
@@ -11054,30 +11054,30 @@ func (fake *FakeActor) GetSpaceUsersByRoleTypeArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetSpaceUsersByRoleTypeReturns(result1 map[constanta.RoleType][]v7action.User, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceUsersByRoleTypeReturns(result1 map[constanta.RoleType][]resources.User, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceUsersByRoleTypeMutex.Lock()
 	defer fake.getSpaceUsersByRoleTypeMutex.Unlock()
 	fake.GetSpaceUsersByRoleTypeStub = nil
 	fake.getSpaceUsersByRoleTypeReturns = struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceUsersByRoleTypeReturnsOnCall(i int, result1 map[constanta.RoleType][]v7action.User, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceUsersByRoleTypeReturnsOnCall(i int, result1 map[constanta.RoleType][]resources.User, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceUsersByRoleTypeMutex.Lock()
 	defer fake.getSpaceUsersByRoleTypeMutex.Unlock()
 	fake.GetSpaceUsersByRoleTypeStub = nil
 	if fake.getSpaceUsersByRoleTypeReturnsOnCall == nil {
 		fake.getSpaceUsersByRoleTypeReturnsOnCall = make(map[int]struct {
-			result1 map[constanta.RoleType][]v7action.User
+			result1 map[constanta.RoleType][]resources.User
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceUsersByRoleTypeReturnsOnCall[i] = struct {
-		result1 map[constanta.RoleType][]v7action.User
+		result1 map[constanta.RoleType][]resources.User
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11488,7 +11488,7 @@ func (fake *FakeActor) GetUnstagedNewestPackageGUIDReturnsOnCall(i int, result1 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetUser(arg1 string, arg2 string) (v7action.User, error) {
+func (fake *FakeActor) GetUser(arg1 string, arg2 string) (resources.User, error) {
 	fake.getUserMutex.Lock()
 	ret, specificReturn := fake.getUserReturnsOnCall[len(fake.getUserArgsForCall)]
 	fake.getUserArgsForCall = append(fake.getUserArgsForCall, struct {
@@ -11513,7 +11513,7 @@ func (fake *FakeActor) GetUserCallCount() int {
 	return len(fake.getUserArgsForCall)
 }
 
-func (fake *FakeActor) GetUserCalls(stub func(string, string) (v7action.User, error)) {
+func (fake *FakeActor) GetUserCalls(stub func(string, string) (resources.User, error)) {
 	fake.getUserMutex.Lock()
 	defer fake.getUserMutex.Unlock()
 	fake.GetUserStub = stub
@@ -11526,28 +11526,28 @@ func (fake *FakeActor) GetUserArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetUserReturns(result1 v7action.User, result2 error) {
+func (fake *FakeActor) GetUserReturns(result1 resources.User, result2 error) {
 	fake.getUserMutex.Lock()
 	defer fake.getUserMutex.Unlock()
 	fake.GetUserStub = nil
 	fake.getUserReturns = struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeActor) GetUserReturnsOnCall(i int, result1 v7action.User, result2 error) {
+func (fake *FakeActor) GetUserReturnsOnCall(i int, result1 resources.User, result2 error) {
 	fake.getUserMutex.Lock()
 	defer fake.getUserMutex.Unlock()
 	fake.GetUserStub = nil
 	if fake.getUserReturnsOnCall == nil {
 		fake.getUserReturnsOnCall = make(map[int]struct {
-			result1 v7action.User
+			result1 resources.User
 			result2 error
 		})
 	}
 	fake.getUserReturnsOnCall[i] = struct {
-		result1 v7action.User
+		result1 resources.User
 		result2 error
 	}{result1, result2}
 }

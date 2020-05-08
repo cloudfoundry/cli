@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -48,7 +49,7 @@ var _ = Describe("Role Actions", func() {
 		When("creating the role succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRoleReturns(
-					ccv3.Role{
+					resources.Role{
 						Type:     roleType,
 						UserGUID: "user-guid",
 						OrgGUID:  "org-guid",
@@ -73,7 +74,7 @@ var _ = Describe("Role Actions", func() {
 					passedRole := fakeCloudControllerClient.CreateRoleArgsForCall(0)
 
 					Expect(passedRole).To(Equal(
-						ccv3.Role{
+						resources.Role{
 							Type:     roleType,
 							UserGUID: "user-guid",
 							OrgGUID:  "org-guid",
@@ -108,7 +109,7 @@ var _ = Describe("Role Actions", func() {
 					passedRole := fakeCloudControllerClient.CreateRoleArgsForCall(0)
 
 					Expect(passedRole).To(Equal(
-						ccv3.Role{
+						resources.Role{
 							Type:     roleType,
 							Username: "user-name",
 							Origin:   "user-origin",
@@ -122,7 +123,7 @@ var _ = Describe("Role Actions", func() {
 		When("the API call to create the role returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRoleReturns(
-					ccv3.Role{},
+					resources.Role{},
 					ccv3.Warnings{"create-role-warning"},
 					errors.New("create-role-error"),
 				)
@@ -162,7 +163,7 @@ var _ = Describe("Role Actions", func() {
 		When("creating the role succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
-					ccv3.Role{
+					resources.Role{
 						Type:     constant.OrgUserRole,
 						UserGUID: "user-guid",
 						OrgGUID:  "org-guid",
@@ -172,7 +173,7 @@ var _ = Describe("Role Actions", func() {
 				)
 
 				fakeCloudControllerClient.CreateRoleReturnsOnCall(1,
-					ccv3.Role{
+					resources.Role{
 						Type:      roleType,
 						UserGUID:  "user-guid",
 						SpaceGUID: "space-guid",
@@ -197,7 +198,7 @@ var _ = Describe("Role Actions", func() {
 
 					passedOrgRole := fakeCloudControllerClient.CreateRoleArgsForCall(0)
 					Expect(passedOrgRole).To(Equal(
-						ccv3.Role{
+						resources.Role{
 							Type:     constant.OrgUserRole,
 							UserGUID: "user-guid",
 							OrgGUID:  "org-guid",
@@ -206,7 +207,7 @@ var _ = Describe("Role Actions", func() {
 
 					passedSpaceRole := fakeCloudControllerClient.CreateRoleArgsForCall(1)
 					Expect(passedSpaceRole).To(Equal(
-						ccv3.Role{
+						resources.Role{
 							Type:      roleType,
 							UserGUID:  "user-guid",
 							SpaceGUID: "space-guid",
@@ -230,7 +231,7 @@ var _ = Describe("Role Actions", func() {
 
 					passedOrgRole := fakeCloudControllerClient.CreateRoleArgsForCall(0)
 					Expect(passedOrgRole).To(Equal(
-						ccv3.Role{
+						resources.Role{
 							Type:     constant.OrgUserRole,
 							Username: "user-name",
 							Origin:   "user-origin",
@@ -240,7 +241,7 @@ var _ = Describe("Role Actions", func() {
 
 					passedSpaceRole := fakeCloudControllerClient.CreateRoleArgsForCall(1)
 					Expect(passedSpaceRole).To(Equal(
-						ccv3.Role{
+						resources.Role{
 							Type:      roleType,
 							Username:  "user-name",
 							Origin:    "user-origin",
@@ -254,7 +255,7 @@ var _ = Describe("Role Actions", func() {
 		When("the user already has an org role", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
-					ccv3.Role{},
+					resources.Role{},
 					ccv3.Warnings{"create-org-role-warning"},
 					ccerror.RoleAlreadyExistsError{},
 				)
@@ -282,7 +283,7 @@ var _ = Describe("Role Actions", func() {
 			Context("and it is not a forbidden", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
-						ccv3.Role{},
+						resources.Role{},
 						ccv3.Warnings{"create-org-role-warning"},
 						errors.New("create-org-role-error"),
 					)
@@ -298,12 +299,12 @@ var _ = Describe("Role Actions", func() {
 			Context("and it is a forbidden", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreateRoleReturnsOnCall(0,
-						ccv3.Role{},
+						resources.Role{},
 						ccv3.Warnings{"create-org-role-warning"},
 						ccerror.ForbiddenError{Message: "create-org-role-forbidden-error"},
 					)
 					fakeCloudControllerClient.CreateRoleReturnsOnCall(1,
-						ccv3.Role{},
+						resources.Role{},
 						ccv3.Warnings{"create-space-role-warning"},
 						ccerror.ForbiddenError{Message: "create-space-role-forbidden-error"},
 					)
@@ -320,7 +321,7 @@ var _ = Describe("Role Actions", func() {
 		When("the API call to create the space role returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRoleReturnsOnCall(1,
-					ccv3.Role{},
+					resources.Role{},
 					ccv3.Warnings{"create-space-role-warning"},
 					errors.New("create-space-role-error"),
 				)
@@ -359,19 +360,19 @@ var _ = Describe("Role Actions", func() {
 		When("deleting a role succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					[]resources.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetUserReturnsOnCall(0,
-					ccv3.User{GUID: "user-guid"},
+					resources.User{GUID: "user-guid"},
 					ccv3.Warnings{"get-user-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{
+					[]resources.Role{
 						{
 							GUID:      "role-guid",
 							Type:      roleType,
@@ -494,13 +495,13 @@ var _ = Describe("Role Actions", func() {
 		When("the user does not have the space role to delete", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					[]resources.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{},
+					[]resources.Role{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-roles-warning"},
 					nil,
@@ -523,7 +524,7 @@ var _ = Describe("Role Actions", func() {
 			When("The user is not a client", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-						[]ccv3.User{},
+						[]resources.User{},
 						ccv3.Warnings{"get-users-warning"},
 						nil,
 					)
@@ -557,7 +558,7 @@ var _ = Describe("Role Actions", func() {
 					userOrigin = ""
 					isClient = true
 					fakeCloudControllerClient.GetUserReturnsOnCall(0,
-						ccv3.User{},
+						resources.User{},
 						ccv3.Warnings{"get-users-warning"},
 						ccerror.UserNotFoundError{},
 					)
@@ -579,13 +580,13 @@ var _ = Describe("Role Actions", func() {
 		When("the API call to delete the space role returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					[]resources.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{
+					[]resources.Role{
 						{
 							GUID:      "role-guid",
 							Type:      roleType,
@@ -641,7 +642,7 @@ var _ = Describe("Role Actions", func() {
 			When("the role is a space role", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-						[]ccv3.Role{
+						[]resources.Role{
 							{
 								GUID:      "role-guid",
 								Type:      roleType,
@@ -682,7 +683,7 @@ var _ = Describe("Role Actions", func() {
 					orgOrSpaceGUID = "org-guid"
 					queryKey = ccv3.OrganizationGUIDFilter
 					fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-						[]ccv3.Role{
+						[]resources.Role{
 							{
 								GUID:     "role-guid",
 								Type:     roleType,
@@ -723,7 +724,7 @@ var _ = Describe("Role Actions", func() {
 		When("the role does not exist and no errors occur", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{},
+					[]resources.Role{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-roles-warning"},
 					nil,
@@ -757,7 +758,7 @@ var _ = Describe("Role Actions", func() {
 			BeforeEach(func() {
 				apiError := errors.New("api-get-roles-error")
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{},
+					[]resources.Role{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-roles-warning"},
 					apiError,
@@ -796,19 +797,19 @@ var _ = Describe("Role Actions", func() {
 		When("deleting a role succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					[]resources.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetUserReturnsOnCall(0,
-					ccv3.User{GUID: "user-guid"},
+					resources.User{GUID: "user-guid"},
 					ccv3.Warnings{"get-user-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{
+					[]resources.Role{
 						{
 							GUID:     "role-guid",
 							Type:     roleType,
@@ -928,13 +929,13 @@ var _ = Describe("Role Actions", func() {
 		When("the user does not have the org role to delete", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					[]resources.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{},
+					[]resources.Role{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"get-roles-warning"},
 					nil,
@@ -957,7 +958,7 @@ var _ = Describe("Role Actions", func() {
 			When("The user is not a client", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-						[]ccv3.User{},
+						[]resources.User{},
 						ccv3.Warnings{"get-users-warning"},
 						nil,
 					)
@@ -989,13 +990,13 @@ var _ = Describe("Role Actions", func() {
 		When("the API call to delete the org role returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUsersReturnsOnCall(0,
-					[]ccv3.User{{Username: userNameOrGUID, GUID: "user-guid"}},
+					[]resources.User{{Username: userNameOrGUID, GUID: "user-guid"}},
 					ccv3.Warnings{"get-users-warning"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetRolesReturnsOnCall(0,
-					[]ccv3.Role{
+					[]resources.Role{
 						{
 							GUID:     "role-guid",
 							Type:     roleType,
@@ -1025,7 +1026,7 @@ var _ = Describe("Role Actions", func() {
 
 	Describe("GetOrgUsersByRoleType", func() {
 		var (
-			usersByType map[constant.RoleType][]User
+			usersByType map[constant.RoleType][]resources.User
 			actualErr   error
 			warnings    Warnings
 		)
@@ -1038,7 +1039,7 @@ var _ = Describe("Role Actions", func() {
 			When("the API returns 2 users", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRolesReturns(
-						[]ccv3.Role{
+						[]resources.Role{
 							{
 								GUID:     "multiple-user-roleGUID",
 								OrgGUID:  "some-org-guid",
@@ -1059,7 +1060,7 @@ var _ = Describe("Role Actions", func() {
 							},
 						},
 						ccv3.IncludedResources{
-							Users: []ccv3.User{
+							Users: []resources.User{
 								{
 									Origin:   "uaa",
 									Username: "i-have-many-roles",
@@ -1079,7 +1080,7 @@ var _ = Describe("Role Actions", func() {
 
 				It("returns the 2 users", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
-					Expect(usersByType[constant.OrgUserRole]).To(Equal([]User{
+					Expect(usersByType[constant.OrgUserRole]).To(Equal([]resources.User{
 						{
 							Origin:   "uaa",
 							Username: "i-have-many-roles",
@@ -1092,7 +1093,7 @@ var _ = Describe("Role Actions", func() {
 						},
 					}))
 
-					Expect(usersByType[constant.OrgManagerRole]).To(Equal([]User{
+					Expect(usersByType[constant.OrgManagerRole]).To(Equal([]resources.User{
 						{
 							Origin:   "uaa",
 							Username: "i-have-many-roles",
@@ -1122,7 +1123,7 @@ var _ = Describe("Role Actions", func() {
 			BeforeEach(func() {
 				apiError = errors.New("api-get-roles-error")
 				fakeCloudControllerClient.GetRolesReturns(
-					[]ccv3.Role{},
+					[]resources.Role{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-warning"},
 					apiError,
@@ -1141,7 +1142,7 @@ var _ = Describe("Role Actions", func() {
 
 	Describe("GetSpaceUsersByRoleType", func() {
 		var (
-			usersByType map[constant.RoleType][]User
+			usersByType map[constant.RoleType][]resources.User
 			actualErr   error
 			warnings    Warnings
 		)
@@ -1154,7 +1155,7 @@ var _ = Describe("Role Actions", func() {
 			When("the API returns 2 users", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRolesReturns(
-						[]ccv3.Role{
+						[]resources.Role{
 							{
 								GUID:     "multiple-user-roleGUID",
 								UserGUID: "multi-role-userGUID",
@@ -1172,7 +1173,7 @@ var _ = Describe("Role Actions", func() {
 							},
 						},
 						ccv3.IncludedResources{
-							Users: []ccv3.User{
+							Users: []resources.User{
 								{
 									Origin:   "uaa",
 									Username: "i-have-many-roles",
@@ -1192,7 +1193,7 @@ var _ = Describe("Role Actions", func() {
 
 				It("returns the 2 users", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
-					Expect(usersByType[constant.SpaceDeveloperRole]).To(Equal([]User{
+					Expect(usersByType[constant.SpaceDeveloperRole]).To(Equal([]resources.User{
 						{
 							Origin:   "uaa",
 							Username: "i-have-many-roles",
@@ -1205,7 +1206,7 @@ var _ = Describe("Role Actions", func() {
 						},
 					}))
 
-					Expect(usersByType[constant.SpaceManagerRole]).To(Equal([]User{
+					Expect(usersByType[constant.SpaceManagerRole]).To(Equal([]resources.User{
 						{
 							Origin:   "uaa",
 							Username: "i-have-many-roles",
@@ -1235,7 +1236,7 @@ var _ = Describe("Role Actions", func() {
 			BeforeEach(func() {
 				apiError = errors.New("api-get-roles-error")
 				fakeCloudControllerClient.GetRolesReturns(
-					[]ccv3.Role{},
+					[]resources.Role{},
 					ccv3.IncludedResources{},
 					ccv3.Warnings{"some-warning"},
 					apiError,

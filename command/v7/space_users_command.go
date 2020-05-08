@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type SpaceUsersCommand struct {
@@ -54,13 +55,13 @@ func (cmd *SpaceUsersCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd SpaceUsersCommand) displaySpaceUsers(orgUsersByRoleType map[constant.RoleType][]v7action.User) {
+func (cmd SpaceUsersCommand) displaySpaceUsers(orgUsersByRoleType map[constant.RoleType][]resources.User) {
 	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceManagerRole], "SPACE MANAGER")
 	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceDeveloperRole], "SPACE DEVELOPER")
 	cmd.displayRoleGroup(orgUsersByRoleType[constant.SpaceAuditorRole], "SPACE AUDITOR")
 }
 
-func (cmd SpaceUsersCommand) displayRoleGroup(usersWithRole []v7action.User, roleLabel string) {
+func (cmd SpaceUsersCommand) displayRoleGroup(usersWithRole []resources.User, roleLabel string) {
 	v7action.SortUsers(usersWithRole)
 
 	cmd.UI.DisplayHeader(roleLabel)

@@ -458,12 +458,12 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("with query params and included resources", func() {
 			var (
-				resources []Role
-				query     []Query
+				resourceList []resources.Role
+				query        []Query
 			)
 
 			BeforeEach(func() {
-				resources = []Role{}
+				resourceList = []resources.Role{}
 				query = []Query{
 					{
 						Key:    OrganizationGUIDFilter,
@@ -477,9 +477,9 @@ var _ = Describe("shared request helpers", func() {
 				requestParams = RequestParams{
 					RequestName:  internal.GetRolesRequest,
 					Query:        query,
-					ResponseBody: Role{},
+					ResponseBody: resources.Role{},
 					AppendToList: func(item interface{}) error {
-						resources = append(resources, item.(Role))
+						resourceList = append(resourceList, item.(resources.Role))
 						return nil
 					},
 				}
@@ -529,7 +529,7 @@ var _ = Describe("shared request helpers", func() {
 				It("returns the given resources and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(resources).To(Equal([]Role{{
+					Expect(resourceList).To(Equal([]resources.Role{{
 						GUID: "role-guid-1",
 						Type: constant.OrgUserRole,
 					}, {
@@ -637,7 +637,7 @@ var _ = Describe("shared request helpers", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(resources).To(Equal([]Role{{
+					Expect(resourceList).To(Equal([]resources.Role{{
 						GUID:     "role-guid-1",
 						Type:     constant.OrgUserRole,
 						UserGUID: "user-guid-1",
@@ -648,7 +648,7 @@ var _ = Describe("shared request helpers", func() {
 					}}))
 
 					Expect(includedResources).To(Equal(IncludedResources{
-						Users: []User{
+						Users: []resources.User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
 						},

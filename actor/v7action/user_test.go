@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -30,7 +31,7 @@ var _ = Describe("User Actions", func() {
 
 	Describe("CreateUser", func() {
 		var (
-			actualUser     User
+			actualUser     resources.User
 			actualWarnings Warnings
 			actualErr      error
 		)
@@ -40,10 +41,10 @@ var _ = Describe("User Actions", func() {
 		})
 
 		When("no API errors occur", func() {
-			var createdUser ccv3.User
+			var createdUser resources.User
 
 			BeforeEach(func() {
-				createdUser = ccv3.User{
+				createdUser = resources.User{
 					GUID: "new-user-cc-guid",
 				}
 				fakeUAAClient.CreateUserReturns(
@@ -65,7 +66,7 @@ var _ = Describe("User Actions", func() {
 			It("creates a new user and returns all warnings", func() {
 				Expect(actualErr).NotTo(HaveOccurred())
 
-				Expect(actualUser).To(Equal(User(createdUser)))
+				Expect(actualUser).To(Equal(resources.User(createdUser)))
 				Expect(actualWarnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeUAAClient.CreateUserCallCount()).To(Equal(1))
@@ -110,7 +111,7 @@ var _ = Describe("User Actions", func() {
 					nil,
 				)
 				fakeCloudControllerClient.CreateUserReturns(
-					ccv3.User{},
+					resources.User{},
 					ccv3.Warnings{
 						"warning-1",
 						"warning-2",
@@ -128,7 +129,7 @@ var _ = Describe("User Actions", func() {
 
 	Describe("GetUser", func() {
 		var (
-			actualUser User
+			actualUser resources.User
 			actualErr  error
 		)
 
@@ -150,7 +151,7 @@ var _ = Describe("User Actions", func() {
 
 				It("returns the single user", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
-					Expect(actualUser).To(Equal(User{GUID: "user-id"}))
+					Expect(actualUser).To(Equal(resources.User{GUID: "user-id"}))
 
 					Expect(fakeUAAClient.ListUsersCallCount()).To(Equal(1))
 					username, origin := fakeUAAClient.ListUsersArgsForCall(0)
@@ -168,7 +169,7 @@ var _ = Describe("User Actions", func() {
 				})
 
 				It("returns an error indicating user was not found in UAA", func() {
-					Expect(actualUser).To(Equal(User{}))
+					Expect(actualUser).To(Equal(resources.User{}))
 					Expect(actualErr).To(Equal(actionerror.UserNotFoundError{
 						Username: "some-user",
 						Origin:   "some-origin",
@@ -189,7 +190,7 @@ var _ = Describe("User Actions", func() {
 				})
 
 				It("returns an error indicating user was not found in UAA", func() {
-					Expect(actualUser).To(Equal(User{}))
+					Expect(actualUser).To(Equal(resources.User{}))
 					Expect(actualErr).To(Equal(actionerror.MultipleUAAUsersFoundError{
 						Username: "some-user",
 						Origins:  []string{"uaa", "ldap"},
@@ -211,7 +212,7 @@ var _ = Describe("User Actions", func() {
 			})
 
 			It("returns error coming from the API", func() {
-				Expect(actualUser).To(Equal(User{}))
+				Expect(actualUser).To(Equal(resources.User{}))
 				Expect(actualErr).To(MatchError("uaa-api-get-users-error"))
 
 				Expect(fakeUAAClient.ListUsersCallCount()).To(Equal(1))
@@ -378,11 +379,11 @@ var _ = Describe("User Actions", func() {
 
 	Describe("SortUsers", func() {
 		var (
-			users []User
+			users []resources.User
 		)
 		When("The PresentationNames are different", func() {
 			BeforeEach(func() {
-				users = []User{
+				users = []resources.User{
 					{PresentationName: "c", Origin: "uaa"},
 					{PresentationName: "a", Origin: "uaa"},
 					{PresentationName: "b", Origin: "ldap"},
@@ -397,7 +398,7 @@ var _ = Describe("User Actions", func() {
 		})
 		When("The PresentationNames are identical", func() {
 			BeforeEach(func() {
-				users = []User{
+				users = []resources.User{
 					{PresentationName: "a", Origin: "cc"},
 					{PresentationName: "a", Origin: "aa"},
 					{PresentationName: "a", Origin: "bb"},
@@ -419,10 +420,10 @@ var _ = Describe("User Actions", func() {
 	})
 
 	Describe("GetHumanReadableOrigin", func() {
-		var user User
+		var user resources.User
 		When("The user has an origin", func() {
 			BeforeEach(func() {
-				user = User{Origin: "some-origin"}
+				user = resources.User{Origin: "some-origin"}
 			})
 			It("displays the origin", func() {
 				Expect(GetHumanReadableOrigin(user)).To(Equal("some-origin"))
@@ -430,7 +431,7 @@ var _ = Describe("User Actions", func() {
 		})
 		When("The user has an empty origin", func() {
 			BeforeEach(func() {
-				user = User{Origin: ""}
+				user = resources.User{Origin: ""}
 			})
 			It("displays 'client'", func() {
 				Expect(GetHumanReadableOrigin(user)).To(Equal("client"))

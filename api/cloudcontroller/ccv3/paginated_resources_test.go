@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -194,7 +195,7 @@ var _ = Describe("Paginated Resources", func() {
 
 		It("can unmarshal the list of included resources into an appropriate struct", func() {
 			Expect(page.IncludedResources.Users).To(ConsistOf(
-				User{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
+				resources.User{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 			))
 			Expect(page.IncludedResources.Organizations).To(ConsistOf(
 				Organization{GUID: "org-guid-1", Name: "org-name-1"},

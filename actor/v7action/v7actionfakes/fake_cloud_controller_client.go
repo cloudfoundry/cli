@@ -303,18 +303,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateRoleStub        func(ccv3.Role) (ccv3.Role, ccv3.Warnings, error)
+	CreateRoleStub        func(resources.Role) (resources.Role, ccv3.Warnings, error)
 	createRoleMutex       sync.RWMutex
 	createRoleArgsForCall []struct {
-		arg1 ccv3.Role
+		arg1 resources.Role
 	}
 	createRoleReturns struct {
-		result1 ccv3.Role
+		result1 resources.Role
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createRoleReturnsOnCall map[int]struct {
-		result1 ccv3.Role
+		result1 resources.Role
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -393,18 +393,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateUserStub        func(string) (ccv3.User, ccv3.Warnings, error)
+	CreateUserStub        func(string) (resources.User, ccv3.Warnings, error)
 	createUserMutex       sync.RWMutex
 	createUserArgsForCall []struct {
 		arg1 string
 	}
 	createUserReturns struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createUserReturnsOnCall map[int]struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1311,19 +1311,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetRolesStub        func(...ccv3.Query) ([]ccv3.Role, ccv3.IncludedResources, ccv3.Warnings, error)
+	GetRolesStub        func(...ccv3.Query) ([]resources.Role, ccv3.IncludedResources, ccv3.Warnings, error)
 	getRolesMutex       sync.RWMutex
 	getRolesArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getRolesReturns struct {
-		result1 []ccv3.Role
+		result1 []resources.Role
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
 	}
 	getRolesReturnsOnCall map[int]struct {
-		result1 []ccv3.Role
+		result1 []resources.Role
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
@@ -1648,33 +1648,33 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetUserStub        func(string) (ccv3.User, ccv3.Warnings, error)
+	GetUserStub        func(string) (resources.User, ccv3.Warnings, error)
 	getUserMutex       sync.RWMutex
 	getUserArgsForCall []struct {
 		arg1 string
 	}
 	getUserReturns struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getUserReturnsOnCall map[int]struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetUsersStub        func(...ccv3.Query) ([]ccv3.User, ccv3.Warnings, error)
+	GetUsersStub        func(...ccv3.Query) ([]resources.User, ccv3.Warnings, error)
 	getUsersMutex       sync.RWMutex
 	getUsersArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getUsersReturns struct {
-		result1 []ccv3.User
+		result1 []resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getUsersReturnsOnCall map[int]struct {
-		result1 []ccv3.User
+		result1 []resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -3633,11 +3633,11 @@ func (fake *FakeCloudControllerClient) CreatePackageReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateRole(arg1 ccv3.Role) (ccv3.Role, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateRole(arg1 resources.Role) (resources.Role, ccv3.Warnings, error) {
 	fake.createRoleMutex.Lock()
 	ret, specificReturn := fake.createRoleReturnsOnCall[len(fake.createRoleArgsForCall)]
 	fake.createRoleArgsForCall = append(fake.createRoleArgsForCall, struct {
-		arg1 ccv3.Role
+		arg1 resources.Role
 	}{arg1})
 	fake.recordInvocation("CreateRole", []interface{}{arg1})
 	fake.createRoleMutex.Unlock()
@@ -3657,43 +3657,43 @@ func (fake *FakeCloudControllerClient) CreateRoleCallCount() int {
 	return len(fake.createRoleArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateRoleCalls(stub func(ccv3.Role) (ccv3.Role, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateRoleCalls(stub func(resources.Role) (resources.Role, ccv3.Warnings, error)) {
 	fake.createRoleMutex.Lock()
 	defer fake.createRoleMutex.Unlock()
 	fake.CreateRoleStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateRoleArgsForCall(i int) ccv3.Role {
+func (fake *FakeCloudControllerClient) CreateRoleArgsForCall(i int) resources.Role {
 	fake.createRoleMutex.RLock()
 	defer fake.createRoleMutex.RUnlock()
 	argsForCall := fake.createRoleArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateRoleReturns(result1 ccv3.Role, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateRoleReturns(result1 resources.Role, result2 ccv3.Warnings, result3 error) {
 	fake.createRoleMutex.Lock()
 	defer fake.createRoleMutex.Unlock()
 	fake.CreateRoleStub = nil
 	fake.createRoleReturns = struct {
-		result1 ccv3.Role
+		result1 resources.Role
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateRoleReturnsOnCall(i int, result1 ccv3.Role, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateRoleReturnsOnCall(i int, result1 resources.Role, result2 ccv3.Warnings, result3 error) {
 	fake.createRoleMutex.Lock()
 	defer fake.createRoleMutex.Unlock()
 	fake.CreateRoleStub = nil
 	if fake.createRoleReturnsOnCall == nil {
 		fake.createRoleReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Role
+			result1 resources.Role
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createRoleReturnsOnCall[i] = struct {
-		result1 ccv3.Role
+		result1 resources.Role
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4029,7 +4029,7 @@ func (fake *FakeCloudControllerClient) CreateSpaceQuotaReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateUser(arg1 string) (ccv3.User, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateUser(arg1 string) (resources.User, ccv3.Warnings, error) {
 	fake.createUserMutex.Lock()
 	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
 	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
@@ -4053,7 +4053,7 @@ func (fake *FakeCloudControllerClient) CreateUserCallCount() int {
 	return len(fake.createUserArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateUserCalls(stub func(string) (ccv3.User, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateUserCalls(stub func(string) (resources.User, ccv3.Warnings, error)) {
 	fake.createUserMutex.Lock()
 	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = stub
@@ -4066,30 +4066,30 @@ func (fake *FakeCloudControllerClient) CreateUserArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateUserReturns(result1 ccv3.User, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateUserReturns(result1 resources.User, result2 ccv3.Warnings, result3 error) {
 	fake.createUserMutex.Lock()
 	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = nil
 	fake.createUserReturns = struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateUserReturnsOnCall(i int, result1 ccv3.User, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateUserReturnsOnCall(i int, result1 resources.User, result2 ccv3.Warnings, result3 error) {
 	fake.createUserMutex.Lock()
 	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = nil
 	if fake.createUserReturnsOnCall == nil {
 		fake.createUserReturnsOnCall = make(map[int]struct {
-			result1 ccv3.User
+			result1 resources.User
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createUserReturnsOnCall[i] = struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -8045,7 +8045,7 @@ func (fake *FakeCloudControllerClient) GetProcessesReturnsOnCall(i int, result1 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetRoles(arg1 ...ccv3.Query) ([]ccv3.Role, ccv3.IncludedResources, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetRoles(arg1 ...ccv3.Query) ([]resources.Role, ccv3.IncludedResources, ccv3.Warnings, error) {
 	fake.getRolesMutex.Lock()
 	ret, specificReturn := fake.getRolesReturnsOnCall[len(fake.getRolesArgsForCall)]
 	fake.getRolesArgsForCall = append(fake.getRolesArgsForCall, struct {
@@ -8069,7 +8069,7 @@ func (fake *FakeCloudControllerClient) GetRolesCallCount() int {
 	return len(fake.getRolesArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetRolesCalls(stub func(...ccv3.Query) ([]ccv3.Role, ccv3.IncludedResources, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetRolesCalls(stub func(...ccv3.Query) ([]resources.Role, ccv3.IncludedResources, ccv3.Warnings, error)) {
 	fake.getRolesMutex.Lock()
 	defer fake.getRolesMutex.Unlock()
 	fake.GetRolesStub = stub
@@ -8082,32 +8082,32 @@ func (fake *FakeCloudControllerClient) GetRolesArgsForCall(i int) []ccv3.Query {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetRolesReturns(result1 []ccv3.Role, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+func (fake *FakeCloudControllerClient) GetRolesReturns(result1 []resources.Role, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
 	fake.getRolesMutex.Lock()
 	defer fake.getRolesMutex.Unlock()
 	fake.GetRolesStub = nil
 	fake.getRolesReturns = struct {
-		result1 []ccv3.Role
+		result1 []resources.Role
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeCloudControllerClient) GetRolesReturnsOnCall(i int, result1 []ccv3.Role, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
+func (fake *FakeCloudControllerClient) GetRolesReturnsOnCall(i int, result1 []resources.Role, result2 ccv3.IncludedResources, result3 ccv3.Warnings, result4 error) {
 	fake.getRolesMutex.Lock()
 	defer fake.getRolesMutex.Unlock()
 	fake.GetRolesStub = nil
 	if fake.getRolesReturnsOnCall == nil {
 		fake.getRolesReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Role
+			result1 []resources.Role
 			result2 ccv3.IncludedResources
 			result3 ccv3.Warnings
 			result4 error
 		})
 	}
 	fake.getRolesReturnsOnCall[i] = struct {
-		result1 []ccv3.Role
+		result1 []resources.Role
 		result2 ccv3.IncludedResources
 		result3 ccv3.Warnings
 		result4 error
@@ -9499,7 +9499,7 @@ func (fake *FakeCloudControllerClient) GetStagingSecurityGroupsReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetUser(arg1 string) (ccv3.User, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetUser(arg1 string) (resources.User, ccv3.Warnings, error) {
 	fake.getUserMutex.Lock()
 	ret, specificReturn := fake.getUserReturnsOnCall[len(fake.getUserArgsForCall)]
 	fake.getUserArgsForCall = append(fake.getUserArgsForCall, struct {
@@ -9523,7 +9523,7 @@ func (fake *FakeCloudControllerClient) GetUserCallCount() int {
 	return len(fake.getUserArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetUserCalls(stub func(string) (ccv3.User, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetUserCalls(stub func(string) (resources.User, ccv3.Warnings, error)) {
 	fake.getUserMutex.Lock()
 	defer fake.getUserMutex.Unlock()
 	fake.GetUserStub = stub
@@ -9536,36 +9536,36 @@ func (fake *FakeCloudControllerClient) GetUserArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetUserReturns(result1 ccv3.User, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetUserReturns(result1 resources.User, result2 ccv3.Warnings, result3 error) {
 	fake.getUserMutex.Lock()
 	defer fake.getUserMutex.Unlock()
 	fake.GetUserStub = nil
 	fake.getUserReturns = struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetUserReturnsOnCall(i int, result1 ccv3.User, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetUserReturnsOnCall(i int, result1 resources.User, result2 ccv3.Warnings, result3 error) {
 	fake.getUserMutex.Lock()
 	defer fake.getUserMutex.Unlock()
 	fake.GetUserStub = nil
 	if fake.getUserReturnsOnCall == nil {
 		fake.getUserReturnsOnCall = make(map[int]struct {
-			result1 ccv3.User
+			result1 resources.User
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getUserReturnsOnCall[i] = struct {
-		result1 ccv3.User
+		result1 resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetUsers(arg1 ...ccv3.Query) ([]ccv3.User, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetUsers(arg1 ...ccv3.Query) ([]resources.User, ccv3.Warnings, error) {
 	fake.getUsersMutex.Lock()
 	ret, specificReturn := fake.getUsersReturnsOnCall[len(fake.getUsersArgsForCall)]
 	fake.getUsersArgsForCall = append(fake.getUsersArgsForCall, struct {
@@ -9589,7 +9589,7 @@ func (fake *FakeCloudControllerClient) GetUsersCallCount() int {
 	return len(fake.getUsersArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetUsersCalls(stub func(...ccv3.Query) ([]ccv3.User, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetUsersCalls(stub func(...ccv3.Query) ([]resources.User, ccv3.Warnings, error)) {
 	fake.getUsersMutex.Lock()
 	defer fake.getUsersMutex.Unlock()
 	fake.GetUsersStub = stub
@@ -9602,30 +9602,30 @@ func (fake *FakeCloudControllerClient) GetUsersArgsForCall(i int) []ccv3.Query {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetUsersReturns(result1 []ccv3.User, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetUsersReturns(result1 []resources.User, result2 ccv3.Warnings, result3 error) {
 	fake.getUsersMutex.Lock()
 	defer fake.getUsersMutex.Unlock()
 	fake.GetUsersStub = nil
 	fake.getUsersReturns = struct {
-		result1 []ccv3.User
+		result1 []resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetUsersReturnsOnCall(i int, result1 []ccv3.User, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetUsersReturnsOnCall(i int, result1 []resources.User, result2 ccv3.Warnings, result3 error) {
 	fake.getUsersMutex.Lock()
 	defer fake.getUsersMutex.Unlock()
 	fake.GetUsersStub = nil
 	if fake.getUsersReturnsOnCall == nil {
 		fake.getUsersReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.User
+			result1 []resources.User
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getUsersReturnsOnCall[i] = struct {
-		result1 []ccv3.User
+		result1 []resources.User
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

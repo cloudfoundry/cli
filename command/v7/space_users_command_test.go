@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -141,38 +142,38 @@ var _ = Describe("space-users Command", func() {
 
 					When("There are all types of users", func() {
 						BeforeEach(func() {
-							abbyUser := v7action.User{
+							abbyUser := resources.User{
 								Origin:           "ldap",
 								PresentationName: "abby",
 								GUID:             "abby-user-guid",
 							}
-							uaaAdmin := v7action.User{
+							uaaAdmin := resources.User{
 								Origin:           "uaa",
 								PresentationName: "admin",
 								GUID:             "uaaAdmin-guid",
 							}
-							ldapAdmin := v7action.User{
+							ldapAdmin := resources.User{
 								Origin:           "ldap",
 								PresentationName: "admin",
 								GUID:             "ldapAdmin-guid",
 							}
-							client := v7action.User{
+							client := resources.User{
 								Origin:           "",
 								PresentationName: "admin",
 								GUID:             "client-guid",
 							}
-							spaceDeveloper := v7action.User{
+							spaceDeveloper := resources.User{
 								Origin:           "uaa",
 								PresentationName: "billing-manager",
 								GUID:             "spaceDeveloper-guid",
 							}
-							spaceAuditor := v7action.User{
+							spaceAuditor := resources.User{
 								Origin:           "uaa",
 								PresentationName: "org-auditor",
 								GUID:             "spaceAuditor-guid",
 							}
 
-							spaceUsersByRole := map[constant.RoleType][]v7action.User{
+							spaceUsersByRole := map[constant.RoleType][]resources.User{
 								constant.SpaceManagerRole:   {uaaAdmin, ldapAdmin, abbyUser, client},
 								constant.SpaceDeveloperRole: {spaceDeveloper},
 								constant.SpaceAuditorRole:   {spaceAuditor},
@@ -209,7 +210,7 @@ var _ = Describe("space-users Command", func() {
 
 					When("There are no space users", func() {
 						BeforeEach(func() {
-							spaceUsersByRole := map[constant.RoleType][]v7action.User{
+							spaceUsersByRole := map[constant.RoleType][]resources.User{
 								constant.OrgManagerRole:        {},
 								constant.OrgBillingManagerRole: {},
 								constant.OrgAuditorRole:        {},

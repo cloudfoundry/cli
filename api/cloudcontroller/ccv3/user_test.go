@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -23,7 +24,7 @@ var _ = Describe("User", func() {
 		var (
 			warnings   Warnings
 			executeErr error
-			user       User
+			user       resources.User
 		)
 
 		JustBeforeEach(func() {
@@ -54,7 +55,7 @@ var _ = Describe("User", func() {
 			It("creates and returns the user and all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(user).To(Equal(User{GUID: "some-uaa-guid", Username: "some-user-name", PresentationName: "some-user-name", Origin: "ldap"}))
+				Expect(user).To(Equal(resources.User{GUID: "some-uaa-guid", Username: "some-user-name", PresentationName: "some-user-name", Origin: "ldap"}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
@@ -184,7 +185,7 @@ var _ = Describe("User", func() {
 
 	Describe("GetUsers", func() {
 		var (
-			users      []User
+			users      []resources.User
 			warnings   Warnings
 			executeErr error
 			query      []Query
@@ -236,7 +237,7 @@ var _ = Describe("User", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1"))
 
-					Expect(users).To(Equal([]User{{
+					Expect(users).To(Equal([]resources.User{{
 						GUID:     "user-guid-1",
 						Username: "some-user-name",
 						Origin:   "uaa",
@@ -293,7 +294,7 @@ var _ = Describe("User", func() {
 
 	Describe("GetUser", func() {
 		var (
-			user       User
+			user       resources.User
 			warnings   Warnings
 			executeErr error
 		)
@@ -320,7 +321,7 @@ var _ = Describe("User", func() {
 			It("returns the given user and all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(user).To(Equal(User{
+				Expect(user).To(Equal(resources.User{
 					GUID:     "some-guid",
 					Username: "some-user-name",
 					Origin:   "some-origin",
@@ -336,7 +337,7 @@ var _ = Describe("User", func() {
 						{
 							"code": 10010,
 							"detail": "User not found",
-							"title": "CF-ResourceNotFound"	
+							"title": "CF-ResourceNotFound"
 						}
 					]
 				}`

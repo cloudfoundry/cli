@@ -2,26 +2,18 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-// User represents a Cloud Controller User.
-type User struct {
-	// GUID is the unique user identifier.
-	GUID             string `json:"guid"`
-	Username         string `json:"username"`
-	PresentationName string `json:"presentation_name"`
-	Origin           string `json:"origin"`
-}
 
 // CreateUser creates a new Cloud Controller User from the provided UAA user
 // ID.
-func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
+func (client *Client) CreateUser(uaaUserID string) (resources.User, Warnings, error) {
 	type userRequestBody struct {
 		GUID string `json:"guid"`
 	}
 
 	user := userRequestBody{GUID: uaaUserID}
-	var responseBody User
+	var responseBody resources.User
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostUserRequest,
@@ -41,8 +33,8 @@ func (client *Client) DeleteUser(uaaUserID string) (JobURL, Warnings, error) {
 	return jobURL, warnings, err
 }
 
-func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
-	var responseBody User
+func (client *Client) GetUser(userGUID string) (resources.User, Warnings, error) {
+	var responseBody resources.User
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetUserRequest,
@@ -53,18 +45,18 @@ func (client *Client) GetUser(userGUID string) (User, Warnings, error) {
 	return responseBody, warnings, err
 }
 
-func (client *Client) GetUsers(query ...Query) ([]User, Warnings, error) {
-	var resources []User
+func (client *Client) GetUsers(query ...Query) ([]resources.User, Warnings, error) {
+	var users []resources.User
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetUsersRequest,
 		Query:        query,
-		ResponseBody: User{},
+		ResponseBody: resources.User{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(User))
+			users = append(users, item.(resources.User))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return users, warnings, err
 }

@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -116,43 +117,43 @@ var _ = Describe("org-users Command", func() {
 
 				When("There are all types of users", func() {
 					BeforeEach(func() {
-						abbyUser := v7action.User{
+						abbyUser := resources.User{
 							Origin:           "ldap",
 							PresentationName: "abby",
 							GUID:             "abby-user-guid",
 						}
-						uaaAdmin := v7action.User{
+						uaaAdmin := resources.User{
 							Origin:           "uaa",
 							PresentationName: "admin",
 							GUID:             "uaaAdmin-guid",
 						}
-						ldapAdmin := v7action.User{
+						ldapAdmin := resources.User{
 							Origin:           "ldap",
 							PresentationName: "admin",
 							GUID:             "ldapAdmin-guid",
 						}
-						client := v7action.User{
+						client := resources.User{
 							Origin:           "",
 							PresentationName: "admin",
 							GUID:             "client-guid",
 						}
-						billingManager := v7action.User{
+						billingManager := resources.User{
 							Origin:           "uaa",
 							PresentationName: "billing-manager",
 							GUID:             "billingManager-guid",
 						}
-						orgAuditor := v7action.User{
+						orgAuditor := resources.User{
 							Origin:           "uaa",
 							PresentationName: "org-auditor",
 							GUID:             "orgAuditor-guid",
 						}
-						orgUser := v7action.User{
+						orgUser := resources.User{
 							Origin:           "uaa",
 							PresentationName: "org-user",
 							GUID:             "orgUser-guid",
 						}
 
-						orgUsersByRole := map[constant.RoleType][]v7action.User{
+						orgUsersByRole := map[constant.RoleType][]resources.User{
 							constant.OrgManagerRole:        {uaaAdmin, ldapAdmin, abbyUser, client},
 							constant.OrgBillingManagerRole: {billingManager, uaaAdmin},
 							constant.OrgAuditorRole:        {orgAuditor},
@@ -217,7 +218,7 @@ var _ = Describe("org-users Command", func() {
 
 				When("There are no org users", func() {
 					BeforeEach(func() {
-						orgUsersByRole := map[constant.RoleType][]v7action.User{
+						orgUsersByRole := map[constant.RoleType][]resources.User{
 							constant.OrgManagerRole:        {},
 							constant.OrgBillingManagerRole: {},
 							constant.OrgAuditorRole:        {},

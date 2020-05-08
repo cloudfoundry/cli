@@ -5,12 +5,11 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-type Role ccv3.Role
-
 func (actor Actor) CreateOrgRole(roleType constant.RoleType, orgGUID string, userNameOrGUID string, userOrigin string, isClient bool) (Warnings, error) {
-	roleToCreate := ccv3.Role{
+	roleToCreate := resources.Role{
 		Type:    roleType,
 		OrgGUID: orgGUID,
 	}
@@ -33,7 +32,7 @@ func (actor Actor) CreateOrgRole(roleType constant.RoleType, orgGUID string, use
 }
 
 func (actor Actor) CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (Warnings, error) {
-	roleToCreate := ccv3.Role{
+	roleToCreate := resources.Role{
 		Type:      roleType,
 		SpaceGUID: spaceGUID,
 	}
@@ -184,15 +183,15 @@ func (actor Actor) GetRoleGUID(queryKey ccv3.QueryKey, orgOrSpaceGUID string, us
 	return ccv3Roles[0].GUID, Warnings(warnings), nil
 }
 
-func (actor Actor) GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType][]User, Warnings, error) {
+func (actor Actor) GetOrgUsersByRoleType(orgGuid string) (map[constant.RoleType][]resources.User, Warnings, error) {
 	return actor.getUsersByRoleType(orgGuid, ccv3.OrganizationGUIDFilter)
 }
 
-func (actor Actor) GetSpaceUsersByRoleType(spaceGuid string) (map[constant.RoleType][]User, Warnings, error) {
+func (actor Actor) GetSpaceUsersByRoleType(spaceGuid string) (map[constant.RoleType][]resources.User, Warnings, error) {
 	return actor.getUsersByRoleType(spaceGuid, ccv3.SpaceGUIDFilter)
 }
 
-func (actor Actor) getUsersByRoleType(guid string, filterKey ccv3.QueryKey) (map[constant.RoleType][]User, Warnings, error) {
+func (actor Actor) getUsersByRoleType(guid string, filterKey ccv3.QueryKey) (map[constant.RoleType][]resources.User, Warnings, error) {
 	ccv3Roles, includes, ccWarnings, err := actor.CloudControllerClient.GetRoles(
 		ccv3.Query{
 			Key:    filterKey,
@@ -206,13 +205,13 @@ func (actor Actor) getUsersByRoleType(guid string, filterKey ccv3.QueryKey) (map
 	if err != nil {
 		return nil, Warnings(ccWarnings), err
 	}
-	usersByGuids := make(map[string]ccv3.User)
+	usersByGuids := make(map[string]resources.User)
 	for _, user := range includes.Users {
 		usersByGuids[user.GUID] = user
 	}
-	usersByRoleType := make(map[constant.RoleType][]User)
+	usersByRoleType := make(map[constant.RoleType][]resources.User)
 	for _, role := range ccv3Roles {
-		user := User(usersByGuids[role.UserGUID])
+		user := resources.User(usersByGuids[role.UserGUID])
 		usersByRoleType[role.Type] = append(usersByRoleType[role.Type], user)
 	}
 	return usersByRoleType, Warnings(ccWarnings), nil
