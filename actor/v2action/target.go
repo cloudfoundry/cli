@@ -38,6 +38,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		Auth:              actor.CloudControllerClient.AuthorizationEndpoint(),
 		MinCLIVersion:     actor.CloudControllerClient.MinCLIVersion(),
 		Doppler:           actor.CloudControllerClient.DopplerEndpoint(),
+		LogCache:          actor.CloudControllerClient.LogCacheEndpoint(),
 		Routing:           actor.CloudControllerClient.RoutingEndpoint(),
 		SkipSSLValidation: settings.SkipSSLValidation,
 	})

@@ -20,9 +20,10 @@ type ConfigRepository struct {
 }
 
 type CCInfo struct {
-	APIVersion               string `json:"api_version"`
-	AuthorizationEndpoint    string `json:"authorization_endpoint"`
-	DopplerEndpoint          string `json:"doppler_logging_endpoint"`
+	APIVersion            string `json:"api_version"`
+	AuthorizationEndpoint string `json:"authorization_endpoint"`
+	DopplerEndpoint       string `json:"doppler_logging_endpoint"`
+	//LogCacheEndpoint         string `json:"doppler_logging_endpoint"`
 	MinCLIVersion            string `json:"min_cli_version"`
 	MinRecommendedCLIVersion string `json:"min_recommended_cli_version"`
 	SSHOAuthClient           string `json:"app_ssh_oauth_client"`
@@ -62,6 +63,7 @@ type Reader interface {
 
 	AuthenticationEndpoint() string
 	DopplerEndpoint() string
+	//LogCacheEndpoint() string
 	UaaEndpoint() string
 	RoutingAPIEndpoint() string
 	AccessToken() string
