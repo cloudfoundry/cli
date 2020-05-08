@@ -1,4 +1,4 @@
-// +build V7
+// +build V8
 
 package common
 
@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/plugin"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 	v7 "code.cloudfoundry.org/cli/command/v7"
+	v8 "code.cloudfoundry.org/cli/command/v8"
 )
 
 var Commands commandList
@@ -21,7 +22,7 @@ type commandList struct {
 
 	V3Push v7.PushCommand `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 
-	API                                v7.APICommand                                `command:"api" description:"Set or view target api url"`
+	API                                v8.APICommand                                `command:"api" description:"Set or view target api url"`
 	AddNetworkPolicy                   v7.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v7.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
