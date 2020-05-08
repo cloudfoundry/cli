@@ -5,7 +5,7 @@ import (
 )
 
 type SSHEnabledCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME ssh-enabled APP_NAME"`

@@ -43,7 +43,7 @@ var _ = Describe("routes Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = RoutesCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

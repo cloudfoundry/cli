@@ -28,7 +28,7 @@ const (
 )
 
 type LabelsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`

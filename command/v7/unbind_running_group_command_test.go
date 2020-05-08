@@ -33,7 +33,7 @@ var _ = Describe("unbind-running-security-group Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = UnbindRunningSecurityGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

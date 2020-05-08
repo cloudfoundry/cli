@@ -6,7 +6,7 @@ import (
 )
 
 type SetEnvCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}             `usage:"CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`

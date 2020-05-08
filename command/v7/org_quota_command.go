@@ -7,7 +7,7 @@ import (
 )
 
 type OrgQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.OrganizationQuota `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME org-quota QUOTA"`

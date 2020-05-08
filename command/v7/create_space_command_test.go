@@ -67,7 +67,7 @@ var _ = Describe("create-space Command", func() {
 
 	JustBeforeEach(func() {
 		cmd = v7.CreateSpaceCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

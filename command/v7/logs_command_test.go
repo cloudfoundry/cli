@@ -39,7 +39,7 @@ var _ = Describe("logs command", func() {
 		logCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		cmd = LogsCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

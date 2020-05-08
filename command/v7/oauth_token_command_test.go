@@ -33,7 +33,7 @@ var _ = Describe("oauth-token command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = OauthTokenCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

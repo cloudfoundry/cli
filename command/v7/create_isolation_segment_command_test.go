@@ -34,7 +34,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = CreateIsolationSegmentCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

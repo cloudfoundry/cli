@@ -5,7 +5,7 @@ import (
 )
 
 type CancelDeploymentCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME cancel-deployment APP_NAME\n\nEXAMPLES:\n   cf cancel-deployment my-app"`

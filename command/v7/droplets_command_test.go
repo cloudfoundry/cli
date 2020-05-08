@@ -43,7 +43,7 @@ var _ = Describe("droplets Command", func() {
 
 		cmd = DropletsCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				Actor:       fakeActor,

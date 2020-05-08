@@ -38,7 +38,7 @@ var _ = Describe("buildpacks Command", func() {
 		args = nil
 
 		cmd = BuildpacksCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

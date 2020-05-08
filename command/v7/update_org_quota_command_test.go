@@ -39,7 +39,7 @@ var _ = Describe("UpdateOrgQuotaCommand", func() {
 		orgQuotaName = "old-org-quota-name"
 
 		cmd = v7.UpdateOrgQuotaCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -6,7 +6,7 @@ import (
 )
 
 type OrgQuotasCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME org-quotas"`
 	relatedCommands interface{} `related_commands:"org-quota"`

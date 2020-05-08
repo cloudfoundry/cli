@@ -40,7 +40,7 @@ var _ = Describe("space-quotas command", func() {
 		args = nil
 
 		cmd = SpaceQuotasCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

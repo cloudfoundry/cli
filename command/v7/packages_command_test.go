@@ -41,7 +41,7 @@ var _ = Describe("packages Command", func() {
 
 		cmd = v7.PackagesCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				Actor:       fakeActor,

@@ -35,7 +35,7 @@ var _ = Describe("rename-space Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = RenameSpaceCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

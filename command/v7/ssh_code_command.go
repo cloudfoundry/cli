@@ -1,7 +1,7 @@
 package v7
 
 type SSHCodeCommand struct {
-	BaseCommand
+	command.BaseCommand
 	usage           interface{} `usage:"CF_NAME ssh-code"`
 	relatedCommands interface{} `related_commands:"curl, ssh"`
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type CreateSharedDomainCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	Internal        bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`

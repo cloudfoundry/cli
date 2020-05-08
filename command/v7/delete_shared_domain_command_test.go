@@ -45,7 +45,7 @@ var _ = Describe("delete-shared-domain Command", func() {
 		cmd = DeleteSharedDomainCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
 
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -36,7 +36,7 @@ var _ = Describe("delete-buildpack Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 
 		cmd = DeleteBuildpackCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Actor:       fakeActor,
 				UI:          testUI,
 				Config:      fakeConfig,

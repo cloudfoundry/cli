@@ -48,7 +48,7 @@ var _ = Describe("ssh Command", func() {
 			SkipHostValidation:  true,
 			SkipRemoteExecution: true,
 
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

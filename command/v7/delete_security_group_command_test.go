@@ -35,7 +35,7 @@ var _ = Describe("delete-security-group Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = DeleteSecurityGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

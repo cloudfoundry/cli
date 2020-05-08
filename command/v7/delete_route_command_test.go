@@ -49,7 +49,7 @@ var _ = Describe("delete-route Command", func() {
 			RequiredArgs: flag.Domain{Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
-			BaseCommand: BaseCommand{UI: testUI,
+			BaseCommand: command.BaseCommand{UI: testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,

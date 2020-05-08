@@ -10,7 +10,7 @@ import (
 )
 
 type RoutesCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME routes [--org-level]"`
 	relatedCommands interface{} `related_commands:"check-route, create-route, domains, map-route, unmap-route"`

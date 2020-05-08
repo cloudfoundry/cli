@@ -13,7 +13,7 @@ type LabelUnsetter interface {
 }
 
 type UnsetLabelCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.UnsetLabelArgs `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME unset-label RESOURCE RESOURCE_NAME KEY...\n\nEXAMPLES:\n   cf unset-label app dora ci_signature_sha2\n   cf unset-label org business pci public-facing\n   cf unset-label buildpack go_buildpack go -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   service-plan\n   space\n   stack"`

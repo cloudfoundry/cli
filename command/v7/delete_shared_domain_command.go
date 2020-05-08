@@ -7,7 +7,7 @@ import (
 )
 
 type DeleteSharedDomainCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`

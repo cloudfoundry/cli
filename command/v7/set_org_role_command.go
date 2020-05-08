@@ -9,7 +9,7 @@ import (
 )
 
 type SetOrgRoleCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Args            flag.OrgRoleArgs `positional-args:"yes"`
 	IsClient        bool             `long:"client" description:"Assign an org role to a client-id of a (non-user) service account"`

@@ -15,7 +15,7 @@ type CreateSpaceActor interface {
 }
 
 type CreateSpaceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Space  `positional-args:"yes"`
 	Organization    string      `short:"o" description:"Organization"`

@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteSecurityGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SecurityGroup `positional-args:"yes"`
 	Force           bool               `long:"force" short:"f" description:"Force deletion without confirmation"`

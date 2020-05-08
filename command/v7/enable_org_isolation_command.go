@@ -5,7 +5,7 @@ import (
 )
 
 type EnableOrgIsolationCommand struct {
-	BaseCommand
+	command.BaseCommand
 	RequiredArgs    flag.OrgIsolationArgs `positional-args:"yes"`
 	usage           interface{}           `usage:"CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME"`
 	relatedCommands interface{}           `related_commands:"create-isolation-segment, isolation-segments, set-org-default-isolation-segment, set-space-isolation-segment"`

@@ -42,7 +42,7 @@ var _ = Describe("stacks Command", func() {
 		args = nil
 
 		cmd = StacksCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

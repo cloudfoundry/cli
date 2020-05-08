@@ -34,7 +34,7 @@ var _ = Describe("rename-org Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = RenameOrgCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

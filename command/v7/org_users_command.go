@@ -7,7 +7,7 @@ import (
 )
 
 type OrgUsersCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	AllUsers        bool              `long:"all-users" short:"a" description:"List all users with roles in the org or in spaces within the org"`

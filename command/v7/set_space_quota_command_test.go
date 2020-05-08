@@ -52,7 +52,7 @@ var _ = Describe("set-space-quota Command", func() {
 		spaceQuotaName = RandomString("space-quota-name")
 
 		cmd = SetSpaceQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

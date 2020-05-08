@@ -5,7 +5,7 @@ import (
 )
 
 type UnsetSpaceQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.UnsetSpaceQuotaArgs `positional-args:"yes"`
 	usage           interface{}              `usage:"CF_NAME unset-space-quota SPACE SPACE_QUOTA"`

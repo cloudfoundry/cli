@@ -5,7 +5,7 @@ import (
 )
 
 type DisableSSHCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME disable-ssh APP_NAME"`

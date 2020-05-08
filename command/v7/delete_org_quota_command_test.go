@@ -40,7 +40,7 @@ var _ = Describe("delete-org-quota Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 		cmd = DeleteOrgQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Actor:       fakeActor,
 				UI:          testUI,
 				Config:      fakeConfig,

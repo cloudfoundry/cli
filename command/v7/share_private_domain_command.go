@@ -5,7 +5,7 @@ import (
 )
 
 type SharePrivateDomainCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.OrgDomain `positional-args:"yes"`
 	usage           interface{}    `usage:"CF_NAME share-private-domain ORG DOMAIN"`

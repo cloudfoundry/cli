@@ -5,7 +5,7 @@ import (
 )
 
 type SetSpaceIsolationSegmentCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SpaceIsolationArgs `positional-args:"yes"`
 	usage           interface{}             `usage:"CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME"`

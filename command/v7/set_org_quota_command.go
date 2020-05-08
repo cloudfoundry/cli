@@ -5,7 +5,7 @@ import (
 )
 
 type SetOrgQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SetOrgQuotaArgs `positional-args:"yes"`
 	usage           interface{}          `usage:"CF_NAME set-org-quota ORG QUOTA"`

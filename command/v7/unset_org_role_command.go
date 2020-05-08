@@ -7,7 +7,7 @@ import (
 )
 
 type UnsetOrgRoleCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Args            flag.OrgRoleArgs `positional-args:"yes"`
 	IsClient        bool             `long:"client" description:"Unassign an org role for a client-id of a (non-user) service account"`

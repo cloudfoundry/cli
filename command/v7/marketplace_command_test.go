@@ -32,7 +32,7 @@ var _ = Describe("marketplace command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = MarketplaceCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

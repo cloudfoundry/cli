@@ -22,7 +22,7 @@ var _ = Describe("logout command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		cmd = LogoutCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:     testUI,
 				Config: fakeConfig,
 			},

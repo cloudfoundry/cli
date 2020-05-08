@@ -34,7 +34,7 @@ var _ = Describe("org-users Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = OrgUsersCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

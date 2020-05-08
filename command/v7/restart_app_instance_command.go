@@ -5,7 +5,7 @@ import (
 )
 
 type RestartAppInstanceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppInstance `positional-args:"yes"`
 	ProcessType     string           `long:"process" default:"web" description:"Process to restart"`

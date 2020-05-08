@@ -35,7 +35,7 @@ var _ = Describe("bind-running-security-group Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = BindRunningSecurityGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

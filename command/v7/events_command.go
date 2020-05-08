@@ -6,7 +6,7 @@ import (
 )
 
 type EventsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME events APP_NAME"`

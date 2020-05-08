@@ -38,7 +38,7 @@ var _ = Describe("create-service-broker Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = &v7.CreateServiceBrokerCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

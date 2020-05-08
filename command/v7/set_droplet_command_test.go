@@ -43,7 +43,7 @@ var _ = Describe("set-droplet Command", func() {
 		cmd = v7.SetDropletCommand{
 			RequiredArgs: flag.AppDroplet{AppName: app, DropletGUID: dropletGUID},
 
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

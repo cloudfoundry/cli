@@ -12,7 +12,7 @@ import (
 )
 
 type CreateAppManifestCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	FilePath        flag.Path    `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`

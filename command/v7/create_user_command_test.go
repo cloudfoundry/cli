@@ -37,7 +37,7 @@ var _ = Describe("create-user Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = CreateUserCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

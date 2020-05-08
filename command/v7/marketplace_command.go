@@ -13,7 +13,7 @@ import (
 )
 
 type MarketplaceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	ServiceOfferingName string      `short:"e" description:"Show plan details for a particular service offering"`
 	ServiceBrokerName   string      `short:"b" description:"Only show details for a particular service broker"`

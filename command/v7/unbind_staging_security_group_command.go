@@ -7,7 +7,7 @@ import (
 )
 
 type UnbindStagingSecurityGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SecurityGroup `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME unbind-staging-security-group SECURITY_GROUP\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`

@@ -12,7 +12,7 @@ import (
 )
 
 type StagePackageCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	PackageGUID     string       `long:"package-guid" description:"The guid of the package to stage (default: latest ready package)"`

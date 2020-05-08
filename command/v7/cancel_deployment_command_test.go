@@ -45,7 +45,7 @@ var _ = Describe("Cancel deployment command", func() {
 
 		cmd = CancelDeploymentCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -5,7 +5,7 @@ import (
 )
 
 type DisableServiceAccessCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Service `positional-args:"yes"`
 	ServiceBroker   string       `short:"b" description:"Disable access to a service from a particular service broker. Required when service name is ambiguous"`

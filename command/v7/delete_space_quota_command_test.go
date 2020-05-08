@@ -42,7 +42,7 @@ var _ = Describe("delete-space-quota Command", func() {
 		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = DeleteSpaceQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Actor:       fakeActor,
 				UI:          testUI,
 				Config:      fakeConfig,

@@ -124,7 +124,7 @@ var _ = Describe("push Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = PushCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				SharedActor: fakeSharedActor,
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -672,7 +672,7 @@ var _ = Describe("push Command", func() {
 			fakeConfig = new(commandfakes.FakeConfig)
 
 			cmd = PushCommand{
-				BaseCommand: BaseCommand{
+				BaseCommand: command.BaseCommand{
 					Config: fakeConfig,
 					UI:     testUI,
 				},

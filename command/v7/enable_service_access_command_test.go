@@ -32,7 +32,7 @@ var _ = Describe("enable-service-access command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = EnableServiceAccessCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -10,7 +10,7 @@ import (
 )
 
 type CreateUserCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Args            flag.CreateUser `positional-args:"yes"`
 	Origin          string          `long:"origin" description:"Origin for mapping a user account to a user in an external identity provider"`

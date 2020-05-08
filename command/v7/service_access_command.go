@@ -10,7 +10,7 @@ import (
 )
 
 type ServiceAccessCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Broker          string      `short:"b" description:"Access for plans of a particular broker"`
 	ServiceOffering string      `short:"e" description:"Access for service name of a particular service offering"`

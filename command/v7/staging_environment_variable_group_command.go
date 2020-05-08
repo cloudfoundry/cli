@@ -7,7 +7,7 @@ import (
 )
 
 type StagingEnvironmentVariableGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME staging-environment-variable-group"`
 	relatedCommands interface{} `related_commands:"env, running-environment-variable-group"`

@@ -7,7 +7,7 @@ import (
 )
 
 type CreateServiceBrokerCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.ServiceBrokerArgs `positional-args:"yes"`
 	SpaceScoped     bool                   `long:"space-scoped" description:"Make the broker's service plans only visible within the targeted space"`

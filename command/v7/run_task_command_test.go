@@ -39,7 +39,7 @@ var _ = Describe("run-task Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = RunTaskCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

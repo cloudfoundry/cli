@@ -46,7 +46,7 @@ var _ = Describe("create-package Command", func() {
 		)
 
 		cmd = v7.CreatePackageCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

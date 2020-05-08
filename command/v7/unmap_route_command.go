@@ -6,7 +6,7 @@ import (
 )
 
 type UnmapRouteCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`

@@ -32,7 +32,7 @@ var _ = Describe("Org Quota Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = OrgQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

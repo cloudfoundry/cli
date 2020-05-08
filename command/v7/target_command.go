@@ -8,7 +8,7 @@ import (
 )
 
 type TargetCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Organization    string      `short:"o" description:"Organization"`
 	Space           string      `short:"s" description:"Space"`

@@ -24,7 +24,7 @@ type UpdateBuildpackActor interface {
 }
 
 type UpdateBuildpackCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.BuildpackName               `positional-args:"Yes"`
 	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`

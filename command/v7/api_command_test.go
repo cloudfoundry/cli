@@ -29,7 +29,7 @@ var _ = Describe("api Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = APICommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:     testUI,
 				Actor:  fakeActor,
 				Config: fakeConfig,

@@ -36,7 +36,7 @@ var _ = Describe("running-environment-variable-group Command", func() {
 		args = nil
 
 		cmd = RunningEnvironmentVariableGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

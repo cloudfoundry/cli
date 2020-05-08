@@ -5,7 +5,7 @@ import (
 )
 
 type RunningSecurityGroupsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME running-security-groups"`
 	relatedCommands interface{} `related_commands:"bind-running-security-group, security-group, unbind-running-security-group"`

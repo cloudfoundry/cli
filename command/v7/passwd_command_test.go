@@ -34,7 +34,7 @@ var _ = Describe("passwd Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v7.PasswdCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          fakeUI,
 				Config:      fakeConfig,
 				Actor:       fakeActor,

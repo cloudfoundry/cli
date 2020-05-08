@@ -1,7 +1,7 @@
 package v7
 
 type LogoutCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage interface{} `usage:"CF_NAME logout"`
 }

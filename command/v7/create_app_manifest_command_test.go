@@ -38,7 +38,7 @@ var _ = Describe("create-app-manifest Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = CreateAppManifestCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -6,7 +6,7 @@ import (
 )
 
 type MapRouteCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
 	usage           interface{}      `usage:"CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`

@@ -5,7 +5,7 @@ import (
 )
 
 type RenameSpaceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.RenameSpace `positional-args:"yes"`
 	usage           interface{}      `usage:"CF_NAME rename-space SPACE NEW_SPACE_NAME"`

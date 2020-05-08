@@ -49,7 +49,7 @@ var _ = Describe("set-health-check Command", func() {
 			ProcessType:       "some-process-type",
 			InvocationTimeout: flag.PositiveInteger{Value: 42},
 
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

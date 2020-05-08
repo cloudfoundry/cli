@@ -15,7 +15,7 @@ type SharedSSHActor interface {
 }
 
 type SSHCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs          flag.AppName             `positional-args:"yes"`
 	ProcessIndex          uint                     `long:"app-instance-index" short:"i" default:"0" description:"App process instance index"`

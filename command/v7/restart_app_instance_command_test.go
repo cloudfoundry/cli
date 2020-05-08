@@ -44,7 +44,7 @@ var _ = Describe("restart-app-instance Command", func() {
 			RequiredArgs: flag.AppInstance{AppName: app, Index: 6},
 			ProcessType:  processType,
 
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

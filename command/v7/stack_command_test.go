@@ -35,7 +35,7 @@ var _ = Describe("Stack Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = StackCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

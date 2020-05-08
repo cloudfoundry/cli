@@ -9,7 +9,7 @@ import (
 )
 
 type GetHealthCheckCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs flag.AppName `positional-args:"yes"`
 	usage        interface{}  `usage:"CF_NAME get-health-check APP_NAME"`

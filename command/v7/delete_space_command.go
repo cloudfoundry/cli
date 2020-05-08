@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteSpaceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs flag.Space  `positional-args:"yes"`
 	Force        bool        `short:"f" description:"Force deletion without confirmation"`

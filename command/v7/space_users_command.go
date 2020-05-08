@@ -7,7 +7,7 @@ import (
 )
 
 type SpaceUsersCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SpaceUsersArgs `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME space-users ORG SPACE"`

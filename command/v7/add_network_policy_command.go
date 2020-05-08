@@ -16,7 +16,7 @@ type NetworkingActor interface {
 }
 
 type AddNetworkPolicyCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs flag.AddNetworkPolicyArgsV7 `positional-args:"yes"`
 	Port         flag.NetworkPort            `long:"port" description:"Port or range of ports for connection to destination app (Default: 8080)"`

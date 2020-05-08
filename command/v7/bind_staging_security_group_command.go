@@ -6,7 +6,7 @@ import (
 )
 
 type BindStagingSecurityGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	SecurityGroup   flag.SecurityGroup `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME bind-staging-security-group SECURITY_GROUP\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`

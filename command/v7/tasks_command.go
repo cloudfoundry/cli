@@ -10,7 +10,7 @@ import (
 )
 
 type TasksCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME tasks APP_NAME"`

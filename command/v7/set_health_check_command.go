@@ -5,7 +5,7 @@ import (
 )
 
 type SetHealthCheckCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs      flag.SetHealthCheckArgs `positional-args:"yes"`
 	HTTPEndpoint      string                  `long:"endpoint" default:"/" description:"Path on the app"`

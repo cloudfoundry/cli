@@ -5,7 +5,7 @@ import (
 )
 
 type StagingSecurityGroupsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME staging-security-groups"`
 	relatedCommands interface{} `related_commands:"bind-staging-security-group, security-group, unbind-staging-security-group"`

@@ -10,7 +10,7 @@ import (
 )
 
 type EnvCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.EnvironmentArgs `positional-args:"yes"`
 	usage           interface{}          `usage:"CF_NAME env APP_NAME"`

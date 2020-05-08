@@ -7,7 +7,7 @@ import (
 )
 
 type FeatureFlagsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME feature-flags"`
 	relatedCommands interface{} `related_commands:"disable-feature-flag, enable-feature-flag, feature-flag"`

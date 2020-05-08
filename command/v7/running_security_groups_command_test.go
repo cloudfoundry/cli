@@ -32,7 +32,7 @@ var _ = Describe("Running Security Groups Command", func() {
 		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = RunningSecurityGroupsCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

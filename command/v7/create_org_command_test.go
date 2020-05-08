@@ -49,7 +49,7 @@ var _ = Describe("create-org Command", func() {
 		quotaName = "quota-name"
 
 		cmd = v7.CreateOrgCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

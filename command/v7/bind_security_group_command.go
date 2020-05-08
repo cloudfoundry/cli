@@ -7,7 +7,7 @@ import (
 )
 
 type BindSecurityGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.BindSecurityGroupV7Args `positional-args:"yes"`
 	Lifecycle       flag.SecurityGroupLifecycle  `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to."`

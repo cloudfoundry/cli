@@ -6,7 +6,7 @@ import (
 )
 
 type RouterGroupsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME router-groups"`
 	relatedCommands interface{} `related_commands:"create-domain, domains"`

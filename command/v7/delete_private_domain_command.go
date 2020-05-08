@@ -8,7 +8,7 @@ import (
 )
 
 type DeletePrivateDomainCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`

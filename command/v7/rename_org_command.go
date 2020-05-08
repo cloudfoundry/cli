@@ -5,7 +5,7 @@ import (
 )
 
 type RenameOrgCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.RenameOrgArgs `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME rename-org ORG NEW_ORG_NAME"`

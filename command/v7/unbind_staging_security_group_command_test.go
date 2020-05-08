@@ -33,7 +33,7 @@ var _ = Describe("unbind-staging-security-group Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = UnbindStagingSecurityGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

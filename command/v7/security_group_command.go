@@ -8,7 +8,7 @@ import (
 )
 
 type SecurityGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SecurityGroup `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME security-group SECURITY_GROUP"`

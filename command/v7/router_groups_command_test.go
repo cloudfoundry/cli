@@ -41,7 +41,7 @@ var _ = Describe("router-groups Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = RouterGroupsCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

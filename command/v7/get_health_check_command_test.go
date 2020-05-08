@@ -42,7 +42,7 @@ var _ = Describe("get-health-check Command", func() {
 		cmd = GetHealthCheckCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

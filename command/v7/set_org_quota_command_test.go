@@ -40,7 +40,7 @@ var _ = Describe("set-org-quota Command", func() {
 		applyQuotaWarning = RandomString("apply-quota-warning")
 
 		cmd = SetOrgQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -18,7 +18,7 @@ type NetworkPoliciesActor interface {
 }
 
 type NetworkPoliciesCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	SourceApp string `long:"source" required:"false" description:"Source app to filter results by"`
 

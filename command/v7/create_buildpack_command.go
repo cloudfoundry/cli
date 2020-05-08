@@ -15,7 +15,7 @@ import (
 )
 
 type CreateBuildpackCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.CreateBuildpackArgs `positional-args:"Yes"`
 	usage           interface{}              `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--disable]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`

@@ -37,7 +37,7 @@ var _ = Describe("tasks Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = TasksCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteOrgQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Quota  `positional-args:"yes"`
 	Force           bool        `long:"force" short:"f" description:"Force deletion without confirmation"`

@@ -61,7 +61,7 @@ var _ = Describe("copy-source Command", func() {
 		}
 
 		cmd = v7.CopySourceCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -37,7 +37,7 @@ var _ = Describe("labels command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		cmd = LabelsCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Actor:       fakeLabelsActor,
 				UI:          testUI,
 				Config:      fakeConfig,

@@ -38,7 +38,7 @@ var _ = Describe("create-org-quota Command", func() {
 		orgQuotaName = "new-org-quota-name"
 
 		cmd = v7.CreateOrgQuotaCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

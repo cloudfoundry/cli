@@ -33,7 +33,7 @@ var _ = Describe("Space Quota Command", func() {
 		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = SpaceQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -7,7 +7,7 @@ import (
 )
 
 type IsolationSegmentsCommand struct {
-	BaseCommand
+	command.BaseCommand
 	usage           interface{} `usage:"CF_NAME isolation-segments"`
 	relatedCommands interface{} `related_commands:"enable-org-isolation, create-isolation-segment"`
 }

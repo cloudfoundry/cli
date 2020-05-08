@@ -6,7 +6,7 @@ import (
 )
 
 type AllowSpaceSSHCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Space  `positional-args:"yes"`
 	usage           interface{} `usage:"CF_NAME allow-space-ssh SPACE_NAME"`

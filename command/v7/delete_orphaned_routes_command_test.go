@@ -39,7 +39,7 @@ var _ = Describe("delete-orphaned-routes Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = DeleteOrphanedRoutesCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -35,7 +35,7 @@ var _ = Describe("purge-service-offering command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = PurgeServiceOfferingCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				Actor:       fakeActor,

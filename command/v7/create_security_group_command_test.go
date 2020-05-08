@@ -43,7 +43,7 @@ var _ = Describe("create-security-group Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 
 		cmd = v7.CreateSecurityGroupCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

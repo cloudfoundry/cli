@@ -37,7 +37,7 @@ var _ = Describe("Feature Flag Command", func() {
 		args = nil
 
 		cmd = FeatureFlagCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

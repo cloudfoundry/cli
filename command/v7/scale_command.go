@@ -9,7 +9,7 @@ import (
 )
 
 type ScaleCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
 	Force               bool           `short:"f" description:"Force restart of app without prompt"`

@@ -6,7 +6,7 @@ import (
 )
 
 type CreateRouteCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
 	usage           interface{}      `usage:"CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo"`

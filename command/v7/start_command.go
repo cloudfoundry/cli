@@ -10,7 +10,7 @@ import (
 )
 
 type StartCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs        flag.AppName `positional-args:"yes"`
 	usage               interface{}  `usage:"CF_NAME start APP_NAME\n\n   If the app's most recent package is unstaged, starting the app will stage and run that package.\n   Otherwise, the app's current droplet will be run."`

@@ -34,7 +34,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = SetSpaceIsolationSegmentCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

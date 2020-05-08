@@ -35,7 +35,7 @@ var _ = Describe("delete-org Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = DeleteOrgCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

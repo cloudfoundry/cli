@@ -35,7 +35,7 @@ var _ = Describe("delete-space Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = DeleteSpaceCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

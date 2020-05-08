@@ -47,7 +47,7 @@ var _ = Describe("apply-manifest Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = ApplyManifestCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

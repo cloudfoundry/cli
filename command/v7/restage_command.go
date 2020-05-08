@@ -10,7 +10,7 @@ import (
 )
 
 type RestageCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs        flag.AppName            `positional-args:"yes"`
 	Strategy            flag.DeploymentStrategy `long:"strategy" description:"Deployment strategy, either rolling or null."`

@@ -14,7 +14,7 @@ import (
 )
 
 type ApplyManifestCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	PathToManifest   flag.ManifestPathWithExistenceCheck `short:"f" description:"Path to app manifest"`
 	Vars             []template.VarKV                    `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`

@@ -40,7 +40,7 @@ var _ = Describe("UpdateSpaceQuotaCommand", func() {
 		spaceQuotaName = "old-space-quota-name"
 
 		cmd = v7.UpdateSpaceQuotaCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

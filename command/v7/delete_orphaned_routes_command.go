@@ -1,7 +1,7 @@
 package v7
 
 type DeleteOrphanedRoutesCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]\n"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`

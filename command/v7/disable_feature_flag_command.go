@@ -5,7 +5,7 @@ import (
 )
 
 type DisableFeatureFlagCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Feature `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME disable-feature-flag FEATURE_FLAG_NAME"`

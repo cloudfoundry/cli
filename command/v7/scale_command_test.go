@@ -46,7 +46,7 @@ var _ = Describe("scale Command", func() {
 		appName = "some-app"
 
 		cmd = ScaleCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

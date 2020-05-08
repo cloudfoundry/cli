@@ -5,7 +5,7 @@ import (
 )
 
 type UnsharePrivateDomainCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.OrgDomain `positional-args:"yes"`
 	usage           interface{}    `usage:"CF_NAME unshare-private-domain ORG DOMAIN"`

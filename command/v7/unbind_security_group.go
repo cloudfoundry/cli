@@ -8,7 +8,7 @@ import (
 )
 
 type UnbindSecurityGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.UnbindSecurityGroupV7Args `positional-args:"yes"`
 	Lifecycle       flag.SecurityGroupLifecycle    `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`

@@ -6,7 +6,7 @@ import (
 )
 
 type PurgeServiceOfferingCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Service `positional-args:"yes"`
 	ServiceBroker   string       `short:"b" description:"Purge a service from a particular service broker. Required when service name is ambiguous"`

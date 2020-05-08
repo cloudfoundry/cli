@@ -43,7 +43,7 @@ var _ = Describe("create-shared-domain Command", func() {
 			RequiredArgs: flag.Domain{
 				Domain: domainName,
 			},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

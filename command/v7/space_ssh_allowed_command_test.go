@@ -39,7 +39,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 		spaceName = RandomString("space")
 
 		cmd = SpaceSSHAllowedCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

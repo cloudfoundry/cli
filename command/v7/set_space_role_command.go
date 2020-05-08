@@ -9,7 +9,7 @@ import (
 )
 
 type SetSpaceRoleCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Args            flag.SpaceRoleArgs `positional-args:"yes"`
 	IsClient        bool               `long:"client" description:"Assign a space role to a client-id of a (non-user) service account"`

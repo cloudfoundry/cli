@@ -44,7 +44,7 @@ var _ = Describe("domains Command", func() {
 		args = nil
 
 		cmd = DomainsCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -43,7 +43,7 @@ var _ = Describe("remove-network-policy Command", func() {
 		protocol = "tcp"
 
 		cmd = RemoveNetworkPolicyCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

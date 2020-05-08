@@ -47,7 +47,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 		cmd = UpdateBuildpackCommand{
 			RequiredArgs: flag.BuildpackName{Buildpack: buildpackName},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,

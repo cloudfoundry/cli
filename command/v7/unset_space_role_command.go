@@ -7,7 +7,7 @@ import (
 )
 
 type UnsetSpaceRoleCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	Args            flag.SpaceRoleArgs `positional-args:"yes"`
 	IsClient        bool               `long:"client" description:"Remove space role from a client-id of a (non-user) service account"`

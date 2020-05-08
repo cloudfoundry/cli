@@ -6,7 +6,7 @@ import (
 )
 
 type SpaceQuotasCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME space-quotas"`
 	relatedCommands interface{} `related_commands:"space-quota, set-space-quota"`

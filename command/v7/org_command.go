@@ -9,7 +9,7 @@ import (
 )
 
 type OrgCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	GUID            bool              `long:"guid" description:"Retrieve and display the given org's guid.  All other output for the org is suppressed."`

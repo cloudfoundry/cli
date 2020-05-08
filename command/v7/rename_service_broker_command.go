@@ -6,7 +6,7 @@ import (
 )
 
 type RenameServiceBrokerCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.RenameServiceBrokerArgs `positional-args:"yes"`
 	usage           interface{}                  `usage:"CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"`

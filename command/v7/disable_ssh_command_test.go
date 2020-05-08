@@ -37,7 +37,7 @@ var _ = Describe("disable-ssh Command", func() {
 		fakeDisableSSHActor = new(v7fakes.FakeActor)
 
 		cmd = DisableSSHCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

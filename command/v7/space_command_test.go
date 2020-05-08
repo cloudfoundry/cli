@@ -40,7 +40,7 @@ var _ = Describe("space command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = SpaceCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

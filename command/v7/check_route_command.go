@@ -5,7 +5,7 @@ import (
 )
 
 type CheckRouteCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`

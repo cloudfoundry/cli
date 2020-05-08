@@ -7,7 +7,7 @@ import (
 )
 
 type CreateSpaceQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs          flag.SpaceQuota          `positional-args:"yes"`
 	NumAppInstances       flag.IntegerLimit        `short:"a" description:"Total number of application instances. (Default: unlimited)."`

@@ -39,7 +39,7 @@ var _ = Describe("unset-space-quota Command", func() {
 		unsetQuotaWarning = RandomString("unset-quota-warning")
 
 		cmd = UnsetSpaceQuotaCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

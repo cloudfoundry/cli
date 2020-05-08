@@ -9,7 +9,7 @@ import (
 )
 
 type CreatePackageCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName                `positional-args:"yes"`
 	DockerImage     flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`

@@ -7,7 +7,7 @@ import (
 )
 
 type CreateIsolationSegmentCommand struct {
-	BaseCommand
+	command.BaseCommand
 	RequiredArgs    flag.IsolationSegmentName `positional-args:"yes"`
 	usage           interface{}               `usage:"CF_NAME create-isolation-segment SEGMENT_NAME\n\nNOTES:\n   The isolation segment name must match the placement tag applied to the Diego cell."`
 	relatedCommands interface{}               `related_commands:"enable-org-isolation, isolation-segments"`

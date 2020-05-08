@@ -13,7 +13,7 @@ import (
 )
 
 type LogsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	Recent          bool         `long:"recent" description:"Dump recent logs instead of tailing"`

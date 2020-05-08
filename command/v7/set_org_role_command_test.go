@@ -38,7 +38,7 @@ var _ = Describe("set-org-role Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = SetOrgRoleCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

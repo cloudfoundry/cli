@@ -47,7 +47,7 @@ var _ = Describe("add-network-policy Command", func() {
 		space = ""
 
 		cmd = AddNetworkPolicyCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				Actor:       fakeActor,

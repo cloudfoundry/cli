@@ -45,7 +45,7 @@ var _ = Describe("app Command", func() {
 
 		cmd = v7.AppCommand{
 			RequiredArgs: flag.AppName{AppName: app},
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

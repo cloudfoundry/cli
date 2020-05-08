@@ -36,7 +36,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = DisableOrgIsolationCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

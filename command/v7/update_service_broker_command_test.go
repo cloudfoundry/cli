@@ -37,7 +37,7 @@ var _ = Describe("update-service-broker command", func() {
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
 		cmd = &v7.UpdateServiceBrokerCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Actor:       fakeUpdateServiceBrokerActor,
 				SharedActor: fakeSharedActor,
 				UI:          testUI,

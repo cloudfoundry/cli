@@ -32,7 +32,7 @@ var _ = Describe("auth Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = AuthCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:     testUI,
 				Config: fakeConfig,
 				Actor:  fakeActor,

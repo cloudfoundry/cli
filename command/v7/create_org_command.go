@@ -7,7 +7,7 @@ import (
 )
 
 type CreateOrgCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	Quota           string            `short:"q" long:"quota" description:"Quota to assign to the newly created org"`

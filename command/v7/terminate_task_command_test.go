@@ -37,7 +37,7 @@ var _ = Describe("terminate-task Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = TerminateTaskCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

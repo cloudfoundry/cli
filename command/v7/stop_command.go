@@ -5,7 +5,7 @@ import (
 )
 
 type StopCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME stop APP_NAME"`

@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs       flag.AppName `positional-args:"yes"`
 	Force              bool         `short:"f" description:"Force deletion without confirmation"`

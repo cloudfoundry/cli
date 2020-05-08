@@ -7,7 +7,7 @@ import (
 )
 
 type SpaceQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SpaceQuota `positional-args:"yes"`
 	usage           interface{}     `usage:"CF_NAME space-quota QUOTA"`

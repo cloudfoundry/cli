@@ -43,7 +43,7 @@ var _ = Describe("delete Command", func() {
 		cmd = DeleteCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

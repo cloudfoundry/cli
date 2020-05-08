@@ -37,7 +37,7 @@ var _ = Describe("unset-org-role Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = UnsetOrgRoleCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

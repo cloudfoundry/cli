@@ -13,7 +13,7 @@ import (
 )
 
 type APICommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	OptionalArgs      flag.APITarget `positional-args:"yes"`
 	SkipSSLValidation bool           `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`

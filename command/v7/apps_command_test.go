@@ -40,7 +40,7 @@ var _ = Describe("apps Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v7.AppsCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				Actor:       fakeActor,

@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteOrgCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Organization `positional-args:"yes"`
 	Force           bool              `short:"f" description:"Force deletion without confirmation"`

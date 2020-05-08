@@ -34,7 +34,7 @@ var _ = Describe("space-users Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = SpaceUsersCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

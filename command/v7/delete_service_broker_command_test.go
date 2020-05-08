@@ -43,7 +43,7 @@ var _ = Describe("delete-service-broker Command", func() {
 		serviceBrokerGUID = "service-broker-guid"
 
 		cmd = DeleteServiceBrokerCommand{
-			BaseCommand: BaseCommand{UI: testUI,
+			BaseCommand: command.BaseCommand{UI: testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				Actor:       fakeActor,

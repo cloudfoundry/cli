@@ -45,7 +45,7 @@ var _ = Describe("create-private-domain Command", func() {
 				Organization: orgName,
 				Domain:       domainName,
 			},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -16,7 +16,7 @@ type RemoveNetworkPolicyActor interface {
 }
 
 type RemoveNetworkPolicyCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs     flag.RemoveNetworkPolicyArgsV7 `positional-args:"yes"`
 	Port             flag.NetworkPort               `long:"port" required:"true" description:"Port or range of ports that destination app is connected with"`

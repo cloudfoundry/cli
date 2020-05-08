@@ -38,7 +38,7 @@ var _ = Describe("bind-security-group Command", func() {
 		getSecurityGroupWarning = v7action.Warnings{"get security group warning"}
 
 		cmd = BindSecurityGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -50,7 +50,7 @@ var _ = Describe("create buildpack Command", func() {
 				Path:      flag.PathWithExistenceCheckOrURL(buildpackPath),
 				Position:  7,
 			},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

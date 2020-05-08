@@ -5,7 +5,7 @@ import (
 )
 
 type SetDropletCommand struct {
-	BaseCommand
+	command.BaseCommand
 	RequiredArgs    flag.AppDroplet `positional-args:"yes"`
 	usage           interface{}     `usage:"CF_NAME set-droplet APP_NAME DROPLET_GUID"`
 	relatedCommands interface{}     `related_commands:"app, droplets, stage, push, packages, create-package"`

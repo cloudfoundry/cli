@@ -9,7 +9,7 @@ import (
 )
 
 type RunTaskCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.RunTaskArgsV7 `positional-args:"yes"`
 	Command         string             `long:"command" short:"c" description:"The command to execute"`

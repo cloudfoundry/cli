@@ -34,7 +34,7 @@ var _ = Describe("disallow-space-ssh Command", func() {
 		disallowSpaceSSHActor = new(v7fakes.FakeActor)
 
 		cmd = DisallowSpaceSSHCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

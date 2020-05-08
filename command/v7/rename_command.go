@@ -5,7 +5,7 @@ import (
 )
 
 type RenameCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Rename `positional-args:"yes"`
 	usage           interface{} `usage:"CF_NAME rename APP_NAME NEW_APP_NAME"`

@@ -36,7 +36,7 @@ var _ = Describe("network-policies Command", func() {
 		srcApp = ""
 
 		cmd = NetworkPoliciesCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
 				UI:          testUI,

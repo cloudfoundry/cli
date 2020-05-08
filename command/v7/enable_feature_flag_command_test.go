@@ -35,7 +35,7 @@ var _ = Describe("Enable Feature Flag Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = EnableFeatureFlagCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

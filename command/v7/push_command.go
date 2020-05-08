@@ -64,7 +64,7 @@ type ManifestLocator interface {
 }
 
 type PushCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	OptionalArgs            flag.OptionalAppName                `positional-args:"yes"`
 	HealthCheckTimeout      flag.PositiveInteger                `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`

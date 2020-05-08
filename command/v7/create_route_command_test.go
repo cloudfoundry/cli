@@ -62,7 +62,7 @@ var _ = Describe("create-route Command", func() {
 			},
 			Hostname: hostname,
 			Path:     flag.V7RoutePath{Path: path},
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

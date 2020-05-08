@@ -37,7 +37,7 @@ var _ = Describe("delete-user Command", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		cmd = DeleteUserCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -44,7 +44,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		cmd = DeletePrivateDomainCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
 
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

@@ -7,7 +7,7 @@ import (
 )
 
 type UpdateOrgQuotaCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs          flag.OrganizationQuota   `positional-args:"Yes"`
 	NumAppInstances       flag.IntegerLimit        `short:"a" description:"Total number of application instances. -1 represents an unlimited amount."`

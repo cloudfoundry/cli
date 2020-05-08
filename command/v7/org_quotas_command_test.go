@@ -39,7 +39,7 @@ var _ = Describe("org-quotas command", func() {
 		args = nil
 
 		cmd = OrgQuotasCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

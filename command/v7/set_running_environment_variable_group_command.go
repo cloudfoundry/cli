@@ -11,7 +11,7 @@ import (
 )
 
 type SetRunningEnvironmentVariableGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SetEnvVarGroup `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`

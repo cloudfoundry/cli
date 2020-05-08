@@ -16,7 +16,7 @@ type LabelSetter interface {
 }
 
 type SetLabelCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SetLabelArgs `positional-args:"yes"`
 	usage           interface{}       `usage:"CF_NAME set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n   cf set-label org business pci=true public-facing=false\n   cf set-label buildpack go_buildpack go=1.12 -s cflinuxfs3\n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   service-plan\n   space\n   stack"`

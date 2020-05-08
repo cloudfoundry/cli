@@ -6,7 +6,7 @@ import (
 )
 
 type UnsetEnvCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.UnsetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}               `usage:"CF_NAME unset-env APP_NAME ENV_VAR_NAME"`

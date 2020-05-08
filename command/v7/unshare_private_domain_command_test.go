@@ -41,7 +41,7 @@ var _ = Describe("unshare-private-domain command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		cmd = UnsharePrivateDomainCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				Actor:       fakeActor,
 				UI:          testUI,
 				Config:      fakeConfig,

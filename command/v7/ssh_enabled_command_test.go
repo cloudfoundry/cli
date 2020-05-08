@@ -35,7 +35,7 @@ var _ = Describe("ssh-enabled Command", func() {
 		fakeSSHEnabledActor = new(v7fakes.FakeActor)
 
 		cmd = SSHEnabledCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

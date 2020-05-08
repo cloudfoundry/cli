@@ -8,7 +8,7 @@ import (
 )
 
 type OauthTokenCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME oauth-token"`
 	relatedCommands interface{} `related_commands:"curl"`

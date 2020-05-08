@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteIsolationSegmentCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.IsolationSegmentName `positional-args:"yes"`
 	Force           bool                      `short:"f" description:"Force deletion without confirmation"`

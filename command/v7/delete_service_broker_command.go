@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteServiceBrokerCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.ServiceBroker `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME delete-service-broker SERVICE_BROKER [-f]\n\n"`

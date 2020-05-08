@@ -8,7 +8,7 @@ import (
 )
 
 type FeatureFlagCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Feature `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME feature-flag FEATURE_FLAG_NAME"`

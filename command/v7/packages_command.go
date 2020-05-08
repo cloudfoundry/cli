@@ -9,7 +9,7 @@ import (
 )
 
 type PackagesCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME packages APP_NAME"`

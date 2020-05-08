@@ -5,7 +5,7 @@ import (
 )
 
 type PasswdCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage interface{} `usage:"CF_NAME passwd"`
 }

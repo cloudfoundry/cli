@@ -44,7 +44,7 @@ var _ = Describe("create-space-quota Command", func() {
 		userName = "some-user-name"
 
 		cmd = v7.CreateSpaceQuotaCommand{
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

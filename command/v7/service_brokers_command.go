@@ -6,7 +6,7 @@ import (
 )
 
 type ServiceBrokersCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME service-brokers"`
 	relatedCommands interface{} `related_commands:"delete-service-broker, disable-service-access, enable-service-access"`

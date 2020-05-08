@@ -34,7 +34,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = ResetOrgDefaultIsolationSegmentCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

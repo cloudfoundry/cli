@@ -6,7 +6,7 @@ import (
 )
 
 type UpdateServiceBrokerCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.ServiceBrokerArgs `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"`

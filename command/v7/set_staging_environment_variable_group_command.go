@@ -11,7 +11,7 @@ import (
 )
 
 type SetStagingEnvironmentVariableGroupCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.SetEnvVarGroup `positional-args:"yes"`
 	usage           interface{}         `usage:"CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`

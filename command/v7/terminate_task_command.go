@@ -6,7 +6,7 @@ import (
 )
 
 type TerminateTaskCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.TerminateTaskArgs `positional-args:"yes"`
 	usage           interface{}            `usage:"CF_NAME terminate-task APP_NAME TASK_ID\n\nEXAMPLES:\n   CF_NAME terminate-task my-app 3"`

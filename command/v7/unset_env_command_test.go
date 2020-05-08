@@ -34,7 +34,7 @@ var _ = Describe("unset-env Command", func() {
 		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = UnsetEnvCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

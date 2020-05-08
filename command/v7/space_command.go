@@ -11,7 +11,7 @@ import (
 )
 
 type SpaceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs       flag.Space  `positional-args:"yes"`
 	GUID               bool        `long:"guid" description:"Retrieve and display the given space's guid.  All other output for the space is suppressed."`

@@ -12,7 +12,7 @@ import (
 )
 
 type AuthCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs      flag.Authentication `positional-args:"yes"`
 	ClientCredentials bool                `long:"client-credentials" description:"Use (non-user) service account (also called client credentials)"`

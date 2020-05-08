@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteBuildpackCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.BuildpackName `positional-args:"yes"`
 	usage           interface{}        `usage:"CF_NAME delete-buildpack BUILDPACK [-f] [-s STACK]"`

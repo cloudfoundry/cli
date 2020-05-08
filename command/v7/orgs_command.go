@@ -6,7 +6,7 @@ import (
 )
 
 type OrgsCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME orgs [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME orgs\n   CF_NAME orgs --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME orgs --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
 	relatedCommands interface{} `related_commands:"create-org, org, org-users, set-org-role"`

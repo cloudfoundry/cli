@@ -10,7 +10,7 @@ import (
 )
 
 type CopySourceCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs        flag.CopySourceArgs     `positional-args:"yes"`
 	usage               interface{}             `usage:"CF_NAME copy-source SOURCE_APP DESTINATION_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart] [--strategy STRATEGY] [--no-wait]"`

@@ -6,7 +6,7 @@ import (
 )
 
 type StackCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.StackName `positional-args:"yes"`
 	GUID            bool           `long:"guid" description:"Retrieve and display the given stack's guid. All other output for the stack is suppressed."`

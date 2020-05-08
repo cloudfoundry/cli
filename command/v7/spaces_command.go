@@ -6,7 +6,7 @@ import (
 )
 
 type SpacesCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	usage           interface{} `usage:"CF_NAME spaces [--labels SELECTOR]\n\nEXAMPLES:\n   CF_NAME spaces\n   CF_NAME spaces --labels 'environment in (production,staging),tier in (backend)'\n   CF_NAME spaces --labels 'env=dev,!chargeback-code,tier in (backend,worker)'"`
 	relatedCommands interface{} `related_commands:"create-space, set-space-role, space, space-users"`

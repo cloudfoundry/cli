@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteUserCommand struct {
-	BaseCommand
+	command.BaseCommand
 
 	RequiredArgs    flag.Username `positional-args:"yes"`
 	Force           bool          `short:"f" description:"Prompt interactively for password"`

@@ -45,7 +45,7 @@ var _ = Describe("restage Command", func() {
 
 		cmd = v7.RestageCommand{
 			RequiredArgs: flag.AppName{AppName: app.Name},
-			BaseCommand: v7.BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,

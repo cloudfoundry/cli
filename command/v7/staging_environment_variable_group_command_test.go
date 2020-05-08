@@ -36,7 +36,7 @@ var _ = Describe("staging-environment-variable-group Command", func() {
 		args = nil
 
 		cmd = StagingEnvironmentVariableGroupCommand{
-			BaseCommand: BaseCommand{
+			BaseCommand: command.BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
