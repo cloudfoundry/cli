@@ -156,10 +156,28 @@ var _ = Describe("Application Summary Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetApplicationRoutesReturns(
+				fakeCloudControllerClient.GetRoutesReturns(
 					[]resources.Route{
-						{GUID: "some-route-guid"},
-						{GUID: "some-other-route-guid"},
+						{
+							GUID: "some-route-guid",
+							Destinations: []resources.RouteDestination{
+								{
+									App: resources.RouteDestinationApp{
+										GUID: "some-app-guid",
+									},
+								},
+							},
+						},
+						{
+							GUID: "some-other-route-guid",
+							Destinations: []resources.RouteDestination{
+								{
+									App: resources.RouteDestinationApp{
+										GUID: "some-app-guid",
+									},
+								},
+							},
+						},
 					},
 					ccv3.Warnings{"get-routes-warning"},
 					nil,
@@ -219,8 +237,26 @@ var _ = Describe("Application Summary Actions", func() {
 							},
 						},
 						Routes: []resources.Route{
-							{GUID: "some-route-guid"},
-							{GUID: "some-other-route-guid"},
+							{
+								GUID: "some-route-guid",
+								Destinations: []resources.RouteDestination{
+									{
+										App: resources.RouteDestinationApp{
+											GUID: "some-app-guid",
+										},
+									},
+								},
+							},
+							{
+								GUID: "some-other-route-guid",
+								Destinations: []resources.RouteDestination{
+									{
+										App: resources.RouteDestinationApp{
+											GUID: "some-app-guid",
+										},
+									},
+								},
+							},
 						},
 					},
 				}))
