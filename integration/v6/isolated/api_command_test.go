@@ -195,6 +195,10 @@ var _ = Describe("api command", func() {
 						ghttp.VerifyRequest("GET", "/v2/info"),
 						ghttp.RespondWith(http.StatusOK, response),
 					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest(http.MethodGet, "/"),
+						ghttp.RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
+					),
 				)
 			})
 
