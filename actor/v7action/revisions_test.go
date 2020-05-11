@@ -67,7 +67,7 @@ var _ = Describe("Revisions Actions", func() {
 							{GUID: "2"},
 							{GUID: "3"},
 						},
-						ccv3.Warnings{"some-revisions-warnings"},
+						ccv3.Warnings{"some-evil-revisions-warnings"},
 						nil,
 					)
 				})
@@ -89,7 +89,7 @@ var _ = Describe("Revisions Actions", func() {
 							{GUID: "3"},
 						}))
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("get-application-warning", "some-revisions-warnings"))
+					Expect(warnings).To(ConsistOf("get-application-warning", "some-evil-revisions-warnings"))
 				})
 			})
 		})
