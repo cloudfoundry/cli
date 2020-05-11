@@ -52,7 +52,5 @@ func (cmd DisableServiceAccessCommand) displayMessage() error {
 		User:            user.Name,
 	}.displayMessage(cmd.UI)
 
-	cmd.UI.DisplayNewline()
-
 	return nil
 }
