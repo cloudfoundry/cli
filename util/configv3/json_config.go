@@ -16,6 +16,7 @@ type JSONConfig struct {
 	ConfigVersion            int                `json:"ConfigVersion"`
 	DopplerEndpoint          string             `json:"DopplerEndPoint"`
 	Locale                   string             `json:"Locale"`
+	LogCacheEndpoint         string             `json:"LogCacheEndPoint"`
 	MinCLIVersion            string             `json:"MinCLIVersion"`
 	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
 	TargetedOrganization     Organization       `json:"OrganizationFields"`
@@ -169,6 +170,7 @@ type TargetInformationArgs struct {
 	ApiVersion        string
 	Auth              string
 	Doppler           string
+	LogCache          string
 	MinCLIVersion     string
 	Routing           string
 	SkipSSLValidation bool
@@ -182,6 +184,7 @@ func (config *Config) SetTargetInformation(args TargetInformationArgs) {
 	config.ConfigFile.AuthorizationEndpoint = args.Auth
 	config.SetMinCLIVersion(args.MinCLIVersion)
 	config.ConfigFile.DopplerEndpoint = args.Doppler
+	config.ConfigFile.LogCacheEndpoint = args.LogCache
 	config.ConfigFile.RoutingEndpoint = args.Routing
 	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
 

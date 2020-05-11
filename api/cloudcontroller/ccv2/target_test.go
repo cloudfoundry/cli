@@ -48,6 +48,10 @@ var _ = Describe("Target", func() {
 					VerifyRequest(http.MethodGet, "/v2/info"),
 					RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/"),
+					RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
+				),
 			)
 		})
 

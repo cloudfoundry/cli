@@ -685,7 +685,7 @@ var _ = Describe("Space", func() {
 			})
 
 			It("makes the user a space developer and returns warnings", func() {
-				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(3))
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 			})

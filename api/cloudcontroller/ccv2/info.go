@@ -18,11 +18,10 @@ type APIInformation struct {
 	// Controller.
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
 
-	// DopplerEndpoint is the Doppler endpoint for the targeted Cloud Controller.
 	DopplerEndpoint string `json:"doppler_logging_endpoint"`
 
-	// MinCLIVersion is the minimum CLI version number required for the targeted
-	// Cloud Controller.
+	LogCacheEndpoint string `json:"log_cache_endpoint"`
+
 	MinCLIVersion string `json:"min_cli_version"`
 
 	// MinimumRecommendedCLIVersion is the minimum CLI version number recommended
@@ -59,6 +58,10 @@ func (client *Client) DopplerEndpoint() string {
 	return client.dopplerEndpoint
 }
 
+func (client *Client) LogCacheEndpoint() string {
+	return client.logCacheEndpoint
+}
+
 // Info returns back endpoint and API information from /v2/info.
 func (client *Client) Info() (APIInformation, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -90,4 +93,36 @@ func (client *Client) MinCLIVersion() string {
 // Controller.
 func (client *Client) RoutingEndpoint() string {
 	return client.routingEndpoint
+}
+
+// Info represents a GET response from the '/' endpoint of the cloud
+// controller API.
+type Info struct {
+	// Links is a list of top level Cloud Controller APIs.
+	Links InfoLinks `json:"links"`
+}
+
+type InfoLinks struct {
+	LogCache APILink `json:"log_cache"`
+}
+
+// rootResponse returns the CC API root document.
+func (client *Client) RootResponse() (Info, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRootRequest,
+	})
+	if err != nil {
+		return Info{}, nil, err
+	}
+
+	var rootResult Info
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &rootResult,
+	}
+
+	err = client.connection.Make(request, &response)
+	if unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError); ok && unknownSourceErr.StatusCode == http.StatusNotFound {
+		return Info{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
+	}
+	return rootResult, response.Warnings, err
 }

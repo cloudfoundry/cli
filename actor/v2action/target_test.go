@@ -39,6 +39,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.Auth).To(BeEmpty())
 			Expect(targetInfoArgs.MinCLIVersion).To(BeEmpty())
 			Expect(targetInfoArgs.Doppler).To(BeEmpty())
+			Expect(targetInfoArgs.LogCache).To(BeEmpty())
 			Expect(targetInfoArgs.Routing).To(BeEmpty())
 			Expect(targetInfoArgs.SkipSSLValidation).To(BeFalse())
 		})
@@ -72,7 +73,7 @@ var _ = Describe("Targeting", func() {
 	})
 
 	Describe("SetTarget", func() {
-		var expectedAPI, expectedAPIVersion, expectedAuth, expectedMinCLIVersion, expectedDoppler, expectedRouting string
+		var expectedAPI, expectedAPIVersion, expectedAuth, expectedMinCLIVersion, expectedDoppler, expectedLogCache, expectedRouting string
 
 		BeforeEach(func() {
 			expectedAPI = "https://api.foo.com"
@@ -80,6 +81,7 @@ var _ = Describe("Targeting", func() {
 			expectedAuth = "https://login.foo.com"
 			expectedMinCLIVersion = "1.0.0"
 			expectedDoppler = "wss://doppler.foo.com"
+			expectedLogCache = "https://log-cache.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
 			settings.URL = expectedAPI
@@ -89,6 +91,7 @@ var _ = Describe("Targeting", func() {
 			fakeCloudControllerClient.AuthorizationEndpointReturns(expectedAuth)
 			fakeCloudControllerClient.MinCLIVersionReturns(expectedMinCLIVersion)
 			fakeCloudControllerClient.DopplerEndpointReturns(expectedDoppler)
+			fakeCloudControllerClient.LogCacheEndpointReturns(expectedLogCache)
 			fakeCloudControllerClient.RoutingEndpointReturns(expectedRouting)
 		})
 
@@ -114,6 +117,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.Auth).To(Equal(expectedAuth))
 			Expect(targetInfoArgs.MinCLIVersion).To(Equal(expectedMinCLIVersion))
 			Expect(targetInfoArgs.Doppler).To(Equal(expectedDoppler))
+			Expect(targetInfoArgs.LogCache).To(Equal(expectedLogCache))
 			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
 			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
 		})

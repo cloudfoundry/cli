@@ -48,9 +48,15 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 		return warnings, err
 	}
 
+	rootInfo, _, err := client.RootResponse()
+	if err != nil {
+		return warnings, err
+	}
+
 	client.authorizationEndpoint = info.AuthorizationEndpoint
 	client.cloudControllerAPIVersion = info.APIVersion
 	client.dopplerEndpoint = info.DopplerEndpoint
+	client.logCacheEndpoint = rootInfo.Links.LogCache.HREF
 	client.minCLIVersion = info.MinCLIVersion
 	client.routingEndpoint = info.RoutingEndpoint
 

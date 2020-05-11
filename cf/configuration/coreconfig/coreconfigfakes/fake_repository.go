@@ -180,6 +180,16 @@ type FakeRepository struct {
 	localeReturnsOnCall map[int]struct {
 		result1 string
 	}
+	LogCacheEndpointStub        func() string
+	logCacheEndpointMutex       sync.RWMutex
+	logCacheEndpointArgsForCall []struct {
+	}
+	logCacheEndpointReturns struct {
+		result1 string
+	}
+	logCacheEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	MinCLIVersionStub        func() string
 	minCLIVersionMutex       sync.RWMutex
 	minCLIVersionArgsForCall []struct {
@@ -293,6 +303,11 @@ type FakeRepository struct {
 	SetLocaleStub        func(string)
 	setLocaleMutex       sync.RWMutex
 	setLocaleArgsForCall []struct {
+		arg1 string
+	}
+	SetLogCacheEndpointStub        func(string)
+	setLogCacheEndpointMutex       sync.RWMutex
+	setLogCacheEndpointArgsForCall []struct {
 		arg1 string
 	}
 	SetMinCLIVersionStub        func(string)
@@ -1358,6 +1373,58 @@ func (fake *FakeRepository) LocaleReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeRepository) LogCacheEndpoint() string {
+	fake.logCacheEndpointMutex.Lock()
+	ret, specificReturn := fake.logCacheEndpointReturnsOnCall[len(fake.logCacheEndpointArgsForCall)]
+	fake.logCacheEndpointArgsForCall = append(fake.logCacheEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LogCacheEndpoint", []interface{}{})
+	fake.logCacheEndpointMutex.Unlock()
+	if fake.LogCacheEndpointStub != nil {
+		return fake.LogCacheEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.logCacheEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRepository) LogCacheEndpointCallCount() int {
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
+	return len(fake.logCacheEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) LogCacheEndpointCalls(stub func() string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = stub
+}
+
+func (fake *FakeRepository) LogCacheEndpointReturns(result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	fake.logCacheEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) LogCacheEndpointReturnsOnCall(i int, result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	if fake.logCacheEndpointReturnsOnCall == nil {
+		fake.logCacheEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.logCacheEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeRepository) MinCLIVersion() string {
 	fake.minCLIVersionMutex.Lock()
 	ret, specificReturn := fake.minCLIVersionReturnsOnCall[len(fake.minCLIVersionArgsForCall)]
@@ -1998,6 +2065,37 @@ func (fake *FakeRepository) SetLocaleArgsForCall(i int) string {
 	fake.setLocaleMutex.RLock()
 	defer fake.setLocaleMutex.RUnlock()
 	argsForCall := fake.setLocaleArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeRepository) SetLogCacheEndpoint(arg1 string) {
+	fake.setLogCacheEndpointMutex.Lock()
+	fake.setLogCacheEndpointArgsForCall = append(fake.setLogCacheEndpointArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetLogCacheEndpoint", []interface{}{arg1})
+	fake.setLogCacheEndpointMutex.Unlock()
+	if fake.SetLogCacheEndpointStub != nil {
+		fake.SetLogCacheEndpointStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetLogCacheEndpointCallCount() int {
+	fake.setLogCacheEndpointMutex.RLock()
+	defer fake.setLogCacheEndpointMutex.RUnlock()
+	return len(fake.setLogCacheEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) SetLogCacheEndpointCalls(stub func(string)) {
+	fake.setLogCacheEndpointMutex.Lock()
+	defer fake.setLogCacheEndpointMutex.Unlock()
+	fake.SetLogCacheEndpointStub = stub
+}
+
+func (fake *FakeRepository) SetLogCacheEndpointArgsForCall(i int) string {
+	fake.setLogCacheEndpointMutex.RLock()
+	defer fake.setLogCacheEndpointMutex.RUnlock()
+	argsForCall := fake.setLogCacheEndpointArgsForCall[i]
 	return argsForCall.arg1
 }
 
@@ -2973,6 +3071,8 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.isSSLDisabledMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.minRecommendedCLIVersionMutex.RLock()
@@ -3005,6 +3105,8 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.setDopplerEndpointMutex.RUnlock()
 	fake.setLocaleMutex.RLock()
 	defer fake.setLocaleMutex.RUnlock()
+	fake.setLogCacheEndpointMutex.RLock()
+	defer fake.setLogCacheEndpointMutex.RUnlock()
 	fake.setMinCLIVersionMutex.RLock()
 	defer fake.setMinCLIVersionMutex.RUnlock()
 	fake.setMinRecommendedCLIVersionMutex.RLock()

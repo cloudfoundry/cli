@@ -304,6 +304,7 @@ var _ = Describe("JSONConfig", func() {
 				Auth:              "https://login.foo.com",
 				MinCLIVersion:     "2.0.0",
 				Doppler:           "wws://doppler.foo.com:443",
+				LogCache:          "https://log-cache.foo.com",
 				Routing:           "https://api.foo.com/routing",
 				SkipSSLValidation: true,
 			})
@@ -313,6 +314,7 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
 			Expect(config.ConfigFile.MinCLIVersion).To(Equal("2.0.0"))
 			Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
+			Expect(config.ConfigFile.LogCacheEndpoint).To(Equal("https://log-cache.foo.com"))
 			Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
 			Expect(config.ConfigFile.SkipSSLValidation).To(BeTrue())
 

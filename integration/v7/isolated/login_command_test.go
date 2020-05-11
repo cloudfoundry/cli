@@ -1,9 +1,12 @@
 package isolated
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -100,14 +103,38 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the user provides the -a flag", func() {
-				It("sets the API endpoint to the provided value", func() {
-					session := helpers.CF("login", "-a", apiURL, "-u", username, "-p", password, "--skip-ssl-validation")
-					Eventually(session).Should(Say("API endpoint: %s", apiURL))
-					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("api")
-					Eventually(session).Should(Exit(0))
-					Expect(session).Should(Say("API endpoint:   %s", apiURL))
+				When("the provided API endpoint is reachable", func() {
+
+					var session *Session
+
+					BeforeEach(func() {
+						session = helpers.CF("login", "-a", apiURL, "-u", username, "-p", password, "--skip-ssl-validation")
+						Eventually(session).Should(Say("API endpoint: %s", apiURL))
+						Eventually(session).Should(Exit(0))
+					})
+					It("writes fields to the config file when targeting an API", func() {
+						rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+						Expect(err).NotTo(HaveOccurred())
+
+						var configFile configv3.JSONConfig
+						err = json.Unmarshal(rawConfig, &configFile)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(configFile.ConfigVersion).To(Equal(3))
+						Expect(configFile.Target).To(Equal(apiURL))
+						Expect(configFile.APIVersion).To(MatchRegexp(`\d+\.\d+\.\d+`))
+						Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
+						Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
+						Expect(configFile.LogCacheEndpoint).To(MatchRegexp(".*log-cache.*"))
+
+					})
+
+					It("sets the API endpoint to the provided value", func() {
+						session = helpers.CF("api")
+						Eventually(session).Should(Exit(0))
+						Expect(session).Should(Say("API endpoint:   %s", apiURL))
+					})
 				})
 
 				When("the provided API endpoint is unreachable", func() {

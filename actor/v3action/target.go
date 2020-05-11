@@ -24,6 +24,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		Auth:              info.UAA(),
 		MinCLIVersion:     "", // Oldest supported V3 version should be OK
 		Doppler:           info.Logging(),
+		LogCache:          info.LogCache(),
 		Routing:           info.Routing(),
 		SkipSSLValidation: settings.SkipSSLValidation,
 	})

@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -112,7 +111,8 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	if err != nil {
 		panic("handle this error!")
 	}
-	logCacheURL := strings.Replace(configV3.ConfigFile.Target, "api", "log-cache", 1)
+
+	logCacheURL := configV3.ConfigFile.LogCacheEndpoint
 	logCacheClient := command.NewLogCacheClient(logCacheURL, configV3, nil)
 	loc.logsRepo = logs.NewLogCacheRepository(logCacheClient, sharedaction.GetRecentLogs, sharedaction.GetStreamingLogs)
 

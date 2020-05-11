@@ -28,6 +28,7 @@ type Data struct {
 	ConfigVersion            int
 	DopplerEndPoint          string
 	Locale                   string
+	LogCacheEndPoint         string
 	MinCLIVersion            string
 	MinRecommendedCLIVersion string
 	OrganizationFields       models.OrganizationFields

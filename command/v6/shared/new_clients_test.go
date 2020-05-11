@@ -83,6 +83,10 @@ var _ = Describe("New Clients", func() {
 						VerifyRequest(http.MethodGet, "/v2/info"),
 						RespondWith(http.StatusOK, `{ "api_version": "2.68.0" }`),
 					),
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
+					),
 				)
 			})
 

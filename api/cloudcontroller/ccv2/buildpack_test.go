@@ -79,8 +79,7 @@ var _ = Describe("Buildpack", func() {
 
 				It("creates a buildpack and returns it with any warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-
-					validateV2InfoPlusNumberOfRequests(1)
+					validateV2InfoPlusNumberOfRequests(2)
 
 					Expect(resultBuildpack).To(Equal(Buildpack{
 						GUID:     "some-guid",
@@ -126,7 +125,7 @@ var _ = Describe("Buildpack", func() {
 				It("creates a buildpack and returns it with any warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					validateV2InfoPlusNumberOfRequests(1)
+					validateV2InfoPlusNumberOfRequests(2)
 
 					Expect(resultBuildpack).To(Equal(Buildpack{
 						GUID:     "some-guid",
@@ -376,7 +375,7 @@ var _ = Describe("Buildpack", func() {
 
 					It("updates and returns the updated buildpack", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						validateV2InfoPlusNumberOfRequests(1)
+						validateV2InfoPlusNumberOfRequests(2)
 						Expect(warnings).To(ConsistOf("this is a warning"))
 						Expect(updatedBuildpack).To(Equal(buildpack))
 					})
@@ -424,7 +423,7 @@ var _ = Describe("Buildpack", func() {
 
 					It("updates and returns the updated buildpack", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						validateV2InfoPlusNumberOfRequests(1)
+						validateV2InfoPlusNumberOfRequests(2)
 						Expect(warnings).To(ConsistOf("this is a warning"))
 						Expect(updatedBuildpack).To(Equal(buildpack))
 					})

@@ -33,6 +33,7 @@ var _ = Describe("Targeting", func() {
 			expectedAPIVersion string
 			expectedAuth       string
 			expectedDoppler    string
+			expectedLogCache   string
 			expectedRouting    string
 
 			err      error
@@ -44,6 +45,7 @@ var _ = Describe("Targeting", func() {
 			expectedAPIVersion = "3.81.0"
 			expectedAuth = "https://login.foo.com"
 			expectedDoppler = "wss://doppler.foo.com"
+			expectedLogCache = "https://log-cache.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
 			skipSSLValidation = true
@@ -62,6 +64,9 @@ var _ = Describe("Targeting", func() {
 					},
 					Logging: ccv3.APILink{
 						HREF: expectedDoppler,
+					},
+					LogCache: ccv3.APILink{
+						HREF: expectedLogCache,
 					},
 					Routing: ccv3.APILink{
 						HREF: expectedRouting,
@@ -111,6 +116,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.ApiVersion).To(Equal(expectedAPIVersion))
 			Expect(targetInfoArgs.Auth).To(Equal(expectedAuth))
 			Expect(targetInfoArgs.Doppler).To(Equal(expectedDoppler))
+			Expect(targetInfoArgs.LogCache).To(Equal(expectedLogCache))
 			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
 			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
 		})
@@ -142,6 +148,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.Auth).To(BeEmpty())
 			Expect(targetInfoArgs.MinCLIVersion).To(BeEmpty())
 			Expect(targetInfoArgs.Doppler).To(BeEmpty())
+			Expect(targetInfoArgs.LogCache).To(BeEmpty())
 			Expect(targetInfoArgs.Routing).To(BeEmpty())
 			Expect(targetInfoArgs.SkipSSLValidation).To(BeFalse())
 		})

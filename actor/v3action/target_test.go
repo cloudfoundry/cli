@@ -30,13 +30,14 @@ var _ = Describe("Targeting", func() {
 	})
 
 	Describe("SetTarget", func() {
-		var expectedAPI, expectedAPIVersion, expectedAuth, expectedDoppler, expectedRouting string
+		var expectedAPI, expectedAPIVersion, expectedAuth, expectedDoppler, expectedLogCache, expectedRouting string
 
 		BeforeEach(func() {
 			expectedAPI = "https://api.foo.com"
 			expectedAPIVersion = "2.59.0"
 			expectedAuth = "https://login.foo.com"
 			expectedDoppler = "wss://doppler.foo.com"
+			expectedLogCache = "https://log-cache.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
 			settings.URL = expectedAPI
@@ -52,6 +53,9 @@ var _ = Describe("Targeting", func() {
 						Meta: meta},
 					Logging: ccv3.APILink{
 						HREF: expectedDoppler,
+					},
+					LogCache: ccv3.APILink{
+						HREF: expectedLogCache,
 					},
 					Routing: ccv3.APILink{
 						HREF: expectedRouting,
@@ -82,6 +86,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.ApiVersion).To(Equal(expectedAPIVersion))
 			Expect(targetInfoArgs.Auth).To(Equal(expectedAuth))
 			Expect(targetInfoArgs.Doppler).To(Equal(expectedDoppler))
+			Expect(targetInfoArgs.LogCache).To(Equal(expectedLogCache))
 			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
 			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
 		})
@@ -129,6 +134,7 @@ var _ = Describe("Targeting", func() {
 			Expect(targetInfoArgs.Auth).To(BeEmpty())
 			Expect(targetInfoArgs.MinCLIVersion).To(BeEmpty())
 			Expect(targetInfoArgs.Doppler).To(BeEmpty())
+			Expect(targetInfoArgs.LogCache).To(BeEmpty())
 			Expect(targetInfoArgs.Routing).To(BeEmpty())
 			Expect(targetInfoArgs.SkipSSLValidation).To(BeFalse())
 		})

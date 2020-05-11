@@ -1,10 +1,13 @@
 package isolated
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"time"
 
@@ -238,8 +241,9 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the user provides the -a flag", func() {
-				It("sets the API endpoint and does not prompt the user for the API endpoint", func() {
-					var session *Session
+
+				var session *Session
+				BeforeEach(func() {
 					if skipSSLValidation {
 						session = helpers.CF("login", "-a", apiURL, "--skip-ssl-validation")
 					} else {
@@ -251,9 +255,28 @@ var _ = Describe("login command", func() {
 					//session.Interrupt()
 					Eventually(session).Should(Exit())
 
+				})
+				It("sets the API endpoint and does not prompt the user for the API endpoint", func() {
 					session = helpers.CF("api")
 					Eventually(session).Should(Exit(0))
 					Expect(session).Should(Say("api endpoint:   %s", apiURL))
+
+				})
+				It("writes fields to the config file when targeting an API", func() {
+					rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+					Expect(err).NotTo(HaveOccurred())
+
+					var configFile configv3.JSONConfig
+					err = json.Unmarshal(rawConfig, &configFile)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(configFile.ConfigVersion).To(Equal(3))
+					Expect(configFile.Target).To(Equal(apiURL))
+					Expect(configFile.APIVersion).To(MatchRegexp(`\d+\.\d+\.\d+`))
+					Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
+					Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
+					Expect(configFile.LogCacheEndpoint).To(MatchRegexp(".*log-cache.*"))
+
 				})
 
 				When("the provided API endpoint is unreachable", func() {
