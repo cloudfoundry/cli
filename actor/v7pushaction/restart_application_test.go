@@ -18,6 +18,7 @@ var _ = Describe("RestartApplication", func() {
 		actor       *Actor
 		fakeV7Actor *v7pushactionfakes.FakeV7Actor
 
+		app       resources.Application
 		paramPlan PushPlan
 
 		warnings   Warnings
@@ -29,10 +30,12 @@ var _ = Describe("RestartApplication", func() {
 	BeforeEach(func() {
 		actor, fakeV7Actor, _ = getTestPushActor()
 
+		app = resources.Application{
+			GUID:  "some-app-guid",
+			State: constant.ApplicationStarted,
+		}
 		paramPlan = PushPlan{
-			Application: resources.Application{
-				GUID: "some-app-guid",
-			},
+			Application: app,
 		}
 	})
 
@@ -49,7 +52,7 @@ var _ = Describe("RestartApplication", func() {
 
 	When("Restarting the app succeeds", func() {
 		BeforeEach(func() {
-			fakeV7Actor.PollStartCalls(func(s string, b bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+			fakeV7Actor.PollStartCalls(func(app resources.Application, b bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
 				handleInstanceDetails("Instances starting...")
 				return nil, nil
 			})
@@ -65,9 +68,9 @@ var _ = Describe("RestartApplication", func() {
 
 			It("calls PollStart with true", func() {
 				Expect(fakeV7Actor.PollStartCallCount()).To(Equal(1))
-				actualAppGUID, givenNoWait, _ := fakeV7Actor.PollStartArgsForCall(0)
+				actualApp, givenNoWait, _ := fakeV7Actor.PollStartArgsForCall(0)
 				Expect(givenNoWait).To(Equal(true))
-				Expect(actualAppGUID).To(Equal("some-app-guid"))
+				Expect(actualApp).To(Equal(app))
 			})
 		})
 
@@ -75,7 +78,7 @@ var _ = Describe("RestartApplication", func() {
 			Expect(fakeV7Actor.PollStartCallCount()).To(Equal(1))
 			actualAppGUID, givenNoWait, _ := fakeV7Actor.PollStartArgsForCall(0)
 			Expect(givenNoWait).To(Equal(false))
-			Expect(actualAppGUID).To(Equal("some-app-guid"))
+			Expect(actualAppGUID).To(Equal(app))
 			Expect(events).To(ConsistOf(RestartingApplication, InstanceDetails, RestartingApplicationComplete))
 		})
 

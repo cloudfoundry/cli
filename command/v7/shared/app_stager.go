@@ -60,8 +60,8 @@ type stagingAndStartActor interface {
 	CreateDeployment(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
 	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
-	PollStart(appGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
-	PollStartForRolling(appGUID string, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
+	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
+	PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
@@ -152,7 +152,7 @@ func (stager *Stager) StartApp(
 			stager.UI.DisplayText(instanceDetails)
 		}
 
-		warnings, err = stager.Actor.PollStartForRolling(app.GUID, deploymentGUID, noWait, handleInstanceDetails)
+		warnings, err = stager.Actor.PollStartForRolling(app, deploymentGUID, noWait, handleInstanceDetails)
 		stager.UI.DisplayNewline()
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {
@@ -219,7 +219,7 @@ func (stager *Stager) StartApp(
 			stager.UI.DisplayText(instanceDetails)
 		}
 
-		warnings, err = stager.Actor.PollStart(app.GUID, noWait, handleInstanceDetails)
+		warnings, err = stager.Actor.PollStart(app, noWait, handleInstanceDetails)
 		stager.UI.DisplayNewline()
 		stager.UI.DisplayWarnings(warnings)
 		if err != nil {

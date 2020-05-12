@@ -735,7 +735,7 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("PollStart", func() {
 		var (
-			appGUID               string
+			app                   resources.Application
 			noWait                bool
 			handleInstanceDetails func(string)
 
@@ -750,7 +750,7 @@ var _ = Describe("Application Actions", func() {
 			done = make(chan bool)
 			fakeConfig.StartupTimeoutReturns(2 * time.Second)
 			fakeConfig.PollingIntervalReturns(1 * time.Second)
-			appGUID = "some-guid"
+			app = resources.Application{GUID: "some-guid"}
 			noWait = false
 
 			reportedInstanceDetails = []string{}
@@ -762,7 +762,7 @@ var _ = Describe("Application Actions", func() {
 		JustBeforeEach(func() {
 			go func() {
 				defer close(done)
-				warnings, executeErr = actor.PollStart(appGUID, noWait, handleInstanceDetails)
+				warnings, executeErr = actor.PollStart(app, noWait, handleInstanceDetails)
 				done <- true
 			}()
 		})
@@ -925,7 +925,7 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("PollStartForRolling", func() {
 		var (
-			appGUID               string
+			app                   resources.Application
 			deploymentGUID        string
 			noWait                bool
 			handleInstanceDetails func(string)
@@ -943,7 +943,7 @@ var _ = Describe("Application Actions", func() {
 				reportedInstanceDetails = append(reportedInstanceDetails, instanceDetails)
 			}
 
-			appGUID = "some-rolling-app-guid"
+			app = resources.Application{GUID: "some-rolling-app-guid"}
 			deploymentGUID = "some-deployment-guid"
 			noWait = false
 
@@ -955,7 +955,7 @@ var _ = Describe("Application Actions", func() {
 
 		JustBeforeEach(func() {
 			go func() {
-				warnings, executeErr = actor.PollStartForRolling(appGUID, deploymentGUID, noWait, handleInstanceDetails)
+				warnings, executeErr = actor.PollStartForRolling(app, deploymentGUID, noWait, handleInstanceDetails)
 				done <- true
 			}()
 		})
@@ -1094,7 +1094,7 @@ var _ = Describe("Application Actions", func() {
 						Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
 
 						Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(appGUID))
+						Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(app.GUID))
 
 						Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(0))
 
@@ -1133,7 +1133,7 @@ var _ = Describe("Application Actions", func() {
 							Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(0)).To(Equal(deploymentGUID))
 
 							Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(appGUID))
+							Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(app.GUID))
 
 							Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-guid"))
@@ -1345,7 +1345,7 @@ var _ = Describe("Application Actions", func() {
 					Eventually(fakeCloudControllerClient.GetDeploymentCallCount).Should(Equal(2))
 					Expect(fakeCloudControllerClient.GetDeploymentArgsForCall(1)).To(Equal(deploymentGUID))
 					Eventually(fakeCloudControllerClient.GetApplicationProcessesCallCount).Should(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(appGUID))
+					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal(app.GUID))
 					Eventually(fakeCloudControllerClient.GetProcessInstancesCallCount).Should(Equal(1))
 					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("process-guid"))
 					Eventually(fakeConfig.PollingIntervalCallCount).Should(Equal(2))

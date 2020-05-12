@@ -280,10 +280,10 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollStartStub        func(string, bool, func(string)) (v7action.Warnings, error)
+	PollStartStub        func(resources.Application, bool, func(string)) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
 	pollStartArgsForCall []struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 bool
 		arg3 func(string)
 	}
@@ -295,10 +295,10 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	PollStartForRollingStub        func(string, string, bool, func(string)) (v7action.Warnings, error)
+	PollStartForRollingStub        func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)
 	pollStartForRollingMutex       sync.RWMutex
 	pollStartForRollingArgsForCall []struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 string
 		arg3 bool
 		arg4 func(string)
@@ -1645,11 +1645,11 @@ func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 v7action.Packag
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollStart(arg1 string, arg2 bool, arg3 func(string)) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollStart(arg1 resources.Application, arg2 bool, arg3 func(string)) (v7action.Warnings, error) {
 	fake.pollStartMutex.Lock()
 	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
 	fake.pollStartArgsForCall = append(fake.pollStartArgsForCall, struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 bool
 		arg3 func(string)
 	}{arg1, arg2, arg3})
@@ -1671,13 +1671,13 @@ func (fake *FakeV7Actor) PollStartCallCount() int {
 	return len(fake.pollStartArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartCalls(stub func(string, bool, func(string)) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollStartCalls(stub func(resources.Application, bool, func(string)) (v7action.Warnings, error)) {
 	fake.pollStartMutex.Lock()
 	defer fake.pollStartMutex.Unlock()
 	fake.PollStartStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartArgsForCall(i int) (string, bool, func(string)) {
+func (fake *FakeV7Actor) PollStartArgsForCall(i int) (resources.Application, bool, func(string)) {
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	argsForCall := fake.pollStartArgsForCall[i]
@@ -1710,11 +1710,11 @@ func (fake *FakeV7Actor) PollStartReturnsOnCall(i int, result1 v7action.Warnings
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollStartForRolling(arg1 string, arg2 string, arg3 bool, arg4 func(string)) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollStartForRolling(arg1 resources.Application, arg2 string, arg3 bool, arg4 func(string)) (v7action.Warnings, error) {
 	fake.pollStartForRollingMutex.Lock()
 	ret, specificReturn := fake.pollStartForRollingReturnsOnCall[len(fake.pollStartForRollingArgsForCall)]
 	fake.pollStartForRollingArgsForCall = append(fake.pollStartForRollingArgsForCall, struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 string
 		arg3 bool
 		arg4 func(string)
@@ -1737,13 +1737,13 @@ func (fake *FakeV7Actor) PollStartForRollingCallCount() int {
 	return len(fake.pollStartForRollingArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(string, string, bool, func(string)) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)) {
 	fake.pollStartForRollingMutex.Lock()
 	defer fake.pollStartForRollingMutex.Unlock()
 	fake.PollStartForRollingStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (string, string, bool, func(string)) {
+func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (resources.Application, string, bool, func(string)) {
 	fake.pollStartForRollingMutex.RLock()
 	defer fake.pollStartForRollingMutex.RUnlock()
 	argsForCall := fake.pollStartForRollingArgsForCall[i]

@@ -55,7 +55,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(instanceDetails)
 	}
 
-	warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
+	warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayWarnings(warnings)
 

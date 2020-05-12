@@ -19,7 +19,7 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 		}
 	}
 
-	pollWarnings, err := actor.V7Actor.PollStartForRolling(pushPlan.Application.GUID, deploymentGUID, pushPlan.NoWait, handleInstanceDetails)
+	pollWarnings, err := actor.V7Actor.PollStartForRolling(pushPlan.Application, deploymentGUID, pushPlan.NoWait, handleInstanceDetails)
 	warnings = append(warnings, pollWarnings...)
 
 	return pushPlan, Warnings(warnings), err

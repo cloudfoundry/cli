@@ -253,9 +253,9 @@ func (actor Actor) GetUnstagedNewestPackageGUID(appGUID string) (string, Warning
 // PollStart polls an application's processes until some are started. If noWait is false,
 // it waits for at least one instance of all processes to be running. If noWait is true,
 // it only waits for an instance of the web process to be running.
-func (actor Actor) PollStart(appGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
+func (actor Actor) PollStart(app resources.Application, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var allWarnings Warnings
-	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
+	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(app.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
@@ -279,7 +279,7 @@ func (actor Actor) PollStart(appGUID string, noWait bool, handleInstanceDetails 
 	for {
 		select {
 		case <-timeout:
-			return allWarnings, actionerror.StartupTimeoutError{}
+			return allWarnings, actionerror.StartupTimeoutError{Name: app.Name}
 		case <-timer.C():
 			stopPolling, warnings, err := actor.PollProcesses(filteredProcesses, handleInstanceDetails)
 			allWarnings = append(allWarnings, warnings...)
@@ -294,7 +294,7 @@ func (actor Actor) PollStart(appGUID string, noWait bool, handleInstanceDetails 
 
 // PollStartForRolling polls a deploying application's processes until some are started. It does the same thing as PollStart, except it accounts for rolling deployments and whether
 // they have failed or been canceled during polling.
-func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
+func (actor Actor) PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleInstanceDetails func(string)) (Warnings, error) {
 	var (
 		deployment  ccv3.Deployment
 		processes   []ccv3.Process
@@ -308,7 +308,7 @@ func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, no
 	for {
 		select {
 		case <-timeout:
-			return allWarnings, actionerror.StartupTimeoutError{}
+			return allWarnings, actionerror.StartupTimeoutError{Name: app.Name}
 		case <-timer.C():
 			if !isDeployed(deployment) {
 				ccDeployment, warnings, err := actor.getDeployment(deploymentGUID)
@@ -317,7 +317,7 @@ func (actor Actor) PollStartForRolling(appGUID string, deploymentGUID string, no
 					return allWarnings, err
 				}
 				deployment = ccDeployment
-				processes, warnings, err = actor.getProcesses(deployment, appGUID, noWait)
+				processes, warnings, err = actor.getProcesses(deployment, app.GUID, noWait)
 				allWarnings = append(allWarnings, warnings...)
 				if err != nil {
 					return allWarnings, err

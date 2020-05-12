@@ -25,7 +25,7 @@ func (actor Actor) RestartApplication(pushPlan PushPlan, eventStream chan<- *Pus
 		}
 	}
 
-	warnings, err = actor.V7Actor.PollStart(pushPlan.Application.GUID, pushPlan.NoWait, handleInstanceDetails)
+	warnings, err = actor.V7Actor.PollStart(pushPlan.Application, pushPlan.NoWait, handleInstanceDetails)
 
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
