@@ -3,7 +3,6 @@ NODES ?= 10
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
-CF_BUILD_VERSION_V6 ?= $$(cat BUILD_VERSION_V6)
 CF_BUILD_VERSION_V7 ?= $$(cat BUILD_VERSION_V7)
 CF_BUILD_VERSION_V8 ?= $$(cat BUILD_VERSION_V8)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
@@ -11,16 +10,12 @@ CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS_COMMON=-w -s \
 	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
 	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
-LD_FLAGS =$(LD_FLAGS_COMMON) \
-	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION_V6)
 LD_FLAGS_V7 =$(LD_FLAGS_COMMON) \
 	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION_V7)
 LD_FLAGS_V8 =$(LD_FLAGS_COMMON) \
 	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION_V8)
-LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
 LD_FLAGS_LINUX_V7 = -extldflags \"-static\" $(LD_FLAGS_V7)
 LD_FLAGS_LINUX_V8 = -extldflags \"-static\" $(LD_FLAGS_V8)
-REQUIRED_FOR_STATIC_BINARY =-a -tags "V6 netgo" -installsuffix netgo
 REQUIRED_FOR_STATIC_BINARY_V7 =-a -tags "V7 netgo" -installsuffix netgo
 REQUIRED_FOR_STATIC_BINARY_V8 =-a -tags "V8 netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
@@ -149,26 +144,12 @@ lint: custom-lint ## Runs all linters and formatters
 		| xargs golangci-lint run $(LINT_FLAGS)
 	@echo "No lint errors!"
 
-ifeq ($(TARGET),V6)
-out/cf: out/cf6
-	cp out/cf6 out/cf
-else ifeq ($(TARGET),V7)
+ifeq ($(TARGET),V7)
 out/cf: out/cf7
 	cp out/cf7 out/cf
 else ifeq ($(TARGET),V8)
 out/cf: out/cf8
 	cp out/cf8 out/cf
-endif
-
-# Build dynamic binary for Darwin
-ifeq ($(UNAME_S),Darwin)
-out/cf6: $(GOSRC)
-	go build -tags="V6" -ldflags "$(LD_FLAGS)" -o out/cf6 .
-else
-out/cf6: $(GOSRC)
-	CGO_ENABLED=0 go build \
-		$(REQUIRED_FOR_STATIC_BINARY) \
-		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf6 .
 endif
 
 # Build dynamic binary for Darwin
@@ -193,28 +174,6 @@ out/cf8: $(GOSRC)
 		$(REQUIRED_FOR_STATIC_BINARY_V8) \
 		-ldflags "$(LD_FLAGS_LINUX_V8)" -o out/cf8 .
 endif
-
-out/cf-cli_linux_i686: $(GOSRC)
-	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
-							$(REQUIRED_FOR_STATIC_BINARY) \
-							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_i686 .
-
-out/cf-cli_linux_x86-64: $(GOSRC)
-	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
-							$(REQUIRED_FOR_STATIC_BINARY) \
-							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
-
-out/cf-cli_osx: $(GOSRC)
-	GOARCH=amd64 GOOS=darwin go build -tags="V6" \
-				 -a -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx .
-
-out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
-	GOARCH=386 GOOS=windows go build -tags="forceposix V6" -o out/cf-cli_win32.exe -ldflags "$(LD_FLAGS)" .
-	rm rsrc.syso
-
-out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
-	GOARCH=amd64 GOOS=windows go build -tags="forceposix V6" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
-	rm rsrc.syso
 
 out/cf7-cli_linux_i686: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
@@ -284,7 +243,7 @@ units-full: build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"
 
 version: ## Print the version number of what would be built
-	@echo $(CF_BUILD_VERSION_V6)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
+	@echo $(CF_BUILD_VERSION_V7)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
 .PHONY: all build clean format version lint custom-lint
 .PHONY: test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
