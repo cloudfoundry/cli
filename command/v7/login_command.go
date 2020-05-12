@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/clock"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -144,10 +145,15 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			return err
 		}
 
-		if len(orgs) == 1 {
-			cmd.Config.SetOrganizationInformation(orgs[0].GUID, orgs[0].Name)
-		} else if len(orgs) > 1 {
-			chosenOrg, err := cmd.promptChosenOrg(orgs)
+		filteredOrgs, err := cmd.filterOrgsForSpace(orgs)
+		if err != nil {
+			return err
+		}
+
+		if len(filteredOrgs) == 1 {
+			cmd.Config.SetOrganizationInformation(filteredOrgs[0].GUID, filteredOrgs[0].Name)
+		} else if len(filteredOrgs) > 1 {
+			chosenOrg, err := cmd.promptChosenOrg(filteredOrgs)
 			if err != nil {
 				return err
 			}
@@ -418,6 +424,27 @@ func (cmd *LoginCommand) showStatus() {
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
 }
 
+func (cmd *LoginCommand) filterOrgsForSpace(allOrgs []v7action.Organization) ([]v7action.Organization, error) {
+	if cmd.Space == "" {
+		return allOrgs, nil
+	}
+
+	var filteredOrgs []v7action.Organization
+	for _, org := range allOrgs {
+		_, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, org.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err == nil {
+			filteredOrgs = append(filteredOrgs, org)
+			continue
+		}
+		if _, ok := err.(actionerror.SpaceNotFoundError); !ok {
+			return []v7action.Organization{}, err
+		}
+	}
+
+	return filteredOrgs, nil
+}
+
 func (cmd *LoginCommand) promptChosenOrg(orgs []v7action.Organization) (v7action.Organization, error) {
 	orgNames := make([]string, len(orgs))
 	for i, org := range orgs {
@@ -428,6 +455,9 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v7action.Organization) (v7action
 
 	if err != nil {
 		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
+			if cmd.Space != "" {
+				return v7action.Organization{}, translatableerror.OrganizationWithSpaceNotFoundError{Name: invalidChoice.Choice, SpaceName: cmd.Space}
+			}
 			return v7action.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
 		}
 

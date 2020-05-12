@@ -866,7 +866,131 @@ var _ = Describe("login Command", func() {
 			})
 		})
 
-		When("-o was not passed", func() {
+		When("-o was not passed, -s was passed", func() {
+			BeforeEach(func() {
+				cmd.APIEndpoint = "example.com"
+				cmd.Username = "some-user"
+				cmd.Password = "some-password"
+				cmd.Space = "some-space"
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+				fakeConfig.TargetReturns("https://example.com")
+				fakeActor.GetOrganizationsReturns(
+					[]v7action.Organization{},
+					v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+					nil,
+				)
+				fakeActor.GetSpaceByNameAndOrganizationCalls(func(spaceName string, orgGUID string) (v7action.Space, v7action.Warnings, error) {
+					if orgGUID != "some-org-guid1" {
+						return v7action.Space{Name: spaceName}, v7action.Warnings{}, nil
+					}
+					return v7action.Space{}, v7action.Warnings{}, actionerror.SpaceNotFoundError{}
+				})
+			})
+
+			When("no org valid org exists", func() {
+				BeforeEach(func() {
+					fakeActor.GetOrganizationsReturns(
+						[]v7action.Organization{v7action.Organization{
+							GUID: "some-org-guid",
+							Name: "some-org-name",
+						}},
+						v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+						nil,
+					)
+				})
+
+				It("does not prompt the user to select an org", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).ToNot(Say("Select an org:"))
+					Expect(testUI.Out).ToNot(Say(`Org \(enter to skip\):`))
+				})
+
+				It("displays how to target an org and space", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say(`API endpoint:\s+https://example.com`))
+					Expect(testUI.Out).To(Say(`API version:\s+3.4.5`))
+					Expect(testUI.Out).To(Say(`user:\s+some-user`))
+					Expect(testUI.Out).To(Say("No org or space targeted, use '%s target -o ORG -s SPACE'", binaryName))
+				})
+			})
+
+			When("only one valid org exists", func() {
+				BeforeEach(func() {
+					fakeActor.GetOrganizationsReturns(
+						[]v7action.Organization{v7action.Organization{
+							GUID: "some-org-guid1",
+							Name: "some-org-name1",
+						}, v7action.Organization{
+							GUID: "some-org-guid2",
+							Name: "some-org-name2",
+						}},
+						v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+						nil,
+					)
+				})
+
+				It("targets that org", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+					orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid2"))
+					Expect(orgName).To(Equal("some-org-name2"))
+				})
+			})
+
+			When("more than one valid org exists", func() {
+				BeforeEach(func() {
+					fakeActor.GetOrganizationsReturns(
+						[]v7action.Organization{
+							v7action.Organization{
+								GUID: "some-org-guid3",
+								Name: "1234",
+							},
+							v7action.Organization{
+								GUID: "some-org-guid1",
+								Name: "some-org-name1",
+							},
+							v7action.Organization{
+								GUID: "some-org-guid2",
+								Name: "some-org-name2",
+							},
+						},
+						v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+						nil,
+					)
+				})
+
+				It("prompts the user to select an org from the filtered selection", func() {
+					Expect(testUI.Out).To(Say("Select an org:"))
+					Expect(testUI.Out).To(Say("1. 1234"))
+					Expect(testUI.Out).To(Say("2. some-org-name2"))
+					Expect(testUI.Out).To(Say("\n\n"))
+					Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+					Expect(executeErr).ToNot(HaveOccurred())
+				})
+			})
+
+			When("filtering the orgs errors", func() {
+				BeforeEach(func() {
+					fakeActor.GetOrganizationsReturns(
+						[]v7action.Organization{v7action.Organization{
+							GUID: "some-org-guid",
+							Name: "some-org-name",
+						}},
+						v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+						nil,
+					)
+					fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, v7action.Warnings{}, errors.New("oh noooooooo"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError(errors.New("oh noooooooo")))
+				})
+			})
+		})
+
+		When("-o and -s were both not passed", func() {
 			BeforeEach(func() {
 				cmd.APIEndpoint = "example.com"
 				cmd.Username = "some-user"

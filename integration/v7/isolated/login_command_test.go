@@ -791,6 +791,103 @@ var _ = Describe("login command", func() {
 			})
 		})
 
+		When("the -o flag is not passed, and the -s flag is passed", func() {
+			var (
+				spaceName     string
+				secondOrgName string
+				thirdOrgName  string
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				createOrgSession := helpers.CF("create-org", orgName)
+				Eventually(createOrgSession).Should(Exit(0))
+				setOrgRoleSession := helpers.CF("set-org-role", username, orgName, "OrgManager")
+				Eventually(setOrgRoleSession).Should(Exit(0))
+				spaceName = helpers.NewSpaceName()
+				createSpaceSession := helpers.CF("create-space", "-o", orgName, spaceName)
+				Eventually(createSpaceSession).Should(Exit(0))
+				roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
+				Eventually(roleSession).Should(Exit(0))
+
+				secondOrgName = helpers.NewOrgName()
+				createOrgSession = helpers.CF("create-org", secondOrgName)
+				Eventually(createOrgSession).Should(Exit(0))
+				setOrgRoleSession = helpers.CF("set-org-role", username, secondOrgName, "OrgManager")
+				Eventually(setOrgRoleSession).Should(Exit(0))
+				secondSpaceName := helpers.NewSpaceName()
+				createSpaceSession = helpers.CF("create-space", "-o", secondOrgName, secondSpaceName)
+				Eventually(createSpaceSession).Should(Exit(0))
+				roleSession = helpers.CF("set-space-role", username, secondOrgName, secondSpaceName, "SpaceManager")
+				Eventually(roleSession).Should(Exit(0))
+			})
+
+			Context("only one org has a correctly named space", func() {
+				It("automatically targets the org associated with the space", func() {
+					session := helpers.CF("login", "-u", username, "-p", password, "-s", spaceName, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+			})
+
+			Context("multiple orgs have the correctly named space", func() {
+				BeforeEach(func() {
+					thirdOrgName = helpers.NewOrgName()
+					createOrgSession := helpers.CF("create-org", thirdOrgName)
+					Eventually(createOrgSession).Should(Exit(0))
+					setOrgRoleSession := helpers.CF("set-org-role", username, thirdOrgName, "OrgManager")
+					Eventually(setOrgRoleSession).Should(Exit(0))
+					createSpaceSession := helpers.CF("create-space", "-o", thirdOrgName, spaceName)
+					Eventually(createSpaceSession).Should(Exit(0))
+					roleSession := helpers.CF("set-space-role", username, thirdOrgName, spaceName, "SpaceManager")
+					Eventually(roleSession).Should(Exit(0))
+				})
+
+				It("prompts the user to select from the matching orgs", func() {
+					input := NewBuffer()
+					_, err := input.Write([]byte("1\n"))
+					Expect(err).ToNot(HaveOccurred())
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-s", spaceName, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					re := regexp.MustCompile("[0-9]+\\. (?P<OrgName>.*)")
+					matches := re.FindStringSubmatch(string(session.Out.Contents()))
+					Expect(matches).To(HaveLen((2)))
+					expectedOrgName := matches[1]
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, expectedOrgName))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+
+				When("the user enters an organization that doesn't contain the space at the prompt", func() {
+					It("targets the org, then displays an error message and does not target the space", func() {
+						input := NewBuffer()
+						_, err := input.Write([]byte(fmt.Sprintf("%s\n", secondOrgName)))
+						Expect(err).ToNot(HaveOccurred())
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-s", spaceName, "-a", apiURL, "--skip-ssl-validation")
+
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Organization '%s' containing space '%s' not found.", secondOrgName, spaceName))
+
+						targetSession := helpers.CF("target")
+						Eventually(targetSession).Should(Exit(0))
+						Eventually(targetSession).Should(Say(`user:\s+%s`, username))
+						Eventually(targetSession).ShouldNot(Say(`org:\s+%s`, orgName))
+						Eventually(targetSession).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+					})
+				})
+			})
+		})
+
 		When("the -o flag is passed", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
@@ -925,7 +1022,7 @@ var _ = Describe("login command", func() {
 						stdin := NewBuffer()
 						_, writeErr := stdin.Write([]byte(orgName + "\n"))
 						Expect(writeErr).ToNot(HaveOccurred())
-						session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+						session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-o", orgName, "-s", spaceName, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
