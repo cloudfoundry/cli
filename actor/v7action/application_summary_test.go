@@ -3,14 +3,13 @@ package v7action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/clock"
 
@@ -427,9 +426,9 @@ var _ = Describe("Application Summary Actions", func() {
 				When("getting current droplet succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-							ccv3.Droplet{
+							resources.Droplet{
 								Stack: "some-stack",
-								Buildpacks: []ccv3.DropletBuildpack{
+								Buildpacks: []resources.DropletBuildpack{
 									{
 										Name: "some-buildpack",
 									},
@@ -521,10 +520,10 @@ var _ = Describe("Application Summary Actions", func() {
 										{GUID: "some-other-route-guid"},
 									},
 								},
-								CurrentDroplet: Droplet{
+								CurrentDroplet: resources.Droplet{
 									Stack: "some-stack",
 									Image: "docker/some-image",
-									Buildpacks: []DropletBuildpack{
+									Buildpacks: []resources.DropletBuildpack{
 										{
 											Name: "some-buildpack",
 										},
@@ -591,7 +590,7 @@ var _ = Describe("Application Summary Actions", func() {
 				When("app does not have current droplet", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-							ccv3.Droplet{},
+							resources.Droplet{},
 							ccv3.Warnings{"get-app-droplet-warning"},
 							ccerror.DropletNotFoundError{},
 						)
@@ -683,7 +682,7 @@ var _ = Describe("Application Summary Actions", func() {
 					BeforeEach(func() {
 						expectedErr = errors.New("some error")
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-							ccv3.Droplet{},
+							resources.Droplet{},
 							ccv3.Warnings{"get-droplet-warning"},
 							expectedErr,
 						)

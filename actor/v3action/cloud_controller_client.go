@@ -3,9 +3,8 @@ package v3action
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 //go:generate counterfeiter . CloudControllerClient
@@ -29,7 +28,7 @@ type CloudControllerClient interface {
 	DeleteIsolationSegmentOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
 	DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
-	GetApplicationDropletCurrent(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
+	GetApplicationDropletCurrent(appGUID string) (resources.Droplet, ccv3.Warnings, error)
 	GetApplicationEnvironment(appGUID string) (ccv3.Environment, ccv3.Warnings, error)
 	GetApplicationProcessByType(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error)
 	GetApplicationProcesses(appGUID string) ([]ccv3.Process, ccv3.Warnings, error)
@@ -38,8 +37,8 @@ type CloudControllerClient interface {
 	GetBuild(guid string) (ccv3.Build, ccv3.Warnings, error)
 	GetDeployment(guid string) (ccv3.Deployment, ccv3.Warnings, error)
 	GetDeployments(query ...ccv3.Query) ([]ccv3.Deployment, ccv3.Warnings, error)
-	GetDroplet(guid string) (ccv3.Droplet, ccv3.Warnings, error)
-	GetDroplets(query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
+	GetDroplet(guid string) (resources.Droplet, ccv3.Warnings, error)
+	GetDroplets(query ...ccv3.Query) ([]resources.Droplet, ccv3.Warnings, error)
 	GetInfo() (ccv3.Info, ccv3.ResourceLinks, ccv3.Warnings, error)
 	GetIsolationSegment(guid string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]ccv3.Organization, ccv3.Warnings, error)

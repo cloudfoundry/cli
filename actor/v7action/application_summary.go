@@ -15,7 +15,7 @@ type ApplicationSummary struct {
 // v7action.DetailedApplicationSummary represents an application with its processes and droplet.
 type DetailedApplicationSummary struct {
 	ApplicationSummary
-	CurrentDroplet Droplet
+	CurrentDroplet resources.Droplet
 }
 
 func (a ApplicationSummary) GetIsolationSegmentName() (string, bool) {

@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -61,7 +62,7 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 				// 	return
 				// }
 
-				ccv3Droplet := ccv3.Droplet{
+				ccv3Droplet := resources.Droplet{
 					GUID:      build.DropletGUID,
 					State:     constant.DropletState(build.State),
 					CreatedAt: build.CreatedAt,

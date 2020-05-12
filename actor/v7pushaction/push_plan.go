@@ -3,11 +3,10 @@ package v7pushaction
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )

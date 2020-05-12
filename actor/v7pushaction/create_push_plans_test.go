@@ -4,11 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

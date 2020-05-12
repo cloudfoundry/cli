@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, deleteRoutes bool) (Warnings, error) {

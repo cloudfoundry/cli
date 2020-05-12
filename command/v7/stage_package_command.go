@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type StagePackageCommand struct {
@@ -88,7 +88,7 @@ func (cmd StagePackageCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 	)
 
-	var droplet v7action.Droplet
+	var droplet resources.Droplet
 	droplet, err = shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
 		return err

@@ -1,11 +1,12 @@
 package ccv2
 
 import (
+	"strings"
+	"time"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 	"github.com/tedsuo/rata"
-	"strings"
-	"time"
 )
 
 // TargetSettings represents configuration for establishing a connection to the

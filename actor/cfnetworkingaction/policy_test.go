@@ -3,10 +3,9 @@ package cfnetworkingaction_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/actor/actionerror"

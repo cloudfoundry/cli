@@ -3,12 +3,11 @@ package ccv3_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

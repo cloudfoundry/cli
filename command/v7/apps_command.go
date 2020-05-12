@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/util/ui"
 )
 

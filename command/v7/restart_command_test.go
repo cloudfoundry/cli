@@ -3,8 +3,6 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -13,6 +11,7 @@ import (
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -169,7 +168,7 @@ var _ = Describe("restart Command", func() {
 
 			inputApp, inputDroplet, inputStrategy, inputNoWait, inputSpace, inputOrg, inputAppAction := fakeAppStager.StartAppArgsForCall(0)
 			Expect(inputApp).To(Equal(app))
-			Expect(inputDroplet).To(Equal(v7action.Droplet{}))
+			Expect(inputDroplet).To(Equal(resources.Droplet{}))
 			Expect(inputStrategy).To(Equal(strategy))
 			Expect(inputNoWait).To(Equal(noWait))
 			Expect(inputSpace).To(Equal(cmd.Config.TargetedSpace()))

@@ -1,11 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type RestartCommand struct {
@@ -77,7 +77,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 			return err
 		}
 	} else {
-		err = cmd.Stager.StartApp(app, v7action.Droplet{}, cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
+		err = cmd.Stager.StartApp(app, resources.Droplet{}, cmd.Strategy.Name, cmd.NoWait, cmd.Config.TargetedSpace(), cmd.Config.TargetedOrganization(), constant.ApplicationRestarting)
 		if err != nil {
 			return err
 		}

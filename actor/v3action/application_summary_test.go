@@ -3,13 +3,12 @@ package v3action_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
@@ -106,9 +105,9 @@ var _ = Describe("Application Summary Actions", func() {
 				When("app has droplet", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-							ccv3.Droplet{
+							resources.Droplet{
 								Stack: "some-stack",
-								Buildpacks: []ccv3.DropletBuildpack{
+								Buildpacks: []resources.DropletBuildpack{
 									{
 										Name: "some-buildpack",
 									},
@@ -189,7 +188,7 @@ var _ = Describe("Application Summary Actions", func() {
 						BeforeEach(func() {
 							expectedErr = errors.New("some error")
 							fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-								ccv3.Droplet{},
+								resources.Droplet{},
 								ccv3.Warnings{"some-droplet-warning"},
 								expectedErr,
 							)
@@ -205,7 +204,7 @@ var _ = Describe("Application Summary Actions", func() {
 				When("app does not have current droplet", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
-							ccv3.Droplet{},
+							resources.Droplet{},
 							ccv3.Warnings{"some-droplet-warning"},
 							ccerror.DropletNotFoundError{},
 						)

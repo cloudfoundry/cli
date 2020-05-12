@@ -4,14 +4,13 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/clock/fakeclock"
 
@@ -1861,7 +1860,7 @@ var _ = Describe("Application Actions", func() {
 			When("the newest package's has a STAGED droplet", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetPackageDropletsReturns(
-						[]ccv3.Droplet{{State: constant.DropletStaged}},
+						[]resources.Droplet{{State: constant.DropletStaged}},
 						ccv3.Warnings{"get-package-droplet-warning"},
 						nil,
 					)
@@ -1877,7 +1876,7 @@ var _ = Describe("Application Actions", func() {
 			When("the package has no STAGED droplets", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetPackageDropletsReturns(
-						[]ccv3.Droplet{},
+						[]resources.Droplet{},
 						ccv3.Warnings{"get-package-droplet-warning"},
 						nil,
 					)

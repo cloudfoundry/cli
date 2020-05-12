@@ -3,11 +3,10 @@ package v7pushaction_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -77,7 +76,7 @@ var _ = Describe("StagePackageForApplication", func() {
 	Describe("polling build", func() {
 		When("the the polling is successful", func() {
 			BeforeEach(func() {
-				fakeV7Actor.PollBuildReturns(v7action.Droplet{GUID: "some-droplet-guid"}, v7action.Warnings{"some-poll-build-warning"}, nil)
+				fakeV7Actor.PollBuildReturns(resources.Droplet{GUID: "some-droplet-guid"}, v7action.Warnings{"some-poll-build-warning"}, nil)
 			})
 
 			It("returns a staging complete event and warnings", func() {
@@ -97,7 +96,7 @@ var _ = Describe("StagePackageForApplication", func() {
 
 			BeforeEach(func() {
 				someErr = errors.New("I AM A BANANA")
-				fakeV7Actor.PollBuildReturns(v7action.Droplet{}, v7action.Warnings{"some-poll-build-warning"}, someErr)
+				fakeV7Actor.PollBuildReturns(resources.Droplet{}, v7action.Warnings{"some-poll-build-warning"}, someErr)
 			})
 
 			It("returns errors and warnings", func() {

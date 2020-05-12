@@ -12,18 +12,18 @@ import (
 )
 
 type FakeV7Actor struct {
-	CreateApplicationDropletStub        func(string) (v7action.Droplet, v7action.Warnings, error)
+	CreateApplicationDropletStub        func(string) (resources.Droplet, v7action.Warnings, error)
 	createApplicationDropletMutex       sync.RWMutex
 	createApplicationDropletArgsForCall []struct {
 		arg1 string
 	}
 	createApplicationDropletReturns struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
 	createApplicationDropletReturnsOnCall map[int]struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -124,19 +124,19 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationDropletsStub        func(string, string) ([]v7action.Droplet, v7action.Warnings, error)
+	GetApplicationDropletsStub        func(string, string) ([]resources.Droplet, v7action.Warnings, error)
 	getApplicationDropletsMutex       sync.RWMutex
 	getApplicationDropletsArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getApplicationDropletsReturns struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationDropletsReturnsOnCall map[int]struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -249,19 +249,19 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	PollBuildStub        func(string, string) (v7action.Droplet, v7action.Warnings, error)
+	PollBuildStub        func(string, string) (resources.Droplet, v7action.Warnings, error)
 	pollBuildMutex       sync.RWMutex
 	pollBuildArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	pollBuildReturns struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
 	pollBuildReturnsOnCall map[int]struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -506,7 +506,7 @@ type FakeV7Actor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV7Actor) CreateApplicationDroplet(arg1 string) (v7action.Droplet, v7action.Warnings, error) {
+func (fake *FakeV7Actor) CreateApplicationDroplet(arg1 string) (resources.Droplet, v7action.Warnings, error) {
 	fake.createApplicationDropletMutex.Lock()
 	ret, specificReturn := fake.createApplicationDropletReturnsOnCall[len(fake.createApplicationDropletArgsForCall)]
 	fake.createApplicationDropletArgsForCall = append(fake.createApplicationDropletArgsForCall, struct {
@@ -530,7 +530,7 @@ func (fake *FakeV7Actor) CreateApplicationDropletCallCount() int {
 	return len(fake.createApplicationDropletArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateApplicationDropletCalls(stub func(string) (v7action.Droplet, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) CreateApplicationDropletCalls(stub func(string) (resources.Droplet, v7action.Warnings, error)) {
 	fake.createApplicationDropletMutex.Lock()
 	defer fake.createApplicationDropletMutex.Unlock()
 	fake.CreateApplicationDropletStub = stub
@@ -543,30 +543,30 @@ func (fake *FakeV7Actor) CreateApplicationDropletArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) CreateApplicationDropletReturns(result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateApplicationDropletReturns(result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.createApplicationDropletMutex.Lock()
 	defer fake.createApplicationDropletMutex.Unlock()
 	fake.CreateApplicationDropletStub = nil
 	fake.createApplicationDropletReturns = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateApplicationDropletReturnsOnCall(i int, result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateApplicationDropletReturnsOnCall(i int, result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.createApplicationDropletMutex.Lock()
 	defer fake.createApplicationDropletMutex.Unlock()
 	fake.CreateApplicationDropletStub = nil
 	if fake.createApplicationDropletReturnsOnCall == nil {
 		fake.createApplicationDropletReturnsOnCall = make(map[int]struct {
-			result1 v7action.Droplet
+			result1 resources.Droplet
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createApplicationDropletReturnsOnCall[i] = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -975,7 +975,7 @@ func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationDroplets(arg1 string, arg2 string) ([]v7action.Droplet, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetApplicationDroplets(arg1 string, arg2 string) ([]resources.Droplet, v7action.Warnings, error) {
 	fake.getApplicationDropletsMutex.Lock()
 	ret, specificReturn := fake.getApplicationDropletsReturnsOnCall[len(fake.getApplicationDropletsArgsForCall)]
 	fake.getApplicationDropletsArgsForCall = append(fake.getApplicationDropletsArgsForCall, struct {
@@ -1000,7 +1000,7 @@ func (fake *FakeV7Actor) GetApplicationDropletsCallCount() int {
 	return len(fake.getApplicationDropletsArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetApplicationDropletsCalls(stub func(string, string) ([]v7action.Droplet, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetApplicationDropletsCalls(stub func(string, string) ([]resources.Droplet, v7action.Warnings, error)) {
 	fake.getApplicationDropletsMutex.Lock()
 	defer fake.getApplicationDropletsMutex.Unlock()
 	fake.GetApplicationDropletsStub = stub
@@ -1013,30 +1013,30 @@ func (fake *FakeV7Actor) GetApplicationDropletsArgsForCall(i int) (string, strin
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) GetApplicationDropletsReturns(result1 []v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationDropletsReturns(result1 []resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationDropletsMutex.Lock()
 	defer fake.getApplicationDropletsMutex.Unlock()
 	fake.GetApplicationDropletsStub = nil
 	fake.getApplicationDropletsReturns = struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationDropletsReturnsOnCall(i int, result1 []v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationDropletsReturnsOnCall(i int, result1 []resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationDropletsMutex.Lock()
 	defer fake.getApplicationDropletsMutex.Unlock()
 	fake.GetApplicationDropletsStub = nil
 	if fake.getApplicationDropletsReturnsOnCall == nil {
 		fake.getApplicationDropletsReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Droplet
+			result1 []resources.Droplet
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationDropletsReturnsOnCall[i] = struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1512,7 +1512,7 @@ func (fake *FakeV7Actor) MapRouteReturnsOnCall(i int, result1 v7action.Warnings,
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollBuild(arg1 string, arg2 string) (v7action.Droplet, v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollBuild(arg1 string, arg2 string) (resources.Droplet, v7action.Warnings, error) {
 	fake.pollBuildMutex.Lock()
 	ret, specificReturn := fake.pollBuildReturnsOnCall[len(fake.pollBuildArgsForCall)]
 	fake.pollBuildArgsForCall = append(fake.pollBuildArgsForCall, struct {
@@ -1537,7 +1537,7 @@ func (fake *FakeV7Actor) PollBuildCallCount() int {
 	return len(fake.pollBuildArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollBuildCalls(stub func(string, string) (v7action.Droplet, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollBuildCalls(stub func(string, string) (resources.Droplet, v7action.Warnings, error)) {
 	fake.pollBuildMutex.Lock()
 	defer fake.pollBuildMutex.Unlock()
 	fake.PollBuildStub = stub
@@ -1550,30 +1550,30 @@ func (fake *FakeV7Actor) PollBuildArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) PollBuildReturns(result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) PollBuildReturns(result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.pollBuildMutex.Lock()
 	defer fake.pollBuildMutex.Unlock()
 	fake.PollBuildStub = nil
 	fake.pollBuildReturns = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollBuildReturnsOnCall(i int, result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) PollBuildReturnsOnCall(i int, result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.pollBuildMutex.Lock()
 	defer fake.pollBuildMutex.Unlock()
 	fake.PollBuildStub = nil
 	if fake.pollBuildReturnsOnCall == nil {
 		fake.pollBuildReturnsOnCall = make(map[int]struct {
-			result1 v7action.Droplet
+			result1 resources.Droplet
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.pollBuildReturnsOnCall[i] = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

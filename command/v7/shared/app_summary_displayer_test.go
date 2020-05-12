@@ -3,12 +3,11 @@ package shared_test
 import (
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -526,7 +525,7 @@ var _ = Describe("app summary displayer", func() {
 							LifecycleType: constant.AppLifecycleTypeDocker,
 						},
 					},
-					CurrentDroplet: v7action.Droplet{
+					CurrentDroplet: resources.Droplet{
 						Image: "docker/some-image",
 					},
 				}
@@ -544,9 +543,9 @@ var _ = Describe("app summary displayer", func() {
 		When("the application is a buildpack app", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
-					CurrentDroplet: v7action.Droplet{
+					CurrentDroplet: resources.Droplet{
 						Stack: "cflinuxfs2",
-						Buildpacks: []v7action.DropletBuildpack{
+						Buildpacks: []resources.DropletBuildpack{
 							{
 								Name:         "ruby_buildpack",
 								DetectOutput: "some-detect-output",

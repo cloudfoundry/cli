@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
@@ -15,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -83,8 +82,8 @@ var _ = Describe("app stager", func() {
 
 				return logStream, errorStream, cancelFunc, v7action.Warnings{"get-logs-warning"}, nil
 			}
-			fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
-				dropletStream := make(chan v7action.Droplet)
+			fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
+				dropletStream := make(chan resources.Droplet)
 				warningsStream := make(chan v7action.Warnings)
 				errorStream := make(chan error)
 
@@ -94,7 +93,7 @@ var _ = Describe("app stager", func() {
 					defer close(warningsStream)
 					defer close(errorStream)
 					warningsStream <- v7action.Warnings{"stage-package-warning"}
-					dropletStream <- v7action.Droplet{
+					dropletStream <- resources.Droplet{
 						GUID:      "some-droplet-guid",
 						CreatedAt: dropletCreateTime,
 						State:     constant.DropletStaged,
@@ -134,9 +133,9 @@ var _ = Describe("app stager", func() {
 			})
 			BeforeEach(func() {
 				expectedErr := errors.New("package-staging-error")
-				fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+				fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
 
-					dropletStream := make(chan v7action.Droplet)
+					dropletStream := make(chan resources.Droplet)
 					warningsStream := make(chan v7action.Warnings)
 					errorStream := make(chan error)
 
@@ -175,7 +174,7 @@ var _ = Describe("app stager", func() {
 
 	Context("StageApp", func() {
 		var (
-			droplet v7action.Droplet
+			droplet resources.Droplet
 		)
 
 		BeforeEach(func() {
@@ -214,8 +213,8 @@ var _ = Describe("app stager", func() {
 
 				return logStream, errorStream, cancelFunc, v7action.Warnings{"get-logs-warning"}, nil
 			}
-			fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
-				dropletStream := make(chan v7action.Droplet)
+			fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
+				dropletStream := make(chan resources.Droplet)
 				warningsStream := make(chan v7action.Warnings)
 				errorStream := make(chan error)
 
@@ -225,7 +224,7 @@ var _ = Describe("app stager", func() {
 					defer close(warningsStream)
 					defer close(errorStream)
 					warningsStream <- v7action.Warnings{"stage-package-warning"}
-					dropletStream <- v7action.Droplet{
+					dropletStream <- resources.Droplet{
 						GUID:      "some-droplet-guid",
 						CreatedAt: dropletCreateTime,
 						State:     constant.DropletStaged,
@@ -249,7 +248,7 @@ var _ = Describe("app stager", func() {
 			Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(droplet).To(Equal(
-				v7action.Droplet{
+				resources.Droplet{
 					GUID:      "some-droplet-guid",
 					CreatedAt: dropletCreateTime,
 					State:     constant.DropletStaged,
@@ -270,7 +269,7 @@ var _ = Describe("app stager", func() {
 
 			It("displays all warnings and returns an error", func() {
 				Expect(executeErr).To(MatchError("get-log-streaming-error"))
-				Expect(droplet).To(Equal(v7action.Droplet{}))
+				Expect(droplet).To(Equal(resources.Droplet{}))
 				Expect(testUI.Err).To(Say("get-log-streaming-warning"))
 			})
 		})
@@ -281,9 +280,9 @@ var _ = Describe("app stager", func() {
 			})
 			BeforeEach(func() {
 				expectedErr := errors.New("package-staging-error")
-				fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
+				fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
 
-					dropletStream := make(chan v7action.Droplet)
+					dropletStream := make(chan resources.Droplet)
 					warningsStream := make(chan v7action.Warnings)
 					errorStream := make(chan error)
 
@@ -311,7 +310,7 @@ var _ = Describe("app stager", func() {
 
 	Context("StartApp", func() {
 		var (
-			droplet v7action.Droplet
+			droplet resources.Droplet
 		)
 
 		BeforeEach(func() {
@@ -327,7 +326,7 @@ var _ = Describe("app stager", func() {
 			appAction = constant.ApplicationRestarting
 
 			app = resources.Application{GUID: "app-guid", Name: "app-name", State: constant.ApplicationStarted}
-			droplet = v7action.Droplet{GUID: "droplet-guid"}
+			droplet = resources.Droplet{GUID: "droplet-guid"}
 			space = configv3.Space{Name: "some-space", GUID: "some-space-guid"}
 			organization = configv3.Organization{Name: "some-org"}
 
@@ -509,7 +508,7 @@ var _ = Describe("app stager", func() {
 
 			When("a droplet guid is not provided", func() {
 				BeforeEach(func() {
-					droplet = v7action.Droplet{}
+					droplet = resources.Droplet{}
 				})
 
 				It("does not try to set the application droplet", func() {

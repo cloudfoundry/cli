@@ -3,11 +3,10 @@ package ccv3
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Deployment struct {
@@ -53,8 +52,8 @@ func (d *Deployment) UnmarshalJSON(data []byte) error {
 			Value  constant.DeploymentStatusValue  `json:"value"`
 			Reason constant.DeploymentStatusReason `json:"reason"`
 		} `json:"status"`
-		Droplet      Droplet   `json:"droplet,omitempty"`
-		NewProcesses []Process `json:"new_processes,omitempty"`
+		Droplet      resources.Droplet `json:"droplet,omitempty"`
+		NewProcesses []Process         `json:"new_processes,omitempty"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccDeployment)
 	if err != nil {

@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/resources"
-
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )

@@ -3,23 +3,22 @@ package v7pushaction
 import (
 	"io"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 //go:generate counterfeiter . V7Actor
 
 type V7Actor interface {
-	CreateApplicationDroplet(appGUID string) (v7action.Droplet, v7action.Warnings, error)
+	CreateApplicationDroplet(appGUID string) (resources.Droplet, v7action.Warnings, error)
 	CreateApplicationInSpace(app resources.Application, spaceGUID string) (resources.Application, v7action.Warnings, error)
 	CreateBitsPackageByApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
 	CreateDeployment(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
 	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
 	CreateRoute(spaceGUID, domainName, hostname, path string) (resources.Route, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, v7action.Warnings, error)
-	GetApplicationDroplets(appName string, spaceGUID string) ([]v7action.Droplet, v7action.Warnings, error)
+	GetApplicationDroplets(appName string, spaceGUID string) ([]resources.Droplet, v7action.Warnings, error)
 	GetApplicationRoutes(appGUID string) ([]resources.Route, v7action.Warnings, error)
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]resources.Application, v7action.Warnings, error)
 	GetDefaultDomain(orgGUID string) (v7action.Domain, v7action.Warnings, error)
@@ -27,7 +26,7 @@ type V7Actor interface {
 	GetRouteByAttributes(domainName, domainGUID, hostname, path string) (resources.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (resources.RouteDestination, v7action.Warnings, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
-	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
+	PollBuild(buildGUID string, appName string) (resources.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)

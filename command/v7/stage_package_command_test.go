@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
@@ -16,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -109,8 +108,8 @@ var _ = Describe("stage-package Command", func() {
 			return logStream, errorStream, cancelFunc, v7action.Warnings{"steve for all I care"}, nil
 		}
 
-		fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
-			dropletStream := make(chan v7action.Droplet)
+		fakeActor.StagePackageStub = func(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
+			dropletStream := make(chan resources.Droplet)
 			warningsStream := make(chan v7action.Warnings)
 			errorStream := make(chan error)
 
@@ -120,7 +119,7 @@ var _ = Describe("stage-package Command", func() {
 				defer close(warningsStream)
 				defer close(errorStream)
 				warningsStream <- v7action.Warnings{"some-warning", "some-other-warning"}
-				dropletStream <- v7action.Droplet{
+				dropletStream <- resources.Droplet{
 					GUID:      "some-droplet-guid",
 					CreatedAt: dropletCreateTime,
 					State:     constant.DropletStaged,
@@ -242,8 +241,8 @@ var _ = Describe("stage-package Command", func() {
 				return logStream, errorStream, cancelFunc, v7action.Warnings{"steve for all I care"}, nil
 			}
 
-			fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
-				dropletStream := make(chan v7action.Droplet)
+			fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
+				dropletStream := make(chan resources.Droplet)
 				warningsStream := make(chan v7action.Warnings)
 				errorStream := make(chan error)
 
@@ -253,7 +252,7 @@ var _ = Describe("stage-package Command", func() {
 					defer close(warningsStream)
 					defer close(errorStream)
 					warningsStream <- v7action.Warnings{"some-warning", "some-other-warning"}
-					dropletStream <- v7action.Droplet{
+					dropletStream <- resources.Droplet{
 						GUID:      "some-droplet-guid",
 						CreatedAt: "2017-08-14T21:16:42Z",
 						State:     constant.DropletStaged,
@@ -304,8 +303,8 @@ var _ = Describe("stage-package Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = errors.New("any gibberish")
-			fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error) {
-				dropletStream := make(chan v7action.Droplet)
+			fakeActor.StagePackageStub = func(packageGUID, _, _ string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error) {
+				dropletStream := make(chan resources.Droplet)
 				warningsStream := make(chan v7action.Warnings)
 				errorStream := make(chan error)
 

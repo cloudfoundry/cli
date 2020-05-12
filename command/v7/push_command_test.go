@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
@@ -18,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
@@ -549,7 +548,7 @@ var _ = Describe("push Command", func() {
 															Application:      resources.Application{},
 															ProcessSummaries: v7action.ProcessSummaries{},
 														},
-														CurrentDroplet: v7action.Droplet{},
+														CurrentDroplet: resources.Droplet{},
 													}
 													fakeVersionActor.GetDetailedAppSummaryReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
 													fakeVersionActor.GetDetailedAppSummaryReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)

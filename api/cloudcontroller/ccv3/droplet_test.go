@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -17,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -35,7 +34,7 @@ var _ = Describe("Droplet", func() {
 
 	Describe("CreateDroplet", func() {
 		var (
-			droplet    Droplet
+			droplet    resources.Droplet
 			warnings   Warnings
 			executeErr error
 		)
@@ -46,7 +45,7 @@ var _ = Describe("Droplet", func() {
 
 		BeforeEach(func() {
 			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-				requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
+				requestParams.ResponseBody.(*resources.Droplet).GUID = "some-guid"
 				return "", Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
@@ -60,12 +59,12 @@ var _ = Describe("Droplet", func() {
 					constant.RelationshipTypeApplication: resources.Relationship{GUID: "app-guid"},
 				},
 			}))
-			_, ok := actualParams.ResponseBody.(*Droplet)
+			_, ok := actualParams.ResponseBody.(*resources.Droplet)
 			Expect(ok).To(BeTrue())
 		})
 
 		It("returns the given droplet and all warnings", func() {
-			Expect(droplet).To(Equal(Droplet{GUID: "some-guid"}))
+			Expect(droplet).To(Equal(resources.Droplet{GUID: "some-guid"}))
 			Expect(warnings).To(ConsistOf("some-warning"))
 			Expect(executeErr).To(MatchError("some-error"))
 		})
@@ -73,7 +72,7 @@ var _ = Describe("Droplet", func() {
 
 	Describe("GetApplicationDropletCurrent", func() {
 		var (
-			droplet    Droplet
+			droplet    resources.Droplet
 			warnings   Warnings
 			executeErr error
 		)
@@ -84,7 +83,7 @@ var _ = Describe("Droplet", func() {
 
 		BeforeEach(func() {
 			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-				requestParams.ResponseBody.(*Droplet).GUID = "some-guid"
+				requestParams.ResponseBody.(*resources.Droplet).GUID = "some-guid"
 				return "", Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
@@ -94,12 +93,12 @@ var _ = Describe("Droplet", func() {
 			actualParams := requester.MakeRequestArgsForCall(0)
 			Expect(actualParams.RequestName).To(Equal(internal.GetApplicationDropletCurrentRequest))
 			Expect(actualParams.URIParams).To(Equal(internal.Params{"app_guid": "some-app-guid"}))
-			_, ok := actualParams.ResponseBody.(*Droplet)
+			_, ok := actualParams.ResponseBody.(*resources.Droplet)
 			Expect(ok).To(BeTrue())
 		})
 
 		It("returns the given droplet and all warnings", func() {
-			Expect(droplet).To(Equal(Droplet{GUID: "some-guid"}))
+			Expect(droplet).To(Equal(resources.Droplet{GUID: "some-guid"}))
 			Expect(warnings).To(ConsistOf("some-warning"))
 			Expect(executeErr).To(MatchError("some-error"))
 		})
@@ -107,7 +106,7 @@ var _ = Describe("Droplet", func() {
 
 	Describe("GetPackageDroplets", func() {
 		var (
-			droplets   []Droplet
+			droplets   []resources.Droplet
 			warnings   Warnings
 			executeErr error
 		)
@@ -121,7 +120,7 @@ var _ = Describe("Droplet", func() {
 
 		BeforeEach(func() {
 			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-				err := requestParams.AppendToList(Droplet{GUID: "some-droplet-guid"})
+				err := requestParams.AppendToList(resources.Droplet{GUID: "some-droplet-guid"})
 				Expect(err).NotTo(HaveOccurred())
 				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
@@ -132,12 +131,12 @@ var _ = Describe("Droplet", func() {
 			actualParams := requester.MakeListRequestArgsForCall(0)
 			Expect(actualParams.RequestName).To(Equal(internal.GetPackageDropletsRequest))
 			Expect(actualParams.URIParams).To(Equal(internal.Params{"package_guid": "package-guid"}))
-			_, ok := actualParams.ResponseBody.(Droplet)
+			_, ok := actualParams.ResponseBody.(resources.Droplet)
 			Expect(ok).To(BeTrue())
 		})
 
 		It("returns the given droplet and all warnings", func() {
-			Expect(droplets).To(Equal([]Droplet{{GUID: "some-droplet-guid"}}))
+			Expect(droplets).To(Equal([]resources.Droplet{{GUID: "some-droplet-guid"}}))
 			Expect(warnings).To(ConsistOf("some-warning"))
 			Expect(executeErr).To(MatchError("some-error"))
 		})
@@ -145,7 +144,7 @@ var _ = Describe("Droplet", func() {
 
 	Describe("GetDroplet", func() {
 		var (
-			droplet    Droplet
+			droplet    resources.Droplet
 			warnings   Warnings
 			executeErr error
 		)
@@ -156,7 +155,7 @@ var _ = Describe("Droplet", func() {
 
 		BeforeEach(func() {
 			requester.MakeRequestCalls(func(requestParams RequestParams) (JobURL, Warnings, error) {
-				requestParams.ResponseBody.(*Droplet).GUID = "some-droplet-guid"
+				requestParams.ResponseBody.(*resources.Droplet).GUID = "some-droplet-guid"
 				return "", Warnings{"some-warning"}, errors.New("some-error")
 			})
 		})
@@ -166,12 +165,12 @@ var _ = Describe("Droplet", func() {
 			actualParams := requester.MakeRequestArgsForCall(0)
 			Expect(actualParams.RequestName).To(Equal(internal.GetDropletRequest))
 			Expect(actualParams.URIParams).To(Equal(internal.Params{"droplet_guid": "some-guid"}))
-			_, ok := actualParams.ResponseBody.(*Droplet)
+			_, ok := actualParams.ResponseBody.(*resources.Droplet)
 			Expect(ok).To(BeTrue())
 		})
 
 		It("returns the given droplet and all warnings", func() {
-			Expect(droplet).To(Equal(Droplet{GUID: "some-droplet-guid"}))
+			Expect(droplet).To(Equal(resources.Droplet{GUID: "some-droplet-guid"}))
 			Expect(warnings).To(ConsistOf("some-warning"))
 			Expect(executeErr).To(MatchError("some-error"))
 		})
@@ -179,7 +178,7 @@ var _ = Describe("Droplet", func() {
 
 	Describe("GetDroplets", func() {
 		var (
-			droplets   []Droplet
+			droplets   []resources.Droplet
 			warnings   Warnings
 			executeErr error
 		)
@@ -193,7 +192,7 @@ var _ = Describe("Droplet", func() {
 
 		BeforeEach(func() {
 			requester.MakeListRequestCalls(func(requestParams RequestParams) (IncludedResources, Warnings, error) {
-				err := requestParams.AppendToList(Droplet{GUID: "some-droplet-guid"})
+				err := requestParams.AppendToList(resources.Droplet{GUID: "some-droplet-guid"})
 				Expect(err).NotTo(HaveOccurred())
 				return IncludedResources{}, Warnings{"some-warning"}, errors.New("some-error")
 			})
@@ -207,12 +206,12 @@ var _ = Describe("Droplet", func() {
 				{Key: AppGUIDFilter, Values: []string{"some-app-guid"}},
 				{Key: PerPage, Values: []string{"2"}},
 			}))
-			_, ok := actualParams.ResponseBody.(Droplet)
+			_, ok := actualParams.ResponseBody.(resources.Droplet)
 			Expect(ok).To(BeTrue())
 		})
 
 		It("returns the given droplet and all warnings", func() {
-			Expect(droplets).To(Equal([]Droplet{{GUID: "some-droplet-guid"}}))
+			Expect(droplets).To(Equal([]resources.Droplet{{GUID: "some-droplet-guid"}}))
 			Expect(warnings).To(ConsistOf("some-warning"))
 			Expect(executeErr).To(MatchError("some-error"))
 		})

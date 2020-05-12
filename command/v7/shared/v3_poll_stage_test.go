@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
-
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -17,10 +17,10 @@ import (
 
 var _ = Describe("V3PollStage", func() {
 	var (
-		returnedDroplet       v7action.Droplet
+		returnedDroplet       resources.Droplet
 		executeErr            error
 		testUI                *ui.UI
-		dropletStream         chan v7action.Droplet
+		dropletStream         chan resources.Droplet
 		warningsStream        chan v7action.Warnings
 		errStream             chan error
 		logStream             chan sharedaction.LogMessage
@@ -62,11 +62,11 @@ var _ = Describe("V3PollStage", func() {
 	BeforeEach(func() {
 		// reset assertion variables
 		executeErr = nil
-		returnedDroplet = v7action.Droplet{}
+		returnedDroplet = resources.Droplet{}
 
 		// create new channels
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		dropletStream = make(chan v7action.Droplet)
+		dropletStream = make(chan resources.Droplet)
 		warningsStream = make(chan v7action.Warnings)
 		errStream = make(chan error)
 		logStream = make(chan sharedaction.LogMessage)
@@ -87,7 +87,7 @@ var _ = Describe("V3PollStage", func() {
 	When("the droplet stream contains a droplet GUID", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
-				dropletStream <- v7action.Droplet{GUID: "droplet-guid"}
+				dropletStream <- resources.Droplet{GUID: "droplet-guid"}
 			})
 		})
 
@@ -109,7 +109,7 @@ var _ = Describe("V3PollStage", func() {
 		It("displays the warnings", func() {
 			executePollStage(func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(returnedDroplet).To(Equal(v7action.Droplet{}))
+				Expect(returnedDroplet).To(Equal(resources.Droplet{}))
 			})
 
 			Eventually(testUI.Err).Should(Say("warning-1"))
@@ -128,7 +128,7 @@ var _ = Describe("V3PollStage", func() {
 			It("prints the log message", func() {
 				executePollStage(func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(returnedDroplet).To(Equal(v7action.Droplet{}))
+					Expect(returnedDroplet).To(Equal(resources.Droplet{}))
 				})
 				Eventually(testUI.Out).Should(Say("some-log-message"))
 			})
@@ -144,7 +144,7 @@ var _ = Describe("V3PollStage", func() {
 			It("ignores the log message", func() {
 				executePollStage(func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(returnedDroplet).To(Equal(v7action.Droplet{}))
+					Expect(returnedDroplet).To(Equal(resources.Droplet{}))
 				})
 				Consistently(testUI.Out).ShouldNot(Say("some-log-message"))
 			})
@@ -161,7 +161,7 @@ var _ = Describe("V3PollStage", func() {
 		It("returns the error without waiting for streams to be closed", func() {
 			executePollStage(func() {
 				Expect(executeErr).To(MatchError("some error"))
-				Expect(returnedDroplet).To(Equal(v7action.Droplet{}))
+				Expect(returnedDroplet).To(Equal(resources.Droplet{}))
 			})
 		})
 	})
@@ -177,7 +177,7 @@ var _ = Describe("V3PollStage", func() {
 		It("displays the log errors as warnings", func() {
 			executePollStage(func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(returnedDroplet).To(Equal(v7action.Droplet{}))
+				Expect(returnedDroplet).To(Equal(resources.Droplet{}))
 			})
 			Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 			Eventually(testUI.Err).Should(Say("some-log-error"))

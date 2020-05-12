@@ -3,10 +3,6 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/resources"
-
-	"code.cloudfoundry.org/cli/types"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -14,6 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -204,9 +202,9 @@ var _ = Describe("app Command", func() {
 							},
 						},
 					},
-					CurrentDroplet: v7action.Droplet{
+					CurrentDroplet: resources.Droplet{
 						Stack: "cflinuxfs2",
-						Buildpacks: []v7action.DropletBuildpack{
+						Buildpacks: []resources.DropletBuildpack{
 							{
 								Name:         "ruby_buildpack",
 								DetectOutput: "some-detect-output",

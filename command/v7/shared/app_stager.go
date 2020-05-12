@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
@@ -36,11 +35,11 @@ type AppStager interface {
 		app resources.Application,
 		packageGUID string,
 		space configv3.Space,
-	) (v7action.Droplet, error)
+	) (resources.Droplet, error)
 
 	StartApp(
 		app resources.Application,
-		droplet v7action.Droplet,
+		droplet resources.Droplet,
 		strategy constant.DeploymentStrategy,
 		noWait bool,
 		space configv3.Space,
@@ -63,7 +62,7 @@ type stagingAndStartActor interface {
 	PollStart(app resources.Application, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	PollStartForRolling(app resources.Application, deploymentGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
-	StagePackage(packageGUID, appName, spaceGUID string) (<-chan v7action.Droplet, <-chan v7action.Warnings, <-chan error)
+	StagePackage(packageGUID, appName, spaceGUID string) (<-chan resources.Droplet, <-chan v7action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 }
@@ -102,11 +101,11 @@ func (stager *Stager) StageAndStart(
 	return nil
 }
 
-func (stager *Stager) StageApp(app resources.Application, packageGUID string, space configv3.Space) (v7action.Droplet, error) {
+func (stager *Stager) StageApp(app resources.Application, packageGUID string, space configv3.Space) (resources.Droplet, error) {
 	logStream, logErrStream, stopLogStreamFunc, logWarnings, logErr := stager.Actor.GetStreamingLogsForApplicationByNameAndSpace(app.Name, space.GUID, stager.LogCache)
 	stager.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
-		return v7action.Droplet{}, logErr
+		return resources.Droplet{}, logErr
 	}
 	defer stopLogStreamFunc()
 
@@ -119,7 +118,7 @@ func (stager *Stager) StageApp(app resources.Application, packageGUID string, sp
 
 	droplet, err := PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, stager.UI)
 	if err != nil {
-		return v7action.Droplet{}, err
+		return resources.Droplet{}, err
 	}
 
 	return droplet, nil
@@ -127,7 +126,7 @@ func (stager *Stager) StageApp(app resources.Application, packageGUID string, sp
 
 func (stager *Stager) StartApp(
 	app resources.Application,
-	droplet v7action.Droplet,
+	droplet resources.Droplet,
 	strategy constant.DeploymentStrategy,
 	noWait bool,
 	space configv3.Space,

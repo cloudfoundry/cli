@@ -1,9 +1,8 @@
 package ccv3
 
 import (
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 func (client Client) ApplySpaceQuota(quotaGUID string, spaceGUID string) (resources.RelationshipList, Warnings, error) {

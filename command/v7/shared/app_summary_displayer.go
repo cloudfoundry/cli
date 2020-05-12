@@ -5,12 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/resources"
-
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/resources"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -139,7 +138,7 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 	return ""
 }
 
-func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.DropletBuildpack) string {
+func (AppSummaryDisplayer) buildpackNames(buildpacks []resources.DropletBuildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
 		if buildpack.DetectOutput != "" {

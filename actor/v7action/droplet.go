@@ -6,28 +6,15 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-// Droplet represents a Cloud Controller droplet.
-type Droplet struct {
-	GUID       string
-	State      constant.DropletState
-	CreatedAt  string
-	Stack      string
-	Image      string
-	Buildpacks []DropletBuildpack
-	IsCurrent  bool
-}
-
-type DropletBuildpack ccv3.DropletBuildpack
 
 // CreateApplicationDroplet creates a new droplet without a package for the app with
 // guid appGUID.
-func (actor Actor) CreateApplicationDroplet(appGUID string) (Droplet, Warnings, error) {
+func (actor Actor) CreateApplicationDroplet(appGUID string) (resources.Droplet, Warnings, error) {
 	ccDroplet, warnings, err := actor.CloudControllerClient.CreateDroplet(appGUID)
 
-	return actor.convertCCToActorDroplet(ccDroplet), Warnings(warnings), err
+	return ccDroplet, Warnings(warnings), err
 }
 
 // SetApplicationDropletByApplicationNameAndSpace sets the droplet for an application.
@@ -60,7 +47,7 @@ func (actor Actor) SetApplicationDroplet(appGUID string, dropletGUID string) (Wa
 }
 
 // GetApplicationDroplets returns the list of droplets that belong to application.
-func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]Droplet, Warnings, error) {
+func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]resources.Droplet, Warnings, error) {
 	allWarnings := Warnings{}
 	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
@@ -68,7 +55,7 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]D
 		return nil, allWarnings, err
 	}
 
-	ccv3Droplets, apiWarnings, err := actor.CloudControllerClient.GetDroplets(
+	droplets, apiWarnings, err := actor.CloudControllerClient.GetDroplets(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{application.GUID}},
 		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 	)
@@ -78,39 +65,34 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]D
 		return nil, allWarnings, err
 	}
 
-	if len(ccv3Droplets) == 0 {
-		return []Droplet{}, allWarnings, nil
+	if len(droplets) == 0 {
+		return []resources.Droplet{}, allWarnings, nil
 	}
 
 	currentDroplet, apiWarnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(application.GUID)
 	allWarnings = append(allWarnings, apiWarnings...)
 	if err != nil {
-		return []Droplet{}, allWarnings, err
+		return []resources.Droplet{}, allWarnings, err
 	}
 
-	var droplets []Droplet
-	for _, ccv3Droplet := range ccv3Droplets {
-		droplet := actor.convertCCToActorDroplet(ccv3Droplet)
-
-		if ccv3Droplet.GUID == currentDroplet.GUID {
-			droplet.IsCurrent = true
+	for i, droplet := range droplets {
+		if droplet.GUID == currentDroplet.GUID {
+			droplets[i].IsCurrent = true
 		}
-
-		droplets = append(droplets, droplet)
 	}
 
 	return droplets, allWarnings, err
 }
 
-func (actor Actor) GetCurrentDropletByApplication(appGUID string) (Droplet, Warnings, error) {
+func (actor Actor) GetCurrentDropletByApplication(appGUID string) (resources.Droplet, Warnings, error) {
 	droplet, warnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(appGUID)
 	switch err.(type) {
 	case ccerror.ApplicationNotFoundError:
-		return Droplet{}, Warnings(warnings), actionerror.ApplicationNotFoundError{GUID: appGUID}
+		return resources.Droplet{}, Warnings(warnings), actionerror.ApplicationNotFoundError{GUID: appGUID}
 	case ccerror.DropletNotFoundError:
-		return Droplet{}, Warnings(warnings), actionerror.DropletNotFoundError{AppGUID: appGUID}
+		return resources.Droplet{}, Warnings(warnings), actionerror.DropletNotFoundError{AppGUID: appGUID}
 	}
-	return actor.convertCCToActorDroplet(droplet), Warnings(warnings), err
+	return droplet, Warnings(warnings), err
 }
 
 func (actor Actor) UploadDroplet(dropletGUID string, dropletPath string, progressReader io.Reader, size int64) (Warnings, error) {
@@ -129,20 +111,4 @@ func (actor Actor) UploadDroplet(dropletGUID string, dropletPath string, progres
 	}
 
 	return allWarnings, nil
-}
-
-func (actor Actor) convertCCToActorDroplet(ccDroplet ccv3.Droplet) Droplet {
-	var buildpacks []DropletBuildpack
-	for _, ccBuildpack := range ccDroplet.Buildpacks {
-		buildpacks = append(buildpacks, DropletBuildpack(ccBuildpack))
-	}
-
-	return Droplet{
-		GUID:       ccDroplet.GUID,
-		State:      ccDroplet.State,
-		CreatedAt:  ccDroplet.CreatedAt,
-		Stack:      ccDroplet.Stack,
-		Buildpacks: buildpacks,
-		Image:      ccDroplet.Image,
-	}
 }
