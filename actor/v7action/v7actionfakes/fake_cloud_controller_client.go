@@ -273,18 +273,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateOrganizationQuotaStub        func(ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)
+	CreateOrganizationQuotaStub        func(resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error)
 	createOrganizationQuotaMutex       sync.RWMutex
 	createOrganizationQuotaArgsForCall []struct {
-		arg1 ccv3.OrganizationQuota
+		arg1 resources.OrganizationQuota
 	}
 	createOrganizationQuotaReturns struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createOrganizationQuotaReturnsOnCall map[int]struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -378,18 +378,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateSpaceQuotaStub        func(ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)
+	CreateSpaceQuotaStub        func(resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error)
 	createSpaceQuotaMutex       sync.RWMutex
 	createSpaceQuotaArgsForCall []struct {
-		arg1 ccv3.SpaceQuota
+		arg1 resources.SpaceQuota
 	}
 	createSpaceQuotaReturns struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	createSpaceQuotaReturnsOnCall map[int]struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1160,33 +1160,33 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetOrganizationQuotaStub        func(string) (ccv3.OrganizationQuota, ccv3.Warnings, error)
+	GetOrganizationQuotaStub        func(string) (resources.OrganizationQuota, ccv3.Warnings, error)
 	getOrganizationQuotaMutex       sync.RWMutex
 	getOrganizationQuotaArgsForCall []struct {
 		arg1 string
 	}
 	getOrganizationQuotaReturns struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getOrganizationQuotaReturnsOnCall map[int]struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetOrganizationQuotasStub        func(...ccv3.Query) ([]ccv3.OrganizationQuota, ccv3.Warnings, error)
+	GetOrganizationQuotasStub        func(...ccv3.Query) ([]resources.OrganizationQuota, ccv3.Warnings, error)
 	getOrganizationQuotasMutex       sync.RWMutex
 	getOrganizationQuotasArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getOrganizationQuotasReturns struct {
-		result1 []ccv3.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getOrganizationQuotasReturnsOnCall map[int]struct {
-		result1 []ccv3.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1570,33 +1570,33 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetSpaceQuotaStub        func(string) (ccv3.SpaceQuota, ccv3.Warnings, error)
+	GetSpaceQuotaStub        func(string) (resources.SpaceQuota, ccv3.Warnings, error)
 	getSpaceQuotaMutex       sync.RWMutex
 	getSpaceQuotaArgsForCall []struct {
 		arg1 string
 	}
 	getSpaceQuotaReturns struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getSpaceQuotaReturnsOnCall map[int]struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetSpaceQuotasStub        func(...ccv3.Query) ([]ccv3.SpaceQuota, ccv3.Warnings, error)
+	GetSpaceQuotasStub        func(...ccv3.Query) ([]resources.SpaceQuota, ccv3.Warnings, error)
 	getSpaceQuotasMutex       sync.RWMutex
 	getSpaceQuotasArgsForCall []struct {
 		arg1 []ccv3.Query
 	}
 	getSpaceQuotasReturns struct {
-		result1 []ccv3.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getSpaceQuotasReturnsOnCall map[int]struct {
-		result1 []ccv3.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2062,18 +2062,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateOrganizationQuotaStub        func(ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)
+	UpdateOrganizationQuotaStub        func(resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error)
 	updateOrganizationQuotaMutex       sync.RWMutex
 	updateOrganizationQuotaArgsForCall []struct {
-		arg1 ccv3.OrganizationQuota
+		arg1 resources.OrganizationQuota
 	}
 	updateOrganizationQuotaReturns struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	updateOrganizationQuotaReturnsOnCall map[int]struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2246,18 +2246,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateSpaceQuotaStub        func(ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)
+	UpdateSpaceQuotaStub        func(resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error)
 	updateSpaceQuotaMutex       sync.RWMutex
 	updateSpaceQuotaArgsForCall []struct {
-		arg1 ccv3.SpaceQuota
+		arg1 resources.SpaceQuota
 	}
 	updateSpaceQuotaReturns struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
 	updateSpaceQuotaReturnsOnCall map[int]struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -3501,11 +3501,11 @@ func (fake *FakeCloudControllerClient) CreateOrganizationReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateOrganizationQuota(arg1 ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateOrganizationQuota(arg1 resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	ret, specificReturn := fake.createOrganizationQuotaReturnsOnCall[len(fake.createOrganizationQuotaArgsForCall)]
 	fake.createOrganizationQuotaArgsForCall = append(fake.createOrganizationQuotaArgsForCall, struct {
-		arg1 ccv3.OrganizationQuota
+		arg1 resources.OrganizationQuota
 	}{arg1})
 	fake.recordInvocation("CreateOrganizationQuota", []interface{}{arg1})
 	fake.createOrganizationQuotaMutex.Unlock()
@@ -3525,43 +3525,43 @@ func (fake *FakeCloudControllerClient) CreateOrganizationQuotaCallCount() int {
 	return len(fake.createOrganizationQuotaArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateOrganizationQuotaCalls(stub func(ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaCalls(stub func(resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error)) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateOrganizationQuotaArgsForCall(i int) ccv3.OrganizationQuota {
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaArgsForCall(i int) resources.OrganizationQuota {
 	fake.createOrganizationQuotaMutex.RLock()
 	defer fake.createOrganizationQuotaMutex.RUnlock()
 	argsForCall := fake.createOrganizationQuotaArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateOrganizationQuotaReturns(result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaReturns(result1 resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = nil
 	fake.createOrganizationQuotaReturns = struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateOrganizationQuotaReturnsOnCall(i int, result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateOrganizationQuotaReturnsOnCall(i int, result1 resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.createOrganizationQuotaMutex.Lock()
 	defer fake.createOrganizationQuotaMutex.Unlock()
 	fake.CreateOrganizationQuotaStub = nil
 	if fake.createOrganizationQuotaReturnsOnCall == nil {
 		fake.createOrganizationQuotaReturnsOnCall = make(map[int]struct {
-			result1 ccv3.OrganizationQuota
+			result1 resources.OrganizationQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createOrganizationQuotaReturnsOnCall[i] = struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -3963,11 +3963,11 @@ func (fake *FakeCloudControllerClient) CreateSpaceReturnsOnCall(i int, result1 c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceQuota(arg1 ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateSpaceQuota(arg1 resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error) {
 	fake.createSpaceQuotaMutex.Lock()
 	ret, specificReturn := fake.createSpaceQuotaReturnsOnCall[len(fake.createSpaceQuotaArgsForCall)]
 	fake.createSpaceQuotaArgsForCall = append(fake.createSpaceQuotaArgsForCall, struct {
-		arg1 ccv3.SpaceQuota
+		arg1 resources.SpaceQuota
 	}{arg1})
 	fake.recordInvocation("CreateSpaceQuota", []interface{}{arg1})
 	fake.createSpaceQuotaMutex.Unlock()
@@ -3987,43 +3987,43 @@ func (fake *FakeCloudControllerClient) CreateSpaceQuotaCallCount() int {
 	return len(fake.createSpaceQuotaArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceQuotaCalls(stub func(ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CreateSpaceQuotaCalls(stub func(resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error)) {
 	fake.createSpaceQuotaMutex.Lock()
 	defer fake.createSpaceQuotaMutex.Unlock()
 	fake.CreateSpaceQuotaStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceQuotaArgsForCall(i int) ccv3.SpaceQuota {
+func (fake *FakeCloudControllerClient) CreateSpaceQuotaArgsForCall(i int) resources.SpaceQuota {
 	fake.createSpaceQuotaMutex.RLock()
 	defer fake.createSpaceQuotaMutex.RUnlock()
 	argsForCall := fake.createSpaceQuotaArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceQuotaReturns(result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateSpaceQuotaReturns(result1 resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.createSpaceQuotaMutex.Lock()
 	defer fake.createSpaceQuotaMutex.Unlock()
 	fake.CreateSpaceQuotaStub = nil
 	fake.createSpaceQuotaReturns = struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateSpaceQuotaReturnsOnCall(i int, result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateSpaceQuotaReturnsOnCall(i int, result1 resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.createSpaceQuotaMutex.Lock()
 	defer fake.createSpaceQuotaMutex.Unlock()
 	fake.CreateSpaceQuotaStub = nil
 	if fake.createSpaceQuotaReturnsOnCall == nil {
 		fake.createSpaceQuotaReturnsOnCall = make(map[int]struct {
-			result1 ccv3.SpaceQuota
+			result1 resources.SpaceQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.createSpaceQuotaReturnsOnCall[i] = struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -7384,7 +7384,7 @@ func (fake *FakeCloudControllerClient) GetOrganizationDomainsReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuota(arg1 string) (ccv3.OrganizationQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuota(arg1 string) (resources.OrganizationQuota, ccv3.Warnings, error) {
 	fake.getOrganizationQuotaMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotaReturnsOnCall[len(fake.getOrganizationQuotaArgsForCall)]
 	fake.getOrganizationQuotaArgsForCall = append(fake.getOrganizationQuotaArgsForCall, struct {
@@ -7408,7 +7408,7 @@ func (fake *FakeCloudControllerClient) GetOrganizationQuotaCallCount() int {
 	return len(fake.getOrganizationQuotaArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotaCalls(stub func(string) (ccv3.OrganizationQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaCalls(stub func(string) (resources.OrganizationQuota, ccv3.Warnings, error)) {
 	fake.getOrganizationQuotaMutex.Lock()
 	defer fake.getOrganizationQuotaMutex.Unlock()
 	fake.GetOrganizationQuotaStub = stub
@@ -7421,36 +7421,36 @@ func (fake *FakeCloudControllerClient) GetOrganizationQuotaArgsForCall(i int) st
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturns(result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturns(result1 resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getOrganizationQuotaMutex.Lock()
 	defer fake.getOrganizationQuotaMutex.Unlock()
 	fake.GetOrganizationQuotaStub = nil
 	fake.getOrganizationQuotaReturns = struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturnsOnCall(i int, result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturnsOnCall(i int, result1 resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getOrganizationQuotaMutex.Lock()
 	defer fake.getOrganizationQuotaMutex.Unlock()
 	fake.GetOrganizationQuotaStub = nil
 	if fake.getOrganizationQuotaReturnsOnCall == nil {
 		fake.getOrganizationQuotaReturnsOnCall = make(map[int]struct {
-			result1 ccv3.OrganizationQuota
+			result1 resources.OrganizationQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationQuotaReturnsOnCall[i] = struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotas(arg1 ...ccv3.Query) ([]ccv3.OrganizationQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotas(arg1 ...ccv3.Query) ([]resources.OrganizationQuota, ccv3.Warnings, error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotasReturnsOnCall[len(fake.getOrganizationQuotasArgsForCall)]
 	fake.getOrganizationQuotasArgsForCall = append(fake.getOrganizationQuotasArgsForCall, struct {
@@ -7474,7 +7474,7 @@ func (fake *FakeCloudControllerClient) GetOrganizationQuotasCallCount() int {
 	return len(fake.getOrganizationQuotasArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotasCalls(stub func(...ccv3.Query) ([]ccv3.OrganizationQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotasCalls(stub func(...ccv3.Query) ([]resources.OrganizationQuota, ccv3.Warnings, error)) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = stub
@@ -7487,30 +7487,30 @@ func (fake *FakeCloudControllerClient) GetOrganizationQuotasArgsForCall(i int) [
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotasReturns(result1 []ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotasReturns(result1 []resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = nil
 	fake.getOrganizationQuotasReturns = struct {
-		result1 []ccv3.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationQuotasReturnsOnCall(i int, result1 []ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetOrganizationQuotasReturnsOnCall(i int, result1 []resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = nil
 	if fake.getOrganizationQuotasReturnsOnCall == nil {
 		fake.getOrganizationQuotasReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.OrganizationQuota
+			result1 []resources.OrganizationQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationQuotasReturnsOnCall[i] = struct {
-		result1 []ccv3.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -9165,7 +9165,7 @@ func (fake *FakeCloudControllerClient) GetSpaceIsolationSegmentReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuota(arg1 string) (ccv3.SpaceQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetSpaceQuota(arg1 string) (resources.SpaceQuota, ccv3.Warnings, error) {
 	fake.getSpaceQuotaMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotaReturnsOnCall[len(fake.getSpaceQuotaArgsForCall)]
 	fake.getSpaceQuotaArgsForCall = append(fake.getSpaceQuotaArgsForCall, struct {
@@ -9189,7 +9189,7 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotaCallCount() int {
 	return len(fake.getSpaceQuotaArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaCalls(stub func(string) (ccv3.SpaceQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotaCalls(stub func(string) (resources.SpaceQuota, ccv3.Warnings, error)) {
 	fake.getSpaceQuotaMutex.Lock()
 	defer fake.getSpaceQuotaMutex.Unlock()
 	fake.GetSpaceQuotaStub = stub
@@ -9202,36 +9202,36 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotaArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaReturns(result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotaReturns(result1 resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getSpaceQuotaMutex.Lock()
 	defer fake.getSpaceQuotaMutex.Unlock()
 	fake.GetSpaceQuotaStub = nil
 	fake.getSpaceQuotaReturns = struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaReturnsOnCall(i int, result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotaReturnsOnCall(i int, result1 resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getSpaceQuotaMutex.Lock()
 	defer fake.getSpaceQuotaMutex.Unlock()
 	fake.GetSpaceQuotaStub = nil
 	if fake.getSpaceQuotaReturnsOnCall == nil {
 		fake.getSpaceQuotaReturnsOnCall = make(map[int]struct {
-			result1 ccv3.SpaceQuota
+			result1 resources.SpaceQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceQuotaReturnsOnCall[i] = struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotas(arg1 ...ccv3.Query) ([]ccv3.SpaceQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotas(arg1 ...ccv3.Query) ([]resources.SpaceQuota, ccv3.Warnings, error) {
 	fake.getSpaceQuotasMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotasReturnsOnCall[len(fake.getSpaceQuotasArgsForCall)]
 	fake.getSpaceQuotasArgsForCall = append(fake.getSpaceQuotasArgsForCall, struct {
@@ -9255,7 +9255,7 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotasCallCount() int {
 	return len(fake.getSpaceQuotasArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotasCalls(stub func(...ccv3.Query) ([]ccv3.SpaceQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotasCalls(stub func(...ccv3.Query) ([]resources.SpaceQuota, ccv3.Warnings, error)) {
 	fake.getSpaceQuotasMutex.Lock()
 	defer fake.getSpaceQuotasMutex.Unlock()
 	fake.GetSpaceQuotasStub = stub
@@ -9268,30 +9268,30 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotasArgsForCall(i int) []ccv3.Q
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotasReturns(result1 []ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotasReturns(result1 []resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getSpaceQuotasMutex.Lock()
 	defer fake.getSpaceQuotasMutex.Unlock()
 	fake.GetSpaceQuotasStub = nil
 	fake.getSpaceQuotasReturns = struct {
-		result1 []ccv3.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotasReturnsOnCall(i int, result1 []ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetSpaceQuotasReturnsOnCall(i int, result1 []resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.getSpaceQuotasMutex.Lock()
 	defer fake.getSpaceQuotasMutex.Unlock()
 	fake.GetSpaceQuotasStub = nil
 	if fake.getSpaceQuotasReturnsOnCall == nil {
 		fake.getSpaceQuotasReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.SpaceQuota
+			result1 []resources.SpaceQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceQuotasReturnsOnCall[i] = struct {
-		result1 []ccv3.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -11339,11 +11339,11 @@ func (fake *FakeCloudControllerClient) UpdateOrganizationDefaultIsolationSegment
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateOrganizationQuota(arg1 ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuota(arg1 resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error) {
 	fake.updateOrganizationQuotaMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationQuotaReturnsOnCall[len(fake.updateOrganizationQuotaArgsForCall)]
 	fake.updateOrganizationQuotaArgsForCall = append(fake.updateOrganizationQuotaArgsForCall, struct {
-		arg1 ccv3.OrganizationQuota
+		arg1 resources.OrganizationQuota
 	}{arg1})
 	fake.recordInvocation("UpdateOrganizationQuota", []interface{}{arg1})
 	fake.updateOrganizationQuotaMutex.Unlock()
@@ -11363,43 +11363,43 @@ func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaCallCount() int {
 	return len(fake.updateOrganizationQuotaArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaCalls(stub func(ccv3.OrganizationQuota) (ccv3.OrganizationQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaCalls(stub func(resources.OrganizationQuota) (resources.OrganizationQuota, ccv3.Warnings, error)) {
 	fake.updateOrganizationQuotaMutex.Lock()
 	defer fake.updateOrganizationQuotaMutex.Unlock()
 	fake.UpdateOrganizationQuotaStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaArgsForCall(i int) ccv3.OrganizationQuota {
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaArgsForCall(i int) resources.OrganizationQuota {
 	fake.updateOrganizationQuotaMutex.RLock()
 	defer fake.updateOrganizationQuotaMutex.RUnlock()
 	argsForCall := fake.updateOrganizationQuotaArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaReturns(result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaReturns(result1 resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.updateOrganizationQuotaMutex.Lock()
 	defer fake.updateOrganizationQuotaMutex.Unlock()
 	fake.UpdateOrganizationQuotaStub = nil
 	fake.updateOrganizationQuotaReturns = struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaReturnsOnCall(i int, result1 ccv3.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateOrganizationQuotaReturnsOnCall(i int, result1 resources.OrganizationQuota, result2 ccv3.Warnings, result3 error) {
 	fake.updateOrganizationQuotaMutex.Lock()
 	defer fake.updateOrganizationQuotaMutex.Unlock()
 	fake.UpdateOrganizationQuotaStub = nil
 	if fake.updateOrganizationQuotaReturnsOnCall == nil {
 		fake.updateOrganizationQuotaReturnsOnCall = make(map[int]struct {
-			result1 ccv3.OrganizationQuota
+			result1 resources.OrganizationQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.updateOrganizationQuotaReturnsOnCall[i] = struct {
-		result1 ccv3.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -12137,11 +12137,11 @@ func (fake *FakeCloudControllerClient) UpdateSpaceIsolationSegmentRelationshipRe
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceQuota(arg1 ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceQuota(arg1 resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error) {
 	fake.updateSpaceQuotaMutex.Lock()
 	ret, specificReturn := fake.updateSpaceQuotaReturnsOnCall[len(fake.updateSpaceQuotaArgsForCall)]
 	fake.updateSpaceQuotaArgsForCall = append(fake.updateSpaceQuotaArgsForCall, struct {
-		arg1 ccv3.SpaceQuota
+		arg1 resources.SpaceQuota
 	}{arg1})
 	fake.recordInvocation("UpdateSpaceQuota", []interface{}{arg1})
 	fake.updateSpaceQuotaMutex.Unlock()
@@ -12161,43 +12161,43 @@ func (fake *FakeCloudControllerClient) UpdateSpaceQuotaCallCount() int {
 	return len(fake.updateSpaceQuotaArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceQuotaCalls(stub func(ccv3.SpaceQuota) (ccv3.SpaceQuota, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaCalls(stub func(resources.SpaceQuota) (resources.SpaceQuota, ccv3.Warnings, error)) {
 	fake.updateSpaceQuotaMutex.Lock()
 	defer fake.updateSpaceQuotaMutex.Unlock()
 	fake.UpdateSpaceQuotaStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceQuotaArgsForCall(i int) ccv3.SpaceQuota {
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaArgsForCall(i int) resources.SpaceQuota {
 	fake.updateSpaceQuotaMutex.RLock()
 	defer fake.updateSpaceQuotaMutex.RUnlock()
 	argsForCall := fake.updateSpaceQuotaArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturns(result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturns(result1 resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.updateSpaceQuotaMutex.Lock()
 	defer fake.updateSpaceQuotaMutex.Unlock()
 	fake.UpdateSpaceQuotaStub = nil
 	fake.updateSpaceQuotaReturns = struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturnsOnCall(i int, result1 ccv3.SpaceQuota, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceQuotaReturnsOnCall(i int, result1 resources.SpaceQuota, result2 ccv3.Warnings, result3 error) {
 	fake.updateSpaceQuotaMutex.Lock()
 	defer fake.updateSpaceQuotaMutex.Unlock()
 	fake.UpdateSpaceQuotaStub = nil
 	if fake.updateSpaceQuotaReturnsOnCall == nil {
 		fake.updateSpaceQuotaReturnsOnCall = make(map[int]struct {
-			result1 ccv3.SpaceQuota
+			result1 resources.SpaceQuota
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.updateSpaceQuotaReturnsOnCall[i] = struct {
-		result1 ccv3.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

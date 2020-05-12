@@ -845,7 +845,7 @@ var _ = Describe("Space", func() {
 				fakeCloudControllerClient.GetSpacesReturns(ccv3Spaces, ccv3.IncludedResources{}, ccv3.Warnings{"get-space-warning"}, nil)
 
 				fakeCloudControllerClient.GetSpaceQuotaReturns(
-					ccv3.SpaceQuota{Quota: ccv3.Quota{Name: "some-quota"}},
+					resources.SpaceQuota{Quota: resources.Quota{Name: "some-quota"}},
 					ccv3.Warnings{"get-squota-warning"},
 					nil,
 				)
@@ -876,7 +876,7 @@ var _ = Describe("Space", func() {
 			When("getting quota info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceQuotaReturns(
-						ccv3.SpaceQuota{},
+						resources.SpaceQuota{},
 						ccv3.Warnings{"get-squota-warning"},
 						errors.New("space-quota-error"),
 					)

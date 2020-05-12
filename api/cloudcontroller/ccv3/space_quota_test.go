@@ -19,9 +19,9 @@ var _ = Describe("Space Quotas", func() {
 		client          *Client
 		executeErr      error
 		warnings        Warnings
-		inputSpaceQuota SpaceQuota
+		inputSpaceQuota resources.SpaceQuota
 
-		createdSpaceQuota SpaceQuota
+		createdSpaceQuota resources.SpaceQuota
 		trueValue         = true
 		falseValue        = false
 	)
@@ -138,19 +138,19 @@ var _ = Describe("Space Quotas", func() {
 
 		When("successfully creating a space quota without spaces", func() {
 			BeforeEach(func() {
-				inputSpaceQuota = SpaceQuota{
-					Quota: Quota{
+				inputSpaceQuota = resources.SpaceQuota{
+					Quota: resources.Quota{
 						Name: "my-space-quota",
-						Apps: AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
 							TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 						},
-						Services: ServiceLimit{
+						Services: resources.ServiceLimit{
 							PaidServicePlans:      &trueValue,
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 5},
 						},
-						Routes: RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: true, Value: 6},
 							TotalReservedPorts: &types.NullInt{IsSet: true, Value: 7},
 						},
@@ -235,20 +235,20 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("space-quota-warning"))
 				Expect(createdSpaceQuota).To(Equal(
-					SpaceQuota{
-						Quota: Quota{
+					resources.SpaceQuota{
+						Quota: resources.Quota{
 							GUID: "space-quota-guid",
 							Name: "my-space-quota",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
 								InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
 								TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								PaidServicePlans:      &trueValue,
 								TotalServiceInstances: &types.NullInt{IsSet: true, Value: 5},
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{IsSet: true, Value: 6},
 								TotalReservedPorts: &types.NullInt{IsSet: true, Value: 7},
 							},
@@ -260,19 +260,19 @@ var _ = Describe("Space Quotas", func() {
 
 		When("successfully creating a space quota with spaces", func() {
 			BeforeEach(func() {
-				inputSpaceQuota = SpaceQuota{
-					Quota: Quota{
+				inputSpaceQuota = resources.SpaceQuota{
+					Quota: resources.Quota{
 						Name: "my-space-quota",
-						Apps: AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
 							TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 						},
-						Services: ServiceLimit{
+						Services: resources.ServiceLimit{
 							PaidServicePlans:      &trueValue,
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 6},
 						},
-						Routes: RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: true, Value: 8},
 							TotalReservedPorts: &types.NullInt{IsSet: true, Value: 9},
 						},
@@ -365,20 +365,20 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("space-quota-warning"))
 				Expect(createdSpaceQuota).To(Equal(
-					SpaceQuota{
-						Quota: Quota{
+					resources.SpaceQuota{
+						Quota: resources.Quota{
 							GUID: "space-quota-guid",
 							Name: "my-space-quota",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{IsSet: true, Value: 2},
 								InstanceMemory:    &types.NullInt{IsSet: true, Value: 3},
 								TotalAppInstances: &types.NullInt{IsSet: true, Value: 4},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								PaidServicePlans:      &trueValue,
 								TotalServiceInstances: &types.NullInt{IsSet: true, Value: 6},
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{IsSet: true, Value: 8},
 								TotalReservedPorts: &types.NullInt{IsSet: true, Value: 9},
 							},
@@ -504,7 +504,7 @@ var _ = Describe("Space Quotas", func() {
 
 	Describe("GetSpaceQuota", func() {
 		var (
-			spaceQuota     SpaceQuota
+			spaceQuota     resources.SpaceQuota
 			spaceQuotaGUID = "space-quota-guid"
 		)
 
@@ -559,20 +559,20 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get warning"))
 				Expect(spaceQuota).To(Equal(
-					SpaceQuota{
-						Quota: Quota{
+					resources.SpaceQuota{
+						Quota: resources.Quota{
 							GUID: "space-quota-guid",
 							Name: "sancho-panza",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 							},
@@ -629,7 +629,7 @@ var _ = Describe("Space Quotas", func() {
 
 	Describe("GetSpaceQuotas", func() {
 		var (
-			spaceQuotas []SpaceQuota
+			spaceQuotas []resources.SpaceQuota
 			query       Query
 		)
 
@@ -749,40 +749,40 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("page1 warning", "page2 warning"))
 				Expect(spaceQuotas).To(ConsistOf(
-					SpaceQuota{
-						Quota: Quota{
+					resources.SpaceQuota{
+						Quota: resources.Quota{
 							GUID: "quota-guid",
 							Name: "don-quixote",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 5120, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 10, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 10, IsSet: true},
 								PaidServicePlans:      &trueValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 8, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 4, IsSet: true},
 							},
 						},
 						OrgGUID: "org-guid-1",
 					},
-					SpaceQuota{
-						Quota: Quota{
+					resources.SpaceQuota{
+						Quota: resources.Quota{
 							GUID: "quota-2-guid",
 							Name: "sancho-panza",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 							},
@@ -851,20 +851,20 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("page1 warning"))
 				Expect(spaceQuotas).To(ConsistOf(
-					SpaceQuota{
-						Quota: Quota{
+					resources.SpaceQuota{
+						Quota: resources.Quota{
 							GUID: "quota-2-guid",
 							Name: "sancho-panza",
-							Apps: AppLimit{
+							Apps: resources.AppLimit{
 								TotalMemory:       &types.NullInt{Value: 10240, IsSet: true},
 								InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 								TotalAppInstances: &types.NullInt{Value: 8, IsSet: true},
 							},
-							Services: ServiceLimit{
+							Services: resources.ServiceLimit{
 								TotalServiceInstances: &types.NullInt{Value: 8, IsSet: true},
 								PaidServicePlans:      &falseValue,
 							},
-							Routes: RouteLimit{
+							Routes: resources.RouteLimit{
 								TotalRoutes:        &types.NullInt{Value: 10, IsSet: true},
 								TotalReservedPorts: &types.NullInt{Value: 5, IsSet: true},
 							},
@@ -997,23 +997,23 @@ var _ = Describe("Space Quotas", func() {
 
 	Describe("UpdateSpaceQuota", func() {
 		var (
-			updatedSpaceQuota SpaceQuota
+			updatedSpaceQuota resources.SpaceQuota
 			warnings          Warnings
 			executeErr        error
-			inputQuota        SpaceQuota
+			inputQuota        resources.SpaceQuota
 		)
 
 		BeforeEach(func() {
-			inputQuota = SpaceQuota{
-				Quota: Quota{
+			inputQuota = resources.SpaceQuota{
+				Quota: resources.Quota{
 					GUID: "elephant-trunk-guid",
 					Name: "elephant-trunk",
-					Apps: AppLimit{
+					Apps: resources.AppLimit{
 						TotalMemory:       &types.NullInt{Value: 2048, IsSet: true},
 						InstanceMemory:    &types.NullInt{Value: 1024, IsSet: true},
 						TotalAppInstances: &types.NullInt{Value: 0, IsSet: false},
 					},
-					Services: ServiceLimit{
+					Services: resources.ServiceLimit{
 						TotalServiceInstances: &types.NullInt{Value: 0, IsSet: true},
 						PaidServicePlans:      &trueValue,
 					},
@@ -1081,20 +1081,20 @@ var _ = Describe("Space Quotas", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
-				Expect(updatedSpaceQuota).To(Equal(SpaceQuota{
-					Quota: Quota{
+				Expect(updatedSpaceQuota).To(Equal(resources.SpaceQuota{
+					Quota: resources.Quota{
 						GUID: "elephant-trunk-guid",
 						Name: "elephant-trunk",
-						Apps: AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
 							TotalAppInstances: &types.NullInt{IsSet: false, Value: 0},
 						},
-						Services: ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: true, Value: 0},
 							PaidServicePlans:      &trueValue,
 						},
-						Routes: RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: false, Value: 0},
 							TotalReservedPorts: &types.NullInt{IsSet: false, Value: 0},
 						},

@@ -176,9 +176,9 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 
 	appliedQuotaRelationshipGUID := space.Relationships[constant.RelationshipTypeQuota].GUID
 
-	var ccv3SpaceQuota ccv3.SpaceQuota
+	var spaceQuota resources.SpaceQuota
 	if appliedQuotaRelationshipGUID != "" {
-		ccv3SpaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		spaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
 		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 
 		if err != nil {
@@ -205,7 +205,7 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		AppNames:              appNames,
 		ServiceInstanceNames:  serviceInstanceNames,
 		IsolationSegmentName:  isoSegName,
-		QuotaName:             ccv3SpaceQuota.Name,
+		QuotaName:             spaceQuota.Name,
 		RunningSecurityGroups: runningSecurityGroups,
 		StagingSecurityGroups: stagingSecurityGroups,
 	}

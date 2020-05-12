@@ -1,9 +1,9 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type SpaceQuotaCommand struct {
@@ -43,7 +43,7 @@ func (cmd SpaceQuotaCommand) Execute(args []string) error {
 	}
 
 	quotaDisplayer := shared.NewQuotaDisplayer(cmd.UI)
-	quotaDisplayer.DisplaySingleQuota(v7action.Quota(spaceQuota.Quota))
+	quotaDisplayer.DisplaySingleQuota(resources.Quota(spaceQuota.Quota))
 
 	return nil
 }

@@ -1322,32 +1322,32 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetOrganizationQuotaByNameStub        func(string) (v7action.OrganizationQuota, v7action.Warnings, error)
+	GetOrganizationQuotaByNameStub        func(string) (resources.OrganizationQuota, v7action.Warnings, error)
 	getOrganizationQuotaByNameMutex       sync.RWMutex
 	getOrganizationQuotaByNameArgsForCall []struct {
 		arg1 string
 	}
 	getOrganizationQuotaByNameReturns struct {
-		result1 v7action.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrganizationQuotaByNameReturnsOnCall map[int]struct {
-		result1 v7action.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetOrganizationQuotasStub        func() ([]v7action.OrganizationQuota, v7action.Warnings, error)
+	GetOrganizationQuotasStub        func() ([]resources.OrganizationQuota, v7action.Warnings, error)
 	getOrganizationQuotasMutex       sync.RWMutex
 	getOrganizationQuotasArgsForCall []struct {
 	}
 	getOrganizationQuotasReturns struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getOrganizationQuotasReturnsOnCall map[int]struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1836,34 +1836,34 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetSpaceQuotaByNameStub        func(string, string) (v7action.SpaceQuota, v7action.Warnings, error)
+	GetSpaceQuotaByNameStub        func(string, string) (resources.SpaceQuota, v7action.Warnings, error)
 	getSpaceQuotaByNameMutex       sync.RWMutex
 	getSpaceQuotaByNameArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getSpaceQuotaByNameReturns struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceQuotaByNameReturnsOnCall map[int]struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetSpaceQuotasByOrgGUIDStub        func(string) ([]v7action.SpaceQuota, v7action.Warnings, error)
+	GetSpaceQuotasByOrgGUIDStub        func(string) ([]resources.SpaceQuota, v7action.Warnings, error)
 	getSpaceQuotasByOrgGUIDMutex       sync.RWMutex
 	getSpaceQuotasByOrgGUIDArgsForCall []struct {
 		arg1 string
 	}
 	getSpaceQuotasByOrgGUIDReturns struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
 	getSpaceQuotasByOrgGUIDReturnsOnCall map[int]struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -8651,7 +8651,7 @@ func (fake *FakeActor) GetOrganizationLabelsReturnsOnCall(i int, result1 map[str
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationQuotaByName(arg1 string) (v7action.OrganizationQuota, v7action.Warnings, error) {
+func (fake *FakeActor) GetOrganizationQuotaByName(arg1 string) (resources.OrganizationQuota, v7action.Warnings, error) {
 	fake.getOrganizationQuotaByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotaByNameReturnsOnCall[len(fake.getOrganizationQuotaByNameArgsForCall)]
 	fake.getOrganizationQuotaByNameArgsForCall = append(fake.getOrganizationQuotaByNameArgsForCall, struct {
@@ -8675,7 +8675,7 @@ func (fake *FakeActor) GetOrganizationQuotaByNameCallCount() int {
 	return len(fake.getOrganizationQuotaByNameArgsForCall)
 }
 
-func (fake *FakeActor) GetOrganizationQuotaByNameCalls(stub func(string) (v7action.OrganizationQuota, v7action.Warnings, error)) {
+func (fake *FakeActor) GetOrganizationQuotaByNameCalls(stub func(string) (resources.OrganizationQuota, v7action.Warnings, error)) {
 	fake.getOrganizationQuotaByNameMutex.Lock()
 	defer fake.getOrganizationQuotaByNameMutex.Unlock()
 	fake.GetOrganizationQuotaByNameStub = stub
@@ -8688,36 +8688,36 @@ func (fake *FakeActor) GetOrganizationQuotaByNameArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetOrganizationQuotaByNameReturns(result1 v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationQuotaByNameReturns(result1 resources.OrganizationQuota, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationQuotaByNameMutex.Lock()
 	defer fake.getOrganizationQuotaByNameMutex.Unlock()
 	fake.GetOrganizationQuotaByNameStub = nil
 	fake.getOrganizationQuotaByNameReturns = struct {
-		result1 v7action.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationQuotaByNameReturnsOnCall(i int, result1 v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationQuotaByNameReturnsOnCall(i int, result1 resources.OrganizationQuota, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationQuotaByNameMutex.Lock()
 	defer fake.getOrganizationQuotaByNameMutex.Unlock()
 	fake.GetOrganizationQuotaByNameStub = nil
 	if fake.getOrganizationQuotaByNameReturnsOnCall == nil {
 		fake.getOrganizationQuotaByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.OrganizationQuota
+			result1 resources.OrganizationQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationQuotaByNameReturnsOnCall[i] = struct {
-		result1 v7action.OrganizationQuota
+		result1 resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationQuotas() ([]v7action.OrganizationQuota, v7action.Warnings, error) {
+func (fake *FakeActor) GetOrganizationQuotas() ([]resources.OrganizationQuota, v7action.Warnings, error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	ret, specificReturn := fake.getOrganizationQuotasReturnsOnCall[len(fake.getOrganizationQuotasArgsForCall)]
 	fake.getOrganizationQuotasArgsForCall = append(fake.getOrganizationQuotasArgsForCall, struct {
@@ -8740,36 +8740,36 @@ func (fake *FakeActor) GetOrganizationQuotasCallCount() int {
 	return len(fake.getOrganizationQuotasArgsForCall)
 }
 
-func (fake *FakeActor) GetOrganizationQuotasCalls(stub func() ([]v7action.OrganizationQuota, v7action.Warnings, error)) {
+func (fake *FakeActor) GetOrganizationQuotasCalls(stub func() ([]resources.OrganizationQuota, v7action.Warnings, error)) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = stub
 }
 
-func (fake *FakeActor) GetOrganizationQuotasReturns(result1 []v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationQuotasReturns(result1 []resources.OrganizationQuota, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = nil
 	fake.getOrganizationQuotasReturns = struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetOrganizationQuotasReturnsOnCall(i int, result1 []v7action.OrganizationQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetOrganizationQuotasReturnsOnCall(i int, result1 []resources.OrganizationQuota, result2 v7action.Warnings, result3 error) {
 	fake.getOrganizationQuotasMutex.Lock()
 	defer fake.getOrganizationQuotasMutex.Unlock()
 	fake.GetOrganizationQuotasStub = nil
 	if fake.getOrganizationQuotasReturnsOnCall == nil {
 		fake.getOrganizationQuotasReturnsOnCall = make(map[int]struct {
-			result1 []v7action.OrganizationQuota
+			result1 []resources.OrganizationQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getOrganizationQuotasReturnsOnCall[i] = struct {
-		result1 []v7action.OrganizationQuota
+		result1 []resources.OrganizationQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -10817,7 +10817,7 @@ func (fake *FakeActor) GetSpaceLabelsReturnsOnCall(i int, result1 map[string]typ
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceQuotaByName(arg1 string, arg2 string) (v7action.SpaceQuota, v7action.Warnings, error) {
+func (fake *FakeActor) GetSpaceQuotaByName(arg1 string, arg2 string) (resources.SpaceQuota, v7action.Warnings, error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotaByNameReturnsOnCall[len(fake.getSpaceQuotaByNameArgsForCall)]
 	fake.getSpaceQuotaByNameArgsForCall = append(fake.getSpaceQuotaByNameArgsForCall, struct {
@@ -10842,7 +10842,7 @@ func (fake *FakeActor) GetSpaceQuotaByNameCallCount() int {
 	return len(fake.getSpaceQuotaByNameArgsForCall)
 }
 
-func (fake *FakeActor) GetSpaceQuotaByNameCalls(stub func(string, string) (v7action.SpaceQuota, v7action.Warnings, error)) {
+func (fake *FakeActor) GetSpaceQuotaByNameCalls(stub func(string, string) (resources.SpaceQuota, v7action.Warnings, error)) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	defer fake.getSpaceQuotaByNameMutex.Unlock()
 	fake.GetSpaceQuotaByNameStub = stub
@@ -10855,36 +10855,36 @@ func (fake *FakeActor) GetSpaceQuotaByNameArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeActor) GetSpaceQuotaByNameReturns(result1 v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceQuotaByNameReturns(result1 resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	defer fake.getSpaceQuotaByNameMutex.Unlock()
 	fake.GetSpaceQuotaByNameStub = nil
 	fake.getSpaceQuotaByNameReturns = struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceQuotaByNameReturnsOnCall(i int, result1 v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceQuotaByNameReturnsOnCall(i int, result1 resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotaByNameMutex.Lock()
 	defer fake.getSpaceQuotaByNameMutex.Unlock()
 	fake.GetSpaceQuotaByNameStub = nil
 	if fake.getSpaceQuotaByNameReturnsOnCall == nil {
 		fake.getSpaceQuotaByNameReturnsOnCall = make(map[int]struct {
-			result1 v7action.SpaceQuota
+			result1 resources.SpaceQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceQuotaByNameReturnsOnCall[i] = struct {
-		result1 v7action.SpaceQuota
+		result1 resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceQuotasByOrgGUID(arg1 string) ([]v7action.SpaceQuota, v7action.Warnings, error) {
+func (fake *FakeActor) GetSpaceQuotasByOrgGUID(arg1 string) ([]resources.SpaceQuota, v7action.Warnings, error) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	ret, specificReturn := fake.getSpaceQuotasByOrgGUIDReturnsOnCall[len(fake.getSpaceQuotasByOrgGUIDArgsForCall)]
 	fake.getSpaceQuotasByOrgGUIDArgsForCall = append(fake.getSpaceQuotasByOrgGUIDArgsForCall, struct {
@@ -10908,7 +10908,7 @@ func (fake *FakeActor) GetSpaceQuotasByOrgGUIDCallCount() int {
 	return len(fake.getSpaceQuotasByOrgGUIDArgsForCall)
 }
 
-func (fake *FakeActor) GetSpaceQuotasByOrgGUIDCalls(stub func(string) ([]v7action.SpaceQuota, v7action.Warnings, error)) {
+func (fake *FakeActor) GetSpaceQuotasByOrgGUIDCalls(stub func(string) ([]resources.SpaceQuota, v7action.Warnings, error)) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	defer fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
 	fake.GetSpaceQuotasByOrgGUIDStub = stub
@@ -10921,30 +10921,30 @@ func (fake *FakeActor) GetSpaceQuotasByOrgGUIDArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeActor) GetSpaceQuotasByOrgGUIDReturns(result1 []v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceQuotasByOrgGUIDReturns(result1 []resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	defer fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
 	fake.GetSpaceQuotasByOrgGUIDStub = nil
 	fake.getSpaceQuotasByOrgGUIDReturns = struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetSpaceQuotasByOrgGUIDReturnsOnCall(i int, result1 []v7action.SpaceQuota, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetSpaceQuotasByOrgGUIDReturnsOnCall(i int, result1 []resources.SpaceQuota, result2 v7action.Warnings, result3 error) {
 	fake.getSpaceQuotasByOrgGUIDMutex.Lock()
 	defer fake.getSpaceQuotasByOrgGUIDMutex.Unlock()
 	fake.GetSpaceQuotasByOrgGUIDStub = nil
 	if fake.getSpaceQuotasByOrgGUIDReturnsOnCall == nil {
 		fake.getSpaceQuotasByOrgGUIDReturnsOnCall = make(map[int]struct {
-			result1 []v7action.SpaceQuota
+			result1 []resources.SpaceQuota
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getSpaceQuotasByOrgGUIDReturnsOnCall[i] = struct {
-		result1 []v7action.SpaceQuota
+		result1 []resources.SpaceQuota
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

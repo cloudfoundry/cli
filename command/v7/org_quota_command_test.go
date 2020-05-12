@@ -3,10 +3,10 @@ package v7_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -72,7 +72,7 @@ var _ = Describe("Org Quota Command", func() {
 				nil)
 
 			fakeActor.GetOrganizationQuotaByNameReturns(
-				v7action.OrganizationQuota{},
+				resources.OrganizationQuota{},
 				v7action.Warnings{"warning-1", "warning-2"},
 				actionerror.OrganizationQuotaNotFoundError{})
 		})
@@ -98,19 +98,19 @@ var _ = Describe("Org Quota Command", func() {
 
 			falseValue := false
 			fakeActor.GetOrganizationQuotaByNameReturns(
-				v7action.OrganizationQuota{
-					Quota: ccv3.Quota{
+				resources.OrganizationQuota{
+					Quota: resources.Quota{
 						Name: "some-org-quota",
-						Apps: ccv3.AppLimit{
+						Apps: resources.AppLimit{
 							TotalMemory:       &types.NullInt{IsSet: true, Value: 2048},
 							InstanceMemory:    &types.NullInt{IsSet: true, Value: 1024},
 							TotalAppInstances: &types.NullInt{IsSet: true, Value: 2},
 						},
-						Services: ccv3.ServiceLimit{
+						Services: resources.ServiceLimit{
 							TotalServiceInstances: &types.NullInt{IsSet: false},
 							PaidServicePlans:      &falseValue,
 						},
-						Routes: ccv3.RouteLimit{
+						Routes: resources.RouteLimit{
 							TotalRoutes:        &types.NullInt{IsSet: true, Value: 4},
 							TotalReservedPorts: &types.NullInt{IsSet: false},
 						},
