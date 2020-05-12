@@ -12,7 +12,7 @@ var _ = Describe("Unmarshal", func() {
 	It("unmarshals a field", func() {
 		var s struct{ Foo string }
 
-		err := jsonry.Unmarshal([]byte(`{"foo": "works"}`), &s)
+		err := jsonry.Unmarshal([]byte(`{"Foo": "works"}`), &s)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(s.Foo).To(Equal("works"))
 	})
@@ -24,7 +24,7 @@ var _ = Describe("Unmarshal", func() {
 			C string
 		}
 
-		data := `{"foo": "JSON", "bar": "JSONry", "c": "inference"}`
+		data := `{"foo": "JSON", "bar": "JSONry", "C": "inference"}`
 
 		err := jsonry.Unmarshal([]byte(data), &s)
 		Expect(err).NotTo(HaveOccurred())
@@ -36,7 +36,7 @@ var _ = Describe("Unmarshal", func() {
 	It("unmarshals into a pointer", func() {
 		var s struct{ A *string }
 
-		err := jsonry.Unmarshal([]byte(`{"a": "pointer works"}`), &s)
+		err := jsonry.Unmarshal([]byte(`{"A": "pointer works"}`), &s)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(s.A).To(PointTo(Equal("pointer works")))
 	})
@@ -48,7 +48,7 @@ var _ = Describe("Unmarshal", func() {
 			C []int
 		}
 
-		data := `{"a": ["q", "w", "e"], "b": ["r", "t", "y"], "c": [1, 2, 3]}`
+		data := `{"A": ["q", "w", "e"], "B": ["r", "t", "y"], "C": [1, 2, 3]}`
 		err := jsonry.Unmarshal([]byte(data), &s)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(s.A).To(Equal([]string{"q", "w", "e"}))
@@ -67,7 +67,7 @@ var _ = Describe("Unmarshal", func() {
 			A []T
 		}
 
-		data := `{"p":"baz", "a": [ {"d": "foo", "e": 123}, {"d": "bar", "e": 1} ]}`
+		data := `{"P":"baz", "A": [ {"d": "foo", "e": 123}, {"d": "bar", "e": 1} ]}`
 
 		err := jsonry.Unmarshal([]byte(data), &s)
 
@@ -111,7 +111,7 @@ var _ = Describe("Unmarshal", func() {
 			Baz *s
 		}
 
-		data := `{"bar": {"foo": "recursion works"}, "baz": {"foo": "pointer recursion works"}}`
+		data := `{"Bar": {"Foo": "recursion works"}, "Baz": {"Foo": "pointer recursion works"}}`
 
 		err := jsonry.Unmarshal([]byte(data), &t)
 		Expect(err).NotTo(HaveOccurred())
@@ -126,7 +126,7 @@ var _ = Describe("Unmarshal", func() {
 			B *rope
 		}
 
-		err := jsonry.Unmarshal([]byte(`{"a": "foo", "b": "bar"}`), &s)
+		err := jsonry.Unmarshal([]byte(`{"A": "foo", "B": "bar"}`), &s)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(s.A).To(Equal(rope("foo")))
 		Expect(s.B).To(PointTo(Equal(rope("bar"))))
@@ -151,7 +151,7 @@ var _ = Describe("Unmarshal", func() {
 
 		data := `
         {
-			"name": "foo",
+			"Name": "foo",
 			"guid": "long-guid",
 			"url": "https://foo.com",
 			"authentication": {
@@ -199,26 +199,26 @@ var _ = Describe("Unmarshal", func() {
 	When("there is a type mismatch", func() {
 		It("fails for simple types", func() {
 			var s struct{ S int }
-			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"S": "hello"}`), &s)
 			Expect(err).To(MatchError("could not convert value 'hello' type 'string' to 'int' for field 'S'"))
 		})
 
 		It("fails when the field expects a list", func() {
 			var s struct{ S []string }
-			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"S": "hello"}`), &s)
 			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to '[]string' for field 'S' because it is not a list type`))
 		})
 
 		It("fails for elements in a list", func() {
 			var s struct{ S []int }
-			err := jsonry.Unmarshal([]byte(`{"s": [4, "hello"]}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"S": [4, "hello"]}`), &s)
 			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to 'int' for field 'S' index 1`))
 		})
 
 		When("in a list of structs", func() {
 			It("fails when its not a struct", func() {
 				var s struct{ S []struct{ A string } }
-				err := jsonry.Unmarshal([]byte(`{"s": ["123"]}`), &s)
+				err := jsonry.Unmarshal([]byte(`{"S": ["123"]}`), &s)
 				Expect(err).To(MatchError(`could not convert value '123' type 'string' to 'struct { A string }' for field 'S' index 0`))
 			})
 
@@ -228,7 +228,7 @@ var _ = Describe("Unmarshal", func() {
 						A bool
 					}
 				}
-				err := jsonry.Unmarshal([]byte(`{"s": [{"b": "123"}]}`), &s)
+				err := jsonry.Unmarshal([]byte(`{"S": [{"b": "123"}]}`), &s)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(s.S[0].A).To(BeFalse())
 			})
@@ -238,7 +238,7 @@ var _ = Describe("Unmarshal", func() {
 	Context("numbers", func() {
 		It("can unmarshal an int", func() {
 			var s struct{ I int }
-			err := jsonry.Unmarshal([]byte(`{"i": 42}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"I": 42}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.I).To(Equal(42))
 		})
@@ -246,7 +246,7 @@ var _ = Describe("Unmarshal", func() {
 		It("can unmarshal a float", func() {
 			var s struct{ F float64 }
 
-			err := jsonry.Unmarshal([]byte(`{"f": 42.02}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"F": 42.02}`), &s)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.F).To(Equal(42.02))
@@ -254,7 +254,7 @@ var _ = Describe("Unmarshal", func() {
 
 		It("fails when the JSON value is not an int", func() {
 			var s struct{ I int }
-			err := jsonry.Unmarshal([]byte(`{"i": "stuffs"}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"I": "stuffs"}`), &s)
 			Expect(err).To(MatchError("could not convert value 'stuffs' type 'string' to 'int' for field 'I'"))
 		})
 	})
@@ -262,7 +262,7 @@ var _ = Describe("Unmarshal", func() {
 	Context("the special map[string]types.NullString", func() {
 		It("can unmarshal a map", func() {
 			var s struct{ M map[string]types.NullString }
-			err := jsonry.Unmarshal([]byte(`{"m": {"foo": "bar", "baz": null}}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"M": {"foo": "bar", "baz": null}}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.M).To(Equal(map[string]types.NullString{
 				"foo": types.NewNullString("bar"),
@@ -272,7 +272,7 @@ var _ = Describe("Unmarshal", func() {
 
 		It("can unmarshal a pointer to a map", func() {
 			var s struct{ M *map[string]types.NullString }
-			err := jsonry.Unmarshal([]byte(`{"m": {"foo": "bar", "baz": null}}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"M": {"foo": "bar", "baz": null}}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.M).To(Equal(&map[string]types.NullString{
 				"foo": types.NewNullString("bar"),

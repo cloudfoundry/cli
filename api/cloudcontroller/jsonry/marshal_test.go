@@ -13,7 +13,7 @@ var _ = Describe("Marshal", func() {
 
 		json, err := jsonry.Marshal(s)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"foo": "works"}`))
+		Expect(json).To(MatchJSON(`{"Foo": "works"}`))
 	})
 
 	It("reads `json` and `jsonry` tags", func() {
@@ -29,7 +29,7 @@ var _ = Describe("Marshal", func() {
 
 		json, err := jsonry.Marshal(s)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"foo": "JSON", "bar": "JSONry", "c": "inference"}`))
+		Expect(json).To(MatchJSON(`{"foo": "JSON", "bar": "JSONry", "C": "inference"}`))
 	})
 
 	It("marshals from a struct pointer", func() {
@@ -37,7 +37,7 @@ var _ = Describe("Marshal", func() {
 
 		json, err := jsonry.Marshal(&s)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"foo": "struct pointer works"}`))
+		Expect(json).To(MatchJSON(`{"Foo": "struct pointer works"}`))
 	})
 
 	It("marshals from a pointer field", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Marshal", func() {
 
 		json, err := jsonry.Marshal(s)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"a": "pointer works", "b": null}`))
+		Expect(json).To(MatchJSON(`{"A": "pointer works", "B": null}`))
 	})
 
 	It("marshals lists", func() {
@@ -62,7 +62,7 @@ var _ = Describe("Marshal", func() {
 
 		json, err := jsonry.Marshal(s)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"a": ["q", "w", "e"], "b": ["r", "t", "y"], "c": [1, 2, 3]}`))
+		Expect(json).To(MatchJSON(`{"A": ["q", "w", "e"], "B": ["r", "t", "y"], "C": [1, 2, 3]}`))
 	})
 
 	It("marshals into nested JSON", func() {
@@ -115,7 +115,7 @@ var _ = Describe("Marshal", func() {
 			Baz: &s{Foo: "pointer recursion works"},
 		}
 
-		e := `{"bar": {"foo": "recursion works"}, "baz": {"foo": "pointer recursion works"}}`
+		e := `{"Bar": {"Foo": "recursion works"}, "Baz": {"Foo": "pointer recursion works"}}`
 
 		json, err := jsonry.Marshal(t)
 		Expect(err).NotTo(HaveOccurred())
@@ -140,7 +140,7 @@ var _ = Describe("Marshal", func() {
 		t.C = &c
 		json, err = jsonry.Marshal(t)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"a": "AA", "bee": "BB", "c": "foo"}`))
+		Expect(json).To(MatchJSON(`{"A": "AA", "bee": "BB", "c": "foo"}`))
 	})
 
 	It("marshals a realistic object", func() {
@@ -175,7 +175,7 @@ var _ = Describe("Marshal", func() {
 
 		e := `
 	   {
-			"name": "foo",
+			"Name": "foo",
 			"guid": "long-guid",
 			"url": "https://foo.com",
 			"authentication": {
@@ -208,19 +208,19 @@ var _ = Describe("Marshal", func() {
 	When("there is a type mismatch", func() {
 		It("fails for simple types", func() {
 			var s struct{ S int }
-			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"S": "hello"}`), &s)
 			Expect(err).To(MatchError("could not convert value 'hello' type 'string' to 'int' for field 'S'"))
 		})
 
 		It("fails when the field expects a list", func() {
 			var s struct{ S []string }
-			err := jsonry.Unmarshal([]byte(`{"s": "hello"}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"S": "hello"}`), &s)
 			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to '[]string' for field 'S' because it is not a list type`))
 		})
 
 		It("fails for elements in a list", func() {
 			var s struct{ S []int }
-			err := jsonry.Unmarshal([]byte(`{"s": [4, "hello"]}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"S": [4, "hello"]}`), &s)
 			Expect(err).To(MatchError(`could not convert value 'hello' type 'string' to 'int' for field 'S' index 1`))
 		})
 	})
@@ -228,14 +228,14 @@ var _ = Describe("Marshal", func() {
 	Context("numbers", func() {
 		It("can unmarshal an int", func() {
 			var s struct{ I int }
-			err := jsonry.Unmarshal([]byte(`{"i": 42}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"I": 42}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.I).To(Equal(42))
 		})
 
 		It("fails when the JSON value is not an int", func() {
 			var s struct{ I int }
-			err := jsonry.Unmarshal([]byte(`{"i": "stuffs"}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"I": "stuffs"}`), &s)
 			Expect(err).To(MatchError("could not convert value 'stuffs' type 'string' to 'int' for field 'I'"))
 		})
 	})
@@ -243,7 +243,7 @@ var _ = Describe("Marshal", func() {
 	Context("the special map[string]types.NullString", func() {
 		It("can unmarshal a map", func() {
 			var s struct{ M map[string]types.NullString }
-			err := jsonry.Unmarshal([]byte(`{"m": {"foo": "bar", "baz": null}}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"M": {"foo": "bar", "baz": null}}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.M).To(Equal(map[string]types.NullString{
 				"foo": types.NewNullString("bar"),
@@ -253,7 +253,7 @@ var _ = Describe("Marshal", func() {
 
 		It("can unmarshal a pointer to a map", func() {
 			var s struct{ M *map[string]types.NullString }
-			err := jsonry.Unmarshal([]byte(`{"m": {"foo": "bar", "baz": null}}`), &s)
+			err := jsonry.Unmarshal([]byte(`{"M": {"foo": "bar", "baz": null}}`), &s)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(s.M).To(Equal(&map[string]types.NullString{
 				"foo": types.NewNullString("bar"),

@@ -10,17 +10,17 @@ import (
 // ServiceOffering represents a Cloud Controller V3 Service Offering.
 type ServiceOffering struct {
 	// GUID is a unique service offering identifier.
-	GUID string
+	GUID string `json:"guid"`
 	// Name is the name of the service offering.
-	Name string
+	Name string `json:"name"`
 	// ServiceBrokerName is the name of the service broker
 	ServiceBrokerName string
 	// ServiceBrokerGUID is the guid of the service broker
 	ServiceBrokerGUID string `jsonry:"relationships.service_broker.data.guid"`
 	// Description of the service offering
-	Description string
+	Description string `json:"description"`
 
-	Metadata *resources.Metadata
+	Metadata *resources.Metadata `json:"metadata"`
 }
 
 func (so *ServiceOffering) UnmarshalJSON(data []byte) error {

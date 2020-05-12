@@ -11,15 +11,15 @@ import (
 // ServicePlan represents a Cloud Controller V3 Service Plan.
 type ServicePlan struct {
 	// GUID is a unique service plan identifier.
-	GUID string
+	GUID string `json:"guid"`
 	// Name is the name of the service plan.
-	Name string
+	Name string `json:"name"`
 	// Description of the Service Plan.
-	Description string
+	Description string `json:"description"`
 	// VisibilityType can be "public", "admin", "organization" or "space"
 	VisibilityType VisibilityType `json:"visibility_type"`
 	// Free shows whether or not the Service Plan is free of charge.
-	Free bool
+	Free bool `json:"free"`
 	// Cost shows the cost of a paid service plan
 	Costs []Cost `json:"costs"`
 	// ServicePlanGUID is the GUID of the service offering
@@ -27,7 +27,7 @@ type ServicePlan struct {
 	// SpaceGUID is the space that a plan from a space-scoped broker relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid"`
 
-	Metadata *resources.Metadata
+	Metadata *resources.Metadata `json:"metadata"`
 }
 
 func (sp *ServicePlan) UnmarshalJSON(data []byte) error {

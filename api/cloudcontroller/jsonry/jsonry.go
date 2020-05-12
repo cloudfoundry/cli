@@ -40,7 +40,7 @@ func computePath(field reflect.StructField) jsonryPath {
 
 		jsonry := parts[0]
 		if len(jsonry) == 0 {
-			jsonry = strings.ToLower(field.Name)
+			jsonry = field.Name
 		}
 
 		var elements []pathElement
@@ -63,5 +63,5 @@ func computePath(field reflect.StructField) jsonryPath {
 		}
 	}
 
-	return jsonryPath{elements: []pathElement{{name: strings.ToLower(field.Name)}}}
+	return jsonryPath{elements: []pathElement{{name: field.Name}}}
 }
