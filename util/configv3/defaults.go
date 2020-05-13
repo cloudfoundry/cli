@@ -4,7 +4,7 @@ import "time"
 
 const (
 	// CurrentConfigVersion is the version field for the main config file
-	CurrentConfigVersion = 3
+	CurrentConfigVersion = 4
 
 	// DefaultDialTimeout is the default timeout for the dial.
 	DefaultDialTimeout = 6 * time.Second
