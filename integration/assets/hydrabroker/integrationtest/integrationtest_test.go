@@ -101,7 +101,7 @@ var _ = Describe("Integration Test", func() {
 			expectStatusCode(response, http.StatusUnauthorized)
 		})
 
-		FIt("responds to the catalog endpoint", func() {
+		It("responds to the catalog endpoint", func() {
 			response := httpRequest(cfg, "GET", server.URL+"/broker/"+guid+"/v2/catalog", nil)
 			expectStatusCode(response, http.StatusOK)
 
