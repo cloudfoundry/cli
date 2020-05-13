@@ -146,7 +146,7 @@ jobs:
             file: capi-ci/ci/bosh-lite/create-bosh-lite.yml
             params:
               GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
-              GCP_INSTANCE_TYPE: n1-highmem-4
+              GCP_INSTANCE_TYPE: n2-standard-8
           - do:
               - task: create-env-vars-file
                 file: capi-ci/ci/bosh-lite/create-env-vars-file.yml
