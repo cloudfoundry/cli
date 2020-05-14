@@ -270,7 +270,7 @@ var _ = Describe("login command", func() {
 					err = json.Unmarshal(rawConfig, &configFile)
 					Expect(err).NotTo(HaveOccurred())
 
-					Expect(configFile.ConfigVersion).To(Equal(3))
+					Expect(configFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
 					Expect(configFile.Target).To(Equal(apiURL))
 					Expect(configFile.APIVersion).To(MatchRegexp(`\d+\.\d+\.\d+`))
 					Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
