@@ -2,6 +2,7 @@ package application_test
 
 import (
 	"os"
+	"runtime"
 	"time"
 
 	. "code.cloudfoundry.org/cli/cf/commands/application"
@@ -88,6 +89,10 @@ var _ = Describe("start command", func() {
 	})
 
 	BeforeEach(func() {
+		if runtime.GOOS == "windows" && time.Now().Before(time.Date(2020, 06, 15, 0, 0, 0, 0, time.UTC)) {
+			Skip("cf start command test temporary disabled on Windows https://www.pivotaltracker.com/story/show/172687176")
+		}
+
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 		ui = new(testterm.FakeUI)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
