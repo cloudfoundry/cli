@@ -11,4 +11,4 @@ go get -u github.com/onsi/ginkgo/ginkgo
 
 ginkgo version
 
-ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration -flakeAttempts=2 .
+ginkgo --regexScansFilePath=true --focus=./cf/commands/application/start_test.go ./cf/commands/application
