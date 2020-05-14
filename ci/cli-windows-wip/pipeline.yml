@@ -1,0 +1,34 @@
+---
+resources:
+- name: cli
+  type: git
+  icon: console
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: windows-flake-172687176
+    ignore_paths:
+    - bin
+    - ci
+    - README.md
+    - .github
+
+- name: cli-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: windows-flake-172687176
+    paths:
+    - bin
+    - ci
+
+jobs:
+- name: units
+  serial: true
+  plan:
+  - in_parallel:
+    - get: cli
+    - get: cli-ci
+  - in_parallel:
+    - task: units-windows
+      tags: ["cli-windows"]
+      file: cli-ci/ci/cli-windows-wip/tasks/units-windows.yml
