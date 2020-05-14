@@ -32,3 +32,12 @@ jobs:
     - task: units-windows
       tags: ["cli-windows"]
       file: cli-ci/ci/cli-windows-wip/tasks/units-windows.yml
+    - task: units-windows
+      tags: ["cli-windows"]
+      file: cli-ci/ci/cli-windows-wip/tasks/units-windows.yml
+    - task: units-windows
+      tags: ["cli-windows"]
+      file: cli-ci/ci/cli-windows-wip/tasks/units-windows.yml
+    - task: units-windows
+      tags: ["cli-windows"]
+      file: cli-ci/ci/cli-windows-wip/tasks/units-windows.yml
