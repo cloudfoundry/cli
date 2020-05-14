@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -127,7 +128,7 @@ var _ = Describe("Domain Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{
+				[]resources.Organization{
 					{GUID: "org-guid"},
 				},
 				ccv3.Warnings{"get-orgs-warning"},
@@ -437,7 +438,7 @@ var _ = Describe("Domain Actions", func() {
 	Describe("share private domain to org", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{
+				[]resources.Organization{
 					{GUID: "org-guid"},
 				},
 				ccv3.Warnings{"get-orgs-warning"},
@@ -513,7 +514,7 @@ var _ = Describe("Domain Actions", func() {
 				)
 
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{Name: orgName, GUID: "org-guid"},
 					},
 					ccv3.Warnings{"get-orgs-warning"},
@@ -599,7 +600,7 @@ var _ = Describe("Domain Actions", func() {
 		When("getting the orgs succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{Name: orgName, GUID: "org-guid"},
 					},
 					ccv3.Warnings{"get-orgs-warning"},

@@ -93,7 +93,7 @@ var _ = Describe("org-users Command", func() {
 			When("getting the org guid fails", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{},
+						resources.Organization{},
 						v7action.Warnings{"get-org-by-name-warning"},
 						errors.New("get-org-by-name-error"))
 				})
@@ -107,7 +107,7 @@ var _ = Describe("org-users Command", func() {
 			When("getting the org guid succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{
+						resources.Organization{
 							Name: "org-1",
 							GUID: "org-guid",
 						},

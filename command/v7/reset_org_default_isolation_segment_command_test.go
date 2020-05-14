@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -98,7 +99,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 
 			When("the org lookup is unsuccessful", func() {
 				BeforeEach(func() {
-					fakeActor.GetOrganizationByNameReturns(v7action.Organization{}, v7action.Warnings{"warning-1", "warning-2"}, actionerror.OrganizationNotFoundError{Name: orgName})
+					fakeActor.GetOrganizationByNameReturns(resources.Organization{}, v7action.Warnings{"warning-1", "warning-2"}, actionerror.OrganizationNotFoundError{Name: orgName})
 				})
 
 				It("returns the warnings and error", func() {
@@ -110,7 +111,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 
 			When("the org lookup is successful", func() {
 				BeforeEach(func() {
-					fakeActor.GetOrganizationByNameReturns(v7action.Organization{
+					fakeActor.GetOrganizationByNameReturns(resources.Organization{
 						Name: orgName,
 						GUID: "some-org-guid",
 					}, v7action.Warnings{"warning-1", "warning-2"}, nil)

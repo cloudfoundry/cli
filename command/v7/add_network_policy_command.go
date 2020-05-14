@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 //go:generate counterfeiter . NetworkingActor
@@ -71,7 +72,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 
 	displayDestinationOrg := cmd.Config.TargetedOrganization().Name
 	if cmd.DestinationOrg != "" {
-		var destOrg v7action.Organization
+		var destOrg resources.Organization
 		var warnings v7action.Warnings
 		destOrg, warnings, err = cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
 		cmd.UI.DisplayWarnings(warnings)

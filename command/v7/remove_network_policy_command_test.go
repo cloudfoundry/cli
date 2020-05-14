@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -122,7 +123,7 @@ var _ = Describe("remove-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationOrg = "dest-org"
 				cmd.DestinationSpace = "dest-space"
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{GUID: "some-org-guid"}, v7action.Warnings{"some-warning-1"}, nil)
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{"some-warning-1"}, nil)
 				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{GUID: "some-dest-guid"}, v7action.Warnings{"some-warning-2"}, nil)
 			})
 
@@ -184,7 +185,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				cmd.DestinationOrg = "coolorg"
 				cmd.DestinationSpace = "coolspace"
 				warnings := v7action.Warnings{"some-org-warning-1", "some-org-warning-2"}
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{}, warnings, actionerror.OrganizationNotFoundError{Name: "coolorg"})
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{}, warnings, actionerror.OrganizationNotFoundError{Name: "coolorg"})
 			})
 
 			It("responds with an error", func() {
@@ -204,7 +205,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				cmd.DestinationOrg = "coolorg"
 				cmd.DestinationSpace = "coolspace"
 				warnings := v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{GUID: "some-org-guid"}, v7action.Warnings{}, nil)
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{}, nil)
 				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "coolspace"})
 			})
 

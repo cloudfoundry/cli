@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -74,7 +75,7 @@ var _ = Describe("org Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{GUID: "some-org-guid"},
+					resources.Organization{GUID: "some-org-guid"},
 					v7action.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
@@ -96,7 +97,7 @@ var _ = Describe("org Command", func() {
 			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{},
+						resources.Organization{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						actionerror.OrganizationNotFoundError{Name: "some-org"})
 				})
@@ -115,7 +116,7 @@ var _ = Describe("org Command", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("get org error")
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{},
+						resources.Organization{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						expectedErr)
 				})
@@ -141,7 +142,7 @@ var _ = Describe("org Command", func() {
 
 				fakeActor.GetOrganizationSummaryByNameReturns(
 					v7action.OrganizationSummary{
-						Organization: v7action.Organization{
+						Organization: resources.Organization{
 							Name: "some-org",
 							GUID: "some-org-guid",
 						},

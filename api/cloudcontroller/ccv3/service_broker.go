@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -18,7 +19,7 @@ type ServiceBroker struct {
 	// URL is the url of the service broker.
 	URL string
 
-	Metadata *Metadata
+	Metadata *resources.Metadata
 }
 
 func (s *ServiceBroker) UnmarshalJSON(data []byte) error {

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -101,7 +102,7 @@ var _ = Describe("create-space Command", func() {
 			BeforeEach(func() {
 				orgName = "some-other-org"
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{"get-org-warnings"},
 					nil,
 				)
@@ -116,7 +117,7 @@ var _ = Describe("create-space Command", func() {
 			BeforeEach(func() {
 				orgName = "some-other-org"
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{Name: "some-other-org", GUID: "some-other-org-guid"},
+					resources.Organization{Name: "some-other-org", GUID: "some-other-org-guid"},
 					v7action.Warnings{},
 					nil,
 				)
@@ -141,7 +142,7 @@ var _ = Describe("create-space Command", func() {
 			BeforeEach(func() {
 				orgName = "some-other-org"
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{},
 					errors.New("get-organization-error"),
 				)

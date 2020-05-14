@@ -5,12 +5,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type CreateSpaceActor interface {
 	CreateSpace(spaceName, orgGUID string) (v7action.Space, v7action.Warnings, error)
 	CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
-	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
+	GetOrganizationByName(orgName string) (resources.Organization, v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
 }
 

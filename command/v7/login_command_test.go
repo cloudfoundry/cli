@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -819,7 +820,7 @@ var _ = Describe("login Command", func() {
 			When("fetching the organization succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{Name: "some-org", GUID: "some-guid"},
+						resources.Organization{Name: "some-org", GUID: "some-guid"},
 						v7action.Warnings{"some-warning-1", "some-warning-2"},
 						nil)
 					fakeConfig.TargetedOrganizationNameReturns("some-org")
@@ -849,7 +850,7 @@ var _ = Describe("login Command", func() {
 			When("fetching the organization fails", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{},
+						resources.Organization{},
 						v7action.Warnings{"some-warning-1", "some-warning-2"},
 						errors.New("org-not-found"),
 					)
@@ -875,7 +876,7 @@ var _ = Describe("login Command", func() {
 				fakeConfig.CurrentUserNameReturns("some-user", nil)
 				fakeConfig.TargetReturns("https://example.com")
 				fakeActor.GetOrganizationsReturns(
-					[]v7action.Organization{},
+					[]resources.Organization{},
 					v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
 					nil,
 				)
@@ -890,7 +891,7 @@ var _ = Describe("login Command", func() {
 			When("no org valid org exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{v7action.Organization{
+						[]resources.Organization{resources.Organization{
 							GUID: "some-org-guid",
 							Name: "some-org-name",
 						}},
@@ -918,10 +919,10 @@ var _ = Describe("login Command", func() {
 			When("only one valid org exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{v7action.Organization{
+						[]resources.Organization{resources.Organization{
 							GUID: "some-org-guid1",
 							Name: "some-org-name1",
-						}, v7action.Organization{
+						}, resources.Organization{
 							GUID: "some-org-guid2",
 							Name: "some-org-name2",
 						}},
@@ -942,16 +943,16 @@ var _ = Describe("login Command", func() {
 			When("more than one valid org exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{
-							v7action.Organization{
+						[]resources.Organization{
+							resources.Organization{
 								GUID: "some-org-guid3",
 								Name: "1234",
 							},
-							v7action.Organization{
+							resources.Organization{
 								GUID: "some-org-guid1",
 								Name: "some-org-name1",
 							},
-							v7action.Organization{
+							resources.Organization{
 								GUID: "some-org-guid2",
 								Name: "some-org-name2",
 							},
@@ -974,7 +975,7 @@ var _ = Describe("login Command", func() {
 			When("filtering the orgs errors", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{v7action.Organization{
+						[]resources.Organization{resources.Organization{
 							GUID: "some-org-guid",
 							Name: "some-org-name",
 						}},
@@ -996,7 +997,7 @@ var _ = Describe("login Command", func() {
 				cmd.Username = "some-user"
 				cmd.Password = "some-password"
 				fakeActor.GetOrganizationsReturns(
-					[]v7action.Organization{},
+					[]resources.Organization{},
 					v7action.Warnings{"some-org-warning-1", "some-org-warning-2"},
 					nil,
 				)
@@ -1038,7 +1039,7 @@ var _ = Describe("login Command", func() {
 				When("only one org exists", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationsReturns(
-							[]v7action.Organization{v7action.Organization{
+							[]resources.Organization{resources.Organization{
 								GUID: "some-org-guid",
 								Name: "some-org-name",
 							}},
@@ -1059,16 +1060,16 @@ var _ = Describe("login Command", func() {
 				When("more than one but fewer than 50 orgs exists", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationsReturns(
-							[]v7action.Organization{
-								v7action.Organization{
+							[]resources.Organization{
+								resources.Organization{
 									GUID: "some-org-guid3",
 									Name: "1234",
 								},
-								v7action.Organization{
+								resources.Organization{
 									GUID: "some-org-guid1",
 									Name: "some-org-name1",
 								},
-								v7action.Organization{
+								resources.Organization{
 									GUID: "some-org-guid2",
 									Name: "some-org-name2",
 								},
@@ -1195,7 +1196,7 @@ var _ = Describe("login Command", func() {
 
 				When("more than 50 orgs exist", func() {
 					BeforeEach(func() {
-						orgs := make([]v7action.Organization, 51)
+						orgs := make([]resources.Organization, 51)
 						for i := range orgs {
 							orgs[i].Name = fmt.Sprintf("org%d", i+1)
 							orgs[i].GUID = fmt.Sprintf("org-guid%d", i+1)
@@ -1251,7 +1252,7 @@ var _ = Describe("login Command", func() {
 			When("fetching the organizations fails", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{},
+						[]resources.Organization{},
 						v7action.Warnings{"some-warning-1", "some-warning-2"},
 						errors.New("api call failed"),
 					)

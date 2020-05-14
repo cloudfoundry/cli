@@ -4,21 +4,12 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// Metadata is used for custom tagging of API resources
-type Metadata struct {
-	Labels map[string]types.NullString `json:"labels,omitempty"`
-}
-
-type ResourceMetadata struct {
-	Metadata *Metadata `json:"metadata,omitempty"`
-}
-
-func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata Metadata) (JobURL, Warnings, error) {
+func (client *Client) UpdateResourceMetadata(resource string, resourceGUID string, metadata resources.Metadata) (JobURL, Warnings, error) {
 	var params RequestParams
-	requestMetadata := ResourceMetadata{Metadata: &metadata}
+	requestMetadata := resources.ResourceMetadata{Metadata: &metadata}
 
 	switch resource {
 	case "app":
@@ -55,7 +46,7 @@ func (client *Client) UpdateResourceMetadata(resource string, resourceGUID strin
 		params = RequestParams{
 			RequestName: internal.PatchServiceBrokerRequest,
 			URIParams:   internal.Params{"service_broker_guid": resourceGUID},
-			RequestBody: ResourceMetadata{Metadata: &metadata},
+			RequestBody: resources.ResourceMetadata{Metadata: &metadata},
 		}
 	case "service-offering":
 		params = RequestParams{

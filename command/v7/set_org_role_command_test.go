@@ -59,7 +59,7 @@ var _ = Describe("set-org-role Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "current-user"}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{GUID: "some-org-guid", Name: "some-org-name"},
+			resources.Organization{GUID: "some-org-guid", Name: "some-org-name"},
 			v7action.Warnings{"get-org-warning"},
 			nil,
 		)
@@ -199,7 +199,7 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
 
 			fakeActor.GetOrganizationByNameReturns(
-				v7action.Organization{},
+				resources.Organization{},
 				v7action.Warnings{"get-org-warning"},
 				errors.New("get-org-error"),
 			)

@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Stack struct {
@@ -13,7 +14,7 @@ type Stack struct {
 	Description string `json:"description"`
 
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
+	Metadata *resources.Metadata `json:"metadata,omitempty"`
 }
 
 // GetStacks lists stacks with optional filters.

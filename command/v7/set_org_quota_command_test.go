@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -55,7 +56,7 @@ var _ = Describe("set-org-quota Command", func() {
 		fakeConfig.CurrentUserNameReturns(currentUser, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{GUID: "some-org-guid"},
+			resources.Organization{GUID: "some-org-guid"},
 			v7action.Warnings{getOrgWarning},
 			nil,
 		)
@@ -132,7 +133,7 @@ var _ = Describe("set-org-quota Command", func() {
 	When("getting the org fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetOrganizationByNameReturns(
-				v7action.Organization{GUID: "some-org-guid"},
+				resources.Organization{GUID: "some-org-guid"},
 				v7action.Warnings{getOrgWarning},
 				errors.New("get-org-error"),
 			)

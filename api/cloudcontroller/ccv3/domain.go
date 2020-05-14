@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -15,7 +16,7 @@ type Domain struct {
 	OrganizationGUID string         `json:"orgguid,omitempty"`
 
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
+	Metadata *resources.Metadata `json:"metadata,omitempty"`
 }
 
 func (d Domain) MarshalJSON() ([]byte, error) {
@@ -68,7 +69,7 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 				} `json:"data,omitempty"`
 			} `json:"organization,omitempty"`
 		} `json:"relationships,omitempty"`
-		Metadata *Metadata
+		Metadata *resources.Metadata
 	}
 
 	err := cloudcontroller.DecodeJSON(data, &ccRouteStruct)

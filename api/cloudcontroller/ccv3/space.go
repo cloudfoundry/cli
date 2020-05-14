@@ -14,7 +14,7 @@ type Space struct {
 	// Relationships list the relationships to the space.
 	Relationships resources.Relationships `json:"relationships,omitempty"`
 	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
+	Metadata *resources.Metadata `json:"metadata,omitempty"`
 }
 
 func (client *Client) CreateSpace(space Space) (Space, Warnings, error) {

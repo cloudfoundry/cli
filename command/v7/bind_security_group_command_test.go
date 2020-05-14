@@ -61,7 +61,7 @@ var _ = Describe("bind-security-group Command", func() {
 			getSecurityGroupWarning,
 			nil)
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{Name: "some-org", GUID: "some-org-guid"},
+			resources.Organization{Name: "some-org", GUID: "some-org-guid"},
 			v7action.Warnings{"get org warning"},
 			nil)
 	})
@@ -134,7 +134,7 @@ var _ = Describe("bind-security-group Command", func() {
 		When("the provided org does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{"get organization warning"},
 					actionerror.OrganizationNotFoundError{Name: "some-org"})
 			})
@@ -152,7 +152,7 @@ var _ = Describe("bind-security-group Command", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get org error")
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{"get org warning"},
 					expectedErr)
 			})

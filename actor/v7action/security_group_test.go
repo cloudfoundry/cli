@@ -8,13 +8,11 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -362,7 +360,7 @@ var _ = Describe("Security Group Actions", func() {
 								constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-2"},
 							},
 						}},
-						ccv3.IncludedResources{Organizations: []ccv3.Organization{{
+						ccv3.IncludedResources{Organizations: []resources.Organization{{
 							Name: "obsolete-social-networks",
 							GUID: "org-guid-1",
 						}, {
@@ -522,7 +520,7 @@ var _ = Describe("Security Group Actions", func() {
 							constant.RelationshipTypeOrganization: resources.Relationship{GUID: "org-guid-2"},
 						},
 					}},
-					ccv3.IncludedResources{Organizations: []ccv3.Organization{{
+					ccv3.IncludedResources{Organizations: []resources.Organization{{
 						Name: "obsolete-social-networks",
 						GUID: "org-guid-1",
 					}, {
@@ -915,7 +913,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{{GUID: "some-org-guid"}},
+				[]resources.Organization{{GUID: "some-org-guid"}},
 				ccv3.Warnings{"get-org-warning"},
 				nil,
 			)
@@ -990,7 +988,7 @@ var _ = Describe("Security Group Actions", func() {
 		When("getting the org fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{{}},
+					[]resources.Organization{{}},
 					ccv3.Warnings{"get-org-warning"},
 					errors.New("org error"),
 				)

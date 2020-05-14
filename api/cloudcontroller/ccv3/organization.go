@@ -1,58 +1,13 @@
 package ccv3
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// Organization represents a Cloud Controller V3 Organization.
-type Organization struct {
-	// GUID is the unique organization identifier.
-	GUID string `json:"guid,omitempty"`
-	// Name is the name of the organization.
-	Name string `json:"name"`
-	// QuotaGUID is the GUID of the organization Quota applied to this Organization
-	QuotaGUID string `json:"-"`
-
-	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
-}
-
-func (org *Organization) UnmarshalJSON(data []byte) error {
-	type alias Organization
-	var aliasOrg alias
-	err := json.Unmarshal(data, &aliasOrg)
-	if err != nil {
-		return err
-	}
-
-	*org = Organization(aliasOrg)
-
-	remainingFields := new(struct {
-		Relationships struct {
-			Quota struct {
-				Data struct {
-					GUID string
-				}
-			}
-		}
-	})
-
-	err = json.Unmarshal(data, &remainingFields)
-	if err != nil {
-		return err
-	}
-
-	org.QuotaGUID = remainingFields.Relationships.Quota.Data.GUID
-
-	return nil
-}
-
-// CreateOrganization creates an organization with the given name.
-func (client *Client) CreateOrganization(orgName string) (Organization, Warnings, error) {
-	org := Organization{Name: orgName}
-	var responseBody Organization
+func (client *Client) CreateOrganization(orgName string) (resources.Organization, Warnings, error) {
+	org := resources.Organization{Name: orgName}
+	var responseBody resources.Organization
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationRequest,
@@ -88,25 +43,25 @@ func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error)
 
 // GetIsolationSegmentOrganizations lists organizations
 // entitled to an isolation segment.
-func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]Organization, Warnings, error) {
-	var resources []Organization
+func (client *Client) GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]resources.Organization, Warnings, error) {
+	var organizations []resources.Organization
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetIsolationSegmentOrganizationsRequest,
 		URIParams:    internal.Params{"isolation_segment_guid": isolationSegmentGUID},
-		ResponseBody: Organization{},
+		ResponseBody: resources.Organization{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Organization))
+			organizations = append(organizations, item.(resources.Organization))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return organizations, warnings, err
 }
 
 // GetOrganization gets an organization by the given guid.
-func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, error) {
-	var responseBody Organization
+func (client *Client) GetOrganization(orgGUID string) (resources.Organization, Warnings, error) {
+	var responseBody resources.Organization
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetOrganizationRequest,
@@ -118,28 +73,28 @@ func (client *Client) GetOrganization(orgGUID string) (Organization, Warnings, e
 }
 
 // GetOrganizations lists organizations with optional filters.
-func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
-	var resources []Organization
+func (client *Client) GetOrganizations(query ...Query) ([]resources.Organization, Warnings, error) {
+	var organizations []resources.Organization
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetOrganizationsRequest,
 		Query:        query,
-		ResponseBody: Organization{},
+		ResponseBody: resources.Organization{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Organization))
+			organizations = append(organizations, item.(resources.Organization))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return organizations, warnings, err
 }
 
 // UpdateOrganization updates an organization with the given properties.
-func (client *Client) UpdateOrganization(org Organization) (Organization, Warnings, error) {
+func (client *Client) UpdateOrganization(org resources.Organization) (resources.Organization, Warnings, error) {
 	orgGUID := org.GUID
 	org.GUID = ""
 
-	var responseBody Organization
+	var responseBody resources.Organization
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchOrganizationRequest,

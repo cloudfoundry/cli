@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/clock"
 
@@ -424,12 +425,12 @@ func (cmd *LoginCommand) showStatus() {
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
 }
 
-func (cmd *LoginCommand) filterOrgsForSpace(allOrgs []v7action.Organization) ([]v7action.Organization, error) {
+func (cmd *LoginCommand) filterOrgsForSpace(allOrgs []resources.Organization) ([]resources.Organization, error) {
 	if cmd.Space == "" {
 		return allOrgs, nil
 	}
 
-	var filteredOrgs []v7action.Organization
+	var filteredOrgs []resources.Organization
 	for _, org := range allOrgs {
 		_, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, org.GUID)
 		cmd.UI.DisplayWarnings(warnings)
@@ -438,14 +439,14 @@ func (cmd *LoginCommand) filterOrgsForSpace(allOrgs []v7action.Organization) ([]
 			continue
 		}
 		if _, ok := err.(actionerror.SpaceNotFoundError); !ok {
-			return []v7action.Organization{}, err
+			return []resources.Organization{}, err
 		}
 	}
 
 	return filteredOrgs, nil
 }
 
-func (cmd *LoginCommand) promptChosenOrg(orgs []v7action.Organization) (v7action.Organization, error) {
+func (cmd *LoginCommand) promptChosenOrg(orgs []resources.Organization) (resources.Organization, error) {
 	orgNames := make([]string, len(orgs))
 	for i, org := range orgs {
 		orgNames[i] = org.Name
@@ -456,16 +457,16 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v7action.Organization) (v7action
 	if err != nil {
 		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
 			if cmd.Space != "" {
-				return v7action.Organization{}, translatableerror.OrganizationWithSpaceNotFoundError{Name: invalidChoice.Choice, SpaceName: cmd.Space}
+				return resources.Organization{}, translatableerror.OrganizationWithSpaceNotFoundError{Name: invalidChoice.Choice, SpaceName: cmd.Space}
 			}
-			return v7action.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
+			return resources.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
 		}
 
 		if err == io.EOF {
-			return v7action.Organization{}, nil
+			return resources.Organization{}, nil
 		}
 
-		return v7action.Organization{}, err
+		return resources.Organization{}, err
 	}
 
 	for _, org := range orgs {
@@ -474,7 +475,7 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v7action.Organization) (v7action
 		}
 	}
 
-	return v7action.Organization{}, nil
+	return resources.Organization{}, nil
 }
 
 func (cmd *LoginCommand) promptChosenSpace(spaces []v7action.Space) (v7action.Space, error) {

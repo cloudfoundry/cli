@@ -3,10 +3,11 @@ package v3action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // Organization represents a V3 actor organization.
-type Organization ccv3.Organization
+type Organization resources.Organization
 
 // GetOrganizationByName returns the organization with the given name.
 func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, error) {
@@ -35,12 +36,12 @@ func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, War
 		return []Organization{}, Warnings(warnings), err
 	}
 
-	guidToOrg := make(map[string]ccv3.Organization)
+	guidToOrg := make(map[string]resources.Organization)
 	for _, org := range orgs {
 		guidToOrg[org.GUID] = org
 	}
 
-	filteredOrgs := make([]ccv3.Organization, 0)
+	filteredOrgs := make([]resources.Organization, 0)
 	for _, guid := range guids {
 		filteredOrgs = append(filteredOrgs, guidToOrg[guid])
 	}
@@ -61,7 +62,7 @@ func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
 	return convertCCToActorOrganizations(orgs), Warnings(warnings), nil
 }
 
-func convertCCToActorOrganizations(v3orgs []ccv3.Organization) []Organization {
+func convertCCToActorOrganizations(v3orgs []resources.Organization) []Organization {
 	orgs := make([]Organization, len(v3orgs))
 	for i := range v3orgs {
 		orgs[i] = Organization(v3orgs[i])

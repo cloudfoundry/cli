@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/resources"
+	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -92,7 +92,7 @@ var _ = Describe("Space", func() {
 		When("the organization does not have a default isolation segment", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
-					resources.Relationship{GUID: ""},
+					Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
@@ -119,10 +119,10 @@ var _ = Describe("Space", func() {
 		When("the organization has a default isolation segment", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
-					resources.Relationship{GUID: ""},
+					Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
-					resources.Relationship{GUID: "some-iso-guid"},
+					Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, nil)
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
 					ccv3.IsolationSegment{Name: "some-iso-name"},
@@ -157,7 +157,7 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
-					resources.Relationship{GUID: ""},
+					Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, expectedErr)
 			})
 
@@ -174,10 +174,10 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
-					resources.Relationship{GUID: ""},
+					Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
-					resources.Relationship{GUID: "some-iso-guid"},
+					Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, expectedErr)
 			})
 
@@ -194,10 +194,10 @@ var _ = Describe("Space", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
-					resources.Relationship{GUID: ""},
+					Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
-					resources.Relationship{GUID: "some-iso-guid"},
+					Relationship{GUID: "some-iso-guid"},
 					ccv3.Warnings{"warning-3", "warning-4"}, nil)
 				fakeCloudControllerClient.GetIsolationSegmentReturns(
 					ccv3.IsolationSegment{Name: "some-iso-name"},
@@ -266,8 +266,8 @@ var _ = Describe("Space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName,
-							Relationships: resources.Relationships{
-								constant.RelationshipTypeQuota: resources.Relationship{GUID: "some-space-quota-guid"},
+							Relationships: Relationships{
+								constant.RelationshipTypeQuota: Relationship{GUID: "some-space-quota-guid"},
 							}}},
 						ccv3.IncludedResources{},
 						ccv3.Warnings{"some-space-warning"}, nil)
@@ -283,8 +283,8 @@ var _ = Describe("Space", func() {
 					Expect(space).To(Equal(Space{
 						GUID: "some-space-guid",
 						Name: spaceName,
-						Relationships: resources.Relationships{
-							constant.RelationshipTypeQuota: resources.Relationship{GUID: "some-space-quota-guid"},
+						Relationships: Relationships{
+							constant.RelationshipTypeQuota: Relationship{GUID: "some-space-quota-guid"},
 						},
 					}))
 				})
@@ -421,7 +421,7 @@ var _ = Describe("Space", func() {
 		When("the org is not found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]Organization{},
 					ccv3.Warnings{
 						"warning-1",
 						"warning-2",
@@ -439,7 +439,7 @@ var _ = Describe("Space", func() {
 		When("the org is found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{{Name: "some-org", GUID: "some-org-guid"}},
+					[]Organization{{Name: "some-org", GUID: "some-org-guid"}},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -649,9 +649,9 @@ var _ = Describe("Space", func() {
 			warnings     Warnings
 			err          error
 
-			org        ccv3.Organization
+			org        Organization
 			ccv3Spaces []ccv3.Space
-			apps       []resources.Application
+			apps       []Application
 		)
 
 		JustBeforeEach(func() {
@@ -659,7 +659,7 @@ var _ = Describe("Space", func() {
 		})
 
 		BeforeEach(func() {
-			org = ccv3.Organization{GUID: "some-org-guid", Name: "some-org-name"}
+			org = Organization{GUID: "some-org-guid", Name: "some-org-name"}
 
 			ccv3Spaces = []ccv3.Space{
 				{
@@ -669,7 +669,7 @@ var _ = Describe("Space", func() {
 			}
 			fakeCloudControllerClient.GetSpacesReturns(ccv3Spaces, ccv3.IncludedResources{}, ccv3.Warnings{"get-space-warning"}, nil)
 
-			apps = []resources.Application{
+			apps = []Application{
 				{
 					Name: "some-app-name-B",
 					GUID: "some-app-guid-B",
@@ -695,7 +695,7 @@ var _ = Describe("Space", func() {
 			When("getting org info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationReturns(
-						ccv3.Organization{},
+						Organization{},
 						ccv3.Warnings{"get-org-warning"},
 						errors.New("get-org-error"),
 					)
@@ -751,7 +751,7 @@ var _ = Describe("Space", func() {
 			When("getting app info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationsReturns(
-						[]resources.Application{},
+						[]Application{},
 						ccv3.Warnings{"get-apps-warning"},
 						errors.New("get-app-error"),
 					)
@@ -795,7 +795,7 @@ var _ = Describe("Space", func() {
 		Describe("isolation segment information", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(
-					resources.Relationship{GUID: "iso-seg-guid"},
+					Relationship{GUID: "iso-seg-guid"},
 					ccv3.Warnings{"get-space-iso-seg-warning"},
 					nil,
 				)
@@ -833,7 +833,7 @@ var _ = Describe("Space", func() {
 					{
 						GUID: "some-space-guid",
 						Name: "some-space-name",
-						Relationships: resources.Relationships{
+						Relationships: Relationships{
 							constant.RelationshipTypeQuota: {
 								GUID: "squota-guid",
 							},
@@ -843,7 +843,7 @@ var _ = Describe("Space", func() {
 				fakeCloudControllerClient.GetSpacesReturns(ccv3Spaces, ccv3.IncludedResources{}, ccv3.Warnings{"get-space-warning"}, nil)
 
 				fakeCloudControllerClient.GetSpaceQuotaReturns(
-					resources.SpaceQuota{Quota: resources.Quota{Name: "some-quota"}},
+					SpaceQuota{Quota: Quota{Name: "some-quota"}},
 					ccv3.Warnings{"get-squota-warning"},
 					nil,
 				)
@@ -874,7 +874,7 @@ var _ = Describe("Space", func() {
 			When("getting quota info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceQuotaReturns(
-						resources.SpaceQuota{},
+						SpaceQuota{},
 						ccv3.Warnings{"get-squota-warning"},
 						errors.New("space-quota-error"),
 					)
@@ -889,7 +889,7 @@ var _ = Describe("Space", func() {
 		Describe("running security group information", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRunningSecurityGroupsReturns(
-					[]resources.SecurityGroup{{Name: "run-group-1"}},
+					[]SecurityGroup{{Name: "run-group-1"}},
 					ccv3.Warnings{"get-running-warning"},
 					nil,
 				)
@@ -897,7 +897,7 @@ var _ = Describe("Space", func() {
 
 			It("returns running security group names in the summary", func() {
 				Expect(warnings).To(ConsistOf("get-running-warning", "get-space-warning"))
-				Expect(spaceSummary.RunningSecurityGroups).To(Equal([]resources.SecurityGroup{
+				Expect(spaceSummary.RunningSecurityGroups).To(Equal([]SecurityGroup{
 					{Name: "run-group-1"},
 				}))
 			})
@@ -905,7 +905,7 @@ var _ = Describe("Space", func() {
 			When("getting running security group info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRunningSecurityGroupsReturns(
-						[]resources.SecurityGroup{},
+						[]SecurityGroup{},
 						ccv3.Warnings{"get-running-warning"},
 						errors.New("get-running-error"),
 					)
@@ -920,7 +920,7 @@ var _ = Describe("Space", func() {
 		Describe("staging security group information", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStagingSecurityGroupsReturns(
-					[]resources.SecurityGroup{{Name: "stag-group-1"}},
+					[]SecurityGroup{{Name: "stag-group-1"}},
 					ccv3.Warnings{"get-staging-warning"},
 					nil,
 				)
@@ -928,7 +928,7 @@ var _ = Describe("Space", func() {
 
 			It("returns staging security group names in the summary", func() {
 				Expect(warnings).To(ConsistOf("get-staging-warning", "get-space-warning"))
-				Expect(spaceSummary.StagingSecurityGroups).To(Equal([]resources.SecurityGroup{
+				Expect(spaceSummary.StagingSecurityGroups).To(Equal([]SecurityGroup{
 					{Name: "stag-group-1"},
 				}))
 			})
@@ -936,7 +936,7 @@ var _ = Describe("Space", func() {
 			When("getting staging security group info fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStagingSecurityGroupsReturns(
-						[]resources.SecurityGroup{},
+						[]SecurityGroup{},
 						ccv3.Warnings{"get-staging-warning"},
 						errors.New("get-staging-error"),
 					)

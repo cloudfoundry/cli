@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -85,7 +86,7 @@ var _ = Describe("orgs Command", func() {
 			When("there are no orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{},
+						[]resources.Organization{},
 						v7action.Warnings{"get-orgs-warning"},
 						nil)
 				})
@@ -106,7 +107,7 @@ var _ = Describe("orgs Command", func() {
 			When("there are multiple orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{
+						[]resources.Organization{
 							{Name: "org-1"},
 							{Name: "org-2"},
 						},

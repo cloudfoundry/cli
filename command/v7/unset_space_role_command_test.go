@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -57,7 +58,7 @@ var _ = Describe("unset-space-role Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "current-user"}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{
+			resources.Organization{
 				GUID:     "some-org-guid",
 				Name:     "some-org-name",
 				Metadata: nil,
@@ -205,7 +206,7 @@ var _ = Describe("unset-space-role Command", func() {
 			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 
 			fakeActor.GetOrganizationByNameReturns(
-				v7action.Organization{},
+				resources.Organization{},
 				v7action.Warnings{"get-user-warning"},
 				errors.New("get-org-error"),
 			)

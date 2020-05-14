@@ -1,7 +1,7 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -44,7 +44,7 @@ func (cmd OrgsCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd OrgsCommand) displayOrgs(orgs []v7action.Organization) {
+func (cmd OrgsCommand) displayOrgs(orgs []resources.Organization) {
 	table := [][]string{{cmd.UI.TranslateText("name")}}
 	for _, org := range orgs {
 		table = append(table, []string{org.Name})

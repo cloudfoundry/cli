@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // ServiceOffering represents a Cloud Controller V3 Service Offering.
@@ -19,7 +20,7 @@ type ServiceOffering struct {
 	// Description of the service offering
 	Description string
 
-	Metadata *Metadata
+	Metadata *resources.Metadata
 }
 
 func (so *ServiceOffering) UnmarshalJSON(data []byte) error {

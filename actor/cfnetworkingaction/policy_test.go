@@ -188,7 +188,7 @@ var _ = Describe("Policy", func() {
 				},
 			}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, nil)
 
-			fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+			fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 				{
 					Name: "orgA",
 					GUID: "orgAGUID",
@@ -401,7 +401,7 @@ var _ = Describe("Policy", func() {
 				},
 			}, ccv3.IncludedResources{}, []string{"GetSpaceWarning"}, nil)
 
-			fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+			fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 				{
 					GUID: "orgAGUID",
 					Name: "orgA",

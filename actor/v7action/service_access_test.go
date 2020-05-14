@@ -9,6 +9,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -116,7 +117,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{{GUID: guid}}, ccv3.Warnings{warning}, nil)
+				fakeCloudControllerClient.GetOrganizationsReturns([]Organization{{GUID: guid}}, ccv3.Warnings{warning}, nil)
 			})
 
 			It("passes the organization in the plan filter", func() {
@@ -140,7 +141,7 @@ var _ = Describe("service access actions", func() {
 			When("the organization is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationsReturns(
-						[]ccv3.Organization{},
+						[]Organization{},
 						ccv3.Warnings{"org warning"},
 						nil,
 					)
@@ -241,7 +242,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{{GUID: orgGUID}}, ccv3.Warnings{orgWarning}, nil)
+				fakeCloudControllerClient.GetOrganizationsReturns([]Organization{{GUID: orgGUID}}, ccv3.Warnings{orgWarning}, nil)
 				fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{GUID: offeringGUID}}, ccv3.Warnings{offeringWarning}, nil)
 			})
 
@@ -341,7 +342,7 @@ var _ = Describe("service access actions", func() {
 	Describe("EnableServiceAccess", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{{GUID: "org-guid"}},
+				[]Organization{{GUID: "org-guid"}},
 				ccv3.Warnings{"org warning"},
 				nil,
 			)
@@ -537,7 +538,7 @@ var _ = Describe("service access actions", func() {
 
 			When("the org does not exist", func() {
 				It("returns an error", func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{}, ccv3.Warnings{"org warning"}, nil)
+					fakeCloudControllerClient.GetOrganizationsReturns([]Organization{}, ccv3.Warnings{"org warning"}, nil)
 
 					_, warnings, err := actor.EnableServiceAccess("fake-offering", "", "fake-org-name", "")
 					Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{
@@ -587,7 +588,7 @@ var _ = Describe("service access actions", func() {
 	Describe("DisableServiceAccess", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{{GUID: "org-guid"}},
+				[]Organization{{GUID: "org-guid"}},
 				ccv3.Warnings{"org warning"},
 				nil,
 			)
@@ -809,7 +810,7 @@ var _ = Describe("service access actions", func() {
 
 			When("the org does not exist", func() {
 				It("returns an error", func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{}, ccv3.Warnings{"org warning"}, nil)
+					fakeCloudControllerClient.GetOrganizationsReturns([]Organization{}, ccv3.Warnings{"org warning"}, nil)
 
 					_, warnings, err := actor.DisableServiceAccess("fake-offering", "", "fake-org-name", "")
 					Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{

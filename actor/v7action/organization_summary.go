@@ -1,9 +1,13 @@
 package v7action
 
-import "sort"
+import (
+	"sort"
+
+	"code.cloudfoundry.org/cli/resources"
+)
 
 type OrganizationSummary struct {
-	Organization
+	resources.Organization
 	DomainNames []string
 	QuotaName   string
 	SpaceNames  []string

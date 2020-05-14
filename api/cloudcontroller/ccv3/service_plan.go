@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -26,7 +27,7 @@ type ServicePlan struct {
 	// SpaceGUID is the space that a plan from a space-scoped broker relates to
 	SpaceGUID string `jsonry:"relationships.space.data.guid"`
 
-	Metadata *Metadata
+	Metadata *resources.Metadata
 }
 
 func (sp *ServicePlan) UnmarshalJSON(data []byte) error {

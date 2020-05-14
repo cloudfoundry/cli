@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -230,7 +231,7 @@ var _ = Describe("target Command", func() {
 					When("the org does not exist", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{},
+								resources.Organization{},
 								nil,
 								actionerror.OrganizationNotFoundError{Name: "some-org"})
 						})
@@ -251,7 +252,7 @@ var _ = Describe("target Command", func() {
 								Name: "some-org",
 							})
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{GUID: "some-org-guid"},
+								resources.Organization{GUID: "some-org-guid"},
 								v7action.Warnings{"warning-1", "warning-2"},
 								nil)
 						})
@@ -417,7 +418,7 @@ var _ = Describe("target Command", func() {
 					When("the org exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{
+								resources.Organization{
 									GUID: "some-org-guid",
 									Name: "some-org",
 								},
@@ -487,7 +488,7 @@ var _ = Describe("target Command", func() {
 					When("the org does not exist", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{},
+								resources.Organization{},
 								nil,
 								actionerror.OrganizationNotFoundError{Name: "some-org"})
 						})

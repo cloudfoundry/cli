@@ -81,7 +81,7 @@ var _ = Describe("copy-source Command", func() {
 			v7action.Warnings{"get-space-by-name-warning"},
 			nil,
 		)
-		fakeActor.GetOrganizationByNameReturns(v7action.Organization{Name: "destination-org", GUID: "destination-org-guid"},
+		fakeActor.GetOrganizationByNameReturns(resources.Organization{Name: "destination-org", GUID: "destination-org-guid"},
 			v7action.Warnings{"get-org-by-name-warning"},
 			nil,
 		)
@@ -192,7 +192,7 @@ var _ = Describe("copy-source Command", func() {
 		When("retrieving the organization fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{},
 					errors.New("get-org-by-name-err"),
 				)

@@ -332,7 +332,7 @@ func getSecurityGroupSpaces(actor Actor, stagingSpaceGUIDs []string, runningSpac
 			return securityGroupSpaces, warnings, err
 		}
 
-		orgsByGuid := make(map[string]ccv3.Organization)
+		orgsByGuid := make(map[string]resources.Organization)
 		for _, org := range includes.Organizations {
 			orgsByGuid[org.GUID] = org
 		}

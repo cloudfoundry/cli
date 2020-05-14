@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -86,7 +87,7 @@ var _ = Describe("create-org Command", func() {
 
 	When("creating the org errors", func() {
 		BeforeEach(func() {
-			fakeActor.CreateOrganizationReturns(v7action.Organization{}, v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("err-create-org"))
+			fakeActor.CreateOrganizationReturns(resources.Organization{}, v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("err-create-org"))
 		})
 
 		It("returns an error and displays warnings", func() {
@@ -99,7 +100,7 @@ var _ = Describe("create-org Command", func() {
 	When("the org already exists", func() {
 		BeforeEach(func() {
 			fakeActor.CreateOrganizationReturns(
-				v7action.Organization{},
+				resources.Organization{},
 				v7action.Warnings{"some-warning"},
 				ccerror.OrganizationNameTakenError{
 					UnprocessableEntityError: ccerror.UnprocessableEntityError{
@@ -122,7 +123,7 @@ var _ = Describe("create-org Command", func() {
 	When("applying the quota errors", func() {
 		BeforeEach(func() {
 			cmd.Quota = "quota-name"
-			fakeActor.CreateOrganizationReturns(v7action.Organization{Name: orgName, GUID: "some-org-guid"}, v7action.Warnings{}, nil)
+			fakeActor.CreateOrganizationReturns(resources.Organization{Name: orgName, GUID: "some-org-guid"}, v7action.Warnings{}, nil)
 			fakeActor.ApplyOrganizationQuotaByNameReturns(v7action.Warnings{"quota-warnings-1", "quota-warnings-2"}, errors.New("quota-error"))
 
 		})
@@ -148,7 +149,7 @@ var _ = Describe("create-org Command", func() {
 
 	When("assigning the org manager role errors", func() {
 		BeforeEach(func() {
-			fakeActor.CreateOrganizationReturns(v7action.Organization{Name: orgName, GUID: "some-org-guid"}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
+			fakeActor.CreateOrganizationReturns(resources.Organization{Name: orgName, GUID: "some-org-guid"}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			fakeActor.CreateOrgRoleReturns(
 				v7action.Warnings{"role-create-warning-1"},
 				errors.New("err-create-role"))
@@ -163,7 +164,7 @@ var _ = Describe("create-org Command", func() {
 	When("creating the org is successful", func() {
 		var orgGUID = "some-org-guid"
 		BeforeEach(func() {
-			fakeActor.CreateOrganizationReturns(v7action.Organization{Name: orgName, GUID: orgGUID}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
+			fakeActor.CreateOrganizationReturns(resources.Organization{Name: orgName, GUID: orgGUID}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			fakeActor.ApplyOrganizationQuotaByNameReturns(v7action.Warnings{"quota-warnings-1", "quota-warnings-2"}, nil)
 			fakeActor.CreateOrgRoleReturns(
 				v7action.Warnings{"role-create-warning-1"},

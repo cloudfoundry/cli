@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -54,7 +55,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		cmd.RequiredArgs.OrganizationName = org
 		cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 
-		fakeActor.GetOrganizationByNameReturns(v7action.Organization{
+		fakeActor.GetOrganizationByNameReturns(resources.Organization{
 			Name: org,
 			GUID: "some-org-guid",
 		}, v7action.Warnings{"org-warning-1", "org-warning-2"}, nil)
@@ -97,7 +98,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("the org lookup is unsuccessful", func() {
 		BeforeEach(func() {
-			fakeActor.GetOrganizationByNameReturns(v7action.Organization{}, v7action.Warnings{"org-warning-1", "org-warning-2"}, actionerror.OrganizationNotFoundError{Name: org})
+			fakeActor.GetOrganizationByNameReturns(resources.Organization{}, v7action.Warnings{"org-warning-1", "org-warning-2"}, actionerror.OrganizationNotFoundError{Name: org})
 		})
 
 		It("returns the warnings and error", func() {

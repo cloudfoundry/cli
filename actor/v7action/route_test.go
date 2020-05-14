@@ -89,7 +89,7 @@ var _ = Describe("Route Actions", func() {
 					)
 
 					fakeCloudControllerClient.GetOrganizationsReturns(
-						[]ccv3.Organization{
+						[]resources.Organization{
 							{Name: "org-name", GUID: "org-guid"},
 						},
 						ccv3.Warnings{"get-orgs-warning"},

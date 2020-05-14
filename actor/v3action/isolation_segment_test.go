@@ -162,7 +162,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			When("the organization exists", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+					fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 						{
 							Name: "some-org",
 							GUID: "some-org-guid",
@@ -535,8 +535,8 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			When("getting entitled organizations succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(0, []ccv3.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(1, []ccv3.Organization{
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(0, []resources.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(1, []resources.Organization{
 						{
 							Name: "iso-2-org-1",
 							GUID: "iso-2-org-guid-1",
@@ -616,7 +616,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			When("the organization exists", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+					fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 						{
 							Name: "org-1",
 							GUID: "org-guid-1",

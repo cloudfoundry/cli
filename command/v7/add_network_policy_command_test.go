@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -178,7 +179,7 @@ var _ = Describe("add-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationOrg = "bananarama"
 				cmd.DestinationSpace = ""
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{}, v7action.Warnings{}, actionerror.OrganizationNotFoundError{Name: "bananarama"})
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{}, v7action.Warnings{}, actionerror.OrganizationNotFoundError{Name: "bananarama"})
 			})
 
 			It("returns an error", func() {
@@ -192,7 +193,7 @@ var _ = Describe("add-network-policy Command", func() {
 				cmd.DestinationOrg = "bananarama"
 				cmd.DestinationSpace = "hamdinger"
 				warnings := v7action.Warnings{"some-org-warning-1", "some-org-warning-2"}
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{}, warnings, actionerror.OrganizationNotFoundError{Name: "bananarama"})
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{}, warnings, actionerror.OrganizationNotFoundError{Name: "bananarama"})
 			})
 
 			It("returns an error", func() {
@@ -211,7 +212,7 @@ var _ = Describe("add-network-policy Command", func() {
 				cmd.DestinationOrg = "bananarama"
 				cmd.DestinationSpace = "hamdinger"
 				warnings := v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{GUID: "some-org-guid"}, v7action.Warnings{}, nil)
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{}, nil)
 				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "bananarama"})
 			})
 
@@ -258,7 +259,7 @@ var _ = Describe("add-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationOrg = "bananarama"
 				cmd.DestinationSpace = "hamdinger"
-				fakeActor.GetOrganizationByNameReturns(v7action.Organization{GUID: "some-org-guid"}, v7action.Warnings{"some-org-warning-1", "some-org-warning-2"}, nil)
+				fakeActor.GetOrganizationByNameReturns(resources.Organization{GUID: "some-org-guid"}, v7action.Warnings{"some-org-warning-1", "some-org-warning-2"}, nil)
 				fakeActor.GetSpaceByNameAndOrganizationReturns(v7action.Space{GUID: "some-other-space-guid"}, v7action.Warnings{"some-space-warning-1", "some-space-warning-2"}, nil)
 				fakeNetworkingActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-add-warning-1", "some-add-warning-2"}, nil)
 			})
