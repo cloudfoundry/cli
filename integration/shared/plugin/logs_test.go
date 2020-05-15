@@ -39,7 +39,7 @@ var _ = Describe("logs", func() {
 				session := helpers.CF("CliCommand", "push",
 					appName, "-p", appDir, "-b", "staticfile_buildpack")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say("buildpack: staticfile_buildpack"))
+				Expect(session).To(Say("Downloading app package..."))
 				Expect(session).To(Say("Creating app"))
 			})
 		})
