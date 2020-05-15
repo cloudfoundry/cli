@@ -73,6 +73,7 @@ lpass sync
 pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
 configure_pipeline cli $pipelines_path/cli/pipeline.yml
+configure_pipeline oslo-scan-status $pipelines_path/oslo-scan-status/pipeline.yml
 
 configure_infrastructure_pipeline inf-beque beque-pipeline baked-potato
 configure_infrastructure_pipeline inf-burmaclub burmaclub-pipeline baked-potato
