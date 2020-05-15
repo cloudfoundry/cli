@@ -22,7 +22,7 @@ var _ = Describe("update-security-group Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeUpdateSecurityGroupActor
+		fakeActor       *v7fakes.FakeActor
 
 		binaryName            string
 		executeErr            error
@@ -36,14 +36,16 @@ var _ = Describe("update-security-group Command", func() {
 		binaryName = "faceman"
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeUpdateSecurityGroupActor)
+		fakeActor = new(v7fakes.FakeActor)
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 
 		cmd = v7.UpdateSecurityGroupCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			RequiredArgs: flag.SecurityGroupArgs{
 				SecurityGroup:   securityGroupName,
 				PathToJSONRules: securityGroupFilePath,

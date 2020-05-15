@@ -2774,6 +2774,20 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateSecurityGroupStub        func(string, string) (v7action.Warnings, error)
+	updateSecurityGroupMutex       sync.RWMutex
+	updateSecurityGroupArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	updateSecurityGroupReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateSecurityGroupReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateSecurityGroupGloballyEnabledStub        func(string, constanta.SecurityGroupLifecycle, bool) (v7action.Warnings, error)
 	updateSecurityGroupGloballyEnabledMutex       sync.RWMutex
 	updateSecurityGroupGloballyEnabledArgsForCall []struct {
@@ -14932,6 +14946,70 @@ func (fake *FakeActor) UpdateRouteLabelsReturnsOnCall(i int, result1 v7action.Wa
 	}{result1, result2}
 }
 
+func (fake *FakeActor) UpdateSecurityGroup(arg1 string, arg2 string) (v7action.Warnings, error) {
+	fake.updateSecurityGroupMutex.Lock()
+	ret, specificReturn := fake.updateSecurityGroupReturnsOnCall[len(fake.updateSecurityGroupArgsForCall)]
+	fake.updateSecurityGroupArgsForCall = append(fake.updateSecurityGroupArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateSecurityGroup", []interface{}{arg1, arg2})
+	fake.updateSecurityGroupMutex.Unlock()
+	if fake.UpdateSecurityGroupStub != nil {
+		return fake.UpdateSecurityGroupStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateSecurityGroupReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeActor) UpdateSecurityGroupCallCount() int {
+	fake.updateSecurityGroupMutex.RLock()
+	defer fake.updateSecurityGroupMutex.RUnlock()
+	return len(fake.updateSecurityGroupArgsForCall)
+}
+
+func (fake *FakeActor) UpdateSecurityGroupCalls(stub func(string, string) (v7action.Warnings, error)) {
+	fake.updateSecurityGroupMutex.Lock()
+	defer fake.updateSecurityGroupMutex.Unlock()
+	fake.UpdateSecurityGroupStub = stub
+}
+
+func (fake *FakeActor) UpdateSecurityGroupArgsForCall(i int) (string, string) {
+	fake.updateSecurityGroupMutex.RLock()
+	defer fake.updateSecurityGroupMutex.RUnlock()
+	argsForCall := fake.updateSecurityGroupArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) UpdateSecurityGroupReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateSecurityGroupMutex.Lock()
+	defer fake.updateSecurityGroupMutex.Unlock()
+	fake.UpdateSecurityGroupStub = nil
+	fake.updateSecurityGroupReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeActor) UpdateSecurityGroupReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateSecurityGroupMutex.Lock()
+	defer fake.updateSecurityGroupMutex.Unlock()
+	fake.UpdateSecurityGroupStub = nil
+	if fake.updateSecurityGroupReturnsOnCall == nil {
+		fake.updateSecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateSecurityGroupReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeActor) UpdateSecurityGroupGloballyEnabled(arg1 string, arg2 constanta.SecurityGroupLifecycle, arg3 bool) (v7action.Warnings, error) {
 	fake.updateSecurityGroupGloballyEnabledMutex.Lock()
 	ret, specificReturn := fake.updateSecurityGroupGloballyEnabledReturnsOnCall[len(fake.updateSecurityGroupGloballyEnabledArgsForCall)]
@@ -16158,6 +16236,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.updateProcessByTypeAndApplicationMutex.RUnlock()
 	fake.updateRouteLabelsMutex.RLock()
 	defer fake.updateRouteLabelsMutex.RUnlock()
+	fake.updateSecurityGroupMutex.RLock()
+	defer fake.updateSecurityGroupMutex.RUnlock()
 	fake.updateSecurityGroupGloballyEnabledMutex.RLock()
 	defer fake.updateSecurityGroupGloballyEnabledMutex.RUnlock()
 	fake.updateServiceBrokerMutex.RLock()
