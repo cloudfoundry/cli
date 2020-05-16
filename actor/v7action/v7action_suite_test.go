@@ -27,15 +27,16 @@ var _ = BeforeEach(func() {
 	log.SetLevel(log.PanicLevel)
 })
 
-func NewTestActor() (*Actor, *v7actionfakes.FakeCloudControllerClient, *v7actionfakes.FakeConfig, *v7actionfakes.FakeSharedActor, *v7actionfakes.FakeUAAClient, *fakeclock.FakeClock) {
+func NewTestActor() (*Actor, *v7actionfakes.FakeCloudControllerClient, *v7actionfakes.FakeConfig, *v7actionfakes.FakeSharedActor, *v7actionfakes.FakeUAAClient, *v7actionfakes.FakeRoutingClient, *fakeclock.FakeClock) {
 	fakeCloudControllerClient := new(v7actionfakes.FakeCloudControllerClient)
 	fakeConfig := new(v7actionfakes.FakeConfig)
 	fakeSharedActor := new(v7actionfakes.FakeSharedActor)
 	fakeUAAClient := new(v7actionfakes.FakeUAAClient)
+	fakeRoutingClient := new(v7actionfakes.FakeRoutingClient)
 	fakeClock := fakeclock.NewFakeClock(time.Now())
-	actor := NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, fakeClock)
+	actor := NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock)
 
-	return actor, fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, fakeClock
+	return actor, fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, fakeRoutingClient, fakeClock
 }
 
 // Thanks to Svett Ralchev

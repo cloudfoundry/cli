@@ -23,7 +23,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, clock.NewClock())
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, clock.NewClock())
 	})
 
 	Describe("ApplyApplicationManifest", func() {

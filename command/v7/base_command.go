@@ -26,14 +26,14 @@ func (cmd *BaseCommand) Setup(config command.Config, ui command.UI) error {
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	ccClient, uaaClient, routingClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return err
 	}
 	cmd.cloudControllerClient = ccClient
 	cmd.uaaClient = uaaClient
 
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, routingClient, clock.NewClock())
 	return nil
 }
 

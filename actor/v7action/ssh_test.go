@@ -29,7 +29,7 @@ var _ = Describe("SSH Actions", func() {
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		fakeSharedActor = new(v7actionfakes.FakeSharedActor)
 		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, nil, nil)
 	})
 
 	Describe("GetSSHPasscode", func() {

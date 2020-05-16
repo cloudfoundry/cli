@@ -15,6 +15,28 @@ type RouterGroup struct {
 	Type            string `json:"type"`
 }
 
+func (client *Client) GetRouterGroups() ([]RouterGroup, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRouterGroups,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	var routerGroups []RouterGroup
+
+	var response = Response{
+		Result: &routerGroups,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return routerGroups, nil
+}
+
 // GetRouterGroupByName returns a list of RouterGroups.
 func (client *Client) GetRouterGroupByName(name string) (RouterGroup, error) {
 	request, err := client.newHTTPRequest(requestOptions{

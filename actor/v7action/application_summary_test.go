@@ -27,7 +27,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, clock.NewClock())
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, clock.NewClock())
 	})
 
 	Describe("ApplicationSummary", func() {

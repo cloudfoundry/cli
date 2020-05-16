@@ -25,7 +25,7 @@ var _ = Describe("User Actions", func() {
 		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig := new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, fakeUAAClient, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, fakeUAAClient, nil, nil)
 	})
 
 	Describe("CreateUser", func() {

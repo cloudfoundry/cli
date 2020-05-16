@@ -88,7 +88,6 @@ var _ = Describe("router-groups Command", func() {
 
 				fakeActor.GetRouterGroupsReturns(
 					routerGroups,
-					v7action.Warnings{"actor-warning-1"},
 					nil,
 				)
 			})
@@ -99,8 +98,6 @@ var _ = Describe("router-groups Command", func() {
 
 			It("prints routes in a table", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-
-				Expect(testUI.Err).To(Say("actor-warning-1"))
 
 				Expect(testUI.Out).To(Say(tableHeaders))
 				Expect(testUI.Out).To(Say(`rg1\s+type1\s+`))
@@ -113,7 +110,6 @@ var _ = Describe("router-groups Command", func() {
 			BeforeEach(func() {
 				fakeActor.GetRouterGroupsReturns(
 					[]v7action.RouterGroup{},
-					v7action.Warnings{"actor-warning-1"},
 					nil,
 				)
 			})
@@ -131,9 +127,8 @@ var _ = Describe("router-groups Command", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				warnings := v7action.Warnings{"warning-1", "warning-2"}
 				expectedErr = errors.New("some-error")
-				fakeActor.GetRouterGroupsReturns(nil, warnings, expectedErr)
+				fakeActor.GetRouterGroupsReturns(nil, expectedErr)
 			})
 
 			It("prints flavor text", func() {
@@ -142,9 +137,6 @@ var _ = Describe("router-groups Command", func() {
 
 			It("prints warnings and returns error", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
-
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
 				Expect(testUI.Out).ToNot(Say(tableHeaders))
 			})
 		})

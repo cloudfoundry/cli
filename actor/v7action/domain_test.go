@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/router"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
@@ -16,10 +17,11 @@ var _ = Describe("Domain Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
+		fakeRoutingClient         *v7actionfakes.FakeRoutingClient
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, _, fakeRoutingClient, _ = NewTestActor()
 	})
 
 	Describe("CheckRoute", func() {
@@ -104,27 +106,69 @@ var _ = Describe("Domain Actions", func() {
 		})
 	})
 
-	Describe("create shared domain", func() {
-		It("delegates to the cloud controller client", func() {
-			fakeCloudControllerClient.CreateDomainReturns(ccv3.Domain{}, ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
+	Describe("CreateSharedDomain", func() {
+		var (
+			warnings    Warnings
+			executeErr  error
+			routerGroup string
+		)
 
-			warnings, executeErr := actor.CreateSharedDomain("the-domain-name", true)
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.CreateSharedDomain("the-domain-name", true, routerGroup)
+		})
+
+		BeforeEach(func() {
+			routerGroup = ""
+			fakeCloudControllerClient.CreateDomainReturns(ccv3.Domain{}, ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
+		})
+
+		It("delegates to the cloud controller client", func() {
 			Expect(executeErr).To(MatchError("create-error"))
 			Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2"))
 
+			Expect(fakeRoutingClient.GetRouterGroupsCallCount()).To(Equal(0))
+
 			Expect(fakeCloudControllerClient.CreateDomainCallCount()).To(Equal(1))
 			passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
-
 			Expect(passedDomain).To(Equal(
 				ccv3.Domain{
-					Name:     "the-domain-name",
-					Internal: types.NullBool{IsSet: true, Value: true},
+					Name:        "the-domain-name",
+					Internal:    types.NullBool{IsSet: true, Value: true},
+					RouterGroup: "",
 				},
 			))
 		})
+
+		Context("when a router group name is provided", func() {
+			BeforeEach(func() {
+				routerGroup = "router-group"
+				fakeRoutingClient.GetRouterGroupByNameReturns(
+					router.RouterGroup{Name: routerGroup, GUID: "router-group-guid"}, nil,
+				)
+			})
+
+			It("delegates to the cloud controller client", func() {
+				Expect(executeErr).To(MatchError("create-error"))
+				Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2"))
+
+				Expect(fakeRoutingClient.GetRouterGroupByNameCallCount()).To(Equal(1))
+				Expect(fakeRoutingClient.GetRouterGroupByNameArgsForCall(0)).To(Equal(routerGroup))
+
+				Expect(fakeCloudControllerClient.CreateDomainCallCount()).To(Equal(1))
+				passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
+
+				Expect(passedDomain).To(Equal(
+					ccv3.Domain{
+						Name:        "the-domain-name",
+						Internal:    types.NullBool{IsSet: true, Value: true},
+						RouterGroup: "router-group-guid",
+					},
+				))
+			})
+		})
 	})
 
-	Describe("create private domain", func() {
+	Describe("CreatePrivateDomain", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(

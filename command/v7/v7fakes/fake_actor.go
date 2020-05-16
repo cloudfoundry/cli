@@ -396,11 +396,12 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateSharedDomainStub        func(string, bool) (v7action.Warnings, error)
+	CreateSharedDomainStub        func(string, bool, string) (v7action.Warnings, error)
 	createSharedDomainMutex       sync.RWMutex
 	createSharedDomainArgsForCall []struct {
 		arg1 string
 		arg2 bool
+		arg3 string
 	}
 	createSharedDomainReturns struct {
 		result1 v7action.Warnings
@@ -1542,19 +1543,17 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRouterGroupsStub        func() ([]v7action.RouterGroup, v7action.Warnings, error)
+	GetRouterGroupsStub        func() ([]v7action.RouterGroup, error)
 	getRouterGroupsMutex       sync.RWMutex
 	getRouterGroupsArgsForCall []struct {
 	}
 	getRouterGroupsReturns struct {
 		result1 []v7action.RouterGroup
-		result2 v7action.Warnings
-		result3 error
+		result2 error
 	}
 	getRouterGroupsReturnsOnCall map[int]struct {
 		result1 []v7action.RouterGroup
-		result2 v7action.Warnings
-		result3 error
+		result2 error
 	}
 	GetRoutesByOrgStub        func(string, string) ([]resources.Route, v7action.Warnings, error)
 	getRoutesByOrgMutex       sync.RWMutex
@@ -4639,17 +4638,18 @@ func (fake *FakeActor) CreateServiceBrokerReturnsOnCall(i int, result1 v7action.
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool) (v7action.Warnings, error) {
+func (fake *FakeActor) CreateSharedDomain(arg1 string, arg2 bool, arg3 string) (v7action.Warnings, error) {
 	fake.createSharedDomainMutex.Lock()
 	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
 	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
 		arg1 string
 		arg2 bool
-	}{arg1, arg2})
-	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3})
 	fake.createSharedDomainMutex.Unlock()
 	if fake.CreateSharedDomainStub != nil {
-		return fake.CreateSharedDomainStub(arg1, arg2)
+		return fake.CreateSharedDomainStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -4664,17 +4664,17 @@ func (fake *FakeActor) CreateSharedDomainCallCount() int {
 	return len(fake.createSharedDomainArgsForCall)
 }
 
-func (fake *FakeActor) CreateSharedDomainCalls(stub func(string, bool) (v7action.Warnings, error)) {
+func (fake *FakeActor) CreateSharedDomainCalls(stub func(string, bool, string) (v7action.Warnings, error)) {
 	fake.createSharedDomainMutex.Lock()
 	defer fake.createSharedDomainMutex.Unlock()
 	fake.CreateSharedDomainStub = stub
 }
 
-func (fake *FakeActor) CreateSharedDomainArgsForCall(i int) (string, bool) {
+func (fake *FakeActor) CreateSharedDomainArgsForCall(i int) (string, bool, string) {
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
 	argsForCall := fake.createSharedDomainArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeActor) CreateSharedDomainReturns(result1 v7action.Warnings, result2 error) {
@@ -9597,7 +9597,7 @@ func (fake *FakeActor) GetRouteSummariesReturnsOnCall(i int, result1 []v7action.
 	}{result1, result2, result3}
 }
 
-func (fake *FakeActor) GetRouterGroups() ([]v7action.RouterGroup, v7action.Warnings, error) {
+func (fake *FakeActor) GetRouterGroups() ([]v7action.RouterGroup, error) {
 	fake.getRouterGroupsMutex.Lock()
 	ret, specificReturn := fake.getRouterGroupsReturnsOnCall[len(fake.getRouterGroupsArgsForCall)]
 	fake.getRouterGroupsArgsForCall = append(fake.getRouterGroupsArgsForCall, struct {
@@ -9608,10 +9608,10 @@ func (fake *FakeActor) GetRouterGroups() ([]v7action.RouterGroup, v7action.Warni
 		return fake.GetRouterGroupsStub()
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.getRouterGroupsReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeActor) GetRouterGroupsCallCount() int {
@@ -9620,39 +9620,36 @@ func (fake *FakeActor) GetRouterGroupsCallCount() int {
 	return len(fake.getRouterGroupsArgsForCall)
 }
 
-func (fake *FakeActor) GetRouterGroupsCalls(stub func() ([]v7action.RouterGroup, v7action.Warnings, error)) {
+func (fake *FakeActor) GetRouterGroupsCalls(stub func() ([]v7action.RouterGroup, error)) {
 	fake.getRouterGroupsMutex.Lock()
 	defer fake.getRouterGroupsMutex.Unlock()
 	fake.GetRouterGroupsStub = stub
 }
 
-func (fake *FakeActor) GetRouterGroupsReturns(result1 []v7action.RouterGroup, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetRouterGroupsReturns(result1 []v7action.RouterGroup, result2 error) {
 	fake.getRouterGroupsMutex.Lock()
 	defer fake.getRouterGroupsMutex.Unlock()
 	fake.GetRouterGroupsStub = nil
 	fake.getRouterGroupsReturns = struct {
 		result1 []v7action.RouterGroup
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeActor) GetRouterGroupsReturnsOnCall(i int, result1 []v7action.RouterGroup, result2 v7action.Warnings, result3 error) {
+func (fake *FakeActor) GetRouterGroupsReturnsOnCall(i int, result1 []v7action.RouterGroup, result2 error) {
 	fake.getRouterGroupsMutex.Lock()
 	defer fake.getRouterGroupsMutex.Unlock()
 	fake.GetRouterGroupsStub = nil
 	if fake.getRouterGroupsReturnsOnCall == nil {
 		fake.getRouterGroupsReturnsOnCall = make(map[int]struct {
 			result1 []v7action.RouterGroup
-			result2 v7action.Warnings
-			result3 error
+			result2 error
 		})
 	}
 	fake.getRouterGroupsReturnsOnCall[i] = struct {
 		result1 []v7action.RouterGroup
-		result2 v7action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeActor) GetRoutesByOrg(arg1 string, arg2 string) ([]resources.Route, v7action.Warnings, error) {

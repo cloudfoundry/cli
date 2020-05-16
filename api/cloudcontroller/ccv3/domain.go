@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
 	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
@@ -13,75 +14,57 @@ type Domain struct {
 	GUID             string         `json:"guid,omitempty"`
 	Name             string         `json:"name"`
 	Internal         types.NullBool `json:"internal,omitempty"`
-	OrganizationGUID string         `json:"orgguid,omitempty"`
+	OrganizationGUID string         `jsonry:"relationships.organization.data.guid,omitempty"`
+	RouterGroup      string         `jsonry:"router_group.guid,omitempty"`
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *resources.Metadata `json:"metadata,omitempty"`
 }
 
 func (d Domain) MarshalJSON() ([]byte, error) {
-	type Data struct {
-		GUID string `json:"guid,omitempty"`
+	type domainWithBoolPointer struct {
+		GUID             string `jsonry:"guid,omitempty"`
+		Name             string `jsonry:"name"`
+		Internal         *bool  `jsonry:"internal,omitempty"`
+		OrganizationGUID string `jsonry:"relationships.organization.data.guid,omitempty"`
+		RouterGroup      string `jsonry:"router_group.guid,omitempty"`
 	}
 
-	type OrgData struct {
-		Data Data `json:"data,omitempty"`
-	}
-
-	type OrgRelationship struct {
-		Org OrgData `json:"organization,omitempty"`
-	}
-
-	type ccDomain struct {
-		GUID          string           `json:"guid,omitempty"`
-		Name          string           `json:"name"`
-		Internal      *bool            `json:"internal,omitempty"`
-		Relationships *OrgRelationship `json:"relationships,omitempty"`
-	}
-
-	ccDom := ccDomain{
-		Name: d.Name,
+	clone := domainWithBoolPointer{
+		GUID:             d.GUID,
+		Name:             d.Name,
+		OrganizationGUID: d.OrganizationGUID,
+		RouterGroup:      d.RouterGroup,
 	}
 
 	if d.Internal.IsSet {
-		ccDom.Internal = &d.Internal.Value
+		clone.Internal = &d.Internal.Value
 	}
-
-	if d.GUID != "" {
-		ccDom.GUID = d.GUID
-	}
-
-	if d.OrganizationGUID != "" {
-		ccDom.Relationships = &OrgRelationship{OrgData{Data{GUID: d.OrganizationGUID}}}
-	}
-	return json.Marshal(ccDom)
+	return jsonry.Marshal(clone)
 }
 
 func (d *Domain) UnmarshalJSON(data []byte) error {
-	var ccRouteStruct struct {
-		GUID          string         `json:"guid,omitempty"`
-		Name          string         `json:"name"`
-		Internal      types.NullBool `json:"internal,omitempty"`
-		Relationships struct {
-			Organization struct {
-				Data struct {
-					GUID string `json:"guid,omitempty"`
-				} `json:"data,omitempty"`
-			} `json:"organization,omitempty"`
-		} `json:"relationships,omitempty"`
-		Metadata *resources.Metadata
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &ccRouteStruct)
+	type alias Domain
+	var defaultUnmarshalledDomain alias
+	err := jsonry.Unmarshal(data, &defaultUnmarshalledDomain)
 	if err != nil {
 		return err
 	}
 
-	d.GUID = ccRouteStruct.GUID
-	d.Name = ccRouteStruct.Name
-	d.Internal = ccRouteStruct.Internal
-	d.OrganizationGUID = ccRouteStruct.Relationships.Organization.Data.GUID
-	d.Metadata = ccRouteStruct.Metadata
+	*d = Domain(defaultUnmarshalledDomain)
+
+	type RemainingFieldsStruct struct {
+		Internal types.NullBool `json:"internal,omitempty"`
+	}
+
+	var remainingFields RemainingFieldsStruct
+	err = json.Unmarshal(data, &remainingFields)
+	if err != nil {
+		return err
+	}
+
+	d.Internal = remainingFields.Internal
+
 	return nil
 }
 

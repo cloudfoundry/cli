@@ -30,7 +30,7 @@ var _ = Describe("Application Actions", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		fakeClock = fakeclock.NewFakeClock(time.Now())
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, fakeClock)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, fakeClock)
 	})
 
 	Describe("DeleteApplicationByNameAndSpace", func() {

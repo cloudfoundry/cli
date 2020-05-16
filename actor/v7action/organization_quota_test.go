@@ -22,7 +22,7 @@ var _ = Describe("Organization Quota Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
 	})
 
 	Describe("ApplyOrganizationQuotaByName", func() {

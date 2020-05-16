@@ -22,7 +22,7 @@ var _ = Describe("instance actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
 	Describe("Instance", func() {

@@ -29,8 +29,7 @@ func (cmd RouterGroupsCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayNewline()
 
-	routerGroups, warnings, err := cmd.Actor.GetRouterGroups()
-	cmd.UI.DisplayWarnings(warnings)
+	routerGroups, err := cmd.Actor.GetRouterGroups()
 	if err != nil {
 		return err
 	}

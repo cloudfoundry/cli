@@ -176,7 +176,13 @@ var _ = Describe("Domain", func() {
 		)
 
 		JustBeforeEach(func() {
-			domain, warnings, executeErr = client.CreateDomain(Domain{Name: "some-name", Internal: types.NullBool{IsSet: true, Value: true}})
+			domain, warnings, executeErr = client.CreateDomain(
+				Domain{
+					Name:        "some-name",
+					Internal:    types.NullBool{IsSet: true, Value: true},
+					RouterGroup: "some-router-group",
+				},
+			)
 		})
 
 		When("the request succeeds", func() {
@@ -184,12 +190,18 @@ var _ = Describe("Domain", func() {
 				response := `{
 					"guid": "some-guid",
 					"name": "some-name",
-					"internal": true
+					"internal": true,
+					"router_group": {
+						"guid": "some-router-group"
+					}
 				}`
 
 				expectedBody := `{
 					"name": "some-name",
-					"internal": true
+					"internal": true,
+					"router_group": {
+						"guid": "some-router-group"
+					}
 				}`
 
 				server.AppendHandlers(
@@ -206,9 +218,10 @@ var _ = Describe("Domain", func() {
 				Expect(warnings).To(ConsistOf("warning-1"))
 
 				Expect(domain).To(Equal(Domain{
-					GUID:     "some-guid",
-					Name:     "some-name",
-					Internal: types.NullBool{IsSet: true, Value: true},
+					GUID:        "some-guid",
+					Name:        "some-name",
+					Internal:    types.NullBool{IsSet: true, Value: true},
+					RouterGroup: "some-router-group",
 				}))
 			})
 		})
@@ -274,9 +287,9 @@ var _ = Describe("Domain", func() {
 				response := `{
 					"guid": "some-guid",
 					"name": "some-name",
-					"relationships": { 
-						"organization": { 
-							"data" : { 
+					"relationships": {
+						"organization": {
+							"data" : {
 								"guid" : "organization-guid"
 							}
 						}
@@ -837,7 +850,7 @@ var _ = Describe("Domain", func() {
 
 		When("the request succeeds", func() {
 			BeforeEach(func() {
-				response := `{"data": 
+				response := `{"data":
 								[{
 									"guid": "some-org-guid"
 								}]

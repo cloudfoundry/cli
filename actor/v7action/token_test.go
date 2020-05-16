@@ -22,7 +22,7 @@ var _ = Describe("Token Actions", func() {
 	BeforeEach(func() {
 		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(nil, fakeConfig, nil, fakeUAAClient, nil)
+		actor = NewActor(nil, fakeConfig, nil, fakeUAAClient, nil, nil)
 	})
 
 	Describe("RefreshAccessToken", func() {

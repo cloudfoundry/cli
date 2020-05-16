@@ -26,7 +26,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -93,7 +93,7 @@ var _ = Describe("Environment Variable Actions", func() {
 		BeforeEach(func() {
 			envVars = ccv3.EnvironmentVariables{}
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -255,7 +255,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 		})
@@ -341,7 +341,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 			envPair = EnvironmentVariablePair{Key: "my-var", Value: "my-val"}
@@ -421,7 +421,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 			envVariableName = "my-var"

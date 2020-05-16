@@ -23,7 +23,7 @@ var _ = Describe("Targeting", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, fakeConfig, _, _, _, _ = NewTestActor()
 
 	})
 

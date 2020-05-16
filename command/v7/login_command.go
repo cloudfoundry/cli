@@ -30,12 +30,12 @@ type ActorReloader interface {
 type ActualActorReloader struct{}
 
 func (a ActualActorReloader) Reload(config command.Config, ui command.UI) (Actor, error) {
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	ccClient, uaaClient, routingClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
 	if err != nil {
 		return nil, err
 	}
 
-	return v7action.NewActor(ccClient, config, nil, uaaClient, clock.NewClock()), nil
+	return v7action.NewActor(ccClient, config, nil, uaaClient, routingClient, clock.NewClock()), nil
 }
 
 const maxLoginTries = 3
@@ -61,7 +61,7 @@ type LoginCommand struct {
 
 func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 	ccClient, _ := shared.NewWrappedCloudControllerClient(config, ui)
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, nil, clock.NewClock())
 	cmd.ActorReloader = ActualActorReloader{}
 
 	cmd.UI = ui

@@ -23,7 +23,7 @@ var _ = Describe("Process Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
 	Describe("GetProcess", func() {

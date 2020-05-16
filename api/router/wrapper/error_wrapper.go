@@ -33,10 +33,13 @@ func (e *ErrorWrapper) Make(request *router.Request, passedResponse *router.Resp
 
 		if rawHTTPStatusErr.StatusCode == http.StatusUnauthorized {
 			var routingAPIErrorBody routererror.ErrorResponse
+
 			_ = json.Unmarshal(rawHTTPStatusErr.RawResponse, &routingAPIErrorBody)
+
 			if routingAPIErrorBody.Message == expiredTokenMessage {
 				return routererror.InvalidAuthTokenError{Message: "Token is expired"}
 			}
+
 			if routingAPIErrorBody.Message == unauthorizedMessage {
 				return routererror.UnauthorizedError{Message: routingAPIErrorBody.Message}
 			}

@@ -29,12 +29,27 @@ func (actor Actor) CheckRoute(domainName string, hostname string, path string) (
 	return matches, allWarnings, err
 }
 
-func (actor Actor) CreateSharedDomain(domainName string, internal bool) (Warnings, error) {
+func (actor Actor) CreateSharedDomain(domainName string, internal bool, routerGroupName string) (Warnings, error) {
+	allWarnings := Warnings{}
+	routerGroupGUID := ""
+
+	if routerGroupName != "" {
+		routerGroup, err := actor.GetRouterGroupByName(routerGroupName)
+		if err != nil {
+			return allWarnings, err
+		}
+
+		routerGroupGUID = routerGroup.GUID
+	}
+
 	_, warnings, err := actor.CloudControllerClient.CreateDomain(ccv3.Domain{
-		Name:     domainName,
-		Internal: types.NullBool{IsSet: true, Value: internal},
+		Name:        domainName,
+		Internal:    types.NullBool{IsSet: true, Value: internal},
+		RouterGroup: routerGroupGUID,
 	})
-	return Warnings(warnings), err
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+
+	return allWarnings, err
 }
 
 func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warnings, error) {

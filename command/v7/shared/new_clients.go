@@ -3,24 +3,32 @@ package shared
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/api/router"
+	routingWrapper "code.cloudfoundry.org/cli/api/router/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
 	uaaWrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersionV3 string) (*ccv3.Client, *uaa.Client, error) {
+func GetNewClientsAndConnectToCF(config command.Config, ui command.UI, minVersionV3 string) (*ccv3.Client, *uaa.Client, *router.Client, error) {
 	var err error
 
 	ccClient, authWrapper := NewWrappedCloudControllerClient(config, ui)
 
 	ccClient, err = connectToCF(config, ui, ccClient, minVersionV3)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	uaaClient, err := newWrappedUAAClient(config, ui, ccClient, authWrapper)
 
-	return ccClient, uaaClient, err
+	uaaClient, err := newWrappedUAAClient(config, ui, ccClient, authWrapper)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	routingClient, err := newWrappedRoutingClient(config, ui, uaaClient)
+
+	return ccClient, uaaClient, routingClient, err
 }
 
 func NewWrappedCloudControllerClient(config command.Config, ui command.UI) (*ccv3.Client, *ccWrapper.UAAAuthentication) {
@@ -74,6 +82,39 @@ func newWrappedUAAClient(config command.Config, ui command.UI, ccClient *ccv3.Cl
 	authWrapper.SetClient(uaaClient)
 
 	return uaaClient, nil
+}
+
+func newWrappedRoutingClient(config command.Config, ui command.UI, uaaClient *uaa.Client) (*router.Client, error) {
+	routingConfig := router.Config{
+		AppName:    config.BinaryName(),
+		AppVersion: config.BinaryVersion(),
+		ConnectionConfig: router.ConnectionConfig{
+			DialTimeout:       config.DialTimeout(),
+			SkipSSLValidation: config.SkipSSLValidation(),
+		},
+		RoutingEndpoint: config.RoutingEndpoint(),
+	}
+
+	routingWrappers := []router.ConnectionWrapper{routingWrapper.NewErrorWrapper()}
+
+	verbose, location := config.Verbose()
+
+	if verbose {
+		routingWrappers = append(routingWrappers, routingWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
+	}
+
+	if location != nil {
+		routingWrappers = append(routingWrappers, routingWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
+	}
+
+	authWrapper := routingWrapper.NewUAAAuthentication(uaaClient, config)
+
+	routingWrappers = append(routingWrappers, authWrapper)
+	routingConfig.Wrappers = routingWrappers
+
+	routingClient := router.NewClient(routingConfig)
+
+	return routingClient, nil
 }
 
 func connectToCF(config command.Config, ui command.UI, ccClient *ccv3.Client, minVersionV3 string) (*ccv3.Client, error) {

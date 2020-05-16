@@ -25,7 +25,7 @@ var _ = Describe("Build Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, clock.NewClock())
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, clock.NewClock())
 	})
 
 	Describe("StagePackage", func() {

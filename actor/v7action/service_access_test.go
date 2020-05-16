@@ -21,7 +21,7 @@ var _ = Describe("service access actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
 	})
 
 	Describe("GetServiceAccess", func() {

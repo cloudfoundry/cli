@@ -26,7 +26,7 @@ var _ = Describe("Logging Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, fakeConfig, _, _, _, _ = NewTestActor()
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})

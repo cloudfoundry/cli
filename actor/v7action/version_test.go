@@ -15,7 +15,7 @@ var _ = Describe("Version Check Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, fakeUAAClient, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, fakeUAAClient, _, _ = NewTestActor()
 	})
 
 	Describe("CloudControllerAPIVersion", func() {

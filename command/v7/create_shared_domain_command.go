@@ -8,8 +8,9 @@ type CreateSharedDomainCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.Domain `positional-args:"yes"`
+	RouterGroup     string      `long:"router-group" description:"Routes for this domain will use routers in the specified router group"`
 	Internal        bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
-	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--internal]"`
+	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP_NAME | --internal]"`
 	relatedCommands interface{} `related_commands:"create-private-domain, domains"`
 }
 
@@ -32,7 +33,7 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 			"User":   user.Name,
 		})
 
-	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal)
+	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal, cmd.RouterGroup)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

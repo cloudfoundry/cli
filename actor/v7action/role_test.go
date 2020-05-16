@@ -22,7 +22,7 @@ var _ = Describe("Role Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, fakeUAAClient, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, fakeUAAClient, _, _ = NewTestActor()
 	})
 
 	Describe("CreateOrgRole", func() {
