@@ -32,15 +32,20 @@ var _ = Describe("Security Group Actions", func() {
 
 	})
 
-	Describe("BindSecurityGroupToSpace", func() {
+	Describe("BindSecurityGroupToSpaces", func() {
 		var (
 			lifecycle constant.SecurityGroupLifecycle
+			spaces    []Space
 			err       error
 			warnings  []string
 		)
 
+		BeforeEach(func() {
+			spaces = []Space{{GUID: "some-space-guid"}, {GUID: "other-space-guid"}}
+		})
+
 		JustBeforeEach(func() {
-			warnings, err = actor.BindSecurityGroupToSpace("some-security-group-guid", "some-space-guid", lifecycle)
+			warnings, err = actor.BindSecurityGroupToSpaces("some-security-group-guid", spaces, lifecycle)
 		})
 
 		When("the lifecycle is neither running nor staging", func() {
@@ -72,7 +77,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupRunningSpaceCallCount()).To(Equal(1))
 					securityGroupGUID, spaceGUID := fakeCloudControllerClient.UpdateSecurityGroupRunningSpaceArgsForCall(0)
 					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(spaceGUID).To(Equal([]string{"some-space-guid", "other-space-guid"}))
 				})
 			})
 
@@ -112,7 +117,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceCallCount()).To(Equal(1))
 					securityGroupGUID, spaceGUID := fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceArgsForCall(0)
 					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(spaceGUID).To(Equal([]string{"some-space-guid", "other-space-guid"}))
 				})
 			})
 

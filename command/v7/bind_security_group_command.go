@@ -1,9 +1,12 @@
 package v7
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type BindSecurityGroupCommand struct {
@@ -82,29 +85,47 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("No spaces in org {{.organization}}.", map[string]interface{}{
 			"organization": org.Name,
 		})
-	}
+	} else {
 
-	for _, space := range spacesToBind {
-		if len(spacesToBind) != 1 {
-			cmd.UI.DisplayTextWithFlavor("Assigning {{.lifecycle}} security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
-				"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
-				"security_group": securityGroup.Name,
-				"space":          space.Name,
-				"organization":   org.Name,
-				"username":       user.Name,
-			})
+		if cmd.Space == "" {
+			cmd.announceBinding(spacesToBind, user)
 		}
 
-		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, constant.SecurityGroupLifecycle(cmd.Lifecycle))
+		warnings, err = cmd.Actor.BindSecurityGroupToSpaces(securityGroup.GUID, spacesToBind, constant.SecurityGroupLifecycle(cmd.Lifecycle))
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
 		}
 
 		cmd.UI.DisplayOK()
+
+		cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
 	}
 
-	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
-
 	return nil
+}
+
+func (cmd BindSecurityGroupCommand) announceBinding(spaces []v7action.Space, user configv3.User) {
+
+	var spacenames []string
+
+	for _, space := range spaces {
+		spacenames = append(spacenames, space.Name)
+	}
+
+	tokens := map[string]interface{}{
+		"lifecycle":      constant.SecurityGroupLifecycle(cmd.Lifecycle),
+		"security_group": cmd.RequiredArgs.SecurityGroupName,
+		"spaces":         strings.Join(spacenames, ", "),
+		"organization":   cmd.RequiredArgs.OrganizationName,
+		"username":       user.Name,
+	}
+	singular := "Assigning {{.lifecycle}} security group {{.security_group}} to space {{.spaces}} in org {{.organization}} as {{.username}}..."
+	plural := "Assigning {{.lifecycle}} security group {{.security_group}} to spaces {{.spaces}} in org {{.organization}} as {{.username}}..."
+
+	if len(spaces) == 1 {
+		cmd.UI.DisplayTextWithFlavor(singular, tokens)
+	} else {
+		cmd.UI.DisplayTextWithFlavor(plural, tokens)
+	}
 }

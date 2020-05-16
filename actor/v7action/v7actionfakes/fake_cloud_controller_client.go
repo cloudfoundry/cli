@@ -2110,11 +2110,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateSecurityGroupRunningSpaceStub        func(string, string) (ccv3.Warnings, error)
+	UpdateSecurityGroupRunningSpaceStub        func(string, []string) (ccv3.Warnings, error)
 	updateSecurityGroupRunningSpaceMutex       sync.RWMutex
 	updateSecurityGroupRunningSpaceArgsForCall []struct {
 		arg1 string
-		arg2 string
+		arg2 []string
 	}
 	updateSecurityGroupRunningSpaceReturns struct {
 		result1 ccv3.Warnings
@@ -2124,11 +2124,11 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
-	UpdateSecurityGroupStagingSpaceStub        func(string, string) (ccv3.Warnings, error)
+	UpdateSecurityGroupStagingSpaceStub        func(string, []string) (ccv3.Warnings, error)
 	updateSecurityGroupStagingSpaceMutex       sync.RWMutex
 	updateSecurityGroupStagingSpaceArgsForCall []struct {
 		arg1 string
-		arg2 string
+		arg2 []string
 	}
 	updateSecurityGroupStagingSpaceReturns struct {
 		result1 ccv3.Warnings
@@ -11533,14 +11533,19 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpace(arg1 string, arg2 []string) (ccv3.Warnings, error) {
+	var arg2Copy []string
+	if arg2 != nil {
+		arg2Copy = make([]string, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.updateSecurityGroupRunningSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSecurityGroupRunningSpaceReturnsOnCall[len(fake.updateSecurityGroupRunningSpaceArgsForCall)]
 	fake.updateSecurityGroupRunningSpaceArgsForCall = append(fake.updateSecurityGroupRunningSpaceArgsForCall, struct {
 		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("UpdateSecurityGroupRunningSpace", []interface{}{arg1, arg2})
+		arg2 []string
+	}{arg1, arg2Copy})
+	fake.recordInvocation("UpdateSecurityGroupRunningSpace", []interface{}{arg1, arg2Copy})
 	fake.updateSecurityGroupRunningSpaceMutex.Unlock()
 	if fake.UpdateSecurityGroupRunningSpaceStub != nil {
 		return fake.UpdateSecurityGroupRunningSpaceStub(arg1, arg2)
@@ -11558,13 +11563,13 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceCallCount(
 	return len(fake.updateSecurityGroupRunningSpaceArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceCalls(stub func(string, string) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceCalls(stub func(string, []string) (ccv3.Warnings, error)) {
 	fake.updateSecurityGroupRunningSpaceMutex.Lock()
 	defer fake.updateSecurityGroupRunningSpaceMutex.Unlock()
 	fake.UpdateSecurityGroupRunningSpaceStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceArgsForCall(i int) (string, string) {
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceArgsForCall(i int) (string, []string) {
 	fake.updateSecurityGroupRunningSpaceMutex.RLock()
 	defer fake.updateSecurityGroupRunningSpaceMutex.RUnlock()
 	argsForCall := fake.updateSecurityGroupRunningSpaceArgsForCall[i]
@@ -11597,14 +11602,19 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupRunningSpaceReturnsOnC
 	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpace(arg1 string, arg2 string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpace(arg1 string, arg2 []string) (ccv3.Warnings, error) {
+	var arg2Copy []string
+	if arg2 != nil {
+		arg2Copy = make([]string, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.updateSecurityGroupStagingSpaceMutex.Lock()
 	ret, specificReturn := fake.updateSecurityGroupStagingSpaceReturnsOnCall[len(fake.updateSecurityGroupStagingSpaceArgsForCall)]
 	fake.updateSecurityGroupStagingSpaceArgsForCall = append(fake.updateSecurityGroupStagingSpaceArgsForCall, struct {
 		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("UpdateSecurityGroupStagingSpace", []interface{}{arg1, arg2})
+		arg2 []string
+	}{arg1, arg2Copy})
+	fake.recordInvocation("UpdateSecurityGroupStagingSpace", []interface{}{arg1, arg2Copy})
 	fake.updateSecurityGroupStagingSpaceMutex.Unlock()
 	if fake.UpdateSecurityGroupStagingSpaceStub != nil {
 		return fake.UpdateSecurityGroupStagingSpaceStub(arg1, arg2)
@@ -11622,13 +11632,13 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceCallCount(
 	return len(fake.updateSecurityGroupStagingSpaceArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceCalls(stub func(string, string) (ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceCalls(stub func(string, []string) (ccv3.Warnings, error)) {
 	fake.updateSecurityGroupStagingSpaceMutex.Lock()
 	defer fake.updateSecurityGroupStagingSpaceMutex.Unlock()
 	fake.UpdateSecurityGroupStagingSpaceStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceArgsForCall(i int) (string, string) {
+func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceArgsForCall(i int) (string, []string) {
 	fake.updateSecurityGroupStagingSpaceMutex.RLock()
 	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
 	argsForCall := fake.updateSecurityGroupStagingSpaceArgsForCall[i]

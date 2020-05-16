@@ -199,7 +199,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 				When("no errors are encountered binding the security group to the space", func() {
 					BeforeEach(func() {
-						fakeActor.BindSecurityGroupToSpaceReturns(
+						fakeActor.BindSecurityGroupToSpacesReturns(
 							v7action.Warnings{"bind security group to space warning"},
 							nil)
 					})
@@ -231,10 +231,10 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(spaceName).To(Equal("some-space"))
 
-						Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+						Expect(fakeActor.BindSecurityGroupToSpacesCallCount()).To(Equal(1))
+						securityGroupGUID, space, lifecycle := fakeActor.BindSecurityGroupToSpacesArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(space[0].GUID).To(Equal("some-space-guid"))
 						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
 					})
 				})
@@ -244,7 +244,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("bind error")
-						fakeActor.BindSecurityGroupToSpaceReturns(
+						fakeActor.BindSecurityGroupToSpacesReturns(
 							v7action.Warnings{"bind security group to space warning"},
 							expectedErr)
 					})
@@ -278,7 +278,7 @@ var _ = Describe("bind-security-group Command", func() {
 					Expect(testUI.Out).To(Say("Assigning running security group %s to all spaces in org %s as some-user...", cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName))
 					Expect(testUI.Out).To(Say("No spaces in org %s.", cmd.RequiredArgs.OrganizationName))
 					Expect(testUI.Out).NotTo(Say("OK"))
-					Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
+					Expect(testUI.Out).NotTo(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`)) //TODO Why?
 
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
@@ -305,22 +305,15 @@ var _ = Describe("bind-security-group Command", func() {
 
 				When("no errors are encountered binding the security group to the spaces", func() {
 					BeforeEach(func() {
-						fakeActor.BindSecurityGroupToSpaceReturnsOnCall(
-							0,
+						fakeActor.BindSecurityGroupToSpacesReturns(
 							v7action.Warnings{"bind security group to space warning 1"},
-							nil)
-						fakeActor.BindSecurityGroupToSpaceReturnsOnCall(
-							1,
-							v7action.Warnings{"bind security group to space warning 2"},
 							nil)
 					})
 
 					It("binds the security group to each space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
-						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning running security group some-security-group to spaces some-space-1, some-space-2 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
@@ -328,7 +321,6 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(testUI.Err).To(Say("get org warning"))
 						Expect(testUI.Err).To(Say("get org spaces warning"))
 						Expect(testUI.Err).To(Say("bind security group to space warning 1"))
-						Expect(testUI.Err).To(Say("bind security group to space warning 2"))
 
 						Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
 						Expect(fakeActor.GetSecurityGroupArgsForCall(0)).To(Equal("some-security-group"))
@@ -336,14 +328,9 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(1))
 						Expect(fakeActor.GetOrganizationByNameArgsForCall(0)).To(Equal("some-org"))
 
-						Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(2))
-						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+						securityGroupGUID, spaceGUIDs, lifecycle := fakeActor.BindSecurityGroupToSpacesArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid-1"))
-						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
-						securityGroupGUID, spaceGUID, lifecycle = fakeActor.BindSecurityGroupToSpaceArgsForCall(1)
-						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid-2"))
+						Expect(spaceGUIDs[0].GUID).To(Equal("some-space-guid-1"))
 						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
 					})
 				})
@@ -353,7 +340,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("bind security group to space error")
-						fakeActor.BindSecurityGroupToSpaceReturns(
+						fakeActor.BindSecurityGroupToSpacesReturns(
 							v7action.Warnings{"bind security group to space warning"},
 							expectedErr)
 					})
@@ -415,7 +402,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 				When("no errors are encountered binding the security group to the space", func() {
 					BeforeEach(func() {
-						fakeActor.BindSecurityGroupToSpaceReturns(
+						fakeActor.BindSecurityGroupToSpacesReturns(
 							v7action.Warnings{"bind security group to space warning"},
 							nil)
 					})
@@ -444,10 +431,10 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(spaceName).To(Equal("some-space"))
 
-						Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+						Expect(fakeActor.BindSecurityGroupToSpacesCallCount()).To(Equal(1))
+						securityGroupGUID, space, lifecycle := fakeActor.BindSecurityGroupToSpacesArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(space[0].GUID).To(Equal("some-space-guid"))
 						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
 					})
 				})
@@ -489,22 +476,16 @@ var _ = Describe("bind-security-group Command", func() {
 
 				When("no errors are encountered binding the security group to the spaces", func() {
 					BeforeEach(func() {
-						fakeActor.BindSecurityGroupToSpaceReturnsOnCall(
+						fakeActor.BindSecurityGroupToSpacesReturnsOnCall(
 							0,
 							v7action.Warnings{"bind security group to space warning 1"},
-							nil)
-						fakeActor.BindSecurityGroupToSpaceReturnsOnCall(
-							1,
-							v7action.Warnings{"bind security group to space warning 2"},
 							nil)
 					})
 
 					It("binds the security group to each space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
-						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Assigning staging security group some-security-group to spaces some-space-1, some-space-2 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
@@ -512,7 +493,6 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(testUI.Err).To(Say("get org warning"))
 						Expect(testUI.Err).To(Say("get org spaces warning"))
 						Expect(testUI.Err).To(Say("bind security group to space warning 1"))
-						Expect(testUI.Err).To(Say("bind security group to space warning 2"))
 
 						Expect(fakeActor.GetSecurityGroupCallCount()).To(Equal(1))
 						Expect(fakeActor.GetSecurityGroupArgsForCall(0)).To(Equal("some-security-group"))
@@ -520,14 +500,10 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(1))
 						Expect(fakeActor.GetOrganizationByNameArgsForCall(0)).To(Equal("some-org"))
 
-						Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(2))
-						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+						Expect(fakeActor.BindSecurityGroupToSpacesCallCount()).To(Equal(1))
+						securityGroupGUID, spaceGUIDs, lifecycle := fakeActor.BindSecurityGroupToSpacesArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid-1"))
-						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
-						securityGroupGUID, spaceGUID, lifecycle = fakeActor.BindSecurityGroupToSpaceArgsForCall(1)
-						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid-2"))
+						Expect(spaceGUIDs[0].GUID).To(Equal("some-space-guid-1"))
 						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
 					})
 				})
@@ -537,7 +513,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("bind security group to space error")
-						fakeActor.BindSecurityGroupToSpaceReturns(
+						fakeActor.BindSecurityGroupToSpacesReturns(
 							v7action.Warnings{"bind security group to space warning"},
 							expectedErr)
 					})
