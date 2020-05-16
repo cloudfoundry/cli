@@ -24,17 +24,22 @@ type SecurityGroupSpace struct {
 	Lifecycle string
 }
 
-func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaces []Space, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
 	var (
-		warnings ccv3.Warnings
-		err      error
+		warnings   ccv3.Warnings
+		err        error
+		spaceGUIDs []string
 	)
+
+	for _, space := range spaces {
+		spaceGUIDs = append(spaceGUIDs, space.GUID)
+	}
 
 	switch lifecycle {
 	case constant.SecurityGroupLifecycleRunning:
-		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupRunningSpace(securityGroupGUID, spaceGUID)
+		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupRunningSpace(securityGroupGUID, spaceGUIDs)
 	case constant.SecurityGroupLifecycleStaging:
-		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUID)
+		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUIDs)
 	default:
 		err = actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
 	}
@@ -62,7 +67,6 @@ func (actor Actor) CreateSecurityGroup(name, filePath string) (Warnings, error) 
 	if err != nil {
 		return allWarnings, err
 	}
-
 	return allWarnings, nil
 }
 

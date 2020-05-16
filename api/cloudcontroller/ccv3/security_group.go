@@ -91,24 +91,24 @@ func (client *Client) UnbindSecurityGroupStagingSpace(securityGroupGUID string, 
 	return warnings, err
 }
 
-func (client *Client) UpdateSecurityGroupRunningSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+func (client *Client) UpdateSecurityGroupRunningSpace(securityGroupGUID string, spaceGUIDs []string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostSecurityGroupRunningSpaceRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
 		RequestBody: resources.RelationshipList{
-			GUIDs: []string{spaceGUID},
+			GUIDs: spaceGUIDs,
 		},
 	})
 
 	return warnings, err
 }
 
-func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUIDs []string) (Warnings, error) {
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName: internal.PostSecurityGroupStagingSpaceRequest,
 		URIParams:   internal.Params{"security_group_guid": securityGroupGUID},
 		RequestBody: resources.RelationshipList{
-			GUIDs: []string{spaceGUID},
+			GUIDs: spaceGUIDs,
 		},
 	})
 

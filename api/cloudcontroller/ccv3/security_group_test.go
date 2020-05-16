@@ -256,7 +256,7 @@ var _ = Describe("SecurityGroup", func() {
 
 	Describe("UpdateSecurityGroupRunningSpace", func() {
 		var (
-			spaceGUID         = "some-space-guid"
+			spaceGUIDs        = []string{"some-space-guid", "other-space-guid"}
 			securityGroupGUID = "some-security-group-guid"
 			warnings          Warnings
 			executeErr        error
@@ -267,7 +267,7 @@ var _ = Describe("SecurityGroup", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.UpdateSecurityGroupRunningSpace(securityGroupGUID, spaceGUID)
+			warnings, executeErr = client.UpdateSecurityGroupRunningSpace(securityGroupGUID, spaceGUIDs)
 		})
 
 		It("makes the correct request", func() {
@@ -277,7 +277,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(params.RequestName).To(Equal(internal.PostSecurityGroupRunningSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
 			Expect(params.RequestBody).To(Equal(resources.RelationshipList{
-				GUIDs: []string{spaceGUID},
+				GUIDs: spaceGUIDs,
 			}))
 		})
 
@@ -289,7 +289,7 @@ var _ = Describe("SecurityGroup", func() {
 
 	Describe("UpdateSecurityGroupStagingSpace", func() {
 		var (
-			spaceGUID         = "some-space-guid"
+			spaceGUIDs        = []string{"some-space-guid", "other-space-guid"}
 			securityGroupGUID = "some-security-group-guid"
 			warnings          Warnings
 			executeErr        error
@@ -300,7 +300,7 @@ var _ = Describe("SecurityGroup", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUID)
+			warnings, executeErr = client.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUIDs)
 		})
 
 		It("makes the correct request", func() {
@@ -310,7 +310,7 @@ var _ = Describe("SecurityGroup", func() {
 			Expect(params.RequestName).To(Equal(internal.PostSecurityGroupStagingSpaceRequest))
 			Expect(params.URIParams).To(Equal(internal.Params{"security_group_guid": securityGroupGUID}))
 			Expect(params.RequestBody).To(Equal(resources.RelationshipList{
-				GUIDs: []string{spaceGUID},
+				GUIDs: spaceGUIDs,
 			}))
 		})
 

@@ -76,11 +76,11 @@ type FakeActor struct {
 	authenticateReturnsOnCall map[int]struct {
 		result1 error
 	}
-	BindSecurityGroupToSpaceStub        func(string, string, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
+	BindSecurityGroupToSpaceStub        func(string, []v7action.Space, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)
 	bindSecurityGroupToSpaceMutex       sync.RWMutex
 	bindSecurityGroupToSpaceArgsForCall []struct {
 		arg1 string
-		arg2 string
+		arg2 []v7action.Space
 		arg3 constanta.SecurityGroupLifecycle
 	}
 	bindSecurityGroupToSpaceReturns struct {
@@ -3232,15 +3232,20 @@ func (fake *FakeActor) AuthenticateReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeActor) BindSecurityGroupToSpace(arg1 string, arg2 string, arg3 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
+func (fake *FakeActor) BindSecurityGroupToSpace(arg1 string, arg2 []v7action.Space, arg3 constanta.SecurityGroupLifecycle) (v7action.Warnings, error) {
+	var arg2Copy []v7action.Space
+	if arg2 != nil {
+		arg2Copy = make([]v7action.Space, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.bindSecurityGroupToSpaceMutex.Lock()
 	ret, specificReturn := fake.bindSecurityGroupToSpaceReturnsOnCall[len(fake.bindSecurityGroupToSpaceArgsForCall)]
 	fake.bindSecurityGroupToSpaceArgsForCall = append(fake.bindSecurityGroupToSpaceArgsForCall, struct {
 		arg1 string
-		arg2 string
+		arg2 []v7action.Space
 		arg3 constanta.SecurityGroupLifecycle
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("BindSecurityGroupToSpace", []interface{}{arg1, arg2, arg3})
+	}{arg1, arg2Copy, arg3})
+	fake.recordInvocation("BindSecurityGroupToSpace", []interface{}{arg1, arg2Copy, arg3})
 	fake.bindSecurityGroupToSpaceMutex.Unlock()
 	if fake.BindSecurityGroupToSpaceStub != nil {
 		return fake.BindSecurityGroupToSpaceStub(arg1, arg2, arg3)
@@ -3258,13 +3263,13 @@ func (fake *FakeActor) BindSecurityGroupToSpaceCallCount() int {
 	return len(fake.bindSecurityGroupToSpaceArgsForCall)
 }
 
-func (fake *FakeActor) BindSecurityGroupToSpaceCalls(stub func(string, string, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)) {
+func (fake *FakeActor) BindSecurityGroupToSpaceCalls(stub func(string, []v7action.Space, constanta.SecurityGroupLifecycle) (v7action.Warnings, error)) {
 	fake.bindSecurityGroupToSpaceMutex.Lock()
 	defer fake.bindSecurityGroupToSpaceMutex.Unlock()
 	fake.BindSecurityGroupToSpaceStub = stub
 }
 
-func (fake *FakeActor) BindSecurityGroupToSpaceArgsForCall(i int) (string, string, constanta.SecurityGroupLifecycle) {
+func (fake *FakeActor) BindSecurityGroupToSpaceArgsForCall(i int) (string, []v7action.Space, constanta.SecurityGroupLifecycle) {
 	fake.bindSecurityGroupToSpaceMutex.RLock()
 	defer fake.bindSecurityGroupToSpaceMutex.RUnlock()
 	argsForCall := fake.bindSecurityGroupToSpaceArgsForCall[i]

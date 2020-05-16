@@ -232,9 +232,9 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(spaceName).To(Equal("some-space"))
 
 						Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+						securityGroupGUID, space, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(space[0].GUID).To(Equal("some-space-guid"))
 						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
 					})
 				})
@@ -278,7 +278,7 @@ var _ = Describe("bind-security-group Command", func() {
 					Expect(testUI.Out).To(Say("Assigning running security group %s to all spaces in org %s as some-user...", cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName))
 					Expect(testUI.Out).To(Say("No spaces in org %s.", cmd.RequiredArgs.OrganizationName))
 					Expect(testUI.Out).NotTo(Say("OK"))
-					Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
+					Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`)) //TODO Why?
 
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
@@ -445,9 +445,9 @@ var _ = Describe("bind-security-group Command", func() {
 						Expect(spaceName).To(Equal("some-space"))
 
 						Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+						securityGroupGUID, space, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(space[0].GUID).To(Equal("some-space-guid"))
 						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
 					})
 				})
