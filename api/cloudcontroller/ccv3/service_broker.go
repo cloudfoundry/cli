@@ -13,13 +13,13 @@ import (
 // ServiceBroker represents Service Broker data
 type ServiceBroker struct {
 	// GUID is a unique service broker identifier.
-	GUID string
+	GUID string `json:"guid"`
 	// Name is the name of the service broker.
-	Name string
+	Name string `json:"name"`
 	// URL is the url of the service broker.
-	URL string
+	URL string `json:"url"`
 
-	Metadata *resources.Metadata
+	Metadata *resources.Metadata `json:"metadata"`
 }
 
 func (s *ServiceBroker) UnmarshalJSON(data []byte) error {
