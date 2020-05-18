@@ -13,6 +13,9 @@ func Sanitize(input string) string {
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)
 	sanitized := re.ReplaceAllString(input, "Authorization: "+PrivateDataPlaceholder())
 
+	re = regexp.MustCompile(`(?m)^Set-Cookie: .*`)
+	sanitized = re.ReplaceAllString(sanitized, "Set-Cookie: "+PrivateDataPlaceholder())
+
 	// allow query parameter to contain all characters of the "query" character class, except for &
 	// https://tools.ietf.org/html/rfc3986#appendix-A
 	re = regexp.MustCompile(`([&?]password)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)

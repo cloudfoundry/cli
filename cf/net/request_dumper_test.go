@@ -36,6 +36,7 @@ var _ = Describe("RequestDumper", func() {
 				request, reqErr = http.NewRequest("GET", "example.com", strings.NewReader(bodyString))
 				request.Header.Set("Content-Type", "application/json")
 				request.Header.Set("Authorization", "bearer: some-secret-token")
+				request.Header.Set("Set-Cookie", "some-secret-cookie")
 				Expect(reqErr).ToNot(HaveOccurred())
 			})
 
@@ -51,6 +52,11 @@ var _ = Describe("RequestDumper", func() {
 			It("redacts the authorization header", func() {
 				Expect(buffer.String()).To(ContainSubstring("Authorization"))
 				Expect(buffer.String()).ToNot(ContainSubstring("some-secret-token"))
+			})
+
+			It("redacts Set-Cookie headers", func() {
+				Expect(buffer.String()).To(ContainSubstring("Set-Cookie: "))
+				Expect(buffer.String()).ToNot(ContainSubstring("some-secret-cookie"))
 			})
 		})
 

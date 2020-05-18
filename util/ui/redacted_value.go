@@ -9,7 +9,7 @@ const RedactedValue = "[PRIVATE DATA HIDDEN]"
 func RedactHeaders(header http.Header) http.Header {
 	redactedHeaders := make(http.Header)
 	for key, value := range header {
-		if key == "Authorization" {
+		if key == "Authorization" || key == "Set-Cookie" {
 			redactedHeaders[key] = []string{RedactedValue}
 		} else {
 			redactedHeaders[key] = value

@@ -39,6 +39,8 @@ func (display *RequestLoggerFileWriter) DisplayBody([]byte) error {
 
 func (display *RequestLoggerFileWriter) DisplayDump(dump string) error {
 	sanitized := display.dumpSanitizer.ReplaceAllString(dump, RedactedValue)
+	cookieCutter := regexp.MustCompile("Set-Cookie:.*")
+	sanitized = cookieCutter.ReplaceAllString(sanitized, "Set-Cookie: "+RedactedValue)
 	for _, logFile := range display.logFiles {
 		_, err := logFile.WriteString(sanitized)
 		if err != nil {
