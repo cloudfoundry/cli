@@ -1,9 +1,6 @@
 package api
 
 import (
-	"net/http"
-	"time"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/cf/api/appevents"
 	api_appfiles "code.cloudfoundry.org/cli/cf/api/appfiles"
@@ -28,12 +25,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/appfiles"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/configv3"
-	"github.com/cloudfoundry/noaa/consumer"
 )
 
 type RepositoryLocator struct {
@@ -79,8 +73,6 @@ type RepositoryLocator struct {
 	copyAppSourceRepo               copyapplicationsource.Repository
 }
 
-const noaaRetryDefaultTimeout = 5 * time.Second
-
 func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer, envDialTimeout string) (loc RepositoryLocator) {
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	routingAPIGateway := gatewaysByName["routing-api"]
@@ -101,11 +93,6 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.endpointRepo = NewEndpointRepository(cloudControllerGateway)
-
-	tlsConfig := util.NewTLSConfig(nil, config.IsSSLDisabled())
-
-	consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
 
 	configV3, err := configv3.GetCFConfig()
 	if err != nil {
