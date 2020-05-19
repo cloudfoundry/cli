@@ -91,6 +91,7 @@ var _ = Describe("domains command", func() {
 			spaceName     string
 			sharedDomain1 helpers.Domain
 			sharedDomain2 helpers.Domain
+			tcpDomain     helpers.Domain
 		)
 
 		BeforeEach(func() {
@@ -104,12 +105,17 @@ var _ = Describe("domains command", func() {
 
 			sharedDomain2 = helpers.NewDomain(orgName, helpers.NewDomainName("b"))
 			sharedDomain2.CreateShared()
+
+			routerGroupName := helpers.FindOrCreateTCPRouterGroup(4)
+			tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("c"))
+			tcpDomain.CreateWithRouterGroup(routerGroupName)
 			Eventually(helpers.CF("set-label", "domain", sharedDomain1.Name, "keyfor1=valuefor1")).Should(Exit(0))
 		})
 
 		AfterEach(func() {
 			Eventually(helpers.CF("delete-shared-domain", sharedDomain1.Name, "-f")).Should(Exit(0))
 			Eventually(helpers.CF("delete-shared-domain", sharedDomain2.Name, "-f")).Should(Exit(0))
+			Eventually(helpers.CF("delete-shared-domain", tcpDomain.Name, "-f")).Should(Exit(0))
 			helpers.QuickDeleteOrg(orgName)
 		})
 
@@ -118,9 +124,10 @@ var _ = Describe("domains command", func() {
 			Eventually(session).Should(Exit(0))
 
 			Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
-			Expect(session).Should(Say(`name\s+availability\s+internal`))
-			Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-			Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+			Expect(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
+			Expect(session).Should(Say(`%s\s+shared\s+http`, sharedDomain1.Name))
+			Expect(session).Should(Say(`%s\s+shared\s+http`, sharedDomain2.Name))
+			Expect(session).Should(Say(`%s\s+shared\s+tcp`, tcpDomain.Name))
 		})
 
 		It("displays the shared domains and denotes that they are shared for matching labels only", func() {
@@ -128,9 +135,9 @@ var _ = Describe("domains command", func() {
 			Eventually(session).Should(Exit(0))
 
 			Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
-			Expect(session).Should(Say(`name\s+availability\s+internal`))
-			Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-			Expect(session).ShouldNot(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+			Expect(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
+			Expect(session).Should(Say(`%s\s+shared\s+http`, sharedDomain1.Name))
+			Expect(session).ShouldNot(Say(`%s\s+shared\s+http`, sharedDomain2.Name))
 		})
 
 		When("the shared domain is internal", func() {
@@ -151,7 +158,7 @@ var _ = Describe("domains command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-				Expect(session).Should(Say(`name\s+availability\s+internal`))
+				Expect(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
 				Expect(session).Should(Say(`%s\s+shared\s+true`, internalDomainName))
 			})
 
@@ -160,9 +167,9 @@ var _ = Describe("domains command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session).Should(Say(`Getting domains in org %s as %s\.\.\.`, orgName, userName))
-				Expect(session).Should(Say(`name\s+availability\s+internal`))
-				Expect(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-				Expect(session).ShouldNot(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+				Expect(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
+				Expect(session).Should(Say(`%s\s+shared\s+http`, sharedDomain1.Name))
+				Expect(session).ShouldNot(Say(`%s\s+shared\s+http`, sharedDomain2.Name))
 				Expect(session).ShouldNot(Say(internalDomainName))
 			})
 		})
@@ -190,9 +197,9 @@ var _ = Describe("domains command", func() {
 
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-				Expect(session).Should(Say(`name\s+availability\s+internal`))
-				Expect(session).Should(Say(`%s\s+private\s+`, privateDomain1.Name))
-				Expect(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
+				Expect(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
+				Expect(session).Should(Say(`%s\s+private\s+http`, privateDomain1.Name))
+				Expect(session).Should(Say(`%s\s+private\s+http`, privateDomain2.Name))
 			})
 
 			It("filters private domains by label", func() {
@@ -200,9 +207,9 @@ var _ = Describe("domains command", func() {
 
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-				Expect(session).Should(Say(`name\s+availability\s+internal`))
-				Expect(session).ShouldNot(Say(`%s\s+private\s+`, privateDomain1.Name))
-				Expect(session).Should(Say(`%s\s+private\s+`, privateDomain2.Name))
+				Expect(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
+				Expect(session).ShouldNot(Say(`%s\s+private\s+http`, privateDomain1.Name))
+				Expect(session).Should(Say(`%s\s+private\s+http`, privateDomain2.Name))
 			})
 
 			When("targeting a different org", func() {
@@ -231,14 +238,14 @@ var _ = Describe("domains command", func() {
 					session := helpers.CF("domains")
 
 					Eventually(session).Should(Say(`Getting domains in org %s as %s`, newOrgName, userName))
-					Eventually(session).Should(Say(`name\s+availability\s+internal`))
+					Eventually(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
 
 					Consistently(session).ShouldNot(Say(`%s`, privateDomain1.Name))
 					Consistently(session).ShouldNot(Say(`%s`, privateDomain2.Name))
 
-					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
-					Eventually(session).Should(Say(`%s\s+private\s+`, privateDomain3.Name))
+					Eventually(session).Should(Say(`%s\s+shared\s+http`, sharedDomain1.Name))
+					Eventually(session).Should(Say(`%s\s+shared\s+http`, sharedDomain2.Name))
+					Eventually(session).Should(Say(`%s\s+private\s+http`, privateDomain3.Name))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -261,9 +268,9 @@ var _ = Describe("domains command", func() {
 					session := helpers.CF("domains")
 
 					Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, userName))
-					Eventually(session).Should(Say(`name\s+availability\s+internal`))
-					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
-					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
+					Eventually(session).Should(Say(`name\s+availability\s+internal\s+protocols`))
+					Eventually(session).Should(Say(`%s\s+shared\s+http`, sharedDomain1.Name))
+					Eventually(session).Should(Say(`%s\s+shared\s+http`, sharedDomain2.Name))
 
 					Consistently(session).ShouldNot(Say(privateDomain1.Name))
 					Consistently(session).ShouldNot(Say(privateDomain2.Name))

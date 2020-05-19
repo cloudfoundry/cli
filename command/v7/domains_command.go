@@ -2,6 +2,7 @@ package v7
 
 import (
 	"sort"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/util/sorting"
@@ -55,6 +56,7 @@ func (cmd DomainsCommand) displayDomainsTable(domains []v7action.Domain) {
 			cmd.UI.TranslateText("name"),
 			cmd.UI.TranslateText("availability"),
 			cmd.UI.TranslateText("internal"),
+			cmd.UI.TranslateText("protocols"),
 		},
 	}
 
@@ -76,6 +78,7 @@ func (cmd DomainsCommand) displayDomainsTable(domains []v7action.Domain) {
 			domain.Name,
 			availability,
 			internal,
+			strings.Join(domain.Protocols, ","),
 		})
 	}
 

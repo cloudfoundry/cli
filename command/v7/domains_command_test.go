@@ -114,9 +114,9 @@ var _ = Describe("domains Command", func() {
 
 			BeforeEach(func() {
 				domains = []v7action.Domain{
-					{Name: "domain1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: true}},
-					{Name: "domain3", GUID: "domain-guid-3", Internal: types.NullBool{IsSet: false, Value: false}, OrganizationGUID: "owning-org-guid"},
-					{Name: "domain2", GUID: "domain-guid-2", Internal: types.NullBool{IsSet: true, Value: false}},
+					{Name: "domain1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: true}, Protocols: []string{"http"}},
+					{Name: "domain3", GUID: "domain-guid-3", Internal: types.NullBool{IsSet: false, Value: false}, Protocols: []string{"tcp"}, OrganizationGUID: "owning-org-guid"},
+					{Name: "domain2", GUID: "domain-guid-2", Internal: types.NullBool{IsSet: true, Value: false}, Protocols: []string{"http", "tcp"}},
 				}
 
 				fakeActor.GetOrganizationDomainsReturns(
@@ -144,9 +144,9 @@ var _ = Describe("domains Command", func() {
 			It("prints the list of domains in alphabetical order", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(testUI.Out).To(Say(tableHeaders))
-				Expect(testUI.Out).To(Say(`domain1\s+shared\s+true`))
-				Expect(testUI.Out).To(Say(`domain2\s+shared`))
-				Expect(testUI.Out).To(Say(`domain3\s+private`))
+				Expect(testUI.Out).To(Say(`domain1\s+shared\s+true\s+http`))
+				Expect(testUI.Out).To(Say(`domain2\s+shared\s+http,tcp`))
+				Expect(testUI.Out).To(Say(`domain3\s+private\s+tcp`))
 			})
 
 			It("prints the flavor text", func() {

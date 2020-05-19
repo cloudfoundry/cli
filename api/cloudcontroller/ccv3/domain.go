@@ -16,6 +16,7 @@ type Domain struct {
 	Internal         types.NullBool `json:"internal,omitempty"`
 	OrganizationGUID string         `jsonry:"relationships.organization.data.guid,omitempty"`
 	RouterGroup      string         `jsonry:"router_group.guid,omitempty"`
+	Protocols        []string       `jsonry:"supported_protocols,omitempty"`
 
 	// Metadata is used for custom tagging of API resources
 	Metadata *resources.Metadata `json:"metadata,omitempty"`
@@ -23,11 +24,12 @@ type Domain struct {
 
 func (d Domain) MarshalJSON() ([]byte, error) {
 	type domainWithBoolPointer struct {
-		GUID             string `jsonry:"guid,omitempty"`
-		Name             string `jsonry:"name"`
-		Internal         *bool  `jsonry:"internal,omitempty"`
-		OrganizationGUID string `jsonry:"relationships.organization.data.guid,omitempty"`
-		RouterGroup      string `jsonry:"router_group.guid,omitempty"`
+		GUID             string   `jsonry:"guid,omitempty"`
+		Name             string   `jsonry:"name"`
+		Internal         *bool    `jsonry:"internal,omitempty"`
+		OrganizationGUID string   `jsonry:"relationships.organization.data.guid,omitempty"`
+		RouterGroup      string   `jsonry:"router_group.guid,omitempty"`
+		Protocols        []string `jsonry:"supported_protocols,omitempty"`
 	}
 
 	clone := domainWithBoolPointer{
@@ -35,6 +37,7 @@ func (d Domain) MarshalJSON() ([]byte, error) {
 		Name:             d.Name,
 		OrganizationGUID: d.OrganizationGUID,
 		RouterGroup:      d.RouterGroup,
+		Protocols:        d.Protocols,
 	}
 
 	if d.Internal.IsSet {
