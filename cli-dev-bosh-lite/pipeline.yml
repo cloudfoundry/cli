@@ -197,34 +197,38 @@ jobs:
                 - task: delete-bosh-lite
                   file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
         on_failure:
-          in_parallel:
-            - put: terraform
+          do:
+            - in_parallel:
+                - put: terraform
+                  params:
+                    action: destroy
+                    env_name_file: terraform/name
+                    terraform_source: capi-ci/terraform/bosh-lite/
+                    vars:
+                      project_id: ((bosh-lite-project-id))
+                      json_key: ((bosh-lite-gcp-json-key))
+                      dns_project_id: ((bosh-lite-project-id))
+                      dns_json_key: ((bosh-lite-gcp-json-key))
+                      system_domain_suffix: ((bosh-lite-system-domain-suffix))
+                      dns_zone_name: ((bosh-lite-dns-zone-name))
+                  get_params:
+                    action: destroy
+                - put: slack-alert
+                  params:
+                    channel: '#cli-eng'
+                    text: |
+                      Creating a bosh-lite failed :(
+                      ```
+                      Do the following tasks:
+                      1.Make sure the bosh-lite is deleted and resources are cleaned up.
+                      2.Remove the corresponding sha file from building-bosh-lites pool.
+                      3.Retrigger the create-bosh-lite task in the pipeline.
+                      Link: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+                      https://bit.ly/2S5aIov
+                      ```
+            - put: building-pool
               params:
-                action: destroy
-                env_name_file: terraform/name
-                terraform_source: capi-ci/terraform/bosh-lite/
-                vars:
-                  project_id: ((bosh-lite-project-id))
-                  json_key: ((bosh-lite-gcp-json-key))
-                  dns_project_id: ((bosh-lite-project-id))
-                  dns_json_key: ((bosh-lite-gcp-json-key))
-                  system_domain_suffix: ((bosh-lite-system-domain-suffix))
-                  dns_zone_name: ((bosh-lite-dns-zone-name))
-              get_params:
-                action: destroy
-            - put: slack-alert
-              params:
-                channel: '#cli-eng'
-                text: |
-                  Creating a bosh-lite failed :(
-                  ```
-                  Do the following tasks:
-                  1.Make sure the bosh-lite is deleted and resources are cleaned up.
-                  2.Remove the corresponding sha file from building-bosh-lites pool.
-                  3.Retrigger the create-bosh-lite task in the pipeline.
-                  Link: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-                  https://bit.ly/2S5aIov
-                  ```
+                remove: fake-placeholder-env/
 
   - name: delete-bosh-lite
     plan:
