@@ -106,12 +106,11 @@ var _ = Describe("Security group resource", func() {
 	)
 
 	DescribeTable("MarshalJSON",
-		func(resource SecurityGroup, expectedBytes []byte) {
+		func(resource SecurityGroup, expected string) {
 			actualBytes, err := json.Marshal(resource)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(actualBytes).To(Equal(expectedBytes))
+			Expect(actualBytes).To(MatchJSON(expected))
 		},
-
 		Entry(
 			"name and empty rules",
 			SecurityGroup{
@@ -126,7 +125,7 @@ var _ = Describe("Security group resource", func() {
 					},
 				},
 			},
-			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"udp","destination":"another-destination"}]}`),
+			`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"udp","destination":"another-destination"}]}`,
 		),
 		Entry(
 			"only rules",
@@ -138,7 +137,7 @@ var _ = Describe("Security group resource", func() {
 					},
 				},
 			},
-			[]byte(`{"rules":[{"protocol":"udp","destination":"another-destination"}]}`),
+			`{"rules":[{"protocol":"udp","destination":"another-destination"}]}`,
 		),
 		Entry(
 			"name and rules",
@@ -159,7 +158,7 @@ var _ = Describe("Security group resource", func() {
 					},
 				},
 			},
-			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"all","destination":"some-Destination","ports":"some-Ports","type":1,"code":0,"description":"some-Description","log":false}]}`),
+			`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","rules":[{"protocol":"all","destination":"some-Destination","ports":"some-Ports","type":1,"code":0,"description":"some-Description","log":false}]}`,
 		),
 		Entry(
 			"globally enabled",
@@ -171,7 +170,7 @@ var _ = Describe("Security group resource", func() {
 				StagingSpaceGUIDs:      []string{"space-guid-1", "space-guid-2"},
 				RunningSpaceGUIDs:      []string{"space-guid-3"},
 			},
-			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}}}`),
+			`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}}}`,
 		),
 		Entry(
 			"relationships",
@@ -183,7 +182,7 @@ var _ = Describe("Security group resource", func() {
 				StagingSpaceGUIDs:      []string{"space-guid-1", "space-guid-2"},
 				RunningSpaceGUIDs:      []string{"space-guid-3"},
 			},
-			[]byte(`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}}}`),
+			`{"globally_enabled":{"running":true,"staging":false},"guid":"security-group-guid","name":"security-group-name","relationships":{"running_spaces":{"data":[{"guid":"space-guid-3"}]},"staging_spaces":{"data":[{"guid":"space-guid-1"},{"guid":"space-guid-2"}]}}}`,
 		),
 	)
 })
