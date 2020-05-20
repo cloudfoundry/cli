@@ -56,13 +56,17 @@
     "translation": "space:api version:"
   },
   {
-     "id": "Email",
-     "translation": "Email",
-     "modified": false
+    "id": "Email",
+    "translation": "Email",
+    "modified": false
   },
   {
-     "id": "Password",
-     "translation": "Password",
-     "modified": false
- }
+    "id": "Password",
+    "translation": "Password",
+    "modified": false
+  },
+  {
+    "id": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
+    "translation": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )"
+  }
 ]
