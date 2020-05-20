@@ -367,7 +367,7 @@ var _ = Describe("Droplet Actions", func() {
 				)
 			})
 
-			It("returns the error", func() {
+			It("does not error", func() {
 				_, warnings, err := actor.GetApplicationDroplets("some-app-name", "some-space-guid")
 
 				Expect(err).To(BeNil())
@@ -424,6 +424,63 @@ var _ = Describe("Droplet Actions", func() {
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-droplets-warning"))
+			})
+		})
+
+		When("the application does not have a current droplet set", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]resources.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetDropletsReturns(
+					[]resources.Droplet{
+						{
+							GUID:      "some-droplet-guid-1",
+							State:     constant.DropletStaged,
+							CreatedAt: "2017-08-14T21:16:42Z",
+							Buildpacks: []resources.DropletBuildpack{
+								{Name: "ruby"},
+								{Name: "nodejs"},
+							},
+							Image: "docker/some-image",
+							Stack: "penguin",
+						},
+					},
+					ccv3.Warnings{"get-application-droplets-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
+					resources.Droplet{},
+					ccv3.Warnings{"get-current-droplet-warning"},
+					ccerror.DropletNotFoundError{},
+				)
+			})
+
+			It("does not error and returns all droplets", func() {
+				droplets, warnings, err := actor.GetApplicationDroplets("some-app-name", "some-space-guid")
+
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-droplets-warning", "get-current-droplet-warning"))
+				Expect(droplets).To(Equal([]resources.Droplet{
+					{
+						GUID:      "some-droplet-guid-1",
+						State:     constant.DropletStaged,
+						CreatedAt: "2017-08-14T21:16:42Z",
+						Buildpacks: []resources.DropletBuildpack{
+							{Name: "ruby"},
+							{Name: "nodejs"},
+						},
+						Image:     "docker/some-image",
+						Stack:     "penguin",
+						IsCurrent: false,
+					},
+				}))
 			})
 		})
 	})

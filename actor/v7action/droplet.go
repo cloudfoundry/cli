@@ -72,6 +72,9 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]r
 	currentDroplet, apiWarnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(application.GUID)
 	allWarnings = append(allWarnings, apiWarnings...)
 	if err != nil {
+		if _, ok := err.(ccerror.DropletNotFoundError); ok {
+			return droplets, allWarnings, nil
+		}
 		return []resources.Droplet{}, allWarnings, err
 	}
 
