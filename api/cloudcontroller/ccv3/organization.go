@@ -29,8 +29,8 @@ func (client *Client) DeleteOrganization(orgGUID string) (JobURL, Warnings, erro
 }
 
 // GetDefaultDomain gets the default domain for the organization with the given GUID.
-func (client *Client) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
-	var responseBody Domain
+func (client *Client) GetDefaultDomain(orgGUID string) (resources.Domain, Warnings, error) {
+	var responseBody resources.Domain
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDefaultDomainRequest,

@@ -47,7 +47,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{
 							GUID: "shared-domain-guid-2",
 							Name: "shared-domain-2",
@@ -165,7 +165,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			When("an error is encountered getting the organization domains", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("domains error")
-					fakeCloudControllerClient.GetOrganizationDomainsReturns([]ccv3.Domain{}, ccv3.Warnings{"domains warning"}, expectedErr)
+					fakeCloudControllerClient.GetOrganizationDomainsReturns([]resources.Domain{}, ccv3.Warnings{"domains warning"}, expectedErr)
 				})
 
 				It("returns that error and all warnings", func() {

@@ -40,7 +40,7 @@ var _ = Describe("Route Actions", func() {
 		When("the API layer calls are successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{Name: "domain-name", GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
@@ -81,7 +81,7 @@ var _ = Describe("Route Actions", func() {
 			When("the cc client returns an RouteNotUniqueError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{
+						[]resources.Domain{
 							{Name: "domain-name", GUID: "domain-guid"},
 						},
 						ccv3.Warnings{"get-domains-warning"},
@@ -127,7 +127,7 @@ var _ = Describe("Route Actions", func() {
 			When("the cc client returns a different error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{},
+						[]resources.Domain{},
 						ccv3.Warnings{"domain-warning-1", "domain-warning-2"},
 						errors.New("api-domains-error"),
 					)
@@ -155,7 +155,7 @@ var _ = Describe("Route Actions", func() {
 		BeforeEach(func() {
 			labels = ""
 			fakeCloudControllerClient.GetDomainsReturns(
-				[]ccv3.Domain{
+				[]resources.Domain{
 					{Name: "domain1-name", GUID: "domain1-guid"},
 					{Name: "domain2-name", GUID: "domain2-guid"},
 				},
@@ -234,7 +234,7 @@ var _ = Describe("Route Actions", func() {
 	Describe("GetRoute", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetDomainsReturns(
-				[]ccv3.Domain{
+				[]resources.Domain{
 					{Name: "domain-name", GUID: "domain-guid"},
 				},
 				ccv3.Warnings{"get-domains-warning"},
@@ -294,14 +294,14 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturnsOnCall(
 					0,
-					[]ccv3.Domain{},
+					[]resources.Domain{},
 					ccv3.Warnings{"get-domains-warning-1"},
 					nil,
 				)
 
 				fakeCloudControllerClient.GetDomainsReturnsOnCall(
 					1,
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{Name: "domain-name", GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning-2"},
@@ -339,7 +339,7 @@ var _ = Describe("Route Actions", func() {
 		When("invalid domain cannot be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{},
+					[]resources.Domain{},
 					ccv3.Warnings{"get-domains-warning"},
 					nil,
 				)
@@ -761,7 +761,7 @@ var _ = Describe("Route Actions", func() {
 		When("deleting a route", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{GUID: "domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},

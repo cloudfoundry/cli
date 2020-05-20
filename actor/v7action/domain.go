@@ -3,16 +3,11 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
 
-type Domain ccv3.Domain
-
 type SharedOrgs ccv3.SharedOrgs
-
-func (domain Domain) Shared() bool {
-	return domain.OrganizationGUID == ""
-}
 
 func (actor Actor) CheckRoute(domainName string, hostname string, path string) (bool, Warnings, error) {
 	var allWarnings Warnings
@@ -42,7 +37,7 @@ func (actor Actor) CreateSharedDomain(domainName string, internal bool, routerGr
 		routerGroupGUID = routerGroup.GUID
 	}
 
-	_, warnings, err := actor.CloudControllerClient.CreateDomain(ccv3.Domain{
+	_, warnings, err := actor.CloudControllerClient.CreateDomain(resources.Domain{
 		Name:        domainName,
 		Internal:    types.NullBool{IsSet: true, Value: internal},
 		RouterGroup: routerGroupGUID,
@@ -60,7 +55,7 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 	if err != nil {
 		return allWarnings, err
 	}
-	_, apiWarnings, err := actor.CloudControllerClient.CreateDomain(ccv3.Domain{
+	_, apiWarnings, err := actor.CloudControllerClient.CreateDomain(resources.Domain{
 		Name:             domainName,
 		OrganizationGUID: organization.GUID,
 	})
@@ -71,7 +66,7 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 	return allWarnings, err
 }
 
-func (actor Actor) DeleteDomain(domain Domain) (Warnings, error) {
+func (actor Actor) DeleteDomain(domain resources.Domain) (Warnings, error) {
 	allWarnings := Warnings{}
 
 	jobURL, apiWarnings, err := actor.CloudControllerClient.DeleteDomain(domain.GUID)
@@ -89,7 +84,7 @@ func (actor Actor) DeleteDomain(domain Domain) (Warnings, error) {
 	return allWarnings, err
 }
 
-func (actor Actor) GetOrganizationDomains(orgGuid string, labelSelector string) ([]Domain, Warnings, error) {
+func (actor Actor) GetOrganizationDomains(orgGuid string, labelSelector string) ([]resources.Domain, Warnings, error) {
 	keys := []ccv3.Query{}
 	if labelSelector != "" {
 		keys = append(keys, ccv3.Query{Key: ccv3.LabelSelectorFilter, Values: []string{labelSelector}})
@@ -100,38 +95,38 @@ func (actor Actor) GetOrganizationDomains(orgGuid string, labelSelector string) 
 		return nil, Warnings(warnings), err
 	}
 
-	var domains []Domain
+	var domains []resources.Domain
 	for _, domain := range ccv3Domains {
-		domains = append(domains, Domain(domain))
+		domains = append(domains, resources.Domain(domain))
 	}
 
 	return domains, Warnings(warnings), nil
 }
 
-func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
+func (actor Actor) GetDomain(domainGUID string) (resources.Domain, Warnings, error) {
 	domain, warnings, err := actor.CloudControllerClient.GetDomain(domainGUID)
 
 	if err != nil {
-		return Domain{}, Warnings(warnings), err
+		return resources.Domain{}, Warnings(warnings), err
 	}
 
-	return Domain(domain), Warnings(warnings), nil
+	return resources.Domain(domain), Warnings(warnings), nil
 }
 
-func (actor Actor) GetDomainByName(domainName string) (Domain, Warnings, error) {
+func (actor Actor) GetDomainByName(domainName string) (resources.Domain, Warnings, error) {
 	domains, warnings, err := actor.CloudControllerClient.GetDomains(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{domainName}},
 	)
 
 	if err != nil {
-		return Domain{}, Warnings(warnings), err
+		return resources.Domain{}, Warnings(warnings), err
 	}
 
 	if len(domains) == 0 {
-		return Domain{}, Warnings(warnings), actionerror.DomainNotFoundError{Name: domainName}
+		return resources.Domain{}, Warnings(warnings), actionerror.DomainNotFoundError{Name: domainName}
 	}
 
-	return Domain(domains[0]), Warnings(warnings), nil
+	return resources.Domain(domains[0]), Warnings(warnings), nil
 }
 
 func (actor Actor) SharePrivateDomain(domainName string, orgName string) (Warnings, error) {

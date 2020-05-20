@@ -41,7 +41,7 @@ var _ = Describe("Domain Actions", func() {
 			path = "/path"
 
 			fakeCloudControllerClient.GetDomainsReturns(
-				[]ccv3.Domain{{GUID: "domain-guid"}},
+				[]resources.Domain{{GUID: "domain-guid"}},
 				ccv3.Warnings{"get-domains-warning"},
 				nil,
 			)
@@ -78,7 +78,7 @@ var _ = Describe("Domain Actions", func() {
 		When("getting the domain by name errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{{GUID: "domain-guid"}},
+					[]resources.Domain{{GUID: "domain-guid"}},
 					ccv3.Warnings{"get-domains-warning"},
 					errors.New("domain not found"),
 				)
@@ -119,7 +119,7 @@ var _ = Describe("Domain Actions", func() {
 
 		BeforeEach(func() {
 			routerGroup = ""
-			fakeCloudControllerClient.CreateDomainReturns(ccv3.Domain{}, ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
+			fakeCloudControllerClient.CreateDomainReturns(resources.Domain{}, ccv3.Warnings{"create-warning-1", "create-warning-2"}, errors.New("create-error"))
 		})
 
 		It("delegates to the cloud controller client", func() {
@@ -131,7 +131,7 @@ var _ = Describe("Domain Actions", func() {
 			Expect(fakeCloudControllerClient.CreateDomainCallCount()).To(Equal(1))
 			passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
 			Expect(passedDomain).To(Equal(
-				ccv3.Domain{
+				resources.Domain{
 					Name:        "the-domain-name",
 					Internal:    types.NullBool{IsSet: true, Value: true},
 					RouterGroup: "",
@@ -158,7 +158,7 @@ var _ = Describe("Domain Actions", func() {
 				passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
 
 				Expect(passedDomain).To(Equal(
-					ccv3.Domain{
+					resources.Domain{
 						Name:        "the-domain-name",
 						Internal:    types.NullBool{IsSet: true, Value: true},
 						RouterGroup: "router-group-guid",
@@ -180,7 +180,7 @@ var _ = Describe("Domain Actions", func() {
 			)
 
 			fakeCloudControllerClient.CreateDomainReturns(
-				ccv3.Domain{},
+				resources.Domain{},
 				ccv3.Warnings{"create-warning-1", "create-warning-2"},
 				errors.New("create-error"),
 			)
@@ -195,7 +195,7 @@ var _ = Describe("Domain Actions", func() {
 			passedDomain := fakeCloudControllerClient.CreateDomainArgsForCall(0)
 
 			Expect(passedDomain).To(Equal(
-				ccv3.Domain{
+				resources.Domain{
 					Name:             "private-domain-name",
 					OrganizationGUID: "org-guid",
 				},
@@ -205,10 +205,10 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("delete domain", func() {
 		var (
-			domain Domain
+			domain resources.Domain
 		)
 		BeforeEach(func() {
-			domain = Domain{Name: "the-domain.com", GUID: "domain-guid"}
+			domain = resources.Domain{Name: "the-domain.com", GUID: "domain-guid"}
 		})
 
 		It("delegates to the cloud controller client", func() {
@@ -251,8 +251,8 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("list domains for org", func() {
 		var (
-			ccv3Domains []ccv3.Domain
-			domains     []Domain
+			ccv3Domains []resources.Domain
+			domains     []resources.Domain
 
 			domain1Name string
 			domain1Guid string
@@ -271,7 +271,7 @@ var _ = Describe("Domain Actions", func() {
 		)
 
 		BeforeEach(func() {
-			ccv3Domains = []ccv3.Domain{
+			ccv3Domains = []resources.Domain{
 				{Name: domain1Name, GUID: domain1Guid, OrganizationGUID: org1Guid},
 				{Name: domain2Name, GUID: domain2Guid, OrganizationGUID: org1Guid},
 				{Name: domain3Name, GUID: domain3Guid, OrganizationGUID: sharedFromOrgGuid},
@@ -302,9 +302,9 @@ var _ = Describe("Domain Actions", func() {
 				Expect(actualOrgGuid).To(Equal(expectedOrgGUID))
 
 				Expect(domains).To(ConsistOf(
-					Domain{Name: domain1Name, GUID: domain1Guid, OrganizationGUID: org1Guid},
-					Domain{Name: domain2Name, GUID: domain2Guid, OrganizationGUID: org1Guid},
-					Domain{Name: domain3Name, GUID: domain3Guid, OrganizationGUID: sharedFromOrgGuid},
+					resources.Domain{Name: domain1Name, GUID: domain1Guid, OrganizationGUID: org1Guid},
+					resources.Domain{Name: domain2Name, GUID: domain2Guid, OrganizationGUID: org1Guid},
+					resources.Domain{Name: domain3Name, GUID: domain3Guid, OrganizationGUID: sharedFromOrgGuid},
 				))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
 
@@ -333,7 +333,7 @@ var _ = Describe("Domain Actions", func() {
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationDomainsReturns(
-					[]ccv3.Domain{},
+					[]resources.Domain{},
 					ccv3.Warnings{"some-domain-warning"},
 					errors.New("list-error"),
 				)
@@ -342,7 +342,7 @@ var _ = Describe("Domain Actions", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(MatchError("list-error"))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
-				Expect(domains).To(ConsistOf([]Domain{}))
+				Expect(domains).To(ConsistOf([]resources.Domain{}))
 
 				Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
 			})
@@ -352,8 +352,8 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("get domain by guid", func() {
 		var (
-			domain      Domain
-			ccv3Domain  ccv3.Domain
+			domain      resources.Domain
+			ccv3Domain  resources.Domain
 			domain1Guid string
 
 			warnings   Warnings
@@ -362,7 +362,7 @@ var _ = Describe("Domain Actions", func() {
 
 		BeforeEach(func() {
 			domain1Guid = "domain-1-guid"
-			ccv3Domain = ccv3.Domain{Name: "domain-1-name", GUID: domain1Guid}
+			ccv3Domain = resources.Domain{Name: "domain-1-name", GUID: domain1Guid}
 		})
 
 		JustBeforeEach(func() {
@@ -387,7 +387,7 @@ var _ = Describe("Domain Actions", func() {
 				Expect(actualGUID).To(Equal(domain1Guid))
 
 				Expect(domain).To(Equal(
-					Domain{Name: "domain-1-name", GUID: domain1Guid},
+					resources.Domain{Name: "domain-1-name", GUID: domain1Guid},
 				))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
 
@@ -397,7 +397,7 @@ var _ = Describe("Domain Actions", func() {
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainReturns(
-					ccv3.Domain{},
+					resources.Domain{},
 					ccv3.Warnings{"some-domain-warning"},
 					errors.New("get-domain-error"),
 				)
@@ -406,7 +406,7 @@ var _ = Describe("Domain Actions", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(MatchError("get-domain-error"))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
-				Expect(domain).To(Equal(Domain{}))
+				Expect(domain).To(Equal(resources.Domain{}))
 
 				Expect(fakeCloudControllerClient.GetDomainCallCount()).To(Equal(1))
 			})
@@ -415,8 +415,8 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("get domain by name", func() {
 		var (
-			ccv3Domains []ccv3.Domain
-			domain      Domain
+			ccv3Domains []resources.Domain
+			domain      resources.Domain
 
 			domain1Name string
 			domain1Guid string
@@ -426,7 +426,7 @@ var _ = Describe("Domain Actions", func() {
 		)
 
 		BeforeEach(func() {
-			ccv3Domains = []ccv3.Domain{
+			ccv3Domains = []resources.Domain{
 				{Name: domain1Name, GUID: domain1Guid},
 			}
 		})
@@ -453,7 +453,7 @@ var _ = Describe("Domain Actions", func() {
 				Expect(actualQuery).To(Equal(expectedQuery))
 
 				Expect(domain).To(Equal(
-					Domain{Name: domain1Name, GUID: domain1Guid},
+					resources.Domain{Name: domain1Name, GUID: domain1Guid},
 				))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
 
@@ -463,7 +463,7 @@ var _ = Describe("Domain Actions", func() {
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{},
+					[]resources.Domain{},
 					ccv3.Warnings{"some-domain-warning"},
 					errors.New("list-error"),
 				)
@@ -472,7 +472,7 @@ var _ = Describe("Domain Actions", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(MatchError("list-error"))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
-				Expect(domain).To(Equal(Domain{}))
+				Expect(domain).To(Equal(resources.Domain{}))
 
 				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
 			})
@@ -490,7 +490,7 @@ var _ = Describe("Domain Actions", func() {
 			)
 
 			fakeCloudControllerClient.GetDomainsReturns(
-				[]ccv3.Domain{
+				[]resources.Domain{
 					{Name: "private-domain.com", GUID: "private-domain-guid"},
 				},
 				ccv3.Warnings{"get-domains-warning"},
@@ -550,7 +550,7 @@ var _ = Describe("Domain Actions", func() {
 		When("getting the guids succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{Name: domainName, GUID: "private-domain-guid"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
@@ -677,7 +677,7 @@ var _ = Describe("Domain Actions", func() {
 			When("the api call are successful", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetDomainsReturns(
-						[]ccv3.Domain{
+						[]resources.Domain{
 							{Name: domainName, GUID: "private-domain-guid"},
 						},
 						ccv3.Warnings{"get-domains-warning"},

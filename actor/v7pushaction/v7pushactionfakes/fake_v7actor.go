@@ -171,33 +171,33 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetDefaultDomainStub        func(string) (v7action.Domain, v7action.Warnings, error)
+	GetDefaultDomainStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDefaultDomainMutex       sync.RWMutex
 	getDefaultDomainArgsForCall []struct {
 		arg1 string
 	}
 	getDefaultDomainReturns struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getDefaultDomainReturnsOnCall map[int]struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetDomainStub        func(string) (v7action.Domain, v7action.Warnings, error)
+	GetDomainStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDomainMutex       sync.RWMutex
 	getDomainArgsForCall []struct {
 		arg1 string
 	}
 	getDomainReturns struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getDomainReturnsOnCall map[int]struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -1180,7 +1180,7 @@ func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDefaultDomain(arg1 string) (v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetDefaultDomain(arg1 string) (resources.Domain, v7action.Warnings, error) {
 	fake.getDefaultDomainMutex.Lock()
 	ret, specificReturn := fake.getDefaultDomainReturnsOnCall[len(fake.getDefaultDomainArgsForCall)]
 	fake.getDefaultDomainArgsForCall = append(fake.getDefaultDomainArgsForCall, struct {
@@ -1204,7 +1204,7 @@ func (fake *FakeV7Actor) GetDefaultDomainCallCount() int {
 	return len(fake.getDefaultDomainArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetDefaultDomainCalls(stub func(string) (v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetDefaultDomainCalls(stub func(string) (resources.Domain, v7action.Warnings, error)) {
 	fake.getDefaultDomainMutex.Lock()
 	defer fake.getDefaultDomainMutex.Unlock()
 	fake.GetDefaultDomainStub = stub
@@ -1217,36 +1217,36 @@ func (fake *FakeV7Actor) GetDefaultDomainArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) GetDefaultDomainReturns(result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDefaultDomainReturns(result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDefaultDomainMutex.Lock()
 	defer fake.getDefaultDomainMutex.Unlock()
 	fake.GetDefaultDomainStub = nil
 	fake.getDefaultDomainReturns = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDefaultDomainReturnsOnCall(i int, result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDefaultDomainReturnsOnCall(i int, result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDefaultDomainMutex.Lock()
 	defer fake.getDefaultDomainMutex.Unlock()
 	fake.GetDefaultDomainStub = nil
 	if fake.getDefaultDomainReturnsOnCall == nil {
 		fake.getDefaultDomainReturnsOnCall = make(map[int]struct {
-			result1 v7action.Domain
+			result1 resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getDefaultDomainReturnsOnCall[i] = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDomain(arg1 string) (v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetDomain(arg1 string) (resources.Domain, v7action.Warnings, error) {
 	fake.getDomainMutex.Lock()
 	ret, specificReturn := fake.getDomainReturnsOnCall[len(fake.getDomainArgsForCall)]
 	fake.getDomainArgsForCall = append(fake.getDomainArgsForCall, struct {
@@ -1270,7 +1270,7 @@ func (fake *FakeV7Actor) GetDomainCallCount() int {
 	return len(fake.getDomainArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetDomainCalls(stub func(string) (v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetDomainCalls(stub func(string) (resources.Domain, v7action.Warnings, error)) {
 	fake.getDomainMutex.Lock()
 	defer fake.getDomainMutex.Unlock()
 	fake.GetDomainStub = stub
@@ -1283,30 +1283,30 @@ func (fake *FakeV7Actor) GetDomainArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) GetDomainReturns(result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDomainReturns(result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainMutex.Lock()
 	defer fake.getDomainMutex.Unlock()
 	fake.GetDomainStub = nil
 	fake.getDomainReturns = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDomainReturnsOnCall(i int, result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDomainReturnsOnCall(i int, result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainMutex.Lock()
 	defer fake.getDomainMutex.Unlock()
 	fake.GetDomainStub = nil
 	if fake.getDomainReturnsOnCall == nil {
 		fake.getDomainReturnsOnCall = make(map[int]struct {
-			result1 v7action.Domain
+			result1 resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getDomainReturnsOnCall[i] = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

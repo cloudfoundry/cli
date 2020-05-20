@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -50,7 +50,7 @@ func (cmd DomainsCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd DomainsCommand) displayDomainsTable(domains []v7action.Domain) {
+func (cmd DomainsCommand) displayDomainsTable(domains []resources.Domain) {
 	var domainsTable = [][]string{
 		{
 			cmd.UI.TranslateText("name"),

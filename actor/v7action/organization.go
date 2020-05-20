@@ -106,8 +106,8 @@ func (actor Actor) DeleteOrganization(name string) (Warnings, error) {
 	return allWarnings, err
 }
 
-func (actor Actor) GetDefaultDomain(orgGUID string) (Domain, Warnings, error) {
+func (actor Actor) GetDefaultDomain(orgGUID string) (resources.Domain, Warnings, error) {
 	domain, warnings, err := actor.CloudControllerClient.GetDefaultDomain(orgGUID)
 
-	return Domain(domain), Warnings(warnings), err
+	return resources.Domain(domain), Warnings(warnings), err
 }

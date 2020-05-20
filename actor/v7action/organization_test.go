@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
@@ -233,7 +234,7 @@ var _ = Describe("Organization Actions", func() {
 
 	Describe("GetDefaultDomain", func() {
 		var (
-			domain     Domain
+			domain     resources.Domain
 			warnings   Warnings
 			executeErr error
 
@@ -247,7 +248,7 @@ var _ = Describe("Organization Actions", func() {
 		When("the api call is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDefaultDomainReturns(
-					ccv3.Domain{
+					resources.Domain{
 						Name: "some-domain-name",
 						GUID: "some-domain-guid",
 					},
@@ -258,7 +259,7 @@ var _ = Describe("Organization Actions", func() {
 
 			It("returns the domain and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(domain).To(Equal(Domain{
+				Expect(domain).To(Equal(resources.Domain{
 					Name: "some-domain-name",
 					GUID: "some-domain-guid",
 				}))
@@ -275,7 +276,7 @@ var _ = Describe("Organization Actions", func() {
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
 				fakeCloudControllerClient.GetDefaultDomainReturns(
-					ccv3.Domain{},
+					resources.Domain{},
 					ccv3.Warnings{"some-warning"},
 					expectedError)
 			})
