@@ -75,6 +75,22 @@ grant_type=password&password=[PRIVATE DATA HIDDEN]&scope=&username=mgehard%2Bcli
 				Expect(Sanitize(request)).To(Equal(expected))
 			})
 
+			It("hides ssh codes in query args", func() {
+				request := `
+GET /login?code=secret-ssh-code
+Host: uaa.run.pivotal.io
+Authorization: [PRIVATE DATA HIDDEN]
+Referer: https://uaa.run.pivotal.io/oauth/authorize?client_id=ssh-proxy&grant_type=authorization_code&response_type=code
+`
+
+				expected := `
+GET /login?code=[PRIVATE DATA HIDDEN]
+Host: uaa.run.pivotal.io
+Authorization: [PRIVATE DATA HIDDEN]
+Referer: https://uaa.run.pivotal.io/oauth/authorize?client_id=ssh-proxy&grant_type=authorization_code&response_type=code
+`
+				Expect(Sanitize(request)).To(Equal(expected))
+			})
 			It("hides passwords in the first and last query parameters", func() {
 				response := `
 HTTP/1.1 200 BORK

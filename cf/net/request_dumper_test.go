@@ -33,15 +33,26 @@ var _ = Describe("RequestDumper", func() {
 
 			BeforeEach(func() {
 				bodyString := `{"password":"verysecret","some-field":"some-value"}`
-				request, reqErr = http.NewRequest("GET", "example.com", strings.NewReader(bodyString))
+				request, reqErr = http.NewRequest("GET", "example.com?code=code-from-uri", strings.NewReader(bodyString))
 				request.Header.Set("Content-Type", "application/json")
 				request.Header.Set("Authorization", "bearer: some-secret-token")
 				request.Header.Set("Set-Cookie", "some-secret-cookie")
+				request.Header.Set("Location", "https://api.cli.fun?code=secret-ssh-code")
 				Expect(reqErr).ToNot(HaveOccurred())
 			})
 
 			JustBeforeEach(func() {
 				dumper.DumpRequest(request)
+			})
+
+			It("redacts code=* from all headers", func() {
+				Expect(buffer.String()).To(ContainSubstring("?code="))
+				Expect(buffer.String()).ToNot(ContainSubstring("secret-ssh-code"))
+			})
+
+			It("redacts code=* from the uri", func() {
+				Expect(buffer.String()).To(ContainSubstring("?code="))
+				Expect(buffer.String()).ToNot(ContainSubstring("code-from-uri"))
 			})
 
 			It("redacts values from the key 'password'", func() {

@@ -21,6 +21,9 @@ func Sanitize(input string) string {
 	re = regexp.MustCompile(`([&?]password)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)
 	sanitized = re.ReplaceAllString(sanitized, "$1="+PrivateDataPlaceholder())
 
+	re = regexp.MustCompile(`([&?]code)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)
+	sanitized = re.ReplaceAllString(sanitized, "$1="+PrivateDataPlaceholder())
+
 	sanitized = sanitizeJSON("token", sanitized)
 	sanitized = sanitizeJSON("password", sanitized)
 

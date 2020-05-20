@@ -310,4 +310,78 @@ var _ = Describe("Verbose", func() {
 			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo", "/bar", []string{"/foo", "/bar"}),
 		)
 	})
+
+	Describe("uaa", func() {
+		When("the user does not provide the -v flag, the CF_TRACE env var, or the --trace config option", func() {
+			It("should not log requests", func() {
+				tmpDir, err := ioutil.TempDir("", "")
+				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				helpers.LoginCF()
+
+				username, password := helpers.GetCredentials()
+				command := []string{"auth", username, password}
+
+				session := helpers.CF(command...)
+
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`Authenticating...`))
+				Expect(session).ToNot(Say(`POST /oauth/token`))
+			})
+		})
+
+		When("the user provides the -v flag", func() {
+			It("should log requests and redact cookies", func() {
+				tmpDir, err := ioutil.TempDir("", "")
+				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				helpers.LoginCF()
+
+				command := []string{"target", "-o", ReadOnlyOrg, "-v"}
+
+				session := helpers.CF(command...)
+				Eventually(session).Should(Exit(0))
+				Expect(session).To(Say(`Set-Cookie: \[PRIVATE DATA HIDDEN\]`))
+			})
+		})
+	})
+
+	Describe("ssh", func() {
+		When("the user is not in verbose mode", func() {
+			It("should not log requests", func() {
+				tmpDir, err := ioutil.TempDir("", "")
+				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				helpers.LoginCF()
+
+				command := []string{"ssh-code"}
+
+				session := helpers.CF(command...)
+
+				Eventually(session).Should(Exit(0))
+				Expect(session).ToNot(Say(`GET`))
+			})
+		})
+
+		When("the user is in verbose mode", func() {
+			It("should redact their one time ssh code", func() {
+				tmpDir, err := ioutil.TempDir("", "")
+				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				helpers.LoginCF()
+
+				command := []string{"ssh-code", "-v"}
+
+				session := helpers.CF(command...)
+
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out.Contents()).ToNot(MatchRegexp(`[?&]code=[^\[].*$`))
+				Expect(session.Out.Contents()).To(ContainSubstring("/login?code=[PRIVATE DATA HIDDEN]"))
+			})
+		})
+	})
 })

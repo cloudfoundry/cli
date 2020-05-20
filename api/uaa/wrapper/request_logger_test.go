@@ -120,6 +120,37 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
+		When("an Location header is in the request", func() {
+			When("an Location header has an ssh code in the request", func() {
+				BeforeEach(func() {
+					request.Header = http.Header{"Location": []string{"foo.bar/login?code=pleaseRedact"}}
+				})
+
+				It("redacts the code query parameter of the Location header", func() {
+					Expect(makeErr).NotTo(HaveOccurred())
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(Equal(1))
+					key, value := fakeOutput.DisplayHeaderArgsForCall(0)
+					Expect(key).To(Equal("Location"))
+					Expect(value).To(ContainSubstring("[PRIVATE DATA HIDDEN]"))
+					Expect(value).ToNot(ContainSubstring("pleaseRedact"))
+				})
+			})
+
+			When("an Location header has a random query param in the request", func() {
+				BeforeEach(func() {
+					request.Header = http.Header{"Location": []string{"foo.bar/login?param=pleasePersist"}}
+				})
+
+				It("persists the query parameter of the Location header", func() {
+					Expect(makeErr).NotTo(HaveOccurred())
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(Equal(1))
+					key, value := fakeOutput.DisplayHeaderArgsForCall(0)
+					Expect(key).To(Equal("Location"))
+					Expect(value).To(ContainSubstring("pleasePersist"))
+				})
+			})
+		})
+
 		When("passed a body", func() {
 			var originalBody io.ReadCloser
 
