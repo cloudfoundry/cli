@@ -11,7 +11,7 @@ type CreateRouteCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
-	usage           interface{}      `usage:"CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo"`
+	usage           interface{}      `usage:"Create an HTTP route:\n      CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n      CF_NAME create-route DOMAIN [--port PORT]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route example.com --port 5000                 # example.com:5000"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
 	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
