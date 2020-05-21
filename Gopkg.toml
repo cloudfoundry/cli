@@ -61,7 +61,7 @@ required = ["github.com/gorilla/websocket"]
 
 [[constraint]]
   name = "github.com/blang/semver"
-  version = ">=3.5.1"
+  version = ">=3.6.1"
 
 [[constraint]]
   branch = "master"
