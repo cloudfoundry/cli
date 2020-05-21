@@ -10,7 +10,7 @@ type EnableServiceAccessCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.Service `positional-args:"yes"`
-	ServiceBroker   string       `short:"b" description:"Enable access to a service from a particular service broker. Required when service name is ambiguous"`
+	ServiceBroker   string       `short:"b" description:"Enable access to a service offering from a particular service broker. Required when service offering name is ambiguous"`
 	Organization    string       `short:"o" description:"Enable access for a specified organization"`
 	ServicePlan     string       `short:"p" description:"Enable access to a specified service plan"`
 	usage           interface{}  `usage:"CF_NAME enable-service-access SERVICE [-b BROKER] [-p PLAN] [-o ORG]"`
@@ -70,7 +70,7 @@ func (msg setServiceAccessMessage) displayMessage(ui command.UI) {
 		template += "all plans "
 	}
 
-	template += "of service {{.ServiceOffering}} "
+	template += "of service offering {{.ServiceOffering}} "
 
 	if msg.ServiceBroker != "" {
 		template += "from broker {{.ServiceBroker}} "
@@ -94,16 +94,19 @@ func (msg setServiceAccessMessage) displayMessage(ui command.UI) {
 }
 
 func displaySkippedPlans(ui command.UI, visibility string, skipped v7action.SkippedPlans) {
-	for _, plan := range skipped {
-		ui.DisplayTextWithFlavor(
-			"Did not update plan {{.ServicePlan}} as it already has visibility {{.Visibility}}.",
-			map[string]interface{}{
-				"ServicePlan": plan,
-				"Visibility":  visibility,
-			},
-		)
-	}
 	if len(skipped) > 0 {
+		ui.DisplayNewline()
+
+		for _, plan := range skipped {
+			ui.DisplayTextWithFlavor(
+				"Did not update plan {{.ServicePlan}} as it already has visibility {{.Visibility}}.",
+				map[string]interface{}{
+					"ServicePlan": plan,
+					"Visibility":  visibility,
+				},
+			)
+		}
+
 		ui.DisplayNewline()
 	}
 }

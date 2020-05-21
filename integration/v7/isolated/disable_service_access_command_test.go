@@ -16,11 +16,11 @@ var _ = Describe("disable service access command", func() {
 				session := helpers.CF("disable-service-access", "--help")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
+				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"))
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
 				Expect(session).To(Say("\\s+\\-o\\s+Disable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
@@ -34,11 +34,11 @@ var _ = Describe("disable service access command", func() {
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE` was not provided"))
 				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
+				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"))
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
 				Expect(session).To(Say("\\s+\\-o\\s+Disable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
@@ -53,11 +53,11 @@ var _ = Describe("disable service access command", func() {
 				Expect(session).To(Say("FAILED"))
 				Expect(session.Err).To(Say(`Incorrect Usage: unexpected argument "extra-arg"`))
 				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
+				Expect(session).To(Say("\\s+disable-service-access - Disable access to a service offering or service plan for one or all orgs"))
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Expect(session).To(Say("\\s+\\-b\\s+Disable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
 				Expect(session).To(Say("\\s+\\-o\\s+Disable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
@@ -91,7 +91,7 @@ var _ = Describe("disable service access command", func() {
 			It("displays FAILED, an informative error message, and exits 1", func() {
 				session := helpers.CF("disable-service-access", "some-service")
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("Disabling access to all plans of service some-service for all orgs as %s\\.\\.\\.", username))
+				Expect(session).To(Say("Disabling access to all plans of service offering some-service for all orgs as %s\\.\\.\\.", username))
 				Expect(session.Err).To(Say("Service offering 'some-service' not found"))
 				Expect(session).To(Say("FAILED"))
 			})
@@ -127,7 +127,7 @@ var _ = Describe("disable service access command", func() {
 					It("displays an informative message, exits 0, and disables the service for all orgs", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
+						Expect(session).To(Say("Disabling access to all plans of service offering %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 						Expect(session).To(Say("OK"))
 
 						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
@@ -144,7 +144,7 @@ var _ = Describe("disable service access command", func() {
 					It("displays an informative message, exits 0, and disables the plan for all orgs", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-p", broker.FirstServicePlanName())
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to plan %s of service %s for all orgs as %s...", broker.FirstServicePlanName(), broker.FirstServiceOfferingName(), username))
+						Expect(session).To(Say("Disabling access to plan %s of service offering %s for all orgs as %s...", broker.FirstServicePlanName(), broker.FirstServiceOfferingName(), username))
 						Expect(session).To(Say("OK"))
 
 						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
@@ -168,7 +168,7 @@ var _ = Describe("disable service access command", func() {
 					It("fails", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-o", orgName)
 						Eventually(session).Should(Exit(1))
-						Expect(session).To(Say("Disabling access to all plans of service %s for org %s as %s...", broker.FirstServiceOfferingName(), orgName, username))
+						Expect(session).To(Say("Disabling access to all plans of service offering %s for org %s as %s...", broker.FirstServiceOfferingName(), orgName, username))
 						Expect(session).To(Say("FAILED"))
 						Expect(session.Err).To(Say("Cannot remove organization level access for public plans\\."))
 					})
@@ -194,7 +194,7 @@ var _ = Describe("disable service access command", func() {
 					It("displays an informative message, and exits 0, and disables the service for the given org", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-o", orgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to all plans of service %s for org %s as %s...", broker.FirstServiceOfferingName(), orgName, username))
+						Expect(session).To(Say("Disabling access to all plans of service offering %s for org %s as %s...", broker.FirstServiceOfferingName(), orgName, username))
 						Expect(session).To(Say("Did not update plan %s as it already has visibility none\\.", broker.Services[0].Plans[1].Name))
 						Expect(session).To(Say("OK"))
 
@@ -213,7 +213,7 @@ var _ = Describe("disable service access command", func() {
 					It("displays an informative message, and exits 0, disables the service for the given org and plan", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-p", broker.FirstServicePlanName(), "-o", orgName)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to plan %s of service %s for org %s as %s...", broker.FirstServicePlanName(), broker.FirstServiceOfferingName(), orgName, username))
+						Expect(session).To(Say("Disabling access to plan %s of service offering %s for org %s as %s...", broker.FirstServicePlanName(), broker.FirstServiceOfferingName(), orgName, username))
 						Expect(session).To(Say("OK"))
 
 						session = helpers.CF("service-access", "-e", broker.FirstServiceOfferingName())
@@ -232,7 +232,7 @@ var _ = Describe("disable service access command", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-o", "not-a-real-org")
 					Eventually(session).Should(Exit(1))
-					Expect(session).To(Say("Disabling access to all plans of service %s for org not-a-real-org as %s...", broker.FirstServiceOfferingName(), username))
+					Expect(session).To(Say("Disabling access to all plans of service offering %s for org not-a-real-org as %s...", broker.FirstServiceOfferingName(), username))
 					Expect(session).To(Say("FAILED"))
 					Expect(session.Err).To(Say("Organization 'not-a-real-org' not found"))
 				})
@@ -242,7 +242,7 @@ var _ = Describe("disable service access command", func() {
 				It("displays FAILED, an informative error message, and exits 1", func() {
 					session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-p", "plan-does-not-exist")
 					Eventually(session).Should(Exit(1))
-					Expect(session).To(Say("Disabling access to plan plan-does-not-exist of service %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
+					Expect(session).To(Say("Disabling access to plan plan-does-not-exist of service offering %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 					Expect(session).To(Say("FAILED"))
 					Expect(session.Err).To(Say("The plan plan-does-not-exist could not be found for service %s", broker.FirstServiceOfferingName()))
 				})
@@ -267,7 +267,7 @@ var _ = Describe("disable service access command", func() {
 					It("fails and asks for disambiguation", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName())
 						Eventually(session).Should(Exit(1))
-						Expect(session).To(Say("Disabling access to all plans of service %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
+						Expect(session).To(Say("Disabling access to all plans of service offering %s for all orgs as %s...", broker.FirstServiceOfferingName(), username))
 						Expect(session.Err).To(Say(
 							"Service '%s' is provided by multiple service brokers: %s, %s\nSpecify a broker by using the '-b' flag.",
 							broker.FirstServiceOfferingName(),
@@ -281,7 +281,7 @@ var _ = Describe("disable service access command", func() {
 					It("displays an informative message, exits 0, and disables access to the service", func() {
 						session := helpers.CF("disable-service-access", broker.FirstServiceOfferingName(), "-b", secondBroker.Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Disabling access to all plans of service %s from broker %s for all orgs as %s...", broker.FirstServiceOfferingName(), secondBroker.Name, username))
+						Expect(session).To(Say("Disabling access to all plans of service offering %s from broker %s for all orgs as %s...", broker.FirstServiceOfferingName(), secondBroker.Name, username))
 						Expect(session).To(Say("OK"))
 
 						session = helpers.CF("service-access", "-b", secondBroker.Name)

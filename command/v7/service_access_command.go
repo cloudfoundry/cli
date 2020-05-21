@@ -13,7 +13,7 @@ type ServiceAccessCommand struct {
 	BaseCommand
 
 	Broker          string      `short:"b" description:"Access for plans of a particular broker"`
-	ServiceOffering string      `short:"e" description:"Access for service name of a particular service offering"`
+	ServiceOffering string      `short:"e" description:"Access for plans of a particular service offering"`
 	Organization    string      `short:"o" description:"Plans accessible by a particular organization"`
 	usage           interface{} `usage:"CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]"`
 	relatedCommands interface{} `related_commands:"marketplace, disable-service-access, enable-service-access, service-brokers"`
@@ -76,9 +76,9 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 
 func getTableHeaders(plan v7action.ServicePlanAccess) []string {
 	if string(plan.VisibilityType) == "space" {
-		return []string{"service", "plan", "access", "space"}
+		return []string{"offering", "plan", "access", "space"}
 	}
-	return []string{"service", "plan", "access", "orgs"}
+	return []string{"offering", "plan", "access", "orgs"}
 }
 
 func accessFromVisibilityType(visibilityType string) string {
@@ -122,7 +122,7 @@ func (msg getServiceAccessMessage) displayMessage(ui command.UI) {
 	}
 
 	if msg.ServiceOffering != "" {
-		resources = append(resources, "service {{.ServiceOffering}}")
+		resources = append(resources, "service offering {{.ServiceOffering}}")
 	}
 
 	if msg.Organization != "" {
