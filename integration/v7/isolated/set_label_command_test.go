@@ -295,39 +295,38 @@ var _ = Describe("set-label command", func() {
 				testExpectedBehaviors("route", "Domain", routeName)
 			})
 
-			// TODO: uncomment when v7 create-route command supports --port
-			// When("the route contains a port", func() {
-			// 	var tcpDomain helpers.Domain
+			When("the route contains a port", func() {
+				var tcpDomain helpers.Domain
 
-			// 	BeforeEach(func() {
-			// 		tcpDomainName := helpers.NewDomainName()
-			// 		tcpDomain = helpers.NewDomain(orgName, tcpDomainName)
-			// 		tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(0))
+				BeforeEach(func() {
+					tcpDomainName := helpers.NewDomainName()
+					tcpDomain = helpers.NewDomain(orgName, tcpDomainName)
+					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(0))
 
-			// 		helpers.CF("create-route", tcpDomainName, "--port", "1028")
-			// 		helpers.CF("create-route", tcpDomainName, "--port", "1029")
-			// 		routeName = tcpDomainName + ":1028"
-			// 	})
+					Eventually(helpers.CF("create-route", tcpDomainName, "--port", "1028")).Should(Exit(0))
+					Eventually(helpers.CF("create-route", tcpDomainName, "--port", "1029")).Should(Exit(0))
+					routeName = tcpDomainName + ":1028"
+				})
 
-			// 	AfterEach(func() {
-			// 		tcpDomain.DeleteShared()
-			// 	})
+				AfterEach(func() {
+					tcpDomain.DeleteShared()
+				})
 
-			// 	It("sets the specified labels on the route", func() {
-			// 		session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
+				It("sets the specified labels on the route", func() {
+					session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
 
-			// 		Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
-			// 		Eventually(session).Should(Say("OK"))
-			// 		Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 
-			// 		helpers.CheckExpectedLabels("/v3/routes?ports=1028", true, helpers.MetadataLabels{
-			// 			"some-key":       "some-value",
-			// 			"some-other-key": "some-other-value",
-			// 		})
+					helpers.CheckExpectedLabels("/v3/routes?ports=1028", true, helpers.MetadataLabels{
+						"some-key":       "some-value",
+						"some-other-key": "some-other-value",
+					})
 
-			// 		helpers.CheckExpectedLabels("/v3/routes?ports=1029", true, helpers.MetadataLabels{})
-			// 	})
-			// })
+					helpers.CheckExpectedLabels("/v3/routes?ports=1029", true, helpers.MetadataLabels{})
+				})
+			})
 
 			When("the route is unknown", func() {
 				It("displays an error", func() {
