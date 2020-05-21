@@ -232,7 +232,7 @@ rsrc.syso:
 	@# Software for windows icon
 	go get github.com/akavel/rsrc
 	@# Generates icon file
-	rsrc -ico ci/installers/windows/cf.ico
+	rsrc -ico cf.ico
 
 test: units ## (synonym for units)
 
