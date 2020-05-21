@@ -41,6 +41,8 @@ const (
 	PathsFilter QueryKey = "paths"
 	// PathFilter is a query param for getting an object with the given host
 	PathFilter QueryKey = "path"
+	// PortsFilter is a query param for getting an object with the given host
+	PortsFilter QueryKey = "ports"
 	// RoleTypesFilter is a query param for getting a role by type
 	RoleTypesFilter QueryKey = "types"
 	// StackFilter is a query parameter for listing objects by stack name
