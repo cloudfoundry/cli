@@ -16,7 +16,7 @@ type V7Actor interface {
 	CreateBitsPackageByApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
 	CreateDeployment(appGUID string, dropletGUID string) (string, v7action.Warnings, error)
 	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
-	CreateRoute(spaceGUID, domainName, hostname, path string) (resources.Route, v7action.Warnings, error)
+	CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, v7action.Warnings, error)
 	GetApplicationDroplets(appName string, spaceGUID string) ([]resources.Droplet, v7action.Warnings, error)
 	GetApplicationRoutes(appGUID string) ([]resources.Route, v7action.Warnings, error)

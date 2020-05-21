@@ -24,6 +24,7 @@ type Route struct {
 	DomainGUID   string
 	Host         string
 	Path         string
+	Port         int
 	URL          string
 	Destinations []RouteDestination
 	Metadata     *Metadata
@@ -48,6 +49,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		GUID          string         `json:"guid,omitempty"`
 		Host          string         `json:"host,omitempty"`
 		Path          string         `json:"path,omitempty"`
+		Port          int            `json:"port,omitempty"`
 		Relationships *Relationships `json:"relationships,omitempty"`
 	}
 
@@ -55,6 +57,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		GUID: r.GUID,
 		Host: r.Host,
 		Path: r.Path,
+		Port: r.Port,
 	}
 
 	if r.SpaceGUID != "" {
@@ -72,6 +75,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 		GUID         string             `json:"guid,omitempty"`
 		Host         string             `json:"host,omitempty"`
 		Path         string             `json:"path,omitempty"`
+		Port         int                `json:"port,omitempty"`
 		URL          string             `json:"url,omitempty"`
 		Destinations []RouteDestination `json:"destinations,omitempty"`
 		Metadata     *Metadata          `json:"metadata,omitempty"`
@@ -100,6 +104,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	r.SpaceGUID = alias.Relationships.Space.Data.GUID
 	r.DomainGUID = alias.Relationships.Domain.Data.GUID
 	r.Path = alias.Path
+	r.Port = alias.Port
 	r.URL = alias.URL
 	r.Destinations = alias.Destinations
 	r.Metadata = alias.Metadata

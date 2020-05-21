@@ -130,6 +130,11 @@ func NewDomainName(prefix ...string) string {
 	return fmt.Sprintf("integration%s.com", PrefixedRandomName(""))
 }
 
+// NewRouterGroupName provides a random name prefixed with INTEGRATION-ROUTER-GROUP
+func NewRouterGroupName() string {
+	return PrefixedRandomName("INTEGRATION-ROUTER-GROUP")
+}
+
 // NewHostName provides a random name prefixed with HOST
 func NewHostName() string {
 	return PrefixedRandomName("HOST")

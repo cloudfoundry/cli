@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -160,7 +162,7 @@ var _ = Describe("create-route command", func() {
 					})
 				})
 
-				When("the domain is shared", func() {
+				When("the domain is a shared HTTP domain", func() {
 					var domain helpers.Domain
 
 					BeforeEach(func() {
@@ -199,6 +201,39 @@ var _ = Describe("create-route command", func() {
 							session := helpers.CF("create-route", domainName, "-n", hostname, "--path", path)
 							Eventually(session).Should(Say(`Creating route %s\.%s\/%s for org %s / space %s as %s\.\.\.`, hostname, domainName, path, orgName, spaceName, userName))
 							Eventually(session).Should(Say(`Route %s\.%s\/%s has been created\.`, hostname, domainName, path))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				When("the domain is a shared TCP domain", func() {
+					var (
+						domain      helpers.Domain
+						routerGroup helpers.RouterGroup
+					)
+
+					BeforeEach(func() {
+						domain = helpers.NewDomain("", domainName)
+						routerGroup = helpers.NewRouterGroup(
+							helpers.NewRouterGroupName(),
+							"1024-2048",
+						)
+
+						routerGroup.Create()
+						domain.CreateWithRouterGroup(routerGroup.Name)
+					})
+
+					AfterEach(func() {
+						domain.DeleteShared()
+						routerGroup.Delete()
+					})
+
+					When("passing in a port", func() {
+						It("creates the route with the port", func() {
+							port := 1029
+							session := helpers.CF("create-route", domainName, "--port", fmt.Sprintf("%d", port))
+							Eventually(session).Should(Say(`Creating route %s:%d for org %s / space %s as %s\.\.\.`, domainName, port, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s:%d has been created\.`, domainName, port))
 							Eventually(session).Should(Exit(0))
 						})
 					})

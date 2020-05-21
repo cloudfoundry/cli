@@ -30,11 +30,19 @@ var _ = Describe("Route Actions", func() {
 		var (
 			warnings   Warnings
 			executeErr error
+			hostname   string
 			path       string
+			port       int
 		)
 
+		BeforeEach(func() {
+			hostname = ""
+			path = ""
+			port = 0
+		})
+
 		JustBeforeEach(func() {
-			_, warnings, executeErr = actor.CreateRoute("space-guid", "domain-name", "hostname", path)
+			_, warnings, executeErr = actor.CreateRoute("space-guid", "domain-name", hostname, path, port)
 		})
 
 		When("the API layer calls are successful", func() {
@@ -53,8 +61,9 @@ var _ = Describe("Route Actions", func() {
 					nil)
 			})
 
-			When("the input path starts with '/'", func() {
+			When("a host and path are given", func() {
 				BeforeEach(func() {
+					hostname = "hostname"
 					path = "/path-name"
 				})
 
@@ -69,8 +78,30 @@ var _ = Describe("Route Actions", func() {
 						resources.Route{
 							SpaceGUID:  "space-guid",
 							DomainGUID: "domain-guid",
-							Host:       "hostname",
-							Path:       "/path-name",
+							Host:       hostname,
+							Path:       path,
+						},
+					))
+				})
+			})
+
+			When("a port is given", func() {
+				BeforeEach(func() {
+					port = 1234
+				})
+
+				It("returns the route with port and prints warnings", func() {
+					Expect(warnings).To(ConsistOf("create-warning-1", "create-warning-2", "get-domains-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+					passedRoute := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+
+					Expect(passedRoute).To(Equal(
+						resources.Route{
+							SpaceGUID:  "space-guid",
+							DomainGUID: "domain-guid",
+							Port:       1234,
 						},
 					))
 				})

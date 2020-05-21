@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 )
@@ -12,6 +14,7 @@ type CreateRouteCommand struct {
 	usage           interface{}      `usage:"CF_NAME create-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME create-route example.com                             # example.com\n   CF_NAME create-route example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route example.com --hostname myapp --path foo # myapp.example.com/foo"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
+	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
 	relatedCommands interface{}      `related_commands:"check-route, domains, map-route, routes, unmap-route"`
 }
 
@@ -29,10 +32,11 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	domain := cmd.RequiredArgs.Domain
 	hostname := cmd.Hostname
 	pathName := cmd.Path.Path
+	port := cmd.Port
 	spaceName := cmd.Config.TargetedSpace().Name
 	orgName := cmd.Config.TargetedOrganization().Name
 	spaceGUID := cmd.Config.TargetedSpace().GUID
-	fqdn := desiredFQDN(domain, hostname, pathName)
+	fqdn := desiredFQDN(domain, hostname, pathName, port)
 
 	cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
 		map[string]interface{}{
@@ -42,7 +46,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			"Organization": orgName,
 		})
 
-	_, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName)
+	_, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName, port)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -63,16 +67,21 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	return nil
 }
 
-func desiredFQDN(domain, hostname, path string) string {
+func desiredFQDN(domain, hostname, path string, port int) string {
 	fqdn := ""
 
 	if hostname != "" {
 		fqdn += hostname + "."
 	}
+
 	fqdn += domain
 
 	if path != "" {
 		fqdn += path
+	}
+
+	if port != 0 {
+		fqdn += fmt.Sprintf(":%d", port)
 	}
 
 	return fqdn

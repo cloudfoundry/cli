@@ -36,7 +36,7 @@ func (cmd CheckRouteCommand) Execute(args []string) error {
 	}
 
 	formatParams := map[string]interface{}{
-		"FQDN": desiredFQDN(cmd.RequiredArgs.Domain, cmd.Hostname, path),
+		"FQDN": desiredFQDN(cmd.RequiredArgs.Domain, cmd.Hostname, path, 0),
 	}
 
 	if matches {

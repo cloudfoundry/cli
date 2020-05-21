@@ -29,18 +29,20 @@ var _ = Describe("Route", func() {
 			domainGUID string
 			host       string
 			path       string
+			port       int
 			ccv3Route  resources.Route
 		)
 
 		BeforeEach(func() {
 			host = ""
 			path = ""
+			port = 0
 		})
 
 		JustBeforeEach(func() {
 			spaceGUID = "space-guid"
 			domainGUID = "domain-guid"
-			ccv3Route = resources.Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path}
+			ccv3Route = resources.Route{SpaceGUID: spaceGUID, DomainGUID: domainGUID, Host: host, Path: path, Port: port}
 			route, warnings, executeErr = client.CreateRoute(ccv3Route)
 		})
 
@@ -203,6 +205,64 @@ var _ = Describe("Route", func() {
 				})
 			})
 
+			When("port is passed in", func() {
+				BeforeEach(func() {
+					port = 1234
+
+					response := `{
+	"guid": "this-route-guid",
+	"relationships": {
+		"space": {
+			"data": {
+				"guid": "space-guid"
+			}
+		},
+		"domain": {
+			"data": {
+				"guid": "domain-guid"
+			}
+		}
+	},
+	"port": 1234
+}`
+					expectedRequestBody := `{
+	"relationships": {
+		"space": {
+			"data": {
+				"guid": "space-guid"
+			}
+		},
+		"domain": {
+			"data": {
+				"guid": "domain-guid"
+			}
+		}
+	},
+	"port": 1234
+}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/routes"),
+							VerifyJSON(expectedRequestBody),
+							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+				})
+				When("the request succeeds", func() {
+					It("returns the given route and all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("warning-1"))
+
+						Expect(route).To(Equal(resources.Route{
+							GUID:       "this-route-guid",
+							SpaceGUID:  "space-guid",
+							DomainGUID: "domain-guid",
+							Port:       1234,
+						}))
+					})
+				})
+			})
 		})
 
 		When("the cloud controller returns errors and warnings", func() {

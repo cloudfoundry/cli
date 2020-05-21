@@ -19,7 +19,7 @@ type RouteSummary struct {
 	SpaceName  string
 }
 
-func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (resources.Route, Warnings, error) {
+func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string, port int) (resources.Route, Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -33,6 +33,7 @@ func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (re
 		DomainGUID: domain.GUID,
 		Host:       hostname,
 		Path:       path,
+		Port:       port,
 	})
 
 	actorWarnings := Warnings(apiWarnings)
@@ -42,13 +43,7 @@ func (actor Actor) CreateRoute(spaceGUID, domainName, hostname, path string) (re
 		return resources.Route{}, allWarnings, actionerror.RouteAlreadyExistsError{Err: err}
 	}
 
-	return resources.Route{
-		GUID:       route.GUID,
-		Host:       route.Host,
-		Path:       route.Path,
-		SpaceGUID:  route.SpaceGUID,
-		DomainGUID: route.DomainGUID,
-	}, allWarnings, err
+	return route, allWarnings, err
 }
 
 func (actor Actor) GetRouteDestinations(routeGUID string) ([]resources.RouteDestination, Warnings, error) {

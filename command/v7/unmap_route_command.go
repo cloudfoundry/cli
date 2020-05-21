@@ -41,7 +41,7 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 
 	path := cmd.Path.Path
 	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
-	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path)
+	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path, 0)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

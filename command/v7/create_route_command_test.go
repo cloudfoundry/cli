@@ -35,6 +35,7 @@ var _ = Describe("create-route Command", func() {
 		orgName    string
 		hostname   string
 		path       string
+		port       int
 	)
 
 	BeforeEach(func() {
@@ -49,6 +50,7 @@ var _ = Describe("create-route Command", func() {
 		orgName = "org"
 		hostname = ""
 		path = ""
+		port = 0
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -61,6 +63,7 @@ var _ = Describe("create-route Command", func() {
 			},
 			Hostname: hostname,
 			Path:     flag.V7RoutePath{Path: path},
+			Port:     port,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -155,7 +158,7 @@ var _ = Describe("create-route Command", func() {
 
 			It("creates the route", func() {
 				Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-				expectedSpaceGUID, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
+				expectedSpaceGUID, expectedDomainName, expectedHostname, _, _ := fakeActor.CreateRouteArgsForCall(0)
 				Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedHostname).To(Equal(hostname))
@@ -176,10 +179,33 @@ var _ = Describe("create-route Command", func() {
 
 				It("creates the route", func() {
 					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-					expectedSpaceGUID, expectedDomainName, expectedHostname, _ := fakeActor.CreateRouteArgsForCall(0)
+					expectedSpaceGUID, expectedDomainName, expectedHostname, _, _ := fakeActor.CreateRouteArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
 					Expect(expectedDomainName).To(Equal(domainName))
 					Expect(expectedHostname).To(Equal(hostname))
+				})
+			})
+
+			When("passing in a port", func() {
+				BeforeEach(func() {
+					port = 1234
+				})
+
+				It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Err).To(Say("warnings-1"))
+					Expect(testUI.Err).To(Say("warnings-2"))
+					Expect(testUI.Out).To(Say(`Route %s:%d has been created.`, domainName, port))
+					Expect(testUI.Out).To(Say("OK"))
+				})
+
+				It("calls the actor with the correct arguments", func() {
+					Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
+					expectedSpaceGUID, expectedDomainName, expectedHostname, _, expectedPort := fakeActor.CreateRouteArgsForCall(0)
+					Expect(expectedSpaceGUID).To(Equal(spaceGUID))
+					Expect(expectedDomainName).To(Equal(domainName))
+					Expect(expectedHostname).To(Equal(hostname))
+					Expect(expectedPort).To(Equal(port))
 				})
 			})
 		})

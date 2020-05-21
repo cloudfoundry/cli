@@ -351,13 +351,14 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CreateRouteStub        func(string, string, string, string) (resources.Route, v7action.Warnings, error)
+	CreateRouteStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
+		arg5 int
 	}
 	createRouteReturns struct {
 		result1 resources.Route
@@ -4447,7 +4448,7 @@ func (fake *FakeActor) CreatePrivateDomainReturnsOnCall(i int, result1 v7action.
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string) (resources.Route, v7action.Warnings, error) {
+func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
@@ -4455,11 +4456,12 @@ func (fake *FakeActor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 s
 		arg2 string
 		arg3 string
 		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4})
+		arg5 int
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4)
+		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -4474,17 +4476,17 @@ func (fake *FakeActor) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeActor) CreateRouteCalls(stub func(string, string, string, string) (resources.Route, v7action.Warnings, error)) {
+func (fake *FakeActor) CreateRouteCalls(stub func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
 }
 
-func (fake *FakeActor) CreateRouteArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeActor) CreateRouteArgsForCall(i int) (string, string, string, string, int) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	argsForCall := fake.createRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeActor) CreateRouteReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {

@@ -30,7 +30,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 	domain := cmd.RequiredArgs.Domain
 	hostname := cmd.Hostname
 	pathName := cmd.Path.Path
-	fqdn := desiredFQDN(domain, hostname, pathName)
+	fqdn := desiredFQDN(domain, hostname, pathName, 0)
 
 	cmd.UI.DisplayText("This action impacts all apps using this route.")
 	cmd.UI.DisplayText("Deleting this route will make apps unreachable via this route.")

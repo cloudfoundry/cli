@@ -247,11 +247,12 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualPath).To(Equal(path))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualSpaceGUID, actualDomainName, actualHostname, actualPath = fakeActor.CreateRouteArgsForCall(0)
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort := fakeActor.CreateRouteArgsForCall(0)
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(0))
 					})
 				})
 
