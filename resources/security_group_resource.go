@@ -3,7 +3,7 @@ package resources
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
+	"code.cloudfoundry.org/jsonry"
 )
 
 type SecurityGroup struct {

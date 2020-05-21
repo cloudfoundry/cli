@@ -1,10 +1,8 @@
 package resources
 
 import (
-	"encoding/json"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/jsonry"
 )
 
 type Domain struct {
@@ -52,18 +50,6 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 	}
 
 	*d = Domain(defaultUnmarshalledDomain)
-
-	type RemainingFieldsStruct struct {
-		Internal types.NullBool `json:"internal,omitempty"`
-	}
-
-	var remainingFields RemainingFieldsStruct
-	err = json.Unmarshal(data, &remainingFields)
-	if err != nil {
-		return err
-	}
-
-	d.Internal = remainingFields.Internal
 
 	return nil
 }
