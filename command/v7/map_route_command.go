@@ -1,6 +1,8 @@
 package v7
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/flag"
 )
@@ -40,8 +42,9 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 	}
 
 	path := cmd.Path.Path
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
-	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path, 0)
+	hostname := strings.ToLower(cmd.Hostname)
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, hostname, path)
+	fqdn := desiredFQDN(domain.Name, hostname, path, 0)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
@@ -57,7 +60,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		route, warnings, err = cmd.Actor.CreateRoute(
 			cmd.Config.TargetedSpace().GUID,
 			domain.Name,
-			cmd.Hostname,
+			hostname,
 			path,
 			0,
 		)

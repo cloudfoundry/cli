@@ -109,7 +109,8 @@ func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall b
 }
 
 func (cmd *MapRoute) Execute(c flags.FlagContext) error {
-	hostName := strings.ToLower(c.String("n"))
+	rawHostNameFromFlag := c.String("n")
+	hostName := strings.ToLower(rawHostNameFromFlag)
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
