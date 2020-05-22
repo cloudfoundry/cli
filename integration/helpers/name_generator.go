@@ -135,9 +135,9 @@ func NewRouterGroupName() string {
 	return PrefixedRandomName("INTEGRATION-ROUTER-GROUP")
 }
 
-// NewHostName provides a random name prefixed with HOST
+// NewHostName provides a random name prefixed with `host`
 func NewHostName() string {
-	return PrefixedRandomName("HOST")
+	return PrefixedRandomName("host")
 }
 
 // NewOrgQuotaName provides a random name prefixed with ORG-QUOTA
