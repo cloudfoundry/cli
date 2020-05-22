@@ -2,6 +2,7 @@ package v7action
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -264,7 +265,7 @@ func (actor Actor) GetRouteSummaries(routes []resources.Route) ([]RouteSummary, 
 			Route:      route,
 			AppNames:   appNames,
 			SpaceName:  spaceNamesByGUID[route.SpaceGUID],
-			DomainName: getDomainName(route.URL, route.Host, route.Path),
+			DomainName: getDomainName(route.URL, route.Host, route.Path, route.Port),
 		})
 	}
 
@@ -396,7 +397,15 @@ func (actor Actor) GetApplicationRoutes(appGUID string) ([]resources.Route, Warn
 	return routes, allWarnings, nil
 }
 
-func getDomainName(fullURL, host, path string) string {
+func getDomainName(fullURL, host, path string, port int) string {
 	domainWithoutHost := strings.TrimPrefix(fullURL, host+".")
-	return strings.TrimSuffix(domainWithoutHost, path)
+	domainWithoutPath := strings.TrimSuffix(domainWithoutHost, path)
+
+	if port > 0 {
+		portString := strconv.Itoa(port)
+		domainWithoutPort := strings.TrimSuffix(domainWithoutPath, ":"+portString)
+		return domainWithoutPort
+	}
+
+	return domainWithoutPath
 }
