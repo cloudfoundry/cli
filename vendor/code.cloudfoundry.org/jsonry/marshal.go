@@ -44,7 +44,9 @@ func marshalStruct(ctx context.Context, in reflect.Value) (map[string]interface{
 
 		if public(f) {
 			p := path.ComputePath(f)
-			if !p.OmitEmpty || !in.Field(i).IsZero() {
+			shouldSkip := p.OmitAlways || (p.OmitEmpty && isEmpty(in.Field(i)))
+
+			if !shouldSkip {
 				r, err := marshal(ctx.WithField(f.Name, f.Type), in.Field(i))
 				if err != nil {
 					return nil, err
@@ -135,4 +137,18 @@ func marshalJSONMarshaler(ctx context.Context, in reflect.Value) (interface{}, e
 	}
 
 	return r, nil
+}
+
+func isEmpty(v reflect.Value) bool {
+	k := v.Kind()
+	switch {
+	case k == reflect.Interface, k == reflect.Ptr:
+		return v.IsZero() || v.IsNil()
+	case k == reflect.String, k == reflect.Map, k == reflect.Slice, k == reflect.Array:
+		return v.Len() == 0
+	case basicType(k):
+		return v.IsZero()
+	default:
+		return false
+	}
 }
