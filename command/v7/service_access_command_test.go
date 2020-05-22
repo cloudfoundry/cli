@@ -65,15 +65,15 @@ var _ = Describe("service-access Command", func() {
 			Entry("when the broker flag is passed", "test-broker", "", "",
 				"Getting service access for broker test-broker as some-user\\.\\.\\."),
 			Entry("when the broker and service flags are passed", "test-broker", "test-service", "",
-				"Getting service access for broker test-broker and service test-service as some-user\\.\\.\\."),
+				"Getting service access for broker test-broker and service offering test-service as some-user\\.\\.\\."),
 			Entry("when the broker and org flags are passed", "test-broker", "", "test-org",
 				"Getting service access for broker test-broker and organization test-org as some-user\\.\\.\\."),
 			Entry("when the broker, service and org flags are passed", "test-broker", "test-service", "test-org",
-				"Getting service access for broker test-broker and service test-service and organization test-org as some-user\\.\\.\\."),
+				"Getting service access for broker test-broker and service offering test-service and organization test-org as some-user\\.\\.\\."),
 			Entry("when the service flag is passed", "", "test-service", "",
-				"Getting service access for service test-service as some-user\\.\\.\\."),
+				"Getting service access for service offering test-service as some-user\\.\\.\\."),
 			Entry("when the service and org flags are passed", "", "test-service", "test-org",
-				"Getting service access for service test-service and organization test-org as some-user\\.\\.\\."),
+				"Getting service access for service offering test-service and organization test-org as some-user\\.\\.\\."),
 			Entry("when the org flag is passed", "", "", "test-org",
 				"Getting service access for organization test-org as some-user\\.\\.\\."),
 		)
@@ -92,7 +92,7 @@ var _ = Describe("service-access Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Err).To(Say("warning"))
 
-				tableHeaders := `service\s+plan\s+access\s+orgs`
+				const tableHeaders = `offering\s+plan\s+access\s+orgs`
 				Expect(testUI.Out).To(Say(`broker:\s+broker-one`))
 				Expect(testUI.Out).To(Say(tableHeaders))
 				Expect(testUI.Out).To(Say(`service-one\s+plan-one\s+all`))
@@ -104,7 +104,7 @@ var _ = Describe("service-access Command", func() {
 				Expect(testUI.Out).To(Say(`service-four\s+plan-four\s+limited\s+org-1,org-3`))
 
 				Expect(testUI.Out).To(Say(`broker:\s+broker-three`))
-				Expect(testUI.Out).To(Say(`service\s+plan\s+access\s+space`))
+				Expect(testUI.Out).To(Say(`offering\s+plan\s+access\s+space`))
 				Expect(testUI.Out).To(Say(`service-five\s+plan-five\s+limited\s+space-1 in org org-1`))
 			})
 		})
