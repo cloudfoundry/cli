@@ -2,6 +2,7 @@ package v7action_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
@@ -1022,87 +1023,171 @@ var _ = Describe("Route Actions", func() {
 		var (
 			domainName = "some-domain.com"
 			domainGUID = "domain-guid"
-			hostname   = "hostname"
-			path       = "/path"
+			hostname   string
+			path       string
+			port       int
 
 			executeErr error
 			warnings   Warnings
 			route      resources.Route
 		)
 
+		BeforeEach(func() {
+			hostname = ""
+			path = ""
+			port = 0
+		})
+
 		JustBeforeEach(func() {
-			route, warnings, executeErr = actor.GetRouteByAttributes(domainName, domainGUID, hostname, path)
+			route, warnings, executeErr = actor.GetRouteByAttributes(domainName, domainGUID, hostname, path, port)
 		})
 
-		When("The cc client errors", func() {
+		When("dealing with HTTP routes", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetRoutesReturns(nil, ccv3.Warnings{"get-routes-warning"}, errors.New("scooby"))
+				hostname = "hostname"
+				path = "/path"
 			})
 
-			It("returns and empty route, warnings, and the error", func() {
-				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(actualQueries).To(ConsistOf(
-					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-				))
+			When("The cc client errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns(nil, ccv3.Warnings{"get-routes-warning"}, errors.New("scooby"))
+				})
 
-				Expect(warnings).To(ConsistOf("get-routes-warning"))
-				Expect(executeErr).To(MatchError(errors.New("scooby")))
+				It("returns and empty route, warnings, and the error", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQueries).To(ConsistOf(
+						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+					))
+
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).To(MatchError(errors.New("scooby")))
+				})
 			})
 
+			When("the cc client succeeds and a route is found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns([]resources.Route{{
+						DomainGUID: domainGUID,
+						Host:       hostname,
+						Path:       path,
+					}}, ccv3.Warnings{"get-routes-warning"}, nil)
+				})
+
+				It("returns the route and the warnings", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQueries).To(ConsistOf(
+						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+					))
+
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(route).To(Equal(resources.Route{
+						DomainGUID: domainGUID,
+						Host:       hostname,
+						Path:       path,
+					}))
+				})
+			})
+
+			When("the cc client succeeds and a route is not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns([]resources.Route{}, ccv3.Warnings{"get-routes-warning"}, nil)
+				})
+
+				It("returns the route and the warnings", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQueries).To(ConsistOf(
+						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+					))
+
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
+						DomainName: domainName,
+						DomainGUID: domainGUID,
+						Host:       hostname,
+						Path:       path,
+					}))
+				})
+			})
 		})
 
-		When("the cc client succeeds and a route is found", func() {
+		When("dealing with TCP routes", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetRoutesReturns([]resources.Route{{
-					DomainGUID: domainGUID,
-					Host:       hostname,
-					Path:       path,
-				}}, ccv3.Warnings{"get-routes-warning"}, nil)
+				port = 1028
 			})
 
-			It("returns the route and the warnings", func() {
-				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(actualQueries).To(ConsistOf(
-					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-				))
+			When("The cc client errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns(nil, ccv3.Warnings{"get-routes-warning"}, errors.New("scooby"))
+				})
 
-				Expect(warnings).To(ConsistOf("get-routes-warning"))
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(route).To(Equal(resources.Route{
-					DomainGUID: domainGUID,
-					Host:       hostname,
-					Path:       path,
-				}))
-			})
-		})
+				It("returns and empty route, warnings, and the error", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQueries).To(ConsistOf(
+						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
+					))
 
-		When("the cc client succeeds and a route is not found", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetRoutesReturns([]resources.Route{}, ccv3.Warnings{"get-routes-warning"}, nil)
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).To(MatchError(errors.New("scooby")))
+				})
 			})
 
-			It("returns the route and the warnings", func() {
-				Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-				actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-				Expect(actualQueries).To(ConsistOf(
-					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-				))
+			When("the cc client succeeds and a route is found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns([]resources.Route{{
+						DomainGUID: domainGUID,
+						Port:       port,
+					}}, ccv3.Warnings{"get-routes-warning"}, nil)
+				})
 
-				Expect(warnings).To(ConsistOf("get-routes-warning"))
-				Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
-					DomainName: domainName,
-					DomainGUID: domainGUID,
-					Host:       hostname,
-					Path:       path,
-				}))
+				It("returns the route and the warnings", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQueries).To(ConsistOf(
+						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
+					))
+
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(route).To(Equal(resources.Route{
+						DomainGUID: domainGUID,
+						Port:       port,
+					}))
+				})
+			})
+
+			When("the cc client succeeds and a route is not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns([]resources.Route{}, ccv3.Warnings{"get-routes-warning"}, nil)
+				})
+
+				It("returns the route and the warnings", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
+					Expect(actualQueries).To(ConsistOf(
+						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
+					))
+
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
+						DomainName: domainName,
+						DomainGUID: domainGUID,
+						Port:       port,
+					}))
+				})
 			})
 		})
 	})

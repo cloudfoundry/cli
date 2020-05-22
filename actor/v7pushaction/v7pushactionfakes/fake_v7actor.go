@@ -202,13 +202,14 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRouteByAttributesStub        func(string, string, string, string) (resources.Route, v7action.Warnings, error)
+	GetRouteByAttributesStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
 	getRouteByAttributesMutex       sync.RWMutex
 	getRouteByAttributesArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
+		arg5 int
 	}
 	getRouteByAttributesReturns struct {
 		result1 resources.Route
@@ -1314,7 +1315,7 @@ func (fake *FakeV7Actor) GetDomainReturnsOnCall(i int, result1 resources.Domain,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributes(arg1 string, arg2 string, arg3 string, arg4 string) (resources.Route, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetRouteByAttributes(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
 	fake.getRouteByAttributesMutex.Lock()
 	ret, specificReturn := fake.getRouteByAttributesReturnsOnCall[len(fake.getRouteByAttributesArgsForCall)]
 	fake.getRouteByAttributesArgsForCall = append(fake.getRouteByAttributesArgsForCall, struct {
@@ -1322,11 +1323,12 @@ func (fake *FakeV7Actor) GetRouteByAttributes(arg1 string, arg2 string, arg3 str
 		arg2 string
 		arg3 string
 		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3, arg4})
+		arg5 int
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.getRouteByAttributesMutex.Unlock()
 	if fake.GetRouteByAttributesStub != nil {
-		return fake.GetRouteByAttributesStub(arg1, arg2, arg3, arg4)
+		return fake.GetRouteByAttributesStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -1341,17 +1343,17 @@ func (fake *FakeV7Actor) GetRouteByAttributesCallCount() int {
 	return len(fake.getRouteByAttributesArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributesCalls(stub func(string, string, string, string) (resources.Route, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetRouteByAttributesCalls(stub func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)) {
 	fake.getRouteByAttributesMutex.Lock()
 	defer fake.getRouteByAttributesMutex.Unlock()
 	fake.GetRouteByAttributesStub = stub
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributesArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeV7Actor) GetRouteByAttributesArgsForCall(i int) (string, string, string, string, int) {
 	fake.getRouteByAttributesMutex.RLock()
 	defer fake.getRouteByAttributesMutex.RUnlock()
 	argsForCall := fake.getRouteByAttributesArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeV7Actor) GetRouteByAttributesReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {

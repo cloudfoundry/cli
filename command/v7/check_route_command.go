@@ -36,13 +36,13 @@ func (cmd CheckRouteCommand) Execute(args []string) error {
 	}
 
 	formatParams := map[string]interface{}{
-		"FQDN": desiredFQDN(cmd.RequiredArgs.Domain, cmd.Hostname, path, 0),
+		"URL": desiredURL(cmd.RequiredArgs.Domain, cmd.Hostname, path, 0),
 	}
 
 	if matches {
-		cmd.UI.DisplayText("Route '{{.FQDN}}' does exist.", formatParams)
+		cmd.UI.DisplayText("Route '{{.URL}}' does exist.", formatParams)
 	} else {
-		cmd.UI.DisplayText("Route '{{.FQDN}}' does not exist.", formatParams)
+		cmd.UI.DisplayText("Route '{{.URL}}' does not exist.", formatParams)
 	}
 
 	cmd.UI.DisplayOK()

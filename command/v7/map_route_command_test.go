@@ -204,11 +204,12 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-						actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+						actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualDomainGUID).To(Equal("domain-guid"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 
@@ -240,19 +241,20 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-						actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+						actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualDomainGUID).To(Equal("domain-guid"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort := fakeActor.CreateRouteArgsForCall(0)
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort = fakeActor.CreateRouteArgsForCall(0)
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
-						Expect(actualPort).To(Equal(0))
+						Expect(actualPort).To(Equal(cmd.Port))
 					})
 				})
 
@@ -286,11 +288,12 @@ var _ = Describe("map-route Command", func() {
 							Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 							Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-							actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+							actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 							Expect(actualDomainName).To(Equal("some-domain.com"))
 							Expect(actualDomainGUID).To(Equal("domain-guid"))
 							Expect(actualHostname).To(Equal(hostname))
 							Expect(actualPath).To(Equal(path))
+							Expect(actualPort).To(Equal(cmd.Port))
 
 							Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
 							actualRouteGUID, actualAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
@@ -327,11 +330,12 @@ var _ = Describe("map-route Command", func() {
 							Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 							Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-							actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+							actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 							Expect(actualDomainName).To(Equal("some-domain.com"))
 							Expect(actualDomainGUID).To(Equal("domain-guid"))
 							Expect(actualHostname).To(Equal(hostname))
 							Expect(actualPath).To(Equal(path))
+							Expect(actualPort).To(Equal(cmd.Port))
 
 							Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
 							actualRouteGUID, actualAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
@@ -363,11 +367,12 @@ var _ = Describe("map-route Command", func() {
 								Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 								Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-								actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+								actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 								Expect(actualDomainName).To(Equal("some-domain.com"))
 								Expect(actualDomainGUID).To(Equal("domain-guid"))
 								Expect(actualHostname).To(Equal(hostname))
 								Expect(actualPath).To(Equal(path))
+								Expect(actualPort).To(Equal(cmd.Port))
 
 								Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
 								actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
@@ -401,11 +406,12 @@ var _ = Describe("map-route Command", func() {
 									Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 									Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-									actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+									actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 									Expect(actualDomainName).To(Equal("some-domain.com"))
 									Expect(actualDomainGUID).To(Equal("domain-guid"))
 									Expect(actualHostname).To(Equal("host"))
 									Expect(actualPath).To(Equal(path))
+									Expect(actualPort).To(Equal(cmd.Port))
 
 									Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
 									actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)

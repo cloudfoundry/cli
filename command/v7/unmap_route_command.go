@@ -40,15 +40,15 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	}
 
 	path := cmd.Path.Path
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
-	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path, 0)
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path, 0)
+	url := desiredURL(domain.Name, cmd.Hostname, path, 0)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing route {{.FQDN}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"FQDN":      fqdn,
+	cmd.UI.DisplayTextWithFlavor("Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"URL":       url,
 		"AppName":   cmd.RequiredArgs.App,
 		"User":      user.Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,

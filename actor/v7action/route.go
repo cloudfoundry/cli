@@ -1,6 +1,7 @@
 package v7action
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -342,12 +343,25 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 	return allWarnings, err
 }
 
-func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (resources.Route, Warnings, error) {
-	routes, ccWarnings, err := actor.CloudControllerClient.GetRoutes(
-		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-		ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-		ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string, port int) (resources.Route, Warnings, error) {
+	var (
+		routes     []resources.Route
+		ccWarnings ccv3.Warnings
+		err        error
 	)
+
+	if port != 0 {
+		routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
+			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+			ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
+		)
+	} else {
+		routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
+			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+			ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+			ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+		)
+	}
 
 	if err != nil {
 		return resources.Route{}, Warnings(ccWarnings), err
@@ -359,16 +373,11 @@ func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, ho
 			DomainGUID: domainGUID,
 			Host:       hostname,
 			Path:       path,
+			Port:       port,
 		}
 	}
 
-	return resources.Route{
-		GUID:       routes[0].GUID,
-		Host:       routes[0].Host,
-		Path:       routes[0].Path,
-		SpaceGUID:  routes[0].SpaceGUID,
-		DomainGUID: routes[0].DomainGUID,
-	}, Warnings(ccWarnings), nil
+	return routes[0], Warnings(ccWarnings), nil
 }
 
 func (actor Actor) MapRoute(routeGUID string, appGUID string) (Warnings, error) {

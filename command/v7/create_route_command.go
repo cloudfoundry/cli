@@ -36,17 +36,17 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	spaceName := cmd.Config.TargetedSpace().Name
 	orgName := cmd.Config.TargetedOrganization().Name
 	spaceGUID := cmd.Config.TargetedSpace().GUID
-	fqdn := desiredFQDN(domain, hostname, pathName, port)
+	url := desiredURL(domain, hostname, pathName, port)
 
-	cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
+	cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.Organization}} / space {{.Space}} as {{.User}}...",
 		map[string]interface{}{
-			"FQDN":         fqdn,
+			"URL":          url,
 			"User":         user.Name,
 			"Space":        spaceName,
 			"Organization": orgName,
 		})
 
-	_, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName, port)
+	route, warnings, err := cmd.Actor.CreateRoute(spaceGUID, domain, hostname, pathName, port)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -58,31 +58,31 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText("Route {{.FQDN}} has been created.",
+	cmd.UI.DisplayText("Route {{.URL}} has been created.",
 		map[string]interface{}{
-			"FQDN": fqdn,
+			"URL": route.URL,
 		})
 
 	cmd.UI.DisplayOK()
 	return nil
 }
 
-func desiredFQDN(domain, hostname, path string, port int) string {
-	fqdn := ""
+func desiredURL(domain, hostname, path string, port int) string {
+	url := ""
 
 	if hostname != "" {
-		fqdn += hostname + "."
+		url += hostname + "."
 	}
 
-	fqdn += domain
+	url += domain
 
 	if path != "" {
-		fqdn += path
+		url += path
 	}
 
 	if port != 0 {
-		fqdn += fmt.Sprintf(":%d", port)
+		url += fmt.Sprintf(":%d", port)
 	}
 
-	return fqdn
+	return url
 }

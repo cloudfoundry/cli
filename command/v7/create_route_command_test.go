@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -100,6 +101,10 @@ var _ = Describe("create-route Command", func() {
 				Name: orgName,
 				GUID: "some-org-guid",
 			})
+
+			fakeActor.CreateRouteReturns(resources.Route{
+				URL: domainName,
+			}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 		})
 
 		It("prints text indicating it is creating a route", func() {
@@ -121,6 +126,10 @@ var _ = Describe("create-route Command", func() {
 		When("passing in a path", func() {
 			BeforeEach(func() {
 				path = "/lion"
+
+				fakeActor.CreateRouteReturns(resources.Route{
+					URL: domainName + path,
+				}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
 			It("prints information about the created route ", func() {
@@ -145,7 +154,9 @@ var _ = Describe("create-route Command", func() {
 
 		When("creating the route is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateRouteReturns(resources.Route{}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
+				fakeActor.CreateRouteReturns(resources.Route{
+					URL: domainName,
+				}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 			})
 
 			It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
@@ -167,6 +178,10 @@ var _ = Describe("create-route Command", func() {
 			When("passing in a hostname", func() {
 				BeforeEach(func() {
 					hostname = "flan"
+
+					fakeActor.CreateRouteReturns(resources.Route{
+						URL: hostname + "." + domainName,
+					}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 				})
 
 				It("prints all warnings, text indicating creation completion, ok and then a tip", func() {
@@ -189,6 +204,10 @@ var _ = Describe("create-route Command", func() {
 			When("passing in a port", func() {
 				BeforeEach(func() {
 					port = 1234
+
+					fakeActor.CreateRouteReturns(resources.Route{
+						URL: domainName + ":" + fmt.Sprintf("%d", port),
+					}, v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 				})
 
 				It("prints all warnings, text indicating creation completion, ok and then a tip", func() {

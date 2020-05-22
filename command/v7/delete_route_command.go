@@ -30,14 +30,14 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 	domain := cmd.RequiredArgs.Domain
 	hostname := cmd.Hostname
 	pathName := cmd.Path.Path
-	fqdn := desiredFQDN(domain, hostname, pathName, 0)
+	url := desiredURL(domain, hostname, pathName, 0)
 
 	cmd.UI.DisplayText("This action impacts all apps using this route.")
 	cmd.UI.DisplayText("Deleting this route will make apps unreachable via this route.")
 
 	if !cmd.Force {
-		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the route {{.FQDN}}?", map[string]interface{}{
-			"FQDN": fqdn,
+		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the route {{.URL}}?", map[string]interface{}{
+			"URL": url,
 		})
 
 		if promptErr != nil {
@@ -45,16 +45,16 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 		}
 
 		if !response {
-			cmd.UI.DisplayText("'{{.FQDN}}' has not been deleted.", map[string]interface{}{
-				"FQDN": fqdn,
+			cmd.UI.DisplayText("'{{.URL}}' has not been deleted.", map[string]interface{}{
+				"URL": url,
 			})
 			return nil
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting route {{.FQDN}}...",
+	cmd.UI.DisplayTextWithFlavor("Deleting route {{.URL}}...",
 		map[string]interface{}{
-			"FQDN": fqdn,
+			"URL": url,
 		})
 
 	warnings, err := cmd.Actor.DeleteRoute(domain, hostname, pathName)

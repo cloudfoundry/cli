@@ -203,11 +203,12 @@ var _ = Describe("unmap-route Command", func() {
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-						actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+						actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualDomainGUID).To(Equal("domain-guid"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(0))
 
 						Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
 					})

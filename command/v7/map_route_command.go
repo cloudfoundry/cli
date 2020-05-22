@@ -11,9 +11,10 @@ type MapRouteCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
-	usage           interface{}      `usage:"CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	usage           interface{}      `usage:"Map an HTTP route:\n      CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Map a TCP route:\n      CF_NAME map-route APP_NAME DOMAIN [--port PORT]\n\nEXAMPLES:\n   CF_NAME map-route my-app example.com                              # example.com\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\n   CF_NAME map-route my-app example.com --port 5000                  # example.com:5000"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname for the HTTP route (required for shared domains)"`
 	Path            flag.V7RoutePath `long:"path" description:"Path for the HTTP route"`
+	Port            int              `long:"port" description:"Port for the TCP route (default: random port)"`
 	relatedCommands interface{}      `related_commands:"create-route, routes, unmap-route"`
 }
 
@@ -43,16 +44,16 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 
 	path := cmd.Path.Path
 	hostname := strings.ToLower(cmd.Hostname)
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, hostname, path)
-	fqdn := desiredFQDN(domain.Name, hostname, path, 0)
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, hostname, path, cmd.Port)
+	url := desiredURL(domain.Name, hostname, path, cmd.Port)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteNotFoundError); !ok {
 			return err
 		}
-		cmd.UI.DisplayTextWithFlavor("Creating route {{.FQDN}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
+		cmd.UI.DisplayTextWithFlavor("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
 			map[string]interface{}{
-				"FQDN":      fqdn,
+				"URL":       url,
 				"User":      user.Name,
 				"SpaceName": cmd.Config.TargetedSpace().Name,
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -62,7 +63,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 			domain.Name,
 			hostname,
 			path,
-			0,
+			cmd.Port,
 		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
@@ -71,8 +72,8 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		cmd.UI.DisplayOK()
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Mapping route {{.FQDN}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"FQDN":      fqdn,
+	cmd.UI.DisplayTextWithFlavor("Mapping route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"URL":       route.URL,
 		"AppName":   cmd.RequiredArgs.App,
 		"User":      user.Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
@@ -86,9 +87,9 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		}
 	}
 	if dest.GUID != "" {
-		cmd.UI.DisplayText("App '{{ .AppName }}' is already mapped to route '{{ .FQDN }}'.", map[string]interface{}{
+		cmd.UI.DisplayText("App '{{ .AppName }}' is already mapped to route '{{ .URL}}'.", map[string]interface{}{
 			"AppName": cmd.RequiredArgs.App,
-			"FQDN":    fqdn,
+			"URL":     route.URL,
 		})
 		cmd.UI.DisplayOK()
 		return nil
