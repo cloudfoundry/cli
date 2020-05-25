@@ -24,6 +24,23 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:81f719d050d126e10640a5080f0f9d0fe1c474c232b9194cfb65e3e1a843ad1f"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "2acd15650eef815159ecd5a83d021ac456280729"
+  version = "v6.51.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -158,12 +175,12 @@
   version = "1.1"
 
 [[projects]]
-  digest = "1:aba270497eb2d49f5cba6f4162d524b9a1195a24cbce8be20bf56a0051f47deb"
+  digest = "1:08cc9df87ba2ac6a626c88cf321883c2750a49e534dbcda5346c2c03177de9c5"
   name = "github.com/blang/semver"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
-  version = "v3.5.1"
+  revision = "af3461a9cbcf1f3f5889d21b83f5ef63880c33a8"
+  version = "v4.0.0"
 
 [[projects]]
   digest = "1:69b95d47eef70cba62af2aa3d33bd5f9ffe9fa0be66d79d79150c38796c6eac1"
