@@ -25,7 +25,7 @@ type Actor interface {
 	Authenticate(credentials map[string]string, origin string, grantType uaa.GrantType) error
 	BindSecurityGroupToSpaces(securityGroupGUID string, spaces []v7action.Space, lifecycle constant.SecurityGroupLifecycle) (v7action.Warnings, error)
 	CancelDeployment(deploymentGUID string) (v7action.Warnings, error)
-	CheckRoute(domainName string, hostname string, path string) (bool, v7action.Warnings, error)
+	CheckRoute(domainName string, hostname string, path string, port int) (bool, v7action.Warnings, error)
 	ClearTarget()
 	CloudControllerAPIVersion() string
 	CopyPackage(sourceApp resources.Application, targetApp resources.Application) (v7action.Package, v7action.Warnings, error)

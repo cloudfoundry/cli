@@ -10,7 +10,8 @@ type CheckRouteCommand struct {
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
 	Path            flag.V7RoutePath `long:"path" description:"Path for the route"`
-	usage           interface{}      `usage:"CF_NAME check-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME check-route example.com                      # example.com\n   CF_NAME check-route example.com -n myhost --path foo # myhost.example.com/foo\n   CF_NAME check-route example.com --path foo           # example.com/foo"`
+	Port            int              `long:"port" description:"Port used to identify the TCP route"`
+	usage           interface{}      `usage:"Check an HTTP route:\n   CF_NAME check-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nCheck a TCP route:\n   cf check-route DOMAIN --port PORT\n\nEXAMPLES:\n   CF_NAME check-route example.com                      # example.com\n   CF_NAME check-route example.com -n myhost --path foo # myhost.example.com/foo\n   CF_NAME check-route example.com --path foo           # example.com/foo\n   CF_NAME check-route example.com --port 5000          # example.com:5000"`
 	relatedCommands interface{}      `related_commands:"create-route, delete-route, routes"`
 }
 
@@ -28,7 +29,7 @@ func (cmd CheckRouteCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Checking for route...")
 
 	path := cmd.Path.Path
-	matches, warnings, err := cmd.Actor.CheckRoute(cmd.RequiredArgs.Domain, cmd.Hostname, path)
+	matches, warnings, err := cmd.Actor.CheckRoute(cmd.RequiredArgs.Domain, cmd.Hostname, path, cmd.Port)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
@@ -36,7 +37,7 @@ func (cmd CheckRouteCommand) Execute(args []string) error {
 	}
 
 	formatParams := map[string]interface{}{
-		"URL": desiredURL(cmd.RequiredArgs.Domain, cmd.Hostname, path, 0),
+		"URL": desiredURL(cmd.RequiredArgs.Domain, cmd.Hostname, path, cmd.Port),
 	}
 
 	if matches {

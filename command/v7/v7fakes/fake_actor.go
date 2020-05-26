@@ -104,12 +104,13 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	CheckRouteStub        func(string, string, string) (bool, v7action.Warnings, error)
+	CheckRouteStub        func(string, string, string, int) (bool, v7action.Warnings, error)
 	checkRouteMutex       sync.RWMutex
 	checkRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 int
 	}
 	checkRouteReturns struct {
 		result1 bool
@@ -3412,18 +3413,19 @@ func (fake *FakeActor) CancelDeploymentReturnsOnCall(i int, result1 v7action.War
 	}{result1, result2}
 }
 
-func (fake *FakeActor) CheckRoute(arg1 string, arg2 string, arg3 string) (bool, v7action.Warnings, error) {
+func (fake *FakeActor) CheckRoute(arg1 string, arg2 string, arg3 string, arg4 int) (bool, v7action.Warnings, error) {
 	fake.checkRouteMutex.Lock()
 	ret, specificReturn := fake.checkRouteReturnsOnCall[len(fake.checkRouteArgsForCall)]
 	fake.checkRouteArgsForCall = append(fake.checkRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("CheckRoute", []interface{}{arg1, arg2, arg3})
+		arg4 int
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("CheckRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.checkRouteMutex.Unlock()
 	if fake.CheckRouteStub != nil {
-		return fake.CheckRouteStub(arg1, arg2, arg3)
+		return fake.CheckRouteStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -3438,17 +3440,17 @@ func (fake *FakeActor) CheckRouteCallCount() int {
 	return len(fake.checkRouteArgsForCall)
 }
 
-func (fake *FakeActor) CheckRouteCalls(stub func(string, string, string) (bool, v7action.Warnings, error)) {
+func (fake *FakeActor) CheckRouteCalls(stub func(string, string, string, int) (bool, v7action.Warnings, error)) {
 	fake.checkRouteMutex.Lock()
 	defer fake.checkRouteMutex.Unlock()
 	fake.CheckRouteStub = stub
 }
 
-func (fake *FakeActor) CheckRouteArgsForCall(i int) (string, string, string) {
+func (fake *FakeActor) CheckRouteArgsForCall(i int) (string, string, string, int) {
 	fake.checkRouteMutex.RLock()
 	defer fake.checkRouteMutex.RUnlock()
 	argsForCall := fake.checkRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActor) CheckRouteReturns(result1 bool, result2 v7action.Warnings, result3 error) {

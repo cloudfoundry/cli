@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -24,18 +26,23 @@ var _ = Describe("check-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`Check an HTTP route:`))
 			Eventually(session).Should(Say(`cf check-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
+			Eventually(session).Should(Say(`Check a TCP route:`))
+			Eventually(session).Should(Say(`cf check-route DOMAIN --port PORT\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf check-route example.com                      # example.com`))
 			Eventually(session).Should(Say(`cf check-route example.com -n myhost --path foo # myhost.example.com/foo`))
 			Eventually(session).Should(Say(`cf check-route example.com --path foo           # example.com/foo`))
+			Eventually(session).Should(Say(`cf check-route example.com --port 5000          # example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route`))
 			Eventually(session).Should(Say(`--path\s+Path for the route`))
+			Eventually(session).Should(Say(`--port\s+Port used to identify the TCP route`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -55,6 +62,8 @@ var _ = Describe("check-route command", func() {
 		var (
 			orgName   string
 			spaceName string
+			port      int
+			tcpDomain helpers.Domain
 		)
 
 		BeforeEach(func() {
@@ -83,23 +92,48 @@ var _ = Describe("check-route command", func() {
 					hostname string
 				)
 
-				BeforeEach(func() {
-					domain = helpers.NewDomain(orgName, domainName)
-					hostname = "key-lime-pie"
-					domain.CreatePrivate()
-					Eventually(helpers.CF("create-route", domainName, "--hostname", hostname)).Should(Exit(0))
+				When("it's an HTTP route", func() {
+					BeforeEach(func() {
+						domain = helpers.NewDomain(orgName, domainName)
+						hostname = "key-lime-pie"
+						domain.CreatePrivate()
+						Eventually(helpers.CF("create-route", domainName, "--hostname", hostname)).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						domain.Delete()
+					})
+
+					It("tells the user the route exists and exits without failing", func() {
+						session := helpers.CF("check-route", domainName, "--hostname", hostname)
+						Eventually(session).Should(Say(`Checking for route\.\.\.`))
+						Eventually(session).Should(Say(`Route '%s\.%s' does exist\.`, hostname, domainName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 
-				AfterEach(func() {
-					domain.Delete()
-				})
+				When("it's a TCP route", func() {
+					BeforeEach(func() {
+						routerGroupName := helpers.FindOrCreateTCPRouterGroup(4)
+						tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("TCP-DOMAIN"))
+						tcpDomain.CreateWithRouterGroup(routerGroupName)
+						port = 1024
 
-				It("tells the user the route exists and exits without failing", func() {
-					session := helpers.CF("check-route", domainName, "--hostname", hostname)
-					Eventually(session).Should(Say(`Checking for route\.\.\.`))
-					Eventually(session).Should(Say(`Route '%s\.%s' does exist\.`, hostname, domainName))
-					Eventually(session).Should(Say(`OK`))
-					Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("create-route", tcpDomain.Name, "--port", fmt.Sprintf("%d", port))).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						tcpDomain.DeleteShared()
+					})
+
+					It("tells the user the route exists and exits without failing", func() {
+						session := helpers.CF("check-route", tcpDomain.Name, "--port", fmt.Sprintf("%d", port))
+						Eventually(session).Should(Say(`Checking for route\.\.\.`))
+						Eventually(session).Should(Say(`Route '%s:%d' does exist\.`, tcpDomain.Name, port))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 
