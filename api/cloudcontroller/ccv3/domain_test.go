@@ -30,6 +30,7 @@ var _ = Describe("Domain", func() {
 			domainGUID string
 			hostname   string
 			path       string
+			port       int
 		)
 
 		BeforeEach(func() {
@@ -39,7 +40,7 @@ var _ = Describe("Domain", func() {
 		})
 
 		JustBeforeEach(func() {
-			matches, warnings, executeErr = client.CheckRoute(domainGUID, hostname, path)
+			matches, warnings, executeErr = client.CheckRoute(domainGUID, hostname, path, port)
 		})
 
 		When("the request succeeds", func() {
@@ -111,6 +112,26 @@ var _ = Describe("Domain", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodGet, "/v3/domains/domain-guid/route_reservations", "host=hello&path=/potato"),
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+						),
+					)
+				})
+
+				It("returns whether the route matches and all warnings", func() {
+					Expect(matches).To(BeTrue())
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1"))
+				})
+			})
+
+			When("port is passed in", func() {
+				BeforeEach(func() {
+					port = 1024
+					response := `{ "matching_route": true }`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v3/domains/domain-guid/route_reservations", "port=1024"),
 							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						),
 					)

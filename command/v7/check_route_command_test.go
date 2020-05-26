@@ -44,10 +44,26 @@ var _ = Describe("check-route Command", func() {
 			},
 			RequiredArgs: flag.Domain{Domain: "some-domain.com"},
 		}
+
+		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
+		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
+		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+		fakeActor.CheckRouteReturns(
+			true,
+			v7action.Warnings{"check-route-warning"},
+			nil,
+		)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	It("checks the target", func() {
+		Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+		checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+		Expect(checkTargetedOrg).To(BeTrue())
+		Expect(checkTargetedSpace).To(BeFalse())
 	})
 
 	When("checking target fails", func() {
@@ -57,133 +73,126 @@ var _ = Describe("check-route Command", func() {
 
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
-
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkTargetedOrg).To(BeTrue())
-			Expect(checkTargetedSpace).To(BeFalse())
 		})
+	})
+
+	It("checks if the user is logged in", func() {
+		Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 	})
 
 	When("the user is not logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("no current user"))
 		})
 
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError("no current user"))
-
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(checkTargetedOrg).To(BeTrue())
-			Expect(checkTargetedSpace).To(BeFalse())
 		})
 	})
 
-	When("targeting an org and logged in", func() {
+	It("displays it's checking for the route", func() {
+		Expect(testUI.Out).To(Say("Checking for route..."))
+	})
+
+	It("checks if the route exists, displaying warnings", func() {
+		Expect(testUI.Err).To(Say("check-route-warning"))
+
+		Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
+		domain, host, path, port := fakeActor.CheckRouteArgsForCall(0)
+		Expect(domain).To(Equal(cmd.RequiredArgs.Domain))
+		Expect(host).To(Equal(cmd.Hostname))
+		Expect(path).To(Equal(cmd.Path.Path))
+		Expect(port).To(Equal(0))
+	})
+
+	When("checking for existing route returns an error", func() {
 		BeforeEach(func() {
-			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+			fakeActor.CheckRouteReturns(
+				false,
+				v7action.Warnings{"check-route-warning"},
+				errors.New("failed to check route"),
+			)
 		})
 
-		When("checking for existing route returns an error", func() {
-			BeforeEach(func() {
-				fakeActor.CheckRouteReturns(
-					false,
-					v7action.Warnings{"check-route-warning"},
-					errors.New("failed to check route"),
-				)
-			})
+		It("returns the error", func() {
+			Expect(executeErr).To(MatchError("failed to check route"))
+		})
+	})
 
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError("failed to check route"))
+	It("confirms that the route exists", func() {
+		Expect(testUI.Out).To(Say(`Route 'some-domain.com' does exist\.`))
+		Expect(testUI.Out).To(Say("OK"))
+	})
 
-				Expect(testUI.Out).To(Say("Checking for route..."))
-
-				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
-				givenDomain, givenHostname, givenPath := fakeActor.CheckRouteArgsForCall(0)
-				Expect(givenDomain).To(Equal("some-domain.com"))
-				Expect(givenHostname).To(Equal(""))
-				Expect(givenPath).To(Equal(""))
-			})
+	When("there's no matching route", func() {
+		BeforeEach(func() {
+			fakeActor.CheckRouteReturns(
+				false,
+				v7action.Warnings{"check-route-warning"},
+				nil,
+			)
 		})
 
-		When("checking for route returns true", func() {
-			BeforeEach(func() {
-				fakeActor.CheckRouteReturns(
-					true,
-					v7action.Warnings{"check-route-warning"},
-					nil,
-				)
-			})
+		It("checks the route and displays the result", func() {
+			Expect(testUI.Out).To(Say(`Route 'some-domain\.com' does not exist\.`))
+		})
+	})
 
-			It("checks the route and displays the result", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
+	When("passing hostname and path flags", func() {
+		BeforeEach(func() {
+			cmd.Path.Path = "/some-path"
+			cmd.Hostname = "some-host"
 
-				Expect(testUI.Out).To(Say("Checking for route..."))
-				Expect(testUI.Out).To(Say(`Route 'some-domain.com' does exist\.`))
-				Expect(testUI.Out).To(Say("OK"))
-
-				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
-				givenDomain, givenHostname, givenPath := fakeActor.CheckRouteArgsForCall(0)
-				Expect(givenDomain).To(Equal("some-domain.com"))
-				Expect(givenHostname).To(Equal(""))
-				Expect(givenPath).To(Equal(""))
-			})
+			fakeActor.CheckRouteReturns(
+				true,
+				v7action.Warnings{"check-route-warning"},
+				nil,
+			)
 		})
 
-		When("checking for route returns false", func() {
-			BeforeEach(func() {
-				fakeActor.CheckRouteReturns(
-					false,
-					v7action.Warnings{"check-route-warning"},
-					nil,
-				)
-			})
+		It("checks the route with correct arguments and displays the result", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
 
-			It("checks the route and displays the result", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say("Checking for route..."))
+			Expect(testUI.Out).To(Say(`Route 'some-host\.some-domain\.com/some-path' does exist\.`))
+			Expect(testUI.Out).To(Say("OK"))
 
-				Expect(testUI.Out).To(Say("Checking for route..."))
-				Expect(testUI.Out).To(Say(`Route 'some-domain\.com' does not exist\.`))
-				Expect(testUI.Out).To(Say("OK"))
+			Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
+			givenDomain, givenHostname, givenPath, givenPort := fakeActor.CheckRouteArgsForCall(0)
+			Expect(givenDomain).To(Equal("some-domain.com"))
+			Expect(givenHostname).To(Equal("some-host"))
+			Expect(givenPath).To(Equal("/some-path"))
+			Expect(givenPort).To(Equal(0))
+		})
+	})
 
-				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
-				givenDomain, givenHostname, givenPath := fakeActor.CheckRouteArgsForCall(0)
-				Expect(givenDomain).To(Equal("some-domain.com"))
-				Expect(givenHostname).To(Equal(""))
-				Expect(givenPath).To(Equal(""))
-			})
+	When("passing in a port flag (for TCP routes)", func() {
+		BeforeEach(func() {
+			cmd.Port = 1024
+
+			fakeActor.CheckRouteReturns(
+				true,
+				v7action.Warnings{"check-route-warning"},
+				nil,
+			)
 		})
 
-		When("passing hostname and path flags", func() {
-			BeforeEach(func() {
-				cmd.Path.Path = "/some-path"
-				cmd.Hostname = "some-host"
+		It("checks the route with correct arguments and displays the result", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
 
-				fakeActor.CheckRouteReturns(
-					true,
-					v7action.Warnings{"check-route-warning"},
-					nil,
-				)
-			})
+			Expect(testUI.Out).To(Say("Checking for route..."))
+			Expect(testUI.Out).To(Say(`Route 'some-domain\.com:1024' does exist\.`))
+			Expect(testUI.Out).To(Say("OK"))
 
-			It("checks the route with correct arguments and displays the result", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-
-				Expect(testUI.Out).To(Say("Checking for route..."))
-				Expect(testUI.Out).To(Say(`Route 'some-host\.some-domain\.com/some-path' does exist\.`))
-				Expect(testUI.Out).To(Say("OK"))
-
-				Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
-				givenDomain, givenHostname, givenPath := fakeActor.CheckRouteArgsForCall(0)
-				Expect(givenDomain).To(Equal("some-domain.com"))
-				Expect(givenHostname).To(Equal("some-host"))
-				Expect(givenPath).To(Equal("/some-path"))
-			})
+			Expect(fakeActor.CheckRouteCallCount()).To(Equal(1))
+			_, _, _, givenPort := fakeActor.CheckRouteArgsForCall(0)
+			Expect(givenPort).To(Equal(1024))
 		})
+	})
+
+	It("displays 'OK' and returns nil (no error)", func() {
+		Expect(testUI.Out).To(Say("OK"))
+
+		Expect(executeErr).NotTo(HaveOccurred())
 	})
 })
