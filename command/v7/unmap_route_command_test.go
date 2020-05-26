@@ -37,6 +37,7 @@ var _ = Describe("unmap-route Command", func() {
 		spaceGUID       string
 		spaceName       string
 		userName        string
+		port            int
 	)
 
 	BeforeEach(func() {
@@ -57,12 +58,13 @@ var _ = Describe("unmap-route Command", func() {
 		spaceGUID = "some-space-guid"
 		spaceName = "some-space"
 		userName = "steve"
+		port = 0
 
 		cmd = UnmapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
-			Port:         1024,
+			Port:         port,
 			BaseCommand: BaseCommand{
 				UI:          testUI,
 				Config:      fakeConfig,
@@ -206,7 +208,34 @@ var _ = Describe("unmap-route Command", func() {
 		})
 	})
 
-	It("gets the routes and and displays warnings", func() {
+	When("the route is TCP", func() {
+		BeforeEach(func() {
+			cmd.Hostname = ""
+			cmd.Path = flag.V7RoutePath{Path: ""}
+			cmd.Port = 1024
+		})
+
+		It("gets the routes and displays warnings", func() {
+			Expect(testUI.Err).To(Say("get-route-warnings"))
+
+			Expect(testUI.Out).To(Say(
+				`Removing route %s from app %s in org %s / space %s as %s\.\.\.`,
+				"some-domain.com:1024",
+				appName,
+				orgName,
+				spaceName,
+				userName,
+			))
+
+			Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
+			actualDomainName, actualDomainGUID, _, _, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
+			Expect(actualDomainName).To(Equal("some-domain.com"))
+			Expect(actualDomainGUID).To(Equal("domain-guid"))
+			Expect(actualPort).To(Equal(1024))
+		})
+	})
+
+	It("gets the routes and displays warnings", func() {
 		Expect(testUI.Err).To(Say("get-route-warnings"))
 
 		Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
@@ -215,7 +244,7 @@ var _ = Describe("unmap-route Command", func() {
 		Expect(actualDomainGUID).To(Equal("domain-guid"))
 		Expect(actualHostname).To(Equal(hostname))
 		Expect(actualPath).To(Equal(path))
-		Expect(actualPort).To(Equal(cmd.Port))
+		Expect(actualPort).To(Equal(0))
 	})
 
 	It("prints flavor text", func() {
