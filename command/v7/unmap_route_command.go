@@ -11,7 +11,8 @@ type UnmapRouteCommand struct {
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
 	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
-	usage           interface{}      `usage:"CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	Port            int              `long:"port" description:"Port used to identify the TCP route"`
+	usage           interface{}      `usage:"Unmap an HTTP route:\n      CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Unmap a TCP route:\n      CF_NAME unmap-route APP_NAME DOMAIN --port PORT\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\n   CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000"`
 	relatedCommands interface{}      `related_commands:"delete-route, map-route, routes"`
 }
 
@@ -40,8 +41,8 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	}
 
 	path := cmd.Path.Path
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path, 0)
-	url := desiredURL(domain.Name, cmd.Hostname, path, 0)
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path, cmd.Port)
+	url := desiredURL(domain.Name, cmd.Hostname, path, cmd.Port)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
