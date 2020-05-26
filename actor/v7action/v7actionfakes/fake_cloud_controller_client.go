@@ -77,12 +77,13 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
-	CheckRouteStub        func(string, string, string) (bool, ccv3.Warnings, error)
+	CheckRouteStub        func(string, string, string, int) (bool, ccv3.Warnings, error)
 	checkRouteMutex       sync.RWMutex
 	checkRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 int
 	}
 	checkRouteReturns struct {
 		result1 bool
@@ -2667,18 +2668,19 @@ func (fake *FakeCloudControllerClient) CancelDeploymentReturnsOnCall(i int, resu
 	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) CheckRoute(arg1 string, arg2 string, arg3 string) (bool, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CheckRoute(arg1 string, arg2 string, arg3 string, arg4 int) (bool, ccv3.Warnings, error) {
 	fake.checkRouteMutex.Lock()
 	ret, specificReturn := fake.checkRouteReturnsOnCall[len(fake.checkRouteArgsForCall)]
 	fake.checkRouteArgsForCall = append(fake.checkRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("CheckRoute", []interface{}{arg1, arg2, arg3})
+		arg4 int
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("CheckRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.checkRouteMutex.Unlock()
 	if fake.CheckRouteStub != nil {
-		return fake.CheckRouteStub(arg1, arg2, arg3)
+		return fake.CheckRouteStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2693,17 +2695,17 @@ func (fake *FakeCloudControllerClient) CheckRouteCallCount() int {
 	return len(fake.checkRouteArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CheckRouteCalls(stub func(string, string, string) (bool, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) CheckRouteCalls(stub func(string, string, string, int) (bool, ccv3.Warnings, error)) {
 	fake.checkRouteMutex.Lock()
 	defer fake.checkRouteMutex.Unlock()
 	fake.CheckRouteStub = stub
 }
 
-func (fake *FakeCloudControllerClient) CheckRouteArgsForCall(i int) (string, string, string) {
+func (fake *FakeCloudControllerClient) CheckRouteArgsForCall(i int) (string, string, string, int) {
 	fake.checkRouteMutex.RLock()
 	defer fake.checkRouteMutex.RUnlock()
 	argsForCall := fake.checkRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeCloudControllerClient) CheckRouteReturns(result1 bool, result2 ccv3.Warnings, result3 error) {

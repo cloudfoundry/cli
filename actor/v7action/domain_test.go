@@ -29,6 +29,7 @@ var _ = Describe("Domain Actions", func() {
 			domainName string
 			hostname   string
 			path       string
+			port       int
 
 			matches    bool
 			warnings   Warnings
@@ -54,7 +55,7 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			matches, warnings, executeErr = actor.CheckRoute(domainName, hostname, path)
+			matches, warnings, executeErr = actor.CheckRoute(domainName, hostname, path, port)
 		})
 
 		It("delegates to the cloud controller client", func() {
@@ -65,10 +66,11 @@ var _ = Describe("Domain Actions", func() {
 			}))
 
 			Expect(fakeCloudControllerClient.CheckRouteCallCount()).To(Equal(1))
-			givenDomainGUID, givenHostname, givenPath := fakeCloudControllerClient.CheckRouteArgsForCall(0)
+			givenDomainGUID, givenHostname, givenPath, givenPort := fakeCloudControllerClient.CheckRouteArgsForCall(0)
 			Expect(givenDomainGUID).To(Equal("domain-guid"))
 			Expect(givenHostname).To(Equal(hostname))
 			Expect(givenPath).To(Equal(path))
+			Expect(givenPort).To(Equal(0))
 
 			Expect(matches).To(BeTrue())
 			Expect(warnings).To(ConsistOf("get-domains-warning", "check-route-warning-1", "check-route-warning-2"))

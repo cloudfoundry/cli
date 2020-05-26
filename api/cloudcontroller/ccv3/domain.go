@@ -2,6 +2,7 @@ package ccv3
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -58,7 +59,7 @@ func (sharedOrgs *SharedOrgs) UnmarshalJSON(data []byte) error {
 
 // CheckRoute checks whether the route with the given domain GUID, hostname,
 // and path exists in the foundation.
-func (client Client) CheckRoute(domainGUID string, hostname string, path string) (bool, Warnings, error) {
+func (client Client) CheckRoute(domainGUID string, hostname string, path string, port int) (bool, Warnings, error) {
 	var query []Query
 
 	if hostname != "" {
@@ -67,6 +68,10 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 
 	if path != "" {
 		query = append(query, Query{Key: PathFilter, Values: []string{path}})
+	}
+
+	if port != 0 {
+		query = append(query, Query{Key: PortFilter, Values: []string{fmt.Sprintf("%d", port)}})
 	}
 
 	var responseBody struct {

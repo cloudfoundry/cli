@@ -9,7 +9,7 @@ import (
 
 type SharedOrgs ccv3.SharedOrgs
 
-func (actor Actor) CheckRoute(domainName string, hostname string, path string) (bool, Warnings, error) {
+func (actor Actor) CheckRoute(domainName string, hostname string, path string, port int) (bool, Warnings, error) {
 	var allWarnings Warnings
 
 	domain, warnings, err := actor.GetDomainByName(domainName)
@@ -18,7 +18,7 @@ func (actor Actor) CheckRoute(domainName string, hostname string, path string) (
 		return false, allWarnings, err
 	}
 
-	matches, checkRouteWarnings, err := actor.CloudControllerClient.CheckRoute(domain.GUID, hostname, path)
+	matches, checkRouteWarnings, err := actor.CloudControllerClient.CheckRoute(domain.GUID, hostname, path, port)
 	allWarnings = append(allWarnings, checkRouteWarnings...)
 
 	return matches, allWarnings, err
