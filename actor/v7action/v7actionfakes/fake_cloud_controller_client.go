@@ -812,7 +812,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-
 	GetApplicationRoutesStub        func(string) ([]resources.Route, ccv3.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
@@ -5879,7 +5878,6 @@ func (fake *FakeCloudControllerClient) GetApplicationRevisionsReturnsOnCall(i in
 }
 
 func (fake *FakeCloudControllerClient) GetApplicationRoutes(arg1 string) ([]resources.Route, ccv3.Warnings, error) {
-
 	fake.getApplicationRoutesMutex.Lock()
 	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
