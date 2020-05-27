@@ -13,7 +13,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS:",
 		CommandList: [][]string{
-			{"apps", "app", "create-app"},
+			{"apps", "app", "create-app", "revisions"},
 			{"push", "scale", "delete", "rename"},
 			{"cancel-deployment"},
 			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},

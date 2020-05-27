@@ -117,6 +117,7 @@ type Actor interface {
 	GetRawApplicationManifestByNameAndSpace(appName string, spaceGUID string) ([]byte, v7action.Warnings, error)
 	GetRecentEventsByApplicationNameAndSpace(appName string, spaceGUID string) ([]v7action.Event, v7action.Warnings, error)
 	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v7action.Warnings, error)
+	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) (v7action.Revisions, v7action.Warnings, error)
 	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string, port int) (resources.Route, v7action.Warnings, error)
 	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (resources.RouteDestination, v7action.Warnings, error)
 	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)

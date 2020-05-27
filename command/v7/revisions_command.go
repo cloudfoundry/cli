@@ -1,14 +1,11 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock"
 	"strconv"
+
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . RevisionsActor
@@ -21,24 +18,7 @@ type RevisionsCommand struct {
 	RequiredArgs flag.EnvironmentArgs `positional-args:"yes"`
 	usage        interface{}          `usage:"CF_NAME revisions APP_NAME"`
 
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       RevisionsActor
-}
-
-func (cmd *RevisionsCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	return nil
+	BaseCommand
 }
 
 func (cmd RevisionsCommand) Execute(_ []string) error {

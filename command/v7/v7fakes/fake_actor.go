@@ -1479,6 +1479,22 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetRevisionsByApplicationNameAndSpaceStub        func(string, string) (v7action.Revisions, v7action.Warnings, error)
+	getRevisionsByApplicationNameAndSpaceMutex       sync.RWMutex
+	getRevisionsByApplicationNameAndSpaceArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	getRevisionsByApplicationNameAndSpaceReturns struct {
+		result1 v7action.Revisions
+		result2 v7action.Warnings
+		result3 error
+	}
+	getRevisionsByApplicationNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v7action.Revisions
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetRouteByAttributesStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
 	getRouteByAttributesMutex       sync.RWMutex
 	getRouteByAttributesArgsForCall []struct {
@@ -9331,6 +9347,73 @@ func (fake *FakeActor) GetRecentLogsForApplicationByNameAndSpaceReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpace(arg1 string, arg2 string) (v7action.Revisions, v7action.Warnings, error) {
+	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[len(fake.getRevisionsByApplicationNameAndSpaceArgsForCall)]
+	fake.getRevisionsByApplicationNameAndSpaceArgsForCall = append(fake.getRevisionsByApplicationNameAndSpaceArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetRevisionsByApplicationNameAndSpace", []interface{}{arg1, arg2})
+	fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
+	if fake.GetRevisionsByApplicationNameAndSpaceStub != nil {
+		return fake.GetRevisionsByApplicationNameAndSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getRevisionsByApplicationNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceCallCount() int {
+	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
+	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
+	return len(fake.getRevisionsByApplicationNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceCalls(stub func(string, string) (v7action.Revisions, v7action.Warnings, error)) {
+	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
+	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
+	fake.GetRevisionsByApplicationNameAndSpaceStub = stub
+}
+
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
+	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getRevisionsByApplicationNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturns(result1 v7action.Revisions, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
+	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
+	fake.GetRevisionsByApplicationNameAndSpaceStub = nil
+	fake.getRevisionsByApplicationNameAndSpaceReturns = struct {
+		result1 v7action.Revisions
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) GetRevisionsByApplicationNameAndSpaceReturnsOnCall(i int, result1 v7action.Revisions, result2 v7action.Warnings, result3 error) {
+	fake.getRevisionsByApplicationNameAndSpaceMutex.Lock()
+	defer fake.getRevisionsByApplicationNameAndSpaceMutex.Unlock()
+	fake.GetRevisionsByApplicationNameAndSpaceStub = nil
+	if fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall == nil {
+		fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v7action.Revisions
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getRevisionsByApplicationNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v7action.Revisions
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeActor) GetRouteByAttributes(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
 	fake.getRouteByAttributesMutex.Lock()
 	ret, specificReturn := fake.getRouteByAttributesReturnsOnCall[len(fake.getRouteByAttributesArgsForCall)]
@@ -16070,6 +16153,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.getRecentEventsByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getRevisionsByApplicationNameAndSpaceMutex.RLock()
+	defer fake.getRevisionsByApplicationNameAndSpaceMutex.RUnlock()
 	fake.getRouteByAttributesMutex.RLock()
 	defer fake.getRouteByAttributesMutex.RUnlock()
 	fake.getRouteDestinationByAppGUIDMutex.RLock()

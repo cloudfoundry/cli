@@ -1,10 +1,12 @@
 package v7action_test
 
 import (
+	"errors"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"errors"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -24,7 +26,7 @@ var _ = Describe("Revisions Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 		})
@@ -46,7 +48,7 @@ var _ = Describe("Revisions Actions", func() {
 
 		When("finding the app succeeds", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
 			})
 
 			When("getting the app revisions fails", func() {
