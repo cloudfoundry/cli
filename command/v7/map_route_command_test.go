@@ -384,7 +384,6 @@ var _ = Describe("map-route Command", func() {
 						When("mapping the route succeeds", func() {
 							BeforeEach(func() {
 								fakeActor.MapRouteReturns(v7action.Warnings{"map-route-warnings"}, nil)
-								cmd.Hostname = "HoSt"
 							})
 
 							It("returns the proper information and passing the proper arguments", func() {
