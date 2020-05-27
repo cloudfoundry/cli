@@ -4,7 +4,6 @@ PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
 CF_BUILD_VERSION ?= $$(cat BUILD_VERSION)
-CF_BUILD_VERSION_V7 ?= $$(cat BUILD_VERSION_V7)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS_COMMON=-w -s \
@@ -12,27 +11,15 @@ LD_FLAGS_COMMON=-w -s \
 	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
 LD_FLAGS =$(LD_FLAGS_COMMON) \
 	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION)
-LD_FLAGS_V7 =$(LD_FLAGS_COMMON) \
-	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION_V7)
 LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
-LD_FLAGS_LINUX_V7 = -extldflags \"-static\" $(LD_FLAGS_V7)
 REQUIRED_FOR_STATIC_BINARY =-a -tags netgo -installsuffix netgo
-REQUIRED_FOR_STATIC_BINARY_V7 =-a -tags "V7 netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
-
-ifndef TARGET_V7
 TARGET = v6
 export GOFLAGS =
 SLOW_SPEC_THRESHOLD=60
 LINT_FLAGS =
-else
-TARGET = v7
-export GOFLAGS = -tags=V7
-SLOW_SPEC_THRESHOLD=120
-LINT_FLAGS = --build-tags=V7
-endif
 
 GINKGO_FLAGS=-r -randomizeAllSpecs -requireSuite
 GINKGO_INT_FLAGS=$(GINKGO_FLAGS) -slowSpecThreshold $(SLOW_SPEC_THRESHOLD)
@@ -65,22 +52,22 @@ custom-lint: ## Run our custom linters
 	@echo
 
 fly-windows-experimental: check-target-env
-	CF_TEST_SUITE=./integration/shared/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
+	CF_TEST_SUITE=./integration/shared/experimental fly -t ci execute -c $(HOME)/workspace/cli-ci/ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-isolated: check-target-env
-	CF_TEST_SUITE=./integration/shared/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
+	CF_TEST_SUITE=./integration/shared/isolated fly -t ci execute -c $(HOME)/workspace/cli-ci/ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-plugin: check-target-env
-	CF_TEST_SUITE=./integration/shared/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
+	CF_TEST_SUITE=./integration/shared/plugin fly -t ci execute -c $(HOME)/workspace/cli-ci/ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-push: check-target-env
-	CF_TEST_SUITE=./integration/v6/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
+	CF_TEST_SUITE=./integration/v6/push fly -t ci execute -c $(HOME)/workspace/cli-ci/ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-global: check-target-env
-	CF_TEST_SUITE=./integration/shared/global fly -t ci execute -c ci/cli/tasks/integration-windows-serial.yml -i cli=./ --tag "cli-windows"
+	CF_TEST_SUITE=./integration/shared/global fly -t ci execute -c $(HOME)/workspace/cli-ci/ci/cli/tasks/integration-windows-serial.yml -i cli=./ --tag "cli-windows"
 
 fly-windows-units:
-	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./ --tag "cli-windows"
+	fly -t ci execute -c $(HOME)/workspace/cli-ci/ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=$(HOME)/workspace/cli-ci --tag "cli-windows"
 
 format: ## Run go fmt
 	go fmt ./...
@@ -154,34 +141,15 @@ lint: custom-lint ## Runs all linters and formatters
 		| xargs golangci-lint run $(LINT_FLAGS)
 	@echo "No lint errors!"
 
-ifeq ($(TARGET),v6)
-out/cf: out/cf6
-	cp out/cf6 out/cf
-else
-out/cf: out/cf7
-	cp out/cf7 out/cf
-endif
-
 # Build dynamic binary for Darwin
 ifeq ($(UNAME_S),Darwin)
-out/cf6: $(GOSRC)
-	go build -ldflags "$(LD_FLAGS)" -o out/cf6 .
+out/cf: $(GOSRC)
+	go build -ldflags "$(LD_FLAGS)" -o out/cf .
 else
-out/cf6: $(GOSRC)
+out/cf: $(GOSRC)
 	CGO_ENABLED=0 go build \
 		$(REQUIRED_FOR_STATIC_BINARY) \
-		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf6 .
-endif
-
-# Build dynamic binary for Darwin
-ifeq ($(UNAME_S),Darwin)
-out/cf7: $(GOSRC)
-	go build -tags="V7" -ldflags "$(LD_FLAGS_V7)" -o out/cf7 .
-else
-out/cf7: $(GOSRC)
-	CGO_ENABLED=0 go build \
-		$(REQUIRED_FOR_STATIC_BINARY_V7) \
-		-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7 .
+		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
 endif
 
 out/cf-cli_linux_i686: $(GOSRC)
@@ -204,28 +172,6 @@ out/cf-cli_win32.exe: $(GOSRC) rsrc.syso
 
 out/cf-cli_winx64.exe: $(GOSRC) rsrc.syso
 	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
-	rm rsrc.syso
-
-out/cf7-cli_linux_i686: $(GOSRC)
-	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
-							$(REQUIRED_FOR_STATIC_BINARY_V7) \
-							-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7-cli_linux_i686 .
-
-out/cf7-cli_linux_x86-64: $(GOSRC)
-	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
-							$(REQUIRED_FOR_STATIC_BINARY_V7) \
-							-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7-cli_linux_x86-64 .
-
-out/cf7-cli_osx: $(GOSRC)
-	GOARCH=amd64 GOOS=darwin go build -tags="V7" \
-				 -a -ldflags "$(LD_FLAGS_V7)" -o out/cf7-cli_osx .
-
-out/cf7-cli_win32.exe: $(GOSRC) rsrc.syso
-	GOARCH=386 GOOS=windows go build -tags="forceposix V7" -o out/cf7-cli_win32.exe -ldflags "$(LD_FLAGS_V7)" .
-	rm rsrc.syso
-
-out/cf7-cli_winx64.exe: $(GOSRC) rsrc.syso
-	GOARCH=amd64 GOOS=windows go build -tags="forceposix V7" -o out/cf7-cli_winx64.exe -ldflags "$(LD_FLAGS_V7)" .
 	rm rsrc.syso
 
 rsrc.syso:
