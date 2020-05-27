@@ -78,10 +78,5 @@
       "id": "Password",
       "translation": "Contraseña",
       "modified": false
-   },
-   {
-      "id": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
-      "translation": "Código de autenticación temporal (obtenlo en {{.AuthenticationEndpoint}}/passcode )",
-      "modified": false
    }
 ]

@@ -176,16 +176,6 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 	credentials := make(map[string]string)
 	passcode := prompts["passcode"]
 
-	if passcode.DisplayName == "" {
-		passcode = coreconfig.AuthPrompt{
-			Type: coreconfig.AuthPromptTypePassword,
-			DisplayName: T("Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
-				map[string]interface{}{
-					"AuthenticationEndpoint": cmd.config.AuthenticationEndpoint(),
-				}),
-		}
-	}
-
 	for i := 0; i < maxLoginTries; i++ {
 		if c.IsSet("sso-passcode") && i == 0 {
 			credentials["passcode"] = c.String("sso-passcode")
