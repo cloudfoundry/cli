@@ -24,7 +24,7 @@ var _ = Describe("Auth Actions", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, fakeUAAClient, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, fakeUAAClient, nil, nil)
 		creds = map[string]string{
 			"client_id":     "some-username",
 			"client_secret": "some-password",

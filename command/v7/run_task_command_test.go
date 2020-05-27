@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -25,7 +26,7 @@ var _ = Describe("run-task Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeRunTaskActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -34,13 +35,15 @@ var _ = Describe("run-task Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeRunTaskActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = RunTaskCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.RequiredArgs.AppName = "some-app-name"
@@ -108,7 +111,7 @@ var _ = Describe("run-task Command", func() {
 			When("provided a valid application name", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{GUID: "some-app-guid"},
+						resources.Application{GUID: "some-app-guid"},
 						v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 						nil)
 				})
@@ -307,7 +310,7 @@ var _ = Describe("run-task Command", func() {
 							expectedErr = errors.New("request-error")
 							returnedErr = ccerror.RequestError{Err: expectedErr}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								nil,
 								returnedErr)
 						})
@@ -323,7 +326,7 @@ var _ = Describe("run-task Command", func() {
 						BeforeEach(func() {
 							returnedErr = ccerror.UnverifiedServerError{URL: "some-url"}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.RunTaskReturns(
@@ -345,7 +348,7 @@ var _ = Describe("run-task Command", func() {
 						BeforeEach(func() {
 							expectedErr = errors.New("got bananapants??")
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 								expectedErr)
 						})
@@ -364,7 +367,7 @@ var _ = Describe("run-task Command", func() {
 						BeforeEach(func() {
 							expectedErr = errors.New("got bananapants??")
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v7action.Application{GUID: "some-app-guid"},
+								resources.Application{GUID: "some-app-guid"},
 								v7action.Warnings{"get-application-warning-1", "get-application-warning-2"},
 								nil)
 							fakeActor.RunTaskReturns(

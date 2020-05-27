@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	client "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	"code.cloudfoundry.org/log-cache/pkg/client"
 )
 
 type FakeLogCacheClient struct {

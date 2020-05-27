@@ -12,10 +12,14 @@ func (actor Actor) CreateDeploymentForApplication(pushPlan PushPlan, eventStream
 	eventStream <- &PushEvent{Plan: pushPlan, Event: WaitingForDeployment}
 
 	handleInstanceDetails := func(instanceDetails string) {
-		eventStream <- &PushEvent{Plan: pushPlan, Event: Event(instanceDetails)}
+		eventStream <- &PushEvent{
+			Plan:     pushPlan,
+			Warnings: Warnings{instanceDetails},
+			Event:    InstanceDetails,
+		}
 	}
 
-	pollWarnings, err := actor.V7Actor.PollStartForRolling(pushPlan.Application.GUID, deploymentGUID, pushPlan.NoWait, handleInstanceDetails)
+	pollWarnings, err := actor.V7Actor.PollStartForRolling(pushPlan.Application, deploymentGUID, pushPlan.NoWait, handleInstanceDetails)
 	warnings = append(warnings, pollWarnings...)
 
 	return pushPlan, Warnings(warnings), err

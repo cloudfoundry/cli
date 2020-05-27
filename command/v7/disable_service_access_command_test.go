@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -22,24 +21,25 @@ var _ = Describe("disable-service-access Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDisableServiceAccessActor
+		fakeActor       *v7fakes.FakeActor
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeDisableServiceAccessActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = DisableServiceAccessCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			RequiredArgs: flag.Service{
-				ServiceOffering: "some-service",
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
 			},
 		}
+
+		setPositionalFlags(&cmd, "some-service")
 
 		fakeActor.DisableServiceAccessReturns(nil, v7action.Warnings{"a warning"}, nil)
 	})
@@ -57,12 +57,12 @@ var _ = Describe("disable-service-access Command", func() {
 	DescribeTable(
 		"message text",
 		func(plan, org, broker, expected string) {
-			cmd.RequiredArgs = flag.Service{ServiceOffering: "fake-service"}
+			setPositionalFlags(&cmd, "fake-service")
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
-			cmd.ServicePlan = plan
-			cmd.Organization = org
-			cmd.ServiceBroker = broker
+			setFlag(&cmd, "-o", org)
+			setFlag(&cmd, "-p", plan)
+			setFlag(&cmd, "-b", broker)
 
 			err := cmd.Execute(nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -70,21 +70,21 @@ var _ = Describe("disable-service-access Command", func() {
 			Expect(testUI.Out).To(Say(expected))
 		},
 		Entry("no flags", "", "", "",
-			`Disabling access to all plans of service fake-service for all orgs as fake-user\.\.\.`),
+			`Disabling access to all plans of service offering fake-service for all orgs as fake-user\.\.\.`),
 		Entry("plan", "fake-plan", "", "",
-			`Disabling access to plan fake-plan of service fake-service for all orgs as fake-user\.\.\.`),
+			`Disabling access to plan fake-plan of service offering fake-service for all orgs as fake-user\.\.\.`),
 		Entry("org", "", "fake-org", "",
-			`Disabling access to all plans of service fake-service for org fake-org as fake-user\.\.\.`),
+			`Disabling access to all plans of service offering fake-service for org fake-org as fake-user\.\.\.`),
 		Entry("broker", "", "", "fake-broker",
-			`Disabling access to all plans of service fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
+			`Disabling access to all plans of service offering fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
 		Entry("plan and org", "fake-plan", "fake-org", "",
-			`Disabling access to plan fake-plan of service fake-service for org fake-org as fake-user\.\.\.`),
+			`Disabling access to plan fake-plan of service offering fake-service for org fake-org as fake-user\.\.\.`),
 		Entry("plan and broker", "fake-plan", "", "fake-broker",
-			`Disabling access to plan fake-plan of service fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
+			`Disabling access to plan fake-plan of service offering fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
 		Entry("plan, org and broker", "fake-plan", "fake-org", "fake-broker",
-			`Disabling access to plan fake-plan of service fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
+			`Disabling access to plan fake-plan of service offering fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
 		Entry("broker and org", "", "fake-org", "fake-broker",
-			`Disabling access to all plans of service fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
+			`Disabling access to all plans of service offering fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
 	)
 
 	It("passes the right parameters to the actor", func() {
@@ -95,10 +95,10 @@ var _ = Describe("disable-service-access Command", func() {
 			org      = "myorg"
 		)
 
-		cmd.RequiredArgs.ServiceOffering = offering
-		cmd.ServiceBroker = broker
-		cmd.ServicePlan = plan
-		cmd.Organization = org
+		setFlag(&cmd, "-b", broker)
+		setFlag(&cmd, "-o", org)
+		setFlag(&cmd, "-p", plan)
+		setPositionalFlags(&cmd, offering)
 
 		err := cmd.Execute(nil)
 		Expect(err).NotTo(HaveOccurred())

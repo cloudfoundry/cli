@@ -8,37 +8,38 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeV7Actor struct {
-	CreateApplicationDropletStub        func(string) (v7action.Droplet, v7action.Warnings, error)
+	CreateApplicationDropletStub        func(string) (resources.Droplet, v7action.Warnings, error)
 	createApplicationDropletMutex       sync.RWMutex
 	createApplicationDropletArgsForCall []struct {
 		arg1 string
 	}
 	createApplicationDropletReturns struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
 	createApplicationDropletReturnsOnCall map[int]struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateApplicationInSpaceStub        func(v7action.Application, string) (v7action.Application, v7action.Warnings, error)
+	CreateApplicationInSpaceStub        func(resources.Application, string) (resources.Application, v7action.Warnings, error)
 	createApplicationInSpaceMutex       sync.RWMutex
 	createApplicationInSpaceArgsForCall []struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 string
 	}
 	createApplicationInSpaceReturns struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
 	createApplicationInSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -89,148 +90,150 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	CreateRouteStub        func(string, string, string, string) (v7action.Route, v7action.Warnings, error)
+	CreateRouteStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
+		arg5 int
 	}
 	createRouteReturns struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}
 	createRouteReturnsOnCall map[int]struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(string, string) (resources.Application, v7action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getApplicationByNameAndSpaceReturns struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationDropletsStub        func(string, string) ([]v7action.Droplet, v7action.Warnings, error)
+	GetApplicationDropletsStub        func(string, string) ([]resources.Droplet, v7action.Warnings, error)
 	getApplicationDropletsMutex       sync.RWMutex
 	getApplicationDropletsArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getApplicationDropletsReturns struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationDropletsReturnsOnCall map[int]struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationRoutesStub        func(string) ([]v7action.Route, v7action.Warnings, error)
+	GetApplicationRoutesStub        func(string) ([]resources.Route, v7action.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
 		arg1 string
 	}
 	getApplicationRoutesReturns struct {
-		result1 []v7action.Route
+		result1 []resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationRoutesReturnsOnCall map[int]struct {
-		result1 []v7action.Route
+		result1 []resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationsByNamesAndSpaceStub        func([]string, string) ([]v7action.Application, v7action.Warnings, error)
+	GetApplicationsByNamesAndSpaceStub        func([]string, string) ([]resources.Application, v7action.Warnings, error)
 	getApplicationsByNamesAndSpaceMutex       sync.RWMutex
 	getApplicationsByNamesAndSpaceArgsForCall []struct {
 		arg1 []string
 		arg2 string
 	}
 	getApplicationsByNamesAndSpaceReturns struct {
-		result1 []v7action.Application
+		result1 []resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
 	getApplicationsByNamesAndSpaceReturnsOnCall map[int]struct {
-		result1 []v7action.Application
+		result1 []resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetDefaultDomainStub        func(string) (v7action.Domain, v7action.Warnings, error)
+	GetDefaultDomainStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDefaultDomainMutex       sync.RWMutex
 	getDefaultDomainArgsForCall []struct {
 		arg1 string
 	}
 	getDefaultDomainReturns struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getDefaultDomainReturnsOnCall map[int]struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetDomainStub        func(string) (v7action.Domain, v7action.Warnings, error)
+	GetDomainStub        func(string) (resources.Domain, v7action.Warnings, error)
 	getDomainMutex       sync.RWMutex
 	getDomainArgsForCall []struct {
 		arg1 string
 	}
 	getDomainReturns struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
 	getDomainReturnsOnCall map[int]struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRouteByAttributesStub        func(string, string, string, string) (v7action.Route, v7action.Warnings, error)
+	GetRouteByAttributesStub        func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)
 	getRouteByAttributesMutex       sync.RWMutex
 	getRouteByAttributesArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
+		arg5 int
 	}
 	getRouteByAttributesReturns struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}
 	getRouteByAttributesReturnsOnCall map[int]struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetRouteDestinationByAppGUIDStub        func(string, string) (v7action.RouteDestination, v7action.Warnings, error)
+	GetRouteDestinationByAppGUIDStub        func(string, string) (resources.RouteDestination, v7action.Warnings, error)
 	getRouteDestinationByAppGUIDMutex       sync.RWMutex
 	getRouteDestinationByAppGUIDArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	getRouteDestinationByAppGUIDReturns struct {
-		result1 v7action.RouteDestination
+		result1 resources.RouteDestination
 		result2 v7action.Warnings
 		result3 error
 	}
 	getRouteDestinationByAppGUIDReturnsOnCall map[int]struct {
-		result1 v7action.RouteDestination
+		result1 resources.RouteDestination
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -248,19 +251,19 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	PollBuildStub        func(string, string) (v7action.Droplet, v7action.Warnings, error)
+	PollBuildStub        func(string, string) (resources.Droplet, v7action.Warnings, error)
 	pollBuildMutex       sync.RWMutex
 	pollBuildArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	pollBuildReturns struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
 	pollBuildReturnsOnCall map[int]struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -279,10 +282,10 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollStartStub        func(string, bool, func(string)) (v7action.Warnings, error)
+	PollStartStub        func(resources.Application, bool, func(string)) (v7action.Warnings, error)
 	pollStartMutex       sync.RWMutex
 	pollStartArgsForCall []struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 bool
 		arg3 func(string)
 	}
@@ -294,10 +297,10 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	PollStartForRollingStub        func(string, string, bool, func(string)) (v7action.Warnings, error)
+	PollStartForRollingStub        func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)
 	pollStartForRollingMutex       sync.RWMutex
 	pollStartForRollingArgsForCall []struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 string
 		arg3 bool
 		arg4 func(string)
@@ -437,18 +440,18 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UpdateApplicationStub        func(v7action.Application) (v7action.Application, v7action.Warnings, error)
+	UpdateApplicationStub        func(resources.Application) (resources.Application, v7action.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 	}
 	updateApplicationReturns struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
 	updateApplicationReturnsOnCall map[int]struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}
@@ -505,7 +508,7 @@ type FakeV7Actor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV7Actor) CreateApplicationDroplet(arg1 string) (v7action.Droplet, v7action.Warnings, error) {
+func (fake *FakeV7Actor) CreateApplicationDroplet(arg1 string) (resources.Droplet, v7action.Warnings, error) {
 	fake.createApplicationDropletMutex.Lock()
 	ret, specificReturn := fake.createApplicationDropletReturnsOnCall[len(fake.createApplicationDropletArgsForCall)]
 	fake.createApplicationDropletArgsForCall = append(fake.createApplicationDropletArgsForCall, struct {
@@ -529,7 +532,7 @@ func (fake *FakeV7Actor) CreateApplicationDropletCallCount() int {
 	return len(fake.createApplicationDropletArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateApplicationDropletCalls(stub func(string) (v7action.Droplet, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) CreateApplicationDropletCalls(stub func(string) (resources.Droplet, v7action.Warnings, error)) {
 	fake.createApplicationDropletMutex.Lock()
 	defer fake.createApplicationDropletMutex.Unlock()
 	fake.CreateApplicationDropletStub = stub
@@ -542,40 +545,40 @@ func (fake *FakeV7Actor) CreateApplicationDropletArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) CreateApplicationDropletReturns(result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateApplicationDropletReturns(result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.createApplicationDropletMutex.Lock()
 	defer fake.createApplicationDropletMutex.Unlock()
 	fake.CreateApplicationDropletStub = nil
 	fake.createApplicationDropletReturns = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateApplicationDropletReturnsOnCall(i int, result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateApplicationDropletReturnsOnCall(i int, result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.createApplicationDropletMutex.Lock()
 	defer fake.createApplicationDropletMutex.Unlock()
 	fake.CreateApplicationDropletStub = nil
 	if fake.createApplicationDropletReturnsOnCall == nil {
 		fake.createApplicationDropletReturnsOnCall = make(map[int]struct {
-			result1 v7action.Droplet
+			result1 resources.Droplet
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createApplicationDropletReturnsOnCall[i] = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateApplicationInSpace(arg1 v7action.Application, arg2 string) (v7action.Application, v7action.Warnings, error) {
+func (fake *FakeV7Actor) CreateApplicationInSpace(arg1 resources.Application, arg2 string) (resources.Application, v7action.Warnings, error) {
 	fake.createApplicationInSpaceMutex.Lock()
 	ret, specificReturn := fake.createApplicationInSpaceReturnsOnCall[len(fake.createApplicationInSpaceArgsForCall)]
 	fake.createApplicationInSpaceArgsForCall = append(fake.createApplicationInSpaceArgsForCall, struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 		arg2 string
 	}{arg1, arg2})
 	fake.recordInvocation("CreateApplicationInSpace", []interface{}{arg1, arg2})
@@ -596,43 +599,43 @@ func (fake *FakeV7Actor) CreateApplicationInSpaceCallCount() int {
 	return len(fake.createApplicationInSpaceArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateApplicationInSpaceCalls(stub func(v7action.Application, string) (v7action.Application, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) CreateApplicationInSpaceCalls(stub func(resources.Application, string) (resources.Application, v7action.Warnings, error)) {
 	fake.createApplicationInSpaceMutex.Lock()
 	defer fake.createApplicationInSpaceMutex.Unlock()
 	fake.CreateApplicationInSpaceStub = stub
 }
 
-func (fake *FakeV7Actor) CreateApplicationInSpaceArgsForCall(i int) (v7action.Application, string) {
+func (fake *FakeV7Actor) CreateApplicationInSpaceArgsForCall(i int) (resources.Application, string) {
 	fake.createApplicationInSpaceMutex.RLock()
 	defer fake.createApplicationInSpaceMutex.RUnlock()
 	argsForCall := fake.createApplicationInSpaceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) CreateApplicationInSpaceReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateApplicationInSpaceReturns(result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.createApplicationInSpaceMutex.Lock()
 	defer fake.createApplicationInSpaceMutex.Unlock()
 	fake.CreateApplicationInSpaceStub = nil
 	fake.createApplicationInSpaceReturns = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateApplicationInSpaceReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateApplicationInSpaceReturnsOnCall(i int, result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.createApplicationInSpaceMutex.Lock()
 	defer fake.createApplicationInSpaceMutex.Unlock()
 	fake.CreateApplicationInSpaceStub = nil
 	if fake.createApplicationInSpaceReturnsOnCall == nil {
 		fake.createApplicationInSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Application
+			result1 resources.Application
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createApplicationInSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -838,7 +841,7 @@ func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Route, v7action.Warnings, error) {
+func (fake *FakeV7Actor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
 	fake.createRouteMutex.Lock()
 	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
@@ -846,11 +849,12 @@ func (fake *FakeV7Actor) CreateRoute(arg1 string, arg2 string, arg3 string, arg4
 		arg2 string
 		arg3 string
 		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4})
+		arg5 int
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateRoute", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
-		return fake.CreateRouteStub(arg1, arg2, arg3, arg4)
+		return fake.CreateRouteStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -865,49 +869,49 @@ func (fake *FakeV7Actor) CreateRouteCallCount() int {
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeV7Actor) CreateRouteCalls(stub func(string, string, string, string) (v7action.Route, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) CreateRouteCalls(stub func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = stub
 }
 
-func (fake *FakeV7Actor) CreateRouteArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeV7Actor) CreateRouteArgsForCall(i int) (string, string, string, string, int) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	argsForCall := fake.createRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakeV7Actor) CreateRouteReturns(result1 v7action.Route, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateRouteReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = nil
 	fake.createRouteReturns = struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) CreateRouteReturnsOnCall(i int, result1 v7action.Route, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) CreateRouteReturnsOnCall(i int, result1 resources.Route, result2 v7action.Warnings, result3 error) {
 	fake.createRouteMutex.Lock()
 	defer fake.createRouteMutex.Unlock()
 	fake.CreateRouteStub = nil
 	if fake.createRouteReturnsOnCall == nil {
 		fake.createRouteReturnsOnCall = make(map[int]struct {
-			result1 v7action.Route
+			result1 resources.Route
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.createRouteReturnsOnCall[i] = struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v7action.Application, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (resources.Application, v7action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
@@ -932,7 +936,7 @@ func (fake *FakeV7Actor) GetApplicationByNameAndSpaceCallCount() int {
 	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v7action.Application, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (resources.Application, v7action.Warnings, error)) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = stub
@@ -945,36 +949,36 @@ func (fake *FakeV7Actor) GetApplicationByNameAndSpaceArgsForCall(i int) (string,
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturns(result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v7action.Application
+			result1 resources.Application
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationDroplets(arg1 string, arg2 string) ([]v7action.Droplet, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetApplicationDroplets(arg1 string, arg2 string) ([]resources.Droplet, v7action.Warnings, error) {
 	fake.getApplicationDropletsMutex.Lock()
 	ret, specificReturn := fake.getApplicationDropletsReturnsOnCall[len(fake.getApplicationDropletsArgsForCall)]
 	fake.getApplicationDropletsArgsForCall = append(fake.getApplicationDropletsArgsForCall, struct {
@@ -999,7 +1003,7 @@ func (fake *FakeV7Actor) GetApplicationDropletsCallCount() int {
 	return len(fake.getApplicationDropletsArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetApplicationDropletsCalls(stub func(string, string) ([]v7action.Droplet, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetApplicationDropletsCalls(stub func(string, string) ([]resources.Droplet, v7action.Warnings, error)) {
 	fake.getApplicationDropletsMutex.Lock()
 	defer fake.getApplicationDropletsMutex.Unlock()
 	fake.GetApplicationDropletsStub = stub
@@ -1012,36 +1016,36 @@ func (fake *FakeV7Actor) GetApplicationDropletsArgsForCall(i int) (string, strin
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) GetApplicationDropletsReturns(result1 []v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationDropletsReturns(result1 []resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationDropletsMutex.Lock()
 	defer fake.getApplicationDropletsMutex.Unlock()
 	fake.GetApplicationDropletsStub = nil
 	fake.getApplicationDropletsReturns = struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationDropletsReturnsOnCall(i int, result1 []v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationDropletsReturnsOnCall(i int, result1 []resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationDropletsMutex.Lock()
 	defer fake.getApplicationDropletsMutex.Unlock()
 	fake.GetApplicationDropletsStub = nil
 	if fake.getApplicationDropletsReturnsOnCall == nil {
 		fake.getApplicationDropletsReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Droplet
+			result1 []resources.Droplet
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationDropletsReturnsOnCall[i] = struct {
-		result1 []v7action.Droplet
+		result1 []resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationRoutes(arg1 string) ([]v7action.Route, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetApplicationRoutes(arg1 string) ([]resources.Route, v7action.Warnings, error) {
 	fake.getApplicationRoutesMutex.Lock()
 	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
@@ -1065,7 +1069,7 @@ func (fake *FakeV7Actor) GetApplicationRoutesCallCount() int {
 	return len(fake.getApplicationRoutesArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetApplicationRoutesCalls(stub func(string) ([]v7action.Route, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetApplicationRoutesCalls(stub func(string) ([]resources.Route, v7action.Warnings, error)) {
 	fake.getApplicationRoutesMutex.Lock()
 	defer fake.getApplicationRoutesMutex.Unlock()
 	fake.GetApplicationRoutesStub = stub
@@ -1078,36 +1082,36 @@ func (fake *FakeV7Actor) GetApplicationRoutesArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) GetApplicationRoutesReturns(result1 []v7action.Route, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationRoutesReturns(result1 []resources.Route, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationRoutesMutex.Lock()
 	defer fake.getApplicationRoutesMutex.Unlock()
 	fake.GetApplicationRoutesStub = nil
 	fake.getApplicationRoutesReturns = struct {
-		result1 []v7action.Route
+		result1 []resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationRoutesReturnsOnCall(i int, result1 []v7action.Route, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationRoutesReturnsOnCall(i int, result1 []resources.Route, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationRoutesMutex.Lock()
 	defer fake.getApplicationRoutesMutex.Unlock()
 	fake.GetApplicationRoutesStub = nil
 	if fake.getApplicationRoutesReturnsOnCall == nil {
 		fake.getApplicationRoutesReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Route
+			result1 []resources.Route
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationRoutesReturnsOnCall[i] = struct {
-		result1 []v7action.Route
+		result1 []resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationsByNamesAndSpace(arg1 []string, arg2 string) ([]v7action.Application, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpace(arg1 []string, arg2 string) ([]resources.Application, v7action.Warnings, error) {
 	var arg1Copy []string
 	if arg1 != nil {
 		arg1Copy = make([]string, len(arg1))
@@ -1137,7 +1141,7 @@ func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceCallCount() int {
 	return len(fake.getApplicationsByNamesAndSpaceArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceCalls(stub func([]string, string) ([]v7action.Application, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceCalls(stub func([]string, string) ([]resources.Application, v7action.Warnings, error)) {
 	fake.getApplicationsByNamesAndSpaceMutex.Lock()
 	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
 	fake.GetApplicationsByNamesAndSpaceStub = stub
@@ -1150,36 +1154,36 @@ func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceArgsForCall(i int) ([]str
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturns(result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturns(result1 []resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationsByNamesAndSpaceMutex.Lock()
 	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
 	fake.GetApplicationsByNamesAndSpaceStub = nil
 	fake.getApplicationsByNamesAndSpaceReturns = struct {
-		result1 []v7action.Application
+		result1 []resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturnsOnCall(i int, result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturnsOnCall(i int, result1 []resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.getApplicationsByNamesAndSpaceMutex.Lock()
 	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
 	fake.GetApplicationsByNamesAndSpaceStub = nil
 	if fake.getApplicationsByNamesAndSpaceReturnsOnCall == nil {
 		fake.getApplicationsByNamesAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 []v7action.Application
+			result1 []resources.Application
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationsByNamesAndSpaceReturnsOnCall[i] = struct {
-		result1 []v7action.Application
+		result1 []resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDefaultDomain(arg1 string) (v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetDefaultDomain(arg1 string) (resources.Domain, v7action.Warnings, error) {
 	fake.getDefaultDomainMutex.Lock()
 	ret, specificReturn := fake.getDefaultDomainReturnsOnCall[len(fake.getDefaultDomainArgsForCall)]
 	fake.getDefaultDomainArgsForCall = append(fake.getDefaultDomainArgsForCall, struct {
@@ -1203,7 +1207,7 @@ func (fake *FakeV7Actor) GetDefaultDomainCallCount() int {
 	return len(fake.getDefaultDomainArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetDefaultDomainCalls(stub func(string) (v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetDefaultDomainCalls(stub func(string) (resources.Domain, v7action.Warnings, error)) {
 	fake.getDefaultDomainMutex.Lock()
 	defer fake.getDefaultDomainMutex.Unlock()
 	fake.GetDefaultDomainStub = stub
@@ -1216,36 +1220,36 @@ func (fake *FakeV7Actor) GetDefaultDomainArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) GetDefaultDomainReturns(result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDefaultDomainReturns(result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDefaultDomainMutex.Lock()
 	defer fake.getDefaultDomainMutex.Unlock()
 	fake.GetDefaultDomainStub = nil
 	fake.getDefaultDomainReturns = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDefaultDomainReturnsOnCall(i int, result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDefaultDomainReturnsOnCall(i int, result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDefaultDomainMutex.Lock()
 	defer fake.getDefaultDomainMutex.Unlock()
 	fake.GetDefaultDomainStub = nil
 	if fake.getDefaultDomainReturnsOnCall == nil {
 		fake.getDefaultDomainReturnsOnCall = make(map[int]struct {
-			result1 v7action.Domain
+			result1 resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getDefaultDomainReturnsOnCall[i] = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDomain(arg1 string) (v7action.Domain, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetDomain(arg1 string) (resources.Domain, v7action.Warnings, error) {
 	fake.getDomainMutex.Lock()
 	ret, specificReturn := fake.getDomainReturnsOnCall[len(fake.getDomainArgsForCall)]
 	fake.getDomainArgsForCall = append(fake.getDomainArgsForCall, struct {
@@ -1269,7 +1273,7 @@ func (fake *FakeV7Actor) GetDomainCallCount() int {
 	return len(fake.getDomainArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetDomainCalls(stub func(string) (v7action.Domain, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetDomainCalls(stub func(string) (resources.Domain, v7action.Warnings, error)) {
 	fake.getDomainMutex.Lock()
 	defer fake.getDomainMutex.Unlock()
 	fake.GetDomainStub = stub
@@ -1282,36 +1286,36 @@ func (fake *FakeV7Actor) GetDomainArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) GetDomainReturns(result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDomainReturns(result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainMutex.Lock()
 	defer fake.getDomainMutex.Unlock()
 	fake.GetDomainStub = nil
 	fake.getDomainReturns = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetDomainReturnsOnCall(i int, result1 v7action.Domain, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetDomainReturnsOnCall(i int, result1 resources.Domain, result2 v7action.Warnings, result3 error) {
 	fake.getDomainMutex.Lock()
 	defer fake.getDomainMutex.Unlock()
 	fake.GetDomainStub = nil
 	if fake.getDomainReturnsOnCall == nil {
 		fake.getDomainReturnsOnCall = make(map[int]struct {
-			result1 v7action.Domain
+			result1 resources.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getDomainReturnsOnCall[i] = struct {
-		result1 v7action.Domain
+		result1 resources.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributes(arg1 string, arg2 string, arg3 string, arg4 string) (v7action.Route, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetRouteByAttributes(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (resources.Route, v7action.Warnings, error) {
 	fake.getRouteByAttributesMutex.Lock()
 	ret, specificReturn := fake.getRouteByAttributesReturnsOnCall[len(fake.getRouteByAttributesArgsForCall)]
 	fake.getRouteByAttributesArgsForCall = append(fake.getRouteByAttributesArgsForCall, struct {
@@ -1319,11 +1323,12 @@ func (fake *FakeV7Actor) GetRouteByAttributes(arg1 string, arg2 string, arg3 str
 		arg2 string
 		arg3 string
 		arg4 string
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3, arg4})
+		arg5 int
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("GetRouteByAttributes", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.getRouteByAttributesMutex.Unlock()
 	if fake.GetRouteByAttributesStub != nil {
-		return fake.GetRouteByAttributesStub(arg1, arg2, arg3, arg4)
+		return fake.GetRouteByAttributesStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -1338,49 +1343,49 @@ func (fake *FakeV7Actor) GetRouteByAttributesCallCount() int {
 	return len(fake.getRouteByAttributesArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributesCalls(stub func(string, string, string, string) (v7action.Route, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetRouteByAttributesCalls(stub func(string, string, string, string, int) (resources.Route, v7action.Warnings, error)) {
 	fake.getRouteByAttributesMutex.Lock()
 	defer fake.getRouteByAttributesMutex.Unlock()
 	fake.GetRouteByAttributesStub = stub
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributesArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeV7Actor) GetRouteByAttributesArgsForCall(i int) (string, string, string, string, int) {
 	fake.getRouteByAttributesMutex.RLock()
 	defer fake.getRouteByAttributesMutex.RUnlock()
 	argsForCall := fake.getRouteByAttributesArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributesReturns(result1 v7action.Route, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetRouteByAttributesReturns(result1 resources.Route, result2 v7action.Warnings, result3 error) {
 	fake.getRouteByAttributesMutex.Lock()
 	defer fake.getRouteByAttributesMutex.Unlock()
 	fake.GetRouteByAttributesStub = nil
 	fake.getRouteByAttributesReturns = struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetRouteByAttributesReturnsOnCall(i int, result1 v7action.Route, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetRouteByAttributesReturnsOnCall(i int, result1 resources.Route, result2 v7action.Warnings, result3 error) {
 	fake.getRouteByAttributesMutex.Lock()
 	defer fake.getRouteByAttributesMutex.Unlock()
 	fake.GetRouteByAttributesStub = nil
 	if fake.getRouteByAttributesReturnsOnCall == nil {
 		fake.getRouteByAttributesReturnsOnCall = make(map[int]struct {
-			result1 v7action.Route
+			result1 resources.Route
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getRouteByAttributesReturnsOnCall[i] = struct {
-		result1 v7action.Route
+		result1 resources.Route
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetRouteDestinationByAppGUID(arg1 string, arg2 string) (v7action.RouteDestination, v7action.Warnings, error) {
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUID(arg1 string, arg2 string) (resources.RouteDestination, v7action.Warnings, error) {
 	fake.getRouteDestinationByAppGUIDMutex.Lock()
 	ret, specificReturn := fake.getRouteDestinationByAppGUIDReturnsOnCall[len(fake.getRouteDestinationByAppGUIDArgsForCall)]
 	fake.getRouteDestinationByAppGUIDArgsForCall = append(fake.getRouteDestinationByAppGUIDArgsForCall, struct {
@@ -1405,7 +1410,7 @@ func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDCallCount() int {
 	return len(fake.getRouteDestinationByAppGUIDArgsForCall)
 }
 
-func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDCalls(stub func(string, string) (v7action.RouteDestination, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDCalls(stub func(string, string) (resources.RouteDestination, v7action.Warnings, error)) {
 	fake.getRouteDestinationByAppGUIDMutex.Lock()
 	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
 	fake.GetRouteDestinationByAppGUIDStub = stub
@@ -1418,30 +1423,30 @@ func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDArgsForCall(i int) (string,
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturns(result1 v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturns(result1 resources.RouteDestination, result2 v7action.Warnings, result3 error) {
 	fake.getRouteDestinationByAppGUIDMutex.Lock()
 	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
 	fake.GetRouteDestinationByAppGUIDStub = nil
 	fake.getRouteDestinationByAppGUIDReturns = struct {
-		result1 v7action.RouteDestination
+		result1 resources.RouteDestination
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturnsOnCall(i int, result1 v7action.RouteDestination, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) GetRouteDestinationByAppGUIDReturnsOnCall(i int, result1 resources.RouteDestination, result2 v7action.Warnings, result3 error) {
 	fake.getRouteDestinationByAppGUIDMutex.Lock()
 	defer fake.getRouteDestinationByAppGUIDMutex.Unlock()
 	fake.GetRouteDestinationByAppGUIDStub = nil
 	if fake.getRouteDestinationByAppGUIDReturnsOnCall == nil {
 		fake.getRouteDestinationByAppGUIDReturnsOnCall = make(map[int]struct {
-			result1 v7action.RouteDestination
+			result1 resources.RouteDestination
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.getRouteDestinationByAppGUIDReturnsOnCall[i] = struct {
-		result1 v7action.RouteDestination
+		result1 resources.RouteDestination
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1511,7 +1516,7 @@ func (fake *FakeV7Actor) MapRouteReturnsOnCall(i int, result1 v7action.Warnings,
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollBuild(arg1 string, arg2 string) (v7action.Droplet, v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollBuild(arg1 string, arg2 string) (resources.Droplet, v7action.Warnings, error) {
 	fake.pollBuildMutex.Lock()
 	ret, specificReturn := fake.pollBuildReturnsOnCall[len(fake.pollBuildArgsForCall)]
 	fake.pollBuildArgsForCall = append(fake.pollBuildArgsForCall, struct {
@@ -1536,7 +1541,7 @@ func (fake *FakeV7Actor) PollBuildCallCount() int {
 	return len(fake.pollBuildArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollBuildCalls(stub func(string, string) (v7action.Droplet, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollBuildCalls(stub func(string, string) (resources.Droplet, v7action.Warnings, error)) {
 	fake.pollBuildMutex.Lock()
 	defer fake.pollBuildMutex.Unlock()
 	fake.PollBuildStub = stub
@@ -1549,30 +1554,30 @@ func (fake *FakeV7Actor) PollBuildArgsForCall(i int) (string, string) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV7Actor) PollBuildReturns(result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) PollBuildReturns(result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.pollBuildMutex.Lock()
 	defer fake.pollBuildMutex.Unlock()
 	fake.PollBuildStub = nil
 	fake.pollBuildReturns = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollBuildReturnsOnCall(i int, result1 v7action.Droplet, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) PollBuildReturnsOnCall(i int, result1 resources.Droplet, result2 v7action.Warnings, result3 error) {
 	fake.pollBuildMutex.Lock()
 	defer fake.pollBuildMutex.Unlock()
 	fake.PollBuildStub = nil
 	if fake.pollBuildReturnsOnCall == nil {
 		fake.pollBuildReturnsOnCall = make(map[int]struct {
-			result1 v7action.Droplet
+			result1 resources.Droplet
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.pollBuildReturnsOnCall[i] = struct {
-		result1 v7action.Droplet
+		result1 resources.Droplet
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1644,11 +1649,11 @@ func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 v7action.Packag
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) PollStart(arg1 string, arg2 bool, arg3 func(string)) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollStart(arg1 resources.Application, arg2 bool, arg3 func(string)) (v7action.Warnings, error) {
 	fake.pollStartMutex.Lock()
 	ret, specificReturn := fake.pollStartReturnsOnCall[len(fake.pollStartArgsForCall)]
 	fake.pollStartArgsForCall = append(fake.pollStartArgsForCall, struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 bool
 		arg3 func(string)
 	}{arg1, arg2, arg3})
@@ -1670,13 +1675,13 @@ func (fake *FakeV7Actor) PollStartCallCount() int {
 	return len(fake.pollStartArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartCalls(stub func(string, bool, func(string)) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollStartCalls(stub func(resources.Application, bool, func(string)) (v7action.Warnings, error)) {
 	fake.pollStartMutex.Lock()
 	defer fake.pollStartMutex.Unlock()
 	fake.PollStartStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartArgsForCall(i int) (string, bool, func(string)) {
+func (fake *FakeV7Actor) PollStartArgsForCall(i int) (resources.Application, bool, func(string)) {
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	argsForCall := fake.pollStartArgsForCall[i]
@@ -1709,11 +1714,11 @@ func (fake *FakeV7Actor) PollStartReturnsOnCall(i int, result1 v7action.Warnings
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) PollStartForRolling(arg1 string, arg2 string, arg3 bool, arg4 func(string)) (v7action.Warnings, error) {
+func (fake *FakeV7Actor) PollStartForRolling(arg1 resources.Application, arg2 string, arg3 bool, arg4 func(string)) (v7action.Warnings, error) {
 	fake.pollStartForRollingMutex.Lock()
 	ret, specificReturn := fake.pollStartForRollingReturnsOnCall[len(fake.pollStartForRollingArgsForCall)]
 	fake.pollStartForRollingArgsForCall = append(fake.pollStartForRollingArgsForCall, struct {
-		arg1 string
+		arg1 resources.Application
 		arg2 string
 		arg3 bool
 		arg4 func(string)
@@ -1736,13 +1741,13 @@ func (fake *FakeV7Actor) PollStartForRollingCallCount() int {
 	return len(fake.pollStartForRollingArgsForCall)
 }
 
-func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(string, string, bool, func(string)) (v7action.Warnings, error)) {
+func (fake *FakeV7Actor) PollStartForRollingCalls(stub func(resources.Application, string, bool, func(string)) (v7action.Warnings, error)) {
 	fake.pollStartForRollingMutex.Lock()
 	defer fake.pollStartForRollingMutex.Unlock()
 	fake.PollStartForRollingStub = stub
 }
 
-func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (string, string, bool, func(string)) {
+func (fake *FakeV7Actor) PollStartForRollingArgsForCall(i int) (resources.Application, string, bool, func(string)) {
 	fake.pollStartForRollingMutex.RLock()
 	defer fake.pollStartForRollingMutex.RUnlock()
 	argsForCall := fake.pollStartForRollingArgsForCall[i]
@@ -2369,11 +2374,11 @@ func (fake *FakeV7Actor) UnmapRouteReturnsOnCall(i int, result1 v7action.Warning
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) UpdateApplication(arg1 v7action.Application) (v7action.Application, v7action.Warnings, error) {
+func (fake *FakeV7Actor) UpdateApplication(arg1 resources.Application) (resources.Application, v7action.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
 	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
-		arg1 v7action.Application
+		arg1 resources.Application
 	}{arg1})
 	fake.recordInvocation("UpdateApplication", []interface{}{arg1})
 	fake.updateApplicationMutex.Unlock()
@@ -2393,43 +2398,43 @@ func (fake *FakeV7Actor) UpdateApplicationCallCount() int {
 	return len(fake.updateApplicationArgsForCall)
 }
 
-func (fake *FakeV7Actor) UpdateApplicationCalls(stub func(v7action.Application) (v7action.Application, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) UpdateApplicationCalls(stub func(resources.Application) (resources.Application, v7action.Warnings, error)) {
 	fake.updateApplicationMutex.Lock()
 	defer fake.updateApplicationMutex.Unlock()
 	fake.UpdateApplicationStub = stub
 }
 
-func (fake *FakeV7Actor) UpdateApplicationArgsForCall(i int) v7action.Application {
+func (fake *FakeV7Actor) UpdateApplicationArgsForCall(i int) resources.Application {
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	argsForCall := fake.updateApplicationArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeV7Actor) UpdateApplicationReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) UpdateApplicationReturns(result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.updateApplicationMutex.Lock()
 	defer fake.updateApplicationMutex.Unlock()
 	fake.UpdateApplicationStub = nil
 	fake.updateApplicationReturns = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV7Actor) UpdateApplicationReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+func (fake *FakeV7Actor) UpdateApplicationReturnsOnCall(i int, result1 resources.Application, result2 v7action.Warnings, result3 error) {
 	fake.updateApplicationMutex.Lock()
 	defer fake.updateApplicationMutex.Unlock()
 	fake.UpdateApplicationStub = nil
 	if fake.updateApplicationReturnsOnCall == nil {
 		fake.updateApplicationReturnsOnCall = make(map[int]struct {
-			result1 v7action.Application
+			result1 resources.Application
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
 	fake.updateApplicationReturnsOnCall[i] = struct {
-		result1 v7action.Application
+		result1 resources.Application
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}

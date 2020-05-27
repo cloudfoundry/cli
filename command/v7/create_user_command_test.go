@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,7 +24,7 @@ var _ = Describe("create-user Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateUserActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -34,13 +35,15 @@ var _ = Describe("create-user Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateUserActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = CreateUserCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.Args.Username = "some-user"
@@ -99,12 +102,12 @@ var _ = Describe("create-user Command", func() {
 			When("origin is not UAA or the empty string", func() {
 				BeforeEach(func() {
 					fakeActor.CreateUserReturns(
-						v7action.User{GUID: "new-user-cc-guid"},
+						resources.User{GUID: "new-user-cc-guid"},
 						v7action.Warnings{"warning"},
 						nil)
 					cmd.Origin = "some-origin"
 					fakeActor.GetUserReturns(
-						v7action.User{},
+						resources.User{},
 						actionerror.UserNotFoundError{})
 				})
 
@@ -139,7 +142,7 @@ var _ = Describe("create-user Command", func() {
 				When("the user already exists in UAA", func() {
 					BeforeEach(func() {
 						fakeActor.GetUserReturns(
-							v7action.User{GUID: "user-guid"},
+							resources.User{GUID: "user-guid"},
 							nil)
 					})
 
@@ -157,11 +160,11 @@ var _ = Describe("create-user Command", func() {
 				When("the user does not yet exist in UAA", func() {
 					BeforeEach(func() {
 						fakeActor.CreateUserReturns(
-							v7action.User{GUID: "new-user-cc-guid"},
+							resources.User{GUID: "new-user-cc-guid"},
 							v7action.Warnings{"warning"},
 							nil)
 						fakeActor.GetUserReturns(
-							v7action.User{},
+							resources.User{},
 							actionerror.UserNotFoundError{})
 					})
 
@@ -210,11 +213,11 @@ var _ = Describe("create-user Command", func() {
 				BeforeEach(func() {
 					returnedErr = errors.New("non-translatable error")
 					fakeActor.CreateUserReturns(
-						v7action.User{},
+						resources.User{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						returnedErr)
 					fakeActor.GetUserReturns(
-						v7action.User{},
+						resources.User{},
 						actionerror.UserNotFoundError{})
 				})
 
@@ -231,11 +234,11 @@ var _ = Describe("create-user Command", func() {
 				BeforeEach(func() {
 					returnedErr = uaa.ConflictError{}
 					fakeActor.CreateUserReturns(
-						v7action.User{},
+						resources.User{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						returnedErr)
 					fakeActor.GetUserReturns(
-						v7action.User{},
+						resources.User{},
 						actionerror.UserNotFoundError{})
 				})
 

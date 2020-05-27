@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -20,7 +21,7 @@ var _ = Describe("rename Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeRenameActor
+		fakeActor       *v7fakes.FakeActor
 		cmd             RenameCommand
 		executeErr      error
 	)
@@ -30,13 +31,15 @@ var _ = Describe("rename Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeRenameActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = RenameCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.RequiredArgs.OldAppName = "old-app-name"
@@ -45,7 +48,7 @@ var _ = Describe("rename Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "targeted-org"})
 		fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "targeted-space"})
-		fakeActor.RenameApplicationByNameAndSpaceGUIDReturns(v7action.Application{Name: "new-app-name"}, v7action.Warnings{"rename-app-warning"}, nil)
+		fakeActor.RenameApplicationByNameAndSpaceGUIDReturns(resources.Application{Name: "new-app-name"}, v7action.Warnings{"rename-app-warning"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -96,7 +99,7 @@ var _ = Describe("rename Command", func() {
 		)
 		BeforeEach(func() {
 			returnedError = errors.New("app rename failed!")
-			fakeActor.RenameApplicationByNameAndSpaceGUIDReturns(v7action.Application{Name: "new-app-name"}, v7action.Warnings{"rename-app-warning"}, returnedError)
+			fakeActor.RenameApplicationByNameAndSpaceGUIDReturns(resources.Application{Name: "new-app-name"}, v7action.Warnings{"rename-app-warning"}, returnedError)
 		})
 
 		It("returns the error", func() {

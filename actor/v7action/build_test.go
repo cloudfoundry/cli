@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,12 +25,12 @@ var _ = Describe("Build Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, clock.NewClock())
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, clock.NewClock())
 	})
 
 	Describe("StagePackage", func() {
 		var (
-			dropletStream  <-chan Droplet
+			dropletStream  <-chan resources.Droplet
 			warningsStream <-chan Warnings
 			errorStream    <-chan error
 
@@ -74,7 +75,7 @@ var _ = Describe("Build Actions", func() {
 
 		When("app is not found", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{}, ccv3.Warnings{"get-apps-warning"}, nil)
 			})
 
 			It("returns the error and warnings", func() {
@@ -88,7 +89,7 @@ var _ = Describe("Build Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("I am a passion fruit")
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns([]ccv3.Package{}, ccv3.Warnings{"get-packages-warning"}, expectedErr)
 			})
 
@@ -99,11 +100,11 @@ var _ = Describe("Build Actions", func() {
 			})
 		})
 
-		When("the package belongs to a different app", func() {
+		When("the package does not belong to the app", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
-					[]ccv3.Package{},
+					[]ccv3.Package{{GUID: "some-other-package-guid"}},
 					ccv3.Warnings{"get-packages-warning"},
 					nil,
 				)
@@ -118,7 +119,7 @@ var _ = Describe("Build Actions", func() {
 
 		When("the creation is successful", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
 					[]ccv3.Package{{GUID: packageGUID}},
 					ccv3.Warnings{"get-packages-warning"},
@@ -140,7 +141,7 @@ var _ = Describe("Build Actions", func() {
 				//TODO: uncommend after #150569020
 				// FWhen("looking up the droplet fails", func() {
 				// 	BeforeEach(func() {
-				// 		fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))
+				// 		fakeCloudControllerClient.GetDropletReturns(resources.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))
 				// 	})
 
 				// 	It("returns the warnings and the droplet error", func() {
@@ -157,7 +158,7 @@ var _ = Describe("Build Actions", func() {
 
 				// When("looking up the droplet succeeds", func() {
 				// 	BeforeEach(func() {
-				// 		fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: dropletGUID, State: ccv3.DropletStateStaged}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, nil)
+				// 		fakeCloudControllerClient.GetDropletReturns(resources.Droplet{GUID: dropletGUID, State: ccv3.DropletStateStaged}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, nil)
 				// 	})
 
 				It("polls until build is finished and returns the final droplet", func() {
@@ -168,7 +169,7 @@ var _ = Describe("Build Actions", func() {
 					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
 					// Eventually(warningsStream).Should(Receive(ConsistOf("droplet-warnings-1", "droplet-warnings-2")))
 
-					Eventually(dropletStream).Should(Receive(Equal(Droplet{GUID: dropletGUID, State: constant.DropletStaged, CreatedAt: "some-time"})))
+					Eventually(dropletStream).Should(Receive(Equal(resources.Droplet{GUID: dropletGUID, State: constant.DropletStaged, CreatedAt: "some-time"})))
 					Consistently(errorStream).ShouldNot(Receive())
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
@@ -264,7 +265,7 @@ var _ = Describe("Build Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: appGUID}}, ccv3.Warnings{"get-apps-warning"}, nil)
 				fakeCloudControllerClient.GetPackagesReturns(
 					[]ccv3.Package{{GUID: packageGUID}},
 					ccv3.Warnings{"get-packages-warning"},
@@ -321,7 +322,7 @@ var _ = Describe("Build Actions", func() {
 
 	Describe("PollBuild", func() {
 		var (
-			droplet    Droplet
+			droplet    resources.Droplet
 			warnings   Warnings
 			executeErr error
 		)
@@ -346,14 +347,14 @@ var _ = Describe("Build Actions", func() {
 
 			When("getting the droplet is successful", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: "some-droplet-guid", CreatedAt: "some-droplet-time", State: constant.DropletStaged}, ccv3.Warnings{"some-get-droplet-warnings"}, nil)
+					fakeCloudControllerClient.GetDropletReturns(resources.Droplet{GUID: "some-droplet-guid", CreatedAt: "some-droplet-time", State: constant.DropletStaged}, ccv3.Warnings{"some-get-droplet-warnings"}, nil)
 				})
 
 				It("returns the droplet and warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(warnings).To(ConsistOf("some-get-build-warnings", "some-get-build-warnings", "some-get-droplet-warnings"))
-					Expect(droplet).To(Equal(Droplet{
+					Expect(droplet).To(Equal(resources.Droplet{
 						GUID:      "some-droplet-guid",
 						CreatedAt: "some-droplet-time",
 						State:     constant.DropletStaged,
@@ -363,7 +364,7 @@ var _ = Describe("Build Actions", func() {
 
 			When("getting the droplet fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"some-get-droplet-warnings"}, errors.New("no rain"))
+					fakeCloudControllerClient.GetDropletReturns(resources.Droplet{}, ccv3.Warnings{"some-get-droplet-warnings"}, errors.New("no rain"))
 				})
 
 				It("returns the error and warnings", func() {

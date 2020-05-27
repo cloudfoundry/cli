@@ -28,6 +28,8 @@ var _ = Describe("delete-org-quota command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(`cf delete-org-quota QUOTA \[-f]`))
 			Eventually(session).Should(Say("\n"))
+			Eventually(session).Should(Say("ALIAS:"))
+			Eventually(session).Should(Say("delete-quota"))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`--force, -f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Say("\n"))

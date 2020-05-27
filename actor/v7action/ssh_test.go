@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,9 +29,55 @@ var _ = Describe("SSH Actions", func() {
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		fakeSharedActor = new(v7actionfakes.FakeSharedActor)
 		fakeUAAClient = new(v7actionfakes.FakeUAAClient)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient, nil, nil)
 	})
 
+	Describe("GetSSHPasscode", func() {
+		var uaaAccessToken string
+
+		BeforeEach(func() {
+			uaaAccessToken = "4cc3sst0k3n"
+			fakeConfig.AccessTokenReturns(uaaAccessToken)
+			fakeConfig.SSHOAuthClientReturns("some-id")
+		})
+
+		When("no errors are encountered getting the ssh passcode", func() {
+			var expectedCode string
+
+			BeforeEach(func() {
+				expectedCode = "s3curep4ss"
+				fakeUAAClient.GetSSHPasscodeReturns(expectedCode, nil)
+			})
+
+			It("returns the ssh passcode", func() {
+				code, err := actor.GetSSHPasscode()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(code).To(Equal(expectedCode))
+				Expect(fakeUAAClient.GetSSHPasscodeCallCount()).To(Equal(1))
+				accessTokenArg, sshOAuthClientArg := fakeUAAClient.GetSSHPasscodeArgsForCall(0)
+				Expect(accessTokenArg).To(Equal(uaaAccessToken))
+				Expect(sshOAuthClientArg).To(Equal("some-id"))
+			})
+		})
+
+		When("an error is encountered getting the ssh passcode", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("failed fetching code")
+				fakeUAAClient.GetSSHPasscodeReturns("", expectedErr)
+			})
+
+			It("returns the error", func() {
+				_, err := actor.GetSSHPasscode()
+				Expect(err).To(MatchError(expectedErr))
+				Expect(fakeUAAClient.GetSSHPasscodeCallCount()).To(Equal(1))
+				accessTokenArg, sshOAuthClientArg := fakeUAAClient.GetSSHPasscodeArgsForCall(0)
+				Expect(accessTokenArg).To(Equal(uaaAccessToken))
+				Expect(sshOAuthClientArg).To(Equal("some-id"))
+			})
+		})
+	})
 	Describe("GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex", func() {
 		var sshAuth SSHAuthentication
 
@@ -104,7 +151,7 @@ var _ = Describe("SSH Actions", func() {
 				When("getting the application succeeds with a started application", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
-							[]ccv3.Application{
+							[]resources.Application{
 								{Name: "some-app", State: constant.ApplicationStarted},
 							},
 							ccv3.Warnings{"some-app-warnings"},
@@ -136,7 +183,7 @@ var _ = Describe("SSH Actions", func() {
 
 						When("the process doesn't have the specified instance index", func() {
 							BeforeEach(func() {
-								fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
+								fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
 								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
 							})
 
@@ -147,7 +194,7 @@ var _ = Describe("SSH Actions", func() {
 
 						When("the process instance is not RUNNING", func() {
 							BeforeEach(func() {
-								fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
+								fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
 								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
 								fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{{State: constant.ProcessInstanceDown, Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
 							})
@@ -159,7 +206,7 @@ var _ = Describe("SSH Actions", func() {
 
 						When("the specified process and index exist and the instance is RUNNING", func() {
 							BeforeEach(func() {
-								fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
+								fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
 								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
 								fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning, Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
 							})
@@ -190,7 +237,7 @@ var _ = Describe("SSH Actions", func() {
 				When("getting the application succeeds with a stopped application", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
-							[]ccv3.Application{
+							[]resources.Application{
 								{Name: "some-app", State: constant.ApplicationStopped},
 							},
 							ccv3.Warnings{"some-app-warnings"},

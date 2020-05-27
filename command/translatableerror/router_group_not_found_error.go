@@ -5,7 +5,7 @@ type RouterGroupNotFoundError struct {
 }
 
 func (e RouterGroupNotFoundError) Error() string {
-	return "Router group {{.RouterGroupName}} not found"
+	return "Router group '{{.RouterGroupName}}' not found."
 }
 
 func (e RouterGroupNotFoundError) Translate(translate func(string, ...interface{}) string) string {

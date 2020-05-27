@@ -23,7 +23,7 @@ var _ = Describe("Targeting", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, fakeConfig, _, _, _, _ = NewTestActor()
 
 	})
 
@@ -33,6 +33,7 @@ var _ = Describe("Targeting", func() {
 			expectedAPIVersion string
 			expectedAuth       string
 			expectedDoppler    string
+			expectedLogCache   string
 			expectedRouting    string
 
 			err      error
@@ -44,6 +45,7 @@ var _ = Describe("Targeting", func() {
 			expectedAPIVersion = "3.81.0"
 			expectedAuth = "https://login.foo.com"
 			expectedDoppler = "wss://doppler.foo.com"
+			expectedLogCache = "https://log-cache.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
 			skipSSLValidation = true
@@ -54,15 +56,17 @@ var _ = Describe("Targeting", func() {
 				OAuthClient        string `json:"oath_client"`
 			}
 			meta.Version = expectedAPIVersion
-			fakeCloudControllerClient.TargetCFReturns(ccv3.Warnings{"info-warning"}, nil)
 
-			fakeCloudControllerClient.RootResponseReturns(ccv3.Info{
+			rootResponse := ccv3.Info{
 				Links: ccv3.InfoLinks{
 					CCV3: ccv3.APILink{
 						Meta: meta,
 					},
 					Logging: ccv3.APILink{
 						HREF: expectedDoppler,
+					},
+					LogCache: ccv3.APILink{
+						HREF: expectedLogCache,
 					},
 					Routing: ccv3.APILink{
 						HREF: expectedRouting,
@@ -71,7 +75,8 @@ var _ = Describe("Targeting", func() {
 						HREF: expectedAuth,
 					},
 				},
-			}, ccv3.Warnings{"root-response-warning"}, nil)
+			}
+			fakeCloudControllerClient.TargetCFReturns(rootResponse, ccv3.Warnings{"info-warning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -80,20 +85,6 @@ var _ = Describe("Targeting", func() {
 				URL:               targetedURL,
 			}
 			warnings, err = actor.SetTarget(settings)
-		})
-
-		When("the requested API and SSL configuration match the existing state", func() {
-			BeforeEach(func() {
-				fakeConfig.TargetReturns(targetedURL)
-				fakeConfig.SkipSSLValidationReturns(skipSSLValidation)
-			})
-
-			It("does not make any API calls", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(BeNil())
-
-				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(BeZero())
-			})
 		})
 
 		It("targets CF with the expected arguments", func() {
@@ -105,7 +96,7 @@ var _ = Describe("Targeting", func() {
 
 		When("targeting CF fails", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.TargetCFReturns(ccv3.Warnings{"info-warning"}, errors.New("target-error"))
+				fakeCloudControllerClient.TargetCFReturns(ccv3.Info{}, ccv3.Warnings{"info-warning"}, errors.New("target-error"))
 			})
 
 			It("returns an error and all warnings", func() {
@@ -114,44 +105,20 @@ var _ = Describe("Targeting", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
 
 				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(0))
-			})
-		})
-
-		It("queries the API root to get the target information", func() {
-			Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(1))
-		})
-
-		When("getting the API root response fails", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.RootResponseReturns(
-					ccv3.Info{},
-					ccv3.Warnings{"root-response-warning"},
-					errors.New("root-error"),
-				)
-			})
-
-			It("returns an error and all warnings", func() {
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("root-error"))
-				Expect(warnings).To(ConsistOf(Warnings{"info-warning", "root-response-warning"}))
-
-				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.RootResponseCallCount()).To(Equal(1))
-				Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(0))
 			})
 		})
 
 		It("sets all the target information", func() {
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, _, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
 
-			Expect(api).To(Equal(expectedAPI))
-			Expect(apiVersion).To(Equal(expectedAPIVersion))
-			Expect(auth).To(Equal(expectedAuth))
-			Expect(doppler).To(Equal(expectedDoppler))
-			Expect(routing).To(Equal(expectedRouting))
-			Expect(sslDisabled).To(Equal(skipSSLValidation))
+			Expect(targetInfoArgs.Api).To(Equal(expectedAPI))
+			Expect(targetInfoArgs.ApiVersion).To(Equal(expectedAPIVersion))
+			Expect(targetInfoArgs.Auth).To(Equal(expectedAuth))
+			Expect(targetInfoArgs.Doppler).To(Equal(expectedDoppler))
+			Expect(targetInfoArgs.LogCache).To(Equal(expectedLogCache))
+			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
+			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
 		})
 
 		It("clears all the token information", func() {
@@ -165,7 +132,7 @@ var _ = Describe("Targeting", func() {
 
 		It("succeeds and returns all warnings", func() {
 			Expect(err).ToNot(HaveOccurred())
-			Expect(warnings).To(ConsistOf(Warnings{"info-warning", "root-response-warning"}))
+			Expect(warnings).To(ConsistOf(Warnings{"info-warning"}))
 		})
 	})
 
@@ -174,15 +141,16 @@ var _ = Describe("Targeting", func() {
 			actor.ClearTarget()
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
 
-			Expect(api).To(BeEmpty())
-			Expect(apiVersion).To(BeEmpty())
-			Expect(auth).To(BeEmpty())
-			Expect(minCLIVersion).To(BeEmpty())
-			Expect(doppler).To(BeEmpty())
-			Expect(routing).To(BeEmpty())
-			Expect(sslDisabled).To(BeFalse())
+			Expect(targetInfoArgs.Api).To(BeEmpty())
+			Expect(targetInfoArgs.ApiVersion).To(BeEmpty())
+			Expect(targetInfoArgs.Auth).To(BeEmpty())
+			Expect(targetInfoArgs.MinCLIVersion).To(BeEmpty())
+			Expect(targetInfoArgs.Doppler).To(BeEmpty())
+			Expect(targetInfoArgs.LogCache).To(BeEmpty())
+			Expect(targetInfoArgs.Routing).To(BeEmpty())
+			Expect(targetInfoArgs.SkipSSLValidation).To(BeFalse())
 		})
 
 		It("clears all the token information", func() {

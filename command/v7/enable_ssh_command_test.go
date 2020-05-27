@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +22,7 @@ var _ = Describe("enable-ssh Command", func() {
 		testUI             *ui.UI
 		fakeConfig         *commandfakes.FakeConfig
 		fakeSharedActor    *commandfakes.FakeSharedActor
-		fakeEnableSSHActor *v7fakes.FakeEnableSSHActor
+		fakeEnableSSHActor *v7fakes.FakeActor
 
 		binaryName      string
 		currentUserName string
@@ -32,13 +33,15 @@ var _ = Describe("enable-ssh Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeEnableSSHActor = new(v7fakes.FakeEnableSSHActor)
+		fakeEnableSSHActor = new(v7fakes.FakeActor)
 
 		cmd = EnableSSHCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeEnableSSHActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeEnableSSHActor,
+			},
 		}
 
 		cmd.RequiredArgs.AppName = "some-app"
@@ -72,7 +75,7 @@ var _ = Describe("enable-ssh Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeEnableSSHActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{Name: "some-app", GUID: "some-app-guid"},
+					resources.Application{Name: "some-app", GUID: "some-app-guid"},
 					v7action.Warnings{"some-get-app-warnings"},
 					nil,
 				)
@@ -167,7 +170,7 @@ var _ = Describe("enable-ssh Command", func() {
 					BeforeEach(func() {
 						returnedErr = actionerror.ApplicationNotFoundError{Name: "some-app"}
 						fakeEnableSSHActor.GetApplicationByNameAndSpaceReturns(
-							v7action.Application{},
+							resources.Application{},
 							nil,
 							returnedErr)
 					})
@@ -202,7 +205,7 @@ var _ = Describe("enable-ssh Command", func() {
 				BeforeEach(func() {
 					returnedErr = errors.New("some-error")
 					fakeEnableSSHActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{Name: "some-app"},
+						resources.Application{Name: "some-app"},
 						v7action.Warnings{"some-warning"},
 						nil,
 					)

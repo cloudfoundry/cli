@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock"
 
 	. "github.com/onsi/ginkgo"
@@ -24,7 +25,7 @@ var _ = Describe("Organization Summary Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, clock.NewClock())
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, clock.NewClock())
 	})
 
 	JustBeforeEach(func() {
@@ -35,7 +36,7 @@ var _ = Describe("Organization Summary Actions", func() {
 		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{
 							GUID:      "some-org-guid",
 							Name:      "some-org",
@@ -46,7 +47,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationDomainsReturns(
-					[]ccv3.Domain{
+					[]resources.Domain{
 						{
 							GUID: "shared-domain-guid-2",
 							Name: "shared-domain-2",
@@ -60,7 +61,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationQuotaReturns(
-					ccv3.OrganizationQuota{Quota: ccv3.Quota{Name: "my-quota", GUID: "quota-guid"}},
+					resources.OrganizationQuota{Quota: resources.Quota{Name: "my-quota", GUID: "quota-guid"}},
 					ccv3.Warnings{"get-quota-warning-1"}, nil)
 
 				fakeCloudControllerClient.GetSpacesReturns(
@@ -79,7 +80,7 @@ var _ = Describe("Organization Summary Actions", func() {
 					nil)
 
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
-					ccv3.Relationship{
+					resources.Relationship{
 						GUID: "default-iso-seg-guid",
 					},
 					ccv3.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"},
@@ -103,7 +104,7 @@ var _ = Describe("Organization Summary Actions", func() {
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)[0].Values).To(ConsistOf("some-org-guid"))
 
 				Expect(orgSummary).To(Equal(OrganizationSummary{
-					Organization: Organization{
+					Organization: resources.Organization{
 						Name:      "some-org",
 						GUID:      "some-org-guid",
 						QuotaGUID: "org-quota-guid",
@@ -132,7 +133,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get-orgs-error")
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
+					[]resources.Organization{},
 					ccv3.Warnings{
 						"get-org-warning-1",
 						"get-org-warning-2",
@@ -150,7 +151,7 @@ var _ = Describe("Organization Summary Actions", func() {
 		When("the organization exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{
+					[]resources.Organization{
 						{GUID: "some-org-guid"},
 					},
 					ccv3.Warnings{
@@ -164,7 +165,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			When("an error is encountered getting the organization domains", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("domains error")
-					fakeCloudControllerClient.GetOrganizationDomainsReturns([]ccv3.Domain{}, ccv3.Warnings{"domains warning"}, expectedErr)
+					fakeCloudControllerClient.GetOrganizationDomainsReturns([]resources.Domain{}, ccv3.Warnings{"domains warning"}, expectedErr)
 				})
 
 				It("returns that error and all warnings", func() {
@@ -176,7 +177,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			When("an error is encountered getting the organization quota", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("quota error")
-					fakeCloudControllerClient.GetOrganizationQuotaReturns(ccv3.OrganizationQuota{}, ccv3.Warnings{"Quota warning"}, expectedErr)
+					fakeCloudControllerClient.GetOrganizationQuotaReturns(resources.OrganizationQuota{}, ccv3.Warnings{"Quota warning"}, expectedErr)
 				})
 
 				It("returns that error and all warnings", func() {

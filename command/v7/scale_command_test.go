@@ -12,6 +12,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -28,8 +29,8 @@ var _ = Describe("scale Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeScaleActor
-		appName         string
+		fakeActor       *v7fakes.FakeActor
+		app             resources.Application
 		binaryName      string
 		executeErr      error
 	)
@@ -40,20 +41,22 @@ var _ = Describe("scale Command", func() {
 		testUI = ui.NewTestUI(input, output, NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeScaleActor)
-		appName = "some-app"
+		fakeActor = new(v7fakes.FakeActor)
+		app = resources.Application{Name: "some-app", GUID: "some-app-guid"}
 
 		cmd = ScaleCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		cmd.RequiredArgs.AppName = appName
+		cmd.RequiredArgs.AppName = app.Name
 		cmd.ProcessType = constant.ProcessTypeWeb
 	})
 
@@ -107,20 +110,20 @@ var _ = Describe("scale Command", func() {
 		When("the application does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"get-app-warning"},
-					actionerror.ApplicationNotFoundError{Name: appName})
+					actionerror.ApplicationNotFoundError{Name: app.Name})
 			})
 
 			It("returns an ApplicationNotFoundError and all warnings", func() {
-				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: appName}))
+				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app.Name}))
 
 				Expect(testUI.Out).ToNot(Say("Showing | Scaling"))
 				Expect(testUI.Err).To(Say("get-app-warning"))
 
 				Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 				appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-				Expect(appNameArg).To(Equal(appName))
+				Expect(appNameArg).To(Equal(app.Name))
 				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 			})
 		})
@@ -131,7 +134,7 @@ var _ = Describe("scale Command", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get app error")
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"get-app-warning"},
 					expectedErr)
 			})
@@ -208,7 +211,7 @@ var _ = Describe("scale Command", func() {
 				}
 
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{GUID: "some-app-guid"},
+					app,
 					v7action.Warnings{"get-app-warning"},
 					nil)
 			})
@@ -347,8 +350,8 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
+								actualApp, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(actualApp).To(Equal(app))
 								handleInstanceDetails("instance details")
 								Expect(testUI.Out).To(Say("instance details"))
 							})
@@ -371,8 +374,8 @@ var _ = Describe("scale Command", func() {
 								})
 
 								It("Delegates the correct appGUID", func() {
-									actualGUID := fakeActor.StartApplicationArgsForCall(0)
-									Expect(actualGUID).To(Equal("some-app-guid"))
+									actualAppGUID := fakeActor.StartApplicationArgsForCall(0)
+									Expect(actualAppGUID).To(Equal("some-app-guid"))
 								})
 
 								It("Prints warnings and returns an error", func() {
@@ -430,7 +433,7 @@ var _ = Describe("scale Command", func() {
 
 								Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 								appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-								Expect(appNameArg).To(Equal(appName))
+								Expect(appNameArg).To(Equal(app.Name))
 								Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 								Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
@@ -457,14 +460,14 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
+								actualApp, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(actualApp).To(Equal(app))
 								handleInstanceDetails("instance details")
 								Expect(testUI.Out).To(Say("instance details"))
 							})
 
 							It("displays the process table", func() {
-								Expect(testUI.Out).To(Say("Showing current scale of app " + appName))
+								Expect(testUI.Out).To(Say("Showing current scale of app " + app.Name))
 							})
 
 							It("displays all warnings and fails", func() {
@@ -472,7 +475,7 @@ var _ = Describe("scale Command", func() {
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
 
 								Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
-									AppName:    appName,
+									AppName:    app.Name,
 									BinaryName: binaryName,
 								}))
 							})
@@ -484,8 +487,8 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
+								actualApp, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(actualApp).To(Equal(app))
 								handleInstanceDetails("instance details")
 								Expect(testUI.Out).To(Say("instance details"))
 							})
@@ -504,8 +507,8 @@ var _ = Describe("scale Command", func() {
 							})
 
 							It("delegates the right appGUID", func() {
-								appGUID, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
-								Expect(appGUID).To(Equal("some-app-guid"))
+								actualApp, _, handleInstanceDetails := fakeActor.PollStartArgsForCall(0)
+								Expect(actualApp).To(Equal(app))
 								handleInstanceDetails("instance details")
 								Expect(testUI.Out).To(Say("instance details"))
 							})
@@ -567,7 +570,7 @@ var _ = Describe("scale Command", func() {
 
 					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appNameArg).To(Equal(appName))
+					Expect(appNameArg).To(Equal(app.Name))
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
@@ -613,7 +616,7 @@ var _ = Describe("scale Command", func() {
 
 					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appNameArg).To(Equal(appName))
+					Expect(appNameArg).To(Equal(app.Name))
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
@@ -665,7 +668,7 @@ var _ = Describe("scale Command", func() {
 
 					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appNameArg).To(Equal(appName))
+					Expect(appNameArg).To(Equal(app.Name))
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
@@ -713,7 +716,7 @@ var _ = Describe("scale Command", func() {
 
 					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appNameArg).To(Equal(appName))
+					Expect(appNameArg).To(Equal(app.Name))
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))

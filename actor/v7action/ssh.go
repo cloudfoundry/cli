@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type SSHAuthentication struct {
@@ -11,6 +12,10 @@ type SSHAuthentication struct {
 	HostKeyFingerprint string
 	Passcode           string
 	Username           string
+}
+
+func (actor Actor) GetSSHPasscode() (string, error) {
+	return actor.UAAClient.GetSSHPasscode(actor.Config.AccessToken(), actor.Config.SSHOAuthClient())
 }
 
 // GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex returns
@@ -59,7 +64,7 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 	}, allWarnings, err
 }
 
-func (actor Actor) getUsername(application Application, processType string, processIndex uint) (string, Warnings, error) {
+func (actor Actor) getUsername(application resources.Application, processType string, processIndex uint) (string, Warnings, error) {
 	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(application.GUID, false)
 	if err != nil {
 		return "", processWarnings, err

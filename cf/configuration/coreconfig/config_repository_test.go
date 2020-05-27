@@ -96,6 +96,9 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetDopplerEndpoint("doppler.the-endpoint")
 		Expect(config.DopplerEndpoint()).To(Equal("doppler.the-endpoint"))
 
+		config.SetLogCacheEndpoint("log-cache.the-endpoint")
+		Expect(config.LogCacheEndpoint()).To(Equal("log-cache.the-endpoint"))
+
 		config.SetRefreshToken("the-token")
 		Expect(config.RefreshToken()).To(Equal("the-token"))
 

@@ -291,7 +291,7 @@ var _ = Describe("update-service command", func() {
 				[]string{"OK"},
 			))
 			_, _, _, tags := serviceRepo.UpdateServiceInstanceArgsForCall(0)
-			Expect(tags).To(ConsistOf("tag1", "tag2", "tag3", "tag4"))
+			Expect(*tags).To(ConsistOf("tag1", "tag2", "tag3", "tag4"))
 		})
 
 		It("successfully updates a service and passes the tags as json", func() {
@@ -302,7 +302,7 @@ var _ = Describe("update-service command", func() {
 				[]string{"OK"},
 			))
 			_, _, _, tags := serviceRepo.UpdateServiceInstanceArgsForCall(0)
-			Expect(tags).To(ConsistOf("tag1"))
+			Expect(*tags).To(ConsistOf("tag1"))
 		})
 
 		Context("and the tags string is passed with an empty string", func() {
@@ -314,7 +314,7 @@ var _ = Describe("update-service command", func() {
 					[]string{"OK"},
 				))
 				_, _, _, tags := serviceRepo.UpdateServiceInstanceArgsForCall(0)
-				Expect(tags).To(Equal([]string{}))
+				Expect(tags).To(Equal(&[]string{}))
 			})
 		})
 	})

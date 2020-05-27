@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -23,7 +24,7 @@ var _ = Describe("unset-space-role Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeUnsetSpaceRoleActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -34,13 +35,15 @@ var _ = Describe("unset-space-role Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeUnsetSpaceRoleActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = UnsetSpaceRoleCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -55,7 +58,7 @@ var _ = Describe("unset-space-role Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "current-user"}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{
+			resources.Organization{
 				GUID:     "some-org-guid",
 				Name:     "some-org-name",
 				Metadata: nil,
@@ -203,7 +206,7 @@ var _ = Describe("unset-space-role Command", func() {
 			cmd.Args.Role = flag.SpaceRole{Role: "SpaceAuditor"}
 
 			fakeActor.GetOrganizationByNameReturns(
-				v7action.Organization{},
+				resources.Organization{},
 				v7action.Warnings{"get-user-warning"},
 				errors.New("get-org-error"),
 			)

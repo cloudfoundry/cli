@@ -23,7 +23,7 @@ var _ = Describe("create-shared-domain Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateSharedDomainActor
+		fakeActor       *v7fakes.FakeActor
 
 		executeErr error
 
@@ -35,7 +35,7 @@ var _ = Describe("create-shared-domain Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateSharedDomainActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		domainName = "example.com"
 
@@ -43,10 +43,12 @@ var _ = Describe("create-shared-domain Command", func() {
 			RequiredArgs: flag.Domain{
 				Domain: domainName,
 			},
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -94,10 +96,24 @@ var _ = Describe("create-shared-domain Command", func() {
 			})
 		})
 
+		When("the provided router group does not exist", func() {
+			BeforeEach(func() {
+				fakeActor.CreateSharedDomainReturns(v7action.Warnings{"warnings-1", "warnings-2"}, errors.New("bad-router-group"))
+				cmd.RouterGroup = "bogus"
+			})
+
+			It("returns an error and displays warnings", func() {
+				Expect(executeErr).To(MatchError("bad-router-group"))
+				Expect(testUI.Err).To(Say("warnings-1"))
+				Expect(testUI.Err).To(Say("warnings-2"))
+			})
+		})
+
 		When("creating the domain is successful", func() {
 			BeforeEach(func() {
 				fakeActor.CreateSharedDomainReturns(v7action.Warnings{"warnings-1", "warnings-2"}, nil)
 				cmd.Internal = true
+				cmd.RouterGroup = "router-group"
 			})
 
 			It("prints all warnings, ok and then a tip", func() {
@@ -110,9 +126,10 @@ var _ = Describe("create-shared-domain Command", func() {
 
 			It("creates the domain", func() {
 				Expect(fakeActor.CreateSharedDomainCallCount()).To(Equal(1))
-				expectedDomainName, expectedInternal := fakeActor.CreateSharedDomainArgsForCall(0)
+				expectedDomainName, expectedInternal, expectedRouterGroup := fakeActor.CreateSharedDomainArgsForCall(0)
 				Expect(expectedDomainName).To(Equal(domainName))
 				Expect(expectedInternal).To(BeTrue())
+				Expect(expectedRouterGroup).To(Equal("router-group"))
 			})
 		})
 	})

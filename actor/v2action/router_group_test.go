@@ -56,7 +56,7 @@ var _ = Describe("Router Group Actions", func() {
 				})
 
 				It("should return an error", func() {
-					Expect(executeErr).To(MatchError(fmt.Sprintf("Router group %s not found", routerGroupName)))
+					Expect(executeErr).To(MatchError(fmt.Sprintf("Router group '%s' not found.", routerGroupName)))
 					Expect(fakeRouterClient.GetRouterGroupByNameCallCount()).To(Equal(1))
 				})
 			})

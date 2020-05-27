@@ -173,7 +173,8 @@ var _ = Describe("delete-org Command", func() {
 				When("the '-f' flag is not provided", func() {
 					When("the user chooses the default", func() {
 						BeforeEach(func() {
-							input.Write([]byte("\n"))
+							_, err := input.Write([]byte("\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("does not delete the org", func() {
@@ -187,7 +188,8 @@ var _ = Describe("delete-org Command", func() {
 
 					When("the user inputs no", func() {
 						BeforeEach(func() {
-							input.Write([]byte("n\n"))
+							_, err := input.Write([]byte("n\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("does not delete the org", func() {
@@ -201,7 +203,8 @@ var _ = Describe("delete-org Command", func() {
 
 					When("the user inputs yes", func() {
 						BeforeEach(func() {
-							input.Write([]byte("y\n"))
+							_, err := input.Write([]byte("y\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("deletes the org", func() {
@@ -220,7 +223,8 @@ var _ = Describe("delete-org Command", func() {
 
 					When("the user input is invalid", func() {
 						BeforeEach(func() {
-							input.Write([]byte("e\n\n"))
+							_, err := input.Write([]byte("e\n\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("asks the user again", func() {

@@ -7,7 +7,8 @@ import (
 )
 
 type Color struct {
-	Color bool
+	Value string
+	IsSet bool
 }
 
 func (Color) Complete(prefix string) []flags.Completion {
@@ -17,9 +18,11 @@ func (Color) Complete(prefix string) []flags.Completion {
 func (c *Color) UnmarshalFlag(val string) error {
 	switch strings.ToLower(val) {
 	case "true":
-		c.Color = true
+		c.Value = "true"
+		c.IsSet = true
 	case "false":
-		c.Color = false
+		c.Value = "false"
+		c.IsSet = true
 	default:
 		return &flags.Error{
 			Type:    flags.ErrRequired,

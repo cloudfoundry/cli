@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -24,7 +25,7 @@ var _ = Describe("set-org-role Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSetOrgRoleActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -35,13 +36,15 @@ var _ = Describe("set-org-role Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetOrgRoleActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = SetOrgRoleCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -56,13 +59,13 @@ var _ = Describe("set-org-role Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "current-user"}, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{GUID: "some-org-guid", Name: "some-org-name"},
+			resources.Organization{GUID: "some-org-guid", Name: "some-org-name"},
 			v7action.Warnings{"get-org-warning"},
 			nil,
 		)
 
 		fakeActor.GetUserReturns(
-			v7action.User{GUID: "target-user-guid", Username: "target-user"},
+			resources.User{GUID: "target-user-guid", Username: "target-user"},
 			nil,
 		)
 	})
@@ -196,7 +199,7 @@ var _ = Describe("set-org-role Command", func() {
 			cmd.Args.Role = flag.OrgRole{Role: "OrgAuditor"}
 
 			fakeActor.GetOrganizationByNameReturns(
-				v7action.Organization{},
+				resources.Organization{},
 				v7action.Warnings{"get-org-warning"},
 				errors.New("get-org-error"),
 			)

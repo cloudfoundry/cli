@@ -52,11 +52,14 @@ func (cmd *Password) Execute(c flags.FlagContext) error {
 	newPassword := cmd.ui.AskForPassword(T("New Password"))
 	verifiedPassword := cmd.ui.AskForPassword(T("Verify Password"))
 
+	cmd.ui.Say(T("Changing password for user {{.Username}}...", map[string]interface{}{
+		"Username": cmd.config.Username(),
+	}))
+
 	if verifiedPassword != newPassword {
 		return errors.New(T("Password verification does not match"))
 	}
 
-	cmd.ui.Say(T("Changing password..."))
 	err := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
 	switch typedErr := err.(type) {

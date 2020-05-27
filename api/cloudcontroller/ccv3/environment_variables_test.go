@@ -50,7 +50,9 @@ var _ = Describe("EnvironmentVariables", func() {
 				responseBody := `{
 						"var": {
 							"DEBUG": "false",
-							"my-var": "my-val"
+							"my-var": "my-val",
+							"number": 6,
+							"json": {"is": "fun"}
 						}
 					}`
 
@@ -68,6 +70,8 @@ var _ = Describe("EnvironmentVariables", func() {
 				Expect(envVars).To(Equal(EnvironmentVariables{
 					"DEBUG":  {Value: "false", IsSet: true},
 					"my-var": {Value: "my-val", IsSet: true},
+					"number": {Value: "6", IsSet: true},
+					"json":   {Value: "{\"is\":\"fun\"}", IsSet: true},
 				}))
 			})
 		})

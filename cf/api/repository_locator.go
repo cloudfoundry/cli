@@ -1,10 +1,7 @@
 package api
 
 import (
-	"net/http"
-	"strconv"
-	"time"
-
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/cf/api/appevents"
 	api_appfiles "code.cloudfoundry.org/cli/cf/api/appfiles"
 	"code.cloudfoundry.org/cli/cf/api/appinstances"
@@ -28,10 +25,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/appfiles"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/util"
-	"github.com/cloudfoundry/noaa/consumer"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type RepositoryLocator struct {
@@ -77,8 +73,6 @@ type RepositoryLocator struct {
 	copyAppSourceRepo               copyapplicationsource.Repository
 }
 
-const noaaRetryDefaultTimeout = 5 * time.Second
-
 func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer, envDialTimeout string) (loc RepositoryLocator) {
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	routingAPIGateway := gatewaysByName["routing-api"]
@@ -100,19 +94,14 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.endpointRepo = NewEndpointRepository(cloudControllerGateway)
 
-	tlsConfig := util.NewTLSConfig(nil, config.IsSSLDisabled())
-
-	var noaaRetryTimeout time.Duration
-	convertedTime, err := strconv.Atoi(envDialTimeout)
+	configV3, err := configv3.GetCFConfig()
 	if err != nil {
-		noaaRetryTimeout = noaaRetryDefaultTimeout
-	} else {
-		noaaRetryTimeout = time.Duration(convertedTime) * 3 * time.Second
+		panic("handle this error!")
 	}
 
-	consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-	loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo, noaaRetryTimeout)
+	logCacheURL := configV3.ConfigFile.LogCacheEndpoint
+	logCacheClient := command.NewLogCacheClient(logCacheURL, configV3, nil)
+	loc.logsRepo = logs.NewLogCacheRepository(logCacheClient, sharedaction.GetRecentLogs, sharedaction.GetStreamingLogs)
 
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerRepository(config, uaaGateway)

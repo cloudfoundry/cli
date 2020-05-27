@@ -5,11 +5,12 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7action.Warnings, errStream <-chan error, logStream <-chan sharedaction.LogMessage, logErrStream <-chan error, ui command.UI) (v7action.Droplet, error) {
+func PollStage(dropletStream <-chan resources.Droplet, warningsStream <-chan v7action.Warnings, errStream <-chan error, logStream <-chan sharedaction.LogMessage, logErrStream <-chan error, ui command.UI) (resources.Droplet, error) {
 	var closedBuildStream, closedWarningsStream, closedErrStream bool
-	var droplet v7action.Droplet
+	var droplet resources.Droplet
 
 	for {
 		select {
@@ -50,7 +51,7 @@ func PollStage(dropletStream <-chan v7action.Droplet, warningsStream <-chan v7ac
 				closedErrStream = true
 				break
 			}
-			return v7action.Droplet{}, err
+			return resources.Droplet{}, err
 		}
 		if closedBuildStream && closedWarningsStream && closedErrStream {
 			return droplet, nil

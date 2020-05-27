@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/resources"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,7 +51,7 @@ func (display AppSummaryDisplayer) AppDisplay(summary v7action.DetailedApplicati
 	display.displayProcessTable(summary, displayStartCommand)
 }
 
-func routeSummary(rs []v7action.Route) string {
+func routeSummary(rs []resources.Route) string {
 	formattedRoutes := []string{}
 	for _, route := range rs {
 		formattedRoutes = append(formattedRoutes, route.URL)
@@ -137,7 +138,7 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.DetailedAppli
 	return ""
 }
 
-func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.DropletBuildpack) string {
+func (AppSummaryDisplayer) buildpackNames(buildpacks []resources.DropletBuildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
 		if buildpack.DetectOutput != "" {

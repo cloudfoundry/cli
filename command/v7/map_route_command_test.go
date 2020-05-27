@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -23,7 +24,7 @@ var _ = Describe("map-route Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeMapRouteActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -40,7 +41,7 @@ var _ = Describe("map-route Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeMapRouteActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -55,10 +56,12 @@ var _ = Describe("map-route Command", func() {
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -109,7 +112,7 @@ var _ = Describe("map-route Command", func() {
 	When("the user is logged in and targeted", func() {
 		When("getting the domain errors", func() {
 			BeforeEach(func() {
-				fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
+				fakeActor.GetDomainByNameReturns(resources.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
 			})
 
 			It("returns the error and displays warnings", func() {
@@ -132,7 +135,7 @@ var _ = Describe("map-route Command", func() {
 		When("getting the domain succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.GetDomainByNameReturns(
-					v7action.Domain{Name: "some-domain.com", GUID: "domain-guid"},
+					resources.Domain{Name: "some-domain.com", GUID: "domain-guid"},
 					v7action.Warnings{"get-domain-warnings"},
 					nil,
 				)
@@ -141,7 +144,7 @@ var _ = Describe("map-route Command", func() {
 			When("getting the app errors", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"get-app-warnings"},
 						errors.New("get-app-error"),
 					)
@@ -171,7 +174,7 @@ var _ = Describe("map-route Command", func() {
 			When("getting the app succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{Name: "app", GUID: "app-guid"},
+						resources.Application{Name: "app", GUID: "app-guid"},
 						v7action.Warnings{"get-app-warnings"},
 						nil,
 					)
@@ -180,7 +183,7 @@ var _ = Describe("map-route Command", func() {
 				When("getting the route errors", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{},
+							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							errors.New("get-route-error"),
 						)
@@ -201,11 +204,12 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-						actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+						actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualDomainGUID).To(Equal("domain-guid"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(0))
 
@@ -216,7 +220,7 @@ var _ = Describe("map-route Command", func() {
 				When("the route does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{},
+							resources.Route{},
 							v7action.Warnings{"get-route-warnings"},
 							actionerror.RouteNotFoundError{},
 						)
@@ -237,25 +241,27 @@ var _ = Describe("map-route Command", func() {
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-						actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+						actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualDomainGUID).To(Equal("domain-guid"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(cmd.Port))
 
 						Expect(fakeActor.CreateRouteCallCount()).To(Equal(1))
-						actualSpaceGUID, actualDomainName, actualHostname, actualPath = fakeActor.CreateRouteArgsForCall(0)
+						actualSpaceGUID, actualDomainName, actualHostname, actualPath, actualPort = fakeActor.CreateRouteArgsForCall(0)
 						Expect(actualSpaceGUID).To(Equal(spaceGUID))
 						Expect(actualDomainName).To(Equal("some-domain.com"))
 						Expect(actualHostname).To(Equal(hostname))
 						Expect(actualPath).To(Equal(path))
+						Expect(actualPort).To(Equal(cmd.Port))
 					})
 				})
 
 				When("getting the route succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{GUID: "route-guid"},
+							resources.Route{GUID: "route-guid"},
 							v7action.Warnings{"get-route-warnings"},
 							nil,
 						)
@@ -264,7 +270,7 @@ var _ = Describe("map-route Command", func() {
 					When("getting the destination errors", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{},
+								resources.RouteDestination{},
 								v7action.Warnings{"get-destination-warning"},
 								errors.New("get-destination-error"),
 							)
@@ -282,11 +288,12 @@ var _ = Describe("map-route Command", func() {
 							Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 							Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-							actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+							actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 							Expect(actualDomainName).To(Equal("some-domain.com"))
 							Expect(actualDomainGUID).To(Equal("domain-guid"))
 							Expect(actualHostname).To(Equal(hostname))
 							Expect(actualPath).To(Equal(path))
+							Expect(actualPort).To(Equal(cmd.Port))
 
 							Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
 							actualRouteGUID, actualAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
@@ -300,9 +307,9 @@ var _ = Describe("map-route Command", func() {
 					When("the destination already exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{
+								resources.RouteDestination{
 									GUID: "route-dst-guid",
-									App: v7action.RouteDestinationApp{
+									App: resources.RouteDestinationApp{
 										GUID: "existing-app-guid",
 									},
 								},
@@ -323,11 +330,12 @@ var _ = Describe("map-route Command", func() {
 							Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 							Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-							actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+							actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 							Expect(actualDomainName).To(Equal("some-domain.com"))
 							Expect(actualDomainGUID).To(Equal("domain-guid"))
 							Expect(actualHostname).To(Equal(hostname))
 							Expect(actualPath).To(Equal(path))
+							Expect(actualPort).To(Equal(cmd.Port))
 
 							Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
 							actualRouteGUID, actualAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
@@ -359,11 +367,12 @@ var _ = Describe("map-route Command", func() {
 								Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
 								Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-								actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
+								actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
 								Expect(actualDomainName).To(Equal("some-domain.com"))
 								Expect(actualDomainGUID).To(Equal("domain-guid"))
 								Expect(actualHostname).To(Equal(hostname))
 								Expect(actualPath).To(Equal(path))
+								Expect(actualPort).To(Equal(cmd.Port))
 
 								Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
 								actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
@@ -377,32 +386,37 @@ var _ = Describe("map-route Command", func() {
 								fakeActor.MapRouteReturns(v7action.Warnings{"map-route-warnings"}, nil)
 							})
 
-							It("returns the error and displays warnings", func() {
-								Expect(testUI.Err).To(Say("get-domain-warnings"))
-								Expect(testUI.Err).To(Say("get-app-warnings"))
-								Expect(testUI.Err).To(Say("get-route-warnings"))
-								Expect(testUI.Err).To(Say("map-route-warnings"))
-								Expect(executeErr).ToNot(HaveOccurred())
+							It("returns the proper information and passing the proper arguments", func() {
+								By("displaying warnings", func() {
+									Expect(testUI.Err).To(Say("get-domain-warnings"))
+									Expect(testUI.Err).To(Say("get-app-warnings"))
+									Expect(testUI.Err).To(Say("get-route-warnings"))
+									Expect(testUI.Err).To(Say("map-route-warnings"))
+									Expect(executeErr).ToNot(HaveOccurred())
+								})
 
-								Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
-								Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
+								By("passing the expected arguments to the actor ", func() {
+									Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
+									Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
 
-								Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-								actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-								Expect(actualAppName).To(Equal(appName))
-								Expect(actualSpaceGUID).To(Equal(spaceGUID))
+									Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+									actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+									Expect(actualAppName).To(Equal(appName))
+									Expect(actualSpaceGUID).To(Equal(spaceGUID))
 
-								Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-								actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
-								Expect(actualDomainName).To(Equal("some-domain.com"))
-								Expect(actualDomainGUID).To(Equal("domain-guid"))
-								Expect(actualHostname).To(Equal(hostname))
-								Expect(actualPath).To(Equal(path))
+									Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
+									actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
+									Expect(actualDomainName).To(Equal("some-domain.com"))
+									Expect(actualDomainGUID).To(Equal("domain-guid"))
+									Expect(actualHostname).To(Equal("host"))
+									Expect(actualPath).To(Equal(path))
+									Expect(actualPort).To(Equal(cmd.Port))
 
-								Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
-								actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
-								Expect(actualRouteGUID).To(Equal("route-guid"))
-								Expect(actualAppGUID).To(Equal("app-guid"))
+									Expect(fakeActor.MapRouteCallCount()).To(Equal(1))
+									actualRouteGUID, actualAppGUID := fakeActor.MapRouteArgsForCall(0)
+									Expect(actualRouteGUID).To(Equal("route-guid"))
+									Expect(actualAppGUID).To(Equal("app-guid"))
+								})
 							})
 						})
 					})

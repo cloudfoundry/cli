@@ -2,46 +2,18 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeleteRouteActor
-
-type DeleteRouteActor interface {
-	DeleteRoute(domainName, hostname, path string) (v7action.Warnings, error)
-}
-
 type DeleteRouteCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
 	usage           interface{}      `usage:"CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\n\nEXAMPLES:\n   CF_NAME delete-route example.com                             # example.com\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo"`
 	Force           bool             `short:"f" description:"Force deletion without confirmation"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route (required for shared domains)"`
 	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
 	relatedCommands interface{}      `related_commands:"delete-orphaned-routes, routes, unmap-route"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       DeleteRouteActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *DeleteRouteCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd DeleteRouteCommand) Execute(args []string) error {
@@ -58,14 +30,14 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 	domain := cmd.RequiredArgs.Domain
 	hostname := cmd.Hostname
 	pathName := cmd.Path.Path
-	fqdn := desiredFQDN(domain, hostname, pathName)
+	url := desiredURL(domain, hostname, pathName, 0)
 
 	cmd.UI.DisplayText("This action impacts all apps using this route.")
 	cmd.UI.DisplayText("Deleting this route will make apps unreachable via this route.")
 
 	if !cmd.Force {
-		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the route {{.FQDN}}?", map[string]interface{}{
-			"FQDN": fqdn,
+		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really delete the route {{.URL}}?", map[string]interface{}{
+			"URL": url,
 		})
 
 		if promptErr != nil {
@@ -73,16 +45,16 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 		}
 
 		if !response {
-			cmd.UI.DisplayText("'{{.FQDN}}' has not been deleted.", map[string]interface{}{
-				"FQDN": fqdn,
+			cmd.UI.DisplayText("'{{.URL}}' has not been deleted.", map[string]interface{}{
+				"URL": url,
 			})
 			return nil
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Deleting route {{.FQDN}}...",
+	cmd.UI.DisplayTextWithFlavor("Deleting route {{.URL}}...",
 		map[string]interface{}{
-			"FQDN": fqdn,
+			"URL": url,
 		})
 
 	warnings, err := cmd.Actor.DeleteRoute(domain, hostname, pathName)

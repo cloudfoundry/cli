@@ -227,13 +227,13 @@ type FakeServiceRepository struct {
 	renameServiceReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UpdateServiceInstanceStub        func(string, string, map[string]interface{}, []string) error
+	UpdateServiceInstanceStub        func(string, string, map[string]interface{}, *[]string) error
 	updateServiceInstanceMutex       sync.RWMutex
 	updateServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 map[string]interface{}
-		arg4 []string
+		arg4 *[]string
 	}
 	updateServiceInstanceReturns struct {
 		result1 error
@@ -1310,21 +1310,16 @@ func (fake *FakeServiceRepository) RenameServiceReturnsOnCall(i int, result1 err
 	}{result1}
 }
 
-func (fake *FakeServiceRepository) UpdateServiceInstance(arg1 string, arg2 string, arg3 map[string]interface{}, arg4 []string) error {
-	var arg4Copy []string
-	if arg4 != nil {
-		arg4Copy = make([]string, len(arg4))
-		copy(arg4Copy, arg4)
-	}
+func (fake *FakeServiceRepository) UpdateServiceInstance(arg1 string, arg2 string, arg3 map[string]interface{}, arg4 *[]string) error {
 	fake.updateServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.updateServiceInstanceReturnsOnCall[len(fake.updateServiceInstanceArgsForCall)]
 	fake.updateServiceInstanceArgsForCall = append(fake.updateServiceInstanceArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 map[string]interface{}
-		arg4 []string
-	}{arg1, arg2, arg3, arg4Copy})
-	fake.recordInvocation("UpdateServiceInstance", []interface{}{arg1, arg2, arg3, arg4Copy})
+		arg4 *[]string
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UpdateServiceInstance", []interface{}{arg1, arg2, arg3, arg4})
 	fake.updateServiceInstanceMutex.Unlock()
 	if fake.UpdateServiceInstanceStub != nil {
 		return fake.UpdateServiceInstanceStub(arg1, arg2, arg3, arg4)
@@ -1342,13 +1337,13 @@ func (fake *FakeServiceRepository) UpdateServiceInstanceCallCount() int {
 	return len(fake.updateServiceInstanceArgsForCall)
 }
 
-func (fake *FakeServiceRepository) UpdateServiceInstanceCalls(stub func(string, string, map[string]interface{}, []string) error) {
+func (fake *FakeServiceRepository) UpdateServiceInstanceCalls(stub func(string, string, map[string]interface{}, *[]string) error) {
 	fake.updateServiceInstanceMutex.Lock()
 	defer fake.updateServiceInstanceMutex.Unlock()
 	fake.UpdateServiceInstanceStub = stub
 }
 
-func (fake *FakeServiceRepository) UpdateServiceInstanceArgsForCall(i int) (string, string, map[string]interface{}, []string) {
+func (fake *FakeServiceRepository) UpdateServiceInstanceArgsForCall(i int) (string, string, map[string]interface{}, *[]string) {
 	fake.updateServiceInstanceMutex.RLock()
 	defer fake.updateServiceInstanceMutex.RUnlock()
 	argsForCall := fake.updateServiceInstanceArgsForCall[i]

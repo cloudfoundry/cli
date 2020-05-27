@@ -20,13 +20,13 @@ import (
 
 var _ = Describe("api command", func() {
 	Context("no arguments", func() {
-		When("the api is set", func() {
+		When("the API is set", func() {
 			When("the user is not logged in", func() {
-				It("outputs the current api", func() {
+				It("outputs the current API", func() {
 					session := helpers.CF("api")
 
-					Eventually(session).Should(Say(`api endpoint:\s+%s`, apiURL))
-					Eventually(session).Should(Say(`api version:\s+\d+\.\d+\.\d+`))
+					Eventually(session).Should(Say(`API endpoint:\s+%s`, apiURL))
+					Eventually(session).Should(Say(`API version:\s+\d+\.\d+\.\d+`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -60,21 +60,21 @@ var _ = Describe("api command", func() {
 
 				It("outputs the user's target information", func() {
 					session := helpers.CF("api")
-					Eventually(session).Should(Say(`api endpoint:\s+%s`, target))
-					Eventually(session).Should(Say(`api version:\s+%s`, apiVersion))
+					Eventually(session).Should(Say(`API endpoint:\s+%s`, target))
+					Eventually(session).Should(Say(`API version:\s+%s`, apiVersion))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
 
-		When("the api is not set", func() {
+		When("the API is not set", func() {
 			BeforeEach(func() {
 				os.RemoveAll(filepath.Join(homeDir, ".cf"))
 			})
 
 			It("outputs that nothing is set", func() {
 				session := helpers.CF("api")
-				Eventually(session).Should(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
+				Eventually(session).Should(Say("No API endpoint set. Use 'cf api' to set an endpoint"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -103,7 +103,7 @@ var _ = Describe("api command", func() {
 			It("clears the targeted context", func() {
 				session := helpers.CF("api", "--unset")
 
-				Eventually(session).Should(Say("Unsetting api endpoint..."))
+				Eventually(session).Should(Say("Unsetting API endpoint..."))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
@@ -114,11 +114,12 @@ var _ = Describe("api command", func() {
 				err = json.Unmarshal(rawConfig, &configFile)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(configFile.ConfigVersion).To(Equal(3))
+				Expect(configFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
 				Expect(configFile.Target).To(BeEmpty())
 				Expect(configFile.APIVersion).To(BeEmpty())
 				Expect(configFile.AuthorizationEndpoint).To(BeEmpty())
 				Expect(configFile.DopplerEndpoint).To(BeEmpty())
+				Expect(configFile.LogCacheEndpoint).To(BeEmpty())
 				Expect(configFile.UAAEndpoint).To(BeEmpty())
 				Expect(configFile.AccessToken).To(BeEmpty())
 				Expect(configFile.RefreshToken).To(BeEmpty())
@@ -133,7 +134,7 @@ var _ = Describe("api command", func() {
 	})
 
 	When("Skip SSL Validation is required", func() {
-		Context("api has SSL", func() {
+		Context("API has SSL", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
@@ -148,7 +149,7 @@ var _ = Describe("api command", func() {
 
 			It("warns about skip SSL", func() {
 				session := helpers.CF("api", apiURL)
-				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
+				Eventually(session).Should(Say("Setting API endpoint to %s...", apiURL))
 				Eventually(session.Err).Should(Say("x509: certificate has expired or is not yet valid|SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Say("FAILED"))
@@ -157,15 +158,15 @@ var _ = Describe("api command", func() {
 
 			It("sets the API endpoint", func() {
 				session := helpers.CF("api", apiURL, "--skip-ssl-validation")
-				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
+				Eventually(session).Should(Say("Setting API endpoint to %s...", apiURL))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say(`api endpoint:\s+%s`, apiURL))
-				Eventually(session).Should(Say(`api version:\s+\d+\.\d+\.\d+`))
+				Eventually(session).Should(Say(`API endpoint:\s+%s`, apiURL))
+				Eventually(session).Should(Say(`API version:\s+\d+\.\d+\.\d+`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
-		Context("api does not have SSL", func() {
+		Context("API does not have SSL", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
@@ -229,7 +230,7 @@ var _ = Describe("api command", func() {
 
 			It("falls back to http and gives a warning", func() {
 				session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
-				Eventually(session).Should(Say("Setting api endpoint to %s...", server.URL()))
+				Eventually(session).Should(Say("Setting API endpoint to %s...", server.URL()))
 				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
@@ -263,7 +264,7 @@ var _ = Describe("api command", func() {
 
 		It("logs in without any warnings", func() {
 			session := helpers.CF("api", apiURL)
-			Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
+			Eventually(session).Should(Say("Setting API endpoint to %s...", apiURL))
 			Consistently(session).ShouldNot(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Say("Not logged in. Use 'cf login' or 'cf login --sso' to log in."))
@@ -285,7 +286,7 @@ var _ = Describe("api command", func() {
 		})
 	})
 
-	When("the v3 api supports routing", func() {
+	When("the v3 API supports routing", func() {
 		It("sets the routing endpoint in the config file", func() {
 			var session *Session
 			if skipSSLValidation {
@@ -323,11 +324,12 @@ var _ = Describe("api command", func() {
 		err = json.Unmarshal(rawConfig, &configFile)
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(configFile.ConfigVersion).To(Equal(3))
+		Expect(configFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
 		Expect(configFile.Target).To(Equal(apiURL))
 		Expect(configFile.APIVersion).To(MatchRegexp(`\d+\.\d+\.\d+`))
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
+		Expect(configFile.LogCacheEndpoint).To(MatchRegexp(".*log-cache.*"))
 		Expect(configFile.UAAEndpoint).To(BeEmpty())
 		Expect(configFile.AccessToken).To(BeEmpty())
 		Expect(configFile.RefreshToken).To(BeEmpty())

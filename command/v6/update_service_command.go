@@ -61,6 +61,7 @@ func (cmd *UpdateServiceCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd *UpdateServiceCommand) Execute(args []string) error {
+
 	if !cmd.Upgrade {
 		return translatableerror.UnrefactoredCommandError{}
 	}

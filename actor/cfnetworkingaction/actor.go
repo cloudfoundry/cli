@@ -6,14 +6,14 @@ type Warnings []string
 
 // Actor handles all business logic for cf networking operations.
 type Actor struct {
-	NetworkingClient NetworkingClient
-	V3Actor          V3Actor
+	NetworkingClient      NetworkingClient
+	CloudControllerClient CloudControllerClient
 }
 
 // NewActor returns a new actor.
-func NewActor(networkingClient NetworkingClient, v3Actor V3Actor) *Actor {
+func NewActor(networkingClient NetworkingClient, ccClient CloudControllerClient) *Actor {
 	return &Actor{
-		NetworkingClient: networkingClient,
-		V3Actor:          v3Actor,
+		NetworkingClient:      networkingClient,
+		CloudControllerClient: ccClient,
 	}
 }

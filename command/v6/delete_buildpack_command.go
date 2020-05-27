@@ -41,7 +41,3 @@ func (cmd *DeleteBuildpackCommand) Setup(config command.Config, ui command.UI) e
 func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 	return translatableerror.UnrefactoredCommandError{}
 }
-
-func (cmd DeleteBuildpackCommand) stackSpecified() bool {
-	return len(cmd.Stack) > 0
-}

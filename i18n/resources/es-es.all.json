@@ -68,5 +68,20 @@
       "id": "user:",
       "translation": "user:",
       "modified": false
+   },
+   {
+      "id": "Email",
+      "translation": "Correo electrónico",
+      "modified": false
+   },
+   {
+      "id": "Password",
+      "translation": "Contraseña",
+      "modified": false
+   },
+   {
+      "id": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
+      "translation": "Código de autenticación temporal (obtenlo en {{.AuthenticationEndpoint}}/passcode )",
+      "modified": false
    }
 ]

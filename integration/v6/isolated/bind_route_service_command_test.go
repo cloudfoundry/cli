@@ -3,7 +3,7 @@ package isolated
 import (
 	"regexp"
 
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -54,7 +54,7 @@ var _ = Describe("bind-route-service command", func() {
 				domain              string
 				host                string
 				serviceInstanceName string
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
@@ -66,17 +66,16 @@ var _ = Describe("bind-route-service command", func() {
 				domain = helpers.DefaultSharedDomain()
 
 				serviceInstanceName = helpers.PrefixedRandomName("instance")
-				broker = fakeservicebroker.New()
+				broker = servicebrokerstub.New()
 				broker.Services[0].Requires = []string{"route_forwarding"}
-				broker.EnsureBrokerIsAvailable()
+				broker.EnableServiceAccess()
 
-				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
-				Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstanceName)).Should(Exit(0))
+				Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName)).Should(Exit(0))
 				Eventually(helpers.CF("create-route", spaceName, domain, "--hostname", host)).Should(Exit(0))
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
+				broker.Forget()
 				helpers.QuickDeleteOrg(orgName)
 			})
 

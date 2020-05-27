@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -25,7 +25,7 @@ func NewQuotaDisplayer(ui command.UI) QuotaDisplayer {
 	return QuotaDisplayer{ui: ui}
 }
 
-func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []v7action.Quota, emptyMessage string) {
+func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []resources.Quota, emptyMessage string) {
 	if len(quotas) == 0 {
 		displayer.ui.DisplayText(emptyMessage)
 		return
@@ -51,7 +51,7 @@ func (displayer QuotaDisplayer) DisplayQuotasTable(quotas []v7action.Quota, empt
 	displayer.ui.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 }
 
-func (displayer QuotaDisplayer) DisplaySingleQuota(quota v7action.Quota) {
+func (displayer QuotaDisplayer) DisplaySingleQuota(quota resources.Quota) {
 	quotaTable := [][]string{
 		{displayer.ui.TranslateText("total memory:"), displayer.presentQuotaMemoryValue(*quota.Apps.TotalMemory)},
 		{displayer.ui.TranslateText("instance memory:"), displayer.presentQuotaMemoryValue(*quota.Apps.InstanceMemory)},

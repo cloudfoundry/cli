@@ -139,8 +139,8 @@ var _ = Describe("plugins Command", func() {
 
 				var err error
 				file, err = ioutil.TempFile("", "")
-				defer file.Close()
 				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
 
 				err = ioutil.WriteFile(file.Name(), []byte("some-text"), 0600)
 				Expect(err).NotTo(HaveOccurred())

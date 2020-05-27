@@ -2,28 +2,24 @@ package ccv3
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
 )
 
-// OrganizationQuota represents a Cloud Controller organization quota.
-type OrganizationQuota struct {
-	Quota
-}
-
-func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (RelationshipList, Warnings, error) {
-	var responseBody RelationshipList
+func (client *Client) ApplyOrganizationQuota(quotaGuid, orgGuid string) (resources.RelationshipList, Warnings, error) {
+	var responseBody resources.RelationshipList
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationQuotaApplyRequest,
 		URIParams:    internal.Params{"quota_guid": quotaGuid},
-		RequestBody:  RelationshipList{GUIDs: []string{orgGuid}},
+		RequestBody:  resources.RelationshipList{GUIDs: []string{orgGuid}},
 		ResponseBody: &responseBody,
 	})
 
 	return responseBody, warnings, err
 }
 
-func (client *Client) CreateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
-	var responseOrgQuota OrganizationQuota
+func (client *Client) CreateOrganizationQuota(orgQuota resources.OrganizationQuota) (resources.OrganizationQuota, Warnings, error) {
+	var responseOrgQuota resources.OrganizationQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostOrganizationQuotaRequest,
@@ -43,8 +39,8 @@ func (client *Client) DeleteOrganizationQuota(quotaGUID string) (JobURL, Warning
 	return jobURL, warnings, err
 }
 
-func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota, Warnings, error) {
-	var responseBody OrganizationQuota
+func (client *Client) GetOrganizationQuota(quotaGUID string) (resources.OrganizationQuota, Warnings, error) {
+	var responseBody resources.OrganizationQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetOrganizationQuotaRequest,
@@ -55,27 +51,27 @@ func (client *Client) GetOrganizationQuota(quotaGUID string) (OrganizationQuota,
 	return responseBody, warnings, err
 }
 
-func (client *Client) GetOrganizationQuotas(query ...Query) ([]OrganizationQuota, Warnings, error) {
-	var resources []OrganizationQuota
+func (client *Client) GetOrganizationQuotas(query ...Query) ([]resources.OrganizationQuota, Warnings, error) {
+	var organizationQuotas []resources.OrganizationQuota
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetOrganizationQuotasRequest,
 		Query:        query,
-		ResponseBody: OrganizationQuota{},
+		ResponseBody: resources.OrganizationQuota{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(OrganizationQuota))
+			organizationQuotas = append(organizationQuotas, item.(resources.OrganizationQuota))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return organizationQuotas, warnings, err
 }
 
-func (client *Client) UpdateOrganizationQuota(orgQuota OrganizationQuota) (OrganizationQuota, Warnings, error) {
+func (client *Client) UpdateOrganizationQuota(orgQuota resources.OrganizationQuota) (resources.OrganizationQuota, Warnings, error) {
 	orgQuotaGUID := orgQuota.GUID
 	orgQuota.GUID = ""
 
-	var responseBody OrganizationQuota
+	var responseBody resources.OrganizationQuota
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PatchOrganizationQuotaRequest,

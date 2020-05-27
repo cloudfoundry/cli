@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -21,7 +22,7 @@ var _ = Describe("orgs Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeOrgsActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -30,13 +31,15 @@ var _ = Describe("orgs Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeOrgsActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = OrgsCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -83,7 +86,7 @@ var _ = Describe("orgs Command", func() {
 			When("there are no orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{},
+						[]resources.Organization{},
 						v7action.Warnings{"get-orgs-warning"},
 						nil)
 				})
@@ -104,7 +107,7 @@ var _ = Describe("orgs Command", func() {
 			When("there are multiple orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
-						[]v7action.Organization{
+						[]resources.Organization{
 							{Name: "org-1"},
 							{Name: "org-2"},
 						},

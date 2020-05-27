@@ -2,49 +2,18 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . UnmapRouteActor
-
-type UnmapRouteActor interface {
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string) (v7action.Route, v7action.Warnings, error)
-	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
-	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (v7action.RouteDestination, v7action.Warnings, error)
-	UnmapRoute(routeGUID string, destinationGUID string) (v7action.Warnings, error)
-}
-
 type UnmapRouteCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.AppDomain   `positional-args:"yes"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route"`
 	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
-	usage           interface{}      `usage:"CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	Port            int              `long:"port" description:"Port used to identify the TCP route"`
+	usage           interface{}      `usage:"Unmap an HTTP route:\n      CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Unmap a TCP route:\n      CF_NAME unmap-route APP_NAME DOMAIN --port PORT\n\nEXAMPLES:\n   CF_NAME unmap-route my-app example.com                              # example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\n   CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000"`
 	relatedCommands interface{}      `related_commands:"delete-route, map-route, routes"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       UnmapRouteActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *UnmapRouteCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd UnmapRouteCommand) Execute(args []string) error {
@@ -72,15 +41,15 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 	}
 
 	path := cmd.Path.Path
-	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path)
-	fqdn := desiredFQDN(domain.Name, cmd.Hostname, path)
+	route, warnings, err := cmd.Actor.GetRouteByAttributes(domain.Name, domain.GUID, cmd.Hostname, path, cmd.Port)
+	url := desiredURL(domain.Name, cmd.Hostname, path, cmd.Port)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing route {{.FQDN}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"FQDN":      fqdn,
+	cmd.UI.DisplayTextWithFlavor("Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
+		"URL":       url,
 		"AppName":   cmd.RequiredArgs.App,
 		"User":      user.Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,

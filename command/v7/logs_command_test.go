@@ -25,7 +25,7 @@ var _ = Describe("logs command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeLogsActor
+		fakeActor       *v7fakes.FakeActor
 		logCacheClient  *sharedactionfakes.FakeLogCacheClient
 		binaryName      string
 		executeErr      error
@@ -35,14 +35,16 @@ var _ = Describe("logs command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeLogsActor)
+		fakeActor = new(v7fakes.FakeActor)
 		logCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 
 		cmd = LogsCommand{
-			UI:             testUI,
-			Config:         fakeConfig,
-			SharedActor:    fakeSharedActor,
-			Actor:          fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			LogCacheClient: logCacheClient,
 		}
 
@@ -211,17 +213,24 @@ var _ = Describe("logs command", func() {
 							logStream := make(chan sharedaction.LogMessage)
 							errorStream := make(chan error)
 							cancelFunctionHasBeenCalled = false
+							streamsWereClosed := false
 
 							cancelFunc := func() {
 								if cancelFunctionHasBeenCalled {
 									return
 								}
 								cancelFunctionHasBeenCalled = true
-								close(logStream)
-								close(errorStream)
+								if !streamsWereClosed {
+									close(logStream)
+									close(errorStream)
+									streamsWereClosed = true
+								}
 							}
 							go func() {
 								errorStream <- expectedErr
+								close(logStream)
+								close(errorStream)
+								streamsWereClosed = true
 							}()
 
 							return logStream, errorStream, cancelFunc, v7action.Warnings{"steve for all I care"}, nil
@@ -240,7 +249,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("displays the error and all warnings", func() {
-					Expect(executeErr).To(MatchError("Failed to retrieve logs from Log Cache: banana"))
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Err).To(Say("steve for all I care"))
 					Expect(cancelFunctionHasBeenCalled).To(BeTrue())
 				})

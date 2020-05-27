@@ -298,27 +298,3 @@ func (client *Client) UpdateRouteApplication(routeGUID string, appGUID string) (
 
 	return route, response.Warnings, err
 }
-
-func (client *Client) checkRouteDeprecated(domainGUID string, host string, path string) (bool, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetRouteReservedDeprecatedRequest,
-		URIParams:   map[string]string{"domain_guid": domainGUID, "host": host},
-	})
-	if err != nil {
-		return false, nil, err
-	}
-
-	queryParams := url.Values{}
-	if path != "" {
-		queryParams.Add("path", path)
-	}
-	request.URL.RawQuery = queryParams.Encode()
-
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-		return false, response.Warnings, nil
-	}
-
-	return response.HTTPResponse.StatusCode == http.StatusNoContent, response.Warnings, err
-}

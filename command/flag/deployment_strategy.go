@@ -21,6 +21,8 @@ func (h *DeploymentStrategy) UnmarshalFlag(val string) error {
 	switch valLower {
 
 	case string(constant.DeploymentStrategyDefault):
+		// Do nothing, leave the default value
+
 	case string(constant.DeploymentStrategyRolling):
 		h.Name = constant.DeploymentStrategy(valLower)
 

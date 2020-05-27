@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -24,7 +25,7 @@ var _ = Describe("Cancel deployment command", func() {
 		input           *Buffer
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCancelDeploymentActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		appName         string
 		spaceGUID       string
@@ -36,17 +37,19 @@ var _ = Describe("Cancel deployment command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCancelDeploymentActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "clodFoundry"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = CancelDeploymentCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -106,7 +109,7 @@ var _ = Describe("Cancel deployment command", func() {
 		When("getting the app fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{},
+					resources.Application{},
 					v7action.Warnings{"get-app-warning"},
 					errors.New("get-app-error"),
 				)
@@ -126,7 +129,7 @@ var _ = Describe("Cancel deployment command", func() {
 			BeforeEach(func() {
 				appGUID = "some-app-guid"
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{Name: appName, GUID: appGUID},
+					resources.Application{Name: appName, GUID: appGUID},
 					v7action.Warnings{"get-app-warning"},
 					nil,
 				)

@@ -147,7 +147,7 @@ func (cmd *MarketplaceCommand) displayServiceSummaries(serviceSummaries []v2acti
 	if len(serviceSummaries) == 0 {
 		cmd.UI.DisplayText("No service offerings found")
 	} else {
-		var table = [][]string{}
+		var table [][]string
 		if cmd.NoPlans {
 			tableHeaders := []string{"service", "description", "broker"}
 			table = [][]string{tableHeaders}

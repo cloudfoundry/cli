@@ -33,7 +33,7 @@ func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID 
 	case constant.SecurityGroupLifecycleStaging:
 		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUID)
 	default:
-		err = actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
+		err = actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
 	}
 
 	return Warnings(warnings), err
@@ -247,7 +247,7 @@ func (actor Actor) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]Sec
 
 func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
 	if lifecycle != constant.SecurityGroupLifecycleRunning && lifecycle != constant.SecurityGroupLifecycleStaging {
-		return nil, actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
+		return nil, actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
 	}
 
 	var allWarnings Warnings
@@ -266,7 +266,7 @@ func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, s
 
 func (actor Actor) UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
 	if lifecycle != constant.SecurityGroupLifecycleRunning && lifecycle != constant.SecurityGroupLifecycleStaging {
-		return nil, actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
+		return nil, actionerror.InvalidLifecycleError{Lifecycle: string(lifecycle)}
 	}
 
 	var allWarnings Warnings

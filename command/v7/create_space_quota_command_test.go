@@ -24,7 +24,7 @@ var _ = Describe("create-space-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateSpaceQuotaActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 
@@ -36,7 +36,7 @@ var _ = Describe("create-space-quota Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateSpaceQuotaActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -44,10 +44,12 @@ var _ = Describe("create-space-quota Command", func() {
 		userName = "some-user-name"
 
 		cmd = v7.CreateSpaceQuotaCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			RequiredArgs: flag.SpaceQuota{SpaceQuota: spaceQuotaName},
 		}
 	})

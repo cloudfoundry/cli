@@ -7,7 +7,7 @@ import "net/http"
 // HTTP method + non-parameter parts of the path + "Request"
 //
 // If the request returns a single entity by GUID, use the singular (for example
-// /v2/organizations/:organization_guid is GetOrganization).
+// /v3/organizations/:organization_guid is GetOrganization).
 const (
 	DeleteApplicationProcessInstanceRequest                     = "DeleteApplicationProcessInstance"
 	DeleteApplicationRequest                                    = "DeleteApplication"
@@ -20,8 +20,12 @@ const (
 	DeleteOrphanedRoutesRequest                                 = "DeleteOrphanedRoutes"
 	DeleteRouteRequest                                          = "DeleteRouteRequest"
 	DeleteRoleRequest                                           = "DeleteRoleRequest"
+	DeleteSecurityGroupRequest                                  = "DeleteSecurityGroup"
+	DeleteSecurityGroupStagingSpaceRequest                      = "DeleteSecurityGroupStagingSpace"
+	DeleteSecurityGroupRunningSpaceRequest                      = "DeleteSecurityGroupRunningSpace"
 	DeleteServiceBrokerRequest                                  = "DeleteServiceBrokerRequest"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
+	DeleteServiceOfferingRequest                                = "DeleteServiceOffering"
 	DeleteServicePlanVisibilityRequest                          = "DeleteServicePlanVisibility"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
 	DeleteSpaceQuotaRequest                                     = "DeleteSpaceQuota"
@@ -65,6 +69,7 @@ const (
 	GetPackagesRequest                                          = "GetPackages"
 	GetPackageDropletsRequest                                   = "GetPackageDroplets"
 	GetProcessRequest                                           = "GetProcess"
+	GetProcessesRequest                                         = "GetProcesses"
 	GetProcessStatsRequest                                      = "GetProcessStats"
 	GetProcessSidecarsRequest                                   = "GetProcessSidecars"
 	GetRolesRequest                                             = "GetRoles"
@@ -78,9 +83,11 @@ const (
 	GetServicePlanVisibilityRequest                             = "GetServicePlanVisibility"
 	GetSpaceFeatureRequest                                      = "GetSpaceFeatureRequest"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
+	GetSpaceRunningSecurityGroupsRequest                        = "GetSpaceRunningSecurityGroups"
 	GetSpacesRequest                                            = "GetSpaces"
 	GetSpaceQuotaRequest                                        = "GetSpaceQuota"
 	GetSpaceQuotasRequest                                       = "GetSpaceQuotas"
+	GetSpaceStagingSecurityGroupsRequest                        = "GetSpaceStagingSecurityGroups"
 	GetSSHEnabled                                               = "GetSSHEnabled"
 	GetStacksRequest                                            = "GetStacks"
 	GetUserRequest                                              = "GetUser"
@@ -99,6 +106,7 @@ const (
 	PatchOrganizationQuotaRequest                               = "PatchOrganizationQuota"
 	PatchProcessRequest                                         = "PatchProcess"
 	PatchRouteRequest                                           = "PatchRoute"
+	PatchSecurityGroupRequest                                   = "PatchSecurityGroup"
 	PatchServiceBrokerRequest                                   = "PatchServiceBrokerRequest"
 	PatchServiceOfferingRequest                                 = "PatchServiceOfferingRequest"
 	PatchServicePlanRequest                                     = "PatchServicePlanRequest"
@@ -133,6 +141,8 @@ const (
 	PostRoleRequest                                             = "PostRole"
 	PostRouteRequest                                            = "PostRoute"
 	PostSecurityGroupRequest                                    = "PostSecurityGroup"
+	PostSecurityGroupStagingSpaceRequest                        = "PostSecurityGroupStagingSpace"
+	PostSecurityGroupRunningSpaceRequest                        = "PostSecurityGroupRunningSpace"
 	PostServiceBrokerRequest                                    = "PostServiceBroker"
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
 	PostServicePlanVisibilityRequest                            = "PostServicePlanVisibility"
@@ -229,6 +239,7 @@ var APIRoutes = []Route{
 	{Resource: PackagesResource, Path: "/:package_guid/upload", Method: http.MethodPost, Name: PostPackageBitsRequest},
 	{Resource: PackagesResource, Path: "/:package_guid/droplets", Method: http.MethodGet, Name: GetPackageDropletsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodGet, Name: GetProcessRequest},
+	{Resource: ProcessesResource, Path: "/", Method: http.MethodGet, Name: GetProcessesRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid", Method: http.MethodPatch, Name: PatchProcessRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessStatsRequest},
 	{Resource: ProcessesResource, Path: "/:process_guid/sidecars", Method: http.MethodGet, Name: GetProcessSidecarsRequest},
@@ -245,6 +256,12 @@ var APIRoutes = []Route{
 	{Resource: RolesResource, Path: "/:role_guid", Method: http.MethodDelete, Name: DeleteRoleRequest},
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
 	{Resource: SecurityGroupsResource, Path: "/", Method: http.MethodPost, Name: PostSecurityGroupRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces", Method: http.MethodPost, Name: PostSecurityGroupStagingSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces", Method: http.MethodPost, Name: PostSecurityGroupRunningSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid/relationships/running_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupRunningSpaceRequest},
+	{Resource: SecurityGroupsResource, Path: "/:security_group_guid", Method: http.MethodPatch, Name: PatchSecurityGroupRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Resource: ServiceBrokersResource, Path: "/", Method: http.MethodPost, Name: PostServiceBrokerRequest},
 	{Resource: ServiceBrokersResource, Path: "/:service_broker_guid", Method: http.MethodDelete, Name: DeleteServiceBrokerRequest},
@@ -254,6 +271,7 @@ var APIRoutes = []Route{
 	{Resource: ServiceInstancesResource, Path: "/:service_instance_guid/relationships/shared_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteServiceInstanceRelationshipsSharedSpaceRequest},
 	{Resource: ServiceOfferingsResource, Path: "/", Method: http.MethodGet, Name: GetServiceOfferingsRequest},
 	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodPatch, Name: PatchServiceOfferingRequest},
+	{Resource: ServiceOfferingsResource, Path: "/:service_offering_guid", Method: http.MethodDelete, Name: DeleteServiceOfferingRequest},
 	{Resource: ServicePlansResource, Path: "/", Method: http.MethodGet, Name: GetServicePlansRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid", Method: http.MethodPatch, Name: PatchServicePlanRequest},
 	{Resource: ServicePlansResource, Path: "/:service_plan_guid/visibility", Method: http.MethodGet, Name: GetServicePlanVisibilityRequest},
@@ -267,6 +285,8 @@ var APIRoutes = []Route{
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/routes", Method: http.MethodDelete, Name: DeleteOrphanedRoutesRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/running_security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},
+	{Resource: SpacesResource, Path: "/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodPatch, Name: PatchSpaceFeaturesRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/features/:feature", Method: http.MethodGet, Name: GetSpaceFeatureRequest},
 	{Resource: SpaceQuotasResource, Path: "/", Method: http.MethodPost, Name: PostSpaceQuotaRequest},

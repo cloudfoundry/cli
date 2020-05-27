@@ -1,44 +1,15 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . RunningEnvironmentVariableGroupActor
-
-type RunningEnvironmentVariableGroupActor interface {
-	GetEnvironmentVariableGroup(group constant.EnvironmentVariableGroupName) (v7action.EnvironmentVariableGroup, v7action.Warnings, error)
-}
-
 type RunningEnvironmentVariableGroupCommand struct {
+	BaseCommand
+
 	usage           interface{} `usage:"CF_NAME running-environment-variable-group"`
 	relatedCommands interface{} `related_commands:"env, staging-environment-variable-group"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       RunningEnvironmentVariableGroupActor
-}
-
-func (cmd *RunningEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd RunningEnvironmentVariableGroupCommand) Execute(args []string) error {
@@ -66,23 +37,13 @@ func (cmd RunningEnvironmentVariableGroupCommand) Execute(args []string) error {
 	if len(envVars) == 0 {
 		cmd.UI.DisplayTextWithFlavor("No running environment variable group has been set.")
 	} else {
-		cmd.displayTable(envVars)
+		table, err := buildEnvVarsTable(envVars)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 	}
 
 	return nil
-}
-
-func (cmd RunningEnvironmentVariableGroupCommand) displayTable(envVars v7action.EnvironmentVariableGroup) {
-	var keyValueTable = [][]string{
-		{"variable name", "assigned value"},
-	}
-
-	for envVarName, envVarValue := range envVars {
-		keyValueTable = append(keyValueTable, []string{
-			envVarName,
-			envVarValue.Value,
-		})
-	}
-
-	cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 }

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/util"
-	logcache "code.cloudfoundry.org/log-cache/pkg/client"
+	logcache "code.cloudfoundry.org/go-log-cache"
 )
 
 type RequestLoggerOutput interface {
@@ -108,7 +108,7 @@ func NewLogCacheClient(logCacheEndpoint string, config Config, ui UI) *logcache.
 	client = &http.Client{Transport: tr}
 
 	verbose, location := config.Verbose()
-	if verbose {
+	if verbose && ui != nil {
 		printer := DebugPrinter{}
 		printer.addOutput(ui.RequestLoggerTerminalDisplay())
 		if location != nil {

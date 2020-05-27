@@ -204,7 +204,7 @@ var _ = Describe("logs command", func() {
 				})
 
 				It("displays the error and all warnings", func() {
-					Expect(executeErr).To(MatchError("Failed to retrieve logs from Log Cache: " + expectedErrMessage))
+					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 				})

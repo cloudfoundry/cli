@@ -22,24 +22,25 @@ var _ = Describe("enable-service-access command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeEnableServiceAccessActor
+		fakeActor       *v7fakes.FakeActor
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeEnableServiceAccessActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = EnableServiceAccessCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			RequiredArgs: flag.Service{
-				ServiceOffering: "some-service",
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
 			},
 		}
+
+		setPositionalFlags(&cmd, "some-service")
 	})
 
 	It("checks the target", func() {
@@ -58,9 +59,9 @@ var _ = Describe("enable-service-access command", func() {
 			cmd.RequiredArgs = flag.Service{ServiceOffering: "fake-service"}
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "fake-user"}, nil)
 
-			cmd.ServicePlan = plan
-			cmd.Organization = org
-			cmd.ServiceBroker = broker
+			setFlag(&cmd, "-p", plan)
+			setFlag(&cmd, "-o", org)
+			setFlag(&cmd, "-b", broker)
 
 			err := cmd.Execute(nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -68,21 +69,21 @@ var _ = Describe("enable-service-access command", func() {
 			Expect(testUI.Out).To(Say(expected))
 		},
 		Entry("no flags", "", "", "",
-			`Enabling access to all plans of service fake-service for all orgs as fake-user\.\.\.`),
+			`Enabling access to all plans of service offering fake-service for all orgs as fake-user\.\.\.`),
 		Entry("plan", "fake-plan", "", "",
-			`Enabling access to plan fake-plan of service fake-service for all orgs as fake-user\.\.\.`),
+			`Enabling access to plan fake-plan of service offering fake-service for all orgs as fake-user\.\.\.`),
 		Entry("org", "", "fake-org", "",
-			`Enabling access to all plans of service fake-service for org fake-org as fake-user\.\.\.`),
+			`Enabling access to all plans of service offering fake-service for org fake-org as fake-user\.\.\.`),
 		Entry("broker", "", "", "fake-broker",
-			`Enabling access to all plans of service fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
+			`Enabling access to all plans of service offering fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
 		Entry("plan and org", "fake-plan", "fake-org", "",
-			`Enabling access to plan fake-plan of service fake-service for org fake-org as fake-user\.\.\.`),
+			`Enabling access to plan fake-plan of service offering fake-service for org fake-org as fake-user\.\.\.`),
 		Entry("plan and broker", "fake-plan", "", "fake-broker",
-			`Enabling access to plan fake-plan of service fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
+			`Enabling access to plan fake-plan of service offering fake-service from broker fake-broker for all orgs as fake-user\.\.\.`),
 		Entry("plan, org and broker", "fake-plan", "fake-org", "fake-broker",
-			`Enabling access to plan fake-plan of service fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
+			`Enabling access to plan fake-plan of service offering fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
 		Entry("broker and org", "", "fake-org", "fake-broker",
-			`Enabling access to all plans of service fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
+			`Enabling access to all plans of service offering fake-service from broker fake-broker for org fake-org as fake-user\.\.\.`),
 	)
 
 	It("calls the actor with the right arguments", func() {
@@ -92,10 +93,11 @@ var _ = Describe("enable-service-access command", func() {
 			orgName      = "some-org"
 			brokerName   = "some-broker"
 		)
-		cmd.ServiceBroker = brokerName
-		cmd.Organization = orgName
-		cmd.ServicePlan = planName
-		cmd.RequiredArgs.ServiceOffering = offeringName
+
+		setFlag(&cmd, "-b", brokerName)
+		setFlag(&cmd, "-o", orgName)
+		setFlag(&cmd, "-p", planName)
+		setPositionalFlags(&cmd, offeringName)
 
 		fakeActor.EnableServiceAccessReturns(v7action.SkippedPlans{}, v7action.Warnings{"a warning"}, nil)
 
@@ -116,7 +118,7 @@ var _ = Describe("enable-service-access command", func() {
 
 	It("reports on skipped plans", func() {
 		const offeringName = "some-offering"
-		cmd.RequiredArgs.ServiceOffering = offeringName
+		setPositionalFlags(&cmd, offeringName)
 
 		fakeActor.EnableServiceAccessReturns(
 			v7action.SkippedPlans{"skipped_1", "skipped_2"},

@@ -92,10 +92,10 @@ func (actor *Actor) GetServiceAccess(offeringName, brokerName, orgName string) (
 func (actor *Actor) EnableServiceAccess(offeringName, brokerName, orgName, planName string) (SkippedPlans, Warnings, error) {
 	var allWarnings Warnings
 
-	offering, offeringWarnings, err := actor.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
+	offering, offeringWarnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
 	allWarnings = append(allWarnings, offeringWarnings...)
 	if err != nil {
-		return nil, allWarnings, err
+		return nil, allWarnings, actionerror.EnrichAPIErrors(err)
 	}
 
 	plansQuery := buildPlansFilterForUpdate(offering.GUID, planName)
@@ -151,10 +151,10 @@ func (actor *Actor) EnableServiceAccess(offeringName, brokerName, orgName, planN
 func (actor *Actor) DisableServiceAccess(offeringName, brokerName, orgName, planName string) (SkippedPlans, Warnings, error) {
 	var allWarnings Warnings
 
-	offering, offeringWarnings, err := actor.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
+	offering, offeringWarnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(offeringName, brokerName)
 	allWarnings = append(allWarnings, offeringWarnings...)
 	if err != nil {
-		return SkippedPlans{}, allWarnings, err
+		return SkippedPlans{}, allWarnings, actionerror.EnrichAPIErrors(err)
 	}
 
 	plansQuery := buildPlansFilterForUpdate(offering.GUID, planName)

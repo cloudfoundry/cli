@@ -1,8 +1,9 @@
 package v6
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"

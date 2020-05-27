@@ -33,7 +33,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("update-buildpack - Update a buildpack"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(regexp.QuoteMeta(`cf update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock] [--rename]`)))
+			Eventually(session).Should(Say(regexp.QuoteMeta(`cf update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--rename NEW_NAME] [--enable|--disable] [--lock|--unlock]`)))
 			Eventually(session).Should(Say("TIP:"))
 			Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\n"))
 			Eventually(session).Should(Say("Use '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"))
@@ -487,7 +487,7 @@ var _ = Describe("update-buildpack command", func() {
 
 							It("displays an error that the buildpack already has a stack association", func() {
 								session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[1])
-								Eventually(session.Err).Should(Say("Buildpack stack can not be changed"))
+								Eventually(session.Err).Should(Say("Buildpack stack cannot be changed"))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							})

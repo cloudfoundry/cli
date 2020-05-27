@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -22,7 +23,7 @@ var _ = Describe("space-users Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSpaceUsersActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -31,13 +32,15 @@ var _ = Describe("space-users Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSpaceUsersActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = SpaceUsersCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -90,7 +93,7 @@ var _ = Describe("space-users Command", func() {
 			When("getting the org guid fails", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{},
+						resources.Organization{},
 						v7action.Warnings{"get-org-by-name-warning"},
 						errors.New("get-org-by-name-error"))
 				})
@@ -104,7 +107,7 @@ var _ = Describe("space-users Command", func() {
 			When("getting the org guid succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
-						v7action.Organization{
+						resources.Organization{
 							Name: "org-1",
 							GUID: "org-guid",
 						},
@@ -129,7 +132,7 @@ var _ = Describe("space-users Command", func() {
 				When("getting the space guid succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationByNameReturns(
-							v7action.Organization{
+							resources.Organization{
 								Name: "org-1",
 								GUID: "org-guid",
 							},
@@ -139,38 +142,38 @@ var _ = Describe("space-users Command", func() {
 
 					When("There are all types of users", func() {
 						BeforeEach(func() {
-							abbyUser := v7action.User{
+							abbyUser := resources.User{
 								Origin:           "ldap",
 								PresentationName: "abby",
 								GUID:             "abby-user-guid",
 							}
-							uaaAdmin := v7action.User{
+							uaaAdmin := resources.User{
 								Origin:           "uaa",
 								PresentationName: "admin",
 								GUID:             "uaaAdmin-guid",
 							}
-							ldapAdmin := v7action.User{
+							ldapAdmin := resources.User{
 								Origin:           "ldap",
 								PresentationName: "admin",
 								GUID:             "ldapAdmin-guid",
 							}
-							client := v7action.User{
+							client := resources.User{
 								Origin:           "",
 								PresentationName: "admin",
 								GUID:             "client-guid",
 							}
-							spaceDeveloper := v7action.User{
+							spaceDeveloper := resources.User{
 								Origin:           "uaa",
 								PresentationName: "billing-manager",
 								GUID:             "spaceDeveloper-guid",
 							}
-							spaceAuditor := v7action.User{
+							spaceAuditor := resources.User{
 								Origin:           "uaa",
 								PresentationName: "org-auditor",
 								GUID:             "spaceAuditor-guid",
 							}
 
-							spaceUsersByRole := map[constant.RoleType][]v7action.User{
+							spaceUsersByRole := map[constant.RoleType][]resources.User{
 								constant.SpaceManagerRole:   {uaaAdmin, ldapAdmin, abbyUser, client},
 								constant.SpaceDeveloperRole: {spaceDeveloper},
 								constant.SpaceAuditorRole:   {spaceAuditor},
@@ -207,7 +210,7 @@ var _ = Describe("space-users Command", func() {
 
 					When("There are no space users", func() {
 						BeforeEach(func() {
-							spaceUsersByRole := map[constant.RoleType][]v7action.User{
+							spaceUsersByRole := map[constant.RoleType][]resources.User{
 								constant.OrgManagerRole:        {},
 								constant.OrgBillingManagerRole: {},
 								constant.OrgAuditorRole:        {},

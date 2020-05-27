@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"regexp"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -27,18 +29,24 @@ var _ = Describe("restart command", func() {
 			It("appears in cf help -a", func() {
 				session := helpers.CF("help", "-a")
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(HaveCommandInCategoryWithDescription("restart", "APPS", "Stop all instances of the app, then start them again. This causes downtime."))
+				Expect(session).To(HaveCommandInCategoryWithDescription("restart", "APPS", "Stop all instances of the app, then start them again."))
 			})
 
 			It("displays command usage to output", func() {
 				session := helpers.CF("restart", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`restart - Stop all instances of the app, then start them again\. This causes downtime\.`))
+				Eventually(session).Should(Say(`restart - Stop all instances of the app, then start them again\.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restart APP_NAME"))
+				Eventually(session).Should(Say("This command will cause downtime unless you use '--strategy rolling'."))
+				Eventually(session).Should(Say("If the app's most recent package is unstaged, restarting the app will stage and run that package."))
+				Eventually(session).Should(Say("Otherwise, the app's current droplet will be run."))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("rs"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("--strategy      Deployment strategy, either rolling or null"))
+				Eventually(session).Should(Say("--no-wait       Exit when the first instance of the web process is healthy"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
 				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for staging, in minutes`))
 				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
@@ -102,17 +110,53 @@ var _ = Describe("restart command", func() {
 				})
 			})
 
-			When("the app is running", func() {
+			When("the app is running with no new packages", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 					})
 				})
 
-				It("stops then restarts the app", func() {
-
+				It("stops then restarts the app, without staging a package", func() {
 					session := helpers.CF("restart", appName)
 					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Stopping app\.\.\.`))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
+					Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+					Eventually(session).Should(Say(`type:\s+web`))
+					Eventually(session).Should(Say(`instances:\s+1/1`))
+					Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
+					Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+					Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+
+					Expect(session.Out.Contents()).NotTo(ContainSubstring("Staging app and tracing logs..."))
+
+					Eventually(session).Should(Exit(0))
+					Expect(session.Err).ToNot(Say(`timeout connecting to log server, no log will be shown`))
+				})
+			})
+
+			When("the app is running with a new packages", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					})
+					helpers.WithHelloWorldApp(func(appDir string) {
+						pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "create-package", appName)
+						Eventually(pkgSession).Should(Exit(0))
+						regex := regexp.MustCompile(`Package with guid '(.+)' has been created\.`)
+						matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
+						Expect(matches).To(HaveLen(2))
+					})
+				})
+
+				It("stages the new package, stops then restarts the app", func() {
+					session := helpers.CF("restart", appName)
+					Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+
+					Eventually(session).Should(Say("Staging app and tracing logs..."))
 					Eventually(session).Should(Say(`Stopping app\.\.\.`))
 					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
 					Eventually(session).Should(Say(`name:\s+%s`, appName))
@@ -130,7 +174,7 @@ var _ = Describe("restart command", func() {
 			})
 
 			When("the app is stopped", func() {
-				When("the app is already staged", func() {
+				When("the app does not have a new package, and has a current droplet", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
@@ -152,24 +196,51 @@ var _ = Describe("restart command", func() {
 						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
 						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
+						Expect(session.Out.Contents()).NotTo(ContainSubstring("Staging app and tracing logs..."))
 						Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
 
 						Eventually(session).Should(Exit(0))
 					})
 				})
 
-				When("the app is *not* staged", func() {
+				When("the app has a new package", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start")).Should(Exit(0))
 						})
 					})
 
+					It("stages the new package and starts the app", func() {
+
+						session := helpers.CF("restart", appName)
+						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Staging app and tracing logs..."))
+						Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
+						Eventually(session).Should(Say(`type:\s+web`))
+						Eventually(session).Should(Say(`instances:\s+1/1`))
+						Eventually(session).Should(Say(`memory usage:\s+\d+(M|G)`))
+						Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+						Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+
+						Expect(session.Out.Contents()).NotTo(ContainSubstring("Stopping app..."))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the app does *not* have a ready package or current droplet", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("create-app", appName)).Should(Exit(0))
+					})
+
 					It("complains about not having a droplet", func() {
 
 						session := helpers.CF("restart", appName)
 						Eventually(session).Should(Say(`Restarting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session.Err).Should(Say(`App can not start with out a package to stage or a droplet to run\.`))
+						Eventually(session.Err).Should(Say(`App cannot start without a package to stage or a droplet to run\.`))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
 					})

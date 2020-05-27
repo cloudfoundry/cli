@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -25,18 +27,23 @@ var _ = Describe("map-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`Map an HTTP route:\n`))
 			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
+			Eventually(session).Should(Say(`Map a TCP route:\n`))
+			Eventually(session).Should(Say(`cf map-route APP_NAME DOMAIN \[--port PORT]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com                              # example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost            # myhost.example.com`))
 			Eventually(session).Should(Say(`cf map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo`))
+			Eventually(session).Should(Say(`cf map-route my-app example.com --port 5000                  # example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
+			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -71,7 +78,6 @@ var _ = Describe("map-route command", func() {
 			spaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
-			domainName = helpers.DefaultSharedDomain()
 
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "push", appName)
@@ -79,12 +85,13 @@ var _ = Describe("map-route command", func() {
 			})
 		})
 
-		When("the route already exists", func() {
+		When("the http route already exists", func() {
 			var (
 				route helpers.Route
 			)
 
 			BeforeEach(func() {
+				domainName = helpers.DefaultSharedDomain()
 				route = helpers.NewRoute(spaceName, domainName, hostName, path)
 				route.V7Create()
 			})
@@ -118,7 +125,63 @@ var _ = Describe("map-route command", func() {
 			})
 		})
 
+		When("the tcp route already exists", func() {
+			var (
+				domain      helpers.Domain
+				routerGroup helpers.RouterGroup
+				route       helpers.Route
+			)
+
+			BeforeEach(func() {
+				domainName = helpers.NewDomainName()
+				domain = helpers.NewDomain("", domainName)
+				routerGroup = helpers.NewRouterGroup(
+					helpers.NewRouterGroupName(),
+					"1024-2048",
+				)
+
+				routerGroup.Create()
+				domain.CreateWithRouterGroup(routerGroup.Name)
+				route = helpers.NewTCPRoute(spaceName, domainName, 1082)
+			})
+
+			AfterEach(func() {
+				domain.DeleteShared()
+				routerGroup.Delete()
+			})
+
+			When("route is already mapped to app", func() {
+				BeforeEach(func() {
+					session := helpers.CF("map-route", appName, domainName, "--port", fmt.Sprintf("%d", route.Port))
+					Eventually(session).Should(Exit(0))
+				})
+				It("exits 0 with helpful message saying that the route is already mapped to the app", func() {
+					session := helpers.CF("map-route", appName, domainName, "--port", fmt.Sprintf("%d", route.Port))
+
+					Eventually(session).Should(Say(`Mapping route %s:%d to app %s in org %s / space %s as %s\.\.\.`, domainName, route.Port, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`App '%s' is already mapped to route '%s:%d'\.`, appName, domainName, route.Port))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Exit(0))
+
+				})
+			})
+
+			When("route is not yet mapped to the app", func() {
+				It("maps the route to an app", func() {
+					session := helpers.CF("map-route", appName, domainName, "--port", fmt.Sprintf("%d", route.Port))
+
+					Eventually(session).Should(Say(`Mapping route %s:%d to app %s in org %s / space %s as %s\.\.\.`, domainName, route.Port, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
 		When("the route does *not* exist", func() {
+			BeforeEach(func() {
+				domainName = helpers.DefaultSharedDomain()
+			})
+
 			It("creates the route and maps it to an app", func() {
 				session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--path", path)
 				Eventually(session).Should(Say(`Creating route %s.%s%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))

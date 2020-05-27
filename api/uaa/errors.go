@@ -96,3 +96,11 @@ type AccountLockedError struct {
 func (e AccountLockedError) Error() string {
 	return ""
 }
+
+type InvalidPasswordError struct {
+	Message string
+}
+
+func (e InvalidPasswordError) Error() string {
+	return e.Message
+}

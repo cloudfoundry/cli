@@ -96,7 +96,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user chooses the default", func() {
 					BeforeEach(func() {
-						input.Write([]byte("\n"))
+						_, err := input.Write([]byte("\n"))
+						Expect(err).NotTo(HaveOccurred())
 					})
 
 					It("does not purge the service offering", func() {
@@ -110,7 +111,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user inputs no", func() {
 					BeforeEach(func() {
-						input.Write([]byte("n\n"))
+						_, err := input.Write([]byte("n\n"))
+						Expect(err).NotTo(HaveOccurred())
 					})
 
 					It("does not purge the service offering", func() {
@@ -124,7 +126,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user inputs yes", func() {
 					BeforeEach(func() {
-						input.Write([]byte("y\n"))
+						_, err := input.Write([]byte("y\n"))
+						Expect(err).NotTo(HaveOccurred())
 						fakePurgeServiceActor.GetServiceByNameAndBrokerNameReturns(v2action.Service{
 							Label: "some-service",
 							GUID:  "some-service-guid",
@@ -183,7 +186,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user input is invalid", func() {
 					BeforeEach(func() {
-						input.Write([]byte("e\n\n"))
+						_, err := input.Write([]byte("e\n\n"))
+						Expect(err).NotTo(HaveOccurred())
 					})
 
 					It("asks the user again", func() {
@@ -228,7 +232,8 @@ var _ = Describe("purge-service-offering command", func() {
 			When("the -p flag is passed", func() {
 				BeforeEach(func() {
 					cmd.Provider = "dave"
-					input.Write([]byte("y\n"))
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("returns an error that this flag is no longer supported", func() {
@@ -245,7 +250,8 @@ var _ = Describe("purge-service-offering command", func() {
 						GUID:  "some-service-guid",
 					}, v2action.Warnings{"get-service-warning"}, nil)
 					fakePurgeServiceActor.PurgeServiceOfferingReturns(v2action.Warnings{"warning-1"}, nil)
-					input.Write([]byte("y\n"))
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("purges the service offering for the specified broker", func() {

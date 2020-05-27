@@ -2,49 +2,27 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-//go:generate counterfeiter . CreateSpaceActor
 
 type CreateSpaceActor interface {
 	CreateSpace(spaceName, orgGUID string) (v7action.Space, v7action.Warnings, error)
 	CreateSpaceRole(roleType constant.RoleType, orgGUID string, spaceGUID string, userNameOrGUID string, userOrigin string, isClient bool) (v7action.Warnings, error)
-	GetOrganizationByName(orgName string) (v7action.Organization, v7action.Warnings, error)
+	GetOrganizationByName(orgName string) (resources.Organization, v7action.Warnings, error)
 	ApplySpaceQuotaByName(quotaName string, spaceGUID string, orgGUID string) (v7action.Warnings, error)
 }
 
 type CreateSpaceCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Space  `positional-args:"yes"`
 	Organization    string      `short:"o" description:"Organization"`
 	Quota           string      `long:"quota" short:"q" description:"Quota to assign to the newly created space"`
 	usage           interface{} `usage:"CF_NAME create-space SPACE [-o ORG] [-q QUOTA]"`
 	relatedCommands interface{} `related_commands:"set-space-isolation-segment, space-quotas, spaces, target"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       CreateSpaceActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *CreateSpaceCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd CreateSpaceCommand) Execute(args []string) error {

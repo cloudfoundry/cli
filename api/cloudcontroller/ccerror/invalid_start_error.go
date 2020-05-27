@@ -4,5 +4,5 @@ type InvalidStartError struct {
 }
 
 func (e InvalidStartError) Error() string {
-	return "App can not start with out a package to stage or a droplet to run."
+	return "App cannot start without a package to stage or a droplet to run."
 }

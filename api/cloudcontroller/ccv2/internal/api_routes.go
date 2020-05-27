@@ -42,6 +42,7 @@ const (
 	GetOrganizationsRequest                              = "GetOrganizations"
 	GetPrivateDomainRequest                              = "GetPrivateDomain"
 	GetPrivateDomainsRequest                             = "GetPrivateDomains"
+	GetRootRequest                                       = "GetRoot"
 	GetRouteAppsRequest                                  = "GetRouteApps"
 	GetRouteMappingRequest                               = "GetRouteMapping"
 	GetRouteMappingsRequest                              = "GetRouteMappings"
@@ -121,6 +122,7 @@ const (
 // APIRoutes is a list of routes used by the rata library to construct request
 // URLs.
 var APIRoutes = rata.Routes{
+	{Path: "/", Method: http.MethodGet, Name: GetRootRequest},
 	{Path: "/v2/apps", Method: http.MethodGet, Name: GetAppsRequest},
 	{Path: "/v2/apps", Method: http.MethodPost, Name: PostAppRequest},
 	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: GetAppRequest},

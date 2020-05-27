@@ -10,8 +10,9 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
+	logcache "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	logcache "code.cloudfoundry.org/log-cache/pkg/client"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -25,7 +26,7 @@ var _ = Describe("Logging Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, fakeConfig, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, fakeConfig, _, _, _, _ = NewTestActor()
 		fakeLogCacheClient = new(sharedactionfakes.FakeLogCacheClient)
 		fakeConfig.AccessTokenReturns("AccessTokenForTest")
 	})
@@ -34,7 +35,7 @@ var _ = Describe("Logging Actions", func() {
 		When("the application can be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app",
 							GUID: "some-app-guid",
@@ -155,7 +156,7 @@ var _ = Describe("Logging Actions", func() {
 				expectedAppGUID = "some-app-guid"
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app",
 							GUID: expectedAppGUID,

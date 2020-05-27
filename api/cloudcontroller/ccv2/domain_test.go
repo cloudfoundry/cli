@@ -599,7 +599,7 @@ var _ = Describe("Domain", func() {
 					),
 				)
 
-				client.GetOrganizationPrivateDomains("some-org-guid", Filter{
+				_, _, _ = client.GetOrganizationPrivateDomains("some-org-guid", Filter{
 					Type:     constant.NameFilter,
 					Operator: constant.EqualOperator,
 					Values:   []string{"private-domain-name"},

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -23,7 +24,7 @@ var _ = Describe("apps Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeAppsActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -32,16 +33,18 @@ var _ = Describe("apps Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeAppsActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v7.AppsCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			Actor:       fakeActor,
-			SharedActor: fakeSharedActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				Actor:       fakeActor,
+				SharedActor: fakeSharedActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -117,13 +120,13 @@ var _ = Describe("apps Command", func() {
 			expectedErr = ccerror.RequestError{}
 			fakeActor.GetAppSummariesForSpaceReturns([]v7action.ApplicationSummary{
 				{
-					Application: v7action.Application{
+					Application: resources.Application{
 						GUID:  "app-guid",
 						Name:  "some-app",
 						State: constant.ApplicationStarted,
 					},
 					ProcessSummaries: []v7action.ProcessSummary{{Process: v7action.Process{Type: "process-type"}}},
-					Routes:           []v7action.Route{},
+					Routes:           []resources.Route{},
 				},
 			}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -143,7 +146,7 @@ var _ = Describe("apps Command", func() {
 			BeforeEach(func() {
 				appSummaries := []v7action.ApplicationSummary{
 					{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "app-guid-1",
 							Name:  "some-app-1",
 							State: constant.ApplicationStarted,
@@ -182,21 +185,19 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 						},
-						Routes: []v7action.Route{
+						Routes: []resources.Route{
 							{
-								Host:       "some-app-1",
-								DomainName: "some-other-domain",
-								URL:        "some-app-1.some-other-domain",
+								Host: "some-app-1",
+								URL:  "some-app-1.some-other-domain",
 							},
 							{
-								Host:       "some-app-1",
-								DomainName: "some-domain",
-								URL:        "some-app-1.some-domain",
+								Host: "some-app-1",
+								URL:  "some-app-1.some-domain",
 							},
 						},
 					},
 					{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "app-guid-2",
 							Name:  "some-app-2",
 							State: constant.ApplicationStopped,
@@ -218,11 +219,10 @@ var _ = Describe("apps Command", func() {
 								},
 							},
 						},
-						Routes: []v7action.Route{
+						Routes: []resources.Route{
 							{
-								Host:       "some-app-2",
-								DomainName: "some-domain",
-								URL:        "some-app-2.some-domain",
+								Host: "some-app-2",
+								URL:  "some-app-2.some-domain",
 							},
 						},
 					},
@@ -253,7 +253,7 @@ var _ = Describe("apps Command", func() {
 			BeforeEach(func() {
 				appSummaries := []v7action.ApplicationSummary{
 					{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "app-guid",
 							Name:  "some-app",
 							State: constant.ApplicationStarted,

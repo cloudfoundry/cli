@@ -419,7 +419,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("polling build", func() {
-		When("the the polling is succesful", func() {
+		When("the the polling is succesfull", func() {
 			BeforeEach(func() {
 				fakeV3Actor.PollBuildReturns(v3action.Droplet{}, v3action.Warnings{"some-poll-build-warning"}, nil)
 			})

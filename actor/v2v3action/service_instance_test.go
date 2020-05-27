@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -115,7 +116,7 @@ var _ = Describe("Service Instance Actions", func() {
 									When("no errors occur sharing the service instance to this space", func() {
 										BeforeEach(func() {
 											fakeV3Actor.ShareServiceInstanceToSpacesReturns(
-												v3action.RelationshipList{
+												resources.RelationshipList{
 													GUIDs: []string{"some-space-guid"},
 												},
 												v3action.Warnings{"share-service-instance-warning"},
@@ -163,7 +164,7 @@ var _ = Describe("Service Instance Actions", func() {
 										BeforeEach(func() {
 											expectedErr = errors.New("share service instance error")
 											fakeV3Actor.ShareServiceInstanceToSpacesReturns(
-												v3action.RelationshipList{},
+												resources.RelationshipList{},
 												v3action.Warnings{"share-service-instance-warning"},
 												expectedErr)
 										})
@@ -403,7 +404,7 @@ var _ = Describe("Service Instance Actions", func() {
 							nil)
 
 						fakeV3Actor.ShareServiceInstanceToSpacesReturns(
-							v3action.RelationshipList{},
+							resources.RelationshipList{},
 							v3action.Warnings{"share-service-instance-warning"},
 							errors.New("User-provided services cannot be shared"))
 					})
@@ -558,7 +559,7 @@ var _ = Describe("Service Instance Actions", func() {
 					nil)
 
 				fakeV3Actor.ShareServiceInstanceToSpacesReturns(
-					v3action.RelationshipList{
+					resources.RelationshipList{
 						GUIDs: []string{"some-space-guid"},
 					},
 					v3action.Warnings{"share-service-instance-warning"},

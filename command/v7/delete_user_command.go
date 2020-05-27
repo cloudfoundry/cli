@@ -2,46 +2,17 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeleteUserActor
-
-type DeleteUserActor interface {
-	DeleteUser(userGuid string) (v7action.Warnings, error)
-	GetUser(username, origin string) (v7action.User, error)
-}
-
 type DeleteUserCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Username `positional-args:"yes"`
 	Force           bool          `short:"f" description:"Prompt interactively for password"`
 	Origin          string        `long:"origin" description:"Origin for mapping a user account to a user in an external identity provider"`
 	usage           interface{}   `usage:"CF_NAME delete-user USERNAME [-f]\n   CF_NAME delete-user USERNAME [--origin ORIGIN]\n\nEXAMPLES:\n   cf delete-user jsmith                   # internal user\n   cf delete-user jsmith --origin ldap     # LDAP user"`
 	relatedCommands interface{}   `related_commands:"org-users"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       DeleteUserActor
-}
-
-func (cmd *DeleteUserCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd *DeleteUserCommand) Execute(args []string) error {

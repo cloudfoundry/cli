@@ -33,6 +33,8 @@ var _ = Describe("create-org-quota command", func() {
 				Eventually(session).Should(Say("create-org-quota - Define a new quota for an organization"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`cf create-org-quota ORG_QUOTA \[-m TOTAL_MEMORY\] \[-i INSTANCE_MEMORY\] \[-r ROUTES\] \[-s SERVICE_INSTANCES\] \[-a APP_INSTANCES\] \[--allow-paid-service-plans\] \[--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
+				Eventually(session).Should(Say("ALIAS:"))
+				Eventually(session).Should(Say("create-quota"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`-a\s+Total number of application instances. \(Default: unlimited\)`))
 				Eventually(session).Should(Say(`--allow-paid-service-plans\s+Allow provisioning instances of paid service plans. \(Default: disallowed\)`))

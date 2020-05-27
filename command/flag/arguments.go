@@ -150,10 +150,21 @@ type BindSecurityGroupArgs struct {
 	SpaceName         string `positional-arg-name:"SPACE" description:"The space name"`
 }
 
+type BindSecurityGroupV7Args struct {
+	SecurityGroupName string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group name"`
+	OrganizationName  string `positional-arg-name:"ORG" required:"true" description:"The organization group name"`
+}
+
 type UnbindSecurityGroupArgs struct {
 	SecurityGroupName string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group name"`
 	OrganizationName  string `positional-arg-name:"ORG" description:"The organization group name"`
 	SpaceName         string `positional-arg-name:"SPACE" description:"The space name"`
+}
+
+type UnbindSecurityGroupV7Args struct {
+	SecurityGroupName string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group name"`
+	OrganizationName  string `positional-arg-name:"ORG" required:"true" description:"The organization group name"`
+	SpaceName         string `positional-arg-name:"SPACE" required:"true" description:"The space name"`
 }
 
 type FilesArgs struct {
@@ -380,6 +391,16 @@ type AddNetworkPolicyArgs struct {
 	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
 }
 
+type AddNetworkPolicyArgsV7 struct {
+	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
+	DestApp   string `positional-arg-name:"DESTINATION_APP" required:"true" description:"The destination app"`
+}
+
 type RemoveNetworkPolicyArgs struct {
 	SourceApp string
+}
+
+type RemoveNetworkPolicyArgsV7 struct {
+	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
+	DestApp   string `positional-arg-name:"DESTINATION_APP" required:"true" description:"The destination app"`
 }

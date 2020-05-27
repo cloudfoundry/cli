@@ -66,6 +66,11 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
+// NewServiceOfferingName provides a random name prefixed with INTEGRATION-SERVICE
+func NewServiceOfferingName() string {
+	return PrefixedRandomName("INTEGRATION-SERVICE")
+}
+
 // NewServiceInstanceName provides a random name prefixed with INT-SI
 func NewServiceInstanceName() string {
 	return PrefixedRandomName("INT-SI")
@@ -125,9 +130,14 @@ func NewDomainName(prefix ...string) string {
 	return fmt.Sprintf("integration%s.com", PrefixedRandomName(""))
 }
 
-// NewHostName provides a random name prefixed with HOST
+// NewRouterGroupName provides a random name prefixed with INTEGRATION-ROUTER-GROUP
+func NewRouterGroupName() string {
+	return PrefixedRandomName("INTEGRATION-ROUTER-GROUP")
+}
+
+// NewHostName provides a random name prefixed with `host`
 func NewHostName() string {
-	return PrefixedRandomName("HOST")
+	return PrefixedRandomName("host")
 }
 
 // NewOrgQuotaName provides a random name prefixed with ORG-QUOTA

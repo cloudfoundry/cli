@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -47,8 +45,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		helpers.EnableFeatureFlag("service_instance_sharing")
 	})
 
-	fakeservicebroker.Setup()
-
 	GinkgoWriter.Write([]byte("==============================End of Global FIRST Node Synchronized Before Each=============================="))
 
 	return nil
@@ -79,7 +75,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 var _ = SynchronizedAfterSuite(func() {
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
-	fakeservicebroker.Cleanup()
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()
 	helpers.LoginCF()

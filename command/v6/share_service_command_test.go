@@ -1,8 +1,9 @@
 package v6_test
 
 import (
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"errors"
+
+	"code.cloudfoundry.org/cli/command/translatableerror"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2v3action"

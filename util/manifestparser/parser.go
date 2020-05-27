@@ -57,11 +57,11 @@ func (m ManifestParser) InterpolateAndParse(pathToManifest string, pathsToVarsFi
 	var parsedManifest Manifest
 	err = yaml.Unmarshal(rawManifest, &parsedManifest)
 	if err != nil {
-		return Manifest{}, err
+		return Manifest{}, &yaml.TypeError{}
 	}
 
 	if len(parsedManifest.Applications) == 0 {
-		return Manifest{}, errors.New("must have at least one application")
+		return Manifest{}, errors.New("Manifest must have at least one application.")
 	}
 
 	parsedManifest.PathToManifest = pathToManifest

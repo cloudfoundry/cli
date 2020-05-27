@@ -4,6 +4,7 @@ import (
 	. "code.cloudfoundry.org/cli/util/manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 )
 
 var _ = Describe("Manifest", func() {
@@ -166,6 +167,33 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.GetFirstApp()).To(Equal(&Application{
 				Name: "app1",
 			}))
+		})
+	})
+
+	Describe("has the correct attributes", func() {
+		It("it unmarshals with the version", func() {
+			manifestBytes := []byte(`---
+applications: []
+version: 151
+`)
+			err := yaml.Unmarshal(manifestBytes, &manifest)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(manifest.Version).To(Equal(151))
+		})
+
+		It("it marshals with the version", func() {
+			manifest = Manifest{
+				Applications: []Application{},
+				Version:      151,
+			}
+			expectedManifestBytes := []byte(`applications: []
+version: 151
+`)
+			actualBytes, err := yaml.Marshal(manifest)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(actualBytes)).To(Equal(string(expectedManifestBytes)))
 		})
 	})
 })

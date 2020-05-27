@@ -6,47 +6,27 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . CreateAppManifestActor
-
-type CreateAppManifestActor interface {
-	GetRawApplicationManifestByNameAndSpace(appName string, spaceGUID string) ([]byte, v7action.Warnings, error)
-}
-
 type CreateAppManifestCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	FilePath        flag.Path    `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
 	usage           interface{}  `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>_manifest.yml]"`
 	relatedCommands interface{}  `related_commands:"apps, push"`
 
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       CreateAppManifestActor
-	PWD         string
+	PWD string
 }
 
 func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}
-
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
 

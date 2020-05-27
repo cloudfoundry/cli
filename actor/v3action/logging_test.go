@@ -8,6 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	noaaErrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
@@ -334,7 +335,7 @@ var _ = Describe("Logging Actions", func() {
 				expectedAppGUID = "some-app-guid"
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app",
 							GUID: expectedAppGUID,

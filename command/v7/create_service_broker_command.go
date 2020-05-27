@@ -1,46 +1,18 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . CreateServiceBrokerActor
-
-type CreateServiceBrokerActor interface {
-	CreateServiceBroker(model v7action.ServiceBrokerModel) (v7action.Warnings, error)
-}
-
 type CreateServiceBrokerCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.ServiceBrokerArgs `positional-args:"yes"`
 	SpaceScoped     bool                   `long:"space-scoped" description:"Make the broker's service plans only visible within the targeted space"`
 	usage           interface{}            `usage:"CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"`
 	relatedCommands interface{}            `related_commands:"enable-service-access, service-brokers, target"`
-
-	SharedActor command.SharedActor
-	Config      command.Config
-	UI          command.UI
-	Actor       CreateServiceBrokerActor
-}
-
-func (cmd *CreateServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd *CreateServiceBrokerCommand) Execute(args []string) error {

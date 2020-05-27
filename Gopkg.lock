@@ -24,6 +24,14 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  branch = "master"
+  digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
+  name = "code.cloudfoundry.org/cli-plugin-repo"
+  packages = ["web"]
+  pruneopts = "NUT"
+  revision = "af98c4be9b856caf8d9999cb718d6abbc9cc004b"
+
+[[projects]]
   digest = "1:41531922c7f47d5157308b4dd1abc6142c4c583845ce424ed9664db867fa48cf"
   name = "code.cloudfoundry.org/clock"
   packages = [
@@ -49,6 +57,18 @@
   revision = "18cdb3586e7fca967680b3330d9c21e3f7d3e767"
 
 [[projects]]
+  branch = "master"
+  digest = "1:6205b1b625268da2b0aedd0acf202e8153301cfaba3856d005de18865b3d3ac1"
+  name = "code.cloudfoundry.org/go-log-cache"
+  packages = [
+    ".",
+    "internal",
+    "rpc/logcache_v1",
+  ]
+  pruneopts = "NUT"
+  revision = "f466e0302c3470445d0111353b0ba5601d2868d8"
+
+[[projects]]
   digest = "1:3d3b0f6dde190db3efcdf2aa6cb3c23be30b5a53c31e91ce9408b62f9e11849c"
   name = "code.cloudfoundry.org/go-loggregator"
   packages = ["rpc/loggregator_v2"]
@@ -65,6 +85,19 @@
   revision = "4d0c80011a0f37da1711c184028bc40137cd45af"
 
 [[projects]]
+  digest = "1:48bab8e85efd1bb42e59770451a4c6162f019782380e0fee5a127a51e2783d9c"
+  name = "code.cloudfoundry.org/jsonry"
+  packages = [
+    ".",
+    "internal/context",
+    "internal/path",
+    "internal/tree",
+  ]
+  pruneopts = "NUT"
+  revision = "71749cb9ffe007906f39e0144529393de652f06f"
+  version = "v1.0.2"
+
+[[projects]]
   branch = "master"
   digest = "1:412001a3e6d850b82d4109e8bbbf1795a78d2f7616d36beacd67d0b1e32ebaa0"
   name = "code.cloudfoundry.org/lager"
@@ -75,18 +108,6 @@
   ]
   pruneopts = "NUT"
   revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
-
-[[projects]]
-  digest = "1:3b3dceaa9c5b85b42400f717ae0fd38dcefbd9ec78a774e46f8336bf3a30e202"
-  name = "code.cloudfoundry.org/log-cache"
-  packages = [
-    "pkg/client",
-    "pkg/marshaler",
-    "pkg/rpc/logcache_v1",
-  ]
-  pruneopts = "NUT"
-  revision = "73f7c04d741ab02f4471e6d2653c6d71ff6dbd49"
-  version = "v2.3.1"
 
 [[projects]]
   branch = "master"
@@ -187,14 +208,6 @@
   ]
   pruneopts = "NUT"
   revision = "c6a922e299b8eb5eaadad8a2842e3ab7e043dc5d"
-
-[[projects]]
-  branch = "master"
-  digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
-  name = "github.com/cloudfoundry/cli-plugin-repo"
-  packages = ["web"]
-  pruneopts = "NUT"
-  revision = "e3bb94a32f8ffc29d1040354d8f081b07dc6e489"
 
 [[projects]]
   branch = "master"
@@ -719,6 +732,7 @@
     "code.cloudfoundry.org/bytefmt",
     "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1",
     "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper",
+    "code.cloudfoundry.org/cli-plugin-repo/web",
     "code.cloudfoundry.org/clock",
     "code.cloudfoundry.org/clock/fakeclock",
     "code.cloudfoundry.org/diego-ssh/server",
@@ -727,11 +741,12 @@
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_io",
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_net",
     "code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh",
+    "code.cloudfoundry.org/go-log-cache",
+    "code.cloudfoundry.org/go-log-cache/rpc/logcache_v1",
     "code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2",
     "code.cloudfoundry.org/gofileutils/fileutils",
+    "code.cloudfoundry.org/jsonry",
     "code.cloudfoundry.org/lager/lagertest",
-    "code.cloudfoundry.org/log-cache/pkg/client",
-    "code.cloudfoundry.org/log-cache/pkg/rpc/logcache_v1",
     "code.cloudfoundry.org/tlsconfig",
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",
@@ -739,15 +754,12 @@
     "github.com/SermoDigital/jose/jwt",
     "github.com/blang/semver",
     "github.com/cloudfoundry/bosh-cli/director/template",
-    "github.com/cloudfoundry/cli-plugin-repo/web",
-    "github.com/cloudfoundry/noaa",
     "github.com/cloudfoundry/noaa/consumer",
     "github.com/cloudfoundry/noaa/errors",
     "github.com/cloudfoundry/sonde-go/events",
     "github.com/cyphar/filepath-securejoin",
     "github.com/docker/distribution/reference",
     "github.com/fatih/color",
-    "github.com/gogo/protobuf/proto",
     "github.com/google/go-querystring/query",
     "github.com/gorilla/websocket",
     "github.com/jessevdk/go-flags",
@@ -766,6 +778,7 @@
     "github.com/onsi/gomega/ghttp",
     "github.com/onsi/gomega/gstruct",
     "github.com/onsi/gomega/types",
+    "github.com/pkg/errors",
     "github.com/sabhiram/go-gitignore",
     "github.com/sajari/fuzzy",
     "github.com/sirupsen/logrus",

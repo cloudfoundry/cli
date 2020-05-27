@@ -23,7 +23,7 @@ var _ = Describe("share-private-domain command", func() {
 		cmd             SharePrivateDomainCommand
 		DomainName      = "some-domain-name"
 		OrgName         = "some-org-name"
-		fakeActor       *v7fakes.FakeSharePrivateDomainActor
+		fakeActor       *v7fakes.FakeActor
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
@@ -34,14 +34,16 @@ var _ = Describe("share-private-domain command", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v7fakes.FakeSharePrivateDomainActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		cmd = SharePrivateDomainCommand{
-			Actor:       fakeActor,
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
+			BaseCommand: BaseCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			},
 		}
 		cmd.RequiredArgs = flag.OrgDomain{
 			Organization: OrgName,

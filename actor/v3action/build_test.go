@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -63,7 +64,7 @@ var _ = Describe("Build Actions", func() {
 				//TODO: uncommend after #150569020
 				// FWhen("looking up the droplet fails", func() {
 				// 	BeforeEach(func() {
-				// 		fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))
+				// 		fakeCloudControllerClient.GetDropletReturns(resources.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))
 				// 	})
 
 				// 	It("returns the warnings and the droplet error", func() {
@@ -78,7 +79,7 @@ var _ = Describe("Build Actions", func() {
 
 				// When("looking up the droplet succeeds", func() {
 				// 	BeforeEach(func() {
-				// 		fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: dropletGUID, State: ccv3.DropletStateStaged}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, nil)
+				// 		fakeCloudControllerClient.GetDropletReturns(resources.Droplet{GUID: dropletGUID, State: ccv3.DropletStateStaged}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, nil)
 				// 	})
 
 				It("polls until build is finished and returns the final droplet", func() {
@@ -240,7 +241,7 @@ var _ = Describe("Build Actions", func() {
 
 			When("getting the droplet is successful", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: "some-droplet-guid", CreatedAt: "some-droplet-time", State: constant.DropletStaged}, ccv3.Warnings{"some-get-droplet-warnings"}, nil)
+					fakeCloudControllerClient.GetDropletReturns(resources.Droplet{GUID: "some-droplet-guid", CreatedAt: "some-droplet-time", State: constant.DropletStaged}, ccv3.Warnings{"some-get-droplet-warnings"}, nil)
 				})
 
 				It("returns the droplet and warnings", func() {
@@ -257,7 +258,7 @@ var _ = Describe("Build Actions", func() {
 
 			When("getting the droplet fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"some-get-droplet-warnings"}, errors.New("no rain"))
+					fakeCloudControllerClient.GetDropletReturns(resources.Droplet{}, ccv3.Warnings{"some-get-droplet-warnings"}, errors.New("no rain"))
 				})
 
 				It("returns the error and warnings", func() {

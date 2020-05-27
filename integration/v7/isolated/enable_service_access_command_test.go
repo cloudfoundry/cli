@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -16,11 +16,11 @@ var _ = Describe("enable service access command", func() {
 				session := helpers.CF("enable-service-access", "--help")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+enable-service-access - Enable access to a service or service plan for one or all orgs"))
+				Expect(session).To(Say("\\s+enable-service-access - Enable access to a service offering or service plan for one or all orgs"))
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say("\\s+cf enable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Enable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Expect(session).To(Say("\\s+\\-b\\s+Enable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
 				Expect(session).To(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
@@ -34,11 +34,11 @@ var _ = Describe("enable service access command", func() {
 				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SERVICE` was not provided"))
 				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+enable-service-access - Enable access to a service or service plan for one or all orgs"))
+				Expect(session).To(Say("\\s+enable-service-access - Enable access to a service offering or service plan for one or all orgs"))
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say("\\s+cf enable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Enable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Expect(session).To(Say("\\s+\\-b\\s+Enable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
 				Expect(session).To(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
@@ -53,11 +53,11 @@ var _ = Describe("enable service access command", func() {
 				Expect(session).To(Say("FAILED"))
 				Expect(session.Err).To(Say(`Incorrect Usage: unexpected argument "another-service"`))
 				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("\\s+enable-service-access - Enable access to a service or service plan for one or all orgs"))
+				Expect(session).To(Say("\\s+enable-service-access - Enable access to a service offering or service plan for one or all orgs"))
 				Expect(session).To(Say("USAGE:"))
 				Expect(session).To(Say("\\s+cf enable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("\\s+\\-b\\s+Enable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Expect(session).To(Say("\\s+\\-b\\s+Enable access to a service offering from a particular service broker. Required when service offering name is ambiguous"))
 				Expect(session).To(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Expect(session).To(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Expect(session).To(Say("SEE ALSO:"))
@@ -77,7 +77,7 @@ var _ = Describe("enable service access command", func() {
 			It("displays FAILED, an informative error message, and exits 1", func() {
 				session := helpers.CF("enable-service-access", "some-service")
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("Enabling access to all plans of service some-service for all orgs as %s\\.\\.\\.", username))
+				Expect(session).To(Say("Enabling access to all plans of service offering some-service for all orgs as %s\\.\\.\\.", username))
 				Expect(session).To(Say("FAILED"))
 				Expect(session.Err).To(Say("Service offering 'some-service' not found"))
 			})
@@ -89,8 +89,8 @@ var _ = Describe("enable service access command", func() {
 				spaceName       string
 				serviceOffering string
 				servicePlan     string
-				broker          *fakeservicebroker.FakeServiceBroker
-				secondBroker    *fakeservicebroker.FakeServiceBroker
+				broker          *servicebrokerstub.ServiceBrokerStub
+				secondBroker    *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
@@ -98,11 +98,11 @@ var _ = Describe("enable service access command", func() {
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
 
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				serviceOffering = broker.ServiceName()
-				servicePlan = broker.ServicePlanName()
+				broker = servicebrokerstub.New().WithPlans(2).Create().Register()
+				serviceOffering = broker.FirstServiceOfferingName()
+				servicePlan = broker.FirstServicePlanName()
 
-				session := helpers.CF("service-access", "-e", serviceOffering, "-b", broker.Name())
+				session := helpers.CF("service-access", "-e", serviceOffering, "-b", broker.Name)
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say("%s\\s+%s\\s+none",
 					serviceOffering,
@@ -111,20 +111,20 @@ var _ = Describe("enable service access command", func() {
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			When("service offering name provided", func() {
 				It("makes all the plans public", func() {
 					session := helpers.CF("enable-service-access", serviceOffering)
 					Eventually(session).Should(Exit(0))
-					Expect(session).To(Say("Enabling access to all plans of service %s for all orgs as %s...", serviceOffering, username))
+					Expect(session).To(Say("Enabling access to all plans of service offering %s for all orgs as %s...", serviceOffering, username))
 					Expect(session).To(Say("OK"))
 
 					session = helpers.CF("service-access", "-e", serviceOffering)
 					Eventually(session).Should(Exit(0))
-					Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+					Expect(session).To(Say("broker:\\s+%s", broker.Name))
 					Expect(session).To(Say("%s\\s+%s\\s+all",
 						serviceOffering,
 						servicePlan,
@@ -136,12 +136,12 @@ var _ = Describe("enable service access command", func() {
 				It("makes the plan public", func() {
 					session := helpers.CF("enable-service-access", serviceOffering, "-p", servicePlan, "-o", orgName, "-v")
 					Eventually(session).Should(Exit(0))
-					Expect(session).To(Say("Enabling access to plan %s of service %s for org %s as %s...", servicePlan, serviceOffering, orgName, username))
+					Expect(session).To(Say("Enabling access to plan %s of service offering %s for org %s as %s...", servicePlan, serviceOffering, orgName, username))
 					Expect(session).To(Say("OK"))
 
 					session = helpers.CF("service-access", "-e", serviceOffering)
 					Eventually(session).Should(Exit(0))
-					Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+					Expect(session).To(Say("broker:\\s+%s", broker.Name))
 					Expect(session).To(Say("%s\\s+%s\\s+%s\\s+%s",
 						serviceOffering,
 						servicePlan,
@@ -153,26 +153,26 @@ var _ = Describe("enable service access command", func() {
 
 			When("two services with the same name are registered", func() {
 				BeforeEach(func() {
-					secondBroker = fakeservicebroker.NewAlternate()
+					secondBroker = servicebrokerstub.New()
 					secondBroker.Services[0].Name = serviceOffering
 					secondBroker.Services[0].Plans[0].Name = servicePlan
-					secondBroker.EnsureBrokerIsAvailable()
+					secondBroker.Create().Register()
 				})
 
 				AfterEach(func() {
-					secondBroker.Destroy()
+					secondBroker.Forget()
 				})
 
 				When("a serviceOffering name and broker name are provided", func() {
 					It("displays an informative message, exits 0, and enables access to the serviceOffering", func() {
-						session := helpers.CF("enable-service-access", serviceOffering, "-b", secondBroker.Name())
+						session := helpers.CF("enable-service-access", serviceOffering, "-b", secondBroker.Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("Enabling access to all plans of service %s from broker %s for all orgs as %s...", serviceOffering, secondBroker.Name(), username))
+						Expect(session).To(Say("Enabling access to all plans of service offering %s from broker %s for all orgs as %s...", serviceOffering, secondBroker.Name, username))
 						Expect(session).To(Say("OK"))
 
-						session = helpers.CF("service-access", "-b", secondBroker.Name())
+						session = helpers.CF("service-access", "-b", secondBroker.Name)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", secondBroker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", secondBroker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+all",
 							serviceOffering,
 							servicePlan,
@@ -196,7 +196,7 @@ var _ = Describe("enable service access command", func() {
 
 						session = helpers.CF("service-access", "-e", serviceOffering)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", broker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+all",
 							serviceOffering,
 							servicePlan,
@@ -214,7 +214,7 @@ var _ = Describe("enable service access command", func() {
 
 						session = helpers.CF("service-access", "-e", serviceOffering)
 						Eventually(session).Should(Exit(0))
-						Expect(session).To(Say("broker:\\s+%s", broker.Name()))
+						Expect(session).To(Say("broker:\\s+%s", broker.Name))
 						Expect(session).To(Say("%s\\s+%s\\s+all",
 							serviceOffering,
 							servicePlan,

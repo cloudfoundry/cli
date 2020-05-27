@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +29,7 @@ var _ = Describe("StopApplication", func() {
 		actor, fakeV7Actor, _ = getTestPushActor()
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 		}

@@ -25,6 +25,8 @@ var _ = Describe("create-private-domain command", func() {
 			Eventually(session).Should(Say(regexp.QuoteMeta("create-private-domain - Create a private domain for a specific org")))
 			Eventually(session).Should(Say("USAGE:\n"))
 			Eventually(session).Should(Say(regexp.QuoteMeta("cf create-private-domain ORG DOMAIN")))
+			Eventually(session).Should(Say("ALIAS:\n"))
+			Eventually(session).Should(Say("create-domain\n"))
 			Eventually(session).Should(Say("SEE ALSO:\n"))
 			Eventually(session).Should(Say("create-shared-domain, domains, share-private-domain"))
 			Eventually(session).Should(Exit(0))

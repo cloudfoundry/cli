@@ -4,15 +4,15 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/command/flag"
-
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -27,7 +27,7 @@ var _ = Describe("droplets Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDropletsActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -36,17 +36,19 @@ var _ = Describe("droplets Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeDropletsActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = DropletsCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
-			UI:           testUI,
-			Config:       fakeConfig,
-			Actor:        fakeActor,
-			SharedActor:  fakeSharedActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				Actor:       fakeActor,
+				SharedActor: fakeSharedActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -98,7 +100,7 @@ var _ = Describe("droplets Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationDropletsReturns([]v7action.Droplet{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.GetApplicationDropletsReturns([]resources.Droplet{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -116,16 +118,18 @@ var _ = Describe("droplets Command", func() {
 		BeforeEach(func() {
 			createdAtOne = "2017-08-14T21:16:42Z"
 			createdAtTwo = "2017-08-16T00:18:24Z"
-			droplets := []v7action.Droplet{
+			droplets := []resources.Droplet{
 				{
 					GUID:      "some-droplet-guid-1",
 					State:     constant.DropletStaged,
 					CreatedAt: createdAtOne,
+					IsCurrent: true,
 				},
 				{
 					GUID:      "some-droplet-guid-2",
 					State:     constant.DropletFailed,
 					CreatedAt: createdAtTwo,
+					IsCurrent: false,
 				},
 			}
 			fakeActor.GetApplicationDropletsReturns(droplets, v7action.Warnings{"warning-1", "warning-2"}, nil)
@@ -143,7 +147,7 @@ var _ = Describe("droplets Command", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say(`guid\s+state\s+created\n`))
-			Expect(testUI.Out).To(Say(`some-droplet-guid-1\s+staged\s+%s\n`, testUI.UserFriendlyDate(createdAtOneParsed)))
+			Expect(testUI.Out).To(Say(`some-droplet-guid-1 \(current\)\s+staged\s+%s\n`, testUI.UserFriendlyDate(createdAtOneParsed)))
 			Expect(testUI.Out).To(Say(`some-droplet-guid-2\s+failed\s+%s\n`, testUI.UserFriendlyDate(createdAtTwoParsed)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
@@ -158,7 +162,7 @@ var _ = Describe("droplets Command", func() {
 
 	When("getting the application droplets returns no droplets", func() {
 		BeforeEach(func() {
-			fakeActor.GetApplicationDropletsReturns([]v7action.Droplet{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
+			fakeActor.GetApplicationDropletsReturns([]resources.Droplet{}, v7action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
 		It("displays there are no droplets", func() {

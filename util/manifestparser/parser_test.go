@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"gopkg.in/yaml.v2"
+
 	. "code.cloudfoundry.org/cli/util/manifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
@@ -71,6 +73,22 @@ applications:
 					},
 				}))
 			})
+		})
+
+		When("the manifest does not contain applications", func() {
+			BeforeEach(func() {
+				rawManifest = []byte(`---
+applications:
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(errors.New("Manifest must have at least one application.")))
+			})
+
 		})
 
 		When("the manifest contains variables that need interpolation", func() {
@@ -227,8 +245,23 @@ applications:
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("parses the manifest properly", func() {
+			It("returns an error", func() {
 				Expect(executeErr).To(HaveOccurred())
+			})
+		})
+
+		When("unmarshalling returns an error", func() {
+			BeforeEach(func() {
+				rawManifest = []byte(`---
+blah blah
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(&yaml.TypeError{}))
 			})
 		})
 	})

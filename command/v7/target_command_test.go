@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -23,7 +24,7 @@ var _ = Describe("target Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeTargetActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		apiVersion      string
 		minCLIVersion   string
@@ -34,13 +35,15 @@ var _ = Describe("target Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeTargetActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = v7.TargetCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -108,8 +111,8 @@ var _ = Describe("target Command", func() {
 						It("displays how to target an org and space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("api endpoint:   some-api-target"))
-							Expect(testUI.Out).To(Say("api version:    1.2.3"))
+							Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
+							Expect(testUI.Out).To(Say("API version:    1.2.3"))
 							Expect(testUI.Out).To(Say("user:           some-user"))
 							Expect(testUI.Out).To(Say("No org or space targeted, use '%s target -o ORG -s SPACE'", binaryName))
 						})
@@ -127,8 +130,8 @@ var _ = Describe("target Command", func() {
 						It("displays the org and tip to target space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("api endpoint:   some-api-target"))
-							Expect(testUI.Out).To(Say("api version:    1.2.3"))
+							Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
+							Expect(testUI.Out).To(Say("API version:    1.2.3"))
 							Expect(testUI.Out).To(Say("user:           some-user"))
 							Expect(testUI.Out).To(Say("org:            some-org"))
 							Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
@@ -152,8 +155,8 @@ var _ = Describe("target Command", func() {
 						It("displays the org and space targeted ", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("api endpoint:   some-api-target"))
-							Expect(testUI.Out).To(Say("api version:    1.2.3"))
+							Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
+							Expect(testUI.Out).To(Say("API version:    1.2.3"))
 							Expect(testUI.Out).To(Say("user:           some-user"))
 							Expect(testUI.Out).To(Say("org:            some-org"))
 							Expect(testUI.Out).To(Say("space:          some-space"))
@@ -228,7 +231,7 @@ var _ = Describe("target Command", func() {
 					When("the org does not exist", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{},
+								resources.Organization{},
 								nil,
 								actionerror.OrganizationNotFoundError{Name: "some-org"})
 						})
@@ -249,7 +252,7 @@ var _ = Describe("target Command", func() {
 								Name: "some-org",
 							})
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{GUID: "some-org-guid"},
+								resources.Organization{GUID: "some-org-guid"},
 								v7action.Warnings{"warning-1", "warning-2"},
 								nil)
 						})
@@ -415,7 +418,7 @@ var _ = Describe("target Command", func() {
 					When("the org exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{
+								resources.Organization{
 									GUID: "some-org-guid",
 									Name: "some-org",
 								},
@@ -485,7 +488,7 @@ var _ = Describe("target Command", func() {
 					When("the org does not exist", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
-								v7action.Organization{},
+								resources.Organization{},
 								nil,
 								actionerror.OrganizationNotFoundError{Name: "some-org"})
 						})

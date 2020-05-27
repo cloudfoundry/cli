@@ -44,6 +44,7 @@ var _ = Describe("scale command", func() {
 
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`cf scale APP_NAME \[--process PROCESS\] \[-i INSTANCES\] \[-k DISK\] \[-m MEMORY\]`))
+				Eventually(session).Should(Say("Modifying the app's disk or memory will cause the app to restart."))
 
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`-f\s+Force restart of app without prompt`))

@@ -1087,6 +1087,16 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	LogCacheEndpointStub        func() string
+	logCacheEndpointMutex       sync.RWMutex
+	logCacheEndpointArgsForCall []struct {
+	}
+	logCacheEndpointReturns struct {
+		result1 string
+	}
+	logCacheEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
 	MinCLIVersionStub        func() string
 	minCLIVersionMutex       sync.RWMutex
 	minCLIVersionArgsForCall []struct {
@@ -6163,6 +6173,58 @@ func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBind
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) LogCacheEndpoint() string {
+	fake.logCacheEndpointMutex.Lock()
+	ret, specificReturn := fake.logCacheEndpointReturnsOnCall[len(fake.logCacheEndpointArgsForCall)]
+	fake.logCacheEndpointArgsForCall = append(fake.logCacheEndpointArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LogCacheEndpoint", []interface{}{})
+	fake.logCacheEndpointMutex.Unlock()
+	if fake.LogCacheEndpointStub != nil {
+		return fake.LogCacheEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.logCacheEndpointReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeCloudControllerClient) LogCacheEndpointCallCount() int {
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
+	return len(fake.logCacheEndpointArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) LogCacheEndpointCalls(stub func() string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = stub
+}
+
+func (fake *FakeCloudControllerClient) LogCacheEndpointReturns(result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	fake.logCacheEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) LogCacheEndpointReturnsOnCall(i int, result1 string) {
+	fake.logCacheEndpointMutex.Lock()
+	defer fake.logCacheEndpointMutex.Unlock()
+	fake.LogCacheEndpointStub = nil
+	if fake.logCacheEndpointReturnsOnCall == nil {
+		fake.logCacheEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.logCacheEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeCloudControllerClient) MinCLIVersion() string {
 	fake.minCLIVersionMutex.Lock()
 	ret, specificReturn := fake.minCLIVersionReturnsOnCall[len(fake.minCLIVersionArgsForCall)]
@@ -7980,6 +8042,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getStacksMutex.RUnlock()
 	fake.getUserProvidedServiceInstanceServiceBindingsMutex.RLock()
 	defer fake.getUserProvidedServiceInstanceServiceBindingsMutex.RUnlock()
+	fake.logCacheEndpointMutex.RLock()
+	defer fake.logCacheEndpointMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.pollJobMutex.RLock()

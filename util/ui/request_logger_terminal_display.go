@@ -30,6 +30,8 @@ func (display *RequestLoggerTerminalDisplay) DisplayBody([]byte) error {
 
 func (display *RequestLoggerTerminalDisplay) DisplayDump(dump string) error {
 	sanitized := display.dumpSanitizer.ReplaceAllString(dump, RedactedValue)
+	cookieCutter := regexp.MustCompile("Set-Cookie:.*")
+	sanitized = cookieCutter.ReplaceAllString(sanitized, "Set-Cookie: "+RedactedValue)
 	fmt.Fprintf(display.ui.Out, "%s\n", sanitized)
 	return nil
 }

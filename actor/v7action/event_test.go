@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -17,7 +18,7 @@ var _ = Describe("Event Actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
 	})
 
 	Describe("GetRecentEventsForApp", func() {
@@ -40,7 +41,7 @@ var _ = Describe("Event Actions", func() {
 
 		When("getting the app succeeds", func() {
 			BeforeEach(func() {
-				apps := []ccv3.Application{
+				apps := []resources.Application{
 					{GUID: "some-app-guid"},
 				}
 

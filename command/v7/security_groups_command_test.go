@@ -21,7 +21,7 @@ var _ = Describe("Security Groups Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSecurityGroupsActor
+		fakeActor       *v7fakes.FakeActor
 		executeErr      error
 	)
 
@@ -29,14 +29,16 @@ var _ = Describe("Security Groups Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSecurityGroupsActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig.TargetedOrganizationNameReturns("some-org")
 
 		cmd = SecurityGroupsCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 	})
 

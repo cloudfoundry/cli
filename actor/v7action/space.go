@@ -8,18 +8,21 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type Space ccv3.Space
 
 type SpaceSummary struct {
 	Space
-	Name                 string
-	OrgName              string
-	AppNames             []string
-	ServiceInstanceNames []string
-	IsolationSegmentName string
-	QuotaName            string
+	Name                  string
+	OrgName               string
+	AppNames              []string
+	ServiceInstanceNames  []string
+	IsolationSegmentName  string
+	QuotaName             string
+	RunningSecurityGroups []resources.SecurityGroup
+	StagingSecurityGroups []resources.SecurityGroup
 }
 
 func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, error) {
@@ -27,8 +30,8 @@ func (actor Actor) CreateSpace(spaceName, orgGUID string) (Space, Warnings, erro
 
 	space, apiWarnings, err := actor.CloudControllerClient.CreateSpace(ccv3.Space{
 		Name: spaceName,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: orgGUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeOrganization: resources.Relationship{GUID: orgGUID},
 		},
 	})
 
@@ -173,9 +176,9 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 
 	appliedQuotaRelationshipGUID := space.Relationships[constant.RelationshipTypeQuota].GUID
 
-	var ccv3SpaceQuota ccv3.SpaceQuota
+	var spaceQuota resources.SpaceQuota
 	if appliedQuotaRelationshipGUID != "" {
-		ccv3SpaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
+		spaceQuota, ccv3Warnings, err = actor.CloudControllerClient.GetSpaceQuota(space.Relationships[constant.RelationshipTypeQuota].GUID)
 		allWarnings = append(allWarnings, Warnings(ccv3Warnings)...)
 
 		if err != nil {
@@ -183,14 +186,28 @@ func (actor Actor) GetSpaceSummaryByNameAndOrganization(spaceName string, orgGUI
 		}
 	}
 
+	runningSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetRunningSecurityGroups(space.GUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
+	stagingSecurityGroups, ccv3Warnings, err := actor.CloudControllerClient.GetStagingSecurityGroups(space.GUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
+	}
+
 	spaceSummary := SpaceSummary{
-		OrgName:              org.Name,
-		Name:                 space.Name,
-		Space:                space,
-		AppNames:             appNames,
-		ServiceInstanceNames: serviceInstanceNames,
-		IsolationSegmentName: isoSegName,
-		QuotaName:            ccv3SpaceQuota.Name,
+		OrgName:               org.Name,
+		Name:                  space.Name,
+		Space:                 space,
+		AppNames:              appNames,
+		ServiceInstanceNames:  serviceInstanceNames,
+		IsolationSegmentName:  isoSegName,
+		QuotaName:             spaceQuota.Name,
+		RunningSecurityGroups: runningSecurityGroups,
+		StagingSecurityGroups: stagingSecurityGroups,
 	}
 
 	return spaceSummary, allWarnings, nil

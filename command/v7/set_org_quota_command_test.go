@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -20,7 +21,7 @@ var _ = Describe("set-org-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSetOrgQuotaActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -35,15 +36,17 @@ var _ = Describe("set-org-quota Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetOrgQuotaActor)
+		fakeActor = new(v7fakes.FakeActor)
 		getOrgWarning = RandomString("get-org-warning")
 		applyQuotaWarning = RandomString("apply-quota-warning")
 
 		cmd = SetOrgQuotaCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -53,7 +56,7 @@ var _ = Describe("set-org-quota Command", func() {
 		fakeConfig.CurrentUserNameReturns(currentUser, nil)
 
 		fakeActor.GetOrganizationByNameReturns(
-			v7action.Organization{GUID: "some-org-guid"},
+			resources.Organization{GUID: "some-org-guid"},
 			v7action.Warnings{getOrgWarning},
 			nil,
 		)
@@ -130,7 +133,7 @@ var _ = Describe("set-org-quota Command", func() {
 	When("getting the org fails", func() {
 		BeforeEach(func() {
 			fakeActor.GetOrganizationByNameReturns(
-				v7action.Organization{GUID: "some-org-guid"},
+				resources.Organization{GUID: "some-org-guid"},
 				v7action.Warnings{getOrgWarning},
 				errors.New("get-org-error"),
 			)

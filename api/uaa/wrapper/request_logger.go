@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"sort"
 	"time"
 
@@ -151,8 +152,18 @@ func (logger *RequestLogger) displaySortedHeaders(headers http.Header) error {
 }
 
 func redactHeaders(key string, value string) string {
-	if key == "Authorization" {
-		return "[PRIVATE DATA HIDDEN]"
+	redactedValue := "[PRIVATE DATA HIDDEN]"
+	redactedKeys := []string{"Authorization", "Set-Cookie"}
+	for _, redactedKey := range redactedKeys {
+		if key == redactedKey {
+			return redactedValue
+		}
 	}
+
+	re := regexp.MustCompile(`([&?]code)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)
+	if key == "Location" {
+		value = re.ReplaceAllString(value, "$1="+redactedValue)
+	}
+
 	return value
 }

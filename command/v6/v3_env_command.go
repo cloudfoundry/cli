@@ -75,10 +75,10 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 
 	if len(envGroups.System) > 0 || len(envGroups.Application) > 0 {
 		cmd.UI.DisplayHeader("System-Provided:")
-		cmd.displayEnvGroup(envGroups.System)
+		_ = cmd.displayEnvGroup(envGroups.System)
 		if len(envGroups.Application) > 0 {
 			cmd.UI.DisplayNewline()
-			cmd.displayEnvGroup(envGroups.Application)
+			_ = cmd.displayEnvGroup(envGroups.Application)
 		}
 	} else {
 		cmd.UI.DisplayText("No system-provided env variables have been set")
@@ -87,7 +87,7 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 
 	if len(envGroups.EnvironmentVariables) > 0 {
 		cmd.UI.DisplayHeader("User-Provided:")
-		cmd.displayEnvGroup(envGroups.EnvironmentVariables)
+		_ = cmd.displayEnvGroup(envGroups.EnvironmentVariables)
 	} else {
 		cmd.UI.DisplayText("No user-provided env variables have been set")
 	}
@@ -95,7 +95,7 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 
 	if len(envGroups.Running) > 0 {
 		cmd.UI.DisplayHeader("Running Environment Variable Groups:")
-		cmd.displayEnvGroup(envGroups.Running)
+		_ = cmd.displayEnvGroup(envGroups.Running)
 	} else {
 		cmd.UI.DisplayText("No running env variables have been set")
 	}
@@ -103,7 +103,7 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 
 	if len(envGroups.Staging) > 0 {
 		cmd.UI.DisplayHeader("Staging Environment Variable Groups:")
-		cmd.displayEnvGroup(envGroups.Staging)
+		_ = cmd.displayEnvGroup(envGroups.Staging)
 	} else {
 		cmd.UI.DisplayText("No staging env variables have been set")
 	}

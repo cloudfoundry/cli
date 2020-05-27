@@ -176,6 +176,16 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 	credentials := make(map[string]string)
 	passcode := prompts["passcode"]
 
+	if passcode.DisplayName == "" {
+		passcode = coreconfig.AuthPrompt{
+			Type: coreconfig.AuthPromptTypePassword,
+			DisplayName: T("Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
+				map[string]interface{}{
+					"AuthenticationEndpoint": cmd.config.AuthenticationEndpoint(),
+				}),
+		}
+	}
+
 	for i := 0; i < maxLoginTries; i++ {
 		if c.IsSet("sso-passcode") && i == 0 {
 			credentials["passcode"] = c.String("sso-passcode")
@@ -220,7 +230,7 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 		if prompts["username"].Type == coreconfig.AuthPromptTypeText && usernameFlagValue != "" {
 			credentials["username"] = usernameFlagValue
 		} else {
-			credentials["username"] = cmd.ui.Ask(value.DisplayName)
+			credentials["username"] = cmd.ui.Ask(T(value.DisplayName))
 		}
 	}
 
@@ -234,7 +244,7 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 		} else if key == "username" {
 			continue
 		} else {
-			credentials[key] = cmd.ui.Ask(prompt.DisplayName)
+			credentials[key] = cmd.ui.Ask(T(prompt.DisplayName))
 		}
 	}
 
@@ -246,12 +256,12 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 				credentials["password"] = passwordFlagValue
 				passwordFlagValue = ""
 			} else {
-				credentials["password"] = cmd.ui.AskForPassword(passPrompt.DisplayName)
+				credentials["password"] = cmd.ui.AskForPassword(T(passPrompt.DisplayName))
 			}
 		}
 
 		for _, key := range passwordKeys {
-			credentials[key] = cmd.ui.AskForPassword(prompts[key].DisplayName)
+			credentials[key] = cmd.ui.AskForPassword(T(prompts[key].DisplayName))
 		}
 
 		credentialsCopy := make(map[string]string, len(credentials))

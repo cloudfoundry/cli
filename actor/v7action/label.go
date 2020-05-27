@@ -1,13 +1,14 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 )
 
 func (actor *Actor) GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	return actor.extractLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+	return actor.extractLabels((*resources.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor *Actor) GetDomainLabels(domainName string) (map[string]types.NullString, Warnings, error) {
@@ -22,7 +23,7 @@ func (actor *Actor) GetOrganizationLabels(orgName string) (map[string]types.Null
 
 func (actor *Actor) GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
 	resource, warnings, err := actor.GetRoute(routeName, spaceGUID)
-	return actor.extractLabels((*ccv3.Metadata)(resource.Metadata), warnings, err)
+	return actor.extractLabels((*resources.Metadata)(resource.Metadata), warnings, err)
 }
 
 func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
@@ -31,8 +32,8 @@ func (actor Actor) GetServiceBrokerLabels(serviceBrokerName string) (map[string]
 }
 
 func (actor Actor) GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
-	serviceOffering, warnings, err := actor.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
-	return actor.extractLabels(serviceOffering.Metadata, warnings, err)
+	serviceOffering, warnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+	return actor.extractLabels(serviceOffering.Metadata, Warnings(warnings), actionerror.EnrichAPIErrors(err))
 }
 
 func (actor Actor) GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, Warnings, error) {
@@ -55,7 +56,7 @@ func (actor *Actor) GetBuildpackLabels(buildpackName string, buildpackStack stri
 	return actor.extractLabels(resource.Metadata, warnings, err)
 }
 
-func (actor *Actor) extractLabels(metadata *ccv3.Metadata, warnings Warnings, err error) (map[string]types.NullString, Warnings, error) {
+func (actor *Actor) extractLabels(metadata *resources.Metadata, warnings Warnings, err error) (map[string]types.NullString, Warnings, error) {
 	var labels map[string]types.NullString
 
 	if err != nil {
@@ -72,7 +73,7 @@ func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spa
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("app", app.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("app", app.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStack(buildpackName string, stack string, labels map[string]types.NullString) (Warnings, error) {
@@ -80,7 +81,7 @@ func (actor *Actor) UpdateBuildpackLabelsByBuildpackNameAndStack(buildpackName s
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("buildpack", buildpack.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("buildpack", buildpack.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateDomainLabelsByDomainName(domainName string, labels map[string]types.NullString) (Warnings, error) {
@@ -88,7 +89,7 @@ func (actor *Actor) UpdateDomainLabelsByDomainName(domainName string, labels map
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("domain", domain.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("domain", domain.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, labels map[string]types.NullString) (Warnings, error) {
@@ -96,7 +97,7 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("org", org.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("org", org.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateRouteLabels(routeName string, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
@@ -104,7 +105,7 @@ func (actor *Actor) UpdateRouteLabels(routeName string, spaceGUID string, labels
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("route", route.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("route", route.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID string, labels map[string]types.NullString) (Warnings, error) {
@@ -112,7 +113,7 @@ func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID strin
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("space", space.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("space", space.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateStackLabelsByStackName(stackName string, labels map[string]types.NullString) (Warnings, error) {
@@ -120,7 +121,7 @@ func (actor *Actor) UpdateStackLabelsByStackName(stackName string, labels map[st
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("stack", stack.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("stack", stack.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateServiceBrokerLabelsByServiceBrokerName(serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
@@ -128,15 +129,15 @@ func (actor *Actor) UpdateServiceBrokerLabelsByServiceBrokerName(serviceBrokerNa
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadataAsync("service-broker", serviceBroker.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("service-broker", serviceBroker.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
 func (actor *Actor) UpdateServiceOfferingLabels(serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
-	serviceOffering, warnings, err := actor.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
+	serviceOffering, warnings, err := actor.CloudControllerClient.GetServiceOfferingByNameAndBroker(serviceOfferingName, serviceBrokerName)
 	if err != nil {
-		return warnings, err
+		return Warnings(warnings), actionerror.EnrichAPIErrors(err)
 	}
-	return actor.updateResourceMetadata("service-offering", serviceOffering.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("service-offering", serviceOffering.GUID, resources.Metadata{Labels: labels}, Warnings(warnings))
 }
 
 func (actor *Actor) UpdateServicePlanLabels(servicePlanName string, serviceOfferingName string, serviceBrokerName string, labels map[string]types.NullString) (Warnings, error) {
@@ -144,21 +145,23 @@ func (actor *Actor) UpdateServicePlanLabels(servicePlanName string, serviceOffer
 	if err != nil {
 		return warnings, err
 	}
-	return actor.updateResourceMetadata("service-plan", servicePlan.GUID, ccv3.Metadata{Labels: labels}, warnings)
+	return actor.updateResourceMetadata("service-plan", servicePlan.GUID, resources.Metadata{Labels: labels}, warnings)
 }
 
-func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
-	return append(warnings, updateWarnings...), err
-}
-
-func (actor *Actor) updateResourceMetadataAsync(resourceType string, resourceGUID string, payload ccv3.Metadata, warnings Warnings) (Warnings, error) {
-	jobURL, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadataAsync(resourceType, resourceGUID, payload)
+func (actor *Actor) updateResourceMetadata(resourceType string, resourceGUID string, payload resources.Metadata, warnings Warnings) (Warnings, error) {
+	jobURL, updateWarnings, err := actor.CloudControllerClient.UpdateResourceMetadata(resourceType, resourceGUID, payload)
 	warnings = append(warnings, updateWarnings...)
 	if err != nil {
 		return warnings, err
 	}
-	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-	warnings = append(warnings, pollWarnings...)
-	return warnings, err
+
+	if jobURL != "" {
+		pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+		warnings = append(warnings, pollWarnings...)
+		if err != nil {
+			return warnings, err
+		}
+	}
+
+	return warnings, nil
 }

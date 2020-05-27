@@ -2,56 +2,24 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . ScaleActor
-
-type ScaleActor interface {
-	AppActor
-
-	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
-	StopApplication(appGUID string) (v7action.Warnings, error)
-	StartApplication(appGUID string) (v7action.Warnings, error)
-	PollStart(appGUID string, noWait bool, handleProcessStats func(string)) (v7action.Warnings, error)
-}
-
 type ScaleCommand struct {
+	BaseCommand
+
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
 	Force               bool           `short:"f" description:"Force restart of app without prompt"`
 	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
 	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
-	usage               interface{}    `usage:"CF_NAME scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"`
+	usage               interface{}    `usage:"CF_NAME scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]\n\n   Modifying the app's disk or memory will cause the app to restart."`
 	relatedCommands     interface{}    `related_commands:"push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       ScaleActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *ScaleCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-
-	return nil
 }
 
 func (cmd ScaleCommand) Execute(args []string) error {
@@ -87,7 +55,8 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		cmd.UI.DisplayText(instanceDetails)
 	}
 
-	warnings, err = cmd.Actor.PollStart(app.GUID, false, handleInstanceDetails)
+	warnings, err = cmd.Actor.PollStart(app, false, handleInstanceDetails)
+	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayWarnings(warnings)
 
 	showErr := cmd.showCurrentScale(user.Name, err)
@@ -204,6 +173,8 @@ func (cmd ScaleCommand) showCurrentScale(userName string, runningErr error) erro
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  userName,
 	})
+
+	cmd.UI.DisplayNewline()
 
 	summary, warnings, err := cmd.Actor.GetDetailedAppSummary(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)

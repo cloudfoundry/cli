@@ -1,4 +1,0 @@
----
-- type: replace
-  path: /instance_groups/name=uaa/vm_type
-  value: small

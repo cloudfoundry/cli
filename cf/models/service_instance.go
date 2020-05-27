@@ -19,7 +19,7 @@ type ServiceInstanceCreateRequest struct {
 type ServiceInstanceUpdateRequest struct {
 	PlanGUID string                 `json:"service_plan_guid,omitempty"`
 	Params   map[string]interface{} `json:"parameters,omitempty"`
-	Tags     []string               `json:"tags"`
+	Tags     *[]string              `json:"tags,omitempty"`
 }
 
 type ServiceInstanceFields struct {

@@ -41,6 +41,8 @@ const (
 	PathsFilter QueryKey = "paths"
 	// PathFilter is a query param for getting an object with the given host
 	PathFilter QueryKey = "path"
+	// PortsFilter is a query param for getting an object with the given host
+	PortsFilter QueryKey = "ports"
 	// RoleTypesFilter is a query param for getting a role by type
 	RoleTypesFilter QueryKey = "types"
 	// StackFilter is a query parameter for listing objects by stack name
@@ -55,12 +57,16 @@ const (
 	StatesFilter QueryKey = "states"
 	// ServiceBrokerNamesFilter is a query parameter when getting plans or offerings according to the Service Brokers that it relates to
 	ServiceBrokerNamesFilter QueryKey = "service_broker_names"
-	// ServiceBrokerGUIDsFilter is a query parameter for getting according to the service broker GUID
+	// ServiceBrokerGUIDsFilter is a query parameter for getting resources according to the service broker GUID
 	ServiceBrokerGUIDsFilter QueryKey = "service_broker_guids"
 	// ServiceOfferingNamesFilter is a query parameter when getting a plan according to the Service Offerings that it relates to
 	ServiceOfferingNamesFilter QueryKey = "service_offering_names"
-	// ServiceOfferingGUIDsFilter is a query parameter when getting according to service offering GUIDs
+	// ServiceOfferingGUIDsFilter is a query parameter when getting resources according to service offering GUIDs
 	ServiceOfferingGUIDsFilter QueryKey = "service_offering_guids"
+	// FieldsServiceOfferingServiceBroker is a query parameter to include specific fields from a service broker in a plan response
+	FieldsServiceOfferingServiceBroker QueryKey = "fields[service_offering.service_broker]"
+	// FieldsServiceBroker is a query parameter to include specific fields from a service broker in an offering response
+	FieldsServiceBroker QueryKey = "fields[service_broker]"
 
 	// OrderBy is a query parameter to specify how to order objects.
 	OrderBy QueryKey = "order_by"
@@ -69,6 +75,12 @@ const (
 	// Include is a query parameter for specifying other resources associated with the
 	// resource returned by the endpoint
 	Include QueryKey = "include"
+
+	// GloballyEnabledStaging is the query parameter for getting only security groups that are globally enabled for staging
+	GloballyEnabledStaging QueryKey = "globally_enabled_staging"
+
+	// GloballyEnabledRunning is the query parameter for getting only security groups that are globally enabled for running
+	GloballyEnabledRunning QueryKey = "globally_enabled_running"
 
 	// NameOrder is a query value for ordering by name. This value is used in
 	// conjunction with the OrderBy QueryKey.
@@ -81,6 +93,13 @@ const (
 	// CreatedAtDescendingOrder is a query value for ordering by created_at timestamp,
 	// in descending order.
 	CreatedAtDescendingOrder = "-created_at"
+
+	// SourceGUID is the query parameter for getting an object. Currently it's used as a package GUID
+	// to retrieve a package to later copy it to an app (CopyPackage())
+	SourceGUID = "source_guid"
+
+	// Purge is a query parameter used on a Delete request to indicate that dependent resources should also be deleted
+	Purge = "purge"
 )
 
 // Query is additional settings that can be passed to some requests that can

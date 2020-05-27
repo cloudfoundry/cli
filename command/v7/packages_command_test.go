@@ -25,7 +25,7 @@ var _ = Describe("packages Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakePackagesActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 	)
@@ -34,17 +34,19 @@ var _ = Describe("packages Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakePackagesActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v7.PackagesCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
-			UI:           testUI,
-			Config:       fakeConfig,
-			Actor:        fakeActor,
-			SharedActor:  fakeSharedActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				Actor:       fakeActor,
+				SharedActor: fakeSharedActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -61,10 +63,6 @@ var _ = Describe("packages Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	It("displays the experimental warning", func() {
-		Expect(testUI.Err).NotTo(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 	})
 
 	When("checking target fails", func() {
@@ -145,8 +143,9 @@ var _ = Describe("packages Command", func() {
 			Expect(err).ToNot(HaveOccurred())
 			package2UTCTime, err := time.Parse(time.RFC3339, package2UTC)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say(`some-package-guid-2\s+failed\s+%s`, testUI.UserFriendlyDate(package2UTCTime)))
+
 			Expect(testUI.Out).To(Say(`some-package-guid-1\s+ready\s+%s`, testUI.UserFriendlyDate(package1UTCTime)))
+			Expect(testUI.Out).To(Say(`some-package-guid-2\s+failed\s+%s`, testUI.UserFriendlyDate(package2UTCTime)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))

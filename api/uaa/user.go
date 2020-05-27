@@ -162,6 +162,30 @@ func (client Client) ListUsers(userName, origin string) ([]User, error) {
 	return users, nil
 }
 
+func (client *Client) UpdatePassword(userGUID string, oldPassword string, newPassword string) error {
+	requestBody := map[string]interface{}{
+		"oldPassword": oldPassword,
+		"password":    newPassword,
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return err
+	}
+
+	request, err := client.newRequest(requestOptions{
+		RequestName: internal.UpdatePasswordRequest,
+		Header:      http.Header{"Content-Type": {"application/json"}},
+		URIParams:   map[string]string{"user_guid": userGUID},
+		Body:        bytes.NewBuffer(bodyBytes),
+	})
+	if err != nil {
+		return err
+	}
+
+	return client.connection.Make(request, &Response{})
+}
+
 func (client Client) ValidateClientUser(clientID string) error {
 	request, err := client.newRequest(requestOptions{
 		RequestName: internal.GetClientUser,

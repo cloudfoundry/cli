@@ -21,7 +21,7 @@ var _ = Describe("unset-env Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeUnsetEnvActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		appName         string
@@ -31,13 +31,15 @@ var _ = Describe("unset-env Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeUnsetEnvActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = UnsetEnvCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -101,7 +103,7 @@ var _ = Describe("unset-env Command", func() {
 					Expect(testUI.Err).To(Say("set-warning-1"))
 					Expect(testUI.Err).To(Say("set-warning-2"))
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say(`TIP: Use 'cf stage some-app' to ensure your env variable changes take effect\.`))
+					Expect(testUI.Out).To(Say(`TIP: Use 'cf restage some-app' to ensure your env variable changes take effect\.`))
 
 					Expect(fakeActor.UnsetEnvironmentVariableByApplicationNameAndSpaceCallCount()).To(Equal(1))
 					appName, spaceGUID, envVarName := fakeActor.UnsetEnvironmentVariableByApplicationNameAndSpaceArgsForCall(0)

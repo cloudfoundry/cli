@@ -3,13 +3,13 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -24,7 +24,7 @@ var _ = Describe("unmap-route Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeUnmapRouteActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -37,6 +37,7 @@ var _ = Describe("unmap-route Command", func() {
 		spaceGUID       string
 		spaceName       string
 		userName        string
+		port            int
 	)
 
 	BeforeEach(func() {
@@ -44,7 +45,7 @@ var _ = Describe("unmap-route Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeUnmapRouteActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -57,15 +58,19 @@ var _ = Describe("unmap-route Command", func() {
 		spaceGUID = "some-space-guid"
 		spaceName = "some-space"
 		userName = "steve"
+		port = 0
 
 		cmd = UnmapRouteCommand{
 			RequiredArgs: flag.AppDomain{App: appName, Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			Port:         port,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -79,6 +84,35 @@ var _ = Describe("unmap-route Command", func() {
 		})
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+
+		fakeActor.GetDomainByNameReturns(
+			resources.Domain{Name: "some-domain.com", GUID: "domain-guid"},
+			v7action.Warnings{"get-domain-warnings"},
+			nil,
+		)
+
+		fakeActor.GetApplicationByNameAndSpaceReturns(
+			resources.Application{Name: "app", GUID: "app-guid"},
+			v7action.Warnings{"get-app-warnings"},
+			nil,
+		)
+
+		fakeActor.GetRouteByAttributesReturns(
+			resources.Route{GUID: "route-guid"},
+			v7action.Warnings{"get-route-warnings"},
+			nil,
+		)
+
+		fakeActor.GetRouteDestinationByAppGUIDReturns(
+			resources.RouteDestination{GUID: "destination-guid"},
+			v7action.Warnings{"get-destination-warning"},
+			nil,
+		)
+
+		fakeActor.UnmapRouteReturns(
+			v7action.Warnings{"unmap-route-warnings"},
+			nil,
+		)
 	})
 
 	JustBeforeEach(func() {
@@ -113,220 +147,186 @@ var _ = Describe("unmap-route Command", func() {
 		})
 	})
 
-	When("the user is logged in and targeted", func() {
-		When("getting the domain errors", func() {
-			BeforeEach(func() {
-				fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
-			})
-
-			It("returns the error and displays warnings", func() {
-				Expect(testUI.Err).To(Say("get-domain-warnings"))
-				Expect(executeErr).To(MatchError(errors.New("get-domain-error")))
-
-				Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
-				Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
-
-				Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(0))
-				Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(0))
-				Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
-			})
+	When("getting the domain errors", func() {
+		BeforeEach(func() {
+			fakeActor.GetDomainByNameReturns(resources.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
 		})
 
-		When("getting the domain succeeds", func() {
-			BeforeEach(func() {
-				fakeActor.GetDomainByNameReturns(
-					v7action.Domain{Name: "some-domain.com", GUID: "domain-guid"},
-					v7action.Warnings{"get-domain-warnings"},
-					nil,
-				)
-			})
-
-			When("getting the app errors", func() {
-				BeforeEach(func() {
-					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
-						v7action.Warnings{"get-app-warnings"},
-						errors.New("get-app-error"),
-					)
-				})
-
-				It("returns the error and displays warnings", func() {
-					Expect(testUI.Err).To(Say("get-domain-warnings"))
-					Expect(testUI.Err).To(Say("get-app-warnings"))
-					Expect(executeErr).To(MatchError(errors.New("get-app-error")))
-
-					Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
-					Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
-
-					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(actualAppName).To(Equal(appName))
-					Expect(actualSpaceGUID).To(Equal(spaceGUID))
-
-					Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(0))
-					Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
-				})
-			})
-
-			When("getting the app succeeds", func() {
-				BeforeEach(func() {
-					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{Name: "app", GUID: "app-guid"},
-						v7action.Warnings{"get-app-warnings"},
-						nil,
-					)
-				})
-
-				When("getting the route errors", func() {
-					BeforeEach(func() {
-						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{},
-							v7action.Warnings{"get-route-warnings"},
-							errors.New("get-route-error"),
-						)
-					})
-
-					It("returns the error and displays warnings", func() {
-						Expect(testUI.Err).To(Say("get-domain-warnings"))
-						Expect(testUI.Err).To(Say("get-app-warnings"))
-						Expect(testUI.Err).To(Say("get-route-warnings"))
-						Expect(executeErr).To(MatchError(errors.New("get-route-error")))
-
-						Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
-						Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
-
-						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-						actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-						Expect(actualAppName).To(Equal(appName))
-						Expect(actualSpaceGUID).To(Equal(spaceGUID))
-
-						Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
-						actualDomainName, actualDomainGUID, actualHostname, actualPath := fakeActor.GetRouteByAttributesArgsForCall(0)
-						Expect(actualDomainName).To(Equal("some-domain.com"))
-						Expect(actualDomainGUID).To(Equal("domain-guid"))
-						Expect(actualHostname).To(Equal(hostname))
-						Expect(actualPath).To(Equal(path))
-
-						Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
-					})
-				})
-
-				When("getting the route succeeds", func() {
-					BeforeEach(func() {
-						fakeActor.GetRouteByAttributesReturns(
-							v7action.Route{GUID: "route-guid"},
-							v7action.Warnings{"get-route-warnings"},
-							nil,
-						)
-					})
-
-					It("prints flavor text", func() {
-						Expect(testUI.Out).To(Say(
-							`Removing route %s from app %s in org %s / space %s as %s\.\.\.`,
-							"host.some-domain.com/path",
-							appName,
-							orgName,
-							spaceName,
-							userName,
-						))
-					})
-
-					When("getting the route destination fails because the app is not mapped", func() {
-						BeforeEach(func() {
-							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{},
-								v7action.Warnings{"get-destination-warning"},
-								actionerror.RouteDestinationNotFoundError{},
-							)
-						})
-
-						It("prints a message and returns without an error", func() {
-							Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
-							givenRouteGUID, givenAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
-							Expect(givenRouteGUID).To(Equal("route-guid"))
-							Expect(givenAppGUID).To(Equal("app-guid"))
-
-							Expect(executeErr).NotTo(HaveOccurred())
-							Expect(testUI.Err).To(Say("get-destination-warning"))
-							Expect(testUI.Out).To(Say("Route to be unmapped is not currently mapped to the application."))
-							Expect(testUI.Out).To(Say("OK"))
-						})
-					})
-
-					When("getting the route destination fails for another reason", func() {
-						BeforeEach(func() {
-							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{},
-								v7action.Warnings{"get-destination-warning"},
-								errors.New("failed to get destination"),
-							)
-						})
-
-						It("prints warnings and returns the error", func() {
-							Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
-							givenRouteGUID, givenAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
-							Expect(givenRouteGUID).To(Equal("route-guid"))
-							Expect(givenAppGUID).To(Equal("app-guid"))
-
-							Expect(testUI.Err).To(Say("get-destination-warning"))
-							Expect(executeErr).To(MatchError("failed to get destination"))
-
-							Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
-						})
-					})
-
-					When("getting the route destination succeeds", func() {
-						BeforeEach(func() {
-							fakeActor.GetRouteDestinationByAppGUIDReturns(
-								v7action.RouteDestination{GUID: "destination-guid"},
-								v7action.Warnings{"get-destination-warning"},
-								nil,
-							)
-						})
-
-						When("unmapping the route fails", func() {
-							BeforeEach(func() {
-								fakeActor.UnmapRouteReturns(
-									v7action.Warnings{"unmap-route-warnings"},
-									errors.New("failed to unmap route"),
-								)
-							})
-
-							It("prints warnings and returns the error", func() {
-								Expect(fakeActor.UnmapRouteCallCount()).To(Equal(1))
-								givenRouteGUID, givenDestinationGUID := fakeActor.UnmapRouteArgsForCall(0)
-								Expect(givenRouteGUID).To(Equal("route-guid"))
-								Expect(givenDestinationGUID).To(Equal("destination-guid"))
-
-								Expect(testUI.Err).To(Say("get-destination-warning"))
-
-								Expect(executeErr).To(MatchError("failed to unmap route"))
-							})
-						})
-
-						When("unmapping the route succeeds", func() {
-							BeforeEach(func() {
-								fakeActor.UnmapRouteReturns(
-									v7action.Warnings{"unmap-route-warnings"},
-									nil,
-								)
-							})
-
-							It("prints warnings and does not return an error", func() {
-								Expect(fakeActor.UnmapRouteCallCount()).To(Equal(1))
-								givenRouteGUID, givenDestinationGUID := fakeActor.UnmapRouteArgsForCall(0)
-								Expect(givenRouteGUID).To(Equal("route-guid"))
-								Expect(givenDestinationGUID).To(Equal("destination-guid"))
-
-								Expect(testUI.Err).To(Say("get-destination-warning"))
-								Expect(testUI.Out).To(Say("OK"))
-
-								Expect(executeErr).NotTo(HaveOccurred())
-							})
-						})
-					})
-				})
-			})
+		It("returns the error and displays warnings", func() {
+			Expect(testUI.Err).To(Say("get-domain-warnings"))
+			Expect(executeErr).To(MatchError(errors.New("get-domain-error")))
+			Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
 		})
+	})
+
+	It("gets the domain and displays warnings", func() {
+		Expect(testUI.Err).To(Say("get-domain-warnings"))
+
+		Expect(fakeActor.GetDomainByNameCallCount()).To(Equal(1))
+		Expect(fakeActor.GetDomainByNameArgsForCall(0)).To(Equal(domain))
+	})
+
+	When("getting the app errors", func() {
+		BeforeEach(func() {
+			fakeActor.GetApplicationByNameAndSpaceReturns(
+				resources.Application{},
+				v7action.Warnings{"get-app-warnings"},
+				errors.New("get-app-error"),
+			)
+		})
+
+		It("returns the error and displays warnings", func() {
+			Expect(testUI.Err).To(Say("get-app-warnings"))
+			Expect(executeErr).To(MatchError(errors.New("get-app-error")))
+			Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
+		})
+	})
+
+	It("gets the app and displays the warnings", func() {
+		Expect(testUI.Err).To(Say("get-app-warnings"))
+
+		Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+		actualAppName, actualSpaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+		Expect(actualAppName).To(Equal(appName))
+		Expect(actualSpaceGUID).To(Equal(spaceGUID))
+	})
+
+	When("getting the route errors", func() {
+		BeforeEach(func() {
+			fakeActor.GetRouteByAttributesReturns(
+				resources.Route{},
+				v7action.Warnings{"get-route-warnings"},
+				errors.New("get-route-error"),
+			)
+		})
+
+		It("returns the error and displays warnings", func() {
+			Expect(testUI.Err).To(Say("get-route-warnings"))
+			Expect(executeErr).To(MatchError(errors.New("get-route-error")))
+
+			Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
+		})
+	})
+
+	When("the route is TCP", func() {
+		BeforeEach(func() {
+			cmd.Hostname = ""
+			cmd.Path = flag.V7RoutePath{Path: ""}
+			cmd.Port = 1024
+		})
+
+		It("gets the routes and displays warnings", func() {
+			Expect(testUI.Err).To(Say("get-route-warnings"))
+
+			Expect(testUI.Out).To(Say(
+				`Removing route %s from app %s in org %s / space %s as %s\.\.\.`,
+				"some-domain.com:1024",
+				appName,
+				orgName,
+				spaceName,
+				userName,
+			))
+
+			Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
+			actualDomainName, actualDomainGUID, _, _, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
+			Expect(actualDomainName).To(Equal("some-domain.com"))
+			Expect(actualDomainGUID).To(Equal("domain-guid"))
+			Expect(actualPort).To(Equal(1024))
+		})
+	})
+
+	It("gets the routes and displays warnings", func() {
+		Expect(testUI.Err).To(Say("get-route-warnings"))
+
+		Expect(fakeActor.GetRouteByAttributesCallCount()).To(Equal(1))
+		actualDomainName, actualDomainGUID, actualHostname, actualPath, actualPort := fakeActor.GetRouteByAttributesArgsForCall(0)
+		Expect(actualDomainName).To(Equal("some-domain.com"))
+		Expect(actualDomainGUID).To(Equal("domain-guid"))
+		Expect(actualHostname).To(Equal(hostname))
+		Expect(actualPath).To(Equal(path))
+		Expect(actualPort).To(Equal(0))
+	})
+
+	It("prints flavor text", func() {
+		Expect(testUI.Out).To(Say(
+			`Removing route %s from app %s in org %s / space %s as %s\.\.\.`,
+			"host.some-domain.com/path",
+			appName,
+			orgName,
+			spaceName,
+			userName,
+		))
+	})
+
+	When("getting the route destination fails because the app is not mapped", func() {
+		BeforeEach(func() {
+			fakeActor.GetRouteDestinationByAppGUIDReturns(
+				resources.RouteDestination{},
+				v7action.Warnings{"get-destination-warning"},
+				actionerror.RouteDestinationNotFoundError{},
+			)
+		})
+
+		It("prints a message and returns without an error", func() {
+			Expect(executeErr).NotTo(HaveOccurred())
+			Expect(testUI.Out).To(Say("Route to be unmapped is not currently mapped to the application."))
+			Expect(testUI.Out).To(Say("OK"))
+		})
+	})
+
+	When("getting the route destination fails for another reason", func() {
+		BeforeEach(func() {
+			fakeActor.GetRouteDestinationByAppGUIDReturns(
+				resources.RouteDestination{},
+				v7action.Warnings{"get-destination-warning"},
+				errors.New("failed to get destination"),
+			)
+		})
+
+		It("prints warnings and returns the error", func() {
+			Expect(executeErr).To(MatchError("failed to get destination"))
+
+			Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
+		})
+	})
+
+	It("gets the route destination and prints the warnings", func() {
+		Expect(testUI.Err).To(Say("get-destination-warning"))
+
+		Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
+		givenRouteGUID, givenAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
+		Expect(givenRouteGUID).To(Equal("route-guid"))
+		Expect(givenAppGUID).To(Equal("app-guid"))
+	})
+
+	When("unmapping the route fails", func() {
+		BeforeEach(func() {
+			fakeActor.UnmapRouteReturns(
+				v7action.Warnings{"unmap-route-warnings"},
+				errors.New("failed to unmap route"),
+			)
+		})
+
+		It("prints warnings and returns the error", func() {
+			Expect(fakeActor.UnmapRouteCallCount()).To(Equal(1))
+			givenRouteGUID, givenDestinationGUID := fakeActor.UnmapRouteArgsForCall(0)
+			Expect(givenRouteGUID).To(Equal("route-guid"))
+			Expect(givenDestinationGUID).To(Equal("destination-guid"))
+
+			Expect(testUI.Err).To(Say("get-destination-warning"))
+
+			Expect(executeErr).To(MatchError("failed to unmap route"))
+		})
+	})
+
+	It("prints warnings and does not return an error", func() {
+		Expect(executeErr).NotTo(HaveOccurred())
+		Expect(testUI.Err).To(Say("get-destination-warning"))
+		Expect(testUI.Out).To(Say("OK"))
+
+		Expect(fakeActor.UnmapRouteCallCount()).To(Equal(1))
+		givenRouteGUID, givenDestinationGUID := fakeActor.UnmapRouteArgsForCall(0)
+		Expect(givenRouteGUID).To(Equal("route-guid"))
+		Expect(givenDestinationGUID).To(Equal("destination-guid"))
 	})
 })

@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -28,7 +29,7 @@ var _ = Describe("Role", func() {
 			orgGUID   string
 			spaceGUID string
 
-			createdRole Role
+			createdRole resources.Role
 			warnings    Warnings
 			executeErr  error
 		)
@@ -42,7 +43,7 @@ var _ = Describe("Role", func() {
 		})
 
 		JustBeforeEach(func() {
-			createdRole, warnings, executeErr = client.CreateRole(Role{
+			createdRole, warnings, executeErr = client.CreateRole(resources.Role{
 				Type:      roleType,
 				UserGUID:  userGUID,
 				Username:  userName,
@@ -101,7 +102,7 @@ var _ = Describe("Role", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
-						Expect(createdRole).To(Equal(Role{
+						Expect(createdRole).To(Equal(resources.Role{
 							GUID:     "some-role-guid",
 							Type:     constant.OrgAuditorRole,
 							UserGUID: "user-guid",
@@ -204,7 +205,7 @@ var _ = Describe("Role", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
-						Expect(createdRole).To(Equal(Role{
+						Expect(createdRole).To(Equal(resources.Role{
 							GUID:      "some-role-guid",
 							Type:      constant.SpaceAuditorRole,
 							UserGUID:  "user-guid",
@@ -263,7 +264,7 @@ var _ = Describe("Role", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
-						Expect(createdRole).To(Equal(Role{
+						Expect(createdRole).To(Equal(resources.Role{
 							GUID:     "some-role-guid",
 							Type:     constant.OrgAuditorRole,
 							UserGUID: "user-guid",
@@ -366,7 +367,7 @@ var _ = Describe("Role", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning-1"))
 
-						Expect(createdRole).To(Equal(Role{
+						Expect(createdRole).To(Equal(resources.Role{
 							GUID:      "some-role-guid",
 							Type:      constant.SpaceAuditorRole,
 							UserGUID:  "user-guid",
@@ -380,7 +381,7 @@ var _ = Describe("Role", func() {
 
 	Describe("GetRoles", func() {
 		var (
-			roles      []Role
+			roles      []resources.Role
 			includes   IncludedResources
 			warnings   Warnings
 			executeErr error
@@ -449,7 +450,7 @@ var _ = Describe("Role", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(roles).To(Equal([]Role{{
+					Expect(roles).To(Equal([]resources.Role{{
 						GUID: "role-guid-1",
 						Type: constant.OrgUserRole,
 					}, {
@@ -532,7 +533,7 @@ var _ = Describe("Role", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(roles).To(Equal([]Role{{
+					Expect(roles).To(Equal([]resources.Role{{
 						GUID:     "role-guid-1",
 						Type:     constant.OrgUserRole,
 						UserGUID: "user-guid-1",
@@ -543,7 +544,7 @@ var _ = Describe("Role", func() {
 					}}))
 
 					Expect(includes).To(Equal(IncludedResources{
-						Users: []User{
+						Users: []resources.User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
 						},

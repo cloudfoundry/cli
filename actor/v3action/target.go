@@ -1,7 +1,10 @@
 package v3action
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type TargetSettings ccv3.TargetSettings
@@ -12,28 +15,28 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
 	}
-	var allWarnings Warnings
 
-	warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
+	info, warnings, err := actor.CloudControllerClient.TargetCF(ccv3.TargetSettings(settings))
 	if err != nil {
 		return Warnings(warnings), err
 	}
-	allWarnings = Warnings(warnings)
-	var info ccv3.Info
+	//TODO Remove this condition when earliest supportest CAPI is 1.87.0
+	//We have to do this because the current legacy supported CAPI version as of 2020 does not display the log cache url, this will break if a foundation on legacy CAPI have non-standard logcache urls
 
-	info, _, warnings, err = actor.CloudControllerClient.GetInfo()
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		return allWarnings, err
+	logCacheUrl := info.LogCache()
+	if logCacheUrl == "" {
+		logCacheUrl = strings.Replace(settings.URL, "api", "log-cache", 1)
 	}
-	actor.Config.SetTargetInformation(settings.URL,
-		info.CloudControllerAPIVersion(),
-		info.UAA(),
-		"", // Oldest supported V3 version should be OK
-		info.Logging(),
-		info.Routing(),
-		settings.SkipSSLValidation,
-	)
+	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{
+		Api:               settings.URL,
+		ApiVersion:        info.CloudControllerAPIVersion(),
+		Auth:              info.UAA(),
+		MinCLIVersion:     "", // Oldest supported V3 version should be OK
+		Doppler:           info.Logging(),
+		LogCache:          logCacheUrl,
+		Routing:           info.Routing(),
+		SkipSSLValidation: settings.SkipSSLValidation,
+	})
 	actor.Config.SetTokenInformation("", "", "")
 
 	return Warnings(warnings), nil
@@ -41,6 +44,6 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 
 // ClearTarget clears target information from the actor.
 func (actor Actor) ClearTarget() {
-	actor.Config.SetTargetInformation("", "", "", "", "", "", false)
+	actor.Config.SetTargetInformation(configv3.TargetInformationArgs{})
 	actor.Config.SetTokenInformation("", "", "")
 }

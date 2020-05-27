@@ -48,6 +48,8 @@ var _ = Describe("set-org-quota command", func() {
 					Eventually(session).Should(Say("set-org-quota - Assign a quota to an organization"))
 					Eventually(session).Should(Say("USAGE:"))
 					Eventually(session).Should(Say("cf set-org-quota ORG QUOTA"))
+					Eventually(session).Should(Say("ALIAS:"))
+					Eventually(session).Should(Say("set-quota"))
 					Eventually(session).Should(Say("SEE ALSO:"))
 					Eventually(session).Should(Say("org-quotas, orgs"))
 					Eventually(session).Should(Exit(0))

@@ -3,39 +3,42 @@ package cfnetworkingaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
+
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction/cfnetworkingactionfakes"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Policy", func() {
 	var (
-		actor                *Actor
-		fakeV3Actor          *cfnetworkingactionfakes.FakeV3Actor
-		fakeNetworkingClient *cfnetworkingactionfakes.FakeNetworkingClient
+		actor                     *Actor
+		fakeCloudControllerClient *cfnetworkingactionfakes.FakeCloudControllerClient
+		fakeNetworkingClient      *cfnetworkingactionfakes.FakeNetworkingClient
 
 		warnings   Warnings
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		fakeV3Actor = new(cfnetworkingactionfakes.FakeV3Actor)
+		fakeCloudControllerClient = new(cfnetworkingactionfakes.FakeCloudControllerClient)
 		fakeNetworkingClient = new(cfnetworkingactionfakes.FakeNetworkingClient)
 
-		fakeV3Actor.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+		fakeCloudControllerClient.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (resources.Application, ccv3.Warnings, error) {
 			if appName == "appA" {
-				return v3action.Application{GUID: "appAGUID"}, []string{"v3ActorWarningA"}, nil
+				return resources.Application{GUID: "appAGUID"}, []string{"v3ActorWarningA"}, nil
 			} else if appName == "appB" {
-				return v3action.Application{GUID: "appBGUID"}, []string{"v3ActorWarningB"}, nil
+				return resources.Application{GUID: "appBGUID"}, []string{"v3ActorWarningB"}, nil
 			}
-			return v3action.Application{}, nil, nil
+			return resources.Application{}, nil, nil
 		}
 
-		actor = NewActor(fakeNetworkingClient, fakeV3Actor)
+		actor = NewActor(fakeNetworkingClient, fakeCloudControllerClient)
 	})
 
 	Describe("AddNetworkPolicy", func() {
@@ -54,12 +57,12 @@ var _ = Describe("Policy", func() {
 			Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
-			sourceAppName, srcSpaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+			Expect(fakeCloudControllerClient.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
+			sourceAppName, srcSpaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(0)
 			Expect(sourceAppName).To(Equal("appA"))
 			Expect(srcSpaceGUID).To(Equal("src-space"))
 
-			destAppName, destSpaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(1)
+			destAppName, destSpaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(1)
 			Expect(destAppName).To(Equal("appB"))
 			Expect(destSpaceGUID).To(Equal("dst-space"))
 
@@ -83,7 +86,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the source app fails ", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
 			It("returns a sensible error", func() {
 				Expect(warnings).To(ConsistOf("v3ActorWarningA"))
@@ -93,11 +96,11 @@ var _ = Describe("Policy", func() {
 
 		When("getting the destination app fails ", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (resources.Application, ccv3.Warnings, error) {
 					if appName == "appB" {
-						return v3action.Application{}, []string{"v3ActorWarningB"}, errors.New("banana")
+						return resources.Application{}, []string{"v3ActorWarningB"}, errors.New("banana")
 					}
-					return v3action.Application{}, []string{"v3ActorWarningA"}, nil
+					return resources.Application{}, []string{"v3ActorWarningA"}, nil
 				}
 			})
 			It("returns a sensible error", func() {
@@ -149,13 +152,13 @@ var _ = Describe("Policy", func() {
 				},
 			}}, nil)
 
-			fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{
+			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{
 				Name:      "appA",
 				GUID:      "appAGUID",
 				SpaceGUID: "spaceAGUID",
 			}, []string{"GetApplicationByNameAndSpaceWarning"}, nil)
 
-			fakeV3Actor.GetApplicationsByGUIDsReturns([]v3action.Application{
+			fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{
 				{
 					Name:      "appB",
 					GUID:      "appBGUID",
@@ -166,22 +169,26 @@ var _ = Describe("Policy", func() {
 					GUID:      "appCGUID",
 					SpaceGUID: "spaceCGUID",
 				},
-			}, []string{"GetApplicationsByGUIDsWarning"}, nil)
+			}, []string{"GetApplicationsWarning"}, nil)
 
-			fakeV3Actor.GetSpacesByGUIDsReturns([]v3action.Space{
+			fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{
 				{
-					Name:             "spaceA",
-					GUID:             "spaceAGUID",
-					OrganizationGUID: "orgAGUID",
+					Name: "spaceA",
+					GUID: "spaceAGUID",
+					Relationships: map[constant.RelationshipType]resources.Relationship{
+						constant.RelationshipTypeOrganization: {GUID: "orgAGUID"},
+					},
 				},
 				{
-					Name:             "spaceC",
-					GUID:             "spaceCGUID",
-					OrganizationGUID: "orgCGUID",
+					Name: "spaceC",
+					GUID: "spaceCGUID",
+					Relationships: map[constant.RelationshipType]resources.Relationship{
+						constant.RelationshipTypeOrganization: {GUID: "orgCGUID"},
+					},
 				},
-			}, []string{"GetSpacesByGUIDsWarning"}, nil)
+			}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, nil)
 
-			fakeV3Actor.GetOrganizationsByGUIDsReturns([]v3action.Organization{
+			fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 				{
 					Name: "orgA",
 					GUID: "orgAGUID",
@@ -190,7 +197,7 @@ var _ = Describe("Policy", func() {
 					Name: "orgC",
 					GUID: "orgCGUID",
 				},
-			}, []string{"GetOrganizationsByGUIDsWarning"}, nil)
+			}, []string{"GetOrganizationsWarning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -230,31 +237,35 @@ var _ = Describe("Policy", func() {
 			It("passes through the source app argument", func() {
 				Expect(warnings).To(ConsistOf(
 					"GetApplicationByNameAndSpaceWarning",
-					"GetApplicationsByGUIDsWarning",
-					"GetSpacesByGUIDsWarning",
-					"GetOrganizationsByGUIDsWarning",
+					"GetApplicationsWarning",
+					"GetSpacesWarning",
+					"GetOrganizationsWarning",
 				))
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-				sourceAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+				Expect(fakeCloudControllerClient.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+				sourceAppName, spaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(0)
 				Expect(sourceAppName).To(Equal("appA"))
 				Expect(spaceGUID).To(Equal("space"))
 
 				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
 				Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(Equal([]string{"appAGUID"}))
 
-				Expect(fakeV3Actor.GetApplicationsByGUIDsCallCount()).To(Equal(1))
-				Expect(fakeV3Actor.GetApplicationsByGUIDsArgsForCall(0)).To(ConsistOf("appBGUID", "appCGUID"))
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal([]ccv3.Query{
+					{Key: ccv3.GUIDFilter, Values: []string{"appBGUID", "appCGUID"}},
+				}))
 
-				Expect(fakeV3Actor.GetSpacesByGUIDsCallCount()).To(Equal(1))
-				Expect(fakeV3Actor.GetSpacesByGUIDsArgsForCall(0)).To(ConsistOf("spaceAGUID", "spaceCGUID"))
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv3.Query{
+					{Key: ccv3.GUIDFilter, Values: []string{"spaceAGUID", "spaceCGUID"}},
+				}))
 			})
 		})
 
 		When("getting the applications by name and space fails", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
@@ -275,24 +286,24 @@ var _ = Describe("Policy", func() {
 
 		When("getting the applications by guids fails", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationsByGUIDsReturns([]v3action.Application{}, []string{"GetApplicationsByGUIDsWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{}, []string{"GetApplicationsWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ContainElement("GetApplicationsByGUIDsWarning"))
+				Expect(warnings).To(ContainElement("GetApplicationsWarning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
 
 		When("getting the spaces by guids fails", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetSpacesByGUIDsReturns([]v3action.Space{}, []string{"GetSpacesByGUIDsWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ContainElement("GetSpacesByGUIDsWarning"))
+				Expect(warnings).To(ContainElement("GetSpacesWarning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -342,7 +353,7 @@ var _ = Describe("Policy", func() {
 				},
 			}}, nil)
 
-			fakeV3Actor.GetApplicationsBySpaceReturns([]v3action.Application{
+			fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{
 				{
 					Name:      "appA",
 					GUID:      "appAGUID",
@@ -358,9 +369,9 @@ var _ = Describe("Policy", func() {
 					GUID:      "appCGUID",
 					SpaceGUID: "spaceCGUID",
 				},
-			}, []string{"GetApplicationsBySpaceWarning"}, nil)
+			}, []string{"filter-apps-by-space-warning"}, nil)
 
-			fakeV3Actor.GetApplicationsByGUIDsReturns([]v3action.Application{
+			fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{
 				{
 					GUID:      "appBGUID",
 					Name:      "appB",
@@ -371,22 +382,26 @@ var _ = Describe("Policy", func() {
 					Name:      "appC",
 					SpaceGUID: "spaceCGUID",
 				},
-			}, []string{"GetApplicationsByGUIDsWarning"}, nil)
+			}, []string{"filter-apps-by-guid-warning"}, nil)
 
-			fakeV3Actor.GetSpacesByGUIDsReturns([]v3action.Space{
+			fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{
 				{
-					GUID:             "spaceAGUID",
-					Name:             "spaceA",
-					OrganizationGUID: "orgAGUID",
+					GUID: "spaceAGUID",
+					Name: "spaceA",
+					Relationships: map[constant.RelationshipType]resources.Relationship{
+						constant.RelationshipTypeOrganization: {GUID: "orgAGUID"},
+					},
 				},
 				{
-					GUID:             "spaceCGUID",
-					Name:             "spaceC",
-					OrganizationGUID: "orgCGUID",
+					GUID: "spaceCGUID",
+					Name: "spaceC",
+					Relationships: map[constant.RelationshipType]resources.Relationship{
+						constant.RelationshipTypeOrganization: {GUID: "orgCGUID"},
+					},
 				},
-			}, []string{"GetSpaceByGUIDsWarning"}, nil)
+			}, ccv3.IncludedResources{}, []string{"GetSpaceWarning"}, nil)
 
-			fakeV3Actor.GetOrganizationsByGUIDsReturns([]v3action.Organization{
+			fakeCloudControllerClient.GetOrganizationsReturns([]resources.Organization{
 				{
 					GUID: "orgAGUID",
 					Name: "orgA",
@@ -395,7 +410,7 @@ var _ = Describe("Policy", func() {
 					GUID: "orgCGUID",
 					Name: "orgC",
 				},
-			}, []string{"GetOrganizationsByGUIDsWarning"}, nil)
+			}, []string{"GetOrganizationsWarning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -432,27 +447,33 @@ var _ = Describe("Policy", func() {
 				}},
 			))
 			Expect(warnings).To(ConsistOf(
-				"GetApplicationsBySpaceWarning",
-				"GetApplicationsByGUIDsWarning",
-				"GetSpaceByGUIDsWarning",
-				"GetOrganizationsByGUIDsWarning",
+				"filter-apps-by-space-warning",
+				"filter-apps-by-guid-warning",
+				"GetSpaceWarning",
+				"GetOrganizationsWarning",
 			))
 			Expect(executeErr).NotTo(HaveOccurred())
-
-			Expect(fakeV3Actor.GetApplicationsBySpaceCallCount()).To(Equal(1))
-			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(0))
 
 			Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
 			Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(ConsistOf("appAGUID", "appBGUID", "appCGUID"))
 
-			Expect(fakeV3Actor.GetApplicationsByGUIDsCallCount()).To(Equal(1))
-			Expect(fakeV3Actor.GetApplicationsByGUIDsArgsForCall(0)).To(ConsistOf("appBGUID", "appCGUID"))
+			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(2))
+			Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal([]ccv3.Query{
+				{Key: ccv3.SpaceGUIDFilter, Values: []string{"space"}},
+			}))
+			Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(1)).To(Equal([]ccv3.Query{
+				{Key: ccv3.GUIDFilter, Values: []string{"appBGUID", "appCGUID"}},
+			}))
 
-			Expect(fakeV3Actor.GetSpacesByGUIDsCallCount()).To(Equal(1))
-			Expect(fakeV3Actor.GetSpacesByGUIDsArgsForCall(0)).To(ConsistOf("spaceAGUID", "spaceCGUID"))
+			Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv3.Query{
+				{Key: ccv3.GUIDFilter, Values: []string{"spaceAGUID", "spaceCGUID"}},
+			}))
 
-			Expect(fakeV3Actor.GetOrganizationsByGUIDsCallCount()).To(Equal(1))
-			Expect(fakeV3Actor.GetOrganizationsByGUIDsArgsForCall(0)).To(ConsistOf("orgAGUID", "orgCGUID"))
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv3.Query{
+				{Key: ccv3.GUIDFilter, Values: []string{"orgAGUID", "orgCGUID"}},
+			}))
 		})
 
 		// policy server returns policies that match the give app guid in the source or destination
@@ -479,14 +500,14 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		When("getting the applications fails", func() {
+		When("getting the applications with a space guids filter fails", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationsBySpaceReturns([]v3action.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(0, []resources.Application{}, []string{"filter-apps-by-space-warning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning"))
+				Expect(warnings).To(ConsistOf("filter-apps-by-space-warning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -502,24 +523,24 @@ var _ = Describe("Policy", func() {
 
 		When("getting the applications by guids fails", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationsByGUIDsReturns([]v3action.Application{}, []string{"GetApplicationsByGUIDsWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationsReturnsOnCall(1, []resources.Application{}, []string{"filter-apps-by-guid-warning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ContainElement("GetApplicationsByGUIDsWarning"))
+				Expect(warnings).To(ContainElement("filter-apps-by-guid-warning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
 
 		When("getting the spaces by guids fails", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetSpacesByGUIDsReturns([]v3action.Space{}, []string{"GetSpacesByGUIDsWarning"}, errors.New("banana"))
+				fakeCloudControllerClient.GetSpacesReturns([]ccv3.Space{}, ccv3.IncludedResources{}, []string{"GetSpacesWarning"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(ContainElement("GetSpacesByGUIDsWarning"))
+				Expect(warnings).To(ContainElement("GetSpacesWarning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -558,12 +579,12 @@ var _ = Describe("Policy", func() {
 			Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 			Expect(executeErr).NotTo(HaveOccurred())
 
-			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
-			sourceAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+			Expect(fakeCloudControllerClient.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
+			sourceAppName, spaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(0)
 			Expect(sourceAppName).To(Equal("appA"))
 			Expect(spaceGUID).To(Equal("spaceA"))
 
-			destAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(1)
+			destAppName, spaceGUID := fakeCloudControllerClient.GetApplicationByNameAndSpaceArgsForCall(1)
 			Expect(destAppName).To(Equal("appB"))
 			Expect(spaceGUID).To(Equal("spaceB"))
 
@@ -600,7 +621,7 @@ var _ = Describe("Policy", func() {
 
 		When("getting the source app fails ", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(resources.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
 			It("returns a sensible error", func() {
 				Expect(warnings).To(ConsistOf("v3ActorWarningA"))
@@ -610,8 +631,8 @@ var _ = Describe("Policy", func() {
 
 		When("getting the destination app fails ", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationByNameAndSpaceReturnsOnCall(0, v3action.Application{}, []string{"v3ActorWarningA"}, nil)
-				fakeV3Actor.GetApplicationByNameAndSpaceReturnsOnCall(1, v3action.Application{}, []string{"v3ActorWarningB"}, errors.New("banana"))
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturnsOnCall(0, resources.Application{}, []string{"v3ActorWarningA"}, nil)
+				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturnsOnCall(1, resources.Application{}, []string{"v3ActorWarningB"}, errors.New("banana"))
 			})
 
 			It("returns a sensible error", func() {

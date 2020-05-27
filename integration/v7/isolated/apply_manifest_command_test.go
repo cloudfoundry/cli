@@ -44,7 +44,7 @@ var _ = Describe("apply-manifest command", func() {
 		It("appears in cf help -a", func() {
 			session := helpers.CF("help", "-a")
 			Eventually(session).Should(Exit(0))
-			Expect(session).To(HaveCommandInCategoryWithDescription("apply-manifest", "APPS", "Apply manifest properties to a space"))
+			Expect(session).To(HaveCommandInCategoryWithDescription("apply-manifest", "SPACES", "Apply manifest properties to a space"))
 		})
 
 		When("--help flag is set", func() {

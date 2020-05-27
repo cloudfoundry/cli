@@ -16,6 +16,7 @@ type JSONConfig struct {
 	ConfigVersion            int                `json:"ConfigVersion"`
 	DopplerEndpoint          string             `json:"DopplerEndPoint"`
 	Locale                   string             `json:"Locale"`
+	LogCacheEndpoint         string             `json:"LogCacheEndPoint"`
 	MinCLIVersion            string             `json:"MinCLIVersion"`
 	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
 	TargetedOrganization     Organization       `json:"OrganizationFields"`
@@ -115,9 +116,28 @@ func (config *Config) RoutingEndpoint() string {
 	return config.ConfigFile.RoutingEndpoint
 }
 
+// SetAsyncTimeout sets the async timeout.
+func (config *Config) SetAsyncTimeout(timeout int) {
+	config.ConfigFile.AsyncTimeout = timeout
+}
+
 // SetAccessToken sets the current access token.
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
+}
+
+// SetColorEnabled sets the color enabled feature to true or false
+func (config *Config) SetColorEnabled(enabled string) {
+	config.ConfigFile.ColorEnabled = enabled
+}
+
+// SetLocale sets the locale, or clears the field if requested
+func (config *Config) SetLocale(locale string) {
+	if locale == "CLEAR" {
+		config.ConfigFile.Locale = ""
+	} else {
+		config.ConfigFile.Locale = locale
+	}
 }
 
 // SetMinCLIVersion sets the minimum CLI version required by the CC.
@@ -145,16 +165,28 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH
 }
 
+type TargetInformationArgs struct {
+	Api               string
+	ApiVersion        string
+	Auth              string
+	Doppler           string
+	LogCache          string
+	MinCLIVersion     string
+	Routing           string
+	SkipSSLValidation bool
+}
+
 // SetTargetInformation sets the currently targeted CC API and related other
 // related API URLs.
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool) {
-	config.ConfigFile.Target = api
-	config.ConfigFile.APIVersion = apiVersion
-	config.ConfigFile.AuthorizationEndpoint = auth
-	config.SetMinCLIVersion(minCLIVersion)
-	config.ConfigFile.DopplerEndpoint = doppler
-	config.ConfigFile.RoutingEndpoint = routing
-	config.ConfigFile.SkipSSLValidation = skipSSLValidation
+func (config *Config) SetTargetInformation(args TargetInformationArgs) {
+	config.ConfigFile.Target = args.Api
+	config.ConfigFile.APIVersion = args.ApiVersion
+	config.ConfigFile.AuthorizationEndpoint = args.Auth
+	config.SetMinCLIVersion(args.MinCLIVersion)
+	config.ConfigFile.DopplerEndpoint = args.Doppler
+	config.ConfigFile.LogCacheEndpoint = args.LogCache
+	config.ConfigFile.RoutingEndpoint = args.Routing
+	config.ConfigFile.SkipSSLValidation = args.SkipSSLValidation
 
 	config.UnsetOrganizationAndSpaceInformation()
 }
@@ -164,6 +196,11 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 	config.ConfigFile.AccessToken = accessToken
 	config.ConfigFile.RefreshToken = refreshToken
 	config.ConfigFile.SSHOAuthClient = sshOAuthClient
+}
+
+// SetTrace sets the trace field to either true, false, or a path to a file.
+func (config *Config) SetTrace(trace string) {
+	config.ConfigFile.Trace = trace
 }
 
 // SetUAAClientCredentials sets the client credentials.

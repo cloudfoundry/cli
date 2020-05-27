@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -26,29 +25,27 @@ var _ = Describe("update-service-broker command", func() {
 
 	var (
 		cmd                          *v7.UpdateServiceBrokerCommand
-		fakeUpdateServiceBrokerActor *v7fakes.FakeUpdateServiceBrokerActor
+		fakeUpdateServiceBrokerActor *v7fakes.FakeActor
 		fakeSharedActor              *commandfakes.FakeSharedActor
 		fakeConfig                   *commandfakes.FakeConfig
 		testUI                       *ui.UI
 	)
 
 	BeforeEach(func() {
-		fakeUpdateServiceBrokerActor = &v7fakes.FakeUpdateServiceBrokerActor{}
+		fakeUpdateServiceBrokerActor = &v7fakes.FakeActor{}
 		fakeSharedActor = &commandfakes.FakeSharedActor{}
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeConfig = &commandfakes.FakeConfig{}
 		cmd = &v7.UpdateServiceBrokerCommand{
-			RequiredArgs: flag.ServiceBrokerArgs{
-				ServiceBroker: serviceBrokerName,
-				Username:      username,
-				Password:      password,
-				URL:           url,
+			BaseCommand: v7.BaseCommand{
+				Actor:       fakeUpdateServiceBrokerActor,
+				SharedActor: fakeSharedActor,
+				UI:          testUI,
+				Config:      fakeConfig,
 			},
-			Actor:       fakeUpdateServiceBrokerActor,
-			SharedActor: fakeSharedActor,
-			UI:          testUI,
-			Config:      fakeConfig,
 		}
+
+		setPositionalFlags(cmd, serviceBrokerName, username, password, url)
 	})
 
 	When("logged in", func() {

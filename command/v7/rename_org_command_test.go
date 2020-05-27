@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -20,7 +21,7 @@ var _ = Describe("rename-org Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeRenameOrganizationActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -31,13 +32,15 @@ var _ = Describe("rename-org Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeRenameOrganizationActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = RenameOrgCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.RequiredArgs.OldOrgName = "old-org-name"
@@ -69,7 +72,7 @@ var _ = Describe("rename-org Command", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "username"}, nil)
 				fakeActor.RenameOrganizationReturns(
-					v7action.Organization{GUID: "old-org-guid", Name: "new-org-name"},
+					resources.Organization{GUID: "old-org-guid", Name: "new-org-name"},
 					v7action.Warnings{"warning-1", "warning-2"},
 					nil,
 				)

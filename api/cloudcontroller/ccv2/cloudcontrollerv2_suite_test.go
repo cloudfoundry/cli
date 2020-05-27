@@ -25,7 +25,6 @@ var server *Server
 
 var _ = BeforeEach(func() {
 	server = NewTLSServer()
-
 	// Suppresses ginkgo server logs
 	server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 })
@@ -39,7 +38,7 @@ func NewTestClient(passed ...Config) *Client {
 }
 
 func NewClientWithCustomAPIVersion(apiVersion string, passed ...Config) *Client {
-	SetupV2InfoResponse(apiVersion)
+	SetupInfoResponses(apiVersion)
 
 	var config Config
 	if len(passed) > 0 {
@@ -60,7 +59,7 @@ func NewClientWithCustomAPIVersion(apiVersion string, passed ...Config) *Client 
 	return client
 }
 
-func SetupV2InfoResponse(apiVersion string) {
+func SetupInfoResponses(apiVersion string) {
 	serverAPIURL := server.URL()[8:]
 	response := fmt.Sprintf(`{
 		"name":"",
@@ -84,6 +83,10 @@ func SetupV2InfoResponse(apiVersion string) {
 		CombineHandlers(
 			VerifyRequest(http.MethodGet, "/v2/info"),
 			RespondWith(http.StatusOK, response),
+		),
+		CombineHandlers(
+			VerifyRequest(http.MethodGet, "/"),
+			RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
 		),
 	)
 }

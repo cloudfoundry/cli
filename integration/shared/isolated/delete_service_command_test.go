@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -53,16 +53,16 @@ var _ = Describe("delete-service command", func() {
 				var (
 					service     string
 					servicePlan string
-					broker      *fakeservicebroker.FakeServiceBroker
+					broker      *servicebrokerstub.ServiceBrokerStub
 
 					serviceInstanceName string
 					appName             string
 				)
 
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
+					broker = servicebrokerstub.EnableServiceAccess()
+					service = broker.FirstServiceOfferingName()
+					servicePlan = broker.FirstServicePlanName()
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 
@@ -81,7 +81,7 @@ var _ = Describe("delete-service command", func() {
 					Eventually(helpers.CF("unbind-service", appName, serviceInstanceName)).Should(Exit(0))
 					Eventually(helpers.CF("delete", appName, "-f")).Should(Exit(0))
 					Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				It("should display an error message that the service instance's keys, bindings, and shares must first be deleted", func() {

@@ -4,12 +4,12 @@ import (
 	"errors"
 	"strings"
 
+	clipr "code.cloudfoundry.org/cli-plugin-repo/web"
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/util"
-	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 )
 
 type pluginInstallerWithRepo struct {

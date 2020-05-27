@@ -1,9 +1,10 @@
 package v6_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"errors"
 	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"

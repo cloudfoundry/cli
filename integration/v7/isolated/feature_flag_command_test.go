@@ -41,4 +41,13 @@ var _ = Describe("feature-flag command", func() {
 		Eventually(session).Should(Say(`user_org_creation\s+(dis|en)abled`))
 		Eventually(session).Should(Exit(0))
 	})
+
+	When("the feature flag doesn't exist", func() {
+		It("gives a luxurious error", func() {
+			session := helpers.CF("feature-flag", "this_flag_does_not_exist")
+			Eventually(session).Should(Say("Getting info for feature flag this_flag_does_not_exist as"))
+			Eventually(session.Err).Should(Say("Feature flag 'this_flag_does_not_exist' not found."))
+			Eventually(session).ShouldNot(Exit(0))
+		})
+	})
 })

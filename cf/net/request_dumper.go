@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -34,7 +35,10 @@ func NewRequestDumper(printer trace.Printer) RequestDumper {
 func (p RequestDumper) DumpRequest(req *http.Request) {
 	p.printer.Printf("\n%s [%s]\n", terminal.HeaderColor(T("REQUEST:")), time.Now().Format(time.RFC3339))
 
-	p.printer.Printf("%s %s %s\n", req.Method, req.URL.RequestURI(), req.Proto)
+	re := regexp.MustCompile(`([&?]code)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)
+	redactedURI := re.ReplaceAllString(req.URL.RequestURI(), "$1="+ui.RedactedValue)
+
+	p.printer.Printf("%s %s %s\n", req.Method, redactedURI, req.Proto)
 
 	p.printer.Printf("Host: %s", req.URL.Host)
 

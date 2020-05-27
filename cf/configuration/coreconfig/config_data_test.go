@@ -11,11 +11,12 @@ import (
 var _ = Describe("V3 Config files", func() {
 	var exampleV3JSON = `
 	{
-		"ConfigVersion": 3,
+		"ConfigVersion": 4,
 		"Target": "api.example.com",
 		"APIVersion": "3",
 		"AuthorizationEndpoint": "auth.example.com",
 		"DopplerEndPoint": "doppler.example.com",
+		"LogCacheEndPoint": "log-cache.example.com",
 		"UaaEndpoint": "uaa.example.com",
 		"RoutingAPIEndpoint": "routing-api.example.com",
 		"AccessToken": "the-access-token",
@@ -66,6 +67,7 @@ var _ = Describe("V3 Config files", func() {
 		"AuthorizationEndpoint": "auth.example.com",
 		"LoggregatorEndPoint": "loggregator.example.com",
 		"DopplerEndPoint": "doppler.example.com",
+		"LogCacheEndPoint": "log-cache.example.com",
 		"UaaEndpoint": "uaa.example.com",
 		"RoutingAPIEndpoint": "routing-api.example.com",
 		"AccessToken": "the-access-token",
@@ -121,6 +123,7 @@ var _ = Describe("V3 Config files", func() {
 				AuthorizationEndpoint:    "auth.example.com",
 				RoutingAPIEndpoint:       "routing-api.example.com",
 				DopplerEndPoint:          "doppler.example.com",
+				LogCacheEndPoint:         "log-cache.example.com",
 				UaaEndpoint:              "uaa.example.com",
 				AccessToken:              "the-access-token",
 				RefreshToken:             "the-refresh-token",
@@ -167,12 +170,13 @@ var _ = Describe("V3 Config files", func() {
 
 		It("creates a config object from valid V3 JSON", func() {
 			expectedData := &coreconfig.Data{
-				ConfigVersion:            3,
+				ConfigVersion:            4,
 				Target:                   "api.example.com",
 				APIVersion:               "3",
 				AuthorizationEndpoint:    "auth.example.com",
 				RoutingAPIEndpoint:       "routing-api.example.com",
 				DopplerEndPoint:          "doppler.example.com",
+				LogCacheEndPoint:         "log-cache.example.com",
 				UaaEndpoint:              "uaa.example.com",
 				AccessToken:              "the-access-token",
 				RefreshToken:             "the-refresh-token",

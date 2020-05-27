@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -21,17 +20,10 @@ var _ = Describe("create-service-broker Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateServiceBrokerActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
-
-		args = flag.ServiceBrokerArgs{
-			ServiceBroker: "service-broker-name",
-			Username:      "username",
-			Password:      "password",
-			URL:           "https://example.org/super-broker",
-		}
 	)
 
 	BeforeEach(func() {
@@ -39,20 +31,22 @@ var _ = Describe("create-service-broker Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateServiceBrokerActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeActor.CreateServiceBrokerReturns(v7action.Warnings{"some default warning"}, nil)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = &v7.CreateServiceBrokerCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-
-			RequiredArgs: args,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
+
+		setPositionalFlags(cmd, "service-broker-name", "username", "password", "https://example.org/super-broker")
 	})
 
 	JustBeforeEach(func() {
@@ -92,7 +86,7 @@ var _ = Describe("create-service-broker Command", func() {
 		})
 
 		It("displays a message with the username", func() {
-			Expect(testUI.Out).To(Say(`Creating service broker %s as %s\.\.\.`, args.ServiceBroker, "steve"))
+			Expect(testUI.Out).To(Say(`Creating service broker %s as %s\.\.\.`, "service-broker-name", "steve"))
 		})
 
 		It("passes the data to the actor layer", func() {
@@ -105,7 +99,6 @@ var _ = Describe("create-service-broker Command", func() {
 			Expect(model.Password).To(Equal("password"))
 			Expect(model.URL).To(Equal("https://example.org/super-broker"))
 			Expect(model.SpaceGUID).To(Equal(""))
-
 		})
 
 		It("displays the warnings", func() {
@@ -146,7 +139,7 @@ var _ = Describe("create-service-broker Command", func() {
 			})
 
 			It("displays the space name in the message", func() {
-				Expect(testUI.Out).To(Say(`Creating service broker %s in org %s / space %s as %s\.\.\.`, args.ServiceBroker, "fake-org-name", "fake-space-name", "steve"))
+				Expect(testUI.Out).To(Say(`Creating service broker %s in org %s / space %s as %s\.\.\.`, "service-broker-name", "fake-org-name", "fake-space-name", "steve"))
 			})
 
 			It("looks up the space guid and passes it to the actor", func() {

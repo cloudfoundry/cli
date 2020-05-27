@@ -34,7 +34,7 @@ var _ = Describe("Cloud Controller Client", func() {
 			client.WrapConnection(fakeConnectionWrapper)
 			Expect(fakeConnectionWrapper.WrapCallCount()).To(Equal(1))
 
-			client.DeleteServiceBinding("does-not-matter", true)
+			_, _, _ = client.DeleteServiceBinding("does-not-matter", true)
 			Expect(fakeConnectionWrapper.MakeCallCount()).To(Equal(1))
 		})
 	})
@@ -52,8 +52,8 @@ var _ = Describe("Cloud Controller Client", func() {
 		})
 
 		It("adds a user agent header", func() {
-			client.GetApplications()
-			Expect(server.ReceivedRequests()).To(HaveLen(2))
+			_, _, _ = client.GetApplications()
+			Expect(server.ReceivedRequests()).To(HaveLen(3))
 		})
 	})
 })

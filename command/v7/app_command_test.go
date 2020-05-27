@@ -3,8 +3,6 @@ package v7_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/types"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -12,6 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -25,7 +25,7 @@ var _ = Describe("app Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeAppActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -35,7 +35,7 @@ var _ = Describe("app Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeAppActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -43,11 +43,12 @@ var _ = Describe("app Command", func() {
 
 		cmd = v7.AppCommand{
 			RequiredArgs: flag.AppName{AppName: app},
-
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -102,7 +103,7 @@ var _ = Describe("app Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v7action.Application{GUID: "some-guid"},
+					resources.Application{GUID: "some-guid"},
 					v7action.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
@@ -125,7 +126,7 @@ var _ = Describe("app Command", func() {
 			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						actionerror.ApplicationNotFoundError{Name: "some-app"})
 				})
@@ -144,7 +145,7 @@ var _ = Describe("app Command", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("get app summary error")
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v7action.Application{},
+						resources.Application{},
 						v7action.Warnings{"warning-1", "warning-2"},
 						expectedErr)
 				})
@@ -182,7 +183,7 @@ var _ = Describe("app Command", func() {
 			BeforeEach(func() {
 				summary := v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name:  "some-app",
 							State: constant.ApplicationStarted,
 						},
@@ -201,9 +202,9 @@ var _ = Describe("app Command", func() {
 							},
 						},
 					},
-					CurrentDroplet: v7action.Droplet{
+					CurrentDroplet: resources.Droplet{
 						Stack: "cflinuxfs2",
-						Buildpacks: []v7action.DropletBuildpack{
+						Buildpacks: []resources.DropletBuildpack{
 							{
 								Name:         "ruby_buildpack",
 								DetectOutput: "some-detect-output",

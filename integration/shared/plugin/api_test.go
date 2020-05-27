@@ -3,8 +3,9 @@ package plugin
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -144,22 +145,21 @@ var _ = Describe("plugin API", func() {
 		var (
 			serviceInstance1 string
 			serviceInstance2 string
-			broker           *fakeservicebroker.FakeServiceBroker
+			broker           *servicebrokerstub.ServiceBrokerStub
 		)
 		BeforeEach(func() {
 			createTargetedOrgAndSpace()
 			serviceInstance1 = helpers.PrefixedRandomName("SI1")
 			serviceInstance2 = helpers.PrefixedRandomName("SI2")
 
-			broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+			broker = servicebrokerstub.EnableServiceAccess()
 
-			Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
-			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance1)).Should(Exit(0))
-			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstance2)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance1)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstance2)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
-			broker.Destroy()
+			broker.Forget()
 		})
 
 		It("GetService gets the given service instance and GetServices returns a list of services instances", func() {

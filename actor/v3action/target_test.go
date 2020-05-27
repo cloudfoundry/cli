@@ -30,13 +30,14 @@ var _ = Describe("Targeting", func() {
 	})
 
 	Describe("SetTarget", func() {
-		var expectedAPI, expectedAPIVersion, expectedAuth, expectedDoppler, expectedRouting string
+		var expectedAPI, expectedAPIVersion, expectedAuth, expectedDoppler, expectedLogCache, expectedRouting string
 
 		BeforeEach(func() {
 			expectedAPI = "https://api.foo.com"
 			expectedAPIVersion = "2.59.0"
 			expectedAuth = "https://login.foo.com"
 			expectedDoppler = "wss://doppler.foo.com"
+			expectedLogCache = "https://log-cache.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
 			settings.URL = expectedAPI
@@ -46,19 +47,22 @@ var _ = Describe("Targeting", func() {
 				OAuthClient        string `json:"oath_client"`
 			}
 			meta.Version = expectedAPIVersion
-			fakeCloudControllerClient.GetInfoReturns(ccv3.Info{
+			fakeCloudControllerClient.TargetCFReturns(ccv3.Info{
 				Links: ccv3.InfoLinks{
 					CCV3: ccv3.APILink{
 						Meta: meta},
 					Logging: ccv3.APILink{
 						HREF: expectedDoppler,
 					},
+					LogCache: ccv3.APILink{
+						HREF: expectedLogCache,
+					},
 					Routing: ccv3.APILink{
 						HREF: expectedRouting,
 					},
 					UAA: ccv3.APILink{
 						HREF: expectedAuth,
-					}}}, ccv3.ResourceLinks{}, ccv3.Warnings{}, nil)
+					}}}, ccv3.Warnings{}, nil)
 		})
 
 		It("targets the passed API", func() {
@@ -76,14 +80,15 @@ var _ = Describe("Targeting", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, _, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
 
-			Expect(api).To(Equal(expectedAPI))
-			Expect(apiVersion).To(Equal(expectedAPIVersion))
-			Expect(auth).To(Equal(expectedAuth))
-			Expect(doppler).To(Equal(expectedDoppler))
-			Expect(routing).To(Equal(expectedRouting))
-			Expect(sslDisabled).To(Equal(skipSSLValidation))
+			Expect(targetInfoArgs.Api).To(Equal(expectedAPI))
+			Expect(targetInfoArgs.ApiVersion).To(Equal(expectedAPIVersion))
+			Expect(targetInfoArgs.Auth).To(Equal(expectedAuth))
+			Expect(targetInfoArgs.Doppler).To(Equal(expectedDoppler))
+			Expect(targetInfoArgs.LogCache).To(Equal(expectedLogCache))
+			Expect(targetInfoArgs.Routing).To(Equal(expectedRouting))
+			Expect(targetInfoArgs.SkipSSLValidation).To(Equal(skipSSLValidation))
 		})
 
 		It("clears all the token information", func() {
@@ -122,15 +127,16 @@ var _ = Describe("Targeting", func() {
 		It("clears all the target information", func() {
 			actor.ClearTarget()
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			targetInfoArgs := fakeConfig.SetTargetInformationArgsForCall(0)
 
-			Expect(api).To(BeEmpty())
-			Expect(apiVersion).To(BeEmpty())
-			Expect(auth).To(BeEmpty())
-			Expect(minCLIVersion).To(BeEmpty())
-			Expect(doppler).To(BeEmpty())
-			Expect(routing).To(BeEmpty())
-			Expect(sslDisabled).To(BeFalse())
+			Expect(targetInfoArgs.Api).To(BeEmpty())
+			Expect(targetInfoArgs.ApiVersion).To(BeEmpty())
+			Expect(targetInfoArgs.Auth).To(BeEmpty())
+			Expect(targetInfoArgs.MinCLIVersion).To(BeEmpty())
+			Expect(targetInfoArgs.Doppler).To(BeEmpty())
+			Expect(targetInfoArgs.LogCache).To(BeEmpty())
+			Expect(targetInfoArgs.Routing).To(BeEmpty())
+			Expect(targetInfoArgs.SkipSSLValidation).To(BeFalse())
 		})
 
 		It("clears all the token information", func() {

@@ -5,6 +5,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -79,7 +80,7 @@ var _ = Describe("Actor", func() {
 			BeforeEach(func() {
 				plan = PushPlan{
 					NoStart:     true,
-					Application: v7action.Application{State: constant.ApplicationStarted},
+					Application: resources.Application{State: constant.ApplicationStarted},
 				}
 			})
 

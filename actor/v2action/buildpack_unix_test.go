@@ -38,11 +38,17 @@ var _ = Describe("Buildpack", func() {
 				source, err = ioutil.TempDir("", "zipit-source-")
 				Expect(err).ToNot(HaveOccurred())
 
-				ioutil.WriteFile(filepath.Join(source, "file1"), []byte{}, 0700)
-				ioutil.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)
+				err = ioutil.WriteFile(filepath.Join(source, "file1"), []byte{}, 0700)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = ioutil.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)
+				Expect(err).ToNot(HaveOccurred())
+
 				subDir, err = ioutil.TempDir(source, "zipit-subdir-")
 				Expect(err).ToNot(HaveOccurred())
-				ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0755)
+
+				err = ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0755)
+				Expect(err).ToNot(HaveOccurred())
 
 				p := filepath.FromSlash(fmt.Sprintf("buildpack-%s.zip", helpers.RandomName()))
 				target, err = filepath.Abs(p)
@@ -60,7 +66,7 @@ var _ = Describe("Buildpack", func() {
 				Expect(err).ToNot(HaveOccurred())
 				defer zipFile.Close()
 
-				zipStat, err := zipFile.Stat()
+				zipStat, _ := zipFile.Stat()
 				reader, err := ykk.NewReader(zipFile, zipStat.Size())
 				Expect(err).ToNot(HaveOccurred())
 

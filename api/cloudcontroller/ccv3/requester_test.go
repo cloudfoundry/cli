@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
+	. "code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -319,19 +320,17 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("PATCH resource", func() {
 			var (
-				responseBody Application
+				responseBody resources.Application
 			)
 
 			BeforeEach(func() {
-				requestBody := Application{
+				requestBody := resources.Application{
 					GUID:                "some-app-guid",
 					Name:                "some-app-name",
 					StackName:           "some-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"some-buildpack"},
-					Relationships: Relationships{
-						constant.RelationshipTypeSpace: Relationship{GUID: "some-space-guid"},
-					},
+					SpaceGUID:           "some-space-guid",
 				}
 				requestParams = RequestParams{
 					RequestName:  internal.PatchApplicationRequest,
@@ -387,7 +386,7 @@ var _ = Describe("shared request helpers", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 
-					Expect(responseBody).To(Equal(Application{
+					Expect(responseBody).To(Equal(resources.Application{
 						GUID:                "some-app-guid",
 						StackName:           "some-stack-name",
 						LifecycleBuildpacks: []string{"some-buildpack"},
@@ -458,12 +457,12 @@ var _ = Describe("shared request helpers", func() {
 
 		Context("with query params and included resources", func() {
 			var (
-				resources []Role
-				query     []Query
+				resourceList []resources.Role
+				query        []Query
 			)
 
 			BeforeEach(func() {
-				resources = []Role{}
+				resourceList = []resources.Role{}
 				query = []Query{
 					{
 						Key:    OrganizationGUIDFilter,
@@ -477,9 +476,9 @@ var _ = Describe("shared request helpers", func() {
 				requestParams = RequestParams{
 					RequestName:  internal.GetRolesRequest,
 					Query:        query,
-					ResponseBody: Role{},
+					ResponseBody: resources.Role{},
 					AppendToList: func(item interface{}) error {
-						resources = append(resources, item.(Role))
+						resourceList = append(resourceList, item.(resources.Role))
 						return nil
 					},
 				}
@@ -529,7 +528,7 @@ var _ = Describe("shared request helpers", func() {
 				It("returns the given resources and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(resources).To(Equal([]Role{{
+					Expect(resourceList).To(Equal([]resources.Role{{
 						GUID: "role-guid-1",
 						Type: constant.OrgUserRole,
 					}, {
@@ -637,7 +636,7 @@ var _ = Describe("shared request helpers", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(resources).To(Equal([]Role{{
+					Expect(resourceList).To(Equal([]resources.Role{{
 						GUID:     "role-guid-1",
 						Type:     constant.OrgUserRole,
 						UserGUID: "user-guid-1",
@@ -648,7 +647,7 @@ var _ = Describe("shared request helpers", func() {
 					}}))
 
 					Expect(includedResources).To(Equal(IncludedResources{
-						Users: []User{
+						Users: []resources.User{
 							{GUID: "user-guid-1", Username: "user-name-1", Origin: "uaa"},
 							{GUID: "user-guid-2", Username: "user-name-2", Origin: "uaa"},
 						},

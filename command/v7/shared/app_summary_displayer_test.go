@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -46,7 +47,7 @@ var _ = Describe("app summary displayer", func() {
 					uptime = time.Since(time.Unix(267321600, 0))
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStarted,
 							},
@@ -156,7 +157,7 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStarted,
 							},
@@ -234,7 +235,7 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStarted,
 							},
@@ -300,7 +301,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStarted,
 						},
@@ -349,7 +350,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStarted,
 						},
@@ -387,7 +388,7 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:  "some-app-guid",
 							State: constant.ApplicationStopped,
 						},
@@ -447,7 +448,7 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					summary = v7action.DetailedApplicationSummary{
 						ApplicationSummary: v7action.ApplicationSummary{
-							Application: v7action.Application{
+							Application: resources.Application{
 								GUID:  "some-app-guid",
 								State: constant.ApplicationStopped,
 							},
@@ -492,7 +493,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the application has routes", func() {
 			BeforeEach(func() {
-				summary.Routes = []v7action.Route{
+				summary.Routes = []resources.Route{
 					{Host: "route1", URL: "route1.example.com"},
 					{Host: "route2", URL: "route2.example.com"},
 				}
@@ -517,14 +518,14 @@ var _ = Describe("app summary displayer", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
 					ApplicationSummary: v7action.ApplicationSummary{
-						Application: v7action.Application{
+						Application: resources.Application{
 							GUID:          "some-guid",
 							Name:          "some-app",
 							State:         constant.ApplicationStarted,
 							LifecycleType: constant.AppLifecycleTypeDocker,
 						},
 					},
-					CurrentDroplet: v7action.Droplet{
+					CurrentDroplet: resources.Droplet{
 						Image: "docker/some-image",
 					},
 				}
@@ -542,9 +543,9 @@ var _ = Describe("app summary displayer", func() {
 		When("the application is a buildpack app", func() {
 			BeforeEach(func() {
 				summary = v7action.DetailedApplicationSummary{
-					CurrentDroplet: v7action.Droplet{
+					CurrentDroplet: resources.Droplet{
 						Stack: "cflinuxfs2",
-						Buildpacks: []v7action.DropletBuildpack{
+						Buildpacks: []resources.DropletBuildpack{
 							{
 								Name:         "ruby_buildpack",
 								DetectOutput: "some-detect-output",

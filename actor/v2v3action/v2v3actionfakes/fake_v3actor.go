@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 type FakeV3Actor struct {
@@ -67,19 +68,19 @@ type FakeV3Actor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	ShareServiceInstanceToSpacesStub        func(string, []string) (v3action.RelationshipList, v3action.Warnings, error)
+	ShareServiceInstanceToSpacesStub        func(string, []string) (resources.RelationshipList, v3action.Warnings, error)
 	shareServiceInstanceToSpacesMutex       sync.RWMutex
 	shareServiceInstanceToSpacesArgsForCall []struct {
 		arg1 string
 		arg2 []string
 	}
 	shareServiceInstanceToSpacesReturns struct {
-		result1 v3action.RelationshipList
+		result1 resources.RelationshipList
 		result2 v3action.Warnings
 		result3 error
 	}
 	shareServiceInstanceToSpacesReturnsOnCall map[int]struct {
-		result1 v3action.RelationshipList
+		result1 resources.RelationshipList
 		result2 v3action.Warnings
 		result3 error
 	}
@@ -354,7 +355,7 @@ func (fake *FakeV3Actor) GetOrganizationByNameReturnsOnCall(i int, result1 v3act
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3Actor) ShareServiceInstanceToSpaces(arg1 string, arg2 []string) (v3action.RelationshipList, v3action.Warnings, error) {
+func (fake *FakeV3Actor) ShareServiceInstanceToSpaces(arg1 string, arg2 []string) (resources.RelationshipList, v3action.Warnings, error) {
 	var arg2Copy []string
 	if arg2 != nil {
 		arg2Copy = make([]string, len(arg2))
@@ -384,7 +385,7 @@ func (fake *FakeV3Actor) ShareServiceInstanceToSpacesCallCount() int {
 	return len(fake.shareServiceInstanceToSpacesArgsForCall)
 }
 
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesCalls(stub func(string, []string) (v3action.RelationshipList, v3action.Warnings, error)) {
+func (fake *FakeV3Actor) ShareServiceInstanceToSpacesCalls(stub func(string, []string) (resources.RelationshipList, v3action.Warnings, error)) {
 	fake.shareServiceInstanceToSpacesMutex.Lock()
 	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
 	fake.ShareServiceInstanceToSpacesStub = stub
@@ -397,30 +398,30 @@ func (fake *FakeV3Actor) ShareServiceInstanceToSpacesArgsForCall(i int) (string,
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturns(result1 v3action.RelationshipList, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturns(result1 resources.RelationshipList, result2 v3action.Warnings, result3 error) {
 	fake.shareServiceInstanceToSpacesMutex.Lock()
 	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
 	fake.ShareServiceInstanceToSpacesStub = nil
 	fake.shareServiceInstanceToSpacesReturns = struct {
-		result1 v3action.RelationshipList
+		result1 resources.RelationshipList
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturnsOnCall(i int, result1 v3action.RelationshipList, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturnsOnCall(i int, result1 resources.RelationshipList, result2 v3action.Warnings, result3 error) {
 	fake.shareServiceInstanceToSpacesMutex.Lock()
 	defer fake.shareServiceInstanceToSpacesMutex.Unlock()
 	fake.ShareServiceInstanceToSpacesStub = nil
 	if fake.shareServiceInstanceToSpacesReturnsOnCall == nil {
 		fake.shareServiceInstanceToSpacesReturnsOnCall = make(map[int]struct {
-			result1 v3action.RelationshipList
+			result1 resources.RelationshipList
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
 	fake.shareServiceInstanceToSpacesReturnsOnCall[i] = struct {
-		result1 v3action.RelationshipList
+		result1 resources.RelationshipList
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}

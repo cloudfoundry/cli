@@ -51,7 +51,7 @@ func (ui terminalUI) AskForPassword(prompt string) (passwd string) {
 		return
 	}
 
-	passwd = readPassword(pid)
+	passwd = readPassword(pid, ui.scanner)
 
 	// Carriage return after the user input.
 	fmt.Println("")
@@ -59,13 +59,11 @@ func (ui terminalUI) AskForPassword(prompt string) (passwd string) {
 	return
 }
 
-func readPassword(pid int) string {
-	rd := bufio.NewReader(os.Stdin)
+func readPassword(pid int, rd *bufio.Scanner) string {
 	_, _ = syscall.Wait4(pid, &ws, 0, nil)
 
-	line, err := rd.ReadString('\n')
-	if err == nil {
-		return strings.TrimSpace(line)
+	if rd.Scan() {
+		return strings.TrimSpace(rd.Text())
 	}
 	return ""
 }

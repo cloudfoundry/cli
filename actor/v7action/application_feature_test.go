@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +25,7 @@ var _ = Describe("Application Feature Actions", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		fakeClock = fakeclock.NewFakeClock(time.Now())
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, fakeClock)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil, nil, fakeClock)
 	})
 
 	Describe("GetAppFeature", func() {
@@ -97,7 +98,7 @@ var _ = Describe("Application Feature Actions", func() {
 
 	Describe("UpdateAppFeature", func() {
 		var (
-			app        = Application{Name: "some-app", GUID: "some-app-guid"}
+			app        = resources.Application{Name: "some-app", GUID: "some-app-guid"}
 			enabled    = true
 			warnings   Warnings
 			executeErr error
@@ -233,7 +234,7 @@ var _ = Describe("Application Feature Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
-				ccv3.Application{Name: appName, GUID: appGUID},
+				resources.Application{Name: appName, GUID: appGUID},
 				ccv3.Warnings{"get-app-warning"},
 				nil,
 			)
@@ -269,7 +270,7 @@ var _ = Describe("Application Feature Actions", func() {
 		When("getting the app fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
-					ccv3.Application{},
+					resources.Application{},
 					ccv3.Warnings{"get-app-warning"},
 					errors.New("get-app-error"),
 				)
@@ -284,7 +285,7 @@ var _ = Describe("Application Feature Actions", func() {
 		When("checking if SSH is enabled fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationByNameAndSpaceReturns(
-					ccv3.Application{Name: appName, GUID: appGUID},
+					resources.Application{Name: appName, GUID: appGUID},
 					ccv3.Warnings{"get-app-warning"},
 					nil,
 				)

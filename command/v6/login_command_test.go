@@ -158,7 +158,8 @@ var _ = Describe("login Command", func() {
 			When("config does not have an API endpoint set and the user enters the endpoint at the prompt", func() {
 				BeforeEach(func() {
 					cmd.APIEndpoint = ""
-					input.Write([]byte("api.example.com\n"))
+					_, err := input.Write([]byte("api.example.com\n"))
+					Expect(err).NotTo(HaveOccurred())
 					fakeConfig.TargetReturnsOnCall(0, "")
 					fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
 				})
@@ -209,7 +210,8 @@ var _ = Describe("login Command", func() {
 			When("the user inputs an empty API", func() {
 				BeforeEach(func() {
 					cmd.APIEndpoint = ""
-					input.Write([]byte("\n\napi.example.com\n"))
+					_, err := input.Write([]byte("\n\napi.example.com\n"))
+					Expect(err).NotTo(HaveOccurred())
 					fakeConfig.TargetReturnsOnCall(0, "")
 					fakeConfig.TargetReturnsOnCall(1, "https://api.example.com")
 				})
@@ -417,7 +419,8 @@ var _ = Describe("login Command", func() {
 
 						When("the password is incorrect", func() {
 							BeforeEach(func() {
-								input.Write([]byte("other-password\n"))
+								_, err := input.Write([]byte("other-password\n"))
+								Expect(err).NotTo(HaveOccurred())
 								fakeActor.AuthenticateReturns(errors.New("bad creds"))
 							})
 
@@ -429,7 +432,8 @@ var _ = Describe("login Command", func() {
 
 						When("there have been too many failed login attempts", func() {
 							BeforeEach(func() {
-								input.Write([]byte("other-password\n"))
+								_, err := input.Write([]byte("other-password\n"))
+								Expect(err).NotTo(HaveOccurred())
 								fakeActor.AuthenticateReturns(
 									uaa.AccountLockedError{
 										Message: "Your account has been locked because of too many failed attempts to login.",
@@ -502,7 +506,8 @@ var _ = Describe("login Command", func() {
 
 					When("no authentication flags are set", func() {
 						BeforeEach(func() {
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
+							_, err := input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("displays text prompts, starting with username, then password prompts, starting with password", func() {
@@ -633,7 +638,8 @@ var _ = Describe("login Command", func() {
 					When("authenticating succeeds", func() {
 						BeforeEach(func() {
 							fakeConfig.CurrentUserNameReturns("potatoface", nil)
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
+							_, err := input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("displays OK and a status summary", func() {
@@ -649,7 +655,8 @@ var _ = Describe("login Command", func() {
 					When("authenticating fails", func() {
 						BeforeEach(func() {
 							fakeActor.AuthenticateReturns(errors.New("something died"))
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
+							_, err := input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("prints the error message three times", func() {
@@ -678,7 +685,8 @@ var _ = Describe("login Command", func() {
 					When("authenticating fails with a bad credentials error", func() {
 						BeforeEach(func() {
 							fakeActor.AuthenticateReturns(uaa.UnauthorizedError{Message: "Bad credentials"})
-							input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
+							_, err := input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("converts the error before printing it", func() {
@@ -719,7 +727,8 @@ var _ = Describe("login Command", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns(fakeAPI)
 
-			input.Write([]byte("some-passcode\n"))
+			_, err := input.Write([]byte("some-passcode\n"))
+			Expect(err).NotTo(HaveOccurred())
 			fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
 				"passcode": {
 					DisplayName: "some-sso-prompt",
@@ -809,7 +818,8 @@ var _ = Describe("login Command", func() {
 						Message: "Bad credentials",
 					})
 					fakeConfig.CurrentUserNameReturns("", nil)
-					input.Write([]byte("some-passcode\n"))
+					_, err := input.Write([]byte("some-passcode\n"))
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("re-prompts two more times", func() {
@@ -1043,7 +1053,8 @@ var _ = Describe("login Command", func() {
 								fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 									GUID: "targeted-org-guid1"})
 								fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
-								input.Write([]byte("2\n"))
+								_, err := input.Write([]byte("2\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("prompts the user to select an org", func() {
@@ -1070,7 +1081,8 @@ var _ = Describe("login Command", func() {
 
 						When("the position is invalid", func() {
 							BeforeEach(func() {
-								input.Write([]byte("4\n"))
+								_, err := input.Write([]byte("4\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("reprompts the user", func() {
@@ -1091,7 +1103,8 @@ var _ = Describe("login Command", func() {
 					When("the user selects an org by name", func() {
 						When("the list contains that org", func() {
 							BeforeEach(func() {
-								input.Write([]byte("some-org-name2\n"))
+								_, err := input.Write([]byte("some-org-name2\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("prompts the user to select an org", func() {
@@ -1113,7 +1126,8 @@ var _ = Describe("login Command", func() {
 
 						When("the org is not in the list", func() {
 							BeforeEach(func() {
-								input.Write([]byte("invalid-org\n"))
+								_, err := input.Write([]byte("invalid-org\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("returns an error", func() {
@@ -1166,7 +1180,8 @@ var _ = Describe("login Command", func() {
 					When("the user selects an org by name", func() {
 						When("the list contains that org", func() {
 							BeforeEach(func() {
-								input.Write([]byte("org37\n"))
+								_, err := input.Write([]byte("org37\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("prompts the user to select an org", func() {
@@ -1185,7 +1200,8 @@ var _ = Describe("login Command", func() {
 
 						When("the org is not in the list", func() {
 							BeforeEach(func() {
-								input.Write([]byte("invalid-org\n"))
+								_, err := input.Write([]byte("invalid-org\n"))
+								Expect(err).NotTo(HaveOccurred())
 							})
 
 							It("returns an error", func() {
@@ -1421,7 +1437,8 @@ var _ = Describe("login Command", func() {
 						When("the user selects a space by list position", func() {
 							When("the position is valid", func() {
 								BeforeEach(func() {
-									input.Write([]byte("2\n"))
+									_, err := input.Write([]byte("2\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("targets that space", func() {
@@ -1436,7 +1453,8 @@ var _ = Describe("login Command", func() {
 
 							When("the position is invalid", func() {
 								BeforeEach(func() {
-									input.Write([]byte("-1\n"))
+									_, err := input.Write([]byte("-1\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("reprompts the user", func() {
@@ -1463,7 +1481,8 @@ var _ = Describe("login Command", func() {
 						When("the user selects a space by name", func() {
 							When("the list contains that space", func() {
 								BeforeEach(func() {
-									input.Write([]byte("some-space-name2\n"))
+									_, err := input.Write([]byte("some-space-name2\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("targets that space", func() {
@@ -1478,7 +1497,8 @@ var _ = Describe("login Command", func() {
 
 							When("the space is not in the list", func() {
 								BeforeEach(func() {
-									input.Write([]byte("invalid-space\n"))
+									_, err := input.Write([]byte("invalid-space\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("returns an error", func() {
@@ -1515,7 +1535,8 @@ var _ = Describe("login Command", func() {
 						When("the user enters text which is both a space name and a digit", func() {
 							When("the entry is a valid position", func() {
 								BeforeEach(func() {
-									input.Write([]byte("3\n"))
+									_, err := input.Write([]byte("3\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("targets the space at the index specified", func() {
@@ -1530,7 +1551,8 @@ var _ = Describe("login Command", func() {
 
 							When("the entry is an invalid position", func() {
 								BeforeEach(func() {
-									input.Write([]byte("100\n"))
+									_, err := input.Write([]byte("100\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("reprompts the user", func() {
@@ -1578,7 +1600,8 @@ var _ = Describe("login Command", func() {
 						When("the user selects an space by name", func() {
 							When("the list contains that space", func() {
 								BeforeEach(func() {
-									input.Write([]byte("space-37\n"))
+									_, err := input.Write([]byte("space-37\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("targets that space", func() {
@@ -1592,7 +1615,8 @@ var _ = Describe("login Command", func() {
 
 							When("the name is a valid list position, but it does not match a space name", func() {
 								BeforeEach(func() {
-									input.Write([]byte("31\n"))
+									_, err := input.Write([]byte("31\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("returns an error", func() {
@@ -1607,7 +1631,8 @@ var _ = Describe("login Command", func() {
 
 							When("the space is not in the list", func() {
 								BeforeEach(func() {
-									input.Write([]byte("invalid-space\n"))
+									_, err := input.Write([]byte("invalid-space\n"))
+									Expect(err).NotTo(HaveOccurred())
 								})
 
 								It("returns an error", func() {
@@ -1671,7 +1696,8 @@ var _ = Describe("login Command", func() {
 					nil,
 				)
 
-				input.Write([]byte("2\n"))
+				_, err := input.Write([]byte("2\n"))
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("outputs targeted org", func() {

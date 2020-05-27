@@ -20,7 +20,7 @@ var _ = Describe("auth Command", func() {
 	var (
 		cmd        AuthCommand
 		testUI     *ui.UI
-		fakeActor  *v7fakes.FakeAuthActor
+		fakeActor  *v7fakes.FakeActor
 		fakeConfig *commandfakes.FakeConfig
 		binaryName string
 		err        error
@@ -28,17 +28,21 @@ var _ = Describe("auth Command", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v7fakes.FakeAuthActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = AuthCommand{
-			UI:     testUI,
-			Config: fakeConfig,
-			Actor:  fakeActor,
+			BaseCommand: BaseCommand{
+				UI:     testUI,
+				Config: fakeConfig,
+				Actor:  fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+		fakeConfig.UAAOAuthClientReturns("cf")
+		fakeConfig.APIVersionReturns("3.84.0")
 	})
 
 	JustBeforeEach(func() {
@@ -73,22 +77,6 @@ var _ = Describe("auth Command", func() {
 				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
 					Args: []string{"--client-credentials", "--origin"},
 				}))
-			})
-		})
-
-		When("when the UAA is above the minimum API version", func() {
-			BeforeEach(func() {
-				cmd.RequiredArgs.Username = "doesn't matter"
-				cmd.RequiredArgs.Password = "doesn't matter"
-				fakeActor.UAAAPIVersionReturns(uaaversion.MinUAAClientVersion)
-			})
-
-			It("authenticates with the values from the command line args", func() {
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-				_, origin, _ := fakeActor.AuthenticateArgsForCall(0)
-				Expect(origin).To(Equal("some-origin"))
 			})
 		})
 	})
@@ -220,6 +208,31 @@ var _ = Describe("auth Command", func() {
 					cmd.RequiredArgs.Password = testSecret
 				})
 
+				When("the API version is older than the minimum supported API version for the v7 CLI", func() {
+					BeforeEach(func() {
+						fakeConfig.APIVersionReturns("3.83.0")
+					})
+					It("warns that the user is targeting an unsupported API version and that things may not work correctly", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
+						Expect(testUI.Err).To(Say("Warning: Your targeted API's version \\(3.83.0\\) is less than the minimum supported API version \\(3.84.0\\). Some commands may not function correctly."))
+					})
+				})
+
+				When("the API version is empty", func() {
+					BeforeEach(func() {
+						fakeConfig.APIVersionReturns("")
+					})
+					It("prints a warning message", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("Warning: unable to determine whether targeted API's version meets minimum supported."))
+					})
+				})
+
+				It("should NOT warn that the user is targeting an unsupported API version", func() {
+					Expect(testUI.Err).ToNot(Say("is less than the minimum supported API version"))
+				})
+
 				It("outputs API target information and clears the targeted org and space", func() {
 					Expect(err).ToNot(HaveOccurred())
 
@@ -287,29 +300,20 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		When("client id or client secret are in the config.json", func() {
+		When("a user has manually added their client credentials to the config file", func() {
 			BeforeEach(func() {
 				fakeConfig.UAAOAuthClientReturns("AClientsId")
 			})
-			When("using --client-credentials", func() {
-				BeforeEach(func() {
-					cmd.ClientCredentials = true
-					cmd.RequiredArgs.Username = "some-client-id"
-					cmd.RequiredArgs.Password = "some-client-secret"
 
-				})
-				It("does not output a deprecation warning", func() {
-					Expect(testUI.Err).ToNot(Say("Deprecation warning"))
-				})
-			})
-			When("logging in as a user", func() {
+			When("the --client-credentials flag is not set", func() {
 				BeforeEach(func() {
 					cmd.ClientCredentials = false
 					cmd.RequiredArgs.Username = "some-username"
 					cmd.RequiredArgs.Password = "some-password"
 				})
-				It("outputs a deprecation warning", func() {
-					Expect(testUI.Err).To(Say("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."))
+
+				It("fails with an error indicating manual client credentials are no longer supported in the config file", func() {
+					Expect(err).To(MatchError(translatableerror.ManualClientCredentialsError{}))
 				})
 			})
 		})

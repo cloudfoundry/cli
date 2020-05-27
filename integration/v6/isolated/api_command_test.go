@@ -114,11 +114,12 @@ var _ = Describe("api command", func() {
 				err = json.Unmarshal(rawConfig, &configFile)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(configFile.ConfigVersion).To(Equal(3))
+				Expect(configFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
 				Expect(configFile.Target).To(BeEmpty())
 				Expect(configFile.APIVersion).To(BeEmpty())
 				Expect(configFile.AuthorizationEndpoint).To(BeEmpty())
 				Expect(configFile.DopplerEndpoint).To(BeEmpty())
+				Expect(configFile.LogCacheEndpoint).To(BeEmpty())
 				Expect(configFile.UAAEndpoint).To(BeEmpty())
 				Expect(configFile.AccessToken).To(BeEmpty())
 				Expect(configFile.RefreshToken).To(BeEmpty())
@@ -193,6 +194,10 @@ var _ = Describe("api command", func() {
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/v2/info"),
 						ghttp.RespondWith(http.StatusOK, response),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest(http.MethodGet, "/"),
+						ghttp.RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
 					),
 				)
 			})
@@ -297,11 +302,12 @@ var _ = Describe("api command", func() {
 		err = json.Unmarshal(rawConfig, &configFile)
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(configFile.ConfigVersion).To(Equal(3))
+		Expect(configFile.ConfigVersion).To(Equal(configv3.CurrentConfigVersion))
 		Expect(configFile.Target).To(Equal(apiURL))
 		Expect(configFile.APIVersion).To(MatchRegexp(`\d+\.\d+\.\d+`))
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
+		Expect(configFile.LogCacheEndpoint).To(MatchRegexp(".*log-cache.*"))
 		Expect(configFile.UAAEndpoint).To(BeEmpty())
 		Expect(configFile.AccessToken).To(BeEmpty())
 		Expect(configFile.RefreshToken).To(BeEmpty())

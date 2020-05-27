@@ -424,6 +424,7 @@ var _ = Describe("curl command", func() {
 						Expect(string(outBytes)).To(MatchJSON(expectedJSON))
 
 						traceBytes, err := ioutil.ReadFile(traceFile)
+						Expect(err).ToNot(HaveOccurred())
 						Expect(traceBytes).To(ContainSubstring("REQUEST: "))
 						Expect(traceBytes).To(ContainSubstring("HTTP/1.1 200 OK"))
 					})

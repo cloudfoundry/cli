@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 )
 
 // Droplet represents a Cloud Controller droplet.
@@ -17,7 +18,7 @@ type Droplet struct {
 	Buildpacks []Buildpack
 }
 
-type Buildpack ccv3.DropletBuildpack
+type Buildpack resources.DropletBuildpack
 
 // SetApplicationDropletByApplicationNameAndSpace sets the droplet for an application.
 func (actor Actor) SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (Warnings, error) {
@@ -85,7 +86,7 @@ func (actor Actor) GetCurrentDropletByApplication(appGUID string) (Droplet, Warn
 	return actor.convertCCToActorDroplet(droplet), Warnings(warnings), err
 }
 
-func (actor Actor) convertCCToActorDroplet(ccDroplet ccv3.Droplet) Droplet {
+func (actor Actor) convertCCToActorDroplet(ccDroplet resources.Droplet) Droplet {
 	var buildpacks []Buildpack
 	for _, ccBuildpack := range ccDroplet.Buildpacks {
 		buildpacks = append(buildpacks, Buildpack(ccBuildpack))

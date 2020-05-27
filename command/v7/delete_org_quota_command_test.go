@@ -21,7 +21,7 @@ var _ = Describe("delete-org-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDeleteOrgQuotaActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		quotaName       string
@@ -30,7 +30,7 @@ var _ = Describe("delete-org-quota Command", func() {
 
 	BeforeEach(func() {
 		input = NewBuffer()
-		fakeActor = new(v7fakes.FakeDeleteOrgQuotaActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
@@ -40,10 +40,12 @@ var _ = Describe("delete-org-quota Command", func() {
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
 		cmd = DeleteOrgQuotaCommand{
-			Actor:       fakeActor,
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
+			BaseCommand: BaseCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			},
 		}
 
 		quotaName = "some-quota"

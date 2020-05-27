@@ -49,7 +49,21 @@ func AddFiftyOneSpaces(server *ghttp.Server) {
 
 	AddHandler(server,
 		http.MethodGet,
+		"/v3/spaces?order_by=name&organization_guids=4305313e-d34e-4015-9a57-5550235cd6b0",
+		http.StatusOK,
+		[]byte(fmt.Sprintf(string(fixtureData("fifty-spaces-page-1.json")), server.URL())),
+	)
+
+	AddHandler(server,
+		http.MethodGet,
 		"/v3/spaces?organization_guids=4305313e-d34e-4015-9a57-5550235cd6b0&page=2&per_page=50",
+		http.StatusOK,
+		[]byte(fmt.Sprintf(string(fixtureData("fifty-spaces-page-2.json")), server.URL())),
+	)
+
+	AddHandler(server,
+		http.MethodGet,
+		"/v3/spaces?order_by=name&organization_guids=4305313e-d34e-4015-9a57-5550235cd6b0&page=2&per_page=50",
 		http.StatusOK,
 		[]byte(fmt.Sprintf(string(fixtureData("fifty-spaces-page-2.json")), server.URL())),
 	)

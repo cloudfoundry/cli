@@ -3,9 +3,8 @@ package v7action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-type SpaceQuota ccv3.SpaceQuota
 
 func (actor Actor) ApplySpaceQuotaByName(quotaName, spaceGUID, orgGUID string) (Warnings, error) {
 	var allWarnings Warnings
@@ -25,19 +24,19 @@ func (actor Actor) ApplySpaceQuotaByName(quotaName, spaceGUID, orgGUID string) (
 func (actor Actor) CreateSpaceQuota(spaceQuotaName string, orgGuid string, limits QuotaLimits) (Warnings, error) {
 	allWarnings := Warnings{}
 
-	spaceQuota := ccv3.SpaceQuota{
-		Quota: ccv3.Quota{
+	spaceQuota := resources.SpaceQuota{
+		Quota: resources.Quota{
 			Name: spaceQuotaName,
-			Apps: ccv3.AppLimit{
+			Apps: resources.AppLimit{
 				TotalMemory:       limits.TotalMemoryInMB,
 				InstanceMemory:    limits.PerProcessMemoryInMB,
 				TotalAppInstances: limits.TotalInstances,
 			},
-			Services: ccv3.ServiceLimit{
+			Services: resources.ServiceLimit{
 				TotalServiceInstances: limits.TotalServiceInstances,
 				PaidServicePlans:      limits.PaidServicesAllowed,
 			},
-			Routes: ccv3.RouteLimit{
+			Routes: resources.RouteLimit{
 				TotalRoutes:        limits.TotalRoutes,
 				TotalReservedPorts: limits.TotalReservedPorts,
 			},
@@ -79,7 +78,7 @@ func (actor Actor) DeleteSpaceQuotaByName(quotaName string, orgGUID string) (War
 	return allWarnings, nil
 }
 
-func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (SpaceQuota, Warnings, error) {
+func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (resources.SpaceQuota, Warnings, error) {
 	ccv3Quotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(
 		ccv3.Query{
 			Key:    ccv3.OrganizationGUIDFilter,
@@ -92,18 +91,18 @@ func (actor Actor) GetSpaceQuotaByName(spaceQuotaName string, orgGUID string) (S
 	)
 
 	if err != nil {
-		return SpaceQuota{}, Warnings(warnings), err
+		return resources.SpaceQuota{}, Warnings(warnings), err
 	}
 
 	if len(ccv3Quotas) == 0 {
-		return SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundForNameError{Name: spaceQuotaName}
+		return resources.SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundForNameError{Name: spaceQuotaName}
 	}
 
-	return SpaceQuota(ccv3Quotas[0]), Warnings(warnings), nil
+	return ccv3Quotas[0], Warnings(warnings), nil
 }
 
-func (actor Actor) GetSpaceQuotasByOrgGUID(orgGUID string) ([]SpaceQuota, Warnings, error) {
-	ccv3Quotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(
+func (actor Actor) GetSpaceQuotasByOrgGUID(orgGUID string) ([]resources.SpaceQuota, Warnings, error) {
+	spaceQuotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(
 		ccv3.Query{
 			Key:    ccv3.OrganizationGUIDFilter,
 			Values: []string{orgGUID},
@@ -111,12 +110,7 @@ func (actor Actor) GetSpaceQuotasByOrgGUID(orgGUID string) ([]SpaceQuota, Warnin
 	)
 
 	if err != nil {
-		return []SpaceQuota{}, Warnings(warnings), err
-	}
-
-	var spaceQuotas []SpaceQuota
-	for _, quota := range ccv3Quotas {
-		spaceQuotas = append(spaceQuotas, SpaceQuota(quota))
+		return []resources.SpaceQuota{}, Warnings(warnings), err
 	}
 
 	return spaceQuotas, Warnings(warnings), nil
@@ -135,20 +129,20 @@ func (actor Actor) UpdateSpaceQuota(currentName, orgGUID, newName string, limits
 		newName = currentName
 	}
 
-	newSpaceQuota := ccv3.SpaceQuota{
-		Quota: ccv3.Quota{
+	newSpaceQuota := resources.SpaceQuota{
+		Quota: resources.Quota{
 			GUID: oldSpaceQuota.GUID,
 			Name: newName,
-			Apps: ccv3.AppLimit{
+			Apps: resources.AppLimit{
 				TotalMemory:       limits.TotalMemoryInMB,
 				InstanceMemory:    limits.PerProcessMemoryInMB,
 				TotalAppInstances: limits.TotalInstances,
 			},
-			Services: ccv3.ServiceLimit{
+			Services: resources.ServiceLimit{
 				TotalServiceInstances: limits.TotalServiceInstances,
 				PaidServicePlans:      limits.PaidServicesAllowed,
 			},
-			Routes: ccv3.RouteLimit{
+			Routes: resources.RouteLimit{
 				TotalRoutes:        limits.TotalRoutes,
 				TotalReservedPorts: limits.TotalReservedPorts,
 			},

@@ -155,8 +155,12 @@ func (logger *RequestLogger) displaySortedHeaders(headers http.Header) error {
 }
 
 func redactHeaders(key string, value string) string {
-	if key == "Authorization" {
-		return "[PRIVATE DATA HIDDEN]"
+	redactedKeys := []string{"Authorization", "Set-Cookie"}
+	for _, redactedKey := range redactedKeys {
+		if key == redactedKey {
+			return "[PRIVATE DATA HIDDEN]"
+		}
 	}
+
 	return value
 }

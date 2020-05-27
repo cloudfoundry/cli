@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,8 +29,8 @@ type DockerImageCredentials struct {
 func (actor Actor) CreateDockerPackageByApplication(appGUID string, dockerImageCredentials DockerImageCredentials) (Package, Warnings, error) {
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeDocker,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 		},
 		DockerImage:    dockerImageCredentials.Path,
 		DockerUsername: dockerImageCredentials.Username,
@@ -66,11 +67,11 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 		return Package{}, allWarnings, err
 	}
 
-	var resources []sharedaction.Resource
+	var fileResources []sharedaction.Resource
 	if info.IsDir() {
-		resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
+		fileResources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
 	} else {
-		resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
+		fileResources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
 	}
 	if err != nil {
 		return Package{}, allWarnings, err
@@ -80,9 +81,9 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 
 	var archivePath string
 	if info.IsDir() {
-		archivePath, err = actor.SharedActor.ZipDirectoryResources(bitsPath, resources)
+		archivePath, err = actor.SharedActor.ZipDirectoryResources(bitsPath, fileResources)
 	} else {
-		archivePath, err = actor.SharedActor.ZipArchiveResources(bitsPath, resources)
+		archivePath, err = actor.SharedActor.ZipArchiveResources(bitsPath, fileResources)
 	}
 	if err != nil {
 		os.RemoveAll(archivePath)
@@ -92,8 +93,8 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeBits,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: app.GUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: app.GUID},
 		},
 	}
 
@@ -130,11 +131,11 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	return updatedPackage, append(allWarnings, updatedWarnings...), err
 }
 
-func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package, Warnings, error) {
+func (actor Actor) GetNewestReadyPackageForApplication(app resources.Application) (Package, Warnings, error) {
 	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
 		ccv3.Query{
 			Key:    ccv3.AppGUIDFilter,
-			Values: []string{appGUID},
+			Values: []string{app.GUID},
 		},
 		ccv3.Query{
 			Key:    ccv3.StatesFilter,
@@ -151,7 +152,7 @@ func (actor Actor) GetNewestReadyPackageForApplication(appGUID string) (Package,
 	}
 
 	if len(ccv3Packages) == 0 {
-		return Package{}, Warnings(warnings), actionerror.PackageNotFoundInAppError{}
+		return Package{}, Warnings(warnings), actionerror.NoEligiblePackagesError{AppName: app.Name}
 	}
 
 	return Package(ccv3Packages[0]), Warnings(warnings), nil
@@ -166,6 +167,7 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 
 	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
 		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
@@ -183,8 +185,8 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 func (actor Actor) CreateBitsPackageByApplication(appGUID string) (Package, Warnings, error) {
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeBits,
-		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+		Relationships: resources.Relationships{
+			constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 		},
 	}
 
@@ -234,4 +236,26 @@ func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
 	}
 
 	return pkg, allWarnings, nil
+}
+
+func (actor Actor) CopyPackage(sourceApp resources.Application, targetApp resources.Application) (Package, Warnings, error) {
+	var allWarnings Warnings
+	sourcePkg, warnings, err := actor.GetNewestReadyPackageForApplication(sourceApp)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+	targetPkg, ccv3Warnings, err := actor.CloudControllerClient.CopyPackage(sourcePkg.GUID, targetApp.GUID)
+	allWarnings = append(allWarnings, ccv3Warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	readyPackage, warnings, err := actor.PollPackage(Package(targetPkg))
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+
+	return readyPackage, allWarnings, nil
 }

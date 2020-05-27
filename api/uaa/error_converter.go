@@ -67,6 +67,11 @@ func convert(rawHTTPStatusErr RawHTTPStatusError) error {
 		return rawHTTPStatusErr
 	case http.StatusConflict: // 409
 		return ConflictError{Message: uaaErrorResponse.Description}
+	case http.StatusUnprocessableEntity: // 422
+		if uaaErrorResponse.Type == "invalid_password" {
+			return InvalidPasswordError{Message: uaaErrorResponse.Description}
+		}
+		return rawHTTPStatusErr
 	default:
 		return rawHTTPStatusErr
 	}

@@ -99,7 +99,7 @@ var _ = Describe("set-droplet command", func() {
 					packageGUID = matches[1]
 				})
 
-				stageSession := helpers.CF("stage", appName, "--package-guid", packageGUID)
+				stageSession := helpers.CF("stage-package", appName, "--package-guid", packageGUID)
 				Eventually(stageSession).Should(Exit(0))
 
 				regex := regexp.MustCompile(`droplet guid:\s+(.+)`)

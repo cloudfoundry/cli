@@ -2,7 +2,7 @@ package global
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -18,7 +18,7 @@ var _ = Describe("service command", func() {
 
 		service     string
 		servicePlan string
-		broker      *fakeservicebroker.FakeServiceBroker
+		broker      *servicebrokerstub.ServiceBrokerStub
 	)
 
 	BeforeEach(func() {
@@ -27,19 +27,15 @@ var _ = Describe("service command", func() {
 		sourceSpaceName = helpers.NewSpaceName()
 		helpers.SetupCF(orgName, sourceSpaceName)
 
-		broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-		service = broker.ServiceName()
-		servicePlan = broker.ServicePlanName()
+		broker = servicebrokerstub.EnableServiceAccess()
+		service = broker.FirstServiceOfferingName()
+		servicePlan = broker.FirstServicePlanName()
 
-		Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 		Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
 	})
 
 	AfterEach(func() {
-		// need to login as admin
-		helpers.LoginCF()
-		helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
-		broker.Destroy()
+		broker.Forget()
 		helpers.QuickDeleteOrg(orgName)
 	})
 
@@ -72,8 +68,8 @@ var _ = Describe("service command", func() {
 
 			Context("AND service broker does not allow service instance sharing", func() {
 				BeforeEach(func() {
-					broker.Services[0].Metadata.Shareable = false
-					broker.Update()
+					broker.Services[0].Shareable = false
+					broker.Configure().Register()
 				})
 
 				It("should display that service instance sharing is disabled for this service (global message)", func() {

@@ -2,6 +2,7 @@ package v7pushaction
 
 import (
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
@@ -53,8 +54,8 @@ func (actor Actor) CreatePushPlans(
 	return pushPlans, warnings, nil
 }
 
-func (actor Actor) generateAppNameToApplicationMapping(applications []v7action.Application) map[string]v7action.Application {
-	nameToApp := make(map[string]v7action.Application, len(applications))
+func (actor Actor) generateAppNameToApplicationMapping(applications []resources.Application) map[string]resources.Application {
+	nameToApp := make(map[string]resources.Application, len(applications))
 	for _, app := range applications {
 		nameToApp[app.Name] = app
 	}

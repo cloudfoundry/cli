@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,7 +28,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 		When("there are apps", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name-1",
 							GUID:  "some-app-guid-1",
@@ -148,7 +149,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
@@ -179,7 +180,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",

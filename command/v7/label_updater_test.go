@@ -52,7 +52,7 @@ var _ = Describe("LabelUpdater", func() {
 
 	var (
 		cmd             LabelUpdater
-		fakeActor       *v7fakes.FakeSetLabelActor
+		fakeActor       *v7fakes.FakeActor
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
@@ -64,7 +64,7 @@ var _ = Describe("LabelUpdater", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetLabelActor)
+		fakeActor = new(v7fakes.FakeActor)
 		cmd = LabelUpdater{
 			UI:          testUI,
 			Config:      fakeConfig,
@@ -78,7 +78,7 @@ var _ = Describe("LabelUpdater", func() {
 
 		BeforeEach(func() {
 			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-			fakeActor = new(v7fakes.FakeSetLabelActor)
+			fakeActor = new(v7fakes.FakeActor)
 			fakeConfig = new(commandfakes.FakeConfig)
 			fakeSharedActor = new(commandfakes.FakeSharedActor)
 			cmd = LabelUpdater{

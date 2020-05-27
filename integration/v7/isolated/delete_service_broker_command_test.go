@@ -3,7 +3,7 @@ package isolated
 import (
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,31 +47,31 @@ var _ = Describe("delete-service-broker command", func() {
 		When("there is a service broker without any instances", func() {
 			var (
 				orgName string
-				broker  *fakeservicebroker.FakeServiceBroker
+				broker  *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				helpers.SetupCF(orgName, helpers.NewSpaceName())
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				broker.EnableServiceAccess()
+				broker = servicebrokerstub.EnableServiceAccess()
 			})
 
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("should delete the service broker", func() {
-				session := helpers.CF("delete-service-broker", broker.Name(), "-f", "-v")
+				session := helpers.CF("delete-service-broker", broker.Name, "-f", "-v")
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("service-brokers")
-				Consistently(session).ShouldNot(Say(broker.Name()))
+				Consistently(session).ShouldNot(Say(broker.Name))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("marketplace")
-				Consistently(session).ShouldNot(Say(broker.ServiceName()))
-				Consistently(session).ShouldNot(Say(broker.ServicePlanName()))
+				Consistently(session).ShouldNot(Say(broker.FirstServiceOfferingName()))
+				Consistently(session).ShouldNot(Say(broker.FirstServicePlanName()))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -79,36 +79,36 @@ var _ = Describe("delete-service-broker command", func() {
 		When("there is a service broker with a service instance", func() {
 			var (
 				orgName string
-				broker  *fakeservicebroker.FakeServiceBroker
+				broker  *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				helpers.SetupCF(orgName, helpers.NewSpaceName())
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				broker.EnableServiceAccess()
+				broker = servicebrokerstub.EnableServiceAccess()
 
 				serviceName := helpers.NewServiceInstanceName()
-				session := helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceName)
+				session := helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceName)
 				Eventually(session).Should(Exit(0))
 			})
 
 			AfterEach(func() {
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("should fail to delete the service broker", func() {
-				session := helpers.CF("delete-service-broker", broker.Name(), "-f")
+				session := helpers.CF("delete-service-broker", broker.Name, "-f")
 				Eventually(session.Err).Should(Say("Can not remove brokers that have associated service instances"))
 				Eventually(session).Should(Exit(1))
 
 				session = helpers.CF("service-brokers")
-				Eventually(session).Should(Say(broker.Name()))
+				Eventually(session).Should(Say(broker.Name))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("marketplace")
-				Eventually(session).Should(Say(broker.ServiceName()))
-				Eventually(session).Should(Say(broker.ServicePlanName()))
+				Eventually(session).Should(Say(broker.FirstServiceOfferingName()))
+				Eventually(session).Should(Say(broker.FirstServicePlanName()))
 				Eventually(session).Should(Exit(0))
 			})
 		})

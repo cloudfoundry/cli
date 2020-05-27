@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -23,7 +24,7 @@ var _ = Describe("create-space Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeCreateSpaceActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 
@@ -39,7 +40,7 @@ var _ = Describe("create-space Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeCreateSpaceActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -67,10 +68,12 @@ var _ = Describe("create-space Command", func() {
 
 	JustBeforeEach(func() {
 		cmd = v7.CreateSpaceCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			RequiredArgs: flag.Space{Space: spaceName},
 			Organization: orgName,
 			Quota:        quotaName,
@@ -99,7 +102,7 @@ var _ = Describe("create-space Command", func() {
 			BeforeEach(func() {
 				orgName = "some-other-org"
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{"get-org-warnings"},
 					nil,
 				)
@@ -114,7 +117,7 @@ var _ = Describe("create-space Command", func() {
 			BeforeEach(func() {
 				orgName = "some-other-org"
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{Name: "some-other-org", GUID: "some-other-org-guid"},
+					resources.Organization{Name: "some-other-org", GUID: "some-other-org-guid"},
 					v7action.Warnings{},
 					nil,
 				)
@@ -139,7 +142,7 @@ var _ = Describe("create-space Command", func() {
 			BeforeEach(func() {
 				orgName = "some-other-org"
 				fakeActor.GetOrganizationByNameReturns(
-					v7action.Organization{},
+					resources.Organization{},
 					v7action.Warnings{},
 					errors.New("get-organization-error"),
 				)

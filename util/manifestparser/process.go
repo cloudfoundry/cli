@@ -1,6 +1,7 @@
 package manifestparser
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 
@@ -8,7 +9,7 @@ import (
 )
 
 type Process struct {
-	DiskQuota               string                   `yaml:"disk_quota,omitempty"`
+	DiskQuota               string                   `yaml:"disk-quota,omitempty"`
 	HealthCheckEndpoint     string                   `yaml:"health-check-http-endpoint,omitempty"`
 	HealthCheckType         constant.HealthCheckType `yaml:"health-check-type,omitempty"`
 	HealthCheckTimeout      int64                    `yaml:"timeout,omitempty"`
@@ -49,6 +50,19 @@ func (process *Process) UnmarshalYAML(unmarshal func(v interface{}) error) error
 
 	value := reflect.ValueOf(*process)
 	removeDuplicateMapKeys(value, process.RemainingManifestFields)
+	// old style was `disk_quota` (underscore not hyphen)
+	// we maintain backwards-compatibility by supporting both flavors
+	if process.RemainingManifestFields["disk_quota"] != nil {
+		if process.DiskQuota != "" {
+			return errors.New("cannot define both `disk_quota` and `disk-quota`")
+		}
+		diskQuota, ok := process.RemainingManifestFields["disk_quota"].(string)
+		if !ok {
+			return errors.New("`disk_quota` must be a string")
+		}
+		process.DiskQuota = diskQuota
+		delete(process.RemainingManifestFields, "disk_quota")
+	}
 
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -37,7 +38,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 		fakeSharedActor.ReadArchiveReturns(new(v7pushactionfakes.FakeReadCloser), 0, nil)
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 		}
@@ -59,7 +60,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 
 			BeforeEach(func() {
 				fakeV7Actor.CreateApplicationDropletReturns(
-					v7action.Droplet{},
+					resources.Droplet{},
 					v7action.Warnings{"create-droplet-warning"},
 					createError,
 				)
@@ -83,7 +84,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 
 			BeforeEach(func() {
 				fakeV7Actor.CreateApplicationDropletReturns(
-					v7action.Droplet{},
+					resources.Droplet{},
 					v7action.Warnings{"create-droplet-warning"},
 					nil,
 				)
@@ -110,7 +111,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 		})
 
 		When("uploading droplet fails", func() {
-			var createdDroplet = v7action.Droplet{GUID: "created-droplet-guid"}
+			var createdDroplet = resources.Droplet{GUID: "created-droplet-guid"}
 			var progressReader = strings.NewReader("123456")
 			var uploadError = errors.New("uploading droplet failed")
 
@@ -161,7 +162,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 		})
 
 		When("a retryable failure occurs", func() {
-			var createdDroplet = v7action.Droplet{GUID: "created-droplet-guid"}
+			var createdDroplet = resources.Droplet{GUID: "created-droplet-guid"}
 			var progressReader = strings.NewReader("123456")
 			var retryableError = ccerror.PipeSeekError{
 				Err: errors.New("network error"),
@@ -267,7 +268,7 @@ var _ = Describe("CreateDropletForApplication", func() {
 		})
 
 		When("upload completes successfully", func() {
-			var createdDroplet = v7action.Droplet{GUID: "created-droplet-guid"}
+			var createdDroplet = resources.Droplet{GUID: "created-droplet-guid"}
 			var progressReader = strings.NewReader("123456")
 
 			BeforeEach(func() {

@@ -73,7 +73,6 @@ var _ = Describe("env command", func() {
 				session := helpers.CF("env", invalidAppName)
 
 				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, invalidAppName, orgName, spaceName, userName))
-				Eventually(session).Should(Say("OK"))
 
 				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
@@ -112,7 +111,6 @@ var _ = Describe("env command", func() {
 				session := helpers.CF("env", appName)
 
 				Eventually(session).Should(Say(fmt.Sprintf(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName)))
-				Eventually(session).Should(Say("OK"))
 
 				Eventually(session).Should(Say("System-Provided:"))
 				Eventually(session).Should(Say(`VCAP_SERVICES: {\s*\n`))
@@ -143,7 +141,6 @@ var _ = Describe("env command", func() {
 
 				session = helpers.CF("env", appName)
 				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say("OK"))
 
 				Eventually(session).Should(Say("System-Provided:"))
 				Eventually(session).Should(Say("VCAP_SERVICES: {}"))

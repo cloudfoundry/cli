@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -32,14 +33,14 @@ var _ = Describe("Package Actions", func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v7actionfakes.FakeConfig)
 		fakeSharedActor = new(v7actionfakes.FakeSharedActor)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil, nil, nil)
 	})
 
 	Describe("GetApplicationPackages", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -91,6 +92,7 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
 					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+					ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 				))
 			})
 		})
@@ -102,7 +104,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"get-applications-warning"},
 					expectedErr,
 				)
@@ -123,7 +125,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -148,14 +150,17 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("GetNewestReadyPackageForApplication", func() {
 		var (
-			appGUID    string
+			app        resources.Application
 			executeErr error
 
 			warnings Warnings
 		)
 
 		BeforeEach(func() {
-			appGUID = "some-app-guid"
+			app = resources.Application{
+				GUID: "some-app-guid",
+				Name: "some-app",
+			}
 		})
 
 		When("the GetNewestReadyPackageForApplication call succeeds", func() {
@@ -179,11 +184,11 @@ var _ = Describe("Package Actions", func() {
 					)
 				})
 				It("gets the most recent package for the given app guid that has a ready state", func() {
-					expectedPackage, warnings, err := actor.GetNewestReadyPackageForApplication("my-app-guid")
+					expectedPackage, warnings, err := actor.GetNewestReadyPackageForApplication(app)
 
 					Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
-						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"my-app-guid"}},
+						ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
 						ccv3.Query{Key: ccv3.StatesFilter, Values: []string{"READY"}},
 						ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.CreatedAtDescendingOrder}},
 					))
@@ -209,11 +214,11 @@ var _ = Describe("Package Actions", func() {
 				})
 
 				JustBeforeEach(func() {
-					_, warnings, executeErr = actor.GetNewestReadyPackageForApplication(appGUID)
+					_, warnings, executeErr = actor.GetNewestReadyPackageForApplication(app)
 				})
 
 				It("returns an error and warnings", func() {
-					Expect(executeErr).To(MatchError(actionerror.PackageNotFoundInAppError{}))
+					Expect(executeErr).To(MatchError(actionerror.NoEligiblePackagesError{AppName: "some-app"}))
 					Expect(warnings).To(ConsistOf("get-application-packages-warning"))
 				})
 			})
@@ -233,7 +238,7 @@ var _ = Describe("Package Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.GetNewestReadyPackageForApplication("my-app-guid")
+				_, warnings, err := actor.GetNewestReadyPackageForApplication(app)
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-packages-warning"))
@@ -255,7 +260,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can't be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-app-warning"},
 					errors.New("some-app-error"),
 				)
@@ -270,7 +275,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
@@ -303,8 +308,8 @@ var _ = Describe("Package Actions", func() {
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -327,8 +332,8 @@ var _ = Describe("Package Actions", func() {
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -347,8 +352,8 @@ var _ = Describe("Package Actions", func() {
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{GUID: "some-app-guid"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 						},
 					}))
 				})
@@ -385,7 +390,7 @@ var _ = Describe("Package Actions", func() {
 		When("retrieving the application errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-app-warning"},
 					errors.New("some-get-error"),
 				)
@@ -400,7 +405,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
@@ -484,8 +489,8 @@ var _ = Describe("Package Actions", func() {
 								createdPackage = ccv3.Package{
 									GUID:  "some-pkg-guid",
 									State: constant.PackageAwaitingUpload,
-									Relationships: ccv3.Relationships{
-										constant.RelationshipTypeApplication: ccv3.Relationship{
+									Relationships: resources.Relationships{
+										constant.RelationshipTypeApplication: resources.Relationship{
 											GUID: "some-app-guid",
 										},
 									},
@@ -569,8 +574,8 @@ var _ = Describe("Package Actions", func() {
 										inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
 										Expect(inputPackage).To(Equal(ccv3.Package{
 											Type: constant.PackageTypeBits,
-											Relationships: ccv3.Relationships{
-												constant.RelationshipTypeApplication: ccv3.Relationship{GUID: "some-app-guid"},
+											Relationships: resources.Relationships{
+												constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 											},
 										}))
 									})
@@ -851,8 +856,8 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
 					Type: constant.PackageTypeBits,
-					Relationships: ccv3.Relationships{
-						constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 					},
 				}))
 
@@ -1025,5 +1030,131 @@ var _ = Describe("Package Actions", func() {
 			Entry("FAILED", constant.PackageFailed, actionerror.PackageProcessingFailedError{}),
 			Entry("EXPIRED", constant.PackageExpired, actionerror.PackageProcessingExpiredError{}),
 		)
+	})
+
+	Describe("CopyPackage", func() {
+		var (
+			sourceApp  resources.Application
+			targetApp  resources.Application
+			pkg        Package
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			targetApp = resources.Application{
+				GUID: "target-app-guid",
+				Name: "target-app",
+			}
+
+			fakeCloudControllerClient.GetPackagesReturns(
+				[]ccv3.Package{{GUID: "source-package-guid"}},
+				ccv3.Warnings{"get-source-package-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.CopyPackageReturns(
+				ccv3.Package{GUID: "target-package-guid"},
+				ccv3.Warnings{"copy-package-warning"},
+				nil,
+			)
+
+			fakeCloudControllerClient.GetPackageReturnsOnCall(0,
+				ccv3.Package{State: constant.PackageCopying, GUID: "target-package-guid"},
+				ccv3.Warnings{"get-package-warning-copying"},
+				nil,
+			)
+			fakeCloudControllerClient.GetPackageReturnsOnCall(1,
+				ccv3.Package{State: constant.PackageReady, GUID: "target-package-guid"},
+				ccv3.Warnings{"get-package-warning-ready"},
+				nil,
+			)
+		})
+
+		JustBeforeEach(func() {
+			pkg, warnings, executeErr = actor.CopyPackage(sourceApp, targetApp)
+		})
+
+		When("getting the source package fails", func() {
+			var err error
+
+			BeforeEach(func() {
+				err = errors.New("get-package-error")
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{},
+					ccv3.Warnings{"get-source-package-warning"},
+					err,
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(err))
+				Expect(warnings).To(ConsistOf("get-source-package-warning"))
+
+				queries := fakeCloudControllerClient.GetPackagesArgsForCall(0)
+				Expect(queries).To(Equal([]ccv3.Query{
+					ccv3.Query{
+						Key:    ccv3.AppGUIDFilter,
+						Values: []string{sourceApp.GUID},
+					},
+					ccv3.Query{
+						Key:    ccv3.StatesFilter,
+						Values: []string{string(constant.PackageReady)},
+					},
+					ccv3.Query{
+						Key:    ccv3.OrderBy,
+						Values: []string{ccv3.CreatedAtDescendingOrder},
+					},
+				}))
+			})
+		})
+
+		When("copying the package fails", func() {
+			var err error
+
+			BeforeEach(func() {
+				err = errors.New("copy-package-error")
+				fakeCloudControllerClient.CopyPackageReturns(
+					ccv3.Package{GUID: "target-package-guid"},
+					ccv3.Warnings{"copy-package-warning"},
+					err,
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(err))
+				Expect(warnings).To(ConsistOf("get-source-package-warning", "copy-package-warning"))
+
+				sourcePkgGUID, appGUID := fakeCloudControllerClient.CopyPackageArgsForCall(0)
+				Expect(sourcePkgGUID).To(Equal("source-package-guid"))
+				Expect(appGUID).To(Equal(targetApp.GUID))
+			})
+		})
+
+		It("polls to make sure the package has finished copying", func() {
+			Expect(executeErr).To(Not(HaveOccurred()))
+			Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(2))
+		})
+
+		When("the package fails to copy while polling the package", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetPackageReturnsOnCall(0,
+					ccv3.Package{State: constant.PackageFailed},
+					ccv3.Warnings{"get-package-warning-copying"},
+					nil,
+				)
+
+			})
+			It("fails", func() {
+				Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(1))
+				Expect(executeErr).To(MatchError(actionerror.PackageProcessingFailedError{}))
+			})
+		})
+
+		It("returns all warnings", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(warnings).To(ConsistOf("get-source-package-warning", "copy-package-warning", "get-package-warning-copying", "get-package-warning-ready"))
+			Expect(pkg).To(Equal(Package{State: constant.PackageReady, GUID: "target-package-guid"}))
+		})
 	})
 })

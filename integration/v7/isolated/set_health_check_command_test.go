@@ -104,7 +104,7 @@ var _ = Describe("set-health-check command", func() {
 			When("the process type is set", func() {
 				It("displays the health check types for each process", func() {
 					packageGUID := helpers.GetFirstAppPackageGuid(appName)
-					stageSession := helpers.CF("stage", appName, "--package-guid", packageGUID)
+					stageSession := helpers.CF("stage-package", appName, "--package-guid", packageGUID)
 					Eventually(stageSession).Should(Exit(0))
 
 					regex := regexp.MustCompile(`droplet guid:\s+(.+)`)

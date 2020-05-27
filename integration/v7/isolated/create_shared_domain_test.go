@@ -25,8 +25,9 @@ var _ = Describe("create-shared-domain command", func() {
 			Eventually(session).Should(Say("NAME:\n"))
 			Eventually(session).Should(Say(regexp.QuoteMeta("create-shared-domain - Create a domain that can be used by all orgs (admin-only)")))
 			Eventually(session).Should(Say("USAGE:\n"))
-			Eventually(session).Should(Say(regexp.QuoteMeta("cf create-shared-domain DOMAIN [--internal]")))
+			Eventually(session).Should(Say(regexp.QuoteMeta("cf create-shared-domain DOMAIN [--router-group ROUTER_GROUP_NAME | --internal]")))
 			Eventually(session).Should(Say("OPTIONS:\n"))
+			Eventually(session).Should(Say(`--router-group\s+Routes for this domain will use routers in the specified router group`))
 			Eventually(session).Should(Say(`--internal\s+Applications that use internal routes communicate directly on the container network`))
 			Eventually(session).Should(Say("SEE ALSO:\n"))
 			Eventually(session).Should(Say("create-private-domain, domains"))
@@ -86,6 +87,31 @@ var _ = Describe("create-shared-domain command", func() {
 			})
 		})
 
+		When("the --router-group flag is specified", func() {
+			var routerGroup string
+
+			BeforeEach(func() {
+				routerGroup = helpers.FindOrCreateTCPRouterGroup(0)
+			})
+
+			It("creates a domain with a router group", func() {
+				session := helpers.CF("create-shared-domain", domainName, "--router-group", routerGroup)
+
+				Eventually(session).Should(Say("Creating shared domain %s as %s...", domainName, userName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("fails helpfully when the router group does not exist", func() {
+				session := helpers.CF("create-shared-domain", domainName, "--router-group", "bogus")
+
+				Eventually(session).Should(Say("Creating shared domain %s as %s...", domainName, userName))
+				Eventually(session.Err).Should(Say("Router group 'bogus' not found."))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		When("the --internal flag is specified", func() {
 			It("creates a domain with internal flag", func() {
 				session := helpers.CF("create-shared-domain", domainName, "--internal")
@@ -101,7 +127,7 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 	})
 
-	When("user is logged in as another user", func() {
+	When("user is not an admin", func() {
 		var (
 			username string
 			password string

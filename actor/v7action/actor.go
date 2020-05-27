@@ -22,16 +22,25 @@ type Actor struct {
 	Config                Config
 	SharedActor           SharedActor
 	UAAClient             UAAClient
+	RoutingClient         RoutingClient
 	Clock                 clock.Clock
 }
 
 // NewActor returns a new V7 actor.
-func NewActor(client CloudControllerClient, config Config, sharedActor SharedActor, uaaClient UAAClient, clk clock.Clock) *Actor {
+func NewActor(
+	client CloudControllerClient,
+	config Config,
+	sharedActor SharedActor,
+	uaaClient UAAClient,
+	routingClient RoutingClient,
+	clk clock.Clock,
+) *Actor {
 	return &Actor{
 		CloudControllerClient: client,
 		Config:                config,
 		SharedActor:           sharedActor,
 		UAAClient:             uaaClient,
+		RoutingClient:         routingClient,
 		Clock:                 clk,
 	}
 }

@@ -10,12 +10,12 @@ import (
 	. "github.com/onsi/gomega/gexec"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 )
 
 var _ = Describe("services command performance", func() {
 	var (
-		broker           *fakeservicebroker.FakeServiceBroker
+		broker           *servicebrokerstub.ServiceBrokerStub
 		currentExecution int
 		maxExecutions    = getEnvOrDefault("MAX_EXECUTIONS", 10)
 		numberOfServices = getEnvOrDefault("NUMBER_OF_SERVICE_INSTANCES", 15)
@@ -34,12 +34,10 @@ var _ = Describe("services command performance", func() {
 		fmt.Printf("Number of samples (MAX_EXECUTIONS): %d\n", maxExecutions)
 		fmt.Printf("Number of service instances (NUMBER_OF_SERVICE_INSTANCES): %d\n", numberOfServices)
 
-		broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-
-		Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+		broker = servicebrokerstub.EnableServiceAccess()
 
 		for i := 0; i < numberOfServices; i++ {
-			Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), fmt.Sprintf("instance-%d", i))).Should(Exit(0))
+			Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), fmt.Sprintf("instance-%d", i))).Should(Exit(0))
 		}
 	})
 
@@ -48,7 +46,7 @@ var _ = Describe("services command performance", func() {
 			for i := 0; i < numberOfServices; i++ {
 				Eventually(helpers.CF("delete-service", fmt.Sprintf("instance-%d", i), "-f")).Should(Exit(0))
 			}
-			broker.Destroy()
+			broker.Forget()
 		}
 	})
 

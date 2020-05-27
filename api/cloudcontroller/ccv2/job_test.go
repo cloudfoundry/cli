@@ -617,7 +617,7 @@ var _ = Describe("Job", func() {
 						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
 
 						// Verify that the application bits are not sent
-						resourcesPart, err = requestReader.NextPart()
+						_, err = requestReader.NextPart()
 						Expect(err).To(MatchError(io.EOF))
 					}
 

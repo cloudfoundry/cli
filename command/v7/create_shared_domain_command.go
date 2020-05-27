@@ -1,44 +1,17 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . CreateSharedDomainActor
-
-type CreateSharedDomainActor interface {
-	CreateSharedDomain(domainName string, internal bool) (v7action.Warnings, error)
-}
-
 type CreateSharedDomainCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Domain `positional-args:"yes"`
+	RouterGroup     string      `long:"router-group" description:"Routes for this domain will use routers in the specified router group"`
 	Internal        bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
-	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--internal]"`
+	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP_NAME | --internal]"`
 	relatedCommands interface{} `related_commands:"create-private-domain, domains"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       CreateSharedDomainActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	return nil
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
@@ -60,7 +33,7 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 			"User":   user.Name,
 		})
 
-	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal)
+	warnings, err := cmd.Actor.CreateSharedDomain(domain, cmd.Internal, cmd.RouterGroup)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package types_test
 
 import (
 	. "code.cloudfoundry.org/cli/types"
+	"github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -53,7 +54,7 @@ var _ = Describe("NullInt", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError("invalid integer value `not-a-integer`"))
 			})
 		})
 	})
@@ -87,7 +88,10 @@ var _ = Describe("NullInt", func() {
 		When("an invalid integer is provided", func() {
 			It("returns an error", func() {
 				err := nullInt.ParseStringValue("abcdef")
-				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(&flags.Error{
+					Type:    flags.ErrMarshal,
+					Message: "invalid integer value `abcdef`",
+				}))
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
 			})
 		})

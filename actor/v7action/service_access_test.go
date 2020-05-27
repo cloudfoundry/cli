@@ -3,10 +3,13 @@ package v7action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	. "code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,7 +21,7 @@ var _ = Describe("service access actions", func() {
 	)
 
 	BeforeEach(func() {
-		actor, fakeCloudControllerClient, _, _, _, _ = NewTestActor()
+		actor, fakeCloudControllerClient, _, _, _, _, _ = NewTestActor()
 	})
 
 	Describe("GetServiceAccess", func() {
@@ -114,7 +117,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{{GUID: guid}}, ccv3.Warnings{warning}, nil)
+				fakeCloudControllerClient.GetOrganizationsReturns([]Organization{{GUID: guid}}, ccv3.Warnings{warning}, nil)
 			})
 
 			It("passes the organization in the plan filter", func() {
@@ -138,7 +141,7 @@ var _ = Describe("service access actions", func() {
 			When("the organization is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationsReturns(
-						[]ccv3.Organization{},
+						[]Organization{},
 						ccv3.Warnings{"org warning"},
 						nil,
 					)
@@ -239,7 +242,7 @@ var _ = Describe("service access actions", func() {
 			)
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{{GUID: orgGUID}}, ccv3.Warnings{orgWarning}, nil)
+				fakeCloudControllerClient.GetOrganizationsReturns([]Organization{{GUID: orgGUID}}, ccv3.Warnings{orgWarning}, nil)
 				fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{GUID: offeringGUID}}, ccv3.Warnings{offeringWarning}, nil)
 			})
 
@@ -339,13 +342,13 @@ var _ = Describe("service access actions", func() {
 	Describe("EnableServiceAccess", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{{GUID: "org-guid"}},
+				[]Organization{{GUID: "org-guid"}},
 				ccv3.Warnings{"org warning"},
 				nil,
 			)
 
-			fakeCloudControllerClient.GetServiceOfferingsReturns(
-				[]ccv3.ServiceOffering{{GUID: "fake-offering-guid"}},
+			fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+				ccv3.ServiceOffering{GUID: "fake-offering-guid"},
 				ccv3.Warnings{"some warning"},
 				nil,
 			)
@@ -384,49 +387,46 @@ var _ = Describe("service access actions", func() {
 		})
 
 		Describe("fetching service offering", func() {
-			It("filters by service offering name", func() {
-				_, _, err := actor.EnableServiceAccess("fake-offering", "", "", "")
+			It("filters by service offering and broker name", func() {
+				_, _, err := actor.EnableServiceAccess("fake-offering", "fake-broker-name", "", "")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ConsistOf(ccv3.Query{
-					Key:    ccv3.NameFilter,
-					Values: []string{"fake-offering"},
-				}))
-			})
-
-			When("the service broker name is specified", func() {
-				It("also filters by service broker name", func() {
-					_, _, err := actor.EnableServiceAccess("fake-offering", "fake-broker-name", "", "")
-					Expect(err).NotTo(HaveOccurred())
-					Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ContainElement(ccv3.Query{
-						Key:    ccv3.ServiceBrokerNamesFilter,
-						Values: []string{"fake-broker-name"},
-					}))
-				})
+				Expect(fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerCallCount()).To(Equal(1))
+				requestedServiceName, requestedBrokerName := fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerArgsForCall(0)
+				Expect(requestedServiceName).To(Equal("fake-offering"))
+				Expect(requestedBrokerName).To(Equal("fake-broker-name"))
 			})
 
 			When("the service offering does not exist", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{}, ccv3.Warnings{"a warning"}, nil)
+					fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+						ccv3.ServiceOffering{},
+						ccv3.Warnings{"a warning"},
+						ccerror.ServiceOfferingNotFoundError{ServiceOfferingName: "no-such-offering"},
+					)
 				})
 
 				It("returns an error", func() {
 					_, warnings, err := actor.EnableServiceAccess("no-such-offering", "", "", "")
 					Expect(warnings).To(ContainElement("a warning"))
-					Expect(err).To(MatchError(actionerror.ServiceNotFoundError{Name: "no-such-offering"}))
+					Expect(err).To(MatchError("Service offering 'no-such-offering' not found."))
 				})
 			})
 
 			When("the service offering name is ambiguous", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{}, {}}, ccv3.Warnings{"another warning"}, nil)
+					fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+						ccv3.ServiceOffering{},
+						ccv3.Warnings{"another warning"},
+						ccerror.ServiceOfferingNameAmbiguityError{
+							ServiceOfferingName: "duplicate-offering",
+							ServiceBrokerNames:  []string{"a-broker", "another-broker"},
+						})
 				})
 
 				It("returns an error", func() {
 					_, warnings, err := actor.EnableServiceAccess("duplicate-offering", "", "", "")
 					Expect(warnings).To(ContainElement("another warning"))
-					Expect(err).To(MatchError(actionerror.DuplicateServiceError{Name: "duplicate-offering"}))
+					Expect(err).To(MatchError("Service 'duplicate-offering' is provided by multiple service brokers: a-broker, another-broker\nSpecify a broker by using the '-b' flag."))
 				})
 			})
 		})
@@ -538,7 +538,7 @@ var _ = Describe("service access actions", func() {
 
 			When("the org does not exist", func() {
 				It("returns an error", func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{}, ccv3.Warnings{"org warning"}, nil)
+					fakeCloudControllerClient.GetOrganizationsReturns([]Organization{}, ccv3.Warnings{"org warning"}, nil)
 
 					_, warnings, err := actor.EnableServiceAccess("fake-offering", "", "fake-org-name", "")
 					Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{
@@ -588,13 +588,13 @@ var _ = Describe("service access actions", func() {
 	Describe("DisableServiceAccess", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{{GUID: "org-guid"}},
+				[]Organization{{GUID: "org-guid"}},
 				ccv3.Warnings{"org warning"},
 				nil,
 			)
 
-			fakeCloudControllerClient.GetServiceOfferingsReturns(
-				[]ccv3.ServiceOffering{{GUID: "fake-offering-guid"}},
+			fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+				ccv3.ServiceOffering{GUID: "fake-offering-guid"},
 				ccv3.Warnings{"some warning"},
 				nil,
 			)
@@ -634,49 +634,46 @@ var _ = Describe("service access actions", func() {
 		})
 
 		Describe("fetching service offering", func() {
-			It("filters by service offering name", func() {
-				_, _, err := actor.DisableServiceAccess("fake-offering", "", "", "")
+			It("filters by service offering name and broker", func() {
+				_, _, err := actor.DisableServiceAccess("fake-offering", "fake-broker-name", "", "")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ConsistOf(ccv3.Query{
-					Key:    ccv3.NameFilter,
-					Values: []string{"fake-offering"},
-				}))
-			})
-
-			When("the service broker name is specified", func() {
-				It("also filters by service broker name", func() {
-					_, _, err := actor.DisableServiceAccess("fake-offering", "fake-broker-name", "", "")
-					Expect(err).NotTo(HaveOccurred())
-					Expect(fakeCloudControllerClient.GetServiceOfferingsCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetServiceOfferingsArgsForCall(0)).To(ContainElement(ccv3.Query{
-						Key:    ccv3.ServiceBrokerNamesFilter,
-						Values: []string{"fake-broker-name"},
-					}))
-				})
+				Expect(fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerCallCount()).To(Equal(1))
+				requestedServiceName, requestedBrokerName := fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerArgsForCall(0)
+				Expect(requestedServiceName).To(Equal("fake-offering"))
+				Expect(requestedBrokerName).To(Equal("fake-broker-name"))
 			})
 
 			When("the service offering does not exist", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{}, ccv3.Warnings{"a warning"}, nil)
+					fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+						ccv3.ServiceOffering{},
+						ccv3.Warnings{"a warning"},
+						ccerror.ServiceOfferingNotFoundError{ServiceOfferingName: "no-such-offering"},
+					)
 				})
 
 				It("returns an error", func() {
 					_, warnings, err := actor.DisableServiceAccess("no-such-offering", "", "", "")
 					Expect(warnings).To(ContainElement("a warning"))
-					Expect(err).To(MatchError(actionerror.ServiceNotFoundError{Name: "no-such-offering"}))
+					Expect(err).To(MatchError("Service offering 'no-such-offering' not found."))
 				})
 			})
 
 			When("the service offering name is ambiguous", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceOfferingsReturns([]ccv3.ServiceOffering{{}, {}}, ccv3.Warnings{"another warning"}, nil)
+					fakeCloudControllerClient.GetServiceOfferingByNameAndBrokerReturns(
+						ccv3.ServiceOffering{},
+						ccv3.Warnings{"another warning"},
+						ccerror.ServiceOfferingNameAmbiguityError{
+							ServiceOfferingName: "duplicate-offering",
+							ServiceBrokerNames:  []string{"a-broker", "another-broker"},
+						})
 				})
 
 				It("returns an error", func() {
 					_, warnings, err := actor.DisableServiceAccess("duplicate-offering", "", "", "")
 					Expect(warnings).To(ContainElement("another warning"))
-					Expect(err).To(MatchError(actionerror.DuplicateServiceError{Name: "duplicate-offering"}))
+					Expect(err).To(MatchError("Service 'duplicate-offering' is provided by multiple service brokers: a-broker, another-broker\nSpecify a broker by using the '-b' flag."))
 				})
 			})
 		})
@@ -813,7 +810,7 @@ var _ = Describe("service access actions", func() {
 
 			When("the org does not exist", func() {
 				It("returns an error", func() {
-					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{}, ccv3.Warnings{"org warning"}, nil)
+					fakeCloudControllerClient.GetOrganizationsReturns([]Organization{}, ccv3.Warnings{"org warning"}, nil)
 
 					_, warnings, err := actor.DisableServiceAccess("fake-offering", "", "fake-org-name", "")
 					Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{

@@ -21,7 +21,7 @@ var _ = Describe("env Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeEnvActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		appName         string
@@ -31,13 +31,15 @@ var _ = Describe("env Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeEnvActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		cmd = EnvCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		binaryName = "faceman"
@@ -103,7 +105,6 @@ var _ = Describe("env Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
-					Expect(testUI.Out).To(Say("OK"))
 					Expect(testUI.Out).To(Say("System-Provided:"))
 					Expect(testUI.Out).To(Say("system-name: {"))
 					Expect(testUI.Out).To(Say(`"mysql": \[`))
@@ -196,7 +197,6 @@ var _ = Describe("env Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
-					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(testUI.Out).To(Say("No system-provided env variables have been set"))
 
@@ -226,7 +226,6 @@ var _ = Describe("env Command", func() {
 				It("returns the error", func() {
 					Expect(executeErr).To(Equal(expectedErr))
 					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
-					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))

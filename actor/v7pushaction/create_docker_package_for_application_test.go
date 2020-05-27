@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -33,7 +34,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 		fakeProgressBar = new(v7pushactionfakes.FakeProgressBar)
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 			DockerImageCredentials: v7action.DockerImageCredentials{
@@ -53,7 +54,7 @@ var _ = Describe("CreateDockerPackageForApplication", func() {
 	Describe("package upload", func() {
 		BeforeEach(func() {
 			fakeV7Actor.CreateApplicationInSpaceReturns(
-				v7action.Application{
+				resources.Application{
 					GUID:          "some-app-guid",
 					Name:          paramPlan.Application.Name,
 					LifecycleType: constant.AppLifecycleTypeDocker,

@@ -3,24 +3,22 @@ package ccv3
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/jsonry"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/resources"
+	"code.cloudfoundry.org/jsonry"
 )
 
 // ServiceBroker represents Service Broker data
 type ServiceBroker struct {
 	// GUID is a unique service broker identifier.
-	GUID string
+	GUID string `json:"guid"`
 	// Name is the name of the service broker.
-	Name string
+	Name string `json:"name"`
 	// URL is the url of the service broker.
-	URL string
-	// Status is the state of the service broker.
-	Status string
+	URL string `json:"url"`
 
-	Metadata *Metadata
+	Metadata *resources.Metadata `json:"metadata"`
 }
 
 func (s *ServiceBroker) UnmarshalJSON(data []byte) error {

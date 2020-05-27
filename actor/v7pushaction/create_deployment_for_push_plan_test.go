@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -31,7 +32,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 		fakeProgressBar = new(v7pushactionfakes.FakeProgressBar)
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 		}
@@ -46,8 +47,8 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 	Describe("creating deployment", func() {
 		When("creating the deployment is successful", func() {
 			BeforeEach(func() {
-				fakeV7Actor.PollStartForRollingCalls(func(_ string, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
-					handleInstanceDetails("instance details")
+				fakeV7Actor.PollStartForRollingCalls(func(_ resources.Application, _ string, _ bool, handleInstanceDetails func(string)) (warnings v7action.Warnings, err error) {
+					handleInstanceDetails("Instances starting...")
 					return nil, nil
 				})
 
@@ -60,11 +61,11 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 
 			It("waits for the app to start", func() {
 				Expect(fakeV7Actor.PollStartForRollingCallCount()).To(Equal(1))
-				givenAppGUID, givenDeploymentGUID, noWait, _ := fakeV7Actor.PollStartForRollingArgsForCall(0)
-				Expect(givenAppGUID).To(Equal("some-app-guid"))
+				givenApp, givenDeploymentGUID, noWait, _ := fakeV7Actor.PollStartForRollingArgsForCall(0)
+				Expect(givenApp).To(Equal(resources.Application{GUID: "some-app-guid"}))
 				Expect(givenDeploymentGUID).To(Equal("some-deployment-guid"))
 				Expect(noWait).To(Equal(false))
-				Expect(events).To(ConsistOf(StartingDeployment, Event("instance details"), WaitingForDeployment))
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
 			})
 
 			It("returns errors and warnings", func() {
@@ -74,7 +75,7 @@ var _ = Describe("CreateDeploymentForApplication()", func() {
 			})
 
 			It("records deployment events", func() {
-				Expect(events).To(ConsistOf(StartingDeployment, Event("instance details"), WaitingForDeployment))
+				Expect(events).To(ConsistOf(StartingDeployment, InstanceDetails, WaitingForDeployment))
 			})
 		})
 

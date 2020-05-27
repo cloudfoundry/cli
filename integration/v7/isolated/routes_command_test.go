@@ -25,15 +25,15 @@ var _ = Describe("routes command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`cf routes \[--orglevel\]\n`))
+			Eventually(session).Should(Say(`cf routes \[--org-level\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
-			Eventually(session).Should(Say(`--orglevel\s+List all the routes for all spaces of current organization`))
+			Eventually(session).Should(Say(`--org-level\s+List all the routes for all spaces of current organization`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
-			Eventually(session).Should(Say(`check-route, domains, map-route, unmap-route`))
+			Eventually(session).Should(Say(`check-route, create-route, domains, map-route, unmap-route`))
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -126,7 +126,7 @@ var _ = Describe("routes command", func() {
 
 			When("fetching routes by org", func() {
 				It("lists all the routes in the org", func() {
-					session := helpers.CF("routes", "--orglevel")
+					session := helpers.CF("routes", "--org-level")
 					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
 					Eventually(session).Should(Say(`space\s+host\s+domain\s+path\s+apps`))
 
@@ -134,6 +134,44 @@ var _ = Describe("routes command", func() {
 					Eventually(session).Should(Say(`%s\s+route2\s+%s\s+\/dodo\s+%s`, otherSpaceName, domainName, appName2))
 					Eventually(session).Should(Exit(0))
 				})
+			})
+		})
+
+		When("when shared tcp routes exist", func() {
+			var (
+				domainName  string
+				domain      helpers.Domain
+				routerGroup helpers.RouterGroup
+			)
+
+			BeforeEach(func() {
+				domainName = helpers.NewDomainName()
+
+				domain = helpers.NewDomain(orgName, domainName)
+
+				routerGroup = helpers.NewRouterGroup(
+					helpers.NewRouterGroupName(),
+					"1024-2048",
+				)
+				routerGroup.Create()
+				domain.CreateWithRouterGroup(routerGroup.Name)
+
+				Eventually(helpers.CF("create-route", domainName, "--port", "1028")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				domain.DeleteShared()
+				routerGroup.Delete()
+			})
+
+			It("lists all the routes", func() {
+				session := helpers.CF("routes")
+				Eventually(session).Should(Exit(0))
+
+				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Expect(session).To(Say(`space\s+host\s+domain\s+path\s+apps`))
+				Expect(session).To(Say(`%s\s+%s[^:]`, spaceName, domainName))
+				Expect(session).NotTo(Say(":1028"))
 			})
 		})
 

@@ -83,6 +83,10 @@ var _ = Describe("New Clients", func() {
 						VerifyRequest(http.MethodGet, "/v2/info"),
 						RespondWith(http.StatusOK, `{ "api_version": "2.68.0" }`),
 					),
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
+					),
 				)
 			})
 
@@ -91,7 +95,8 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("outputs a warning", func() {
-				GetNewClientsAndConnectToCF(fakeConfig, testUI)
+				_, _, err := GetNewClientsAndConnectToCF(fakeConfig, testUI)
+				Expect(err).To(HaveOccurred())
 				Expect(testUI.Err).To(Say("Your CF API version .+ is no longer supported. Upgrade to a newer version of the API .+"))
 			})
 		})

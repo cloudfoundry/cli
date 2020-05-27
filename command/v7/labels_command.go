@@ -5,15 +5,11 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock"
 )
 
 type ResourceType string
@@ -31,22 +27,9 @@ const (
 	ServicePlan     ResourceType = "service-plan"
 )
 
-//go:generate counterfeiter . LabelsActor
-
-type LabelsActor interface {
-	GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
-	GetDomainLabels(domainName string) (map[string]types.NullString, v7action.Warnings, error)
-	GetOrganizationLabels(orgName string) (map[string]types.NullString, v7action.Warnings, error)
-	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
-	GetSpaceLabels(spaceName string, orgGUID string) (map[string]types.NullString, v7action.Warnings, error)
-	GetBuildpackLabels(buildpackName string, buildpackStack string) (map[string]types.NullString, v7action.Warnings, error)
-	GetStackLabels(stackName string) (map[string]types.NullString, v7action.Warnings, error)
-	GetServiceBrokerLabels(serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
-	GetServiceOfferingLabels(serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
-	GetServicePlanLabels(servicePlanName, serviceOfferingName, serviceBrokerName string) (map[string]types.NullString, v7action.Warnings, error)
-}
-
 type LabelsCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.LabelsArgs `positional-args:"yes"`
 	BuildpackStack  string          `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	usage           interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora\n   cf labels org business\n   cf labels buildpack go_buildpack --stack cflinuxfs3 \n\nRESOURCES:\n   app\n   buildpack\n   domain\n   org\n   route\n   service-broker\n   service-offering\n   service-plan\n   space\n   stack"`
@@ -54,24 +37,7 @@ type LabelsCommand struct {
 	ServiceBroker   string          `long:"broker" short:"b" description:"Specify a service broker to disambiguate service offerings or service plans with the same name."`
 	ServiceOffering string          `long:"offering" short:"e" description:"Specify a service offering to disambiguate service plans with the same name."`
 
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       LabelsActor
-
 	username string
-}
-
-func (cmd *LabelsCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-	return nil
 }
 
 func (cmd LabelsCommand) Execute(args []string) error {
@@ -208,8 +174,7 @@ func (cmd LabelsCommand) checkTarget() error {
 }
 
 func (cmd LabelsCommand) displayMessageDefault() {
-	cmd.UI.DisplayTextWithFlavor("Getting labels for {{.ResourceType}} {{.ResourceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(fmt.Sprintf("Getting labels for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType), map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"User":         cmd.username,
 	})
@@ -218,8 +183,7 @@ func (cmd LabelsCommand) displayMessageDefault() {
 }
 
 func (cmd LabelsCommand) displayMessageWithOrgAndSpace() {
-	cmd.UI.DisplayTextWithFlavor("Getting labels for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(fmt.Sprintf("Getting labels for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType), map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"SpaceName":    cmd.Config.TargetedSpace().Name,
@@ -230,8 +194,7 @@ func (cmd LabelsCommand) displayMessageWithOrgAndSpace() {
 }
 
 func (cmd LabelsCommand) displayMessageWithOrg() {
-	cmd.UI.DisplayTextWithFlavor("Getting labels for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
+	cmd.UI.DisplayTextWithFlavor(fmt.Sprintf("Getting labels for %s {{.ResourceName}} in org {{.OrgName}} as {{.User}}...", cmd.RequiredArgs.ResourceType), map[string]interface{}{
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"OrgName":      cmd.Config.TargetedOrganization().Name,
 		"User":         cmd.username,
@@ -243,13 +206,12 @@ func (cmd LabelsCommand) displayMessageWithOrg() {
 func (cmd LabelsCommand) displayMessageWithStack() {
 	var template string
 	if cmd.BuildpackStack == "" {
-		template = "Getting labels for {{.ResourceType}} {{.ResourceName}} as {{.User}}..."
+		template = fmt.Sprintf("Getting labels for %s {{.ResourceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
 	} else {
-		template = "Getting labels for {{.ResourceType}} {{.ResourceName}} with stack {{.StackName}} as {{.User}}..."
+		template = fmt.Sprintf("Getting labels for %s {{.ResourceName}} with stack {{.StackName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
 	}
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
-		"ResourceType": cmd.RequiredArgs.ResourceType,
 		"ResourceName": cmd.RequiredArgs.ResourceName,
 		"StackName":    cmd.BuildpackStack,
 		"User":         cmd.username,
@@ -260,7 +222,7 @@ func (cmd LabelsCommand) displayMessageWithStack() {
 
 func (cmd LabelsCommand) displayMessageForServiceCommands() {
 	var template string
-	template = "Getting labels for {{.ResourceType}} {{.ResourceName}}"
+	template = fmt.Sprintf("Getting labels for %s {{.ResourceName}}", cmd.RequiredArgs.ResourceType)
 
 	if cmd.ServiceOffering != "" || cmd.ServiceBroker != "" {
 		template += " from"
@@ -280,7 +242,6 @@ func (cmd LabelsCommand) displayMessageForServiceCommands() {
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
 		"ResourceName":    cmd.RequiredArgs.ResourceName,
-		"ResourceType":    cmd.RequiredArgs.ResourceType,
 		"ServiceBroker":   cmd.ServiceBroker,
 		"ServiceOffering": cmd.ServiceOffering,
 		"User":            cmd.username,

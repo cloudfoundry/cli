@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,27 +47,30 @@ var _ = Describe("service-brokers command", func() {
 
 		When("there is a broker", func() {
 			var (
-				orgName   string
-				spaceName string
-				broker    *fakeservicebroker.FakeServiceBroker
+				orgName          string
+				spaceName        string
+				broker1, broker2 *servicebrokerstub.ServiceBrokerStub
 			)
 
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker1 = servicebrokerstub.Register()
+				broker2 = servicebrokerstub.Register()
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
+				broker1.Forget()
+				broker2.Forget()
 				helpers.QuickDeleteOrg(orgName)
 			})
 
 			It("prints a table of service brokers", func() {
 				Eventually(session).Should(Say("Getting service brokers as %s...", username))
-				Eventually(session).Should(Say(`name\s+url\s+status`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker.Name(), broker.URL(), "available"))
+				Eventually(session).Should(Say(`name\s+url`))
+				Eventually(session).Should(Say(`%s\s+%s`, broker1.Name, broker1.URL))
+				Eventually(session).Should(Say(`%s\s+%s`, broker2.Name, broker2.URL))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -92,34 +95,6 @@ var _ = Describe("service-brokers command", func() {
 					Eventually(session).Should(Say("No service brokers found"))
 					Eventually(session).Should(Exit(0))
 				})
-			})
-		})
-
-		When("the broker was created via the V2 API", func() {
-			var (
-				orgName   string
-				spaceName string
-				broker    *fakeservicebroker.FakeServiceBroker
-			)
-
-			BeforeEach(func() {
-				orgName = helpers.NewOrgName()
-				spaceName = helpers.NewSpaceName()
-				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New()
-				broker.EnsureRegisteredViaV2()
-			})
-
-			AfterEach(func() {
-				broker.Destroy()
-				helpers.QuickDeleteOrg(orgName)
-			})
-
-			It("shows as 'available'", func() {
-				Eventually(session).Should(Say("Getting service brokers as %s...", username))
-				Eventually(session).Should(Say(`name\s+url\s+status`))
-				Eventually(session).Should(Say(`%s\s+%s\s+%s`, broker.Name(), broker.URL(), "available"))
-				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

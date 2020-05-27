@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -47,7 +48,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 		fakeSharedActor.ReadArchiveReturns(new(v7pushactionfakes.FakeReadCloser), 0, nil)
 
 		paramPlan = PushPlan{
-			Application: v7action.Application{
+			Application: resources.Application{
 				GUID: "some-app-guid",
 			},
 		}
@@ -93,7 +94,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					}
 
 					paramPlan = PushPlan{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name: "some-app",
 							GUID: "some-app-guid",
 						},
@@ -118,7 +119,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					}
 
 					paramPlan = PushPlan{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name: "some-app",
 							GUID: "some-app-guid",
 						},
@@ -164,7 +165,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					BeforeEach(func() {
 						fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
 						fakeV7Actor.UpdateApplicationReturns(
-							v7action.Application{
+							resources.Application{
 								Name: "some-app",
 								GUID: paramPlan.Application.GUID,
 							},
@@ -297,7 +298,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 					}
 
 					paramPlan = PushPlan{
-						Application: v7action.Application{
+						Application: resources.Application{
 							Name: "some-app",
 							GUID: "some-app-guid",
 						},
@@ -378,7 +379,7 @@ var _ = Describe("CreateBitsPackageForApplication", func() {
 			}
 
 			paramPlan = PushPlan{
-				Application: v7action.Application{
+				Application: resources.Application{
 					Name: "some-app",
 					GUID: "some-app-guid",
 				},

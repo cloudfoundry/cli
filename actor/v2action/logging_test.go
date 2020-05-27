@@ -12,9 +12,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	logcache "code.cloudfoundry.org/go-log-cache"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
-	logcache "code.cloudfoundry.org/log-cache/pkg/client"
-	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -92,7 +91,7 @@ var _ = Describe("Logging Actions", func() {
 
 					return []*loggregator_v2.Envelope{{
 							// 3 seconds in the past to get past Walk delay
-							Timestamp:  time.Now().Add(-3 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-4 * time.Second).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -106,7 +105,7 @@ var _ = Describe("Logging Actions", func() {
 							},
 						}, {
 							// 2 seconds in the past to get past Walk delay
-							Timestamp:  time.Now().Add(-2 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-3 * time.Second).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -119,7 +118,7 @@ var _ = Describe("Logging Actions", func() {
 								"source_type": "some-source-type",
 							},
 						}, {
-							Timestamp:  time.Now().Add(-4 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-2005 * time.Millisecond).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -132,7 +131,7 @@ var _ = Describe("Logging Actions", func() {
 								"source_type": "some-source-type",
 							},
 						}, {
-							Timestamp:  time.Now().Add(-1 * time.Second).UnixNano(),
+							Timestamp:  time.Now().Add(-1900 * time.Millisecond).UnixNano(),
 							SourceId:   expectedAppGUID,
 							InstanceId: "some-source-instance",
 							Message: &loggregator_v2.Envelope_Log{
@@ -166,9 +165,8 @@ var _ = Describe("Logging Actions", func() {
 				Expect(message.SourceType()).To(Equal("some-source-type"))
 				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
 
-				Eventually(messages).Should(Receive(&message))
-				Expect(message.Message()).To(Equal("message-4"))
-				Expect(message.Type()).To(Equal("OUT"))
+				// The last message in the list is ignored because of the new WalkDelay of 2 seconds
+				Consistently(messages).ShouldNot(Receive(&message))
 			})
 		})
 	})
@@ -190,27 +188,6 @@ var _ = Describe("Logging Actions", func() {
 
 			When("LogCache returns logs", func() {
 				BeforeEach(func() {
-					outMessage := events.LogMessage_OUT
-					ts1 := int64(10)
-					ts2 := int64(20)
-					sourceType := "some-source-type"
-					sourceInstance := "some-source-instance"
-
-					var messages []*events.LogMessage
-					messages = append(messages, &events.LogMessage{
-						Message:        []byte("message-2"),
-						MessageType:    &outMessage,
-						Timestamp:      &ts2,
-						SourceType:     &sourceType,
-						SourceInstance: &sourceInstance,
-					})
-					messages = append(messages, &events.LogMessage{
-						Message:        []byte("message-1"),
-						MessageType:    &outMessage,
-						Timestamp:      &ts1,
-						SourceType:     &sourceType,
-						SourceInstance: &sourceInstance,
-					})
 					fakeConfig.DialTimeoutReturns(60 * time.Minute)
 
 					fakeLogCacheClient.ReadReturns([]*loggregator_v2.Envelope{{

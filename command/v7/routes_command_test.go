@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -22,7 +23,7 @@ var _ = Describe("routes Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeRoutesActor
+		fakeActor       *v7fakes.FakeActor
 		executeErr      error
 		args            []string
 		binaryName      string
@@ -34,18 +35,20 @@ var _ = Describe("routes Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeRoutesActor)
+		fakeActor = new(v7fakes.FakeActor)
 		args = nil
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = RoutesCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			Orglevel:    false,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
+			Orglevel: false,
 		}
 	})
 
@@ -99,14 +102,14 @@ var _ = Describe("routes Command", func() {
 
 		When("getting routes succeeds", func() {
 			var (
-				routes []v7action.Route
+				routes []resources.Route
 			)
 
 			BeforeEach(func() {
-				routes = []v7action.Route{
-					{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"},
-					{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"},
-					{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"},
+				routes = []resources.Route{
+					{GUID: "route-guid-3", Host: "host-1"},
+					{GUID: "route-guid-1"},
+					{GUID: "route-guid-2", Host: "host-3", Path: "/path/2"},
 				}
 
 				fakeActor.GetRoutesBySpaceReturns(
@@ -129,9 +132,22 @@ var _ = Describe("routes Command", func() {
 
 				BeforeEach(func() {
 					routeSummaries = []v7action.RouteSummary{
-						{Route: v7action.Route{DomainName: "domain1", GUID: "route-guid-1", SpaceName: "space-1"}},
-						{Route: v7action.Route{DomainName: "domain2", GUID: "route-guid-2", SpaceName: "space-2", Host: "host-3", Path: "/path/2"}},
-						{Route: v7action.Route{DomainName: "domain3", GUID: "route-guid-3", SpaceName: "space-3", Host: "host-1"}, AppNames: []string{"app1", "app2"}},
+						{
+							DomainName: "domain1",
+							SpaceName:  "space-1",
+							Route:      resources.Route{GUID: "route-guid-1"},
+						},
+						{
+							DomainName: "domain2",
+							SpaceName:  "space-2",
+							Route:      resources.Route{GUID: "route-guid-2", Host: "host-3", Path: "/path/2"},
+						},
+						{
+							DomainName: "domain3",
+							SpaceName:  "space-3",
+							Route:      resources.Route{GUID: "route-guid-3", Host: "host-1"},
+							AppNames:   []string{"app1", "app2"},
+						},
 					}
 
 					fakeActor.GetRouteSummariesReturns(

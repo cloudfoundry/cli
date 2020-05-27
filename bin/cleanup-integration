@@ -41,7 +41,7 @@ if [[ $1 == "unbind-first" ]]; then
   cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i running | awk '{print $2 " " $3 " " $4}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle running
   cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i running | awk '{print $1 " " $2 " " $3}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle running
 fi
-cf security-groups | grep -i "integration-sec-group" | awk '{print $2}' | xargs_func cf delete-security-group -f
+cf security-groups | grep -i "integration-sec-group" | sed 's=^#[0-9]*==' | awk '{print $1}' | xargs_func cf delete-security-group -f
 
 cf isolation-segments | grep -i ^integration-isolation-segment | xargs_func cf delete-isolation-segment -f
 

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"regexp"
 
+	"gopkg.in/yaml.v2"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -26,7 +28,7 @@ var _ = Describe("apply-manifest Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeApplyManifestActor
+		fakeActor       *v7fakes.FakeActor
 		fakeParser      *v7fakes.FakeManifestParser
 		fakeLocator     *v7fakes.FakeManifestLocator
 		binaryName      string
@@ -37,7 +39,7 @@ var _ = Describe("apply-manifest Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeApplyManifestActor)
+		fakeActor = new(v7fakes.FakeActor)
 		fakeParser = new(v7fakes.FakeManifestParser)
 		fakeLocator = new(v7fakes.FakeManifestLocator)
 
@@ -45,10 +47,12 @@ var _ = Describe("apply-manifest Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = ApplyManifestCommand{
-			UI:              testUI,
-			Config:          fakeConfig,
-			SharedActor:     fakeSharedActor,
-			Actor:           fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			ManifestParser:  fakeParser,
 			ManifestLocator: fakeLocator,
 			CWD:             "fake-directory",
@@ -178,15 +182,14 @@ var _ = Describe("apply-manifest Command", func() {
 				})
 
 				When("the manifest is unparseable", func() {
-					var expectedErr error
-
 					BeforeEach(func() {
-						expectedErr = errors.New("oooooh nooooos")
-						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, expectedErr)
+						fakeParser.InterpolateAndParseReturns(manifestparser.Manifest{}, &yaml.TypeError{
+							Errors: []string{"oooooh nooooos"},
+						})
 					})
 
 					It("returns back the parse error", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(executeErr).To(MatchError(errors.New("Unable to apply manifest because its format is invalid.")))
 
 						Expect(fakeActor.SetSpaceManifestCallCount()).To(Equal(0))
 					})

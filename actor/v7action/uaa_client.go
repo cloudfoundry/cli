@@ -14,6 +14,8 @@ type UAAClient interface {
 	DeleteUser(userGuid string) (uaa.User, error)
 	GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error)
 	ListUsers(userName, origin string) ([]uaa.User, error)
+	LoginPrompts() map[string][]string
 	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
+	UpdatePassword(userGUID string, oldPassword string, newPassword string) error
 	ValidateClientUser(clientID string) error
 }

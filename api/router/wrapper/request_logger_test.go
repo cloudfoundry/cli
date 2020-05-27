@@ -109,6 +109,20 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
+		When("a Set-Cookie header is in the request", func() {
+			BeforeEach(func() {
+				request.Header = http.Header{"Set-Cookie": []string{"should not be shown"}}
+			})
+
+			It("redacts the contents of the Set-Cookie header", func() {
+				Expect(makeErr).NotTo(HaveOccurred())
+				Expect(fakeOutput.DisplayHeaderCallCount()).To(Equal(1))
+				key, value := fakeOutput.DisplayHeaderArgsForCall(0)
+				Expect(key).To(Equal("Set-Cookie"))
+				Expect(value).To(Equal("[PRIVATE DATA HIDDEN]"))
+			})
+		})
+
 		When("passed a body", func() {
 			When("the request's Content-Type is application/json", func() {
 				BeforeEach(func() {

@@ -24,8 +24,12 @@ var _ = Describe("Target", func() {
 	})
 
 	Describe("TargetCF", func() {
+		var response string
+		var fakeWrapper1 *ccv2fakes.FakeConnectionWrapper
+		var fakeWrapper2 *ccv2fakes.FakeConnectionWrapper
+
 		BeforeEach(func() {
-			response := `{
+			response = `{
 					"name":"",
 					"build":"",
 					"support":"http://support.cloudfoundry.com",
@@ -43,17 +47,56 @@ var _ = Describe("Target", func() {
 					"doppler_logging_endpoint":"wss://doppler.APISERVER"
 				}`
 			response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
+			fakeWrapper1 = new(ccv2fakes.FakeConnectionWrapper)
+			fakeWrapper1.WrapReturns(fakeWrapper1)
+			fakeWrapper2 = new(ccv2fakes.FakeConnectionWrapper)
+			fakeWrapper2.WrapReturns(fakeWrapper2)
+
+			client = NewClient(Config{
+				AppName:    "CF CLI API Target Test",
+				AppVersion: "Unknown",
+				Wrappers:   []ConnectionWrapper{fakeWrapper1, fakeWrapper2},
+			})
+
+		})
+		When("using a older API that does not have the log cache url", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/info"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusOK, `{ "links": "someurl" : "cool beans"}}`),
+					),
+				)
+
+			})
+			It("should string parse the API url to add the log cache url", func() {
+				_, err := client.TargetCF(TargetSettings{
+					SkipSSLValidation: true,
+					URL:               "api.fun.com",
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(client.LogCacheEndpoint()).To(Equal("log-cache.fun.com"))
+			})
+		})
+		BeforeEach(func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/v2/info"),
 					RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/"),
+					RespondWith(http.StatusOK, `{ "links": {"log_cache": {"href": "api.coolbeans.log-cache"}}}`),
+				),
 			)
 		})
 
 		When("client has wrappers", func() {
-			var fakeWrapper1 *ccv2fakes.FakeConnectionWrapper
-			var fakeWrapper2 *ccv2fakes.FakeConnectionWrapper
 
 			BeforeEach(func() {
 				fakeWrapper1 = new(ccv2fakes.FakeConnectionWrapper)

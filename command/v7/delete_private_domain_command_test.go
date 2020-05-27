@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/resources"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -23,7 +24,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDeletePrivateDomainActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -35,7 +36,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeDeletePrivateDomainActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -44,10 +45,12 @@ var _ = Describe("delete-private-domain Command", func() {
 		cmd = DeletePrivateDomainCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -92,7 +95,7 @@ var _ = Describe("delete-private-domain Command", func() {
 
 	When("the domain does not exist", func() {
 		BeforeEach(func() {
-			fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, actionerror.DomainNotFoundError{Name: "domain.com"})
+			fakeActor.GetDomainByNameReturns(resources.Domain{}, v7action.Warnings{"get-domain-warnings"}, actionerror.DomainNotFoundError{Name: "domain.com"})
 		})
 
 		It("displays OK and returns with success", func() {
@@ -106,7 +109,7 @@ var _ = Describe("delete-private-domain Command", func() {
 
 	When("the getting the domain errors", func() {
 		BeforeEach(func() {
-			fakeActor.GetDomainByNameReturns(v7action.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
+			fakeActor.GetDomainByNameReturns(resources.Domain{}, v7action.Warnings{"get-domain-warnings"}, errors.New("get-domain-error"))
 		})
 
 		It("displays OK and returns with success", func() {
@@ -118,7 +121,7 @@ var _ = Describe("delete-private-domain Command", func() {
 	When("the -f flag is NOT provided", func() {
 		BeforeEach(func() {
 			cmd.Force = false
-			fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org", GUID: "domain-guid"}, nil, nil)
+			fakeActor.GetDomainByNameReturns(resources.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org", GUID: "domain-guid"}, nil, nil)
 		})
 
 		When("the user inputs yes", func() {
@@ -131,7 +134,7 @@ var _ = Describe("delete-private-domain Command", func() {
 
 			It("delegates to the Actor", func() {
 				actualDomain := fakeActor.DeleteDomainArgsForCall(0)
-				Expect(actualDomain).To(Equal(v7action.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org", GUID: "domain-guid"}))
+				Expect(actualDomain).To(Equal(resources.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org", GUID: "domain-guid"}))
 			})
 
 			It("deletes the private domain", func() {
@@ -198,7 +201,7 @@ var _ = Describe("delete-private-domain Command", func() {
 		When("deleting the private domain errors", func() {
 			Context("generic error", func() {
 				BeforeEach(func() {
-					fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org", GUID: "domain-guid"}, nil, nil)
+					fakeActor.GetDomainByNameReturns(resources.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org", GUID: "domain-guid"}, nil, nil)
 					fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning"}, errors.New("some-error"))
 				})
 
@@ -213,7 +216,7 @@ var _ = Describe("delete-private-domain Command", func() {
 
 		When("the private domain exists", func() {
 			BeforeEach(func() {
-				fakeActor.GetDomainByNameReturns(v7action.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org"}, nil, nil)
+				fakeActor.GetDomainByNameReturns(resources.Domain{Name: "some-domain.com", OrganizationGUID: "owning-org"}, nil, nil)
 				fakeActor.DeleteDomainReturns(v7action.Warnings{"some-warning"}, nil)
 			})
 

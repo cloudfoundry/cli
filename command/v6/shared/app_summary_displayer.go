@@ -180,17 +180,6 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v3action.Applicat
 	}
 }
 
-func (AppSummaryDisplayer) usageSummary(processSummaries v3action.ProcessSummaries) string {
-	var usageStrings []string
-	for _, summary := range processSummaries {
-		if summary.TotalInstanceCount() > 0 {
-			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", summary.MemoryInMB.Value, summary.TotalInstanceCount()))
-		}
-	}
-
-	return strings.Join(usageStrings, ", ")
-}
-
 func (AppSummaryDisplayer) buildpackNames(buildpacks []v3action.Buildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
@@ -216,18 +205,4 @@ func (AppSummaryDisplayer) processHasAnInstance(processSummary *v3action.Process
 	}
 
 	return false
-}
-
-func (AppSummaryDisplayer) processInstancesAreAllCrashed(processSummary *v3action.ProcessSummary) bool {
-	if len(processSummary.InstanceDetails) < 1 {
-		return false
-	}
-
-	for instanceIdx := range processSummary.InstanceDetails {
-		if processSummary.InstanceDetails[instanceIdx].State != constant.ProcessInstanceCrashed {
-			return false
-		}
-	}
-
-	return true
 }

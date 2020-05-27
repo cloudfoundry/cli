@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -20,7 +21,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
 	Describe("ProcessHealthChecks", func() {
@@ -68,7 +69,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					nil,
 				)
@@ -86,7 +87,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-warning"},
 					expectedErr,
 				)
@@ -101,7 +102,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		When("application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							GUID: "some-app-guid",
 						},

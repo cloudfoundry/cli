@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +20,7 @@ var _ = Describe("delete-user Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeDeleteUserActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -32,15 +33,17 @@ var _ = Describe("delete-user Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeDeleteUserActor)
+		fakeActor = new(v7fakes.FakeActor)
 		currentUser, err = fakeConfig.CurrentUserName()
 		Expect(err).NotTo(HaveOccurred())
 
 		cmd = DeleteUserCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		cmd.RequiredArgs.Username = "some-user"
@@ -72,7 +75,7 @@ var _ = Describe("delete-user Command", func() {
 		When("no errors occur", func() {
 			BeforeEach(func() {
 				cmd.Origin = "some-origin"
-				fakeActor.GetUserReturns(v7action.User{
+				fakeActor.GetUserReturns(resources.User{
 					GUID: "some-user-guid", Origin: "some-origin",
 				}, nil)
 				fakeActor.DeleteUserReturns(v7action.Warnings{"warning: user is about to be deleted"}, nil)
@@ -184,7 +187,7 @@ var _ = Describe("delete-user Command", func() {
 					BeforeEach(func() {
 						returnedErr = actionerror.UserNotFoundError{Username: "some-user"}
 						fakeActor.GetUserReturns(
-							v7action.User{},
+							resources.User{},
 							returnedErr)
 					})
 
@@ -202,7 +205,7 @@ var _ = Describe("delete-user Command", func() {
 				BeforeEach(func() {
 					returnedErr = uaa.ConflictError{}
 					fakeActor.GetUserReturns(
-						v7action.User{GUID: "some-guid", Origin: "uaa"},
+						resources.User{GUID: "some-guid", Origin: "uaa"},
 						nil)
 					fakeActor.DeleteUserReturns(nil, returnedErr)
 				})
@@ -217,7 +220,7 @@ var _ = Describe("delete-user Command", func() {
 
 				BeforeEach(func() {
 					fakeActor.GetUserReturns(
-						v7action.User{GUID: "some-guid", Origin: "uaa"},
+						resources.User{GUID: "some-guid", Origin: "uaa"},
 						nil)
 					warnings := []string{"warning-1", "warning-2"}
 					fakeActor.DeleteUserReturns(warnings, returnedErr)

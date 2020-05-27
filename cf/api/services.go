@@ -29,7 +29,7 @@ type ServiceRepository interface {
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
 	PurgeServiceInstance(instance models.ServiceInstance) error
 	CreateServiceInstance(name, planGUID string, params map[string]interface{}, tags []string) (apiErr error)
-	UpdateServiceInstance(instanceGUID, planGUID string, params map[string]interface{}, tags []string) (apiErr error)
+	UpdateServiceInstance(instanceGUID, planGUID string, params map[string]interface{}, tags *[]string) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGUID string, apiErr error)
@@ -166,7 +166,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGUI
 	return
 }
 
-func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGUID, planGUID string, params map[string]interface{}, tags []string) (err error) {
+func (repo CloudControllerServiceRepository) UpdateServiceInstance(instanceGUID, planGUID string, params map[string]interface{}, tags *[]string) (err error) {
 	path := fmt.Sprintf("/v2/service_instances/%s?accepts_incomplete=true", instanceGUID)
 	request := models.ServiceInstanceUpdateRequest{
 		PlanGUID: planGUID,

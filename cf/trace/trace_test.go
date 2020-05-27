@@ -30,6 +30,27 @@ This is the body. Please don't get rid of me even though I contain Authorization
 			Expect(Sanitize(request)).To(Equal(expected))
 		})
 
+		It("hides the cookies", func() {
+			request := `
+REQUEST:
+GET /v2/organizations HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Set-Cookie: I like leaking credentials
+This is the body. Please don't get rid of me even though I contain Set-Cookie: and some other text
+	`
+
+			expected := `
+REQUEST:
+GET /v2/organizations HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Set-Cookie: [PRIVATE DATA HIDDEN]
+This is the body. Please don't get rid of me even though I contain Set-Cookie: and some other text
+	`
+
+			Expect(Sanitize(request)).To(Equal(expected))
+		})
 		Describe("hiding passwords in the body of requests", func() {
 			It("hides passwords in query args", func() {
 				request := `
@@ -54,6 +75,22 @@ grant_type=password&password=[PRIVATE DATA HIDDEN]&scope=&username=mgehard%2Bcli
 				Expect(Sanitize(request)).To(Equal(expected))
 			})
 
+			It("hides ssh codes in query args", func() {
+				request := `
+GET /login?code=secret-ssh-code
+Host: uaa.run.pivotal.io
+Authorization: [PRIVATE DATA HIDDEN]
+Referer: https://uaa.run.pivotal.io/oauth/authorize?client_id=ssh-proxy&grant_type=authorization_code&response_type=code
+`
+
+				expected := `
+GET /login?code=[PRIVATE DATA HIDDEN]
+Host: uaa.run.pivotal.io
+Authorization: [PRIVATE DATA HIDDEN]
+Referer: https://uaa.run.pivotal.io/oauth/authorize?client_id=ssh-proxy&grant_type=authorization_code&response_type=code
+`
+				Expect(Sanitize(request)).To(Equal(expected))
+			})
 			It("hides passwords in the first and last query parameters", func() {
 				response := `
 HTTP/1.1 200 BORK

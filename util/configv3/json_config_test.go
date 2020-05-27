@@ -216,11 +216,41 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
+	Describe("SetAsyncTimeout", func() {
+		It("sets the async timeout", func() {
+			config = new(Config)
+			config.SetAsyncTimeout(2)
+			Expect(config.ConfigFile.AsyncTimeout).To(Equal(2))
+		})
+	})
+
+	Describe("SetColorEnabled", func() {
+		It("sets the color enabled field", func() {
+			config = new(Config)
+			config.SetColorEnabled("true")
+			Expect(config.ConfigFile.ColorEnabled).To(Equal("true"))
+		})
+	})
+
 	Describe("SetAccessToken", func() {
 		It("sets the authentication token information", func() {
 			config = new(Config)
 			config.SetAccessToken("I am the access token")
 			Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
+		})
+	})
+
+	Describe("SetLocale", func() {
+		It("sets the locale field", func() {
+			config = new(Config)
+			config.SetLocale("en-US")
+			Expect(config.ConfigFile.Locale).To(Equal("en-US"))
+		})
+
+		It("clears the locale field if requested", func() {
+			config = new(Config)
+			config.SetLocale("CLEAR")
+			Expect(config.ConfigFile.Locale).To(Equal(""))
 		})
 	})
 
@@ -268,21 +298,23 @@ var _ = Describe("JSONConfig", func() {
 					},
 				},
 			}
-			config.SetTargetInformation(
-				"https://api.foo.com",
-				"2.59.31",
-				"https://login.foo.com",
-				"2.0.0",
-				"wws://doppler.foo.com:443",
-				"https://api.foo.com/routing",
-				true,
-			)
+			config.SetTargetInformation(TargetInformationArgs{
+				Api:               "https://api.foo.com",
+				ApiVersion:        "2.59.31",
+				Auth:              "https://login.foo.com",
+				MinCLIVersion:     "2.0.0",
+				Doppler:           "wws://doppler.foo.com:443",
+				LogCache:          "https://log-cache.foo.com",
+				Routing:           "https://api.foo.com/routing",
+				SkipSSLValidation: true,
+			})
 
 			Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
 			Expect(config.ConfigFile.APIVersion).To(Equal("2.59.31"))
 			Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
 			Expect(config.ConfigFile.MinCLIVersion).To(Equal("2.0.0"))
 			Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
+			Expect(config.ConfigFile.LogCacheEndpoint).To(Equal("https://log-cache.foo.com"))
 			Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
 			Expect(config.ConfigFile.SkipSSLValidation).To(BeTrue())
 
@@ -302,6 +334,14 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
 			Expect(config.ConfigFile.RefreshToken).To(Equal("I am the refresh token"))
 			Expect(config.ConfigFile.SSHOAuthClient).To(Equal("I am the SSH OAuth client"))
+		})
+	})
+
+	Describe("SetTrace", func() {
+		It("sets the trace field", func() {
+			config = new(Config)
+			config.SetTrace("true")
+			Expect(config.ConfigFile.Trace).To(Equal("true"))
 		})
 	})
 

@@ -1,22 +1,14 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . CreateSpaceQuotaActor
-
-type CreateSpaceQuotaActor interface {
-	CreateSpaceQuota(spaceQuotaName string, orgGuid string, limits v7action.QuotaLimits) (v7action.Warnings, error)
-}
-
 type CreateSpaceQuotaCommand struct {
+	BaseCommand
+
 	RequiredArgs          flag.SpaceQuota          `positional-args:"yes"`
 	NumAppInstances       flag.IntegerLimit        `short:"a" description:"Total number of application instances. (Default: unlimited)."`
 	PaidServicePlans      bool                     `long:"allow-paid-service-plans" description:"Allow provisioning instances of paid service plans. (Default: disallowed)."`
@@ -27,25 +19,6 @@ type CreateSpaceQuotaCommand struct {
 	TotalServiceInstances flag.IntegerLimit        `short:"s" description:"Total number of service instances. -1 represents an unlimited amount. (Default: 0)."`
 	usage                 interface{}              `usage:"CF_NAME create-space-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
 	relatedCommands       interface{}              `related_commands:"create-space, space-quotas, set-space-quota"`
-
-	UI          command.UI
-	Config      command.Config
-	Actor       CreateSpaceQuotaActor
-	SharedActor command.SharedActor
-}
-
-func (cmd *CreateSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	client, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(client, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd CreateSpaceQuotaCommand) Execute([]string) error {

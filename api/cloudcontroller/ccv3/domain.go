@@ -5,84 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/resources"
 )
-
-type Domain struct {
-	GUID             string         `json:"guid,omitempty"`
-	Name             string         `json:"name"`
-	Internal         types.NullBool `json:"internal,omitempty"`
-	OrganizationGUID string         `json:"orgguid,omitempty"`
-
-	// Metadata is used for custom tagging of API resources
-	Metadata *Metadata `json:"metadata,omitempty"`
-}
-
-func (d Domain) MarshalJSON() ([]byte, error) {
-	type Data struct {
-		GUID string `json:"guid,omitempty"`
-	}
-
-	type OrgData struct {
-		Data Data `json:"data,omitempty"`
-	}
-
-	type OrgRelationship struct {
-		Org OrgData `json:"organization,omitempty"`
-	}
-
-	type ccDomain struct {
-		GUID          string           `json:"guid,omitempty"`
-		Name          string           `json:"name"`
-		Internal      *bool            `json:"internal,omitempty"`
-		Relationships *OrgRelationship `json:"relationships,omitempty"`
-	}
-
-	ccDom := ccDomain{
-		Name: d.Name,
-	}
-
-	if d.Internal.IsSet {
-		ccDom.Internal = &d.Internal.Value
-	}
-
-	if d.GUID != "" {
-		ccDom.GUID = d.GUID
-	}
-
-	if d.OrganizationGUID != "" {
-		ccDom.Relationships = &OrgRelationship{OrgData{Data{GUID: d.OrganizationGUID}}}
-	}
-	return json.Marshal(ccDom)
-}
-
-func (d *Domain) UnmarshalJSON(data []byte) error {
-	var ccRouteStruct struct {
-		GUID          string         `json:"guid,omitempty"`
-		Name          string         `json:"name"`
-		Internal      types.NullBool `json:"internal,omitempty"`
-		Relationships struct {
-			Organization struct {
-				Data struct {
-					GUID string `json:"guid,omitempty"`
-				} `json:"data,omitempty"`
-			} `json:"organization,omitempty"`
-		} `json:"relationships,omitempty"`
-		Metadata *Metadata
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &ccRouteStruct)
-	if err != nil {
-		return err
-	}
-
-	d.GUID = ccRouteStruct.GUID
-	d.Name = ccRouteStruct.Name
-	d.Internal = ccRouteStruct.Internal
-	d.OrganizationGUID = ccRouteStruct.Relationships.Organization.Data.GUID
-	d.Metadata = ccRouteStruct.Metadata
-	return nil
-}
 
 type SharedOrgs struct {
 	GUIDs []string
@@ -159,8 +83,8 @@ func (client Client) CheckRoute(domainGUID string, hostname string, path string)
 	return responseBody.MatchingRoute, warnings, err
 }
 
-func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
-	var responseBody Domain
+func (client Client) CreateDomain(domain resources.Domain) (resources.Domain, Warnings, error) {
+	var responseBody resources.Domain
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.PostDomainRequest,
@@ -181,8 +105,8 @@ func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
 }
 
 // GetDomain returns a domain with the given GUID.
-func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
-	var responseBody Domain
+func (client *Client) GetDomain(domainGUID string) (resources.Domain, Warnings, error) {
+	var responseBody resources.Domain
 
 	_, warnings, err := client.MakeRequest(RequestParams{
 		RequestName:  internal.GetDomainRequest,
@@ -193,37 +117,37 @@ func (client *Client) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	return responseBody, warnings, err
 }
 
-func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
-	var resources []Domain
+func (client Client) GetDomains(query ...Query) ([]resources.Domain, Warnings, error) {
+	var domains []resources.Domain
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		RequestName:  internal.GetDomainsRequest,
 		Query:        query,
-		ResponseBody: Domain{},
+		ResponseBody: resources.Domain{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Domain))
+			domains = append(domains, item.(resources.Domain))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return domains, warnings, err
 }
 
-func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]Domain, Warnings, error) {
-	var resources []Domain
+func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]resources.Domain, Warnings, error) {
+	var domains []resources.Domain
 
 	_, warnings, err := client.MakeListRequest(RequestParams{
 		URIParams:    internal.Params{"organization_guid": orgGUID},
 		RequestName:  internal.GetOrganizationDomainsRequest,
 		Query:        query,
-		ResponseBody: Domain{},
+		ResponseBody: resources.Domain{},
 		AppendToList: func(item interface{}) error {
-			resources = append(resources, item.(Domain))
+			domains = append(domains, item.(resources.Domain))
 			return nil
 		},
 	})
 
-	return resources, warnings, err
+	return domains, warnings, err
 }
 
 func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {

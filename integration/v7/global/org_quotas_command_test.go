@@ -28,6 +28,8 @@ var _ = Describe("org-quotas command", func() {
 				Eventually(session).Should(Say("org-quotas - List available organization quotas"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf org-quotas"))
+				Eventually(session).Should(Say("ALIAS:"))
+				Eventually(session).Should(Say("quotas"))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("org-quota"))
 				Eventually(session).Should(Exit(0))

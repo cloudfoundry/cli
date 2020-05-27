@@ -105,8 +105,6 @@ var _ = Describe("create-shared-domain command", func() {
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 
-						session = helpers.CF("domains")
-
 						var sharedDomainResponse struct {
 							Resources []struct {
 								Entity struct {
@@ -188,7 +186,7 @@ var _ = Describe("create-shared-domain command", func() {
 				It("should fail and return an error", func() {
 					session := helpers.CF("create-shared-domain", domainName, "--router-group", routerGroupName)
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Router group not-a-real-router-group not found"))
+					Eventually(session.Err).Should(Say("Router group 'not-a-real-router-group' not found."))
 					Eventually(session).Should(Exit(1))
 				})
 			})

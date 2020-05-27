@@ -12,24 +12,14 @@ import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
-//go:generate counterfeiter . APIActor
-
-type APIActor interface {
-	ClearTarget()
-	SetTarget(settings v7action.TargetSettings) (v7action.Warnings, error)
-}
-
 type APICommand struct {
+	BaseCommand
+
 	OptionalArgs      flag.APITarget `positional-args:"yes"`
 	SkipSSLValidation bool           `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`
 	Unset             bool           `long:"unset" description:"Remove all api endpoint targeting"`
 	usage             interface{}    `usage:"CF_NAME api [URL]"`
 	relatedCommands   interface{}    `related_commands:"auth, login, target"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       APIActor
 }
 
 func (cmd *APICommand) Setup(config command.Config, ui command.UI) error {
@@ -37,7 +27,7 @@ func (cmd *APICommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 
 	ccClient, _ := shared.NewWrappedCloudControllerClient(config, ui)
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, nil, clock.NewClock())
 	return nil
 }
 
@@ -54,14 +44,14 @@ func (cmd *APICommand) Execute(args []string) error {
 }
 
 func (cmd *APICommand) clearTarget() error {
-	cmd.UI.DisplayTextWithFlavor("Unsetting api endpoint...")
+	cmd.UI.DisplayTextWithFlavor("Unsetting API endpoint...")
 	cmd.Actor.ClearTarget()
 	cmd.UI.DisplayOK()
 	return nil
 }
 
 func (cmd *APICommand) setAPI() error {
-	cmd.UI.DisplayTextWithFlavor("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Setting API endpoint to {{.Endpoint}}...", map[string]interface{}{
 		"Endpoint": cmd.OptionalArgs.URL,
 	})
 
@@ -93,7 +83,7 @@ func (cmd *APICommand) processURL(apiURL string) string {
 
 func (cmd *APICommand) viewTarget() error {
 	if cmd.Config.Target() == "" {
-		cmd.UI.DisplayText("No api endpoint set. Use '{{.Name}}' to set an endpoint", map[string]interface{}{
+		cmd.UI.DisplayText("No API endpoint set. Use '{{.Name}}' to set an endpoint", map[string]interface{}{
 			"Name": "cf api",
 		})
 		return nil
@@ -104,12 +94,13 @@ func (cmd *APICommand) viewTarget() error {
 
 func (cmd *APICommand) displayTarget() error {
 	cmd.UI.DisplayKeyValueTable("", [][]string{
-		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("api version:"), cmd.Config.APIVersion()},
+		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
+		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
 	}, 3)
 
 	user, err := cmd.Config.CurrentUser()
 	if user.Name == "" {
+		cmd.UI.DisplayNewline()
 		command.DisplayNotLoggedInText(cmd.Config.BinaryName(), cmd.UI)
 	}
 	return err

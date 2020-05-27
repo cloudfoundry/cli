@@ -87,6 +87,7 @@ Upgrade: websocket
 Connection: Upgrade
 Sec-WebSocket-Version: 13
 Sec-WebSocket-Key: [HIDDEN]
+Set-Cookie: please-redact-this
 Authorization: bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImtleS0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiI3YzRmYWEyZjI5MmQ0MTQ5ODM5NGE3OTU0Y2E3ZWNlMCIsInN1YiI6IjIyMjNiM2IzLTE3ZTktNDJkNi1iNzQzLThjZjcyZWIwOWRlNSIsInNjb3BlIjpbInJvdXRpbmcucm91dGVyX2dyb3Vwcy5yZWFkIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwib3BlbmlkIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLmFkbWluIiwidWFhLnVzZXIiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImF6cCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjIyMjNiM2IzLTE3ZTktNDJkNi1iNzQzLThjZjcyZWIwOWRlNSIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsInJldl9zaWciOiI4NDBiMDBhMyIsImlhdCI6MTQ5NjQyNTU5NiwiZXhwIjoxNDk2NDI2MTk2LCJpc3MiOiJodHRwczovL3VhYS5ib3NoLWxpdGUuY29tL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbInNjaW0iLCJjbG91ZF9jb250cm9sbGVyIiwicGFzc3dvcmQiLCJjZiIsInVhYSIsIm9wZW5pZCIsImRvcHBsZXIiLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMiXX0.TFDmHviKcs-eeNoz79dVwOl-k_dHTdqHkyztont2qnBDchNSpWvR5Yba54MMG8uTUHM72YbCopxdyaLY-g8s5wJFGLaBocrDgqswUh3mQRvynQG6_zne1h_0oHXnm0U-ZPnTyV8qjtHUoLvks4GOuktXc6ZE3NriWODpKIU5WdMgEbvyhuTnUEn88rQnmGJbKvHOIilulb6avSkZfTEq1o8w4VLCeRDlVLNh5JzCUtGzLfImNb31ks_Wv6HuI8kFjQZ5PQiTYjlhkuDQOcNSaAyWxQ_7425hiA7x8omBgEr-uST7GsxLvgoHqQaDH0JSTgMmO_GaN_QD52JVuru9og
 Origin: wss://doppler.bosh-lite.com:443`
 				err := display.DisplayDump(dump)
@@ -100,6 +101,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				contents := string(raw)
 
 				Expect(contents).To(MatchRegexp("Connection: Upgrade"))
+				Expect(contents).To(MatchRegexp(`Set-Cookie: \[PRIVATE DATA HIDDEN\]`))
 				Expect(contents).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Expect(contents).To(MatchRegexp("Origin: wss://doppler.bosh-lite.com:443"))
 

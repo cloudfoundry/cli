@@ -21,7 +21,7 @@ var _ = Describe("service-brokers Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeServiceBrokersActor
+		fakeActor       *v7fakes.FakeActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -32,16 +32,18 @@ var _ = Describe("service-brokers Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeServiceBrokersActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = &v7.ServiceBrokersCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: v7.BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 	})
 
@@ -116,14 +118,14 @@ var _ = Describe("service-brokers Command", func() {
 		When("there is one service broker", func() {
 			BeforeEach(func() {
 				serviceBrokers := []v7action.ServiceBroker{
-					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo", Status: "available"},
+					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo"},
 				}
 				fakeActor.GetServiceBrokersReturns(serviceBrokers, v7action.Warnings{"service-broker-warnings"}, nil)
 			})
 
 			It("prints a table header and the broker details", func() {
-				Expect(testUI.Out).To(Say("name\\s+url\\s+status"))
-				Expect(testUI.Out).To(Say("foo\\s+http://foo.url\\s+available"))
+				Expect(testUI.Out).To(Say("name\\s+url"))
+				Expect(testUI.Out).To(Say("foo\\s+http://foo.url"))
 				Expect(testUI.Err).To(Say("service-broker-warnings"))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})
@@ -132,16 +134,16 @@ var _ = Describe("service-brokers Command", func() {
 		When("there are many service brokers", func() {
 			BeforeEach(func() {
 				serviceBrokers := []v7action.ServiceBroker{
-					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo", Status: "available"},
-					{Name: "bar", URL: "https://bar.com", GUID: "guid-bar", Status: "available"},
+					{Name: "foo", URL: "http://foo.url", GUID: "guid-foo"},
+					{Name: "bar", URL: "https://bar.com", GUID: "guid-bar"},
 				}
 				fakeActor.GetServiceBrokersReturns(serviceBrokers, v7action.Warnings{"service-broker-warnings"}, nil)
 			})
 
 			It("prints a table header and the broker details", func() {
-				Expect(testUI.Out).To(Say("name\\s+url\\s+status"))
-				Expect(testUI.Out).To(Say("foo\\s+http://foo.url\\s+available"))
-				Expect(testUI.Out).To(Say("bar\\s+https://bar.com\\s+available"))
+				Expect(testUI.Out).To(Say("name\\s+url"))
+				Expect(testUI.Out).To(Say("foo\\s+http://foo.url"))
+				Expect(testUI.Out).To(Say("bar\\s+https://bar.com"))
 				Expect(testUI.Err).To(Say("service-broker-warnings"))
 				Expect(executeErr).NotTo(HaveOccurred())
 			})

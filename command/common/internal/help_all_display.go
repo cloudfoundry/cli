@@ -13,10 +13,10 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "APPS:",
 		CommandList: [][]string{
-			{"apps", "app", "create-app", "apply-manifest"},
+			{"apps", "app", "create-app"},
 			{"push", "scale", "delete", "rename"},
 			{"cancel-deployment"},
-			{"start", "stop", "restart", "stage", "restage", "restart-app-instance"},
+			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
 			{"packages", "create-package"},
 			{"droplets", "set-droplet"},

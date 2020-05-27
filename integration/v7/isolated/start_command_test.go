@@ -1,6 +1,9 @@
 package isolated
 
 import (
+	"fmt"
+	"strings"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -44,6 +47,8 @@ var _ = Describe("start command", func() {
 				Eventually(session).Should(Say("start - Start an app"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf start APP_NAME"))
+				Eventually(session).Should(Say("If the app's most recent package is unstaged, starting the app will stage and run that package."))
+				Eventually(session).Should(Say("Otherwise, the app's current droplet will be run."))
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("st"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
@@ -101,7 +106,7 @@ var _ = Describe("start command", func() {
 						packageGUID = matches[1]
 					})
 
-					stageSession := helpers.CF("stage", appName, "--package-guid", packageGUID)
+					stageSession := helpers.CF("stage-package", appName, "--package-guid", packageGUID)
 					Eventually(stageSession).Should(Exit(0))
 
 					regex := regexp.MustCompile(`droplet guid:\s+(.+)`)
@@ -192,12 +197,43 @@ var _ = Describe("start command", func() {
 					Expect(helpers.GetPackageFirstDroplet(packageGUID)).To(Equal(helpers.GetAppDroplet(helpers.AppGUID(appName))))
 				})
 			})
+			When("the package does not exist", func() {
+				var appGUID string
+				var postBody string
+				BeforeEach(func() {
+					session := helpers.CF("app", appName, "--guid")
+					Eventually(session).Should(Exit(0))
+					appGUID = strings.TrimSuffix(string(session.Out.Contents()), "\n")
+
+					postBody = fmt.Sprintf(`{
+						"type": "bits",
+						"relationships": {
+							"app": {
+								"data": {
+									"guid": "%s"
+								}
+							}
+						}
+					}`, appGUID)
+					session = helpers.CF("curl", "-X", "POST", "/v3/packages/", "-d", postBody)
+					Eventually(session).Should(Exit(0))
+
+				})
+
+				It("gives a luxurious error message", func() {
+					session := helpers.CF("start", appName)
+					Eventually(session.Err).Should(Say(`Cannot stage package unless its state is 'READY'.`))
+					Eventually(session).Should(Say("FAILED"))
+
+					Eventually(session).Should(Exit(1))
+				})
+			})
 
 			When("the app cannot be started or staged", func() {
 				It("gives an error", func() {
 					session := helpers.CF("start", appName)
 
-					Eventually(session.Err).Should(Say(`App can not start with out a package to stage or a droplet to run.`))
+					Eventually(session.Err).Should(Say(`App cannot start without a package to stage or a droplet to run.`))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

@@ -54,12 +54,7 @@ func NewCommandParser() (CommandParser, error) {
 
 func (p *CommandParser) ParseCommandFromArgs(ui *ui.UI, args []string) (int, error) {
 	p.UI = ui
-	exitStatus, err := p.parse(args, &common.Commands)
-	// TODO Remove the fallback command and return an UnknownCommandError
-	if _, ok := err.(translatableerror.V3V2SwitchError); ok {
-		return p.parse(args, &common.FallbackCommands)
-	}
-	return exitStatus, err
+	return p.parse(args, &common.Commands)
 }
 
 func (p *CommandParser) executionWrapper(cmd flags.Commander, args []string) error {
@@ -198,22 +193,25 @@ func (p *CommandParser) handleFlagErrorAndCommandHelp(flagErr *flags.Error, flag
 		fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
 		_, err := p.parse([]string{"help", originalArgs[0]}, commandList)
 		return 1, err
+
 	case flags.ErrUnknownCommand:
 		if containsHelpFlag(originalArgs) {
 			return p.parse([]string{"help", originalArgs[0]}, commandList)
 		} else {
-			// TODO Extract handling of unknown commands/suggested commands out of legacy
-			return 0, UnknownCommandError{}
+			return 0, UnknownCommandError{CommandName: originalArgs[0]}
 		}
+
 	case flags.ErrCommandRequired:
 		if common.Commands.VerboseOrVersion {
 			return p.parse([]string{"version"}, commandList)
 		} else {
 			return p.parse([]string{"help"}, commandList)
 		}
+
 	default:
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 	}
+
 	return 0, nil
 }
 

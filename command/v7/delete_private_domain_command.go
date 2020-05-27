@@ -4,45 +4,16 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/clock"
 )
 
-//go:generate counterfeiter . DeletePrivateDomainActor
-
-type DeletePrivateDomainActor interface {
-	DeleteDomain(domain v7action.Domain) (v7action.Warnings, error)
-	GetDomainByName(domainName string) (v7action.Domain, v7action.Warnings, error)
-}
-
 type DeletePrivateDomainCommand struct {
+	BaseCommand
+
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
 	usage           interface{} `usage:"CF_NAME delete-private-domain DOMAIN [-f]"`
 	relatedCommands interface{} `related_commands:"delete-shared-domain, domains, unshare-private-domain"`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       DeletePrivateDomainActor
-}
-
-func (cmd *DeletePrivateDomainCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.UI = ui
-	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
-
-	ccClient, _, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
-	if err != nil {
-		return err
-	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil, clock.NewClock())
-
-	return nil
 }
 
 func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
@@ -57,20 +28,16 @@ func (cmd DeletePrivateDomainCommand) Execute(args []string) error {
 		return err
 	}
 
-	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
-	cmd.UI.DisplayWarnings(warnings)
-
 	cmd.UI.DisplayTextWithFlavor("Deleting private domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
 		"DomainName": domainName,
 		"Username":   currentUser.Name,
 	})
 
+	domain, warnings, err := cmd.Actor.GetDomainByName(domainName)
+	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
 		if _, ok := err.(actionerror.DomainNotFoundError); ok {
-			cmd.UI.DisplayTextWithFlavor("Deleting private domain {{.DomainName}} as {{.Username}}...", map[string]interface{}{
-				"DomainName": domainName,
-				"Username":   currentUser.Name,
-			})
 			cmd.UI.DisplayWarning("Domain '{{.DomainName}}' does not exist.", map[string]interface{}{
 				"DomainName": cmd.RequiredArgs.Domain,
 			})

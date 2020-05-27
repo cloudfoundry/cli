@@ -1,4 +1,4 @@
-# ADR X: Implementing start Command Client-side
+# ADR 6: Implementing start Command Client-side
 
 ## Status
 

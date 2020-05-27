@@ -3,7 +3,7 @@ package isolated
 import (
 	"time"
 
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -119,16 +119,14 @@ var _ = Describe("unbind-service command", func() {
 			var (
 				service     string
 				servicePlan string
-				broker      *fakeservicebroker.FakeServiceBroker
+				broker      *servicebrokerstub.ServiceBrokerStub
 			)
 
 			When("the unbinding is asynchronous", func() {
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().WithAsyncBehaviour().EnsureBrokerIsAvailable()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
-
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+					broker = servicebrokerstub.New().WithAsyncDelay(time.Millisecond).EnableServiceAccess()
+					service = broker.FirstServiceOfferingName()
+					servicePlan = broker.FirstServicePlanName()
 
 					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 					helpers.WithHelloWorldApp(func(appDir string) {
@@ -147,7 +145,7 @@ var _ = Describe("unbind-service command", func() {
 				})
 
 				AfterEach(func() {
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				It("returns that the unbind is in progress", func() {
@@ -160,15 +158,13 @@ var _ = Describe("unbind-service command", func() {
 
 			When("the unbinding is blocking", func() {
 				BeforeEach(func() {
-					broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-					service = broker.ServiceName()
-					servicePlan = broker.ServicePlanName()
-
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+					broker = servicebrokerstub.EnableServiceAccess()
+					service = broker.FirstServiceOfferingName()
+					servicePlan = broker.FirstServicePlanName()
 				})
 
 				AfterEach(func() {
-					broker.Destroy()
+					broker.Forget()
 				})
 
 				When("the service is bound to an app", func() {

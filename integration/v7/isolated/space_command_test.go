@@ -3,8 +3,10 @@ package isolated
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -102,10 +104,12 @@ var _ = Describe("space command", func() {
 						Eventually(session).Should(Say(`services:`))
 						Eventually(session).Should(Say("isolation segment:"))
 						Eventually(session).Should(Say("quota:"))
+						Eventually(session).Should(Say(`running security groups:\s+(.*)dns`))
+						Eventually(session).Should(Say(`staging security groups:\s+(.*)dns`))
 						Eventually(session).Should(Exit(0))
 					})
 
-					When("isolations segments are enabled", func() {
+					When("isolation segments are enabled", func() {
 						BeforeEach(func() {
 							isolationSegmentName = helpers.NewIsolationSegmentName()
 							Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
@@ -120,6 +124,58 @@ var _ = Describe("space command", func() {
 							Eventually(session).Should(Say(`Getting info for space %s in org %s as %s\.\.\.`, spaceName, orgName, userName))
 							Eventually(session).Should(Say(`isolation segment:\s+%s`, isolationSegmentName))
 						})
+					})
+				})
+
+				When("the --security-group-rules flag is used", func() {
+					var (
+						ports                string
+						description          string
+						runningSecurityGroup resources.SecurityGroup
+						stagingSecurityGroup resources.SecurityGroup
+					)
+
+					BeforeEach(func() {
+						ports = "25,465,587"
+						description = "Email our friends"
+						runningSecurityGroup = helpers.NewSecurityGroup(
+							helpers.PrefixedRandomName("INTEGRATION-SECURITY-GROUP-A"),
+							"tcp",
+							"0.0.0.0/0",
+							&ports,
+							&description,
+						)
+						stagingSecurityGroup = helpers.NewSecurityGroup(
+							helpers.PrefixedRandomName("INTEGRATION-SECURITY-GROUP-B"),
+							"tcp",
+							"0.0.0.0/0",
+							&ports,
+							&description,
+						)
+						helpers.CreateSecurityGroup(runningSecurityGroup)
+						helpers.CreateSecurityGroup(stagingSecurityGroup)
+						session1 := helpers.CF("bind-security-group", runningSecurityGroup.Name, orgName, "--lifecycle", "running")
+						session2 := helpers.CF("bind-security-group", stagingSecurityGroup.Name, orgName, "--lifecycle", "staging")
+
+						Eventually(session1).Should(Exit(0))
+						Eventually(session2).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						helpers.DeleteSecurityGroup(runningSecurityGroup)
+						helpers.DeleteSecurityGroup(stagingSecurityGroup)
+					})
+
+					It("shows the security groups applied to that space", func() {
+						session := helpers.CF("space", spaceName, "--security-group-rules")
+						Eventually(session).Should(Say(`running security groups:\s+(.*)+%s`, runningSecurityGroup.Name))
+						Eventually(session).Should(Say(`staging security groups:\s+(.*)+%s`, stagingSecurityGroup.Name))
+
+						Eventually(session).Should(Say(`security group\s+destination\s+ports\s+protocol\s+lifecycle\s+description`))
+						Eventually(session).Should(Say(`%s\s+0.0.0.0/0\s+%s\s+tcp\s+running\s+%s`, runningSecurityGroup.Name, ports, description))
+						Eventually(session).Should(Say(`%s\s+0.0.0.0/0\s+%s\s+tcp\s+staging\s+%s`, stagingSecurityGroup.Name, ports, description))
+
+						Eventually(session).Should(Exit(0))
 					})
 				})
 
@@ -145,20 +201,19 @@ var _ = Describe("space command", func() {
 						service             string
 						servicePlan         string
 						serviceInstanceName string
-						broker              *fakeservicebroker.FakeServiceBroker
+						broker              *servicebrokerstub.ServiceBrokerStub
 					)
 
 					BeforeEach(func() {
-						broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-						service = broker.ServiceName()
-						servicePlan = broker.ServicePlanName()
+						broker = servicebrokerstub.EnableServiceAccess()
+						service = broker.FirstServiceOfferingName()
+						servicePlan = broker.FirstServicePlanName()
 						serviceInstanceName = helpers.NewServiceInstanceName()
-						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						broker.Destroy()
+						broker.Forget()
 					})
 
 					It("shows the service instance", func() {

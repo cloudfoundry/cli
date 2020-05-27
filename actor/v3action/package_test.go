@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/resources"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -39,7 +40,7 @@ var _ = Describe("Package Actions", func() {
 		When("there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -102,7 +103,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"get-applications-warning"},
 					expectedErr,
 				)
@@ -123,7 +124,7 @@ var _ = Describe("Package Actions", func() {
 				expectedErr = errors.New("some get application error")
 
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{GUID: "some-app-guid"},
 					},
 					ccv3.Warnings{"get-applications-warning"},
@@ -160,7 +161,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can't be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-app-warning"},
 					errors.New("some-app-error"),
 				)
@@ -175,7 +176,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
@@ -208,8 +209,8 @@ var _ = Describe("Package Actions", func() {
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -232,8 +233,8 @@ var _ = Describe("Package Actions", func() {
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -252,8 +253,8 @@ var _ = Describe("Package Actions", func() {
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
-						Relationships: ccv3.Relationships{
-							constant.RelationshipTypeApplication: ccv3.Relationship{GUID: "some-app-guid"},
+						Relationships: resources.Relationships{
+							constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 						},
 					}))
 				})
@@ -290,7 +291,7 @@ var _ = Describe("Package Actions", func() {
 		When("retrieving the application errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
+					[]resources.Application{},
 					ccv3.Warnings{"some-app-warning"},
 					errors.New("some-get-error"),
 				)
@@ -305,7 +306,7 @@ var _ = Describe("Package Actions", func() {
 		When("the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{
+					[]resources.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
@@ -389,8 +390,8 @@ var _ = Describe("Package Actions", func() {
 								createdPackage = ccv3.Package{
 									GUID:  "some-pkg-guid",
 									State: constant.PackageAwaitingUpload,
-									Relationships: ccv3.Relationships{
-										constant.RelationshipTypeApplication: ccv3.Relationship{
+									Relationships: resources.Relationships{
+										constant.RelationshipTypeApplication: resources.Relationship{
 											GUID: "some-app-guid",
 										},
 									},
@@ -474,8 +475,8 @@ var _ = Describe("Package Actions", func() {
 										inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
 										Expect(inputPackage).To(Equal(ccv3.Package{
 											Type: constant.PackageTypeBits,
-											Relationships: ccv3.Relationships{
-												constant.RelationshipTypeApplication: ccv3.Relationship{GUID: "some-app-guid"},
+											Relationships: resources.Relationships{
+												constant.RelationshipTypeApplication: resources.Relationship{GUID: "some-app-guid"},
 											},
 										}))
 									})
@@ -580,7 +581,8 @@ var _ = Describe("Package Actions", func() {
 					Expect(bitsPathFile.Close()).To(Succeed())
 					bitsPath = bitsPathFile.Name()
 
-					zipit(tempFilePath, bitsPath, "")
+					err = zipit(tempFilePath, bitsPath, "")
+					Expect(err).ToNot(HaveOccurred())
 					Expect(os.Remove(tempFilePath)).To(Succeed())
 				})
 
@@ -682,7 +684,8 @@ var _ = Describe("Package Actions", func() {
 					Expect(archivePathFile.Close()).To(Succeed())
 					archivePath = archivePathFile.Name()
 
-					zipit(tempArchiveFilePath, archivePath, "")
+					err = zipit(tempArchiveFilePath, archivePath, "")
+					Expect(err).ToNot(HaveOccurred())
 					Expect(os.Remove(tempArchiveFilePath)).To(Succeed())
 
 					tempFile, err := ioutil.TempFile("", "example-file-")
@@ -754,8 +757,8 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
 					Type: constant.PackageTypeBits,
-					Relationships: ccv3.Relationships{
-						constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+					Relationships: resources.Relationships{
+						constant.RelationshipTypeApplication: resources.Relationship{GUID: appGUID},
 					},
 				}))
 

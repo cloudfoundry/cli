@@ -23,12 +23,23 @@ var _ = Describe("Command 'Parser'", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	It("returns an unknown command error", func() {
-		parser, err := command_parser.NewCommandParser()
-		Expect(err).ToNot(HaveOccurred())
-		exitCode, err := parser.ParseCommandFromArgs(pluginUI, []string{"howdy"})
-		Expect(err).To(MatchError(command_parser.UnknownCommandError{}))
-		Expect(exitCode).To(Equal(0))
+	Describe("unknown command handling", func() {
+		var (
+			exitCode int
+			err      error
+		)
+
+		BeforeEach(func() {
+			parser, newErr := command_parser.NewCommandParser()
+			Expect(newErr).ToNot(HaveOccurred())
+			exitCode, err = parser.ParseCommandFromArgs(pluginUI, []string{"howdy"})
+		})
+
+		It("returns an unknown command error with the command name", func() {
+			unknownCommandErr := err.(command_parser.UnknownCommandError)
+			Expect(unknownCommandErr.CommandName).To(Equal("howdy"))
+			Expect(exitCode).To(Equal(0))
+		})
 	})
 
 	Describe("the verbose flag", func() {

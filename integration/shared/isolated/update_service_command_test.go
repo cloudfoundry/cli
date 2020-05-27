@@ -2,8 +2,9 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/integration/assets/hydrabroker/config"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -15,39 +16,41 @@ var _ = Describe("update-service command", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("update-service", "--help")
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`\s+update-service - Update a service instance`))
-				Eventually(session).Should(Say(`USAGE:`))
-				Eventually(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE \[-p NEW_PLAN\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\] \[--upgrade\]`))
-				Eventually(session).Should(Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:`))
-				Eventually(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'`))
-				Eventually(session).Should(Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.`))
-				Eventually(session).Should(Say(`\s+The path to the parameters file can be an absolute or relative path to a file:`))
-				Eventually(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE -c PATH_TO_FILE`))
-				Eventually(session).Should(Say(`\s+Example of valid JSON object:`))
-				Eventually(session).Should(Say(`\s+{`))
-				Eventually(session).Should(Say(`\s+\"cluster_nodes\": {`))
-				Eventually(session).Should(Say(`\s+\"count\": 5,`))
-				Eventually(session).Should(Say(`\s+\"memory_mb\": 1024`))
-				Eventually(session).Should(Say(`\s+}`))
-				Eventually(session).Should(Say(`\s+}`))
-				Eventually(session).Should(Say(`\s+ Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.`))
-				Eventually(session).Should(Say(`EXAMPLES:`))
-				Eventually(session).Should(Say(`\s+cf update-service mydb -p gold`))
-				Eventually(session).Should(Say(`\s+cf update-service mydb -c '{\"ram_gb\":4}'`))
-				Eventually(session).Should(Say(`\s+cf update-service mydb -c ~/workspace/tmp/instance_config.json`))
-				Eventually(session).Should(Say(`\s+cf update-service mydb -t "list, of, tags"`))
-				Eventually(session).Should(Say(`\s+cf update-service mydb --upgrade`))
-				Eventually(session).Should(Say(`\s+cf update-service mydb --upgrade --force`))
-				Eventually(session).Should(Say(`OPTIONS:`))
-				Eventually(session).Should(Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`))
-				Eventually(session).Should(Say(`\s+-p\s+Change service plan for a service instance`))
-				Eventually(session).Should(Say(`\s+-t\s+User provided tags`))
-				Eventually(session).Should(Say(`\s+--upgrade, -u\s+Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t.`))
-				Eventually(session).Should(Say(`\s+--force, -f\s+Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade.`))
-				Eventually(session).Should(Say(`SEE ALSO:`))
-				Eventually(session).Should(Say(`\s+rename-service, services, update-user-provided-service`))
+
 				Eventually(session).Should(Exit(0))
+
+				Expect(session).Should(Say("NAME:"))
+				Expect(session).Should(Say(`\s+update-service - Update a service instance`))
+				Expect(session).Should(Say(`USAGE:`))
+				Expect(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE \[-p NEW_PLAN\] \[-c PARAMETERS_AS_JSON\] \[-t TAGS\] \[--upgrade\]`))
+				Expect(session).Should(Say(`\s+Optionally provide service-specific configuration parameters in a valid JSON object in-line:`))
+				Expect(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'`))
+				Expect(session).Should(Say(`\s+Optionally provide a file containing service-specific configuration parameters in a valid JSON object\.`))
+				Expect(session).Should(Say(`\s+The path to the parameters file can be an absolute or relative path to a file:`))
+				Expect(session).Should(Say(`\s+cf update-service SERVICE_INSTANCE -c PATH_TO_FILE`))
+				Expect(session).Should(Say(`\s+Example of valid JSON object:`))
+				Expect(session).Should(Say(`\s+{`))
+				Expect(session).Should(Say(`\s+\"cluster_nodes\": {`))
+				Expect(session).Should(Say(`\s+\"count\": 5,`))
+				Expect(session).Should(Say(`\s+\"memory_mb\": 1024`))
+				Expect(session).Should(Say(`\s+}`))
+				Expect(session).Should(Say(`\s+}`))
+				Expect(session).Should(Say(`\s+ Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.`))
+				Expect(session).Should(Say(`EXAMPLES:`))
+				Expect(session).Should(Say(`\s+cf update-service mydb -p gold`))
+				Expect(session).Should(Say(`\s+cf update-service mydb -c '{\"ram_gb\":4}'`))
+				Expect(session).Should(Say(`\s+cf update-service mydb -c ~/workspace/tmp/instance_config.json`))
+				Expect(session).Should(Say(`\s+cf update-service mydb -t "list, of, tags"`))
+				Expect(session).Should(Say(`\s+cf update-service mydb --upgrade`))
+				Expect(session).Should(Say(`\s+cf update-service mydb --upgrade --force`))
+				Expect(session).Should(Say(`OPTIONS:`))
+				Expect(session).Should(Say(`\s+-c\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file\. For a list of supported configuration parameters, see documentation for the particular service offering\.`))
+				Expect(session).Should(Say(`\s+-p\s+Change service plan for a service instance`))
+				Expect(session).Should(Say(`\s+-t\s+User provided tags`))
+				Expect(session).Should(Say(`\s+--upgrade, -u\s+Upgrade the service instance to the latest version of the service plan available. It cannot be combined with flags: -c, -p, -t.`))
+				Expect(session).Should(Say(`\s+--force, -f\s+Force the upgrade to the latest available version of the service plan. It can only be used with: -u, --upgrade.`))
+				Expect(session).Should(Say(`SEE ALSO:`))
+				Expect(session).Should(Say(`\s+rename-service, services, update-user-provided-service`))
 			})
 		})
 	})
@@ -86,8 +89,10 @@ var _ = Describe("update-service command", func() {
 
 				It("displays an informative error before prompting and exits 1", func() {
 					session := helpers.CF("update-service", "non-existent-service", "--upgrade")
-					Eventually(session.Err).Should(Say("Service instance non-existent-service not found"))
+
 					Eventually(session).Should(Exit(1))
+
+					Expect(session.Err).Should(Say("Service instance non-existent-service not found"))
 				})
 			})
 		})
@@ -95,50 +100,56 @@ var _ = Describe("update-service command", func() {
 		When("providing other arguments while upgrading", func() {
 			It("displays an informative error message and exits 1", func() {
 				session := helpers.CF("update-service", "irrelevant", "--upgrade", "-c", "{\"hello\": \"world\"}")
-				Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --upgrade, -t, -c, -p"))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("USAGE:"))
+
 				Eventually(session).Should(Exit(1))
+				Expect(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --upgrade, -t, -c, -p"))
+				Expect(session).Should(Say("FAILED"))
+				Expect(session).Should(Say("USAGE:"))
+				Expect(session).Should(Exit(1))
 			})
 		})
 
 		When("there is a service instance", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				serviceInstanceName string
+				tags                string
 				username            string
 			)
 
 			BeforeEach(func() {
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
-				Eventually(helpers.CF("enable-service-access", broker.ServiceName())).Should(Exit(0))
+				broker = servicebrokerstub.EnableServiceAccess()
 
 				serviceInstanceName = helpers.PrefixedRandomName("SI")
-				Eventually(helpers.CF("create-service", broker.ServiceName(), broker.ServicePlanName(), serviceInstanceName)).Should(Exit(0))
+				tags = "a tag"
+				Eventually(helpers.CF("create-service", broker.FirstServiceOfferingName(), broker.FirstServicePlanName(), serviceInstanceName, "-t", tags)).Should(Exit(0))
 
 				username, _ = helpers.GetCredentials()
 			})
 
 			AfterEach(func() {
 				Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-				broker.Destroy()
+				broker.Forget()
 			})
 
 			When("updating to a service plan that does not exist", func() {
 				It("displays an informative error message, exits 1", func() {
 					session := helpers.CF("update-service", serviceInstanceName, "-p", "non-existing-service-plan")
-					Eventually(session).Should(Say("Plan does not exist for the %s service", broker.ServiceName()))
 					Eventually(session).Should(Exit(1))
+
+					Expect(session).Should(Say("Plan does not exist for the %s service", broker.FirstServiceOfferingName()))
 				})
 			})
 
 			When("updating to the same service plan (no-op)", func() {
 				It("displays an informative success message, exits 0", func() {
-					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.ServicePlanName())
-					Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("No changes were made"))
+					session := helpers.CF("update-service", serviceInstanceName, "-p", broker.FirstServicePlanName())
+
 					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
+
+					Expect(session).Should(Say("OK"))
+					Expect(session).Should(Say("No changes were made"))
 				})
 			})
 
@@ -174,11 +185,14 @@ var _ = Describe("update-service command", func() {
 
 						It("does not proceed", func() {
 							session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
-							Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
-							Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
-							Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
-							Eventually(session).Should(Say("Update cancelled"))
+
 							Eventually(session).Should(Exit(0))
+
+							Expect(session).Should(Say("You are about to update %s", serviceInstanceName))
+							Expect(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+							Expect(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+							Expect(session).Should(Say("Update cancelled"))
+							Expect(session).Should(Exit(0))
 						})
 					})
 
@@ -188,21 +202,37 @@ var _ = Describe("update-service command", func() {
 							Expect(err).ToNot(HaveOccurred())
 						})
 
+						When("updating a parameter", func() {
+							It("updates the service without removing the tags", func() {
+								session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "-c", "{\"tls\": true}")
+
+								Eventually(session).Should(Exit(0))
+
+								Expect(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
+
+								session = helpers.CF("service", serviceInstanceName)
+
+								Eventually(session).Should(Exit(0))
+								Expect(session).Should(Say("a tag"))
+							})
+						})
+
 						When("upgrade is available", func() {
 							BeforeEach(func() {
-								broker.Services[0].Plans[0].MaintenanceInfo.Version = "9.1.2"
-								broker.Update()
+								broker.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "9.1.2"}
+								broker.Configure().Register()
 							})
 
 							It("updates the service", func() {
-								session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
 
+								session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
 								By("displaying an informative message")
-								Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
-								Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
-								Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
-								Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 								Eventually(session).Should(Exit(0))
+
+								Expect(session).Should(Say("You are about to update %s", serviceInstanceName))
+								Expect(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+								Expect(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+								Expect(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 
 								By("requesting an upgrade from the platform")
 								session = helpers.CF("service", serviceInstanceName)
@@ -214,29 +244,30 @@ var _ = Describe("update-service command", func() {
 							It("does not update the service and outputs informative message", func() {
 								session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade")
 
-								Eventually(session).Should(Say("You are about to update %s", serviceInstanceName))
-								Eventually(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
-								Eventually(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
-								Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
-								Eventually(session.Err).Should(Say("No upgrade is available."))
-								Eventually(session.Err).Should(Say("TIP: To find out if upgrade is available run `cf service %s`.", serviceInstanceName))
 								Eventually(session).Should(Exit(1))
+
+								Expect(session).Should(Say("You are about to update %s", serviceInstanceName))
+								Expect(session).Should(Say("Warning: This operation may be long running and will block further operations on the service until complete."))
+								Expect(session).Should(Say("Really update service %s\\? \\[yN\\]:", serviceInstanceName))
+								Expect(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
+								Expect(session.Err).Should(Say("No upgrade is available."))
+								Expect(session.Err).Should(Say("TIP: To find out if upgrade is available run `cf service %s`.", serviceInstanceName))
 							})
 						})
 					})
 
 					When("providing --force argument and upgrade is available", func() {
 						BeforeEach(func() {
-							broker.Services[0].Plans[0].MaintenanceInfo.Version = "9.1.2"
-							broker.Update()
+							broker.Services[0].Plans[0].MaintenanceInfo = &config.MaintenanceInfo{Version: "9.1.2"}
+							broker.Configure().Register()
 						})
 
 						It("updates the service without prompting", func() {
 							session := helpers.CFWithStdin(buffer, "update-service", serviceInstanceName, "--upgrade", "--force")
 
 							By("displaying an informative message")
-							Eventually(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 							Eventually(session).Should(Exit(0))
+							Expect(session).Should(Say("Updating service instance %s as %s...", serviceInstanceName, username))
 
 							By("requesting an upgrade from the platform")
 							session = helpers.CF("service", serviceInstanceName)

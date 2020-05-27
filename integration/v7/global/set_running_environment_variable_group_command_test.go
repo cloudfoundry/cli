@@ -41,7 +41,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`cf set-running-environment-variable-group '{"name":"value","name":"value"}'`))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("set-env, staging-environment-variable-group"))
+				Eventually(session).Should(Say("running-environment-variable-group, set-env"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

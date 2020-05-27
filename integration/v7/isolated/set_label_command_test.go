@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"code.cloudfoundry.org/cli/integration/helpers/fakeservicebroker"
+	"code.cloudfoundry.org/cli/integration/helpers/servicebrokerstub"
 
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -293,6 +293,39 @@ var _ = Describe("set-label command", func() {
 			It("has the expected shared behaviors", func() {
 				// The Domain is checked first, hence why the error message says 'Domain' and not 'Route'
 				testExpectedBehaviors("route", "Domain", routeName)
+			})
+
+			When("the route contains a port", func() {
+				var tcpDomain helpers.Domain
+
+				BeforeEach(func() {
+					tcpDomainName := helpers.NewDomainName()
+					tcpDomain = helpers.NewDomain(orgName, tcpDomainName)
+					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(0))
+
+					Eventually(helpers.CF("create-route", tcpDomainName, "--port", "1028")).Should(Exit(0))
+					Eventually(helpers.CF("create-route", tcpDomainName, "--port", "1029")).Should(Exit(0))
+					routeName = tcpDomainName + ":1028"
+				})
+
+				AfterEach(func() {
+					tcpDomain.DeleteShared()
+				})
+
+				It("sets the specified labels on the route", func() {
+					session := helpers.CF("set-label", "route", routeName, "some-key=some-value", "some-other-key=some-other-value")
+
+					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for route %s in org %s / space %s as %s...`), routeName, orgName, spaceName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					helpers.CheckExpectedLabels("/v3/routes?ports=1028", true, helpers.MetadataLabels{
+						"some-key":       "some-value",
+						"some-other-key": "some-other-value",
+					})
+
+					helpers.CheckExpectedLabels("/v3/routes?ports=1029", true, helpers.MetadataLabels{})
+				})
 			})
 
 			When("the route is unknown", func() {
@@ -598,31 +631,31 @@ var _ = Describe("set-label command", func() {
 		})
 
 		When("assigning label to service-broker", func() {
-			var broker *fakeservicebroker.FakeServiceBroker
+			var broker *servicebrokerstub.ServiceBrokerStub
 
 			BeforeEach(func() {
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("has the expected shared behaviors", func() {
-				testExpectedBehaviors("service-broker", "Service broker", broker.Name())
+				testExpectedBehaviors("service-broker", "Service broker", broker.Name)
 			})
 
 			It("sets the specified labels on the service-broker", func() {
-				session := helpers.CF("set-label", "service-broker", broker.Name(), "some-key=some-value", "some-other-key=some-other-value")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s as %s...`), broker.Name(), username))
+				session := helpers.CF("set-label", "service-broker", broker.Name, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-broker %s as %s...`), broker.Name, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
+				helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name), true, helpers.MetadataLabels{
 					"some-key":       "some-value",
 					"some-other-key": "some-other-value",
 				})
@@ -630,10 +663,10 @@ var _ = Describe("set-label command", func() {
 
 			When("more than one value is provided for the same key", func() {
 				It("uses the last value", func() {
-					session := helpers.CF("set-label", "service-broker", broker.Name(), "owner=sue", "owner=beth")
+					session := helpers.CF("set-label", "service-broker", broker.Name, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
+					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name), true, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -642,7 +675,7 @@ var _ = Describe("set-label command", func() {
 
 		When("assigning label to service-offering", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				serviceOfferingName string
 			)
 
@@ -650,13 +683,13 @@ var _ = Describe("set-label command", func() {
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 				serviceOfferingName = broker.Services[0].Name
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("has the expected shared behaviors", func() {
@@ -677,10 +710,10 @@ var _ = Describe("set-label command", func() {
 
 			When("more than one value is provided for the same key", func() {
 				It("uses the last value", func() {
-					session := helpers.CF("set-label", "service-broker", broker.Name(), "owner=sue", "owner=beth")
+					session := helpers.CF("set-label", "service-broker", broker.Name, "owner=sue", "owner=beth")
 					Eventually(session).Should(Exit(0))
 
-					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name()), true, helpers.MetadataLabels{
+					helpers.CheckExpectedLabels(fmt.Sprintf("/v3/service_brokers?names=%s", broker.Name), true, helpers.MetadataLabels{
 						"owner": "beth",
 					})
 				})
@@ -688,8 +721,8 @@ var _ = Describe("set-label command", func() {
 
 			When("the service broker name is specified as part of the command", func() {
 				It("sets the specified labels", func() {
-					session := helpers.CF("set-label", "-b", broker.Name(), "service-offering", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
-					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s from service broker %s as %s...`), serviceOfferingName, broker.Name(), username))
+					session := helpers.CF("set-label", "-b", broker.Name, "service-offering", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
+					Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-offering %s from service broker %s as %s...`), serviceOfferingName, broker.Name, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
@@ -703,7 +736,7 @@ var _ = Describe("set-label command", func() {
 
 		When("assigning label to service-plan", func() {
 			var (
-				broker              *fakeservicebroker.FakeServiceBroker
+				broker              *servicebrokerstub.ServiceBrokerStub
 				servicePlanName     string
 				serviceOfferingName string
 			)
@@ -712,14 +745,14 @@ var _ = Describe("set-label command", func() {
 				orgName = helpers.NewOrgName()
 				spaceName = helpers.NewSpaceName()
 				helpers.SetupCF(orgName, spaceName)
-				broker = fakeservicebroker.New().EnsureBrokerIsAvailable()
+				broker = servicebrokerstub.Register()
 				servicePlanName = broker.Services[0].Plans[0].Name
 				serviceOfferingName = broker.Services[0].Name
 			})
 
 			AfterEach(func() {
-				broker.Destroy()
 				helpers.QuickDeleteOrg(orgName)
+				broker.Forget()
 			})
 
 			It("has the expected shared behaviors", func() {
@@ -727,8 +760,8 @@ var _ = Describe("set-label command", func() {
 			})
 
 			It("sets the specified labels", func() {
-				session := helpers.CF("set-label", "service-plan", servicePlanName, "-b", broker.Name(), "-e", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s from service offering %s / service broker %s as %s...`), servicePlanName, serviceOfferingName, broker.Name(), username))
+				session := helpers.CF("set-label", "service-plan", servicePlanName, "-b", broker.Name, "-e", serviceOfferingName, "some-key=some-value", "some-other-key=some-other-value")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for service-plan %s from service offering %s / service broker %s as %s...`), servicePlanName, serviceOfferingName, broker.Name, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 

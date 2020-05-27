@@ -14,10 +14,10 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
-	"code.cloudfoundry.org/clock"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 )
@@ -42,7 +42,8 @@ type PushActor interface {
 //go:generate counterfeiter . V7ActorForPush
 
 type V7ActorForPush interface {
-	AppActor
+	GetApplicationByNameAndSpace(name string, spaceGUID string) (resources.Application, v7action.Warnings, error)
+	GetDetailedAppSummary(appName string, spaceGUID string, withObfuscatedValues bool) (v7action.DetailedApplicationSummary, v7action.Warnings, error)
 	SetSpaceManifest(spaceGUID string, rawManifest []byte) (v7action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) (<-chan sharedaction.LogMessage, <-chan error, context.CancelFunc, v7action.Warnings, error)
 	RestartApplication(appGUID string, noWait bool) (v7action.Warnings, error)
@@ -62,6 +63,8 @@ type ManifestLocator interface {
 }
 
 type PushCommand struct {
+	BaseCommand
+
 	OptionalArgs            flag.OptionalAppName                `positional-args:"yes"`
 	HealthCheckTimeout      flag.PositiveInteger                `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	Buildpacks              []string                            `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
@@ -77,7 +80,7 @@ type PushCommand struct {
 	NoManifest              bool                                `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute                 bool                                `long:"no-route" description:"Do not map a route to this app"`
 	NoStart                 bool                                `long:"no-start" description:"Do not stage and start the app after pushing"`
-	NoWait                  bool                                `long:"no-wait" description:"Do not wait for the long-running operation to complete; push exits when one instance of the web process is healthy"`
+	NoWait                  bool                                `long:"no-wait" description:"Exit when the first instance of the web process is healthy"`
 	AppPath                 flag.PathWithExistenceCheck         `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	RandomRoute             bool                                `long:"random-route" description:"Create a random route for this app (except when no-route is specified in the manifest)"`
 	Stack                   string                              `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
@@ -91,12 +94,9 @@ type PushCommand struct {
 	envCFStagingTimeout     interface{}                         `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	Config          command.Config
-	UI              command.UI
 	LogCacheClient  sharedaction.LogCacheClient
-	Actor           PushActor
+	PushActor       PushActor
 	VersionActor    V7ActorForPush
-	SharedActor     command.SharedActor
 	ProgressBar     ProgressBar
 	CWD             string
 	ManifestLocator ManifestLocator
@@ -106,23 +106,20 @@ type PushCommand struct {
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
-	cmd.UI = ui
-	cmd.ProgressBar = progressbar.NewProgressBar()
-
-	sharedActor := sharedaction.NewActor(config)
-	cmd.SharedActor = sharedActor
-
-	ccClient, uaaClient, err := shared.GetNewClientsAndConnectToCF(config, ui, "")
+	err := cmd.BaseCommand.Setup(config, ui)
 	if err != nil {
 		return err
 	}
 
-	v7actor := v7action.NewActor(ccClient, config, sharedActor, uaaClient, clock.NewClock())
-	cmd.VersionActor = v7actor
-	cmd.Actor = v7pushaction.NewActor(v7actor, sharedActor)
+	cmd.ProgressBar = progressbar.NewProgressBar()
+	cmd.VersionActor = cmd.Actor
+	cmd.PushActor = v7pushaction.NewActor(cmd.Actor, sharedaction.NewActor(config))
 
-	cmd.LogCacheClient = command.NewLogCacheClient(ccClient.Info.LogCache(), config, ui)
+	logCacheEndpoint, _, err := cmd.Actor.GetLogCacheEndpoint()
+	if err != nil {
+		return err
+	}
+	cmd.LogCacheClient = command.NewLogCacheClient(logCacheEndpoint, config, ui)
 
 	currentDir, err := os.Getwd()
 	cmd.CWD = currentDir
@@ -160,7 +157,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	transformedManifest, err := cmd.Actor.HandleFlagOverrides(baseManifest, flagOverrides)
+	transformedManifest, err := cmd.PushActor.HandleFlagOverrides(baseManifest, flagOverrides)
 	if err != nil {
 		return err
 	}
@@ -198,7 +195,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("Manifest applied")
 	}
 
-	pushPlans, warnings, err := cmd.Actor.CreatePushPlans(
+	pushPlans, warnings, err := cmd.PushActor.CreatePushPlans(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
 		transformedManifest,
@@ -218,7 +215,7 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	for _, plan := range pushPlans {
 		log.WithField("app_name", plan.Application.Name).Info("actualizing")
-		eventStream := cmd.Actor.Actualize(plan, cmd.ProgressBar)
+		eventStream := cmd.PushActor.Actualize(plan, cmd.ProgressBar)
 		err := cmd.eventStreamHandler(eventStream)
 
 		if cmd.shouldDisplaySummary(err) {
@@ -570,6 +567,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 				"AppName": appName,
 			},
 		)
+		cmd.UI.DisplayNewline()
 	case v7pushaction.StartingDeployment:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayTextWithFlavor(
@@ -580,6 +578,7 @@ func (cmd *PushCommand) processEvent(event v7pushaction.Event, appName string) e
 		)
 	case v7pushaction.WaitingForDeployment:
 		cmd.UI.DisplayText("Waiting for app to deploy...")
+		cmd.UI.DisplayNewline()
 	default:
 		log.WithField("event", event).Debug("ignoring event")
 	}

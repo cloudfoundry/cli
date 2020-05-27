@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/resources"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -23,7 +24,7 @@ var _ = Describe("set-health-check Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSetHealthCheckActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -34,7 +35,7 @@ var _ = Describe("set-health-check Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetHealthCheckActor)
+		fakeActor = new(v7fakes.FakeActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -47,10 +48,12 @@ var _ = Describe("set-health-check Command", func() {
 			ProcessType:       "some-process-type",
 			InvocationTimeout: flag.PositiveInteger{Value: 42},
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -102,7 +105,7 @@ var _ = Describe("set-health-check Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(v7action.Application{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(resources.Application{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -118,7 +121,7 @@ var _ = Describe("set-health-check Command", func() {
 	When("application is started", func() {
 		BeforeEach(func() {
 			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(
-				v7action.Application{
+				resources.Application{
 					State: constant.ApplicationStarted,
 				},
 				v7action.Warnings{"warning-1", "warning-2"},
@@ -148,7 +151,7 @@ var _ = Describe("set-health-check Command", func() {
 	When("app is not started", func() {
 		BeforeEach(func() {
 			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(
-				v7action.Application{
+				resources.Application{
 					State: constant.ApplicationStopped,
 				},
 				v7action.Warnings{"warning-1", "warning-2"},

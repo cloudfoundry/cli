@@ -105,8 +105,13 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 }
 
 func handleBadRequest(errorResponse ccerror.V3Error, _ *cloudcontroller.Request) error {
-	// Currently the CF-BadQueryParameter is the only 400 BadRequest error returned from v3
-	return ccerror.BadRequestError{Message: errorResponse.Detail}
+	switch errorResponse.Detail {
+	case "Bad request: Cannot stage package whose state is not ready.":
+		return ccerror.InvalidStateError{}
+	default:
+		return ccerror.BadRequestError{Message: errorResponse.Detail}
+
+	}
 }
 
 func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Request) error {
@@ -166,6 +171,9 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 		return ccerror.QuotaAlreadyExists{Message: err.Message}
 	case securityGroupExistsRegexp.MatchString(errorString):
 		return ccerror.SecurityGroupAlreadyExists{Message: err.Message}
+	case strings.Contains(errorString,
+		"Ensure the space is bound to this security group."):
+		return ccerror.SecurityGroupNotBound{Message: err.Message}
 	default:
 		return err
 	}

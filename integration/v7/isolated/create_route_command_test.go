@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -24,18 +26,23 @@ var _ = Describe("create-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`Create an HTTP route:\n`))
 			Eventually(session).Should(Say(`cf create-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\]\n`))
+			Eventually(session).Should(Say(`Create a TCP route:\n`))
+			Eventually(session).Should(Say(`cf create-route DOMAIN \[--port PORT\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf create-route example.com\s+# example.com`))
 			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp\s+# myapp.example.com`))
 			Eventually(session).Should(Say(`cf create-route example.com --hostname myapp --path foo\s+# myapp.example.com/foo`))
+			Eventually(session).Should(Say(`cf create-route example.com --port 5000\s+# example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname for the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path for the HTTP route`))
+			Eventually(session).Should(Say(`--port\s+Port for the TCP route \(default: random port\)`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -160,7 +167,7 @@ var _ = Describe("create-route command", func() {
 					})
 				})
 
-				When("the domain is shared", func() {
+				When("the domain is a shared HTTP domain", func() {
 					var domain helpers.Domain
 
 					BeforeEach(func() {
@@ -199,6 +206,39 @@ var _ = Describe("create-route command", func() {
 							session := helpers.CF("create-route", domainName, "-n", hostname, "--path", path)
 							Eventually(session).Should(Say(`Creating route %s\.%s\/%s for org %s / space %s as %s\.\.\.`, hostname, domainName, path, orgName, spaceName, userName))
 							Eventually(session).Should(Say(`Route %s\.%s\/%s has been created\.`, hostname, domainName, path))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				When("the domain is a shared TCP domain", func() {
+					var (
+						domain      helpers.Domain
+						routerGroup helpers.RouterGroup
+					)
+
+					BeforeEach(func() {
+						domain = helpers.NewDomain("", domainName)
+						routerGroup = helpers.NewRouterGroup(
+							helpers.NewRouterGroupName(),
+							"1024-2048",
+						)
+
+						routerGroup.Create()
+						domain.CreateWithRouterGroup(routerGroup.Name)
+					})
+
+					AfterEach(func() {
+						domain.DeleteShared()
+						routerGroup.Delete()
+					})
+
+					When("passing in a port", func() {
+						It("creates the route with the port", func() {
+							port := 1029
+							session := helpers.CF("create-route", domainName, "--port", fmt.Sprintf("%d", port))
+							Eventually(session).Should(Say(`Creating route %s:%d for org %s / space %s as %s\.\.\.`, domainName, port, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Route %s:%d has been created\.`, domainName, port))
 							Eventually(session).Should(Exit(0))
 						})
 					})

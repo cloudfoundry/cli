@@ -22,7 +22,7 @@ var _ = Describe("set-space-quota Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v7fakes.FakeSetSpaceQuotaActor
+		fakeActor       *v7fakes.FakeActor
 		binaryName      string
 		executeErr      error
 		input           *Buffer
@@ -43,7 +43,7 @@ var _ = Describe("set-space-quota Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v7fakes.FakeSetSpaceQuotaActor)
+		fakeActor = new(v7fakes.FakeActor)
 		getSpaceWarning = RandomString("get-space-warning")
 		applyQuotaWarning = RandomString("apply-quota-warning")
 
@@ -52,10 +52,12 @@ var _ = Describe("set-space-quota Command", func() {
 		spaceQuotaName = RandomString("space-quota-name")
 
 		cmd = SetSpaceQuotaCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			BaseCommand: BaseCommand{
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+				Actor:       fakeActor,
+			},
 			RequiredArgs: flag.SetSpaceQuotaArgs{
 				Space:      spaceName,
 				SpaceQuota: spaceQuotaName,

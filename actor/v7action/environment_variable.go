@@ -71,7 +71,7 @@ func (actor *Actor) SetEnvironmentVariableGroup(group constant.EnvironmentVariab
 
 	for k := range existingEnvVars {
 		if _, ok := newEnvVars[k]; !ok {
-			newEnvVars[k] = types.FilteredString{Value: "", IsSet: false}
+			newEnvVars[k] = types.FilteredString{IsSet: false}
 		}
 	}
 

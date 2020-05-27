@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -21,7 +22,7 @@ var _ = Describe("instance actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil, nil, nil)
 	})
 
 	Describe("Instance", func() {
@@ -48,7 +49,7 @@ var _ = Describe("instance actions", func() {
 
 		When("getting the application returns an error", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, ccv3.Warnings{"some-get-app-warning"}, errors.New("some-get-app-error"))
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{}, ccv3.Warnings{"some-get-app-warning"}, errors.New("some-get-app-error"))
 			})
 
 			It("returns all warnings and the error", func() {
@@ -59,7 +60,7 @@ var _ = Describe("instance actions", func() {
 
 		When("getting the application succeeds", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: "some-app-guid"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{GUID: "some-app-guid"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
 			})
 
 			When("deleting the instance returns ProcessNotFoundError", func() {
