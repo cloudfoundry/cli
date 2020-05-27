@@ -1,5 +1,3 @@
-// +build V7
-
 package ui_test
 
 import (
