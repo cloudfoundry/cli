@@ -44,7 +44,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 
 		if !response {
 			cmd.UI.DisplayText("'{{.URL}}' has not been deleted.", map[string]interface{}{
-			"URL": url,
+				"URL": url,
 			})
 			return nil
 		}
