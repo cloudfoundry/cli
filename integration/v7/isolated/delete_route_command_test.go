@@ -27,19 +27,21 @@ var _ = Describe("delete-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`cf delete-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[-f\]\n`))
+			Eventually(session).Should(Say(`cf delete-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--port PORT\] \[-f\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
 			Eventually(session).Should(Say(`cf delete-route example.com\s+# example.com`))
 			Eventually(session).Should(Say(`cf delete-route example.com --hostname myhost\s+# myhost.example.com`))
 			Eventually(session).Should(Say(`cf delete-route example.com --hostname myhost --path foo\s+# myhost.example.com/foo`))
+			Eventually(session).Should(Say(`cf delete-route example.com --port 5000\s+# example.com:5000`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`-f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route \(required for shared domains\)`))
 			Eventually(session).Should(Say(`--path\s+Path used to identify the HTTP route`))
+			Eventually(session).Should(Say(`--port\s+Port used to identify the TCP route`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`SEE ALSO:`))
@@ -363,6 +365,34 @@ var _ = Describe("delete-route command", func() {
 							Eventually(session).Should(Exit(0))
 
 							Expect(string(session.Out.Contents())).NotTo(ContainSubstring("Unable to delete"))
+						})
+					})
+
+					When("The the route has a port", func() {
+						var tcpDomain helpers.Domain
+						var port string
+
+						BeforeEach(func() {
+							port = "1026"
+							tcpDomainName := helpers.NewDomainName()
+							tcpDomain = helpers.NewDomain(orgName, tcpDomainName)
+							tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(0))
+
+							Eventually(helpers.CF("create-route", tcpDomainName, "--port", port)).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							tcpDomain.DeleteShared()
+						})
+
+						It("deletes the route with the port", func() {
+							session := helpers.CF("delete-route", tcpDomain.Name, "--port", port, "-f")
+							Eventually(session).Should(Say(`Deleting route %s:%s\.\.\.`, tcpDomain.Name, port))
+							Eventually(session).Should(Say(`OK`))
+							Eventually(session).Should(Exit(0))
+							session = helpers.CF("routes")
+							Consistently(session).ShouldNot(Say(`%s`, tcpDomain.Name))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})

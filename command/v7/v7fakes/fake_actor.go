@@ -619,12 +619,13 @@ type FakeActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	DeleteRouteStub        func(string, string, string) (v7action.Warnings, error)
+	DeleteRouteStub        func(string, string, string, int) (v7action.Warnings, error)
 	deleteRouteMutex       sync.RWMutex
 	deleteRouteArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 int
 	}
 	deleteRouteReturns struct {
 		result1 v7action.Warnings
@@ -5636,18 +5637,19 @@ func (fake *FakeActor) DeleteOrphanedRoutesReturnsOnCall(i int, result1 v7action
 	}{result1, result2}
 }
 
-func (fake *FakeActor) DeleteRoute(arg1 string, arg2 string, arg3 string) (v7action.Warnings, error) {
+func (fake *FakeActor) DeleteRoute(arg1 string, arg2 string, arg3 string, arg4 int) (v7action.Warnings, error) {
 	fake.deleteRouteMutex.Lock()
 	ret, specificReturn := fake.deleteRouteReturnsOnCall[len(fake.deleteRouteArgsForCall)]
 	fake.deleteRouteArgsForCall = append(fake.deleteRouteArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("DeleteRoute", []interface{}{arg1, arg2, arg3})
+		arg4 int
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("DeleteRoute", []interface{}{arg1, arg2, arg3, arg4})
 	fake.deleteRouteMutex.Unlock()
 	if fake.DeleteRouteStub != nil {
-		return fake.DeleteRouteStub(arg1, arg2, arg3)
+		return fake.DeleteRouteStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -5662,17 +5664,17 @@ func (fake *FakeActor) DeleteRouteCallCount() int {
 	return len(fake.deleteRouteArgsForCall)
 }
 
-func (fake *FakeActor) DeleteRouteCalls(stub func(string, string, string) (v7action.Warnings, error)) {
+func (fake *FakeActor) DeleteRouteCalls(stub func(string, string, string, int) (v7action.Warnings, error)) {
 	fake.deleteRouteMutex.Lock()
 	defer fake.deleteRouteMutex.Unlock()
 	fake.DeleteRouteStub = stub
 }
 
-func (fake *FakeActor) DeleteRouteArgsForCall(i int) (string, string, string) {
+func (fake *FakeActor) DeleteRouteArgsForCall(i int) (string, string, string, int) {
 	fake.deleteRouteMutex.RLock()
 	defer fake.deleteRouteMutex.RUnlock()
 	argsForCall := fake.deleteRouteArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeActor) DeleteRouteReturns(result1 v7action.Warnings, result2 error) {

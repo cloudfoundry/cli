@@ -30,6 +30,7 @@ var _ = Describe("delete-route Command", func() {
 		domain          string
 		hostname        string
 		path            string
+		port            int
 	)
 
 	BeforeEach(func() {
@@ -44,11 +45,13 @@ var _ = Describe("delete-route Command", func() {
 		domain = "some-domain.com"
 		hostname = "host"
 		path = "/path"
+		port = 1234
 
 		cmd = DeleteRouteCommand{
 			RequiredArgs: flag.Domain{Domain: domain},
 			Hostname:     hostname,
 			Path:         flag.V7RoutePath{Path: path},
+			Port:         port,
 			BaseCommand: BaseCommand{UI: testUI,
 				Config:      fakeConfig,
 				SharedActor: fakeSharedActor,
@@ -110,17 +113,18 @@ var _ = Describe("delete-route Command", func() {
 			})
 
 			It("delegates to the Actor", func() {
-				actualDomainName, actualHostname, actualPath := fakeActor.DeleteRouteArgsForCall(0)
+				actualDomainName, actualHostname, actualPath, actualPort := fakeActor.DeleteRouteArgsForCall(0)
 				Expect(actualDomainName).To(Equal(domain))
 				Expect(actualHostname).To(Equal(hostname))
 				Expect(actualPath).To(Equal(path))
+				Expect(actualPort).To(Equal(port))
 			})
 
 			It("deletes the route", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Deleting route %s.%s%s\.\.\.`, hostname, domain, path))
+				Expect(testUI.Out).To(Say(`Deleting route %s.%s%s:%d\.\.\.`, hostname, domain, path, port))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).NotTo(Say("Route 'some-domain' does not exist"))
 			})
@@ -135,7 +139,7 @@ var _ = Describe("delete-route Command", func() {
 			It("cancels the delete", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("'%s.%s%s' has not been deleted.", hostname, domain, path))
+				Expect(testUI.Out).To(Say("'%s.%s%s:%d' has not been deleted.", hostname, domain, path, port))
 				Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
 			})
 		})
@@ -149,7 +153,7 @@ var _ = Describe("delete-route Command", func() {
 			It("cancels the delete", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("'%s.%s%s' has not been deleted.", hostname, domain, path))
+				Expect(testUI.Out).To(Say("'%s.%s%s:%d' has not been deleted.", hostname, domain, path, port))
 				Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
 			})
 		})
@@ -163,9 +167,9 @@ var _ = Describe("delete-route Command", func() {
 			It("asks the user again", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(testUI.Out).To(Say(`Really delete the route host.some-domain\.com/path\? \[yN\]`))
+				Expect(testUI.Out).To(Say(`Really delete the route host.some-domain\.com/path:1234\? \[yN\]`))
 				Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
-				Expect(testUI.Out).To(Say(`Really delete the route host.some-domain\.com/path\? \[yN\]`))
+				Expect(testUI.Out).To(Say(`Really delete the route host.some-domain\.com/path:1234\? \[yN\]`))
 
 				Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
 			})
@@ -185,7 +189,7 @@ var _ = Describe("delete-route Command", func() {
 
 				It("displays all warnings, and returns the error", func() {
 					Expect(testUI.Err).To(Say("some-warning"))
-					Expect(testUI.Out).To(Say(`Deleting route host.some-domain.com\/path\.\.\.`))
+					Expect(testUI.Out).To(Say(`Deleting route host.some-domain.com\/path:1234\.\.\.`))
 					Expect(testUI.Out).ToNot(Say("OK"))
 					Expect(executeErr).To(MatchError("some-error"))
 				})
@@ -207,7 +211,7 @@ var _ = Describe("delete-route Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Deleting route %s.%s%s\.\.\.`, hostname, domain, path))
+				Expect(testUI.Out).To(Say(`Deleting route %s.%s%s:%d\.\.\.`, hostname, domain, path, port))
 				Expect(testUI.Out).To(Say(`Unable to delete\. Route with host '%s', domain '%s', and path '%s' not found.`, hostname, domain, path))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -222,7 +226,7 @@ var _ = Describe("delete-route Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say(`Deleting route %s\.%s%s\.\.\.`, hostname, domain, path))
+				Expect(testUI.Out).To(Say(`Deleting route %s\.%s%s:%d\.\.\.`, hostname, domain, path, port))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
