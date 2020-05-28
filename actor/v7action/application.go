@@ -43,13 +43,17 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name, spaceGUID string, delet
 		}
 	}
 
-	jobURL, deleteAppWarnings, err := actor.CloudControllerClient.DeleteApplication(app.GUID)
+	appDeleteJobURL, deleteAppWarnings, err := actor.CloudControllerClient.DeleteApplication(app.GUID)
 	allWarnings = append(allWarnings, deleteAppWarnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	jobQueue = append(jobQueue, jobURL)
+	pollWarnings, err := actor.CloudControllerClient.PollJob(appDeleteJobURL)
+	allWarnings = append(allWarnings, pollWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
 
 	if deleteRoutes {
 		for _, route := range routes {
