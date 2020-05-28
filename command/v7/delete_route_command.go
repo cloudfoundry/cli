@@ -9,10 +9,11 @@ type DeleteRouteCommand struct {
 	BaseCommand
 
 	RequiredArgs    flag.Domain      `positional-args:"yes"`
-	usage           interface{}      `usage:"CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\n\nEXAMPLES:\n   CF_NAME delete-route example.com                             # example.com\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo"`
+	usage           interface{}      `usage:"CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [--port PORT] [-f]\n\nEXAMPLES:\n   CF_NAME delete-route example.com                             # example.com\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo    cf delete-route example.com --port 5000                  # example.com:5000"`
 	Force           bool             `short:"f" description:"Force deletion without confirmation"`
 	Hostname        string           `long:"hostname" short:"n" description:"Hostname used to identify the HTTP route (required for shared domains)"`
 	Path            flag.V7RoutePath `long:"path" description:"Path used to identify the HTTP route"`
+	Port            int              `long:"port" description:"Port used to identify the TCP route"`
 	relatedCommands interface{}      `related_commands:"delete-orphaned-routes, routes, unmap-route"`
 }
 
@@ -27,10 +28,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	domain := cmd.RequiredArgs.Domain
-	hostname := cmd.Hostname
-	pathName := cmd.Path.Path
-	url := desiredURL(domain, hostname, pathName, 0)
+	url := desiredURL(cmd.RequiredArgs.Domain, cmd.Hostname, cmd.Path.Path, cmd.Port)
 
 	cmd.UI.DisplayText("This action impacts all apps using this route.")
 	cmd.UI.DisplayText("Deleting this route will make apps unreachable via this route.")
@@ -46,7 +44,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 
 		if !response {
 			cmd.UI.DisplayText("'{{.URL}}' has not been deleted.", map[string]interface{}{
-				"URL": url,
+			"URL": url,
 			})
 			return nil
 		}
@@ -57,7 +55,7 @@ func (cmd DeleteRouteCommand) Execute(args []string) error {
 			"URL": url,
 		})
 
-	warnings, err := cmd.Actor.DeleteRoute(domain, hostname, pathName)
+	warnings, err := cmd.Actor.DeleteRoute(cmd.RequiredArgs.Domain, cmd.Hostname, cmd.Path.Path, cmd.Port)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

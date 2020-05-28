@@ -292,7 +292,7 @@ func (actor Actor) DeleteOrphanedRoutes(spaceGUID string) (Warnings, error) {
 	return allWarnings, err
 }
 
-func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, error) {
+func (actor Actor) DeleteRoute(domainName, hostname, path string, port int) (Warnings, error) {
 	allWarnings := Warnings{}
 	domain, warnings, err := actor.GetDomainByName(domainName)
 	allWarnings = append(allWarnings, warnings...)
@@ -306,30 +306,15 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 		return allWarnings, err
 	}
 
-	queryArray := []ccv3.Query{
-		{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
-		{Key: ccv3.HostsFilter, Values: []string{hostname}},
-		{Key: ccv3.PathsFilter, Values: []string{path}},
-	}
+	route, actorWarnings, err := actor.GetRouteByAttributes(domainName, domain.GUID, hostname, path, port)
 
-	routes, apiWarnings, err := actor.CloudControllerClient.GetRoutes(queryArray...)
-
-	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
 
 	if err != nil {
 		return allWarnings, err
 	}
 
-	if len(routes) == 0 {
-		return allWarnings, actionerror.RouteNotFoundError{
-			DomainName: domainName,
-			Host:       hostname,
-			Path:       path,
-		}
-	}
-
-	jobURL, apiWarnings, err := actor.CloudControllerClient.DeleteRoute(routes[0].GUID)
+	jobURL, apiWarnings, err := actor.CloudControllerClient.DeleteRoute(route.GUID)
 	actorWarnings = Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
 
