@@ -1030,6 +1030,7 @@ var _ = Describe("Route Actions", func() {
 			executeErr error
 			warnings   Warnings
 			route      resources.Route
+			domain     resources.Domain
 		)
 
 		BeforeEach(func() {
@@ -1039,11 +1040,16 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			route, warnings, executeErr = actor.GetRouteByAttributes(domainName, domainGUID, hostname, path, port)
+			route, warnings, executeErr = actor.GetRouteByAttributes(domain, hostname, path, port)
 		})
 
 		When("dealing with HTTP routes", func() {
 			BeforeEach(func() {
+				domain = resources.Domain{
+					Name:      domainName,
+					GUID:      domainGUID,
+					Protocols: []string{"http"},
+				}
 				hostname = "hostname"
 				path = "/path"
 			})
@@ -1122,9 +1128,24 @@ var _ = Describe("Route Actions", func() {
 
 		When("dealing with TCP routes", func() {
 			BeforeEach(func() {
+				domain = resources.Domain{
+					Name:      domainName,
+					GUID:      domainGUID,
+					Protocols: []string{"tcp"},
+				}
 				port = 1028
 			})
 
+			When("no port is provided", func() {
+				BeforeEach(func() {
+					port = 0
+				})
+
+				It("returns and empty route, warnings, and an explicit error", func() {
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(0))
+					Expect(executeErr).To(MatchError(actionerror.TCPLookupWithoutPort{}))
+				})
+			})
 			When("The cc client errors", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRoutesReturns(nil, ccv3.Warnings{"get-routes-warning"}, errors.New("scooby"))

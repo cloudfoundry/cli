@@ -343,21 +343,25 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string) (Warnings, err
 	return allWarnings, err
 }
 
-func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string, port int) (resources.Route, Warnings, error) {
+func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string, path string, port int) (resources.Route, Warnings, error) {
 	var (
 		routes     []resources.Route
 		ccWarnings ccv3.Warnings
 		err        error
 	)
 
+	if domain.HasProtocolType("tcp") && port == 0 {
+		return resources.Route{}, Warnings(ccWarnings), actionerror.TCPLookupWithoutPort{}
+	}
+
 	if port != 0 {
 		routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
-			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
 			ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
 		)
 	} else {
 		routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
-			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
+			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
 			ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
 			ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
 		)
@@ -369,8 +373,8 @@ func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, ho
 
 	if len(routes) < 1 {
 		return resources.Route{}, Warnings(ccWarnings), actionerror.RouteNotFoundError{
-			DomainName: domainName,
-			DomainGUID: domainGUID,
+			DomainName: domain.Name,
+			DomainGUID: domain.GUID,
 			Host:       hostname,
 			Path:       path,
 			Port:       port,

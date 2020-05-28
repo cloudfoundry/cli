@@ -57,3 +57,14 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 func (d Domain) Shared() bool {
 	return d.OrganizationGUID == ""
 }
+
+func (d *Domain) HasProtocolType(protocolType string) bool{
+	for _, p := range d.Protocols {
+			if p == protocolType {
+					return true
+			}
+	}
+	return false
+}
+
+
