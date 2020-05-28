@@ -57,9 +57,10 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		When("looking up the app guid succeeds", func() {
+		When("looking up the app guid succeeds without routes", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{Name: "some-app", GUID: "abc123"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
+				deleteMappedRoutes = false
 			})
 
 			When("sending the delete fails", func() {
@@ -102,7 +103,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		When("attempting to delete mapped routes", func() {
+		When("looking up the app guid succeeds with routes", func() {
 			BeforeEach(func() {
 				deleteMappedRoutes = true
 				fakeCloudControllerClient.GetApplicationsReturns([]resources.Application{{Name: "some-app", GUID: "abc123"}}, nil, nil)
