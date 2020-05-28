@@ -3,6 +3,7 @@ package v7action_test
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/resources"
@@ -858,7 +859,7 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetDomainsReturns(
 					[]resources.Domain{
-						{GUID: "domain-guid"},
+						{GUID: "domain-guid", Name: "domain.com"},
 					},
 					ccv3.Warnings{"get-domains-warning"},
 					nil,
@@ -898,9 +899,10 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
 					Expect(query).To(ConsistOf([]ccv3.Query{
-						{Key: "domain_guids", Values: []string{"domain-guid"}},
-						{Key: "hosts", Values: []string{"hostname"}},
-						{Key: "paths", Values: []string{"/path"}},
+						{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+						{Key: ccv3.HostsFilter, Values: []string{"hostname"}},
+						{Key: ccv3.PathsFilter, Values: []string{"/path"}},
+						{Key: ccv3.PortsFilter, Values: []string{"0"}},
 					}))
 
 					// Delete the route asynchronously
@@ -936,8 +938,10 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					query = fakeCloudControllerClient.GetRoutesArgsForCall(0)
 					Expect(query).To(ConsistOf([]ccv3.Query{
-						{Key: "domain_guids", Values: []string{"domain-guid"}},
-						{Key: "ports", Values: []string{"1026"}},
+						{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
+						{Key: ccv3.HostsFilter, Values: []string{""}},
+						{Key: ccv3.PathsFilter, Values: []string{""}},
+						{Key: ccv3.PortsFilter, Values: []string{"1026"}},
 					}))
 
 					// Delete the route asynchronously
@@ -1036,6 +1040,7 @@ var _ = Describe("Route Actions", func() {
 						DomainGUID: "domain-guid",
 						Host:       "hostname",
 						Path:       "/path",
+						Port:       0,
 					}))
 					Expect(warnings).To(ConsistOf("get-domains-warning", "get-routes-warning"))
 				})
@@ -1054,6 +1059,7 @@ var _ = Describe("Route Actions", func() {
 			executeErr error
 			warnings   Warnings
 			route      resources.Route
+			domain     resources.Domain
 		)
 
 		BeforeEach(func() {
@@ -1063,11 +1069,16 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			route, warnings, executeErr = actor.GetRouteByAttributes(domainName, domainGUID, hostname, path, port)
+			route, warnings, executeErr = actor.GetRouteByAttributes(domain, hostname, path, port)
 		})
 
 		When("dealing with HTTP routes", func() {
 			BeforeEach(func() {
+				domain = resources.Domain{
+					Name:      domainName,
+					GUID:      domainGUID,
+					Protocols: []string{"http"},
+				}
 				hostname = "hostname"
 				path = "/path"
 			})
@@ -1078,12 +1089,6 @@ var _ = Describe("Route Actions", func() {
 				})
 				It("returns and empty route, warnings, and the error", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-					Expect(actualQueries).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(errors.New("scooby")))
@@ -1106,6 +1111,7 @@ var _ = Describe("Route Actions", func() {
 						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
 						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{strconv.Itoa(0)}},
 					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -1125,12 +1131,6 @@ var _ = Describe("Route Actions", func() {
 
 				It("returns the route and the warnings", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-					Expect(actualQueries).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{
@@ -1145,6 +1145,11 @@ var _ = Describe("Route Actions", func() {
 
 		When("dealing with TCP routes", func() {
 			BeforeEach(func() {
+				domain = resources.Domain{
+					Name:      domainName,
+					GUID:      domainGUID,
+					Protocols: []string{"tcp"},
+				}
 				port = 1028
 			})
 
@@ -1155,11 +1160,6 @@ var _ = Describe("Route Actions", func() {
 
 				It("returns and empty route, warnings, and the error", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-					Expect(actualQueries).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
-					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(errors.New("scooby")))
@@ -1180,6 +1180,8 @@ var _ = Describe("Route Actions", func() {
 					Expect(actualQueries).To(ConsistOf(
 						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
 						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
+						ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
+						ccv3.Query{Key: ccv3.PathsFilter, Values: []string{""}},
 					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
@@ -1197,11 +1199,6 @@ var _ = Describe("Route Actions", func() {
 				})
 				It("returns the route and the warnings", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					actualQueries := fakeCloudControllerClient.GetRoutesArgsForCall(0)
-					Expect(actualQueries).To(ConsistOf(
-						ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-						ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
-					))
 
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{

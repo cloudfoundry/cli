@@ -41,6 +41,16 @@ var _ = Describe("RouteNotFoundError", func() {
 				})
 			})
 
+			When("the port is specified", func() {
+				It("returns an error message referencing domain and port", func() {
+					err := actionerror.RouteNotFoundError{
+						DomainName: "some-domain.com",
+						Port:       1052,
+					}
+					Expect(err.Error()).To(Equal("Route with domain 'some-domain.com' and port 1052 not found."))
+				})
+			})
+
 			When("neither host nor path is specified", func() {
 				It("returns an error message referencing domain", func() {
 					err := actionerror.RouteNotFoundError{

@@ -1,7 +1,6 @@
 package v7action
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -306,7 +305,7 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string, port int) (War
 		return allWarnings, err
 	}
 
-	route, actorWarnings, err := actor.GetRouteByAttributes(domainName, domain.GUID, hostname, path, port)
+	route, actorWarnings, err := actor.GetRouteByAttributes(domain, hostname, path, port)
 
 	allWarnings = append(allWarnings, actorWarnings...)
 
@@ -328,25 +327,19 @@ func (actor Actor) DeleteRoute(domainName, hostname, path string, port int) (War
 	return allWarnings, err
 }
 
-func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, hostname string, path string, port int) (resources.Route, Warnings, error) {
+func (actor Actor) GetRouteByAttributes(domain resources.Domain, hostname string, path string, port int) (resources.Route, Warnings, error) {
 	var (
 		routes     []resources.Route
 		ccWarnings ccv3.Warnings
 		err        error
 	)
 
-	if port != 0 {
-		routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
-			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-			ccv3.Query{Key: ccv3.PortsFilter, Values: []string{fmt.Sprintf("%d", port)}},
-		)
-	} else {
-		routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
-			ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domainGUID}},
-			ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
-			ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
-		)
-	}
+	routes, ccWarnings, err = actor.CloudControllerClient.GetRoutes(
+		ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{domain.GUID}},
+		ccv3.Query{Key: ccv3.HostsFilter, Values: []string{hostname}},
+		ccv3.Query{Key: ccv3.PathsFilter, Values: []string{path}},
+		ccv3.Query{Key: ccv3.PortsFilter, Values: []string{strconv.Itoa(port)}},
+	)
 
 	if err != nil {
 		return resources.Route{}, Warnings(ccWarnings), err
@@ -354,8 +347,8 @@ func (actor Actor) GetRouteByAttributes(domainName string, domainGUID string, ho
 
 	if len(routes) < 1 {
 		return resources.Route{}, Warnings(ccWarnings), actionerror.RouteNotFoundError{
-			DomainName: domainName,
-			DomainGUID: domainGUID,
+			DomainName: domain.Name,
+			DomainGUID: domain.GUID,
 			Host:       hostname,
 			Path:       path,
 			Port:       port,
