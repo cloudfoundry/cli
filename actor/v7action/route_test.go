@@ -852,7 +852,7 @@ var _ = Describe("Route Actions", func() {
 	Describe("DeleteRoute", func() {
 		When("deleting a route", func() {
 			var (
-				warnings Warnings
+				warnings   Warnings
 				executeErr error
 			)
 			BeforeEach(func() {
@@ -917,9 +917,9 @@ var _ = Describe("Route Actions", func() {
 
 			When("in the TCP case", func() {
 
-			BeforeEach(func() {
+				BeforeEach(func() {
 					warnings, executeErr = actor.DeleteRoute("domain.com", "", "", 1026)
-			})
+				})
 
 				It("delegates to the cloud controller client", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
