@@ -20,6 +20,8 @@ func (e RouteNotFoundError) Error() string {
 			return fmt.Sprintf("Route with host '%s' and domain '%s' not found.", e.Host, e.DomainName)
 		case e.Path != "":
 			return fmt.Sprintf("Route with domain '%s' and path '%s' not found.", e.DomainName, e.Path)
+		case e.Port != 0:
+			return fmt.Sprintf("Route with domain '%s' and port %d not found.", e.DomainName, e.Port)
 		default:
 			return fmt.Sprintf("Route with domain '%s' not found.", e.DomainName)
 		}

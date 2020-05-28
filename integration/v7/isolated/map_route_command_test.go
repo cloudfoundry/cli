@@ -178,17 +178,64 @@ var _ = Describe("map-route command", func() {
 		})
 
 		When("the route does *not* exist", func() {
-			BeforeEach(func() {
-				domainName = helpers.DefaultSharedDomain()
+			When("it is an HTTP domain", func() {
+				BeforeEach(func() {
+					domainName = helpers.DefaultSharedDomain()
+				})
+
+				It("creates the route and maps it to an app", func() {
+					session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--path", path)
+					Eventually(session).Should(Say(`Creating route %s.%s%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 
-			It("creates the route and maps it to an app", func() {
-				session := helpers.CF("map-route", appName, domainName, "--hostname", hostName, "--path", path)
-				Eventually(session).Should(Say(`Creating route %s.%s%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`OK`))
-				Eventually(session).Should(Say(`Mapping route %s.%s%s to app %s in org %s / space %s as %s\.\.\.`, hostName, domainName, path, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`OK`))
-				Eventually(session).Should(Exit(0))
+			When("it is an TCP domain", func() {
+				var (
+					domain      helpers.Domain
+					routerGroup helpers.RouterGroup
+				)
+
+				BeforeEach(func() {
+					domainName = helpers.NewDomainName()
+					domain = helpers.NewDomain("", domainName)
+					routerGroup = helpers.NewRouterGroup(
+						helpers.NewRouterGroupName(),
+						"1024-2048",
+					)
+
+					routerGroup.Create()
+					domain.CreateWithRouterGroup(routerGroup.Name)
+				})
+
+				AfterEach(func() {
+					domain.DeleteShared()
+					routerGroup.Delete()
+				})
+				When("a port is provided", func() {
+					It("creates the route and maps it to an app", func() {
+						session := helpers.CF("map-route", appName, domainName, "--port", "1052")
+						Eventually(session).Should(Say(`Creating route %s:%s for org %s / space %s as %s\.\.\.`, domainName, "1052", orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Say(`Mapping route %s:%s to app %s in org %s / space %s as %s\.\.\.`, domainName, "1052", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("a port is not provided", func() {
+					It("creates the route and maps it to an app", func() {
+						session := helpers.CF("map-route", appName, domainName)
+						Eventually(session).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Say(`Mapping route %s:[0-9]+ to app %s in org %s / space %s as %s\.\.\.`, domainName, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`OK`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 		})
 	})

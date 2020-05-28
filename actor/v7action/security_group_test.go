@@ -1222,7 +1222,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
 					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
 					Expect(args).To(Equal(resources.SecurityGroup{
-						GUID:                   "some-security-group-guid",
+						GUID: "some-security-group-guid",
 						StagingGloballyEnabled: &trueValue,
 					}))
 
@@ -1247,7 +1247,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
 					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
 					Expect(args).To(Equal(resources.SecurityGroup{
-						GUID:                   "some-security-group-guid",
+						GUID: "some-security-group-guid",
 						StagingGloballyEnabled: &falseValue,
 					}))
 
@@ -1272,7 +1272,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
 					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
 					Expect(args).To(Equal(resources.SecurityGroup{
-						GUID:                   "some-security-group-guid",
+						GUID: "some-security-group-guid",
 						RunningGloballyEnabled: &trueValue,
 					}))
 
@@ -1297,7 +1297,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateSecurityGroupCallCount()).To(Equal(1))
 					args := fakeCloudControllerClient.UpdateSecurityGroupArgsForCall(0)
 					Expect(args).To(Equal(resources.SecurityGroup{
-						GUID:                   "some-security-group-guid",
+						GUID: "some-security-group-guid",
 						RunningGloballyEnabled: &falseValue,
 					}))
 
