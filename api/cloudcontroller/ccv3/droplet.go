@@ -117,3 +117,12 @@ func (client *Client) UploadDropletBits(dropletGUID string, dropletPath string, 
 
 	return JobURL(responseLocation), warnings, err
 }
+
+func (client *Client) DownloadDroplet(dropletGUID string) ([]byte, Warnings, error) {
+	bytes, warnings, err := client.MakeRequestReceiveRaw(
+		internal.GetDropletBitsRequest,
+		internal.Params{"droplet_guid": dropletGUID},
+		"application/json",
+	)
+	return bytes, warnings, err
+}

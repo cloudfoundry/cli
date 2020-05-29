@@ -69,6 +69,7 @@ type Actor interface {
 	DeleteIsolationSegmentOrganizationByName(isolationSegmentName string, orgName string) (v7action.Warnings, error)
 	DisableFeatureFlag(flagName string) (v7action.Warnings, error)
 	DisableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
+	DownloadDropletByAppName(appName string, spaceGUID string) ([]byte, string, v7action.Warnings, error)
 	EnableFeatureFlag(flagName string) (v7action.Warnings, error)
 	EnableServiceAccess(offeringName, brokerName, orgName, planName string) (v7action.SkippedPlans, v7action.Warnings, error)
 	EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (v7action.Warnings, error)

@@ -80,6 +80,7 @@ type commandList struct {
 	DisableServiceAccess               v7.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service offering or service plan for one or all orgs"`
 	DisallowSpaceSSH                   v7.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
 	Domains                            v7.DomainsCommand                            `command:"domains" description:"List domains in the target org"`
+	DownloadDroplet                    v7.DownloadDropletCommand                    `command:"download-droplet" description:"Download an application droplet"`
 	Droplets                           v7.DropletsCommand                           `command:"droplets" description:"List droplets of an app"`
 	EnableFeatureFlag                  v7.EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Allow use of a feature"`
 	EnableOrgIsolation                 v7.EnableOrgIsolationCommand                 `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
