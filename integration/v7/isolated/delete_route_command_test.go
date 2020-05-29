@@ -27,7 +27,10 @@ var _ = Describe("delete-route command", func() {
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`cf delete-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[--port PORT\] \[-f\]\n`))
+			Eventually(session).Should(Say(`Delete an HTTP route:\n`))
+			Eventually(session).Should(Say(`cf delete-route DOMAIN \[--hostname HOSTNAME\] \[--path PATH\] \[-f\]\n`))
+			Eventually(session).Should(Say(`Delete a TCP route:\n`))
+			Eventually(session).Should(Say(`cf delete-route DOMAIN --port PORT \[-f\]\n`))
 			Eventually(session).Should(Say(`\n`))
 
 			Eventually(session).Should(Say(`EXAMPLES:`))
