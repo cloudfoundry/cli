@@ -673,6 +673,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DownloadDropletStub        func(string) ([]byte, ccv3.Warnings, error)
+	downloadDropletMutex       sync.RWMutex
+	downloadDropletArgsForCall []struct {
+		arg1 string
+	}
+	downloadDropletReturns struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
+	downloadDropletReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
 	EntitleIsolationSegmentToOrganizationsStub        func(string, []string) (resources.RelationshipList, ccv3.Warnings, error)
 	entitleIsolationSegmentToOrganizationsMutex       sync.RWMutex
 	entitleIsolationSegmentToOrganizationsArgsForCall []struct {
@@ -5269,6 +5284,72 @@ func (fake *FakeCloudControllerClient) DeleteUserReturnsOnCall(i int, result1 cc
 	}
 	fake.deleteUserReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DownloadDroplet(arg1 string) ([]byte, ccv3.Warnings, error) {
+	fake.downloadDropletMutex.Lock()
+	ret, specificReturn := fake.downloadDropletReturnsOnCall[len(fake.downloadDropletArgsForCall)]
+	fake.downloadDropletArgsForCall = append(fake.downloadDropletArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DownloadDroplet", []interface{}{arg1})
+	fake.downloadDropletMutex.Unlock()
+	if fake.DownloadDropletStub != nil {
+		return fake.DownloadDropletStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.downloadDropletReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DownloadDropletCallCount() int {
+	fake.downloadDropletMutex.RLock()
+	defer fake.downloadDropletMutex.RUnlock()
+	return len(fake.downloadDropletArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DownloadDropletCalls(stub func(string) ([]byte, ccv3.Warnings, error)) {
+	fake.downloadDropletMutex.Lock()
+	defer fake.downloadDropletMutex.Unlock()
+	fake.DownloadDropletStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DownloadDropletArgsForCall(i int) string {
+	fake.downloadDropletMutex.RLock()
+	defer fake.downloadDropletMutex.RUnlock()
+	argsForCall := fake.downloadDropletArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DownloadDropletReturns(result1 []byte, result2 ccv3.Warnings, result3 error) {
+	fake.downloadDropletMutex.Lock()
+	defer fake.downloadDropletMutex.Unlock()
+	fake.DownloadDropletStub = nil
+	fake.downloadDropletReturns = struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DownloadDropletReturnsOnCall(i int, result1 []byte, result2 ccv3.Warnings, result3 error) {
+	fake.downloadDropletMutex.Lock()
+	defer fake.downloadDropletMutex.Unlock()
+	fake.DownloadDropletStub = nil
+	if fake.downloadDropletReturnsOnCall == nil {
+		fake.downloadDropletReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.downloadDropletReturnsOnCall[i] = struct {
+		result1 []byte
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -12660,6 +12741,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteSpaceQuotaMutex.RUnlock()
 	fake.deleteUserMutex.RLock()
 	defer fake.deleteUserMutex.RUnlock()
+	fake.downloadDropletMutex.RLock()
+	defer fake.downloadDropletMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
 	fake.getAppFeatureMutex.RLock()

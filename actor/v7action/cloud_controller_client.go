@@ -56,6 +56,7 @@ type CloudControllerClient interface {
 	DeleteSpaceQuota(spaceQuotaGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteSpace(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteUser(userGUID string) (ccv3.JobURL, ccv3.Warnings, error)
+	DownloadDroplet(dropletGUID string) ([]byte, ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (resources.RelationshipList, ccv3.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (resources.Application, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (resources.Droplet, ccv3.Warnings, error)

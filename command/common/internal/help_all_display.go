@@ -19,7 +19,7 @@ var HelpCategoryList = []HelpCategory{
 			{"start", "stop", "restart", "stage-package", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
 			{"packages", "create-package"},
-			{"droplets", "set-droplet"},
+			{"droplets", "set-droplet", "download-droplet"},
 			{"events", "logs"},
 			{"env", "set-env", "unset-env"},
 			{"stacks", "stack"},

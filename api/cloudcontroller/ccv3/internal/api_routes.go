@@ -52,6 +52,7 @@ const (
 	GetDomainsRequest                                           = "GetDomains"
 	GetDropletRequest                                           = "GetDroplet"
 	GetDropletsRequest                                          = "GetDroplets"
+	GetDropletBitsRequest                                       = "GetDropletBits"
 	GetEnvironmentVariableGroupRequest                          = "GetEnvironmentVariableGroup"
 	GetEventsRequest                                            = "GetEvents"
 	GetFeatureFlagRequest                                       = "GetFeatureFlag"
@@ -205,6 +206,7 @@ var APIRoutes = []Route{
 	{Resource: DropletsResource, Path: "/", Method: http.MethodPost, Name: PostDropletRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid/upload", Method: http.MethodPost, Name: PostDropletBitsRequest},
+	{Resource: DropletsResource, Path: "/:droplet_guid/download", Method: http.MethodGet, Name: GetDropletBitsRequest},
 	{Resource: EnvironmentVariableGroupsResource, Path: "/:group_name", Method: http.MethodGet, Name: GetEnvironmentVariableGroupRequest},
 	{Resource: EnvironmentVariableGroupsResource, Path: "/:group_name", Method: http.MethodPatch, Name: PatchEnvironmentVariableGroupRequest},
 	{Resource: EventsResource, Path: "/", Method: http.MethodGet, Name: GetEventsRequest},

@@ -10,6 +10,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -418,6 +419,38 @@ var _ = Describe("Droplet", func() {
 			It("returns the http error", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			})
+		})
+	})
+
+	Describe("DownloadDroplet", func() {
+		var (
+			dropletBytes []byte
+			warnings     Warnings
+			executeErr   error
+		)
+
+		JustBeforeEach(func() {
+			dropletBytes, warnings, executeErr = client.DownloadDroplet("some-droplet-guid")
+		})
+
+		BeforeEach(func() {
+			requester.MakeRequestReceiveRawCalls(func(string, internal.Params, string) ([]byte, ccv3.Warnings, error) {
+				return []byte{'d', 'r', 'o', 'p'}, Warnings{"some-warning"}, errors.New("some-error")
+			})
+		})
+
+		It("makes the correct request", func() {
+			Expect(requester.MakeRequestReceiveRawCallCount()).To(Equal(1))
+			requestType, requestParams, responseType := requester.MakeRequestReceiveRawArgsForCall(0)
+			Expect(requestType).To(Equal(internal.GetDropletBitsRequest))
+			Expect(requestParams).To(Equal(internal.Params{"droplet_guid": "some-droplet-guid"}))
+			Expect(responseType).To(Equal("application/json"))
+		})
+
+		It("returns the given droplet and all warnings", func() {
+			Expect(dropletBytes).To(Equal([]byte{'d', 'r', 'o', 'p'}))
+			Expect(warnings).To(ConsistOf("some-warning"))
+			Expect(executeErr).To(MatchError("some-error"))
 		})
 	})
 })

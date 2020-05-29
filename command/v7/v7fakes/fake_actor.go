@@ -750,6 +750,24 @@ type FakeActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	DownloadDropletByAppNameStub        func(string, string) ([]byte, string, v7action.Warnings, error)
+	downloadDropletByAppNameMutex       sync.RWMutex
+	downloadDropletByAppNameArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	downloadDropletByAppNameReturns struct {
+		result1 []byte
+		result2 string
+		result3 v7action.Warnings
+		result4 error
+	}
+	downloadDropletByAppNameReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 string
+		result3 v7action.Warnings
+		result4 error
+	}
 	EnableFeatureFlagStub        func(string) (v7action.Warnings, error)
 	enableFeatureFlagMutex       sync.RWMutex
 	enableFeatureFlagArgsForCall []struct {
@@ -6216,6 +6234,76 @@ func (fake *FakeActor) DisableServiceAccessReturnsOnCall(i int, result1 v7action
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeActor) DownloadDropletByAppName(arg1 string, arg2 string) ([]byte, string, v7action.Warnings, error) {
+	fake.downloadDropletByAppNameMutex.Lock()
+	ret, specificReturn := fake.downloadDropletByAppNameReturnsOnCall[len(fake.downloadDropletByAppNameArgsForCall)]
+	fake.downloadDropletByAppNameArgsForCall = append(fake.downloadDropletByAppNameArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("DownloadDropletByAppName", []interface{}{arg1, arg2})
+	fake.downloadDropletByAppNameMutex.Unlock()
+	if fake.DownloadDropletByAppNameStub != nil {
+		return fake.DownloadDropletByAppNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	fakeReturns := fake.downloadDropletByAppNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3, fakeReturns.result4
+}
+
+func (fake *FakeActor) DownloadDropletByAppNameCallCount() int {
+	fake.downloadDropletByAppNameMutex.RLock()
+	defer fake.downloadDropletByAppNameMutex.RUnlock()
+	return len(fake.downloadDropletByAppNameArgsForCall)
+}
+
+func (fake *FakeActor) DownloadDropletByAppNameCalls(stub func(string, string) ([]byte, string, v7action.Warnings, error)) {
+	fake.downloadDropletByAppNameMutex.Lock()
+	defer fake.downloadDropletByAppNameMutex.Unlock()
+	fake.DownloadDropletByAppNameStub = stub
+}
+
+func (fake *FakeActor) DownloadDropletByAppNameArgsForCall(i int) (string, string) {
+	fake.downloadDropletByAppNameMutex.RLock()
+	defer fake.downloadDropletByAppNameMutex.RUnlock()
+	argsForCall := fake.downloadDropletByAppNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeActor) DownloadDropletByAppNameReturns(result1 []byte, result2 string, result3 v7action.Warnings, result4 error) {
+	fake.downloadDropletByAppNameMutex.Lock()
+	defer fake.downloadDropletByAppNameMutex.Unlock()
+	fake.DownloadDropletByAppNameStub = nil
+	fake.downloadDropletByAppNameReturns = struct {
+		result1 []byte
+		result2 string
+		result3 v7action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeActor) DownloadDropletByAppNameReturnsOnCall(i int, result1 []byte, result2 string, result3 v7action.Warnings, result4 error) {
+	fake.downloadDropletByAppNameMutex.Lock()
+	defer fake.downloadDropletByAppNameMutex.Unlock()
+	fake.DownloadDropletByAppNameStub = nil
+	if fake.downloadDropletByAppNameReturnsOnCall == nil {
+		fake.downloadDropletByAppNameReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 string
+			result3 v7action.Warnings
+			result4 error
+		})
+	}
+	fake.downloadDropletByAppNameReturnsOnCall[i] = struct {
+		result1 []byte
+		result2 string
+		result3 v7action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
 }
 
 func (fake *FakeActor) EnableFeatureFlag(arg1 string) (v7action.Warnings, error) {
@@ -16057,6 +16145,8 @@ func (fake *FakeActor) Invocations() map[string][][]interface{} {
 	defer fake.disableFeatureFlagMutex.RUnlock()
 	fake.disableServiceAccessMutex.RLock()
 	defer fake.disableServiceAccessMutex.RUnlock()
+	fake.downloadDropletByAppNameMutex.RLock()
+	defer fake.downloadDropletByAppNameMutex.RUnlock()
 	fake.enableFeatureFlagMutex.RLock()
 	defer fake.enableFeatureFlagMutex.RUnlock()
 	fake.enableServiceAccessMutex.RLock()

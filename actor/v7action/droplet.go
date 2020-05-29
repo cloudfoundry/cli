@@ -115,3 +115,31 @@ func (actor Actor) UploadDroplet(dropletGUID string, dropletPath string, progres
 
 	return allWarnings, nil
 }
+
+func (actor Actor) DownloadDropletByAppName(appName string, spaceGUID string) ([]byte, string, Warnings, error) {
+	var allWarnings Warnings
+
+	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return []byte{}, "", allWarnings, err
+	}
+
+	droplet, ccWarnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(app.GUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+
+	if err != nil {
+		if _, ok := err.(ccerror.DropletNotFoundError); ok {
+			return []byte{}, "", allWarnings, actionerror.DropletNotFoundError{}
+		}
+		return []byte{}, "", allWarnings, err
+	}
+
+	rawDropletBytes, ccWarnings, err := actor.CloudControllerClient.DownloadDroplet(droplet.GUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+	if err != nil {
+		return []byte{}, "", allWarnings, err
+	}
+
+	return rawDropletBytes, droplet.GUID, allWarnings, nil
+}
