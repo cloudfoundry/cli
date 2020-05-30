@@ -111,7 +111,7 @@ var _ = Describe("download-droplet command", func() {
 			It("downloads the droplet successfully", func() {
 				session := helpers.CF("download-droplet", appName)
 				Eventually(session).Should(Say(`Downloading current droplet for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say(`Droplet downloaded successfully at %s`, dropletPath))
+				Eventually(session).Should(helpers.SayPath(`Droplet downloaded successfully at %s`, dropletPath))
 				Eventually(session).Should(Say("OK"))
 
 				_, err := os.Stat(dropletPath)
