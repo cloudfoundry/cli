@@ -105,7 +105,6 @@ var _ = Describe("unmap-route Command", func() {
 
 		fakeActor.GetRouteDestinationByAppGUIDReturns(
 			resources.RouteDestination{GUID: "destination-guid"},
-			v7action.Warnings{"get-destination-warning"},
 			nil,
 		)
 
@@ -262,7 +261,6 @@ var _ = Describe("unmap-route Command", func() {
 		BeforeEach(func() {
 			fakeActor.GetRouteDestinationByAppGUIDReturns(
 				resources.RouteDestination{},
-				v7action.Warnings{"get-destination-warning"},
 				actionerror.RouteDestinationNotFoundError{},
 			)
 		})
@@ -274,28 +272,10 @@ var _ = Describe("unmap-route Command", func() {
 		})
 	})
 
-	When("getting the route destination fails for another reason", func() {
-		BeforeEach(func() {
-			fakeActor.GetRouteDestinationByAppGUIDReturns(
-				resources.RouteDestination{},
-				v7action.Warnings{"get-destination-warning"},
-				errors.New("failed to get destination"),
-			)
-		})
-
-		It("prints warnings and returns the error", func() {
-			Expect(executeErr).To(MatchError("failed to get destination"))
-
-			Expect(fakeActor.UnmapRouteCallCount()).To(Equal(0))
-		})
-	})
-
 	It("gets the route destination and prints the warnings", func() {
-		Expect(testUI.Err).To(Say("get-destination-warning"))
-
 		Expect(fakeActor.GetRouteDestinationByAppGUIDCallCount()).To(Equal(1))
-		givenRouteGUID, givenAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
-		Expect(givenRouteGUID).To(Equal("route-guid"))
+		givenRoute, givenAppGUID := fakeActor.GetRouteDestinationByAppGUIDArgsForCall(0)
+		Expect(givenRoute.GUID).To(Equal("route-guid"))
 		Expect(givenAppGUID).To(Equal("app-guid"))
 	})
 
@@ -313,15 +293,12 @@ var _ = Describe("unmap-route Command", func() {
 			Expect(givenRouteGUID).To(Equal("route-guid"))
 			Expect(givenDestinationGUID).To(Equal("destination-guid"))
 
-			Expect(testUI.Err).To(Say("get-destination-warning"))
-
 			Expect(executeErr).To(MatchError("failed to unmap route"))
 		})
 	})
 
 	It("prints warnings and does not return an error", func() {
 		Expect(executeErr).NotTo(HaveOccurred())
-		Expect(testUI.Err).To(Say("get-destination-warning"))
 		Expect(testUI.Out).To(Say("OK"))
 
 		Expect(fakeActor.UnmapRouteCallCount()).To(Equal(1))

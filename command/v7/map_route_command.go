@@ -76,8 +76,7 @@ func (cmd MapRouteCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 	})
-	dest, warnings, err := cmd.Actor.GetRouteDestinationByAppGUID(route.GUID, app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	dest, err := cmd.Actor.GetRouteDestinationByAppGUID(route, app.GUID)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteDestinationNotFoundError); !ok {
 			return err

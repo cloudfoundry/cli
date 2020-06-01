@@ -758,57 +758,36 @@ var _ = Describe("Route Actions", func() {
 		var (
 			routeGUID   = "route-guid"
 			appGUID     = "app-guid"
+			route       = resources.Route{GUID: routeGUID}
 			destination resources.RouteDestination
 
 			executeErr error
-			warnings   Warnings
 		)
 
 		JustBeforeEach(func() {
-			destination, warnings, executeErr = actor.GetRouteDestinationByAppGUID(routeGUID, appGUID)
-		})
-
-		When("the cloud controller client errors", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetRouteDestinationsReturns(
-					nil,
-					ccv3.Warnings{"get-destinations-warning"},
-					errors.New("get-destinations-error"),
-				)
-			})
-
-			It("returns the error and warnings", func() {
-				Expect(destination).To(Equal(resources.RouteDestination{}))
-				Expect(executeErr).To(MatchError(errors.New("get-destinations-error")))
-				Expect(warnings).To(ConsistOf("get-destinations-warning"))
-			})
+			destination, executeErr = actor.GetRouteDestinationByAppGUID(route, appGUID)
 		})
 
 		When("the cloud controller client succeeds with a matching app", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetRouteDestinationsReturns(
-					[]resources.RouteDestination{
-						{
-							GUID: "destination-guid-1",
-							App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: "worker"}},
-						},
-						{
-							GUID: "destination-guid-2",
-							App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
-						},
-						{
-							GUID: "destination-guid-3",
-							App:  resources.RouteDestinationApp{GUID: "app-guid-2", Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
-						},
+				route.Destinations = []resources.RouteDestination{
+					{
+						GUID: "destination-guid-1",
+						App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: "worker"}},
 					},
-					ccv3.Warnings{"get-destinations-warning"},
-					nil,
-				)
+					{
+						GUID: "destination-guid-2",
+						App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
+					},
+					{
+						GUID: "destination-guid-3",
+						App:  resources.RouteDestinationApp{GUID: "app-guid-2", Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
+					},
+				}
 			})
 
 			It("returns the matching destination and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("get-destinations-warning"))
 				Expect(destination).To(Equal(resources.RouteDestination{
 					GUID: "destination-guid-2",
 					App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
@@ -818,24 +797,20 @@ var _ = Describe("Route Actions", func() {
 
 		When("the cloud controller client succeeds without a matching app", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetRouteDestinationsReturns(
-					[]resources.RouteDestination{
-						{
-							GUID: "destination-guid-1",
-							App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: "worker"}},
-						},
-						{
-							GUID: "destination-guid-2",
-							App:  resources.RouteDestinationApp{GUID: "app-guid-2", Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
-						},
-						{
-							GUID: "destination-guid-3",
-							App:  resources.RouteDestinationApp{GUID: "app-guid-3", Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
-						},
+				route.Destinations = []resources.RouteDestination{
+					{
+						GUID: "destination-guid-1",
+						App:  resources.RouteDestinationApp{GUID: appGUID, Process: struct{ Type string }{Type: "worker"}},
 					},
-					ccv3.Warnings{"get-destinations-warning"},
-					nil,
-				)
+					{
+						GUID: "destination-guid-2",
+						App:  resources.RouteDestinationApp{GUID: "app-guid-2", Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
+					},
+					{
+						GUID: "destination-guid-3",
+						App:  resources.RouteDestinationApp{GUID: "app-guid-3", Process: struct{ Type string }{Type: constant.ProcessTypeWeb}},
+					},
+				}
 			})
 
 			It("returns an error and warnings", func() {
@@ -845,7 +820,6 @@ var _ = Describe("Route Actions", func() {
 					ProcessType: constant.ProcessTypeWeb,
 					RouteGUID:   routeGUID,
 				}))
-				Expect(warnings).To(ConsistOf("get-destinations-warning"))
 			})
 		})
 	})
