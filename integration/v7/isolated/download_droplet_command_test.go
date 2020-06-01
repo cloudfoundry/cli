@@ -2,7 +2,7 @@ package isolated
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
@@ -102,7 +102,7 @@ var _ = Describe("download-droplet command", func() {
 
 				dir, err := os.Getwd()
 				Expect(err).ToNot(HaveOccurred())
-				dropletPath = path.Join(dir, "droplet_"+dropletGUID+".tgz")
+				dropletPath = filepath.Join(dir, "droplet_"+dropletGUID+".tgz")
 			})
 
 			AfterEach(func() {
