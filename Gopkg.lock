@@ -24,6 +24,23 @@
   revision = "4b04f26287a67f2b08e92187fc03e7946f8f99f7"
 
 [[projects]]
+  digest = "1:81f719d050d126e10640a5080f0f9d0fe1c474c232b9194cfb65e3e1a843ad1f"
+  name = "code.cloudfoundry.org/cli"
+  packages = [
+    "actor/actionerror",
+    "api/cloudcontroller/ccerror",
+    "api/cloudcontroller/ccv2/constant",
+    "api/cloudcontroller/ccv3/constant",
+    "api/uaa",
+    "api/uaa/constant",
+    "api/uaa/internal",
+    "util",
+  ]
+  pruneopts = "NUT"
+  revision = "2acd15650eef815159ecd5a83d021ac456280729"
+  version = "v6.51.0"
+
+[[projects]]
   branch = "master"
   digest = "1:d460dfec5d2bb8a053b9145d1f56b2373a1bd0bdaedf8f12ae5bab66da97370a"
   name = "code.cloudfoundry.org/cli-plugin-repo"
@@ -274,6 +291,14 @@
   revision = "5df930a27be2502f99b292b7cc09ebad4d0891f4"
 
 [[projects]]
+  digest = "1:0914bf7efc3e3052163e92b859a89f3b407ad353d7c3b7f59a1bbb4fd05bb25d"
+  name = "github.com/fsnotify/fsnotify"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "45d7d09e39ef4ac08d493309fa031790c15bfe8a"
+  version = "v1.4.9"
+
+[[projects]]
   branch = "master"
   digest = "1:dc984388f49af46e504fb1a57adb644b9152882e88f8fc3160800b7e7dc352b2"
   name = "github.com/gogo/protobuf"
@@ -331,20 +356,6 @@
   pruneopts = "NUT"
   revision = "ece8fdf051b731392b407fdb9a9b1b9ffb6f9793"
   version = "v1.11.3"
-
-[[projects]]
-  digest = "1:41933d387bfa3eaa6a82647914ed7044f7b8355764c24fb920892bc8c03ef0c3"
-  name = "github.com/hpcloud/tail"
-  packages = [
-    ".",
-    "ratelimiter",
-    "util",
-    "watch",
-    "winfile",
-  ]
-  pruneopts = "NUT"
-  revision = "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
-  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -424,7 +435,21 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:9c88c09de47a47bbc7e7d1cad7dbe963edc6b2f27b89ac8591ea7cc60cd376d3"
+  digest = "1:17995b544cdab2ad44419d8c9f551416c63c0fdee5a8b916373188623ed77ea5"
+  name = "github.com/nxadm/tail"
+  packages = [
+    ".",
+    "ratelimiter",
+    "util",
+    "watch",
+    "winfile",
+  ]
+  pruneopts = "NUT"
+  revision = "327c577245448d8192115e77a76ea3d6aee88202"
+  version = "v1.4.4"
+
+[[projects]]
+  digest = "1:365f31076fabbc85e23ab7fabe07cf3a783d132e910dc791a39c0d14828fbc13"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -433,6 +458,7 @@
     "internal/codelocation",
     "internal/containernode",
     "internal/failer",
+    "internal/global",
     "internal/leafnodes",
     "internal/remote",
     "internal/spec",
@@ -448,8 +474,8 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "2e1be8f7d90e9d3e3e58b0ce470f2f14d075406f"
-  version = "v1.7.0"
+  revision = "9bef594084d663dc2c58c2874b5d2edf06071744"
+  version = "v1.12.3"
 
 [[projects]]
   digest = "1:95f09e7b02ad73c56c05479182dba9de59a5576e2acaff2f0b2532369fe14ea0"
@@ -699,15 +725,6 @@
   pruneopts = "NUT"
   revision = "1cc5bbe20449079337944d56292c7383510c534c"
   version = "v1.0.27"
-
-[[projects]]
-  digest = "1:1b91ae0dc69a41d4c2ed23ea5cffb721ea63f5037ca4b81e6d6771fbb8f45129"
-  name = "gopkg.in/fsnotify.v1"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
-  source = "https://github.com/fsnotify/fsnotify.git"
-  version = "v1.4.7"
 
 [[projects]]
   branch = "v1"
