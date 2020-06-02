@@ -24,7 +24,7 @@ type V7Actor interface {
 	GetDefaultDomain(orgGUID string) (resources.Domain, v7action.Warnings, error)
 	GetDomain(domainGUID string) (resources.Domain, v7action.Warnings, error)
 	GetRouteByAttributes(domain resources.Domain, hostname, path string, port int) (resources.Route, v7action.Warnings, error)
-	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (resources.RouteDestination, v7action.Warnings, error)
+	GetRouteDestinationByAppGUID(route resources.Route, appGUID string) (resources.RouteDestination, error)
 	MapRoute(routeGUID string, appGUID string) (v7action.Warnings, error)
 	PollBuild(buildGUID string, appName string) (resources.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)

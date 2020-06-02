@@ -120,7 +120,7 @@ type Actor interface {
 	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client sharedaction.LogCacheClient) ([]sharedaction.LogMessage, v7action.Warnings, error)
 	GetRevisionsByApplicationNameAndSpace(appName string, spaceGUID string) (v7action.Revisions, v7action.Warnings, error)
 	GetRouteByAttributes(domain resources.Domain, hostname string, path string, port int) (resources.Route, v7action.Warnings, error)
-	GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (resources.RouteDestination, v7action.Warnings, error)
+	GetRouteDestinationByAppGUID(route resources.Route, appGUID string) (resources.RouteDestination, error)
 	GetRouteLabels(routeName string, spaceGUID string) (map[string]types.NullString, v7action.Warnings, error)
 	GetRouterGroups() ([]v7action.RouterGroup, error)
 	GetRouteSummaries([]resources.Route) ([]v7action.RouteSummary, v7action.Warnings, error)

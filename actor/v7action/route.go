@@ -61,22 +61,17 @@ func (actor Actor) GetRouteDestinations(routeGUID string) ([]resources.RouteDest
 	return actorDestinations, Warnings(warnings), err
 }
 
-func (actor Actor) GetRouteDestinationByAppGUID(routeGUID string, appGUID string) (resources.RouteDestination, Warnings, error) {
-	allDestinations, warnings, err := actor.GetRouteDestinations(routeGUID)
-	if err != nil {
-		return resources.RouteDestination{}, warnings, err
-	}
-
-	for _, destination := range allDestinations {
+func (actor Actor) GetRouteDestinationByAppGUID(route resources.Route, appGUID string) (resources.RouteDestination, error) {
+	for _, destination := range route.Destinations {
 		if destination.App.GUID == appGUID && destination.App.Process.Type == constant.ProcessTypeWeb {
-			return destination, warnings, nil
+			return destination, nil
 		}
 	}
 
-	return resources.RouteDestination{}, warnings, actionerror.RouteDestinationNotFoundError{
+	return resources.RouteDestination{}, actionerror.RouteDestinationNotFoundError{
 		AppGUID:     appGUID,
 		ProcessType: constant.ProcessTypeWeb,
-		RouteGUID:   routeGUID,
+		RouteGUID:   route.GUID,
 	}
 }
 

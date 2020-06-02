@@ -56,8 +56,7 @@ func (cmd UnmapRouteCommand) Execute(args []string) error {
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 	})
 
-	destination, warnings, err := cmd.Actor.GetRouteDestinationByAppGUID(route.GUID, app.GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	destination, err := cmd.Actor.GetRouteDestinationByAppGUID(route, app.GUID)
 	if err != nil {
 		if _, ok := err.(actionerror.RouteDestinationNotFoundError); ok {
 			cmd.UI.DisplayText("Route to be unmapped is not currently mapped to the application.")
