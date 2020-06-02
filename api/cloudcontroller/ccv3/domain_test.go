@@ -37,6 +37,7 @@ var _ = Describe("Domain", func() {
 			domainGUID = "domain-guid"
 			hostname = ""
 			path = ""
+			port = 0
 		})
 
 		JustBeforeEach(func() {
