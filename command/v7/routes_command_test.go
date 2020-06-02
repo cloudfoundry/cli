@@ -29,7 +29,7 @@ var _ = Describe("routes Command", func() {
 		binaryName      string
 	)
 
-	const tableHeaders = `space\s+host\s+domain\s+path\s+apps`
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+apps`
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
@@ -148,6 +148,12 @@ var _ = Describe("routes Command", func() {
 							Route:      resources.Route{GUID: "route-guid-3", Host: "host-1"},
 							AppNames:   []string{"app1", "app2"},
 						},
+						{
+							DomainName: "tcp.domain",
+							SpaceName:  "space-3",
+							Route:      resources.Route{GUID: "route-guid-3", Port: 1024},
+							AppNames:   []string{"app1", "app2"},
+						},
 					}
 
 					fakeActor.GetRouteSummariesReturns(
@@ -167,6 +173,7 @@ var _ = Describe("routes Command", func() {
 					Expect(testUI.Out).To(Say(`space-1\s+domain1\s+`))
 					Expect(testUI.Out).To(Say(`space-2\s+host-3\s+domain2\s+\/path\/2`))
 					Expect(testUI.Out).To(Say(`space-3\s+host-1\s+domain3\s+app1, app2`))
+					Expect(testUI.Out).To(Say(`space-3\s+tcp\.domain\s+1024\s+app1, app2`))
 				})
 			})
 

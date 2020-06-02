@@ -106,7 +106,7 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+path\s+apps`))
+				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+apps`))
 				Expect(session).To(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
 				Expect(session).To(Say(`%s\s+route1a\s+%s\s+%s`, spaceName, domainName, appName1))
 				Expect(session).To(Say(`%s\s+route1b\s+%s\s+%s`, spaceName, domainName, appName1))
@@ -117,7 +117,7 @@ var _ = Describe("routes command", func() {
 				session := helpers.CF("routes", "--labels", "env in (prod)")
 				Eventually(session).Should(Exit(0))
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+path\s+apps`))
+				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+apps`))
 				Expect(session).ToNot(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
 				Expect(session).ToNot(Say(`%s\s+route1a\s+%s\s+%s`, spaceName, domainName, appName1))
 				Expect(session).To(Say(`%s\s+route1b\s+%s\s+%s`, spaceName, domainName, appName1))
@@ -128,7 +128,7 @@ var _ = Describe("routes command", func() {
 				It("lists all the routes in the org", func() {
 					session := helpers.CF("routes", "--org-level")
 					Eventually(session).Should(Say(`Getting routes for org %s as %s\.\.\.`, orgName, userName))
-					Eventually(session).Should(Say(`space\s+host\s+domain\s+path\s+apps`))
+					Eventually(session).Should(Say(`space\s+host\s+domain\s+port\s+path\s+apps`))
 
 					Eventually(session).Should(Say(`%s\s+route1\s+%s\s+%s`, spaceName, domainName, appName1))
 					Eventually(session).Should(Say(`%s\s+route2\s+%s\s+\/dodo\s+%s`, otherSpaceName, domainName, appName2))
@@ -169,9 +169,8 @@ var _ = Describe("routes command", func() {
 				Eventually(session).Should(Exit(0))
 
 				Expect(session).To(Say(`Getting routes for org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
-				Expect(session).To(Say(`space\s+host\s+domain\s+path\s+apps`))
-				Expect(session).To(Say(`%s\s+%s[^:]`, spaceName, domainName))
-				Expect(session).NotTo(Say(":1028"))
+				Expect(session).To(Say(`space\s+host\s+domain\s+port\s+path\s+apps`))
+				Expect(session).To(Say(`%s\s+%s[^:]\s+%d`, spaceName, domainName, 1028))
 			})
 		})
 
