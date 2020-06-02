@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"strconv"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -78,16 +79,22 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			cmd.UI.TranslateText("space"),
 			cmd.UI.TranslateText("host"),
 			cmd.UI.TranslateText("domain"),
+			cmd.UI.TranslateText("port"),
 			cmd.UI.TranslateText("path"),
 			cmd.UI.TranslateText("apps"),
 		},
 	}
 
 	for _, routeSummary := range routeSummaries {
+		port := ""
+		if routeSummary.Port != 0 {
+			port = strconv.Itoa(routeSummary.Port)
+		}
 		routesTable = append(routesTable, []string{
 			routeSummary.SpaceName,
 			routeSummary.Host,
 			routeSummary.DomainName,
+			port,
 			routeSummary.Path,
 			strings.Join(routeSummary.AppNames, ", "),
 		})
