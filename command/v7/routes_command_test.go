@@ -29,7 +29,7 @@ var _ = Describe("routes Command", func() {
 		binaryName      string
 	)
 
-	const tableHeaders = `space\s+host\s+domain\s+path\s+port\s+protocol\s+apps`
+	const tableHeaders = `space\s+host\s+domain\s+port\s+path\s+protocol\s+apps`
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
