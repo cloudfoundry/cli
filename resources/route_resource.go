@@ -24,6 +24,7 @@ type Route struct {
 	DomainGUID   string
 	Host         string
 	Path         string
+	Protocol     string
 	Port         int
 	URL          string
 	Destinations []RouteDestination
@@ -49,15 +50,17 @@ func (r Route) MarshalJSON() ([]byte, error) {
 		GUID          string         `json:"guid,omitempty"`
 		Host          string         `json:"host,omitempty"`
 		Path          string         `json:"path,omitempty"`
+		Protocol      string         `json:"protocol,omitempty"`
 		Port          int            `json:"port,omitempty"`
 		Relationships *Relationships `json:"relationships,omitempty"`
 	}
 
 	ccR := ccRoute{
-		GUID: r.GUID,
-		Host: r.Host,
-		Path: r.Path,
-		Port: r.Port,
+		GUID:     r.GUID,
+		Host:     r.Host,
+		Path:     r.Path,
+		Protocol: r.Protocol,
+		Port:     r.Port,
 	}
 
 	if r.SpaceGUID != "" {
@@ -73,6 +76,7 @@ func (r Route) MarshalJSON() ([]byte, error) {
 func (r *Route) UnmarshalJSON(data []byte) error {
 	var alias struct {
 		GUID         string             `json:"guid,omitempty"`
+		Protocol     string             `json:"protocol,omitempty"`
 		Host         string             `json:"host,omitempty"`
 		Path         string             `json:"path,omitempty"`
 		Port         int                `json:"port,omitempty"`
@@ -100,6 +104,7 @@ func (r *Route) UnmarshalJSON(data []byte) error {
 	}
 
 	r.GUID = alias.GUID
+	r.Protocol = alias.Protocol
 	r.Host = alias.Host
 	r.SpaceGUID = alias.Relationships.Space.Data.GUID
 	r.DomainGUID = alias.Relationships.Domain.Data.GUID
