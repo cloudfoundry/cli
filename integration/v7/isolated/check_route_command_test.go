@@ -114,10 +114,17 @@ var _ = Describe("check-route command", func() {
 				})
 
 				When("it's a TCP route", func() {
+					var (
+						routerGroup helpers.RouterGroup
+					)
+
 					BeforeEach(func() {
-						routerGroupName := helpers.FindOrCreateTCPRouterGroup(4)
+						routerGroup = helpers.NewRouterGroup(helpers.NewRouterGroupName(), "1024-2048")
+						routerGroup.Create()
+
 						tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("TCP-DOMAIN"))
-						tcpDomain.CreateWithRouterGroup(routerGroupName)
+						tcpDomain.CreateWithRouterGroup(routerGroup.Name)
+
 						port = 1024
 
 						Eventually(helpers.CF("create-route", tcpDomain.Name, "--port", fmt.Sprintf("%d", port))).Should(Exit(0))
@@ -125,6 +132,7 @@ var _ = Describe("check-route command", func() {
 
 					AfterEach(func() {
 						tcpDomain.DeleteShared()
+						routerGroup.Delete()
 					})
 
 					It("tells the user the route exists and exits without failing", func() {
