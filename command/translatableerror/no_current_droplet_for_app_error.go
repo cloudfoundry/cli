@@ -2,7 +2,7 @@ package translatableerror
 
 // NoDropletForAppError will default to current droplet if no droplet GUID is provided
 type NoDropletForAppError struct {
-	AppName string
+	AppName     string
 	DropletGUID string
 }
 
@@ -15,7 +15,7 @@ func (e NoDropletForAppError) Error() string {
 
 func (e NoDropletForAppError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"AppName": e.AppName,
+		"AppName":     e.AppName,
 		"DropletGUID": e.DropletGUID,
 	})
 }

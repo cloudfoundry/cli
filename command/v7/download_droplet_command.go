@@ -37,17 +37,17 @@ func (cmd DownloadDropletCommand) Execute(args []string) error {
 
 	var (
 		rawDropletBytes []byte
-		dropletGUID string
-		warnings v7action.Warnings
+		dropletGUID     string
+		warnings        v7action.Warnings
 	)
 	if cmd.Droplet != "" {
 		dropletGUID = cmd.Droplet
 		cmd.UI.DisplayTextWithFlavor("Downloading droplet {{.DropletGUID}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"DropletGUID": dropletGUID,
-			"AppName":   cmd.RequiredArgs.AppName,
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"Username":  user.Name,
+			"AppName":     cmd.RequiredArgs.AppName,
+			"OrgName":     cmd.Config.TargetedOrganization().Name,
+			"SpaceName":   cmd.Config.TargetedSpace().Name,
+			"Username":    user.Name,
 		})
 
 		rawDropletBytes, warnings, err = cmd.Actor.DownloadDropletByGUIDAndAppName(dropletGUID, cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
