@@ -116,7 +116,7 @@ func (actor Actor) UploadDroplet(dropletGUID string, dropletPath string, progres
 	return allWarnings, nil
 }
 
-func (actor Actor) DownloadDropletByAppName(appName string, spaceGUID string) ([]byte, string, Warnings, error) {
+func (actor Actor) DownloadCurrentDropletByAppName(appName string, spaceGUID string) ([]byte, string, Warnings, error) {
 	var allWarnings Warnings
 
 	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
@@ -142,4 +142,35 @@ func (actor Actor) DownloadDropletByAppName(appName string, spaceGUID string) ([
 	}
 
 	return rawDropletBytes, droplet.GUID, allWarnings, nil
+}
+
+func (actor Actor) DownloadDropletByGUIDAndAppName(dropletGUID string, appName string, spaceGUID string) ([]byte, Warnings, error) {
+	var allWarnings Warnings
+
+	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return []byte{}, allWarnings, err
+	}
+
+	droplets, getDropletWarnings, err := actor.CloudControllerClient.GetDroplets(
+		ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{dropletGUID}},
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+	)
+	allWarnings = append(allWarnings, getDropletWarnings...)
+	if err != nil {
+		return []byte{}, allWarnings, err
+	}
+
+	if len(droplets) == 0 {
+		return []byte{}, allWarnings, actionerror.DropletNotFoundError{}
+	}
+
+	rawDropletBytes, ccWarnings, err := actor.CloudControllerClient.DownloadDroplet(dropletGUID)
+	allWarnings = append(allWarnings, ccWarnings...)
+	if err != nil {
+		return []byte{}, allWarnings, err
+	}
+
+	return rawDropletBytes, allWarnings, nil
 }

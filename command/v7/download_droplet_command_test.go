@@ -85,7 +85,7 @@ var _ = Describe("download-droplet Command", func() {
 		var pathToDropletFile string
 
 		BeforeEach(func() {
-			fakeActor.DownloadDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
 
 			pathToDropletFile = filepath.Join("droplet_some-droplet-guid.tgz")
 		})
@@ -97,8 +97,8 @@ var _ = Describe("download-droplet Command", func() {
 		It("creates a droplet tarball in the current directory", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(fakeActor.DownloadDropletByAppNameCallCount()).To(Equal(1))
-			appArg, spaceGUIDArg := fakeActor.DownloadDropletByAppNameArgsForCall(0)
+			Expect(fakeActor.DownloadCurrentDropletByAppNameCallCount()).To(Equal(1))
+			appArg, spaceGUIDArg := fakeActor.DownloadCurrentDropletByAppNameArgsForCall(0)
 			Expect(appArg).To(Equal("some-app"))
 			Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
@@ -116,12 +116,49 @@ var _ = Describe("download-droplet Command", func() {
 		})
 	})
 
-	When("there is an error downloading the droplet", func() {
+	When("the path is passed in", func() {
+		var pathToDropletFile string
+
 		BeforeEach(func() {
-			fakeActor.DownloadDropletByAppNameReturns([]byte{}, "", v7action.Warnings{"some-warning"}, errors.New("something went wrong"))
+			cmd.Droplet = "some-droplet-guid"
+			fakeActor.DownloadDropletByGUIDAndAppNameReturns([]byte("some-droplet"), v7action.Warnings{"some-warning"}, nil)
+
+			pathToDropletFile = filepath.Join("droplet_some-droplet-guid.tgz")
 		})
 
-		It("displays warnings and returns a 'NoCurrentDropletForAppError'", func() {
+		AfterEach(func() {
+			Expect(os.Remove("droplet_some-droplet-guid.tgz")).ToNot(HaveOccurred())
+		})
+
+		It("creates a droplet tarball in the current directory", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(fakeActor.DownloadDropletByGUIDAndAppNameCallCount()).To(Equal(1))
+			dropletGUIDArg, appArg, spaceGUIDArg := fakeActor.DownloadDropletByGUIDAndAppNameArgsForCall(0)
+			Expect(dropletGUIDArg).To(Equal("some-droplet-guid"))
+			Expect(appArg).To(Equal("some-app"))
+			Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+			fileContents, err := ioutil.ReadFile(pathToDropletFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(fileContents)).To(Equal("some-droplet"))
+		})
+
+		It("displays the file it created and returns no errors", func() {
+			Expect(testUI.Out).To(Say("Downloading droplet some-droplet-guid for app some-app in org some-org / space some-space as some-user..."))
+			Expect(testUI.Err).To(Say("some-warning"))
+			Expect(testUI.Out).To(Say(`Droplet downloaded successfully at .*droplet_some-droplet-guid.tgz`))
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(executeErr).ToNot(HaveOccurred())
+		})
+	})
+
+	When("there is an error downloading the droplet", func() {
+		BeforeEach(func() {
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte{}, "", v7action.Warnings{"some-warning"}, errors.New("something went wrong"))
+		})
+
+		It("displays warnings and returns an error", func() {
 			Expect(testUI.Err).To(Say("some-warning"))
 			Expect(executeErr).To(MatchError("something went wrong"))
 		})
@@ -129,19 +166,19 @@ var _ = Describe("download-droplet Command", func() {
 
 	When("the app does not have a current droplet", func() {
 		BeforeEach(func() {
-			fakeActor.DownloadDropletByAppNameReturns([]byte{}, "", v7action.Warnings{"some-warning"}, actionerror.DropletNotFoundError{})
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte{}, "", v7action.Warnings{"some-warning"}, actionerror.DropletNotFoundError{})
 		})
 
-		It("displays warnings and returns a 'NoCurrentDropletForAppError'", func() {
+		It("displays warnings and returns an error", func() {
 			Expect(testUI.Err).To(Say("some-warning"))
-			Expect(executeErr).To(MatchError(translatableerror.NoCurrentDropletForAppError{AppName: "some-app"}))
+			Expect(executeErr).To(MatchError(translatableerror.NoDropletForAppError{AppName: "some-app"}))
 		})
 	})
 
 	When("writing the droplet file fails", func() {
 		BeforeEach(func() {
 			cmd.CWD = filepath.Join("should", "be", "unwritable")
-			fakeActor.DownloadDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
+			fakeActor.DownloadCurrentDropletByAppNameReturns([]byte("some-droplet"), "some-droplet-guid", v7action.Warnings{"some-warning"}, nil)
 		})
 
 		It("returns a 'DropletFileError' error", func() {

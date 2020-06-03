@@ -27,7 +27,9 @@ var _ = Describe("download-droplet command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("download-droplet - Download an application droplet"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf download-droplet APP_NAME"))
+			Eventually(session).Should(Say("cf download-droplet APP_NAME [--droplet DROPLET_GUID]"))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say(`--droplet\s+The guid of the droplet to download \(default: app's current droplet\).`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("apps, droplets, push, set-droplet"))
 		}
@@ -145,6 +147,60 @@ var _ = Describe("download-droplet command", func() {
 				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the droplet flag is passed", func() {
+			var (
+				dropletPath string
+				dropletGUID string
+			)
+
+			BeforeEach(func() {
+				helpers.CreateApp(appName)
+
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+				})
+				dropletSession := helpers.CF("droplets", appName)
+				Eventually(dropletSession).Should(Exit(0))
+				regex := regexp.MustCompile(`(.+)\s+\(current\)`)
+				matches := regex.FindStringSubmatch(string(dropletSession.Out.Contents()))
+				Expect(matches).To(HaveLen(2))
+				dropletGUID = matches[1]
+
+				dir, err := os.Getwd()
+				Expect(err).ToNot(HaveOccurred())
+				dropletPath = filepath.Join(dir, "droplet_"+dropletGUID+".tgz")
+
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+				})
+			})
+
+			AfterEach(func() {
+				os.RemoveAll(dropletPath)
+			})
+
+			It("downloads the droplet successfully", func() {
+				session := helpers.CF("download-droplet", appName, "--droplet", dropletGUID)
+				Eventually(session).Should(Say(`Downloading droplet %s for app %s in org %s / space %s as %s\.\.\.`, dropletGUID, appName, orgName, spaceName, userName))
+				Eventually(session).Should(helpers.SayPath(`Droplet downloaded successfully at %s`, dropletPath))
+				Eventually(session).Should(Say("OK"))
+
+				_, err := os.Stat(dropletPath)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			When("the app does not contain a droplet with the given guid", func() {
+				It("downloads the droplet successfully", func() {
+					session := helpers.CF("download-droplet", appName, "--droplet", "bogus")
+					Eventually(session).Should(Say(`Downloading droplet bogus for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session.Err).Should(Say("Droplet 'bogus' not found for app '%s'", appName))
+					Eventually(session).Should(Say("FAILED"))
+
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})
