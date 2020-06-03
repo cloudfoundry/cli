@@ -81,6 +81,7 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			cmd.UI.TranslateText("domain"),
 			cmd.UI.TranslateText("port"),
 			cmd.UI.TranslateText("path"),
+			cmd.UI.TranslateText("protocol"),
 			cmd.UI.TranslateText("apps"),
 		},
 	}
@@ -96,6 +97,7 @@ func (cmd RoutesCommand) displayRoutesTable(routeSummaries []v7action.RouteSumma
 			routeSummary.DomainName,
 			port,
 			routeSummary.Path,
+			routeSummary.Protocol,
 			strings.Join(routeSummary.AppNames, ", "),
 		})
 	}
