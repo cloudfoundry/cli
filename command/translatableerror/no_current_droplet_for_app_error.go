@@ -1,16 +1,21 @@
 package translatableerror
 
-// NoCurrentDropletForAppError is returned when there is no current droplet for an app
-type NoCurrentDropletForAppError struct {
+// NoDropletForAppError will default to current droplet if no droplet GUID is provided
+type NoDropletForAppError struct {
 	AppName string
+	DropletGUID string
 }
 
-func (NoCurrentDropletForAppError) Error() string {
+func (e NoDropletForAppError) Error() string {
+	if e.DropletGUID != "" {
+		return "Droplet '{{.DropletGUID}}' not found for app '{{.AppName}}'"
+	}
 	return "App '{{.AppName}}' does not have a current droplet."
 }
 
-func (e NoCurrentDropletForAppError) Translate(translate func(string, ...interface{}) string) string {
+func (e NoDropletForAppError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"AppName": e.AppName,
+		"DropletGUID": e.DropletGUID,
 	})
 }
