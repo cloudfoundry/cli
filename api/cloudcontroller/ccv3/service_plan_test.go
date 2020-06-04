@@ -46,6 +46,7 @@ var _ = Describe("Service Plan", func() {
 								"guid": "service-plan-1-guid",
 								"name": "service-plan-1-name",
 								"description": "service-plan-1-description",
+                                "available": true,
 								"free": true,
 								"visibility_type": "public",
 								"relationships": {
@@ -59,6 +60,7 @@ var _ = Describe("Service Plan", func() {
 							{
 								"guid": "service-plan-2-guid",
 								"name": "service-plan-2-name",
+								"available": false,
 								"visibility_type": "admin",
 								"description": "service-plan-2-description",
 								"free": false,
@@ -87,6 +89,7 @@ var _ = Describe("Service Plan", func() {
 								"name": "service-plan-3-name",
 								"visibility_type": "organization",
 								"description": "service-plan-3-description",
+                                "available": true,
 								"free": true,
 								"relationships": {
 									"service_offering": {
@@ -134,6 +137,7 @@ var _ = Describe("Service Plan", func() {
 						GUID:                "service-plan-1-guid",
 						Name:                "service-plan-1-name",
 						Description:         "service-plan-1-description",
+						Available:           true,
 						Free:                true,
 						VisibilityType:      "public",
 						ServiceOfferingGUID: "79d428b9-75b4-44db-addf-19c85c7f0f1e",
@@ -142,6 +146,7 @@ var _ = Describe("Service Plan", func() {
 						GUID:                "service-plan-2-guid",
 						Name:                "service-plan-2-name",
 						Description:         "service-plan-2-description",
+						Available:           false,
 						Free:                false,
 						VisibilityType:      "admin",
 						ServiceOfferingGUID: "69d428b9-75b4-44db-addf-19c85c7f0f1e",
@@ -150,6 +155,7 @@ var _ = Describe("Service Plan", func() {
 						GUID:                "service-plan-3-guid",
 						Name:                "service-plan-3-name",
 						Description:         "service-plan-3-description",
+						Available:           true,
 						Free:                true,
 						VisibilityType:      "organization",
 						ServiceOfferingGUID: "59d428b9-75b4-44db-addf-19c85c7f0f1e",
@@ -437,6 +443,7 @@ var _ = Describe("Service Plan", func() {
 								"guid": "service-plan-1-guid",
 								"name": "service-plan-1-name",
 								"description": "service-plan-1-description",
+								"available": true,
 								"free": true,
 								"relationships": {
 									"service_offering": {
@@ -450,6 +457,7 @@ var _ = Describe("Service Plan", func() {
 								"guid": "service-plan-2-guid",
 								"name": "service-plan-2-name",
 								"description": "service-plan-2-description",
+								"available": false,
 								"free": false,
 								"costs": [
 									{
@@ -538,6 +546,7 @@ var _ = Describe("Service Plan", func() {
 								"guid": "service-plan-3-guid",
 								"name": "service-plan-3-name",
 								"description": "service-plan-3-description",
+								"available": true,
 								"free": true,
 								"relationships": {
 									"service_offering": {
@@ -609,6 +618,7 @@ var _ = Describe("Service Plan", func() {
 								GUID:                "service-plan-1-guid",
 								Name:                "service-plan-1-name",
 								Description:         "service-plan-1-description",
+								Available:           true,
 								Free:                true,
 								ServiceOfferingGUID: "79d428b9-75b4-44db-addf-19c85c7f0f1e",
 							},
@@ -616,6 +626,7 @@ var _ = Describe("Service Plan", func() {
 								GUID:                "service-plan-3-guid",
 								Name:                "service-plan-3-name",
 								Description:         "service-plan-3-description",
+								Available:           true,
 								Free:                true,
 								ServiceOfferingGUID: "79d428b9-75b4-44db-addf-19c85c7f0f1e",
 							},
@@ -630,6 +641,7 @@ var _ = Describe("Service Plan", func() {
 							{
 								GUID:        "service-plan-2-guid",
 								Name:        "service-plan-2-name",
+								Available:   false,
 								Description: "service-plan-2-description",
 								Free:        false,
 								Costs: []Cost{

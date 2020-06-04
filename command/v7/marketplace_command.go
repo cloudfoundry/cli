@@ -119,9 +119,9 @@ func (cmd MarketplaceCommand) displayMessage(username string) {
 
 func (cmd MarketplaceCommand) displayPlansTable(offerings []v7action.ServiceOfferingWithPlans) error {
 	for _, o := range offerings {
-		data := [][]string{{"plan", "description", "free or paid", "costs"}}
+		data := [][]string{{"plan", "description", "free or paid", "costs", "available"}}
 		for _, p := range o.Plans {
-			data = append(data, []string{p.Name, p.Description, freeOrPaid(p.Free), costsList(p.Costs)})
+			data = append(data, []string{p.Name, p.Description, freeOrPaid(p.Free), costsList(p.Costs), available(p.Available)})
 		}
 
 		cmd.UI.DisplayNewline()
@@ -179,6 +179,13 @@ func freeOrPaid(free bool) string {
 		return "free"
 	}
 	return "paid"
+}
+
+func available(available bool) string {
+	if available {
+		return "yes"
+	}
+	return "no"
 }
 
 func costsList(costs []ccv3.Cost) string {

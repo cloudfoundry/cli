@@ -15,6 +15,8 @@ type ServicePlan struct {
 	Name string `json:"name"`
 	// Description of the Service Plan.
 	Description string `json:"description"`
+	// Whether the Service Plan is available
+	Available bool `json:"available"`
 	// VisibilityType can be "public", "admin", "organization" or "space"
 	VisibilityType VisibilityType `json:"visibility_type"`
 	// Free shows whether or not the Service Plan is free of charge.
