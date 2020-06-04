@@ -41,7 +41,7 @@ var _ = Describe("check-route command", func() {
 
 			Eventually(session).Should(Say(`OPTIONS:`))
 			Eventually(session).Should(Say(`--hostname, -n\s+Hostname used to identify the HTTP route`))
-			Eventually(session).Should(Say(`--path\s+Path for the route`))
+			Eventually(session).Should(Say(`--path\s+Path used to identify the HTTP route`))
 			Eventually(session).Should(Say(`--port\s+Port used to identify the TCP route`))
 			Eventually(session).Should(Say(`\n`))
 
