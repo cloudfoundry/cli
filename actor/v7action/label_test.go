@@ -321,7 +321,6 @@ var _ = Describe("labels", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
 					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/my-route/path"}},
-					ccv3.Query{Key: ccv3.PortsFilter, Values: []string{""}},
 				))
 			})
 
@@ -932,7 +931,6 @@ var _ = Describe("labels", func() {
 					ccv3.Query{Key: ccv3.DomainGUIDFilter, Values: []string{"domain-guid"}},
 					ccv3.Query{Key: ccv3.HostsFilter, Values: []string{""}},
 					ccv3.Query{Key: ccv3.PathsFilter, Values: []string{"/my-route/path"}},
-					ccv3.Query{Key: ccv3.PortsFilter, Values: []string{""}},
 				))
 			})
 
