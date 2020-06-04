@@ -449,6 +449,7 @@ var _ = Describe("marketplace command", func() {
 									GUID:        "plan-guid-1",
 									Name:        "plan-1",
 									Description: "best available plan",
+									Available:   true,
 									Free:        true,
 								},
 							},
@@ -463,6 +464,7 @@ var _ = Describe("marketplace command", func() {
 									GUID:        "plan-guid-2",
 									Name:        "plan-2",
 									Description: "just another plan",
+									Available:   true,
 									Free:        false,
 									Costs: []ccv3.Cost{
 										{
@@ -478,14 +480,16 @@ var _ = Describe("marketplace command", func() {
 									},
 								},
 								{
-									GUID: "plan-guid-3",
-									Name: "plan-3",
-									Free: true,
+									GUID:      "plan-guid-3",
+									Name:      "plan-3",
+									Free:      true,
+									Available: false,
 								},
 								{
-									GUID: "plan-guid-4",
-									Name: "plan-4",
-									Free: false,
+									GUID:      "plan-guid-4",
+									Name:      "plan-4",
+									Free:      false,
+									Available: true,
 								},
 							},
 						},
@@ -500,14 +504,14 @@ var _ = Describe("marketplace command", func() {
 
 				Expect(testUI.Out).To(Say(`\n\n`))
 				Expect(testUI.Out).To(Say(`broker: service-broker-1`))
-				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+cost`))
-				Expect(testUI.Out).To(Say(`plan-1\s+best available plan\s+free`))
+				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+costs\s+available`))
+				Expect(testUI.Out).To(Say(`plan-1\s+best available plan\s+free\s+yes`))
 				Expect(testUI.Out).To(Say(`\n\n`))
 				Expect(testUI.Out).To(Say(`broker: service-broker-2`))
-				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+cost`))
-				Expect(testUI.Out).To(Say(`plan-2\s+just another plan\s+paid\s+USD 100.00/Monthly, USD 1.00/1GB of messages over 20GB`))
-				Expect(testUI.Out).To(Say(`plan-3\s+free`))
-				Expect(testUI.Out).To(Say(`plan-4\s+paid`))
+				Expect(testUI.Out).To(Say(`plan\s+description\s+free or paid\s+costs\s+available`))
+				Expect(testUI.Out).To(Say(`plan-2\s+just another plan\s+paid\s+USD 100.00/Monthly, USD 1.00/1GB of messages over 20GB\s+yes`))
+				Expect(testUI.Out).To(Say(`plan-3\s+free\s+no`))
+				Expect(testUI.Out).To(Say(`plan-4\s+paid\s+yes`))
 
 				Expect(testUI.Err).To(Say("warning 1"))
 				Expect(testUI.Err).To(Say("warning 2"))
