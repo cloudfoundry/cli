@@ -129,7 +129,7 @@ var _ = Describe("update-service-broker command", func() {
 
 				Eventually(session.Err).Should(SatisfyAll(
 					Say("Job (.*) failed"),
-					Say("The service broker returned an invalid response for the request "),
+					Say("The service broker returned an invalid response"),
 					Say("Status Code: 500 Internal Server Error"),
 				))
 
